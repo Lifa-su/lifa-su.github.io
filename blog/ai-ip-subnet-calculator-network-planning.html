@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI IP Subnet Calculator — Network Planning Made Simple | Lifa AI Tools Blog</title>
+<meta name="description" content="Calculate IP subnets, CIDR ranges, subnet masks, and network addresses instantly. Free AI subnet calculator for developers and network engineers.">
+<meta property="og:title" content="AI IP Subnet Calculator — Network Planning Made Simple">
+<meta property="og:description" content="Calculate IP subnets, CIDR ranges, subnet masks, and network addresses instantly. Free AI subnet calculator for developers and network engineers.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="ip subnet calculator, cidr calculator, subnet mask calculator, network address calculator, ip range calculator, vlsm calculator, ipv4 subnet, ipv6 subnet, network planning tool, cidr to ip range">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-ip-subnet-calculator-network-planning.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}
+a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}
+nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}
+nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}
+nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}
+.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}
+.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}
+.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}
+.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}
+.article p{margin-bottom:16px;color:var(--text);font-size:1rem}
+.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}
+.article blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:20px 0;background:rgba(108,92,231,0.08);border-radius:0 8px 8px 0}
+.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}
+.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}
+.article pre code{background:none;padding:0}
+.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}
+.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}
+.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}
+footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}
+@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav>
+<a class="logo" href="https://lifa-su.github.io/">⚡ Lifa AI Tools</a>
+<div class="links">
+<a href="https://lifa-su.github.io/">Home</a>
+<a href="https://lifa-su.github.io/blog/">Blog</a>
+<a href="https://lifa-su.github.io/about.html">About</a>
+</div>
+</nav>
+<article class="article">
+<h1>AI IP Subnet Calculator &mdash; Network Planning Made Simple</h1>
+<div class="meta">Published February 23, 2026 &middot; 8 min read &middot; Developer Tools</div>
+
+<p>You are setting up a new VPC in AWS and need to divide a /16 network into subnets for production, staging, and development. Or you are configuring firewall rules and need to know exactly which IP addresses fall within a /24 block. Or a colleague asks if 10.0.3.47 is in the 10.0.2.0/23 subnet and you are not sure. These are everyday networking questions, and an <strong>IP subnet calculator</strong> answers them instantly.</p>
+
+<p>Subnetting is one of those topics that every developer and sysadmin needs to understand but few enjoy calculating by hand. Converting between CIDR notation, subnet masks, wildcard masks, and address ranges involves binary math that is easy to get wrong. A good subnet calculator eliminates the mental arithmetic and lets you focus on network design decisions instead of bit manipulation.</p>
+
+<h2>IP Subnetting Fundamentals</h2>
+
+<h3>What Is a Subnet?</h3>
+
+<p>A subnet (subnetwork) is a logical division of an IP network. Every IP address has two parts: the network portion and the host portion. The subnet mask determines where the boundary falls. In the address <code>192.168.1.100/24</code>, the first 24 bits identify the network (192.168.1.0) and the remaining 8 bits identify the host (.100). This gives you 256 addresses in the subnet, of which 254 are usable for hosts (the first is the network address, the last is the broadcast address).</p>
+
+<h3>CIDR Notation</h3>
+
+<p>Classless Inter-Domain Routing (CIDR) notation uses a slash followed by the number of network bits. A /24 means 24 bits for the network, leaving 8 bits for hosts (256 addresses). A /16 means 16 network bits and 16 host bits (65,536 addresses). The smaller the CIDR number, the larger the network:</p>
+
+<ul>
+<li><strong>/32</strong> &mdash; single host (1 address)</li>
+<li><strong>/24</strong> &mdash; 256 addresses (254 usable)</li>
+<li><strong>/16</strong> &mdash; 65,536 addresses (65,534 usable)</li>
+<li><strong>/8</strong> &mdash; 16,777,216 addresses</li>
+</ul>
+
+<h3>Subnet Masks vs. CIDR</h3>
+
+<p>Subnet masks express the same information as CIDR notation but in dotted decimal format. A /24 equals 255.255.255.0. A /16 equals 255.255.0.0. The mask is a sequence of 1-bits (network portion) followed by 0-bits (host portion). While CIDR is more concise, many network devices and configuration files still use subnet masks, so you need to convert between them fluently.</p>
+
+<h2>Common Subnetting Scenarios</h2>
+
+<h3>Cloud VPC Design</h3>
+
+<p>When creating a VPC in AWS, Azure, or GCP, you typically start with a large block like 10.0.0.0/16 and divide it into smaller subnets. A common pattern:</p>
+
+<pre><code>VPC: 10.0.0.0/16 (65,536 addresses)
+
+Public subnets (internet-facing):
+  10.0.1.0/24  (AZ-a, 254 hosts)
+  10.0.2.0/24  (AZ-b, 254 hosts)
+
+Private subnets (application tier):
+  10.0.10.0/24 (AZ-a, 254 hosts)
+  10.0.11.0/24 (AZ-b, 254 hosts)
+
+Database subnets (isolated):
+  10.0.20.0/24 (AZ-a, 254 hosts)
+  10.0.21.0/24 (AZ-b, 254 hosts)</code></pre>
+
+<p>Using a subnet calculator, you can quickly verify that these ranges do not overlap and that each subnet has enough addresses for your expected workload. For looking up which geographic region an IP belongs to, pair this with our <a href="https://lifa-su.github.io/blog/ai-ip-lookup-geolocation-isp-map.html">IP geolocation lookup tool</a>.</p>
+
+<h3>Office Network Segmentation</h3>
+
+<p>Segmenting an office network improves security and performance. You might allocate:</p>
+
+<ul>
+<li><strong>192.168.1.0/24</strong> &mdash; employee workstations (254 hosts)</li>
+<li><strong>192.168.2.0/24</strong> &mdash; servers and infrastructure</li>
+<li><strong>192.168.3.0/24</strong> &mdash; guest Wi-Fi (isolated)</li>
+<li><strong>192.168.4.0/24</strong> &mdash; IoT devices (isolated)</li>
+</ul>
+
+<p>Each segment gets its own firewall rules, preventing a compromised IoT device from accessing employee workstations or servers.</p>
+
+<h3>Firewall Rule Calculation</h3>
+
+<p>Firewall rules often use CIDR notation to specify source and destination ranges. If you need to allow traffic from 10.0.0.0 through 10.0.3.255, that is a /22 block (1,024 addresses). Getting the CIDR wrong means either blocking legitimate traffic or allowing unauthorized access. A subnet calculator makes this conversion instant and error-free.</p>
+
+<h2>The Binary Math Behind Subnetting</h2>
+
+<p>Understanding the binary is not strictly necessary with a calculator, but it helps you reason about networks intuitively. Take 192.168.1.0/26:</p>
+
+<pre><code>IP:          192.168.1.0
+Binary:      11000000.10101000.00000001.00000000
+Mask (/26):  11111111.11111111.11111111.11000000
+
+Network:     192.168.1.0    (first address)
+First host:  192.168.1.1
+Last host:   192.168.1.62
+Broadcast:   192.168.1.63   (last address)
+Next subnet: 192.168.1.64</code></pre>
+
+<p>The /26 mask means 26 network bits and 6 host bits. 2^6 = 64 addresses per subnet. The network address has all host bits set to 0, and the broadcast address has all host bits set to 1. Usable host addresses are everything in between: 62 hosts per /26 subnet.</p>
+
+<div class="tip">
+<strong>Pro tip:</strong> When planning subnets, always allocate more addresses than you currently need. Expanding a subnet later often means re-IPing existing hosts. A /24 (254 hosts) is the sweet spot for most use cases &mdash; large enough for growth, small enough to manage.
+</div>
+
+<h2>IPv6 Subnetting</h2>
+
+<p>IPv6 subnetting follows the same principles but with much larger address spaces. The standard allocation for a single LAN segment is a /64, which provides 2^64 (about 18 quintillion) host addresses. ISPs typically assign a /48 or /56 to customers, giving them thousands of /64 subnets to work with.</p>
+
+<p>Common IPv6 subnet sizes:</p>
+
+<ul>
+<li><strong>/128</strong> &mdash; single host (loopback, point-to-point links)</li>
+<li><strong>/64</strong> &mdash; standard LAN subnet (required for SLAAC)</li>
+<li><strong>/48</strong> &mdash; typical site allocation (65,536 /64 subnets)</li>
+<li><strong>/32</strong> &mdash; ISP allocation</li>
+</ul>
+
+<p>Unlike IPv4, you should never use subnets smaller than /64 for regular LANs in IPv6. Stateless Address Autoconfiguration (SLAAC) requires a /64 prefix to function correctly.</p>
+
+<h2>Private IP Ranges You Should Know</h2>
+
+<p>RFC 1918 defines three private IPv4 ranges that are not routable on the public internet:</p>
+
+<ul>
+<li><strong>10.0.0.0/8</strong> &mdash; 16.7 million addresses (Class A)</li>
+<li><strong>172.16.0.0/12</strong> &mdash; 1.05 million addresses (Class B range)</li>
+<li><strong>192.168.0.0/16</strong> &mdash; 65,536 addresses (Class C range)</li>
+</ul>
+
+<p>For cloud VPCs, 10.0.0.0/8 is the most common choice because it provides the largest address space. For home and small office networks, 192.168.0.0/16 is standard. The 172.16.0.0/12 range is often used for Docker networks and VPN tunnels.</p>
+
+<p>There is also 100.64.0.0/10 (Carrier-Grade NAT) and 169.254.0.0/16 (link-local), which serve special purposes and should not be used for regular subnetting.</p>
+
+<h2>Subnet Calculator Use Cases for Developers</h2>
+
+<p>Even if you are not a network engineer, subnetting comes up regularly in development:</p>
+
+<ul>
+<li><strong>Docker networking</strong> &mdash; understanding bridge networks, overlay networks, and container IP allocation. See our <a href="https://lifa-su.github.io/blog/ai-docker-run-generator-visual-commands.html">Docker command generator</a> for related tooling.</li>
+<li><strong>Kubernetes pod networking</strong> &mdash; calculating CIDR ranges for pod and service networks</li>
+<li><strong>CI/CD pipelines</strong> &mdash; whitelisting IP ranges for deployment access</li>
+<li><strong>API rate limiting</strong> &mdash; identifying requests from the same subnet</li>
+<li><strong>Security groups</strong> &mdash; writing precise ingress and egress rules</li>
+</ul>
+
+<p>A subnet calculator is not just for network engineers. Any developer working with cloud infrastructure, containers, or APIs benefits from quick subnet calculations. Combined with <a href="https://lifa-su.github.io/blog/ai-dns-lookup-query-domain-records.html">DNS lookup</a> and <a href="https://lifa-su.github.io/blog/ai-ssl-certificate-checker-website-security.html">SSL certificate checking</a>, you have a complete toolkit for debugging connectivity issues.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>Subnetting does not have to involve scribbling binary on a whiteboard. Whether you are designing a cloud VPC, segmenting an office network, or writing firewall rules, an IP subnet calculator gives you instant answers: network address, broadcast address, usable host range, wildcard mask, and the number of available hosts. It turns minutes of error-prone binary math into seconds of confident network planning.</p>
+
+<p>The key concepts &mdash; CIDR notation, subnet masks, network vs. host bits, and private address ranges &mdash; are worth understanding even with a calculator at hand. They help you make better design decisions and communicate clearly with your team. But for the actual calculations, let the tool do the math.</p>
+
+<div class="cta-box">
+<h3>Calculate Any Subnet Instantly</h3>
+<p>CIDR to range, subnet mask conversion, network and broadcast addresses, and visual subnet maps &mdash; all in your browser.</p>
+<a href="https://lifa-su.github.io/ai-ip-subnet/">Try the AI IP Subnet Calculator &rarr;</a>
+</div>
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &hearts; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
