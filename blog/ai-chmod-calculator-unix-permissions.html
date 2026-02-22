@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chmod Calculator — Unix Permissions Made Easy | Lifa AI Tools Blog</title>
+<meta name="description" content="Calculate Unix file permissions instantly with an AI-powered chmod calculator. Convert between symbolic and numeric notation. Understand rwx, setuid, and sticky bit.">
+<meta property="og:title" content="AI Chmod Calculator — Unix Permissions Made Easy">
+<meta property="og:description" content="Calculate Unix file permissions with AI. Convert between symbolic and numeric chmod notation instantly.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="chmod calculator, unix permissions, linux file permissions, chmod command, rwx permissions, chmod 755, chmod 644, file permission calculator">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-chmod-calculator-unix-permissions.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>AI Chmod Calculator &mdash; Unix Permissions Made Easy</h1>
+<div class="meta">Published February 23, 2026 &middot; 8 min read &middot; Developer Tools</div>
+
+<p>You just deployed your web application and nothing works. The logs say "Permission denied." You SSH into the server and start guessing: <code>chmod 777 everything</code>. It works, but now your security team is sending you angry messages. The problem was never complicated &mdash; you just needed <code>chmod 755</code> for directories and <code>chmod 644</code> for files. But in the moment, with production down, who can remember what those numbers mean?</p>
+
+<p>A <strong>chmod calculator</strong> eliminates the guesswork. Click the permissions you want, get the numeric code. Enter a numeric code, see exactly what it allows. No more memorizing octal values or decoding <code>drwxr-xr-x</code> from <code>ls -la</code> output.</p>
+
+<h2>Understanding Unix File Permissions</h2>
+
+<p>Every file and directory on a Unix-like system (Linux, macOS, BSD) has three sets of permissions for three categories of users:</p>
+
+<ul>
+<li><strong>Owner (u)</strong> &mdash; the user who owns the file</li>
+<li><strong>Group (g)</strong> &mdash; users in the file's group</li>
+<li><strong>Others (o)</strong> &mdash; everyone else</li>
+</ul>
+
+<p>Each category can have three types of access:</p>
+
+<ul>
+<li><strong>Read (r)</strong> &mdash; view file contents or list directory entries</li>
+<li><strong>Write (w)</strong> &mdash; modify file contents or create/delete files in a directory</li>
+<li><strong>Execute (x)</strong> &mdash; run the file as a program or enter a directory</li>
+</ul>
+
+<p>This gives you a 3&times;3 matrix of permissions. The <code>ls -la</code> command displays them as a 10-character string like <code>-rwxr-xr--</code>, where the first character indicates the file type and the remaining nine show the permission matrix.</p>
+
+<h3>Numeric (Octal) Notation</h3>
+
+<p>Each permission has a numeric value: read = 4, write = 2, execute = 1. Add them together for each category. So <code>rwx</code> = 4+2+1 = 7, <code>r-x</code> = 4+0+1 = 5, and <code>r--</code> = 4+0+0 = 4. The full permission is three digits: <code>754</code> means owner gets rwx, group gets r-x, others get r--.</p>
+
+<p>This is where most people get confused. The mapping between <code>chmod 644</code> and "owner can read and write, everyone else can only read" is not immediately obvious unless you have internalized the octal system. A <strong>chmod calculator</strong> makes this translation instant.</p>
+
+<h3>Symbolic Notation</h3>
+
+<p>The chmod command also accepts symbolic notation, which is more readable but longer to type:</p>
+
+<pre><code># Numeric: chmod 755 script.sh
+# Symbolic equivalent:
+chmod u=rwx,g=rx,o=rx script.sh
+
+# Add execute for owner only:
+chmod u+x script.sh
+
+# Remove write from group and others:
+chmod go-w file.txt
+
+# Set read-only for everyone:
+chmod a=r document.pdf</code></pre>
+
+<p>Symbolic notation is great for making relative changes (add or remove specific permissions) while numeric notation is better for setting absolute permissions. Both have their place, and a good <strong>unix permissions</strong> tool converts between them seamlessly.</p>
+
+<h2>Common Permission Patterns Every Developer Should Know</h2>
+
+<p>You do not need to memorize every possible combination. These cover 90 percent of real-world scenarios:</p>
+
+<h3>Files</h3>
+
+<ul>
+<li><code>644</code> (<code>rw-r--r--</code>) &mdash; Standard files. Owner can edit, everyone can read. Use for HTML, CSS, images, config files.</li>
+<li><code>600</code> (<code>rw-------</code>) &mdash; Private files. Only the owner can read or write. Use for SSH keys, <code>.env</code> files, database credentials.</li>
+<li><code>755</code> (<code>rwxr-xr-x</code>) &mdash; Executable files. Owner has full control, everyone can run it. Use for scripts, binaries, CLI tools.</li>
+<li><code>400</code> (<code>r--------</code>) &mdash; Read-only, owner only. SSH requires this for private keys: <code>chmod 400 ~/.ssh/id_rsa</code>.</li>
+</ul>
+
+<h3>Directories</h3>
+
+<ul>
+<li><code>755</code> (<code>rwxr-xr-x</code>) &mdash; Standard directories. Owner can modify contents, everyone can list and enter. Use for web roots, project folders.</li>
+<li><code>700</code> (<code>rwx------</code>) &mdash; Private directories. Only the owner can access. Use for <code>~/.ssh</code>, personal config directories.</li>
+<li><code>775</code> (<code>rwxrwxr-x</code>) &mdash; Group-writable directories. Owner and group members can modify. Use for shared project directories.</li>
+<li><code>1777</code> (<code>drwxrwxrwt</code>) &mdash; Sticky bit. Everyone can write, but only file owners can delete their own files. This is how <code>/tmp</code> works.</li>
+</ul>
+
+<div class="cta-box">
+<p>&#128208; Stop guessing chmod values. Calculate exact permissions in seconds.</p>
+<a href="https://lifa-su.github.io/ai-chmod-calculator/">Open AI Chmod Calculator &rarr;</a>
+</div>
+
+<h2>Special Permissions: Setuid, Setgid, and Sticky Bit</h2>
+
+<p>Beyond the basic rwx permissions, Unix has three special permission bits that most developers encounter but few fully understand:</p>
+
+<h3>Setuid (4xxx)</h3>
+
+<p>When set on an executable, the program runs with the permissions of the file owner, not the user who launched it. The classic example is <code>/usr/bin/passwd</code>, which needs root access to modify <code>/etc/shadow</code> but must be runnable by any user. You will see an <code>s</code> in the owner execute position: <code>-rwsr-xr-x</code>.</p>
+
+<pre><code># Set setuid:
+chmod 4755 program
+chmod u+s program
+
+# The passwd command is a real-world example:
+ls -la /usr/bin/passwd
+# -rwsr-xr-x 1 root root 68208 ... /usr/bin/passwd</code></pre>
+
+<div class="tip">
+<strong>&#9888;&#65039; Security Warning:</strong> Setuid on shell scripts is a massive security risk and is ignored by most modern kernels. Only use setuid on compiled binaries, and only when absolutely necessary. A setuid root program with a vulnerability gives attackers full system access.
+</div>
+
+<h3>Setgid (2xxx)</h3>
+
+<p>On executables, setgid works like setuid but for the group. On directories, it is far more useful: new files created inside a setgid directory inherit the directory's group instead of the creator's primary group. This is essential for shared project directories where multiple users need to collaborate.</p>
+
+<pre><code># Create a shared project directory:
+mkdir /var/www/project
+chgrp developers /var/www/project
+chmod 2775 /var/www/project
+
+# Now any file created inside inherits the "developers" group</code></pre>
+
+<h3>Sticky Bit (1xxx)</h3>
+
+<p>The sticky bit on a directory prevents users from deleting files they do not own, even if they have write permission on the directory. Without it, anyone with write access to a directory can delete any file in it. The <code>/tmp</code> directory uses this to let everyone create temporary files without letting them delete each other's files.</p>
+
+<pre><code>ls -la / | grep tmp
+# drwxrwxrwt  20 root root 4096 ... tmp
+# The "t" at the end indicates the sticky bit</code></pre>
+
+<h2>Common Permission Mistakes and How to Avoid Them</h2>
+
+<h3>The chmod 777 Anti-Pattern</h3>
+
+<p>When something does not work, the temptation is to <code>chmod 777</code> everything. This gives full read, write, and execute permissions to every user on the system. It fixes the immediate problem but creates serious security vulnerabilities. Any user or compromised process can modify or execute your files.</p>
+
+<p>Instead of 777, diagnose the actual problem:</p>
+
+<ol>
+<li>Check which user the process runs as: <code>ps aux | grep nginx</code></li>
+<li>Check the file ownership: <code>ls -la /var/www/</code></li>
+<li>Set the minimum permissions needed. Usually <code>755</code> for directories and <code>644</code> for files, with the web server user as the owner.</li>
+</ol>
+
+<h3>Forgetting Directory Execute Permission</h3>
+
+<p>A common confusion: why does a directory need execute permission? On directories, execute means "traverse" &mdash; the ability to <code>cd</code> into the directory and access files inside it. A directory with read but no execute (<code>r--</code>) lets you list filenames but not access the files themselves. You almost always want execute on directories.</p>
+
+<h3>SSH Key Permissions</h3>
+
+<p>SSH is notoriously strict about permissions. If your key files are too permissive, SSH refuses to use them:</p>
+
+<pre><code># Required permissions:
+chmod 700 ~/.ssh           # Directory: owner only
+chmod 600 ~/.ssh/config    # Config: owner read/write
+chmod 400 ~/.ssh/id_rsa    # Private key: owner read only
+chmod 644 ~/.ssh/id_rsa.pub  # Public key: everyone can read
+chmod 600 ~/.ssh/authorized_keys  # Auth keys: owner read/write</code></pre>
+
+<p>Getting any of these wrong results in cryptic "Permission denied (publickey)" errors that waste hours of debugging time.</p>
+
+<h2>Using chmod Recursively</h2>
+
+<p>The <code>-R</code> flag applies permissions recursively, but applying the same permissions to both files and directories is usually wrong. Directories need execute permission; files usually do not. Use <code>find</code> to apply different permissions:</p>
+
+<pre><code># Set directories to 755:
+find /var/www -type d -exec chmod 755 {} \;
+
+# Set files to 644:
+find /var/www -type f -exec chmod 644 {} \;
+
+# Make specific scripts executable:
+find /var/www/scripts -name "*.sh" -exec chmod 755 {} \;</code></pre>
+
+<p>This is the correct way to fix permissions on a web server. Never use <code>chmod -R 755</code> on a directory containing both files and subdirectories unless you specifically want every file to be executable.</p>
+
+<h2>How Our AI Chmod Calculator Helps</h2>
+
+<p>The <a href="https://lifa-su.github.io/ai-chmod-calculator/">Lifa AI Chmod Calculator</a> provides a visual interface for Unix permissions. Click checkboxes for each permission, and the numeric code updates in real time. Enter a numeric code, and the checkboxes reflect the permissions. It handles special bits (setuid, setgid, sticky) and generates both the <code>chmod</code> command and the symbolic representation.</p>
+
+<p>The AI component goes further. Describe your scenario in plain English &mdash; "web server config file that only root should edit" &mdash; and it suggests the appropriate permissions with an explanation of why. It warns you about common security mistakes and suggests best practices for your specific use case.</p>
+
+<p>Everything runs locally in your browser. No server calls, no data collection, no signup. Just fast, accurate <strong>unix permissions</strong> calculations.</p>
+
+<div class="cta-box">
+<p>&#128736;&#65039; Calculate chmod permissions visually &mdash; free, instant, and secure.</p>
+<a href="https://lifa-su.github.io/ai-chmod-calculator/">Try the AI Chmod Calculator &rarr;</a>
+</div>
+
+<h2>Related Tools</h2>
+
+<ul>
+<li><a href="https://lifa-su.github.io/ai-hash-generator/">AI Hash Generator</a> &mdash; generate MD5, SHA-256, and other hashes for file integrity checks</li>
+<li><a href="https://lifa-su.github.io/ai-password-generator/">AI Password Generator</a> &mdash; create strong passwords with cryptographic randomness</li>
+<li><a href="https://lifa-su.github.io/ai-base64/">AI Base64 Encoder/Decoder</a> &mdash; encode and decode Base64 strings and JWT tokens</li>
+<li><a href="https://lifa-su.github.io/blog/ai-hash-generator-md5-sha256.html">Guide: Hash Algorithms Explained</a> &mdash; understand when to use MD5, SHA-256, and beyond</li>
+</ul>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &hearts; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
