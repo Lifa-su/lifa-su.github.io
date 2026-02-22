@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unix Timestamp Conversion — The Developer's Quick Reference Guide | Lifa AI Tools Blog</title>
+<meta name="description" content="Quick reference for Unix timestamp conversion. Common epoch values, timezone pitfalls, language-specific examples, and an instant converter tool for developers.">
+<meta property="og:title" content="Unix Timestamp Conversion — The Developer's Quick Reference Guide">
+<meta property="og:description" content="Quick reference for Unix timestamps. Common epoch values, timezone pitfalls, and conversion examples in every major language.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="unix timestamp reference, epoch time cheat sheet, timestamp conversion guide, unix time examples, epoch converter developer, timestamp timezone, millisecond timestamp, timestamp programming">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-unix-timestamp-quick-reference-guide.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>Unix Timestamp Conversion &mdash; The Developer&rsquo;s Quick Reference Guide</h1>
+<div class="meta">Published February 23, 2026 &middot; 8 min read &middot; Developer Tools</div>
+
+<p>It is 3 AM and your production logs show an error at timestamp <code>1740268800</code>. Your brain is not converting that to February 23, 2025 at midnight UTC on its own. You need a converter, and you need it fast. This guide is the reference you bookmark and come back to every time timestamps make your head spin.</p>
+
+<p>Unix timestamps &mdash; the number of seconds since January 1, 1970 (the Unix epoch) &mdash; are the lingua franca of time in computing. Databases store them, APIs return them, log files are full of them. They are unambiguous, timezone-neutral, and easy to sort. They are also completely unreadable to humans. Here is everything you need to work with them efficiently.</p>
+
+<h2>Landmark Timestamps Worth Memorizing</h2>
+
+<p>Having a few reference points in your head makes it easier to sanity-check values you encounter in the wild:</p>
+
+<ul>
+<li><code>0</code> &mdash; January 1, 1970 00:00:00 UTC (the epoch)</li>
+<li><code>1000000000</code> &mdash; September 9, 2001 (the first 10-digit timestamp)</li>
+<li><code>1234567890</code> &mdash; February 13, 2009 23:31:30 UTC</li>
+<li><code>1700000000</code> &mdash; November 14, 2023</li>
+<li><code>1750000000</code> &mdash; June 15, 2025</li>
+<li><code>1800000000</code> &mdash; January 15, 2027</li>
+<li><code>2000000000</code> &mdash; May 18, 2033</li>
+<li><code>2147483647</code> &mdash; January 19, 2038 (the Y2K38 problem for 32-bit systems)</li>
+</ul>
+
+<p>If a timestamp starts with <code>17</code>, it is from 2023&ndash;2027. If it starts with <code>16</code>, it is from 2020&ndash;2023. This rough mental math helps you spot obviously wrong values immediately.</p>
+
+<div class="cta-box">
+<p><strong>Need to convert a timestamp right now?</strong></p>
+<a href="https://lifa-su.github.io/ai-timestamp/">Open AI Timestamp Converter &rarr;</a>
+</div>
+
+<h2>Seconds vs Milliseconds: The Most Common Bug</h2>
+
+<p>The single most frequent timestamp bug is mixing up seconds and milliseconds. A Unix timestamp in seconds has 10 digits in the current era (like <code>1740268800</code>). A millisecond timestamp has 13 digits (like <code>1740268800000</code>). Pass a millisecond value to a function expecting seconds, and you get a date in the year 57000.</p>
+
+<h3>How Different Systems Handle It</h3>
+
+<ul>
+<li><strong>JavaScript</strong> &mdash; <code>Date.now()</code> returns milliseconds. <code>new Date()</code> expects milliseconds.</li>
+<li><strong>Python</strong> &mdash; <code>time.time()</code> returns seconds as a float. <code>datetime.fromtimestamp()</code> expects seconds.</li>
+<li><strong>Java</strong> &mdash; <code>System.currentTimeMillis()</code> returns milliseconds. <code>Instant.ofEpochSecond()</code> expects seconds.</li>
+<li><strong>Go</strong> &mdash; <code>time.Now().Unix()</code> returns seconds. <code>time.Now().UnixMilli()</code> returns milliseconds.</li>
+<li><strong>PostgreSQL</strong> &mdash; <code>EXTRACT(EPOCH FROM now())</code> returns seconds as a decimal.</li>
+<li><strong>MySQL</strong> &mdash; <code>UNIX_TIMESTAMP()</code> returns seconds as an integer.</li>
+</ul>
+
+<div class="tip">
+<strong>&#128161; Quick Check:</strong> If a timestamp has 10 digits, it is seconds. If it has 13 digits, it is milliseconds. If it has 16 digits, it is microseconds (common in some logging systems). The <a href="https://lifa-su.github.io/ai-timestamp/">AI Timestamp Converter</a> auto-detects the format so you do not have to count digits.
+</div>
+
+<h2>Conversion Snippets for Every Language</h2>
+
+<p>Bookmark these. You will use them more often than you think.</p>
+
+<h3>JavaScript</h3>
+
+<pre><code>// Current timestamp (seconds)
+Math.floor(Date.now() / 1000);
+
+// Timestamp to date string
+new Date(1740268800 * 1000).toISOString();
+// "2025-02-23T00:00:00.000Z"
+
+// Date string to timestamp
+Math.floor(new Date("2025-02-23").getTime() / 1000);
+// 1740268800</code></pre>
+
+<h3>Python</h3>
+
+<pre><code>from datetime import datetime, timezone
+
+# Current timestamp
+int(datetime.now(timezone.utc).timestamp())
+
+# Timestamp to datetime
+datetime.fromtimestamp(1740268800, tz=timezone.utc)
+# datetime(2025, 2, 23, 0, 0, tzinfo=timezone.utc)
+
+# Datetime to timestamp
+int(datetime(2025, 2, 23, tzinfo=timezone.utc).timestamp())
+# 1740268800</code></pre>
+
+<h3>Go</h3>
+
+<pre><code>// Current timestamp
+time.Now().Unix()
+
+// Timestamp to time.Time
+t := time.Unix(1740268800, 0).UTC()
+
+// time.Time to timestamp
+t.Unix()</code></pre>
+
+<h3>SQL (PostgreSQL)</h3>
+
+<pre><code>-- Timestamp to date
+SELECT to_timestamp(1740268800) AT TIME ZONE 'UTC';
+
+-- Date to timestamp
+SELECT EXTRACT(EPOCH FROM TIMESTAMP '2025-02-23 00:00:00');</code></pre>
+
+<h2>Timezone Pitfalls That Cause Production Bugs</h2>
+
+<p>Unix timestamps are always UTC. The bugs happen when you convert them to local time without being explicit about the timezone.</p>
+
+<h3>The Silent Offset</h3>
+
+<p>In JavaScript, <code>new Date(1740268800000).toString()</code> returns a string in the browser's local timezone. If your server is in UTC and your user is in EST, the same timestamp displays as two different dates near midnight. This is how "off by one day" bugs are born.</p>
+
+<p>Always use <code>.toISOString()</code> or explicitly specify the timezone with <code>Intl.DateTimeFormat</code>. Never rely on the default <code>.toString()</code> for anything user-facing.</p>
+
+<h3>Daylight Saving Time Gaps</h3>
+
+<p>When clocks spring forward, there is a gap. 2:00 AM becomes 3:00 AM, and timestamps in that hour do not correspond to valid local times. When clocks fall back, there is an overlap &mdash; the same local time occurs twice. If you store local times instead of UTC timestamps, you will eventually hit both of these edge cases.</p>
+
+<p>The rule is simple: store timestamps in UTC (or as Unix timestamps), convert to local time only for display.</p>
+
+<h2>The Y2K38 Problem: Should You Worry?</h2>
+
+<p>On January 19, 2038 at 03:14:07 UTC, 32-bit signed integers overflow. The timestamp <code>2147483647</code> wraps to <code>-2147483648</code>, which represents December 13, 1901. This is the Y2K38 problem.</p>
+
+<p>Most modern systems use 64-bit timestamps, which will not overflow for another 292 billion years. But embedded systems, legacy databases, and some file formats still use 32-bit timestamps. If you are building something that needs to handle dates beyond 2038, verify your entire stack uses 64-bit time.</p>
+
+<h2>ISO 8601 vs Unix Timestamps: When to Use Which</h2>
+
+<p>Unix timestamps are ideal for storage, sorting, and computation. ISO 8601 strings like <code>2025-02-23T00:00:00Z</code> are ideal for APIs, logs, and anything humans might read.</p>
+
+<ul>
+<li><strong>Use Unix timestamps</strong> for database columns, cache expiration, JWT expiry (<code>exp</code> claim), and internal computations</li>
+<li><strong>Use ISO 8601</strong> for API responses, log messages, configuration files, and user-facing displays</li>
+<li><strong>Use both</strong> when debugging &mdash; log the timestamp and the human-readable version side by side</li>
+</ul>
+
+<p>For a deeper dive into timestamp formats and conversion workflows, check out our <a href="https://lifa-su.github.io/blog/ai-timestamp-converter-unix-human-readable.html">complete guide to AI timestamp conversion</a>.</p>
+
+<div class="cta-box">
+<p><strong>Convert timestamps instantly &mdash; seconds, milliseconds, ISO 8601, and more.</strong></p>
+<a href="https://lifa-su.github.io/ai-timestamp/">Try AI Timestamp Converter &rarr;</a>
+</div>
+
+<h2>Related Tools and Resources</h2>
+
+<ul>
+<li><a href="https://lifa-su.github.io/ai-timestamp/">AI Timestamp Converter</a> &mdash; instant conversion with auto-format detection</li>
+<li><a href="https://lifa-su.github.io/blog/ai-timestamp-converter-unix-human-readable.html">AI Timestamp Converter Guide</a> &mdash; in-depth tutorial on timestamp conversion</li>
+<li><a href="https://lifa-su.github.io/ai-cron-generator/">AI Crontab Generator</a> &mdash; schedule tasks with human-readable cron expressions</li>
+<li><a href="https://lifa-su.github.io/blog/ai-countdown-timer-events-deadlines.html">AI Countdown Timer</a> &mdash; track deadlines and events</li>
+<li><a href="https://lifa-su.github.io/ai-json-formatter/">AI JSON Formatter</a> &mdash; format API responses that contain timestamps</li>
+<li><a href="https://lifa-su.github.io/blog/free-json-formatter-validator-online.html">JSON Formatter Guide</a> &mdash; debug API responses with nested timestamp fields</li>
+</ul>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &#10084;&#65039; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
