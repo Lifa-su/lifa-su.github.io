@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Font Face — Custom Web Font Loading Made Simple | Lifa AI Tools Blog</title>
+<meta name="description" content="Master @font-face CSS rules with AI. Learn custom font loading, format selection, font-display strategies, variable fonts, and performance optimization for web typography.">
+<meta property="og:title" content="AI CSS Font Face — Custom Web Font Loading Made Simple">
+<meta property="og:description" content="Generate @font-face CSS with AI. Load custom fonts, optimize performance, and master web typography.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="css font face, @font-face, custom web fonts, font loading, woff2, font-display, variable fonts, web typography, font performance, css fonts">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-css-font-face-custom-fonts.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>AI CSS Font Face &mdash; Custom Web Font Loading Made Simple</h1>
+<div class="meta">Published February 23, 2026 &middot; 9 min read &middot; Design</div>
+
+<p>Your designer hands you a brand font. It is a beautiful typeface that makes the mockup look stunning. You download the files, add a <code>@font-face</code> rule, refresh the browser, and watch the page flash from Times New Roman to the custom font half a second later. The text jumps, the layout shifts, and your Lighthouse score drops. Custom fonts should enhance your site, not break it. The problem is almost never the font itself &mdash; it is how you load it.</p>
+
+<p>The <code>@font-face</code> CSS rule is the foundation of custom web typography. It tells the browser where to find font files, when to use them, and how to behave while they load. Getting it right means fast rendering, zero layout shift, and typography that matches your design perfectly.</p>
+
+<h2>The Anatomy of @font-face</h2>
+
+<p>A basic <code>@font-face</code> declaration has three essential parts: a name, a source, and optional descriptors that control when the font applies:</p>
+
+<pre><code>@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans.woff2') format('woff2'),
+       url('/fonts/brand-sans.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}</code></pre>
+
+<p>The <code>font-family</code> name is what you reference in your CSS. The <code>src</code> tells the browser where to download the file. The <code>font-weight</code> and <code>font-style</code> descriptors map this specific file to a weight and style combination. And <code>font-display</code> controls the loading behavior &mdash; arguably the most important property for performance.</p>
+
+<h3>Font Formats: What to Use in 2026</h3>
+
+<p>Font format support has simplified dramatically. Here is what matters today:</p>
+
+<ul>
+<li><code>woff2</code> &mdash; The standard. Brotli-compressed, 30 percent smaller than woff. Supported by every modern browser. Use this as your primary format.</li>
+<li><code>woff</code> &mdash; Fallback for older browsers. Gzip-compressed. Include it if you need to support browsers from before 2015.</li>
+<li><code>ttf</code> / <code>otf</code> &mdash; Desktop font formats. Larger file sizes, no compression. Avoid for web use unless you have no other option.</li>
+<li><code>eot</code> &mdash; Internet Explorer only. Unless you are supporting IE 11, skip it entirely.</li>
+</ul>
+
+<p>For most projects in 2026, you only need woff2. The browser support is universal, and the compression is excellent. A typical 40KB TTF file compresses to around 15KB as woff2.</p>
+
+<div class="tip">
+<strong>&#128161; Pro Tip:</strong> Use tools like <code>woff2_compress</code> or online converters to generate woff2 from TTF/OTF source files. The compression ratio is typically 50&ndash;70 percent, which directly impacts your page load time.
+</div>
+
+<h2>Font-Display: The Most Important Property You Are Probably Ignoring</h2>
+
+<p>The <code>font-display</code> property controls what happens while the custom font is downloading. Without it, browsers use their default behavior, which varies and often causes visible text flashing:</p>
+
+<h3>The Five Values</h3>
+
+<ul>
+<li><code>swap</code> &mdash; Show fallback text immediately, swap to custom font when ready. Best for body text where readability matters more than visual consistency. Causes FOUT (Flash of Unstyled Text).</li>
+<li><code>block</code> &mdash; Hide text for up to 3 seconds while the font loads. Causes FOIT (Flash of Invisible Text). Bad for performance and user experience.</li>
+<li><code>fallback</code> &mdash; Short block period (100ms), then fallback. If the font loads within about 3 seconds, it swaps in. Otherwise, the fallback stays. Good compromise.</li>
+<li><code>optional</code> &mdash; Extremely short block period. Browser decides whether to use the custom font based on connection speed. Best for performance-critical pages.</li>
+<li><code>auto</code> &mdash; Browser default. Usually behaves like <code>block</code>. Avoid relying on this.</li>
+</ul>
+
+<pre><code>/* Recommended for most sites: */
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans.woff2') format('woff2');
+  font-display: swap; /* Show content immediately */
+}
+
+/* For hero text where visual consistency matters: */
+@font-face {
+  font-family: 'HeroDisplay';
+  src: url('/fonts/hero-display.woff2') format('woff2');
+  font-display: optional; /* Skip if slow connection */
+}</code></pre>
+
+<h2>Loading Multiple Weights and Styles</h2>
+
+<p>A common mistake is loading every weight of a font family. Each weight is a separate file download. Four weights (regular, italic, bold, bold italic) means four HTTP requests and potentially 60&ndash;100KB of font data. Only load what you actually use:</p>
+
+<pre><code>/* Regular */
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bold */
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Now use it naturally: */
+body { font-family: 'BrandSans', system-ui, sans-serif; }
+h1, h2, h3 { font-weight: 700; } /* Uses bold file */
+p { font-weight: 400; } /* Uses regular file */</code></pre>
+
+<div class="tip">
+<strong>&#9888;&#65039; Common Mistake:</strong> If you use <code>font-weight: bold</code> in your CSS but only loaded the 400-weight file, the browser will synthetically bold it. Synthetic bold looks thicker and blurrier than a properly designed bold weight. Always load the weights you reference.
+</div>
+
+<h2>Variable Fonts: One File, Every Weight</h2>
+
+<p>Variable fonts solve the multiple-file problem. A single variable font file contains a continuous range of weights, widths, or other axes. Instead of loading separate files for regular, medium, semibold, and bold, you load one file that covers everything:</p>
+
+<pre><code>@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans-variable.woff2') format('woff2-variations');
+  font-weight: 100 900; /* Supports any weight in this range */
+  font-display: swap;
+}
+
+/* Now you can use any weight: */
+.light { font-weight: 300; }
+.regular { font-weight: 400; }
+.medium { font-weight: 500; }
+.semibold { font-weight: 600; }
+.bold { font-weight: 700; }
+.heavy { font-weight: 900; }</code></pre>
+
+<p>A variable font file is typically larger than a single static weight (30&ndash;50KB vs 15&ndash;20KB) but much smaller than loading three or four separate weights. If you use more than two weights of the same family, variable fonts are almost always the better choice.</p>
+
+<h2>Performance Optimization Strategies</h2>
+
+<h3>Preload Critical Fonts</h3>
+
+<p>The browser does not start downloading fonts until it encounters text that needs them during rendering. By then, the HTML and CSS have already been parsed. Preloading tells the browser to start the download immediately:</p>
+
+<pre><code>&lt;link rel="preload" href="/fonts/brand-sans.woff2"
+      as="font" type="font/woff2" crossorigin&gt;</code></pre>
+
+<p>Only preload fonts that appear above the fold. Preloading too many fonts wastes bandwidth and can actually slow down the initial render by competing with other critical resources.</p>
+
+<h3>Subset Your Fonts</h3>
+
+<p>Most fonts include glyphs for hundreds of languages. If your site is English-only, you are shipping characters you will never use. Font subsetting removes unused glyphs, often reducing file size by 50&ndash;80 percent:</p>
+
+<pre><code>/* Use unicode-range to load subsets on demand: */
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153; /* Latin */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BrandSans';
+  src: url('/fonts/brand-sans-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1; /* Cyrillic */
+  font-display: swap;
+}</code></pre>
+
+<p>The browser only downloads the subset that contains characters actually used on the page. Google Fonts uses this technique automatically, splitting fonts into dozens of small subset files.</p>
+
+<h3>Self-Host vs CDN</h3>
+
+<p>Google Fonts is convenient but comes with trade-offs. Since Chrome 86, cross-origin caches are partitioned, meaning a font cached from Google on one site is not reused on another. The caching advantage of CDN-hosted fonts is gone. Self-hosting gives you full control over caching headers, eliminates a third-party DNS lookup, and avoids privacy concerns with Google tracking font requests.</p>
+
+<div class="cta-box">
+<p>&#127912; Generate perfect @font-face rules with AI &mdash; choose formats, set font-display, and optimize loading.</p>
+<a href="https://lifa-su.github.io/ai-css-font-face/">Open AI CSS Font Face Tool &rarr;</a>
+</div>
+
+<h2>Common @font-face Mistakes</h2>
+
+<h3>Wrong MIME Types on the Server</h3>
+
+<p>If your server does not send the correct <code>Content-Type</code> header for font files, some browsers will refuse to load them. Make sure your server configuration includes:</p>
+
+<pre><code># Nginx:
+types {
+  font/woff2  woff2;
+  font/woff   woff;
+}
+
+# Apache (.htaccess):
+AddType font/woff2 .woff2
+AddType font/woff .woff</code></pre>
+
+<h3>Missing crossorigin Attribute</h3>
+
+<p>Fonts loaded from a different origin (including CDNs) require CORS headers. If you preload a font without the <code>crossorigin</code> attribute, the browser downloads it twice &mdash; once for the preload (without CORS) and once for the actual font request (with CORS). Always include <code>crossorigin</code> on font preload links, even for same-origin fonts.</p>
+
+<h3>Too Many Font Families</h3>
+
+<p>Every additional font family adds HTTP requests and rendering complexity. Stick to two families maximum: one for headings, one for body text. If you need variety, use different weights of the same family rather than loading entirely separate typefaces.</p>
+
+<h2>How Our AI CSS Font Face Tool Helps</h2>
+
+<p>The <a href="https://lifa-su.github.io/ai-css-font-face/">Lifa AI CSS Font Face</a> tool generates complete <code>@font-face</code> declarations from your requirements. Select your font files, choose the weights and styles you need, pick a <code>font-display</code> strategy, and get production-ready CSS with preload tags and fallback stacks included.</p>
+
+<p>The AI component analyzes your choices and suggests optimizations: whether to use variable fonts, which subsets to include, and how to structure your font loading for the best Core Web Vitals scores. Describe your needs in plain English &mdash; "brand font for headings, system font for body, fast loading on mobile" &mdash; and get a complete implementation.</p>
+
+<div class="cta-box">
+<p>&#128295; Stop fighting with font loading. Generate optimized @font-face CSS in seconds.</p>
+<a href="https://lifa-su.github.io/ai-css-font-face/">Try the AI CSS Font Face Tool &rarr;</a>
+</div>
+
+<h2>Related Tools and Articles</h2>
+
+<ul>
+<li><a href="https://lifa-su.github.io/ai-font-pairing/">AI Font Pairing</a> &mdash; find perfect font combinations for your design</li>
+<li><a href="https://lifa-su.github.io/ai-web-fonts/">AI Web Fonts</a> &mdash; browse and preview web fonts before loading them</li>
+<li><a href="https://lifa-su.github.io/blog/ai-font-pairing-perfect-typography-combinations.html">Guide: Perfect Font Pairing Combinations</a> &mdash; typography pairing principles and examples</li>
+<li><a href="https://lifa-su.github.io/blog/ai-web-fonts-preview-typography.html">Guide: Web Fonts Preview and Typography</a> &mdash; choosing the right fonts for your project</li>
+<li><a href="https://lifa-su.github.io/blog/ai-css-letter-spacing-typography.html">Guide: CSS Letter Spacing and Typography</a> &mdash; fine-tune tracking for clean web design</li>
+</ul>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &hearts; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
