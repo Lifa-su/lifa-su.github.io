@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI JWT Decoder — Inspect and Debug JSON Web Tokens | Lifa AI Tools Blog</title>
+<meta name="description" content="Decode and inspect JWT tokens with AI. Learn JWT structure, header and payload claims, signature verification, token expiration, and security best practices for authentication.">
+<meta property="og:title" content="AI JWT Decoder — Inspect and Debug JSON Web Tokens">
+<meta property="og:description" content="Decode JWT tokens with AI. Inspect headers, payloads, claims, and expiration. Debug authentication issues. Free online tool.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="jwt decoder, jwt token, json web token, jwt debugger, jwt claims, jwt expiration, jwt signature, ai jwt decoder, jwt authentication, jwt payload inspector">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-jwt-decoder-token-inspection-security.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>AI JWT Decoder &mdash; Inspect and Debug JSON Web Tokens</h1>
+<div class="meta">Published February 23, 2026 &middot; 9 min read &middot; Security</div>
+
+<p>JSON Web Tokens are everywhere in modern authentication. Every API call with a Bearer token, every OAuth flow, every single sign-on session relies on JWTs to carry identity and authorization data. But when authentication breaks, the first thing you need to do is look inside the token to understand what went wrong.</p>
+
+<p>An <strong>AI JWT decoder</strong> instantly splits a token into its three parts, decodes the Base64URL-encoded header and payload, formats the JSON for readability, checks expiration timestamps, and highlights potential security issues.</p>
+
+<h2>Anatomy of a JWT</h2>
+
+<p>A JWT consists of three Base64URL-encoded parts separated by dots: the header, the payload, and the signature. Each part serves a distinct purpose:</p>
+
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpv
+aG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+// Decoded header:
+{ "alg": "HS256", "typ": "JWT" }
+
+// Decoded payload:
+{ "sub": "1234567890", "name": "John Doe", "iat": 1516239022 }</code></pre>
+
+<h3>The Header</h3>
+
+<p>The header declares the token type and the signing algorithm. The most common algorithms are <code>HS256</code> (HMAC with SHA-256, symmetric) and <code>RS256</code> (RSA with SHA-256, asymmetric). The algorithm choice affects how you verify the signature and has significant security implications.</p>
+
+<h3>The Payload</h3>
+
+<p>The payload contains claims, which are statements about the user and metadata. Standard claims include:</p>
+
+<ul>
+<li><code>sub</code> (subject) &mdash; the user identifier</li>
+<li><code>iat</code> (issued at) &mdash; when the token was created</li>
+<li><code>exp</code> (expiration) &mdash; when the token expires</li>
+<li><code>iss</code> (issuer) &mdash; who created the token</li>
+<li><code>aud</code> (audience) &mdash; who the token is intended for</li>
+<li><code>nbf</code> (not before) &mdash; earliest time the token is valid</li>
+</ul>
+
+<p>Applications add custom claims for roles, permissions, tenant IDs, and other authorization data. The payload is encoded, not encrypted, so anyone with the token can read its contents. Never put sensitive data like passwords or API keys in JWT claims.</p>
+
+<h3>The Signature</h3>
+
+<p>The signature ensures the token has not been tampered with. For HS256, the server creates the signature using a shared secret. For RS256, it uses a private key, and anyone with the public key can verify it. The signature covers both the header and payload, so changing any claim invalidates the token.</p>
+
+<div class="tip"><strong>Pro tip:</strong> The payload is only Base64URL-encoded, not encrypted. Anyone can decode it without the secret key. Use JWE (JSON Web Encryption) if you need to hide the payload contents, or keep sensitive data server-side and reference it by ID in the token.</div>
+
+<h2>Common JWT Debugging Scenarios</h2>
+
+<h3>Token Expired</h3>
+
+<p>The most frequent JWT issue is expiration. The <code>exp</code> claim is a Unix timestamp, and if the current time exceeds it, the token is invalid. Decode the token to check the <code>exp</code> value and compare it to the current time:</p>
+
+<pre><code>// Payload with expiration
+{
+  "sub": "user123",
+  "exp": 1740000000,  // Check: is this in the past?
+  "iat": 1739996400
+}
+
+// JavaScript check
+const payload = JSON.parse(atob(token.split('.')[1]));
+const isExpired = payload.exp * 1000 < Date.now();</code></pre>
+
+<p>Clock skew between servers can cause tokens to appear expired prematurely. Most JWT libraries accept a small leeway (typically 30&ndash;60 seconds) to account for this.</p>
+
+<h3>Wrong Audience or Issuer</h3>
+
+<p>In microservice architectures, tokens issued for one service should not be accepted by another. If your API rejects a valid-looking token, check the <code>iss</code> and <code>aud</code> claims to make sure they match what your service expects.</p>
+
+<h3>Algorithm Confusion Attacks</h3>
+
+<p>One of the most dangerous JWT vulnerabilities is the algorithm confusion attack. If a server is configured to accept RS256 tokens but does not validate the algorithm claim, an attacker can change the header to HS256 and sign the token using the public key as the HMAC secret. Always validate the <code>alg</code> header against an allowlist on the server side.</p>
+
+<h2>JWT Security Best Practices</h2>
+
+<p>JWTs are a powerful authentication mechanism, but they come with security considerations that every developer should understand:</p>
+
+<ul>
+<li>Always verify the signature before trusting any claims</li>
+<li>Validate <code>exp</code>, <code>iss</code>, and <code>aud</code> claims on every request</li>
+<li>Use asymmetric algorithms (RS256, ES256) for distributed systems where multiple services verify tokens</li>
+<li>Keep token lifetimes short (15 minutes for access tokens) and use refresh tokens for longer sessions</li>
+<li>Never store JWTs in localStorage for sensitive applications &mdash; use httpOnly cookies instead</li>
+<li>Implement token revocation through short expiry times or a server-side blocklist</li>
+</ul>
+
+<p>For more on web security practices, see our <a href="https://lifa-su.github.io/blog/ai-chmod-calculator-linux-file-security.html">Linux file security guide</a> and the <a href="https://lifa-su.github.io/blog/ai-base64-encoding-decoding-developers-guide.html">Base64 encoding guide</a> which covers the encoding format JWTs use internally.</p>
+
+<h2>Decoding JWTs in Code</h2>
+
+<p>You can decode the header and payload without any library since they are just Base64URL-encoded JSON. But for signature verification, use a trusted library:</p>
+
+<pre><code>// Decode without verification (for inspection only)
+function decodeJWT(token) {
+  const [header, payload] = token.split('.').slice(0, 2)
+    .map(part => JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))));
+  return { header, payload };
+}
+
+// Verify with a library (Node.js jsonwebtoken)
+const jwt = require('jsonwebtoken');
+try {
+  const decoded = jwt.verify(token, publicKey, {
+    algorithms: ['RS256'],
+    issuer: 'https://auth.example.com',
+    audience: 'my-api'
+  });
+} catch (err) {
+  console.error('Token invalid:', err.message);
+}</code></pre>
+
+<p>Note the <code>algorithms</code> allowlist in the verify call. This prevents algorithm confusion attacks by explicitly declaring which algorithms your server accepts.</p>
+
+<h2>Decode and Inspect Tokens Instantly</h2>
+
+<p>The <a href="https://lifa-su.github.io/ai-jwt-decoder/">AI JWT Decoder</a> parses any JWT instantly, showing you the decoded header, payload with formatted JSON, expiration status, and algorithm details. It highlights potential security issues like missing expiration claims or weak algorithms. Combine it with our <a href="https://lifa-su.github.io/blog/free-json-formatter-validator-online.html">JSON formatter</a> for working with complex payload structures.</p>
+
+<div class="cta-box">
+<strong>Decode and inspect JWT tokens instantly</strong><br>
+Paste any JWT to see decoded header, payload claims, expiration status, and security warnings. No data sent to any server.
+<br><a href="https://lifa-su.github.io/ai-jwt-decoder/">Try AI JWT Decoder &rarr;</a>
+</div>
+
+<p>The <a href="https://lifa-su.github.io/ai-jwt-decoder/">AI JWT Decoder</a> runs entirely in your browser, so your tokens never leave your machine. Paste a token from your API logs, browser dev tools, or authentication flow and instantly see what is inside, whether it has expired, and if there are any security red flags to address.</p>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &#10084;&#65039; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
