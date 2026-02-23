@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Specificity Calculator - Debug and Fix CSS Cascade Conflicts Like a Pro | Lifa AI Tools Blog</title>
+<meta name="description" content="Learn how to debug CSS specificity issues and fix cascade conflicts. Understand the scoring system, avoid !important traps, and write maintainable CSS.">
+<meta property="og:title" content="AI CSS Specificity Calculator - Debug and Fix CSS Cascade Conflicts Like a Pro">
+<meta property="og:description" content="Debug CSS specificity issues and fix cascade conflicts with our free AI-powered specificity calculator.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="CSS specificity calculator, CSS cascade conflicts, debug CSS, specificity scoring, CSS important, CSS selector priority, AI CSS tools, CSS debugging workflow, maintainable CSS">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-css-specificity-calculator-debug-css.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>AI CSS Specificity Calculator &#8212; Debug and Fix CSS Cascade Conflicts Like a Pro</h1>
+<div class="meta">Published February 23, 2026 &middot; 7 min read &middot; CSS Debugging</div>
+
+<p>You write a CSS rule. You reload the browser. Nothing changes. You add another selector. Still nothing. You slap on <code>!important</code> and it finally works &#8212; but now you have created a bigger problem. Sound familiar?</p>
+
+<p>CSS specificity is the invisible scoring system that determines which styles get applied when multiple rules target the same element. Understanding it is the difference between writing clean, predictable stylesheets and drowning in cascade conflicts. This guide breaks down how specificity works, why your styles are not applying, and how to debug conflicts systematically.</p>
+
+<h2>How CSS Specificity Scoring Actually Works</h2>
+
+<p>Every CSS selector gets a specificity score as a three-part tuple: <code>(IDs, Classes, Elements)</code>. When two rules target the same element, the browser compares these scores left to right. The higher score wins.</p>
+
+<h3>The Specificity Hierarchy</h3>
+
+<ul>
+<li><code>Inline styles</code> &#8212; highest priority (avoid in production)</li>
+<li><code>ID selectors</code> (#header) &#8212; score: <code>(1, 0, 0)</code></li>
+<li><code>Class selectors</code> (.nav), attribute selectors, pseudo-classes (:hover) &#8212; score: <code>(0, 1, 0)</code></li>
+<li><code>Element selectors</code> (div, p), pseudo-elements (::before) &#8212; score: <code>(0, 0, 1)</code></li>
+</ul>
+
+<p>Consider these two selectors targeting the same button:</p>
+
+<pre><code>/* Specificity: (0, 1, 1) */
+.sidebar button {
+  background: blue;
+}
+
+/* Specificity: (0, 2, 0) */
+.sidebar .btn-primary {
+  background: green;
+}</code></pre>
+
+<p>The second rule wins because <code>(0, 2, 0)</code> beats <code>(0, 1, 1)</code> &#8212; two classes outrank one class plus one element.</p>
+
+<div class="cta-box">
+<p>Stop guessing specificity scores. Paste any selector and get instant results.</p>
+<a href="https://lifa-su.github.io/ai-css-specificity/">Try the AI CSS Specificity Calculator</a>
+</div>
+<h2>Why Your Styles Are Not Applying: A Debugging Workflow</h2>
+
+<p>When a CSS rule does not take effect, work through this checklist before reaching for <code>!important</code>:</p>
+
+<h3>Step 1: Inspect the Computed Styles</h3>
+
+<p>Open DevTools (F12), select the element, and check the Computed tab. Look for your property &#8212; if it is crossed out, another rule is overriding it. The Styles panel shows all matching rules sorted by specificity, with the winning rule on top.</p>
+
+<h3>Step 2: Compare Specificity Scores</h3>
+
+<p>Identify the winning selector and your losing selector. Calculate both scores. Here is a real-world conflict:</p>
+
+<pre><code>/* Your rule - Specificity: (0, 1, 0) */
+.card-title {
+  color: #333;
+}
+
+/* Framework rule - Specificity: (0, 2, 1) */
+.content .card h3.card-title {
+  color: #666;
+}</code></pre>
+
+<p>Your single class <code>(0, 1, 0)</code> loses to the framework selector at <code>(0, 2, 1)</code>. You need to either match or exceed that score.</p>
+
+<h3>Step 3: Fix Without Escalating</h3>
+
+<p>Instead of adding <code>!important</code>, increase your selector specificity just enough to win:</p>
+
+<pre><code>/* Boosted - Specificity: (0, 2, 1) */
+.content .card h3.card-title {
+  color: #333;
+}
+
+/* Or use a parent class - Specificity: (0, 2, 0) */
+.my-theme .card-title {
+  color: #333;
+}</code></pre>
+
+<div class="tip">
+<strong>Pro tip:</strong> When building layouts with <a href="https://lifa-su.github.io/blog/ai-css-generator-flexbox-grid.html">flexbox and grid</a>, keep your selectors flat. Deep nesting creates high-specificity selectors that are hard to override later.
+</div>
+
+<h2>The !important Trap and How to Escape It</h2>
+
+<p>Using <code>!important</code> does not fix specificity problems &#8212; it bypasses them. And once you start, you end up in an escalation war where every override needs its own <code>!important</code>.</p>
+
+<p>Here is what the cascade looks like when <code>!important</code> enters the picture:</p>
+
+<ol>
+<li>Normal declarations (sorted by specificity)</li>
+<li><code>!important</code> declarations (sorted by specificity)</li>
+<li>Inline <code>!important</code> (almost impossible to override)</li>
+</ol>
+
+<p>The real danger: two competing <code>!important</code> rules still resolve by specificity. So you are back to the same problem, just at a higher escalation level:</p>
+
+<pre><code>/* Specificity: (0, 1, 0) + !important */
+.btn { background: red !important; }
+
+/* Specificity: (1, 1, 0) + !important - WINS */
+#nav .btn { background: blue !important; }</code></pre>
+
+<p>The second rule wins because among <code>!important</code> declarations, normal specificity rules still apply. This is how stylesheets become unmaintainable.</p>
+<h2>Strategies for Writing Low-Specificity Maintainable CSS</h2>
+
+<p>The best way to avoid specificity conflicts is to keep specificity low and consistent across your entire codebase. Here are proven strategies:</p>
+
+<h3>Use BEM Naming Convention</h3>
+
+<p>BEM (Block Element Modifier) keeps everything at single-class specificity <code>(0, 1, 0)</code>:</p>
+
+<pre><code>/* All selectors at (0, 1, 0) - easy to override */
+.card { }
+.card__title { }
+.card__title--highlighted { }
+.card__body { }</code></pre>
+
+<p>No nesting, no IDs, no element selectors. Every rule has the same weight, so source order becomes the tiebreaker &#8212; which is predictable and easy to manage.</p>
+
+<h3>Leverage CSS Cascade Layers</h3>
+
+<p>The <code>@layer</code> rule, supported in all modern browsers, lets you control cascade priority independent of specificity:</p>
+
+<pre><code>@layer framework, components, utilities;
+
+@layer framework {
+  #app .card h3 { color: gray; }  /* High specificity, but low layer */
+}
+
+@layer utilities {
+  .text-white { color: #fff; }    /* Low specificity, but high layer - WINS */
+}</code></pre>
+
+<p>Layers are a game-changer. A single class in a higher layer beats an ID selector in a lower layer. This is how modern CSS frameworks like Tailwind v4 manage their styles.</p>
+
+<h3>Avoid ID Selectors in Stylesheets</h3>
+
+<p>A single ID selector <code>(1, 0, 0)</code> outweighs 10 class selectors <code>(0, 10, 0)</code>. IDs create specificity spikes that force every override to also use IDs or resort to <code>!important</code>. Use classes instead &#8212; always.</p>
+
+<div class="tip">
+<strong>Quick check:</strong> If you are working with <a href="https://lifa-su.github.io/blog/ai-css-animation-generator-effects.html">CSS animations</a> or <a href="https://lifa-su.github.io/blog/ai-css-box-shadow-layering-depth-effects.html">layered box shadows</a>, specificity conflicts multiply fast when combining visual effects. Calculate before you code.
+</div>
+
+<h2>Real-World Specificity Battle: Framework vs Custom Styles</h2>
+
+<p>One of the most common specificity headaches is overriding framework styles. Here is a typical scenario with Bootstrap-style CSS:</p>
+
+<pre><code>/* Bootstrap (loaded first) */
+#app .container .card h3 {       /* (1, 2, 1) */
+  font-size: 1.2rem;
+  color: #212529;
+}
+
+/* Your styles (loaded second) */
+.card__title {                    /* (0, 1, 0) - LOSES */
+  font-size: 1.5rem;
+  color: #fff;
+}</code></pre>
+
+<p>The framework selector scores <code>(1, 2, 1)</code> thanks to the ID. Your BEM class scores <code>(0, 1, 0)</code>. Source order does not matter here &#8212; the framework wins on specificity alone.</p>
+
+<p>The fix options, ranked from best to worst:</p>
+
+<ol>
+<li>Use <code>@layer</code> to put framework styles in a lower-priority layer</li>
+<li>Match the specificity: <code>#app .card__title</code> &#8212; score <code>(1, 1, 0)</code>, then wins by source order</li>
+<li>Use <code>!important</code> &#8212; last resort only</li>
+</ol>
+<h2>Your CSS Specificity Debugging Cheat Sheet</h2>
+
+<p>Keep this workflow handy next time a style refuses to apply:</p>
+
+<ol>
+<li>Open DevTools and find the overriding rule in the Styles panel</li>
+<li>Calculate both specificity scores (or use the <a href="https://lifa-su.github.io/ai-css-specificity/">AI Specificity Calculator</a>)</li>
+<li>Increase your selector specificity just enough to win &#8212; do not overshoot</li>
+<li>Never use <code>!important</code> unless overriding third-party inline styles</li>
+<li>Refactor to <code>@layer</code> if you are fighting framework specificity regularly</li>
+<li>Adopt BEM or similar flat naming to keep baseline specificity at <code>(0, 1, 0)</code></li>
+</ol>
+
+<p>Specificity is not complicated once you see it as a scoring system rather than magic. Every conflict has a logical explanation, and every fix follows from understanding the numbers. When working with complex visual effects like <a href="https://lifa-su.github.io/blog/ai-css-glassmorphism-accessible-design.html">glassmorphism designs</a> or <a href="https://lifa-su.github.io/blog/ai-css-filter-generator-visual-effects.html">CSS filter effects</a>, keeping specificity low from the start saves hours of debugging later.</p>
+
+<div class="cta-box">
+<p>Debug specificity conflicts instantly. Paste your selectors, compare scores, and find the winning rule in seconds.</p>
+<a href="https://lifa-su.github.io/ai-css-specificity/">Open the AI CSS Specificity Calculator</a>
+</div>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools &mdash; <a href="https://lifa-su.github.io/">Home</a> &middot; <a href="https://lifa-su.github.io/blog/">Blog</a> &middot; <a href="https://lifa-su.github.io/about.html">About</a></footer>
+</body>
+</html>
