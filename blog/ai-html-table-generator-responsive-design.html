@@ -48,25 +48,35 @@
   width: 100%;
 }</code></pre>
 
-<p>This works well for data-dense tables where every column matters equally. Add a subtle gradient shadow on the right edge to hint that more content is available. The <a href="https://lifa-su.github.io/ai-css-generator/">AI CSS Generator</a> can produce these scroll-hint effects with a single prompt.</p>
+<p>This works well for data-dense tables where every column matters equally. Add a subtle gradient shadow on the right edge to hint that more content is available. For generating the wrapper CSS quickly, the <a href="https://lifa-su.github.io/ai-css-generator/">AI CSS Generator</a> can produce scroll containers with custom styling in seconds.</p>
 
 <h3>2. Stacked Card Layout</h3>
 
-<p>For tables with fewer than 6 columns, you can reflow each row into a vertical card on small screens. Each cell displays its column header as a label using CSS <code>::before</code> pseudo-elements and <code>data-label</code> attributes:</p>
+<p>On small screens, transform each table row into a vertical card. Each cell displays its column header as a label, stacking the data vertically. This is the most readable pattern for <strong>mobile friendly table</strong> designs:</p>
 
 <pre><code>@media (max-width: 640px) {
-  table, thead, tbody, tr, th, td {
+  table, thead, tbody, th, td, tr {
     display: block;
   }
+
   thead {
     position: absolute;
-    clip: rect(0 0 0 0);
+    left: -9999px;
   }
+
+  tr {
+    margin-bottom: 16px;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
   td {
-    padding: 8px 12px;
-    padding-left: 45%;
+    padding: 8px 0;
     position: relative;
+    padding-left: 45%;
   }
+
   td::before {
     content: attr(data-label);
     position: absolute;
@@ -76,151 +86,166 @@
   }
 }</code></pre>
 
-<p>This pattern transforms a wide table into a series of readable cards. Each row becomes its own block, with labels on the left and values on the right. It is ideal for comparison tables, contact lists, and order summaries.</p>
+<p>The trick is the <code>data-label</code> attribute on each <code>&lt;td&gt;</code>. You add it to your HTML like <code>&lt;td data-label="Price"&gt;$29&lt;/td&gt;</code>, and CSS uses it to display the column header inline. This is where a <strong>data table generator</strong> saves enormous time&mdash;manually adding <code>data-label</code> to every cell in a 50-row table is tedious and error-prone.</p>
 
 <h3>3. Priority Columns</h3>
 
-<p>When a table has many columns but only a few are essential, hide lower-priority columns on small screens and let users toggle them:</p>
+<p>Not all columns are equally important. Priority columns let you show essential data on mobile and hide secondary columns behind a toggle or detail view:</p>
 
 <pre><code>@media (max-width: 640px) {
-  .col-priority-low {
+  .col-secondary {
     display: none;
+  }
+
+  .expand-btn {
+    display: inline-block;
   }
 }
 
-@media (max-width: 480px) {
-  .col-priority-medium {
+@media (min-width: 641px) {
+  .expand-btn {
     display: none;
   }
 }</code></pre>
 
-<p>Pair this with a "Show all columns" toggle button for users who need the full dataset. This approach keeps the table scannable on mobile without losing information entirely.</p>
+<p>Mark columns with priority classes like <code>col-primary</code> and <code>col-secondary</code>. On mobile, secondary columns collapse and a "Show more" button reveals the full row. This pattern works especially well for comparison tables and product listings.</p>
 
-<div class="tip"><strong>Tip:</strong> Not sure which pattern fits your data? The <a href="https://lifa-su.github.io/ai-table-generator/">AI Table Generator</a> analyzes your column count and data types to recommend the best responsive strategy automatically.</div>
+<div class="cta-box">
+<p><strong>Skip the manual work.</strong> Our AI Table Generator creates responsive, accessible tables with all three patterns built in.</p>
+<a href="https://lifa-su.github.io/ai-table-generator/">Generate Responsive Tables Free &rarr;</a>
+</div>
 
-<h2>Accessible HTML Tables: Beyond the Basics</h2>
+<h2>Making Tables Accessible: ARIA, Scope, and Semantic Markup</h2>
 
-<p>An <strong>accessible html table</strong> is not just about adding <code>alt</code> text. Screen readers like NVDA, JAWS, and VoiceOver navigate tables cell by cell, announcing row and column headers for context. Without proper semantic markup, users hear a stream of disconnected values with no way to understand what each number means.</p>
+<p>A <strong>responsive table design</strong> means nothing if screen reader users cannot navigate the data. <strong>Table accessibility ARIA</strong> attributes and proper semantic HTML are non-negotiable for an <strong>accessible html table</strong>.</p>
 
 <h3>Essential Semantic Elements</h3>
 
-<ul>
-<li><code>&lt;caption&gt;</code> &mdash; Provides a title for the table. Screen readers announce it before the data, giving users context. Think of it as the table&rsquo;s <code>&lt;h2&gt;</code>.</li>
-<li><code>&lt;th scope="col"&gt;</code> &mdash; Marks column headers. The <code>scope</code> attribute tells assistive technology which cells this header describes.</li>
-<li><code>&lt;th scope="row"&gt;</code> &mdash; Marks row headers for tables where the first column labels each row (e.g., feature comparison tables).</li>
-<li><code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, <code>&lt;tfoot&gt;</code> &mdash; Group rows semantically. Screen readers use these to distinguish header rows from data rows.</li>
-</ul>
+<p>Every data table needs these foundational elements:</p>
 
-<h3>ARIA Attributes for Complex Tables</h3>
-
-<p>Simple tables with clear headers rarely need ARIA. But for complex tables with merged cells, nested headers, or interactive sorting, <strong>table accessibility aria</strong> attributes become essential:</p>
-
-<pre><code>&lt;table role="grid" aria-label="Q4 Sales Report"&gt;
+<pre><code>&lt;table role="table" aria-label="Quarterly revenue by region"&gt;
+  &lt;caption&gt;Quarterly Revenue by Region (2026)&lt;/caption&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th scope="col" aria-sort="ascending"&gt;Region&lt;/th&gt;
-      &lt;th scope="col" aria-sort="none"&gt;Revenue&lt;/th&gt;
-      &lt;th scope="col" aria-sort="none"&gt;Growth&lt;/th&gt;
+      &lt;th scope="col"&gt;Region&lt;/th&gt;
+      &lt;th scope="col"&gt;Q1&lt;/th&gt;
+      &lt;th scope="col"&gt;Q2&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;th scope="row"&gt;North America&lt;/th&gt;
+      &lt;td&gt;$1.2M&lt;/td&gt;
+      &lt;td&gt;$1.4M&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
 &lt;/table&gt;</code></pre>
 
 <ul>
-<li><code>role="grid"</code> &mdash; Use for interactive tables with sortable columns or editable cells. For static data, the default <code>table</code> role is sufficient.</li>
-<li><code>aria-sort</code> &mdash; Indicates the current sort direction. Update it dynamically when users click column headers.</li>
-<li><code>aria-describedby</code> &mdash; Link to a paragraph that explains the table&rsquo;s data or how to interact with it.</li>
-<li><code>aria-colcount</code> and <code>aria-rowcount</code> &mdash; Useful when the table is virtualized and only a subset of rows is rendered in the DOM.</li>
+<li><code>&lt;caption&gt;</code> provides a visible title that screen readers announce when entering the table</li>
+<li><code>scope="col"</code> on header cells tells assistive technology which direction the header applies</li>
+<li><code>scope="row"</code> on the first cell of each row creates row headers for horizontal navigation</li>
+<li><code>aria-label</code> provides a concise description when the caption is too verbose or styled differently</li>
 </ul>
 
-<p>Ensure your color choices meet contrast requirements too. The <a href="https://lifa-su.github.io/ai-color-contrast-checker/">AI Color Contrast Checker</a> validates that your table text and background combinations pass WCAG AA standards, and the <a href="https://lifa-su.github.io/ai-accessibility-checker/">AI Accessibility Checker</a> can audit your full table markup for issues.</p>
-
-<div class="cta-box">
-<p>Skip the manual markup. Generate responsive, accessible HTML tables with proper semantics, ARIA attributes, and mobile-ready CSS&mdash;all from a visual editor.</p>
-<a href="https://lifa-su.github.io/ai-table-generator/">Try the AI Table Generator &rarr;</a>
+<div class="tip">
+<strong>Tip:</strong> Use the <a href="https://lifa-su.github.io/ai-accessibility/">AI Accessibility Checker</a> to validate your table markup against WCAG 2.2 guidelines. It catches missing <code>scope</code> attributes, absent captions, and incorrect ARIA roles automatically.
 </div>
 
-<h2>Modern CSS Table Techniques</h2>
+<h3>ARIA Roles for Complex Tables</h3>
 
-<p>A well-structured <strong>css table layout</strong> goes beyond basic borders. Here are the techniques that make data tables look polished and feel usable:</p>
+<p>For tables with merged cells, nested headers, or interactive sorting, you need additional ARIA attributes:</p>
 
-<h3>Sticky Headers</h3>
+<ul>
+<li><code>aria-sort="ascending"</code> or <code>aria-sort="descending"</code> on sortable column headers</li>
+<li><code>aria-describedby</code> to link cells to footnotes or explanatory text</li>
+<li><code>role="rowgroup"</code> for grouped sections within <code>&lt;tbody&gt;</code></li>
+<li><code>headers</code> attribute on <code>&lt;td&gt;</code> elements to explicitly associate cells with their headers in complex multi-level tables</li>
+</ul>
 
-<p>When users scroll through long tables, they lose track of which column is which. Sticky headers solve this:</p>
+<p>For color-dependent information in tables (like red for negative values), always ensure sufficient contrast. The <a href="https://lifa-su.github.io/ai-color-contrast/">AI Color Contrast Checker</a> verifies your table color choices meet WCAG AA and AAA standards.</p>
 
-<pre><code>thead th {
+<h2>Modern CSS Table Styling Techniques</h2>
+
+<p>A well-styled table improves readability and user experience. Here is a complete <strong>css table layout</strong> with sticky headers, zebra striping, and hover states:</p>
+
+<pre><code>table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Sticky header */
+thead th {
   position: sticky;
   top: 0;
   background: #12121a;
   z-index: 10;
-  box-shadow: 0 1px 0 #1e1e2e;
-}</code></pre>
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #6c5ce7;
+}
 
-<p>The header row stays fixed at the top of the viewport (or scroll container) while the body scrolls beneath it. The <code>box-shadow</code> creates a subtle separator so the header does not visually merge with the first data row.</p>
-
-<h3>Zebra Striping and Hover States</h3>
-
-<p>Alternating row colors help users track data across wide tables. Hover states highlight the current row for precise reading:</p>
-
-<pre><code>tbody tr:nth-child(even) {
+/* Zebra striping */
+tbody tr:nth-child(even) {
   background: rgba(108, 92, 231, 0.05);
 }
 
+/* Hover state */
 tbody tr:hover {
   background: rgba(0, 206, 201, 0.08);
   transition: background 0.15s ease;
-}</code></pre>
-
-<p>Keep the contrast subtle. Heavy zebra striping competes with the data itself. A 3&ndash;5% opacity shift is enough to guide the eye without overwhelming the content.</p>
-
-<h3>Responsive Column Sizing</h3>
-
-<p>Use <code>table-layout: fixed</code> with percentage widths for predictable column sizing, or let the browser auto-calculate with <code>table-layout: auto</code>. For fine-grained control, combine <code>min-width</code> and <code>max-width</code> on <code>&lt;th&gt;</code> elements:</p>
-
-<pre><code>table {
-  table-layout: fixed;
-  width: 100%;
 }
 
-th:first-child { width: 30%; }
-th:nth-child(2) { width: 20%; }
-th:last-child { width: 50%; }</code></pre>
+/* Cell padding and borders */
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #1e1e2e;
+}
 
-<h2>Tables vs. CSS Grid vs. Flexbox</h2>
+/* Numeric alignment */
+td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}</code></pre>
 
-<p>A common question: should you use <code>&lt;table&gt;</code> elements or build table-like layouts with <a href="https://lifa-su.github.io/ai-css-grid-generator/">CSS Grid</a> or <a href="https://lifa-su.github.io/ai-flexbox-generator/">Flexbox</a>?</p>
+<p>The <code>font-variant-numeric: tabular-nums</code> property ensures numbers align vertically in columns&mdash;a small detail that makes financial and statistical tables significantly easier to scan. Use <code>border-collapse: separate</code> instead of <code>collapse</code> when you need <code>border-radius</code> on the table or sticky positioning on headers.</p>
 
-<p>The answer depends on the content:</p>
+<p>Need to generate custom table styles quickly? The <a href="https://lifa-su.github.io/ai-css-generator/">AI CSS Generator</a> can produce complete table stylesheets from a text description.</p>
+
+<h2>Tables vs. CSS Grid vs. Flexbox: When to Use What</h2>
+
+<p>Not every grid of data belongs in a <code>&lt;table&gt;</code>. Here is when to use each approach:</p>
 
 <ul>
-<li>Use <code>&lt;table&gt;</code> for <strong>actual tabular data</strong>&mdash;anything where rows and columns have a meaningful relationship (spreadsheets, reports, comparisons). Screen readers understand table semantics natively.</li>
-<li>Use <strong>CSS Grid</strong> for <strong>layout that looks like a table</strong> but is not data&mdash;pricing cards, feature grids, dashboard widgets. Grid gives you full control over responsive reflow without fighting table rendering. Learn more in our <a href="https://lifa-su.github.io/blog/ai-css-grid-template-visual-layout-builder.html">CSS Grid Template guide</a>.</li>
-<li>Use <strong>Flexbox</strong> for <strong>single-axis layouts</strong>&mdash;navigation bars, toolbars, or card rows that wrap. Flexbox is not designed for two-dimensional data alignment. See our <a href="https://lifa-su.github.io/blog/ai-css-generator-flexbox-grid.html">Flexbox and Grid comparison</a> for deeper guidance.</li>
+<li><strong>Use <code>&lt;table&gt;</code></strong> for actual tabular data&mdash;information where rows and columns have a meaningful relationship. Financial reports, comparison charts, schedules, and datasets. Screen readers understand table semantics natively.</li>
+<li><strong>Use <a href="https://lifa-su.github.io/ai-css-grid-template/">CSS Grid</a></strong> for page layouts that look like tables but are not data. Pricing cards, feature grids, and dashboard widgets. Grid gives you responsive reflow without the semantic baggage of table elements.</li>
+<li><strong>Use <a href="https://lifa-su.github.io/ai-css-flexbox/">Flexbox</a></strong> for single-axis layouts. Navigation bars, form rows, and card lists. Flexbox handles wrapping and alignment beautifully but is not designed for two-dimensional data relationships.</li>
 </ul>
 
-<p>If you use CSS Grid to display tabular data, add <code>role="table"</code>, <code>role="row"</code>, and <code>role="cell"</code> ARIA roles so assistive technology can still parse the structure. But in most cases, a semantic <code>&lt;table&gt;</code> with responsive CSS is the better choice.</p>
+<div class="tip">
+<strong>Rule of thumb:</strong> If the data makes sense in a spreadsheet, use a <code>&lt;table&gt;</code>. If it is a visual layout that happens to look grid-like, use CSS Grid or Flexbox instead.
+</div>
 
 <h2>Optimizing Table Output for Production</h2>
 
-<p>Once your <strong>data table generator</strong> produces the HTML, a few extra steps prepare it for production:</p>
+<p>Generated table HTML can be verbose. Before deploying, run your markup through the <a href="https://lifa-su.github.io/ai-html-minifier/">AI HTML Minifier</a> to strip whitespace, remove optional tags, and reduce file size without affecting rendering.</p>
 
-<ul>
-<li><strong>Minify the markup</strong> &mdash; Table HTML is verbose. Run it through the <a href="https://lifa-su.github.io/ai-html-minifier/">AI HTML Minifier</a> to strip whitespace and reduce file size, especially for tables embedded in emails or static pages.</li>
-<li><strong>Export as JSON or CSV</strong> &mdash; Need the same data in an API response or spreadsheet? The <a href="https://lifa-su.github.io/ai-json-to-csv/">JSON to CSV Converter</a> handles format conversion without manual reformatting.</li>
-<li><strong>Test with a screen reader</strong> &mdash; No automated tool catches every accessibility issue. Tab through your table with VoiceOver (macOS) or NVDA (Windows) to verify that headers are announced correctly and navigation makes sense.</li>
-</ul>
+<p>If your data originates from JSON APIs or databases, the <a href="https://lifa-su.github.io/ai-json-to-csv/">AI JSON to CSV Converter</a> can transform raw data into table-ready formats before you generate the final HTML.</p>
 
-<div class="tip"><strong>Related reading:</strong> If you are new to table generation, start with our <a href="https://lifa-su.github.io/blog/free-ai-table-generator-html-markdown-csv.html">guide to generating HTML, Markdown, and CSV tables</a> for the fundamentals of table creation and format conversion.</div>
+<h2>Putting It All Together</h2>
 
-<h2>Wrapping Up</h2>
+<p>A production-ready <strong>accessible html table</strong> combines all three layers: semantic HTML with proper <code>scope</code> and <code>caption</code> elements, ARIA attributes for complex interactions, and responsive CSS that adapts to any screen size. Getting all of this right manually for every table is time-consuming and error-prone.</p>
 
-<p>Responsive, accessible tables require more than just a <code>&lt;table&gt;</code> tag. You need semantic HTML for screen readers, ARIA attributes for complex interactions, and CSS patterns that adapt gracefully from desktop to mobile. Getting all of this right by hand is tedious and error-prone.</p>
-
-<p>An AI-powered <strong>html table generator</strong> handles the structural complexity for you&mdash;producing clean markup with proper <code>scope</code> attributes, <code>&lt;caption&gt;</code> elements, responsive CSS, and mobile-friendly layouts. You focus on the data; the tool handles the code.</p>
+<p>That is exactly why an AI-powered <strong>html table generator</strong> exists. Describe your data, choose your responsive pattern, and get production-ready code with accessibility baked in&mdash;no manual <code>data-label</code> attributes, no forgotten <code>scope</code> declarations, no broken mobile layouts.</p>
 
 <div class="cta-box">
-<p>Generate production-ready responsive tables with built-in accessibility. No manual markup required.</p>
-<a href="https://lifa-su.github.io/ai-table-generator/">Open the AI Table Generator &rarr;</a>
+<p><strong>Ready to build better tables?</strong> Generate responsive, accessible HTML tables in seconds with AI.</p>
+<a href="https://lifa-su.github.io/ai-table-generator/">Try the AI Table Generator &rarr;</a>
 </div>
+
+<p>For more on table generation basics and format options, see our guide on <a href="https://lifa-su.github.io/blog/free-ai-table-generator-html-markdown-csv.html">free AI table generation for HTML, Markdown, and CSV</a>.</p>
 
 </article>
 <footer>&copy; 2026 Lifa AI Tools. Built with &#10084;&#65039; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>

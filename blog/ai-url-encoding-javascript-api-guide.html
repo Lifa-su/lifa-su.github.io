@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI URL Encoding in JavaScript — encodeURI vs encodeURIComponent Explained | Lifa AI Tools Blog</title>
+<meta name="description" content="Master URL encoding in JavaScript APIs. Learn the difference between encodeURI and encodeURIComponent, handle international characters, debug encoding issues, and encode URLs with AI.">
+<meta property="og:title" content="AI URL Encoding in JavaScript — encodeURI vs encodeURIComponent Explained">
+<meta property="og:description" content="Master JavaScript URL encoding. encodeURI vs encodeURIComponent, international characters, API query strings, and common pitfalls.">
+<meta property="og:type" content="article">
+<meta name="keywords" content="url encoding javascript, encodeURIComponent, encodeURI, javascript url encode, percent encoding api, url encode query string, javascript api url, url encode special characters, fetch api url encoding, ai url encoder">
+<link rel="canonical" href="https://lifa-su.github.io/blog/ai-url-encoding-javascript-api-guide.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<article class="article">
+<h1>AI URL Encoding in JavaScript &mdash; encodeURI vs encodeURIComponent Explained</h1>
+<div class="meta">Published February 23, 2026 &middot; 9 min read &middot; Developer Tools</div>
+
+<p>You are building a search feature and a user types <code>C++ tutorials &amp; guides</code> into the search box. Your code constructs a URL like <code>/search?q=C++ tutorials &amp; guides</code> and passes it to <code>fetch()</code>. The API returns zero results. The <code>+</code> signs got interpreted as spaces, the <code>&amp;</code> split your query into two parameters, and the server received <code>q=C</code> and a mystery parameter called <code>guides</code>. Choosing the right JavaScript encoding function would have prevented this entirely.</p>
+
+<p>If you have read our <a href="https://lifa-su.github.io/blog/ai-url-encoder-decoder-guide.html">URL encoding fundamentals guide</a>, you know how percent-encoding works at the protocol level. This article goes deeper into the JavaScript side &mdash; when to use which function, how the modern URL API simplifies everything, and the encoding pitfalls that catch experienced developers.</p>
+
+<h2>The Three JavaScript Encoding Functions</h2>
+
+<p>JavaScript provides three built-in functions for URL encoding, and using the wrong one is the single most common source of URL bugs in web applications.</p>
+
+<h3>encodeURIComponent &mdash; The One You Usually Want</h3>
+
+<p><code>encodeURIComponent()</code> encodes everything except letters, digits, and the characters <code>- _ . ! ~ * ' ( )</code>. It is designed for encoding individual URI components &mdash; a query parameter value, a path segment, a fragment identifier:</p>
+
+<pre><code>const query = 'C++ tutorials & guides';
+const url = `/search?q=${encodeURIComponent(query)}`;
+// /search?q=C%2B%2B%20tutorials%20%26%20guides</code></pre>
+
+<p>This is the correct choice for query parameter values because it encodes <code>&amp;</code>, <code>=</code>, <code>+</code>, <code>/</code>, and <code>?</code> &mdash; all characters that have special meaning in URLs. If you remember only one rule: use <code>encodeURIComponent</code> for values, not full URLs.</p>
+
+<h3>encodeURI &mdash; For Complete URLs</h3>
+
+<p><code>encodeURI()</code> encodes a full URI but preserves characters that are structurally meaningful in URLs: <code>: / ? # [ ] @ ! $ &amp; ' ( ) * + , ; =</code>. Use it when you have a complete URL that might contain non-ASCII characters but whose structure is already correct:</p>
+
+<pre><code>const pageUrl = 'https://example.com/café/menü';
+const encoded = encodeURI(pageUrl);
+// https://example.com/caf%C3%A9/men%C3%BC</code></pre>
+
+<p>Notice that the slashes, colon, and protocol remain intact. If you had used <code>encodeURIComponent</code> here, the <code>://</code> and <code>/</code> would be encoded too, producing an unusable string.</p>
+
+<h3>The Legacy escape() &mdash; Never Use It</h3>
+
+<p>The <code>escape()</code> function is deprecated and handles Unicode incorrectly. It encodes characters above U+00FF using a non-standard <code>%uXXXX</code> format that no server expects. If you see <code>escape()</code> in a codebase, replace it with <code>encodeURIComponent()</code>.</p>
+
+<div class="tip"><strong>Quick rule:</strong> Use <code>encodeURIComponent()</code> for parameter values. Use <code>encodeURI()</code> for full URLs with non-ASCII characters. Use the <code>URL</code> API (below) when building URLs from parts. Never use <code>escape()</code>.</div>
+
+<h2>The Modern URL API</h2>
+
+<p>The <code>URL</code> and <code>URLSearchParams</code> APIs handle encoding automatically, eliminating the need to call encoding functions manually in most cases:</p>
+
+<pre><code>const url = new URL('https://api.example.com/search');
+url.searchParams.set('q', 'C++ tutorials & guides');
+url.searchParams.set('lang', 'en');
+url.searchParams.set('page', '1');
+
+console.log(url.toString());
+// https://api.example.com/search?q=C%2B%2B+tutorials+%26+guides&lang=en&page=1</code></pre>
+
+<p>Notice that <code>URLSearchParams</code> uses <code>+</code> for spaces instead of <code>%20</code>. Both are valid in query strings (the <code>application/x-www-form-urlencoded</code> format uses <code>+</code>), but this difference occasionally causes issues with servers that only accept <code>%20</code>. If you hit that edge case:</p>
+
+<pre><code>const params = new URLSearchParams({ q: 'hello world' });
+const fixed = params.toString().replace(/\+/g, '%20');
+// q=hello%20world</code></pre>
+
+<h3>Building URLs Safely with URL API</h3>
+
+<p>The <code>URL</code> constructor also handles path encoding. This is particularly useful when path segments come from user input or database values:</p>
+
+<pre><code>const base = 'https://api.example.com';
+const category = 'electronics/phones & tablets';
+
+// Wrong — breaks the URL structure
+const bad = `${base}/category/${category}`;
+
+// Right — encode the path segment
+const url = new URL(`/category/${encodeURIComponent(category)}`, base);
+// https://api.example.com/category/electronics%2Fphones%20%26%20tablets</code></pre>
+
+<p>The <code>URL</code> API validates the result, throwing a <code>TypeError</code> if the URL is malformed. This built-in validation catches bugs at construction time rather than at request time.</p>
+
+<h2>Common Encoding Pitfalls</h2>
+
+<h3>Double Encoding</h3>
+
+<p>The most insidious encoding bug is double encoding &mdash; encoding a string that is already encoded. A <code>%20</code> becomes <code>%2520</code> (the <code>%</code> gets encoded to <code>%25</code>), and the server receives literal <code>%20</code> instead of a space:</p>
+
+<pre><code>// Bug: encoding twice
+const value = 'hello world';
+const once = encodeURIComponent(value);  // hello%20world
+const twice = encodeURIComponent(once);  // hello%2520world ← broken</code></pre>
+
+<p>This happens when encoding functions are called at multiple layers &mdash; once in your code, once in a library, and once in the HTTP client. Audit your encoding chain and encode exactly once, as close to the URL construction point as possible.</p>
+
+<h3>Encoding the Entire URL</h3>
+
+<p>A common mistake is wrapping an entire URL in <code>encodeURIComponent()</code>:</p>
+
+<pre><code>// Wrong — destroys URL structure
+const broken = encodeURIComponent('https://example.com/path?key=value');
+// https%3A%2F%2Fexample.com%2Fpath%3Fkey%3Dvalue
+
+// Right — encode only the dynamic parts
+const safe = `https://example.com/path?key=${encodeURIComponent(userValue)}`;</code></pre>
+
+<h3>Forgetting to Encode Path Segments</h3>
+
+<p>Developers often encode query parameters but forget that path segments can also contain special characters. A username like <code>user/admin</code> or a filename like <code>report (final).pdf</code> will break your URL if not encoded:</p>
+
+<pre><code>const filename = 'report (final).pdf';
+const url = `/files/${encodeURIComponent(filename)}`;
+// /files/report%20(final).pdf</code></pre>
+
+<div class="tip"><strong>Pro tip:</strong> When debugging URL encoding issues, use the browser DevTools Network tab. Click on a request and check the "Query String Parameters" section &mdash; Chrome automatically decodes the parameters so you can see what the server actually received. For quick encoding tests, use the <a href="https://lifa-su.github.io/ai-url-encoder/">AI URL Encoder</a> to visualize the encoding in real time.</div>
+
+<h2>Encoding in Different Contexts</h2>
+
+<h3>Fetch API and Axios</h3>
+
+<p>Modern HTTP clients like <code>fetch()</code> and Axios do not automatically encode URL parameters. You must encode them yourself or use <code>URLSearchParams</code>:</p>
+
+<pre><code>// fetch with URLSearchParams
+const params = new URLSearchParams({
+  q: 'machine learning',
+  category: 'AI & ML',
+  limit: '20'
+});
+
+const response = await fetch(`https://api.example.com/search?${params}`);
+
+// Axios with params object (Axios encodes automatically)
+const response = await axios.get('https://api.example.com/search', {
+  params: { q: 'machine learning', category: 'AI & ML' }
+});</code></pre>
+
+<p>Axios serializes the <code>params</code> object and handles encoding internally. If you pass a pre-encoded string as the URL, Axios will not double-encode it &mdash; but mixing manual encoding with Axios params can cause issues.</p>
+
+<h3>Form Submissions</h3>
+
+<p>HTML forms use <code>application/x-www-form-urlencoded</code> encoding by default, which is slightly different from standard percent-encoding. Spaces become <code>+</code> instead of <code>%20</code>, and the encoding rules differ for a few characters. The <code>URLSearchParams</code> API follows this format, making it the right choice for building form-like request bodies:</p>
+
+<pre><code>const body = new URLSearchParams({
+  username: 'john doe',
+  password: 'p@ss&word!'
+});
+
+fetch('/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: body.toString()
+});</code></pre>
+
+<h3>Encoding for Different Languages</h3>
+
+<p>International characters (Chinese, Arabic, emoji) are encoded as their UTF-8 byte sequences. A single emoji can expand to 12 characters of percent-encoded text:</p>
+
+<pre><code>encodeURIComponent('🚀')  // %F0%9F%9A%80
+encodeURIComponent('日本語') // %E6%97%A5%E6%9C%AC%E8%AA%9E</code></pre>
+
+<p>This is correct behavior. Servers that support UTF-8 (which is nearly all modern servers) will decode these byte sequences back to the original characters. If your server returns garbled text, check that it is reading the request as UTF-8, not Latin-1 or another encoding.</p>
+
+<div class="cta-box">
+<p><strong>Encode and decode URLs instantly</strong></p>
+<p>Paste any URL or text, see the encoded result in real time, and switch between encodeURI and encodeURIComponent modes.</p>
+<a href="https://lifa-su.github.io/ai-url-encoder/">Try AI URL Encoder &rarr;</a>
+</div>
+
+<h2>Testing and Debugging URL Encoding</h2>
+
+<p>When URL encoding goes wrong, the symptoms are often misleading &mdash; 404 errors, empty search results, or garbled text that looks like a different bug entirely. Here is a systematic debugging approach:</p>
+
+<ol>
+<li>Log the full URL before sending the request &mdash; <code>console.log(url.toString())</code></li>
+<li>Check the Network tab in DevTools for the actual request URL</li>
+<li>Compare the "Request URL" with the decoded "Query String Parameters"</li>
+<li>Look for <code>%25</code> in the URL &mdash; this is the telltale sign of double encoding</li>
+<li>Test with the <a href="https://lifa-su.github.io/ai-url-encoder/">AI URL Encoder</a> to verify expected output</li>
+</ol>
+
+<p>For automated testing, write unit tests that verify encoding for edge cases: strings with <code>&amp;</code>, <code>=</code>, <code>+</code>, spaces, Unicode characters, and already-encoded strings. These tests catch encoding regressions before they reach production.</p>
+
+<h2>Wrapping Up</h2>
+
+<p>URL encoding in JavaScript comes down to three rules: use <code>encodeURIComponent()</code> for individual values, use the <code>URL</code>/<code>URLSearchParams</code> API for building complete URLs, and encode exactly once. The modern URL API handles most encoding automatically and validates your URLs at construction time, making it the safest approach for new code.</p>
+
+<p>Explore more developer tools for working with URLs and data:</p>
+
+<ul>
+<li><a href="https://lifa-su.github.io/blog/ai-url-encoder-decoder-guide.html">URL Encoding Fundamentals</a> for the protocol-level explanation</li>
+<li><a href="https://lifa-su.github.io/blog/ai-base64-encoding-decoding-developers-guide.html">Base64 Encoding Guide</a> for encoding binary data in URLs</li>
+<li><a href="https://lifa-su.github.io/blog/ai-http-status-codes-quick-reference.html">HTTP Status Codes Reference</a> for debugging API responses</li>
+<li><a href="https://lifa-su.github.io/blog/ai-regex-builder-visual-patterns.html">AI Regex Builder</a> for validating URL patterns</li>
+</ul>
+
+<p>The <a href="https://lifa-su.github.io/ai-url-encoder/">AI URL Encoder</a> lets you paste any text, see the encoded output instantly, toggle between encoding modes, and decode percent-encoded strings back to readable text &mdash; all in your browser with zero setup.</p>
+
+</article>
+<footer>&copy; 2026 Lifa AI Tools. Built with &#10084;&#65039; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+</body>
+</html>
