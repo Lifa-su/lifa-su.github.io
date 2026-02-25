@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate CSS accent-color styles for form controls. Preview checkboxes, radio buttons, range sliders, and progress bars with custom accent colors.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-accent-color/">
+<title>AI CSS Accent Color Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:24px 20px}
+header{text-align:center;padding:40px 0 32px}
+header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#6c63ff,#e91e63);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:#999;font-size:1rem}
+.main{display:grid;grid-template-columns:320px 1fr;gap:28px;margin-bottom:32px}
+@media(max-width:768px){.main{grid-template-columns:1fr}}
+.panel{background:#16213e;border-radius:16px;padding:28px;border:1px solid #0f3460}
+.panel h2{font-size:1.1rem;margin-bottom:20px;color:#fff}
+.color-picker-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.color-picker-wrap input[type="color"]{-webkit-appearance:none;appearance:none;width:64px;height:64px;border:none;border-radius:12px;cursor:pointer;background:none}
+.color-picker-wrap input[type="color"]::-webkit-color-swatch-wrapper{padding:0}
+.color-picker-wrap input[type="color"]::-webkit-color-swatch{border:2px solid #0f3460;border-radius:10px}
+.color-value{font-family:monospace;font-size:1.4rem;font-weight:600;color:#fff}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.preset{width:36px;height:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s}
+.preset:hover{transform:scale(1.15)}
+.preset.active{border-color:#fff;box-shadow:0 0 12px rgba(255,255,255,.3)}
+.preview-card{background:#1a1a3e;border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,.06);margin-bottom:16px}
+.preview-card h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:14px}
+.checkbox-group,.radio-group{display:flex;flex-direction:column;gap:10px}
+.checkbox-group label,.radio-group label{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:.95rem;padding:6px 8px;border-radius:8px}
+.checkbox-group input,.radio-group input{width:20px;height:20px;cursor:pointer}
+input[type="range"]{width:100%;height:8px;-webkit-appearance:none;appearance:none;background:#0f3460;border-radius:4px;outline:none;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;cursor:pointer}
+.range-row,.progress-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.range-row span,.progress-row span{font-size:.85rem;color:#888;min-width:36px;text-align:right}
+progress{width:100%;height:12px;border-radius:6px;overflow:hidden;border:none;background:#0f3460}
+progress::-webkit-progress-bar{background:#0f3460;border-radius:6px}
+progress::-webkit-progress-value{border-radius:6px}
+.code-section{background:#16213e;border-radius:16px;padding:28px;border:1px solid #0f3460}
+.code-header{font-size:1.1rem;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.copy-btn{background:#6c63ff;color:#fff;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.copy-btn:hover{background:#5a52d5}
+.copy-btn.copied{background:#4caf50}
+.code-block{background:#0d1117;border-radius:10px;padding:20px;font-family:monospace;font-size:.9rem;color:#c9d1d9;overflow-x:auto;line-height:1.8;white-space:pre}
+footer{text-align:center;padding:32px 0 20px;color:#555;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>AI CSS Accent Color Generator</h1>
+  <p>Customize form element theme colors with the CSS accent-color property</p>
+</header>
+<div class="main">
+  <div class="panel">
+    <h2>&#127912; Accent Color</h2>
+    <div class="color-picker-wrap">
+      <input type="color" id="colorPicker" value="#6c63ff" aria-label="Choose accent color">
+      <div class="color-value" id="colorValue">#6c63ff</div>
+    </div>
+    <div class="presets" id="presets"></div>
+  </div>
+  <div class="panel">
+    <h2>&#128065; Live Preview</h2>
+    <div class="preview-card">
+      <h3>Checkboxes</h3>
+      <div class="checkbox-group">
+        <label><input type="checkbox" checked> Enable notifications</label>
+        <label><input type="checkbox" checked> Dark mode</label>
+        <label><input type="checkbox"> Auto-save drafts</label>
+        <label><input type="checkbox"> Show tooltips</label>
+      </div>
+    </div>
+    <div class="preview-card">
+      <h3>Radio Buttons</h3>
+      <div class="radio-group">
+        <label><input type="radio" name="plan" checked> Starter Plan</label>
+        <label><input type="radio" name="plan"> Pro Plan</label>
+        <label><input type="radio" name="plan"> Enterprise</label>
+      </div>
+    </div>
+    <div class="preview-card">
+      <h3>Range Sliders</h3>
+      <div class="range-row"><input type="range" min="0" max="100" value="70"><span>70</span></div>
+      <div class="range-row"><input type="range" min="0" max="100" value="40"><span>40</span></div>
+    </div>
+    <div class="preview-card">
+      <h3>Progress Bars</h3>
+      <div class="progress-row"><progress value="85" max="100"></progress><span>85%</span></div>
+      <div class="progress-row"><progress value="50" max="100"></progress><span>50%</span></div>
+      <div class="progress-row"><progress value="25" max="100"></progress><span>25%</span></div>
+    </div>
+  </div>
+</div>
+<div class="code-section">
+  <div class="code-header">
+    <span>&#128196; Generated CSS</span>
+    <button class="copy-btn" id="copyBtn">Copy CSS</button>
+  </div>
+  <div class="code-block" id="codeBlock"></div>
+</div>
+</div>
+<footer>AI CSS Accent Color Generator &mdash; A modern CSS tool</footer>
+<script>
+const picker = document.getElementById('colorPicker');
+const valueEl = document.getElementById('colorValue');
+const codeBlock = document.getElementById('codeBlock');
+const copyBtn = document.getElementById('copyBtn');
+const presetsEl = document.getElementById('presets');
+const presetColors = ['#6c63ff','#e91e63','#ff5722','#ff9800','#4caf50','#00bcd4','#2196f3','#9c27b0','#f44336','#607d8b'];
+
+presetColors.forEach(c => {
+  const d = document.createElement('div');
+  d.className = 'preset' + (c === '#6c63ff' ? ' active' : '');
+  d.style.background = c;
+  d.setAttribute('role', 'button');
+  d.setAttribute('aria-label', 'Select color ' + c);
+  d.onclick = () => { picker.value = c; update(c); };
+  presetsEl.appendChild(d);
+});
+
+function update(color) {
+  valueEl.textContent = color;
+  document.querySelectorAll('.preset').forEach(p => {
+    p.classList.toggle('active', p.style.background === color || rgbToHex(p.style.background) === color.toLowerCase());
+  });
+  const els = document.querySelectorAll('input[type="checkbox"],input[type="radio"],input[type="range"],progress');
+  els.forEach(el => el.style.accentColor = color);
+  const css = '/* Apply accent-color to all form elements */\n' +
+    'input[type="checkbox"],\ninput[type="radio"],\ninput[type="range"],\nprogress {\n  accent-color: ' + color + ';\n}\n\n' +
+    '/* Or apply globally */\n:root {\n  accent-color: ' + color + ';\n}';
+  codeBlock.textContent = css;
+}
+
+function rgbToHex(rgb) {
+  if (!rgb || rgb.startsWith('#')) return rgb;
+  const m = rgb.match(/\d+/g);
+  if (!m) return rgb;
+  return '#' + m.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+copyBtn.onclick = () => {
+  navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+    copyBtn.textContent = 'Copied!';
+    copyBtn.classList.add('copied');
+    setTimeout(() => { copyBtn.textContent = 'Copy CSS'; copyBtn.classList.remove('copied'); }, 2000);
+  });
+};
+
+picker.addEventListener('input', e => update(e.target.value));
+
+document.querySelectorAll('input[type="range"]').forEach(r => {
+  r.addEventListener('input', e => { e.target.nextElementSibling.textContent = e.target.value; });
+});
+
+update('#6c63ff');
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

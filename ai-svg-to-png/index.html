@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert SVG files to PNG images online. Set custom dimensions, background color, and resolution. Download high-quality PNG exports from any SVG graphic file.">
+<link rel="canonical" href="https://lifa-su.com/ai-svg-to-png/">
+<title>SVG 转 PNG 工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;padding:20px}
+.container{max-width:1100px;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin-bottom:8px;color:#00d2ff}
+.subtitle{text-align:center;color:#888;margin-bottom:24px;font-size:.9rem}
+.card{background:#16213e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #1a3a5c}
+.card h2{font-size:1rem;color:#00d2ff;margin-bottom:12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{padding:8px 16px;border-radius:8px;border:1px solid #1a3a5c;background:transparent;color:#e0e0e0;cursor:pointer;font-size:.9rem;transition:all .2s}
+.tab.active{background:#0f3460;border-color:#00d2ff;color:#00d2ff}
+textarea{width:100%;height:160px;background:#0f3460;border:1px solid #1a3a5c;border-radius:8px;color:#e0e0e0;padding:12px;font-family:'Courier New',monospace;font-size:.85rem;resize:vertical}
+textarea:focus{outline:none;border-color:#00d2ff}
+.file-upload{border:2px dashed #1a3a5c;border-radius:8px;padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative}
+.file-upload:hover{border-color:#00d2ff}
+.file-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-upload p{color:#888;font-size:.9rem}
+.file-upload .icon{font-size:2rem;margin-bottom:8px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.row>.card{flex:1;min-width:280px}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.85rem;color:#aaa;margin-bottom:4px}
+select,input[type="number"],input[type="color"]{width:100%;padding:8px;background:#0f3460;border:1px solid #1a3a5c;border-radius:6px;color:#e0e0e0;font-size:.9rem}
+select:focus,input:focus{outline:none;border-color:#00d2ff}
+input[type="color"]{height:38px;padding:2px;cursor:pointer}
+.size-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.size-btn{padding:6px 14px;border-radius:6px;border:1px solid #1a3a5c;background:transparent;color:#e0e0e0;cursor:pointer;font-size:.85rem;transition:all .2s}
+.size-btn.active{background:#0f3460;border-color:#00d2ff;color:#00d2ff}
+.custom-size{display:none;gap:8px;align-items:center;margin-top:8px}
+.custom-size.show{display:flex}
+.custom-size input{width:80px}
+.custom-size span{color:#888}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{padding:10px 24px;border-radius:8px;border:none;font-size:.95rem;cursor:pointer;font-weight:600;transition:all .2s}
+.btn-convert{background:linear-gradient(135deg,#00d2ff,#0f3460);color:#fff}
+.btn-convert:hover{opacity:.9;transform:translateY(-1px)}
+.btn-download{background:#28a745;color:#fff}
+.btn-download:hover{opacity:.9}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.preview-area{min-height:120px;background:#0d1b2a;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.preview-area img,.preview-area svg{max-width:100%;max-height:300px;object-fit:contain}
+.preview-area .placeholder{color:#555;font-size:.9rem}
+.checkered{background-image:linear-gradient(45deg,#1a1a2e 25%,transparent 25%),linear-gradient(-45deg,#1a1a2e 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1a1a2e 75%),linear-gradient(-45deg,transparent 75%,#1a1a2e 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+.info{margin-top:8px;font-size:.85rem;color:#888}
+.error{color:#ff6b6b;font-size:.85rem;margin-top:8px;display:none}
+.hidden{display:none}
+@media(max-width:600px){
+  body{padding:12px}
+  h1{font-size:1.4rem}
+  .options-grid{grid-template-columns:1fr}
+  .row{flex-direction:column}
+  .row>.card{min-width:auto}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎨 SVG 转 PNG 工具</h1>
+  <p class="subtitle">在线将 SVG 转换为高质量 PNG，支持自定义尺寸和背景色</p>
+
+  <div class="card">
+    <h2>📥 输入 SVG</h2>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('paste')">粘贴代码</button>
+      <button class="tab" onclick="switchTab('upload')">上传文件</button>
+    </div>
+    <div id="tab-paste">
+      <textarea id="svgInput" placeholder="在此粘贴 SVG 代码...&#10;例如: <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;>...</svg>"></textarea>
+    </div>
+    <div id="tab-upload" class="hidden">
+      <div class="file-upload">
+        <input type="file" id="fileInput" accept=".svg,image/svg+xml">
+        <div class="icon">📁</div>
+        <p>点击或拖拽 SVG 文件到此处</p>
+        <p id="fileName" style="color:#00d2ff;margin-top:8px"></p>
+      </div>
+    </div>
+    <div class="error" id="inputError"></div>
+  </div>
+
+  <div class="row">
+    <div class="card">
+      <h2>⚙️ 输出设置</h2>
+      <div class="options-grid">
+        <div>
+          <label>缩放倍数</label>
+          <div class="size-btns">
+            <button class="size-btn active" data-scale="1" onclick="setScale(this)">1x</button>
+            <button class="size-btn" data-scale="2" onclick="setScale(this)">2x</button>
+            <button class="size-btn" data-scale="4" onclick="setScale(this)">4x</button>
+            <button class="size-btn" data-scale="0" onclick="setScale(this)">自定义</button>
+          </div>
+          <div class="custom-size" id="customSize">
+            <input type="number" id="customW" placeholder="宽" min="1" max="8192">
+            <span>×</span>
+            <input type="number" id="customH" placeholder="高" min="1" max="8192">
+            <span>px</span>
+          </div>
+        </div>
+        <div>
+          <label>背景色</label>
+          <select id="bgSelect" onchange="onBgChange()">
+            <option value="transparent">透明</option>
+            <option value="#ffffff">白色</option>
+            <option value="#000000">黑色</option>
+            <option value="custom">自定义颜色</option>
+          </select>
+          <div id="customColorWrap" class="hidden" style="margin-top:8px">
+            <input type="color" id="customColor" value="#336699">
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-convert" onclick="convert()">🔄 转换为 PNG</button>
+        <button class="btn btn-download" id="downloadBtn" disabled onclick="download()">💾 下载 PNG</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>👁️ SVG 预览</h2>
+      <div class="preview-area checkered" id="svgPreview">
+        <span class="placeholder">SVG 预览将显示在这里</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="resultCard" class="hidden">
+    <h2>🖼️ PNG 结果</h2>
+    <div class="preview-area checkered" id="pngPreview">
+      <span class="placeholder">转换后的 PNG 将显示在这里</span>
+    </div>
+    <div class="info" id="pngInfo"></div>
+  </div>
+</div>
+
+<script>
+let currentSvg = '';
+let pngDataUrl = '';
+let scale = 1;
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById('tab-paste').classList.toggle('hidden', tab !== 'paste');
+  document.getElementById('tab-upload').classList.toggle('hidden', tab !== 'upload');
+}
+
+document.getElementById('svgInput').addEventListener('input', function() {
+  updateSvgPreview(this.value);
+});
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('fileName').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    document.getElementById('svgInput').value = ev.target.result;
+    updateSvgPreview(ev.target.result);
+  };
+  reader.readAsText(file);
+});
+
+function updateSvgPreview(svg) {
+  const preview = document.getElementById('svgPreview');
+  const err = document.getElementById('inputError');
+  err.style.display = 'none';
+  if (!svg.trim()) {
+    preview.innerHTML = '<span class="placeholder">SVG 预览将显示在这里</span>';
+    currentSvg = '';
+    return;
+  }
+  if (!svg.includes('<svg')) {
+    err.textContent = '⚠️ 无效的 SVG：未找到 <svg> 标签';
+    err.style.display = 'block';
+    preview.innerHTML = '<span class="placeholder">无效的 SVG</span>';
+    currentSvg = '';
+    return;
+  }
+  currentSvg = svg;
+  preview.innerHTML = '';
+  const div = document.createElement('div');
+  div.innerHTML = svg;
+  const svgEl = div.querySelector('svg');
+  if (svgEl) {
+    svgEl.style.maxWidth = '100%';
+    svgEl.style.maxHeight = '300px';
+    preview.appendChild(svgEl);
+  }
+}
+
+function setScale(btn) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const s = parseInt(btn.dataset.scale);
+  scale = s;
+  document.getElementById('customSize').classList.toggle('show', s === 0);
+}
+
+function onBgChange() {
+  const v = document.getElementById('bgSelect').value;
+  document.getElementById('customColorWrap').classList.toggle('hidden', v !== 'custom');
+}
+
+function getBgColor() {
+  const v = document.getElementById('bgSelect').value;
+  if (v === 'custom') return document.getElementById('customColor').value;
+  return v;
+}
+
+function getSvgSize(svgText) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgText, 'image/svg+xml');
+  const svg = doc.querySelector('svg');
+  if (!svg) return null;
+  let w = parseFloat(svg.getAttribute('width'));
+  let h = parseFloat(svg.getAttribute('height'));
+  if ((!w || !h) && svg.getAttribute('viewBox')) {
+    const vb = svg.getAttribute('viewBox').split(/[\s,]+/).map(Number);
+    if (vb.length === 4) { w = vb[2]; h = vb[3]; }
+  }
+  return (w && h) ? { w, h } : null;
+}
+
+function convert() {
+  const err = document.getElementById('inputError');
+  err.style.display = 'none';
+  const svg = currentSvg || document.getElementById('svgInput').value;
+  if (!svg.trim() || !svg.includes('<svg')) {
+    err.textContent = '⚠️ 请先输入有效的 SVG 代码';
+    err.style.display = 'block';
+    return;
+  }
+  const size = getSvgSize(svg);
+  if (!size) {
+    err.textContent = '⚠️ 无法解析 SVG 尺寸，请确保 SVG 包含 width/height 或 viewBox 属性';
+    err.style.display = 'block';
+    return;
+  }
+  let outW, outH;
+  if (scale === 0) {
+    outW = parseInt(document.getElementById('customW').value) || size.w;
+    outH = parseInt(document.getElementById('customH').value) || size.h;
+  } else {
+    outW = size.w * scale;
+    outH = size.h * scale;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext('2d');
+  const bg = getBgColor();
+  if (bg !== 'transparent') {
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, outW, outH);
+  }
+  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, outW, outH);
+    URL.revokeObjectURL(url);
+    pngDataUrl = canvas.toDataURL('image/png');
+    const pngPreview = document.getElementById('pngPreview');
+    pngPreview.innerHTML = '';
+    const pngImg = document.createElement('img');
+    pngImg.src = pngDataUrl;
+    pngPreview.appendChild(pngImg);
+    const bytes = Math.round((pngDataUrl.length - 'data:image/png;base64,'.length) * 3 / 4);
+    const sizeStr = bytes > 1024 ? (bytes / 1024).toFixed(1) + ' KB' : bytes + ' B';
+    document.getElementById('pngInfo').textContent = `尺寸: ${outW} × ${outH} px | 文件大小: ~${sizeStr}`;
+    document.getElementById('downloadBtn').disabled = false;
+    document.getElementById('resultCard').classList.remove('hidden');
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(url);
+    err.textContent = '⚠️ SVG 渲染失败，请检查 SVG 代码是否正确';
+    err.style.display = 'block';
+  };
+  img.src = url;
+}
+
+function download() {
+  if (!pngDataUrl) return;
+  const a = document.createElement('a');
+  a.href = pngDataUrl;
+  a.download = 'converted.png';
+  a.click();
+}
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1100px;margin:0 auto 20px;padding:0 20px}
+.pro-blur-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;opacity:.6;padding:24px;background:#16213e;border-radius:12px;border:1px solid #1a3a5c}
+.pro-blur-content .mock-title{font-size:.95rem;color:#00d2ff;margin-bottom:12px;font-weight:600}
+.pro-blur-content .mock-row{display:flex;gap:10px;margin-bottom:10px}
+.pro-blur-content .mock-input{flex:1;height:38px;background:#0f3460;border:1px solid #1a3a5c;border-radius:8px}
+.pro-blur-content .mock-btn{width:140px;height:38px;background:linear-gradient(135deg,#00d2ff,#0f3460);border-radius:8px}
+.pro-blur-content .mock-upload{width:100%;height:80px;border:2px dashed #1a3a5c;border-radius:8px;margin:10px 0;display:flex;align-items:center;justify-content:center;color:#1a3a5c;font-size:1.5rem}
+.pro-blur-content .mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.pro-blur-content .mock-item{background:#0f3460;border:1px solid #1a3a5c;border-radius:6px;padding:12px;text-align:center;color:#555;font-size:.8rem}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:12px;z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-label{font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:1px}
+.pro-sublabel{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal-box{background:#16213e;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid #00d2ff;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.pro-modal-box h3{font-size:1.4rem;margin-bottom:4px;color:#fff}
+.pro-modal-box .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#00d2ff,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc}
+.pro-modal-box ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal-box .pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#00d2ff,#0f3460);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-modal-box .pro-upgrade-btn:hover{opacity:.88}
+.pro-modal-box .pro-later-btn{display:block;width:100%;padding:12px;background:transparent;color:#888;font-size:.9rem;border:none;cursor:pointer;margin-top:8px;transition:color .2s}
+.pro-modal-box .pro-later-btn:hover{color:#fff}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur-content">
+<div class="mock-title">📦 Batch SVG Conversion</div>
+<div class="mock-upload">📁 Drop multiple SVG files</div>
+<div class="mock-grid"><div class="mock-item">file1.svg → PNG</div><div class="mock-item">file2.svg → PNG</div><div class="mock-item">file3.svg → PNG</div></div>
+<div class="mock-title">🔧 Custom DPI Settings</div>
+<div class="mock-row"><div class="mock-input"></div><div class="mock-input" style="flex:.5"></div><div class="mock-btn" style="width:100px"></div></div>
+<div class="mock-title">⚡ SVG Optimizer</div>
+<div class="mock-row"><div class="mock-btn" style="background:#28a745"></div><div class="mock-btn" style="background:rgba(255,255,255,.08)"></div></div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal-box">
+<h3>🎨 SVG to PNG Pro</h3>
+<div class="pro-price">$9</div>
+<p style="color:#aab;font-size:.9rem;margin-bottom:8px">One-time payment · Lifetime access</p>
+<ul>
+<li>Batch SVG Conversion (unlimited files)</li>
+<li>Custom DPI / Resolution Control</li>
+<li>Built-in SVG Optimizer (SVGO)</li>
+<li>ZIP Download for Batch</li>
+<li>Priority Support</li>
+</ul>
+<a class="pro-upgrade-btn" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

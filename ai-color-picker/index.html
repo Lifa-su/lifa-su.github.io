@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Color Picker - Free Online Color Selector, HEX RGB HSL CMYK Converter</title>
+<meta name="description" content="Free online color picker tool with HSL color wheel, HEX RGB HSL CMYK converter, CSS color name lookup, color palette manager and history. Modern dark theme UI.">
+<meta name="keywords" content="color picker, color selector, hex to rgb, rgb to hsl, cmyk converter, css color names, color palette, online color tool">
+<link rel="canonical" href="https://lifa-su.com/ai-color-picker/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--radius:12px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:1100px;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:var(--text2);margin-bottom:24px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--bg2);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.card h2{font-size:1rem;margin-bottom:14px;color:var(--text2);font-weight:500}
+.preview-box{width:100%;height:120px;border-radius:8px;margin-bottom:16px;border:2px solid rgba(255,255,255,.1);transition:background .15s}
+.color-wheel-wrap{position:relative;width:260px;height:260px;margin:0 auto 16px}
+.color-wheel{width:260px;height:260px;border-radius:50%;cursor:crosshair;border:3px solid rgba(255,255,255,.15)}
+.wheel-cursor{position:absolute;width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);pointer-events:none;transform:translate(-50%,-50%);z-index:2}
+.sl-panel{width:260px;height:160px;margin:0 auto 16px;border-radius:8px;cursor:crosshair;position:relative;border:2px solid rgba(255,255,255,.1)}
+.sl-cursor{position:absolute;width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 4px rgba(0,0,0,.5);pointer-events:none;transform:translate(-50%,-50%);z-index:2}
+label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px}
+input[type=text],input[type=number]{width:100%;padding:8px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:var(--text);font-size:.9rem;outline:none;transition:border .2s}
+input:focus{border-color:var(--accent)}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+.row{display:flex;gap:8px;margin-bottom:10px}
+.row>div{flex:1}
+.btn{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:#d63851}
+.btn-secondary{background:rgba(255,255,255,.1);color:var(--text)}
+.btn-secondary:hover{background:rgba(255,255,255,.18)}
+.btn-small{padding:4px 10px;font-size:.75rem}
+.format-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:6px;margin-bottom:6px;font-family:monospace;font-size:.85rem}
+.format-row .copy-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:.8rem;padding:2px 6px;border-radius:4px}
+.format-row .copy-btn:hover{background:rgba(233,69,96,.15)}
+.history-grid,.palette-colors{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.history-swatch,.palette-swatch{width:32px;height:32px;border-radius:6px;cursor:pointer;border:2px solid rgba(255,255,255,.1);transition:transform .15s,border .15s}
+.history-swatch:hover,.palette-swatch:hover{transform:scale(1.15);border-color:var(--accent)}
+.palette-item{background:rgba(255,255,255,.04);border-radius:8px;padding:10px;margin-bottom:8px}
+.palette-item .palette-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.palette-item .palette-name{font-size:.85rem;font-weight:500}
+.palette-item .delete-btn{background:none;border:none;color:#e94560;cursor:pointer;font-size:.85rem}
+.css-name-result{margin-top:10px;padding:10px;background:rgba(255,255,255,.05);border-radius:6px;display:flex;align-items:center;gap:10px}
+.css-name-swatch{width:36px;height:36px;border-radius:6px;border:1px solid rgba(255,255,255,.1);flex-shrink:0}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.85rem;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.add-palette-form{display:flex;gap:6px;margin-top:10px}
+.add-palette-form input{flex:1}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.color-wheel-wrap,.color-wheel,.sl-panel{width:100%;max-width:280px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🎨 AI Color Picker</h1>
+<p class="subtitle">Pick colors, convert formats, find CSS names, build palettes</p>
+<div class="grid">
+<div>
+<div class="card">
+<h2>Color Picker</h2>
+<div class="preview-box" id="preview"></div>
+<div class="color-wheel-wrap">
+<canvas class="color-wheel" id="wheelCanvas" width="260" height="260"></canvas>
+<div class="wheel-cursor" id="wheelCursor"></div>
+</div>
+<div class="sl-panel" id="slPanel">
+<canvas id="slCanvas" width="260" height="160"></canvas>
+<div class="sl-cursor" id="slCursor"></div>
+</div>
+</div>
+<div class="card">
+<h2>Color Formats (click to copy)</h2>
+<div id="formatList"></div>
+</div>
+</div>
+<div>
+<div class="card">
+<h2>Input Values</h2>
+<div style="margin-bottom:10px">
+<label>HEX</label>
+<input type="text" id="hexInput" placeholder="#e94560">
+</div>
+<div class="row">
+<div><label>R</label><input type="number" id="rInput" min="0" max="255"></div>
+<div><label>G</label><input type="number" id="gInput" min="0" max="255"></div>
+<div><label>B</label><input type="number" id="bInput" min="0" max="255"></div>
+</div>
+<div class="row">
+<div><label>H</label><input type="number" id="hInput" min="0" max="360"></div>
+<div><label>S%</label><input type="number" id="sInput" min="0" max="100"></div>
+<div><label>L%</label><input type="number" id="lInput" min="0" max="100"></div>
+</div>
+</div>
+<div class="card">
+<h2>CSS Color Name Lookup</h2>
+<input type="text" id="cssNameInput" placeholder='Type a color name (e.g. "coral") or hex value'>
+<div id="cssNameResult"></div>
+</div>
+<div class="card">
+<h2>History</h2>
+<div class="history-grid" id="historyGrid"></div>
+</div>
+<div class="card">
+<h2>Palettes</h2>
+<div id="paletteList"></div>
+<div class="add-palette-form">
+<input type="text" id="paletteName" placeholder="New palette name">
+<button class="btn btn-accent btn-small" onclick="createPalette()">Create</button>
+</div>
+<button class="btn btn-secondary btn-small" style="margin-top:8px;width:100%" onclick="addToPalettePrompt()">+ Add current color to palette</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const CSS_COLORS={"aliceblue":"#f0f8ff","antiquewhite":"#faebd7","aqua":"#00ffff","aquamarine":"#7fffd4","azure":"#f0ffff","beige":"#f5f5dc","bisque":"#ffe4c4","black":"#000000","blanchedalmond":"#ffebcd","blue":"#0000ff","blueviolet":"#8a2be2","brown":"#a52a2a","burlywood":"#deb887","cadetblue":"#5f9ea0","chartreuse":"#7fff00","chocolate":"#d2691e","coral":"#ff7f50","cornflowerblue":"#6495ed","cornsilk":"#fff8dc","crimson":"#dc143c","cyan":"#00ffff","darkblue":"#00008b","darkcyan":"#008b8b","darkgoldenrod":"#b8860b","darkgray":"#a9a9a9","darkgreen":"#006400","darkkhaki":"#bdb76b","darkmagenta":"#8b008b","darkolivegreen":"#556b2f","darkorange":"#ff8c00","darkorchid":"#9932cc","darkred":"#8b0000","darksalmon":"#e9967a","darkseagreen":"#8fbc8f","darkslateblue":"#483d8b","darkslategray":"#2f4f4f","darkturquoise":"#00ced1","darkviolet":"#9400d3","deeppink":"#ff1493","deepskyblue":"#00bfff","dimgray":"#696969","dodgerblue":"#1e90ff","firebrick":"#b22222","floralwhite":"#fffaf0","forestgreen":"#228b22","fuchsia":"#ff00ff","gainsboro":"#dcdcdc","ghostwhite":"#f8f8ff","gold":"#ffd700","goldenrod":"#daa520","gray":"#808080","green":"#008000","greenyellow":"#adff2f","honeydew":"#f0fff0","hotpink":"#ff69b4","indianred":"#cd5c5c","indigo":"#4b0082","ivory":"#fffff0","khaki":"#f0e68c","lavender":"#e6e6fa","lavenderblush":"#fff0f5","lawngreen":"#7cfc00","lemonchiffon":"#fffacd","lightblue":"#add8e6","lightcoral":"#f08080","lightcyan":"#e0ffff","lightgoldenrodyellow":"#fafad2","lightgray":"#d3d3d3","lightgreen":"#90ee90","lightpink":"#ffb6c1","lightsalmon":"#ffa07a","lightseagreen":"#20b2aa","lightskyblue":"#87cefa","lightslategray":"#778899","lightsteelblue":"#b0c4de","lightyellow":"#ffffe0","lime":"#00ff00","limegreen":"#32cd32","linen":"#faf0e6","magenta":"#ff00ff","maroon":"#800000","mediumaquamarine":"#66cdaa","mediumblue":"#0000cd","mediumorchid":"#ba55d3","mediumpurple":"#9370db","mediumseagreen":"#3cb371","mediumslateblue":"#7b68ee","mediumspringgreen":"#00fa9a","mediumturquoise":"#48d1cc","mediumvioletred":"#c71585","midnightblue":"#191970","mintcream":"#f5fffa","mistyrose":"#ffe4e1","moccasin":"#ffe4b5","navajowhite":"#ffdead","navy":"#000080","oldlace":"#fdf5e6","olive":"#808000","olivedrab":"#6b8e23","orange":"#ffa500","orangered":"#ff4500","orchid":"#da70d6","palegoldenrod":"#eee8aa","palegreen":"#98fb98","paleturquoise":"#afeeee","palevioletred":"#db7093","papayawhip":"#ffefd5","peachpuff":"#ffdab9","peru":"#cd853f","pink":"#ffc0cb","plum":"#dda0dd","powderblue":"#b0e0e6","purple":"#800080","rebeccapurple":"#663399","red":"#ff0000","rosybrown":"#bc8f8f","royalblue":"#4169e1","saddlebrown":"#8b4513","salmon":"#fa8072","sandybrown":"#f4a460","seagreen":"#2e8b57","seashell":"#fff5ee","sienna":"#a0522d","silver":"#c0c0c0","skyblue":"#87ceeb","slateblue":"#6a5acd","slategray":"#708090","snow":"#fffafa","springgreen":"#00ff7f","steelblue":"#4682b4","tan":"#d2b48c","teal":"#008080","thistle":"#d8bfd8","tomato":"#ff6347","turquoise":"#40e0d0","violet":"#ee82ee","wheat":"#f5deb3","white":"#ffffff","whitesmoke":"#f5f5f5","yellow":"#ffff00","yellowgreen":"#9acd32"};
+let currentH=340,currentS=80,currentL=55;
+let wheelDragging=false,slDragging=false;
+let history=JSON.parse(localStorage.getItem('colorHistory')||'[]');
+let palettes=JSON.parse(localStorage.getItem('colorPalettes')||'[]');
+
+function hslToRgb(h,s,l){s/=100;l/=100;const a=s*Math.min(l,1-l);const f=n=>{const k=(n+h/30)%12;return l-a*Math.max(Math.min(k-3,9-k,1),-1)};return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)]}
+function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h,s,l=(mx+mn)/2;if(mx===mn){h=s=0}else{const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break}h*=360}return[Math.round(h),Math.round(s*100),Math.round(l*100)]}
+function rgbToHex(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function hexToRgb(hex){hex=hex.replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');const n=parseInt(hex,16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function rgbToCmyk(r,g,b){if(r===0&&g===0&&b===0)return[0,0,0,100];const c1=1-r/255,m1=1-g/255,y1=1-b/255;const k=Math.min(c1,m1,y1);return[Math.round((c1-k)/(1-k)*100),Math.round((m1-k)/(1-k)*100),Math.round((y1-k)/(1-k)*100),Math.round(k*100)]}
+
+function drawWheel(){const cv=document.getElementById('wheelCanvas'),ctx=cv.getContext('2d');const cx=130,cy=130,outerR=125,innerR=85;ctx.clearRect(0,0,260,260);for(let a=0;a<360;a+=0.5){const rad1=a*Math.PI/180,rad2=(a+1)*Math.PI/180;ctx.beginPath();ctx.moveTo(cx+innerR*Math.cos(rad1),cy+innerR*Math.sin(rad1));ctx.lineTo(cx+outerR*Math.cos(rad1),cy+outerR*Math.sin(rad1));ctx.lineTo(cx+outerR*Math.cos(rad2),cy+outerR*Math.sin(rad2));ctx.lineTo(cx+innerR*Math.cos(rad2),cy+innerR*Math.sin(rad2));ctx.closePath();ctx.fillStyle=`hsl(${a},100%,50%)`;ctx.fill()}}
+function updateWheelCursor(){const cx=130,cy=130,r=105;const rad=currentH*Math.PI/180;const x=cx+r*Math.cos(rad),y=cy+r*Math.sin(rad);const cur=document.getElementById('wheelCursor');cur.style.left=x+'px';cur.style.top=y+'px';cur.style.background=`hsl(${currentH},100%,50%)`}
+function drawSLPanel(){const cv=document.getElementById('slCanvas'),ctx=cv.getContext('2d');const w=260,h=160;for(let x=0;x<w;x++){for(let y=0;y<h;y++){const s=x/w*100,l=(1-y/h)*100;ctx.fillStyle=`hsl(${currentH},${s}%,${l}%)`;ctx.fillRect(x,y,1,1)}}}
+function updateSLCursor(){const x=currentS/100*260,y=(1-currentL/100)*160;const cur=document.getElementById('slCursor');cur.style.left=x+'px';cur.style.top=y+'px';cur.style.background=`hsl(${currentH},${currentS}%,${currentL}%)`}
+
+function updateAll(addHistory=true){
+const[r,g,b]=hslToRgb(currentH,currentS,currentL);
+const hex=rgbToHex(r,g,b);
+const[c,m,y,k]=rgbToCmyk(r,g,b);
+document.getElementById('preview').style.background=hex;
+document.getElementById('hexInput').value=hex;
+document.getElementById('rInput').value=r;
+document.getElementById('gInput').value=g;
+document.getElementById('bInput').value=b;
+document.getElementById('hInput').value=currentH;
+document.getElementById('sInput').value=currentS;
+document.getElementById('lInput').value=currentL;
+updateWheelCursor();updateSLCursor();
+const fl=document.getElementById('formatList');
+fl.innerHTML=[
+`HEX: ${hex}`,
+`RGB: rgb(${r}, ${g}, ${b})`,
+`HSL: hsl(${currentH}, ${currentS}%, ${currentL}%)`,
+`CMYK: cmyk(${c}%, ${m}%, ${y}%, ${k}%)`
+].map(f=>`<div class="format-row"><span>${f}</span><button class="copy-btn" onclick="copyText('${f.split(': ')[1]}')">📋 Copy</button></div>`).join('');
+if(addHistory){addToHistory(hex)}
+}
+
+function addToHistory(hex){
+history=history.filter(h=>h!==hex);
+history.unshift(hex);
+if(history.length>30)history.pop();
+localStorage.setItem('colorHistory',JSON.stringify(history));
+renderHistory();
+}
+function renderHistory(){
+const g=document.getElementById('historyGrid');
+g.innerHTML=history.map(c=>`<div class="history-swatch" style="background:${c}" title="${c}" onclick="setFromHex('${c}')"></div>`).join('');
+}
+function setFromHex(hex){
+const[r,g,b]=hexToRgb(hex);
+const[h,s,l]=rgbToHsl(r,g,b);
+currentH=h;currentS=s;currentL=l;
+drawSLPanel();updateAll();
+}
+
+function createPalette(){
+const name=document.getElementById('paletteName').value.trim();
+if(!name)return;
+palettes.push({name,colors:[]});
+localStorage.setItem('colorPalettes',JSON.stringify(palettes));
+document.getElementById('paletteName').value='';
+renderPalettes();
+}
+function deletePalette(i){palettes.splice(i,1);localStorage.setItem('colorPalettes',JSON.stringify(palettes));renderPalettes()}
+function addToPalettePrompt(){
+if(!palettes.length){toast('Create a palette first');return}
+const hex=document.getElementById('hexInput').value;
+if(palettes.length===1){palettes[0].colors.push(hex);localStorage.setItem('colorPalettes',JSON.stringify(palettes));renderPalettes();toast('Added to '+palettes[0].name);return}
+const name=prompt('Palette name:\n'+palettes.map((p,i)=>`${i+1}. ${p.name}`).join('\n'));
+const idx=palettes.findIndex(p=>p.name===name)||parseInt(name)-1;
+if(idx>=0&&idx<palettes.length){palettes[idx].colors.push(hex);localStorage.setItem('colorPalettes',JSON.stringify(palettes));renderPalettes();toast('Added!')}
+}
+function removeFromPalette(pi,ci){palettes[pi].colors.splice(ci,1);localStorage.setItem('colorPalettes',JSON.stringify(palettes));renderPalettes()}
+function renderPalettes(){
+const el=document.getElementById('paletteList');
+el.innerHTML=palettes.map((p,pi)=>`<div class="palette-item"><div class="palette-header"><span class="palette-name">${p.name} (${p.colors.length})</span><button class="delete-btn" onclick="deletePalette(${pi})">✕</button></div><div class="palette-colors">${p.colors.map((c,ci)=>`<div class="palette-swatch" style="background:${c}" title="${c} (click=use, right-click=remove)" onclick="setFromHex('${c}')" oncontextmenu="event.preventDefault();removeFromPalette(${pi},${ci})"></div>`).join('')}</div></div>`).join('');
+}
+
+function findCSSColor(query){
+const res=document.getElementById('cssNameResult');
+query=query.trim().toLowerCase();
+if(!query){res.innerHTML='';return}
+if(query.startsWith('#')){
+const[r1,g1,b1]=hexToRgb(query);
+let best='',bestD=Infinity;
+for(const[name,hex]of Object.entries(CSS_COLORS)){
+const[r2,g2,b2]=hexToRgb(hex);
+const d=Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
+if(d<bestD){bestD=d;best=name}
+}
+res.innerHTML=`<div class="css-name-result"><div class="css-name-swatch" style="background:${CSS_COLORS[best]}"></div><div><strong>${best}</strong><br><small>${CSS_COLORS[best]}</small></div></div>`;
+}else{
+const matches=Object.entries(CSS_COLORS).filter(([n])=>n.includes(query));
+if(matches.length){
+res.innerHTML=matches.slice(0,8).map(([n,h])=>`<div class="css-name-result" style="cursor:pointer" onclick="setFromHex('${h}')"><div class="css-name-swatch" style="background:${h}"></div><div><strong>${n}</strong><br><small>${h}</small></div></div>`).join('');
+}else{res.innerHTML='<p style="color:var(--text2);margin-top:8px">No matching CSS color found</p>'}
+}
+}
+
+function copyText(t){navigator.clipboard.writeText(t).then(()=>toast('Copied: '+t))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+
+// Wheel interaction
+const wheelCv=document.getElementById('wheelCanvas');
+function wheelEvent(e){
+const rect=wheelCv.getBoundingClientRect();
+const x=e.clientX-rect.left-130,y=e.clientY-rect.top-130;
+const dist=Math.sqrt(x*x+y*y);
+if(dist<80||dist>130)return;
+let angle=Math.atan2(y,x)*180/Math.PI;
+if(angle<0)angle+=360;
+currentH=Math.round(angle);
+drawSLPanel();updateAll();
+}
+wheelCv.addEventListener('mousedown',e=>{wheelDragging=true;wheelEvent(e)});
+document.addEventListener('mousemove',e=>{if(wheelDragging)wheelEvent(e)});
+document.addEventListener('mouseup',()=>wheelDragging=false);
+wheelCv.addEventListener('touchstart',e=>{e.preventDefault();wheelDragging=true;wheelEvent(e.touches[0])},{passive:false});
+document.addEventListener('touchmove',e=>{if(wheelDragging){e.preventDefault();wheelEvent(e.touches[0]);}},{passive:false});
+document.addEventListener('touchend',()=>wheelDragging=false);
+
+// SL panel interaction
+const slCv=document.getElementById('slCanvas');
+function slEvent(e){
+const rect=slCv.getBoundingClientRect();
+const x=Math.max(0,Math.min(e.clientX-rect.left,260));
+const y=Math.max(0,Math.min(e.clientY-rect.top,160));
+currentS=Math.round(x/260*100);
+currentL=Math.round((1-y/160)*100);
+updateAll();
+}
+slCv.addEventListener('mousedown',e=>{slDragging=true;slEvent(e)});
+document.addEventListener('mousemove',e=>{if(slDragging)slEvent(e)});
+document.addEventListener('mouseup',()=>slDragging=false);
+slCv.addEventListener('touchstart',e=>{e.preventDefault();slDragging=true;slEvent(e.touches[0])},{passive:false});
+document.addEventListener('touchmove',e=>{if(slDragging){e.preventDefault();slEvent(e.touches[0]);}},{passive:false});
+document.addEventListener('touchend',()=>slDragging=false);
+
+// Input listeners
+document.getElementById('hexInput').addEventListener('input',function(){const v=this.value;if(/^#[0-9a-f]{6}$/i.test(v))setFromHex(v)});
+['rInput','gInput','bInput'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{
+const r=parseInt(document.getElementById('rInput').value)||0;
+const g=parseInt(document.getElementById('gInput').value)||0;
+const b=parseInt(document.getElementById('bInput').value)||0;
+const[h,s,l]=rgbToHsl(r,g,b);currentH=h;currentS=s;currentL=l;drawSLPanel();updateAll();
+})});
+['hInput','sInput','lInput'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{
+currentH=parseInt(document.getElementById('hInput').value)||0;
+currentS=parseInt(document.getElementById('sInput').value)||0;
+currentL=parseInt(document.getElementById('lInput').value)||0;
+drawSLPanel();updateAll();
+})});
+document.getElementById('cssNameInput').addEventListener('input',function(){findCSSColor(this.value)});
+
+// Init
+drawWheel();drawSLPanel();updateAll(false);renderHistory();renderPalettes();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1100px;margin:30px auto;padding:0 20px}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-mock{padding:24px;background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:12px;filter:blur(3px);-webkit-filter:blur(3px);opacity:.6;pointer-events:none;user-select:none}
+.pro-mock h3{font-size:1rem;margin-bottom:14px;color:#fff}
+.pro-mock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pro-mock-item{padding:14px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid rgba(255,255,255,.06)}
+.pro-mock-item .pm-title{font-size:.85rem;color:#ccc;margin-bottom:6px;font-weight:600}
+.pro-mock-item .pm-desc{font-size:.75rem;color:#666}
+.pro-lock-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px}
+.pro-lock-text{font-size:1.1rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-lock-sub{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:4px}
+.pro-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:32px;width:100%;max-width:420px;text-align:center;animation:proModalIn .3s ease}
+@keyframes proModalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h3{font-size:1.3rem;margin-bottom:4px;color:#fff}
+.pro-modal .pro-subtitle{font-size:.85rem;color:var(--text2);margin-bottom:8px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0 4px}
+.pro-modal .pro-price-note{font-size:.8rem;color:var(--text2);margin-bottom:16px}
+.pro-modal ul{list-style:none;text-align:left;margin:0 0 20px;padding:0}
+.pro-modal ul li{padding:10px 0;font-size:.9rem;color:#ddd;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✓';color:var(--accent);font-weight:700;font-size:1.1rem}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:opacity .2s}
+.pro-upgrade-btn:hover{opacity:.9}
+.pro-maybe-btn{background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-maybe-btn:hover{color:#fff}
+@media(max-width:700px){.pro-mock-grid{grid-template-columns:1fr}.pro-section{padding:0 12px}}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-mock">
+<h3>⚡ Pro Features</h3>
+<div class="pro-mock-grid">
+<div class="pro-mock-item"><div class="pm-title">📤 Palette Export</div><div class="pm-desc">Export palettes to ASE, SCSS, Tailwind config, and more formats</div></div>
+<div class="pro-mock-item"><div class="pm-title">🎨 Figma Plugin</div><div class="pm-desc">Sync colors directly to Figma with one-click plugin integration</div></div>
+<div class="pro-mock-item"><div class="pm-title">🏢 Brand Color Manager</div><div class="pm-desc">Organize brand color systems with naming, grouping, and style guides</div></div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>🎨 Color Picker Pro</h3>
+<div class="pro-subtitle">Professional color workflow tools</div>
+<div class="pro-price">$14</div>
+<div class="pro-price-note">One-time payment · Lifetime access</div>
+<ul>
+<li>Export palettes (ASE, SCSS, Tailwind, JSON)</li>
+<li>Figma plugin integration</li>
+<li>Brand color system manager</li>
+<li>Color accessibility checker (WCAG)</li>
+<li>Priority support & updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $14</a>
+<button class="pro-maybe-btn" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

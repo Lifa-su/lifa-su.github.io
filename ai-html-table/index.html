@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI HTML table generator. Create responsive HTML tables with custom rows, columns, headers, and styling. Export clean table code with CSS for any website.">
+<link rel="canonical" href="https://lifa-su.com/ai-html-table/">
+<title>AI HTML Table Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--surface:#1e2746;--surface2:#253256;--text:#e0e0e0;--text2:#a0a0b0;--accent:#e94560;--accent2:#ff6b6b;--border:#2a3a5c;--success:#4ecca3;--hover:#2a3a6c}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+/* Toolbar */
+.toolbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.toolbar-group{display:flex;align-items:center;gap:8px;padding:0 12px;border-right:1px solid var(--border)}
+.toolbar-group:last-child{border-right:none}
+.toolbar-group label{font-size:13px;color:var(--text2);white-space:nowrap}
+.btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:var(--hover);border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-success{background:var(--success);border-color:var(--success);color:#1a1a2e}
+.btn-success:hover{opacity:.85}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-icon{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+input[type="number"]{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:5px 8px;border-radius:5px;width:60px;text-align:center;font-size:13px}
+input[type="number"]:focus{outline:none;border-color:var(--accent)}
+select{background:var(--surface);color:var(--text);border:1px solid var(--border);padding:5px 8px;border-radius:5px;font-size:13px;cursor:pointer}
+select:focus{outline:none;border-color:var(--accent)}
+/* Toggle switch */
+.toggle{position:relative;width:40px;height:22px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:var(--surface);border:1px solid var(--border);border-radius:11px;transition:.3s}
+.toggle .slider:before{content:'';position:absolute;height:16px;width:16px;left:2px;bottom:2px;background:var(--text2);border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.slider:before{transform:translateX(18px);background:#fff}
+/* Main content */
+.main{flex:1;display:flex;flex-direction:column;padding:20px;gap:16px;overflow:auto}
+.section-title{font-size:14px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.section-title span{font-size:11px;background:var(--surface2);padding:2px 8px;border-radius:10px}
+/* Table editor */
+.editor-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;overflow:auto;flex:1;min-height:200px;position:relative}
+.editor-wrap table{border-collapse:collapse;width:auto;min-width:100%}
+.editor-wrap th,.editor-wrap td{position:relative;min-width:80px;padding:8px 12px;border:1px solid var(--border);cursor:text;transition:background .15s;vertical-align:top;word-break:break-word}
+.editor-wrap th{background:var(--bg3);font-weight:600}
+.editor-wrap td{background:var(--surface2)}
+.editor-wrap td:focus,.editor-wrap th:focus{outline:2px solid var(--accent);outline-offset:-2px;z-index:1}
+.editor-wrap td.selected,.editor-wrap th.selected{background:rgba(233,69,96,.15);outline:2px solid var(--accent);outline-offset:-2px}
+.editor-wrap td.selecting,.editor-wrap th.selecting{background:rgba(233,69,96,.1)}
+/* Row/col controls */
+.row-handle,.col-handle{position:absolute;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;opacity:0;transition:opacity .2s;z-index:5}
+.editor-wrap:hover .row-handle,.editor-wrap:hover .col-handle{opacity:.6}
+.row-handle:hover,.col-handle:hover{opacity:1!important;color:var(--accent)}
+/* Code output */
+.code-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;max-height:300px;overflow:auto}
+.code-wrap pre{font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:13px;line-height:1.6;color:var(--success);white-space:pre-wrap;word-break:break-all}
+/* Selection info bar */
+.info-bar{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:12px;min-height:38px}
+.info-bar .sel-info{color:var(--accent)}
+/* Toast */
+.toast{position:fixed;bottom:30px;right:30px;background:var(--success);color:#1a1a2e;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+/* Style preview classes */
+.preview-border-none td,.preview-border-none th{border:none}
+.preview-border-thin td,.preview-border-thin th{border:1px solid #555}
+.preview-border-thick td,.preview-border-thick th{border:2px solid #555}
+.preview-border-double td,.preview-border-double th{border:3px double #555}
+.preview-striped tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.preview-hover tr:hover td{background:rgba(233,69,96,.08)!important}
+.preview-header-styled th{background:var(--accent)!important;color:#fff}
+.preview-compact td,.preview-compact th{padding:4px 8px}
+.preview-loose td,.preview-loose th{padding:14px 18px}
+/* Responsive */
+@media(max-width:768px){.toolbar{padding:10px;gap:8px}.toolbar-group{padding:0 6px;flex-wrap:wrap}.main{padding:12px}}
+/* Color picker */
+input[type="color"]{width:30px;height:26px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;padding:1px}
+</style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-group">
+    <label>行</label>
+    <button class="btn btn-icon btn-sm" onclick="removeRow()" title="删除行">−</button>
+    <input type="number" id="rowCount" value="4" min="1" max="50" onchange="rebuildTable()">
+    <button class="btn btn-icon btn-sm" onclick="addRow()" title="添加行">+</button>
+  </div>
+  <div class="toolbar-group">
+    <label>列</label>
+    <button class="btn btn-icon btn-sm" onclick="removeCol()" title="删除列">−</button>
+    <input type="number" id="colCount" value="4" min="1" max="20" onchange="rebuildTable()">
+    <button class="btn btn-icon btn-sm" onclick="addCol()" title="添加列">+</button>
+  </div>
+  <div class="toolbar-group">
+    <label>边框</label>
+    <select id="borderStyle" onchange="updatePreview()">
+      <option value="thin">细线</option>
+      <option value="none">无边框</option>
+      <option value="thick">粗线</option>
+      <option value="double">双线</option>
+    </select>
+  </div>
+  <div class="toolbar-group">
+    <label>间距</label>
+    <select id="spacingStyle" onchange="updatePreview()">
+      <option value="normal">标准</option>
+      <option value="compact">紧凑</option>
+      <option value="loose">宽松</option>
+    </select>
+  </div>
+  <div class="toolbar-group">
+    <label>斑马纹</label>
+    <label class="toggle"><input type="checkbox" id="toggleStripe" onchange="updatePreview()"><span class="slider"></span></label>
+  </div>
+  <div class="toolbar-group">
+    <label>悬停高亮</label>
+    <label class="toggle"><input type="checkbox" id="toggleHover" checked onchange="updatePreview()"><span class="slider"></span></label>
+  </div>
+  <div class="toolbar-group">
+    <label>表头样式</label>
+    <label class="toggle"><input type="checkbox" id="toggleHeader" checked onchange="updatePreview()"><span class="slider"></span></label>
+    <input type="color" id="headerColor" value="#e94560" onchange="updatePreview()" title="表头颜色">
+  </div>
+  <div class="toolbar-group">
+    <button class="btn btn-primary" onclick="mergeSelected()" title="合并选中的单元格">合并单元格</button>
+    <button class="btn" onclick="unmergeSelected()" title="拆分选中的合并单元格">拆分单元格</button>
+  </div>
+</div>
+
+<!-- Info bar -->
+<div style="padding:8px 20px 0">
+  <div class="info-bar">
+    <span>💡 点击单元格编辑内容 · 按住鼠标拖选多个单元格后可合并</span>
+    <span class="sel-info" id="selInfo"></span>
+  </div>
+</div>
+
+<!-- Editor -->
+<div class="main">
+  <div>
+    <div class="section-title">可视化编辑区 <span>点击编辑 · 拖选合并</span></div>
+    <div class="editor-wrap" id="editorWrap">
+      <table id="editTable"></table>
+    </div>
+  </div>
+  <div>
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+      <div>HTML 代码输出</div>
+      <button class="btn btn-success btn-sm" onclick="copyCode()">📋 复制代码</button>
+    </div>
+    <div class="code-wrap">
+      <pre id="codeOutput"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== State =====
+let tableData = []; // 2D array: {text, colspan, rowspan, merged (if hidden by merge)}
+let selection = {active:false, startR:0, startC:0, endR:0, endC:0};
+let isSelecting = false;
+
+function initData(rows, cols, preserve) {
+  const old = preserve ? tableData : [];
+  tableData = [];
+  for (let r = 0; r < rows; r++) {
+    tableData[r] = [];
+    for (let c = 0; c < cols; c++) {
+      if (old[r] && old[r][c]) {
+        tableData[r][c] = {...old[r][c]};
+      } else {
+        tableData[r][c] = {text: r === 0 ? '表头' + (c+1) : '', colspan:1, rowspan:1, merged:false};
+      }
+    }
+  }
+}
+
+function getRows() { return parseInt(document.getElementById('rowCount').value) || 4; }
+function getCols() { return parseInt(document.getElementById('colCount').value) || 4; }
+
+// ===== Build Table =====
+function rebuildTable() {
+  const rows = getRows(), cols = getCols();
+  initData(rows, cols, true);
+  renderTable();
+}
+
+function renderTable() {
+  const table = document.getElementById('editTable');
+  table.innerHTML = '';
+  const rows = tableData.length;
+  if (!rows) return;
+  for (let r = 0; r < rows; r++) {
+    const tr = document.createElement('tr');
+    const cols = tableData[r].length;
+    for (let c = 0; c < cols; c++) {
+      const cell = tableData[r][c];
+      if (cell.merged) continue;
+      const el = r === 0 ? document.createElement('th') : document.createElement('td');
+      el.contentEditable = true;
+      el.textContent = cell.text;
+      el.dataset.r = r;
+      el.dataset.c = c;
+      if (cell.colspan > 1) el.colSpan = cell.colspan;
+      if (cell.rowspan > 1) el.rowSpan = cell.rowspan;
+      // Events
+      el.addEventListener('input', onCellInput);
+      el.addEventListener('mousedown', onCellMouseDown);
+      el.addEventListener('mouseover', onCellMouseOver);
+      el.addEventListener('focus', onCellFocus);
+      tr.appendChild(el);
+    }
+    table.appendChild(tr);
+  }
+  updatePreview();
+  generateCode();
+}
+
+function onCellInput(e) {
+  const r = +e.target.dataset.r, c = +e.target.dataset.c;
+  tableData[r][c].text = e.target.textContent;
+  generateCode();
+}
+
+function onCellFocus(e) {
+  // Clear selection visual when focusing a cell for editing
+}
+
+// ===== Selection =====
+function onCellMouseDown(e) {
+  if (e.button !== 0) return;
+  const r = +e.target.dataset.r, c = +e.target.dataset.c;
+  if (isNaN(r) || isNaN(c)) return;
+  isSelecting = true;
+  selection = {active:true, startR:r, startC:c, endR:r, endC:c};
+  updateSelectionVisual();
+  e.target.focus();
+  // Prevent default to allow drag selection
+  const onUp = () => { isSelecting = false; document.removeEventListener('mouseup', onUp); };
+  document.addEventListener('mouseup', onUp);
+}
+
+function onCellMouseOver(e) {
+  if (!isSelecting) return;
+  const r = +e.target.dataset.r, c = +e.target.dataset.c;
+  if (isNaN(r) || isNaN(c)) return;
+  selection.endR = r;
+  selection.endC = c;
+  updateSelectionVisual();
+}
+
+function updateSelectionVisual() {
+  const cells = document.querySelectorAll('#editTable td, #editTable th');
+  const {minR, maxR, minC, maxC} = getSelectionBounds();
+  const count = (maxR - minR + 1) * (maxC - minC + 1);
+  cells.forEach(cell => {
+    const r = +cell.dataset.r, c = +cell.dataset.c;
+    const d = tableData[r][c];
+    // Check if cell overlaps with selection
+    const cellEndR = r + (d.rowspan || 1) - 1;
+    const cellEndC = c + (d.colspan || 1) - 1;
+    const overlaps = r <= maxR && cellEndR >= minR && c <= maxC && cellEndC >= minC;
+    cell.classList.toggle('selected', overlaps && count > 1);
+    cell.classList.toggle('selecting', overlaps && isSelecting && count > 1);
+  });
+  const info = document.getElementById('selInfo');
+  if (count > 1) {
+    info.textContent = `已选择 ${maxR-minR+1}×${maxC-minC+1} 区域 (${count} 格)`;
+  } else {
+    info.textContent = '';
+  }
+}
+
+function getSelectionBounds() {
+  let minR = Math.min(selection.startR, selection.endR);
+  let maxR = Math.max(selection.startR, selection.endR);
+  let minC = Math.min(selection.startC, selection.endC);
+  let maxC = Math.max(selection.startC, selection.endC);
+  // Expand bounds to include any merged cells that overlap
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (let r = 0; r < tableData.length; r++) {
+      for (let c = 0; c < tableData[r].length; c++) {
+        const d = tableData[r][c];
+        if (d.merged) continue;
+        const er = r + (d.rowspan||1) - 1;
+        const ec = c + (d.colspan||1) - 1;
+        if (r <= maxR && er >= minR && c <= maxC && ec >= minC) {
+          if (r < minR) { minR = r; changed = true; }
+          if (er > maxR) { maxR = er; changed = true; }
+          if (c < minC) { minC = c; changed = true; }
+          if (ec > maxC) { maxC = ec; changed = true; }
+        }
+      }
+    }
+  }
+  return {minR, maxR, minC, maxC};
+}
+
+// ===== Merge / Unmerge =====
+function mergeSelected() {
+  if (!selection.active) return showToast('请先拖选要合并的单元格');
+  const {minR, maxR, minC, maxC} = getSelectionBounds();
+  if (minR === maxR && minC === maxC) return showToast('请选择多个单元格');
+  // Collect text from all cells
+  let texts = [];
+  for (let r = minR; r <= maxR; r++) {
+    for (let c = minC; c <= maxC; c++) {
+      if (!tableData[r][c].merged && tableData[r][c].text) {
+        texts.push(tableData[r][c].text);
+      }
+    }
+  }
+  // First unmerge everything in range
+  for (let r = minR; r <= maxR; r++) {
+    for (let c = minC; c <= maxC; c++) {
+      tableData[r][c] = {text:'', colspan:1, rowspan:1, merged:false};
+    }
+  }
+  // Set top-left as the merged cell
+  tableData[minR][minC] = {
+    text: texts.join(' '),
+    colspan: maxC - minC + 1,
+    rowspan: maxR - minR + 1,
+    merged: false
+  };
+  // Mark others as merged
+  for (let r = minR; r <= maxR; r++) {
+    for (let c = minC; c <= maxC; c++) {
+      if (r === minR && c === minC) continue;
+      tableData[r][c].merged = true;
+    }
+  }
+  selection.active = false;
+  renderTable();
+  showToast('单元格已合并');
+}
+
+function unmergeSelected() {
+  const {minR, maxR, minC, maxC} = getSelectionBounds();
+  let found = false;
+  for (let r = minR; r <= maxR; r++) {
+    for (let c = minC; c <= maxC; c++) {
+      const d = tableData[r][c];
+      if (!d.merged && (d.colspan > 1 || d.rowspan > 1)) {
+        found = true;
+        const text = d.text;
+        for (let rr = r; rr < r + d.rowspan; rr++) {
+          for (let cc = c; cc < c + d.colspan; cc++) {
+            tableData[rr][cc] = {text: (rr===r&&cc===c)?text:'', colspan:1, rowspan:1, merged:false};
+          }
+        }
+      }
+    }
+  }
+  if (!found) return showToast('选中区域没有合并的单元格');
+  selection.active = false;
+  renderTable();
+  showToast('单元格已拆分');
+}
+
+// ===== Add/Remove Rows & Cols =====
+function addRow() {
+  const cols = getCols();
+  const newRow = [];
+  for (let c = 0; c < cols; c++) {
+    newRow.push({text:'', colspan:1, rowspan:1, merged:false});
+  }
+  tableData.push(newRow);
+  document.getElementById('rowCount').value = tableData.length;
+  renderTable();
+}
+
+function removeRow() {
+  if (tableData.length <= 1) return;
+  // Unmerge any cells that span into the last row
+  const lastR = tableData.length - 1;
+  for (let r = 0; r < lastR; r++) {
+    for (let c = 0; c < tableData[r].length; c++) {
+      const d = tableData[r][c];
+      if (!d.merged && r + d.rowspan - 1 >= lastR) {
+        d.rowspan = lastR - r;
+      }
+    }
+  }
+  tableData.pop();
+  document.getElementById('rowCount').value = tableData.length;
+  renderTable();
+}
+
+function addCol() {
+  for (let r = 0; r < tableData.length; r++) {
+    tableData[r].push({text: r===0?'表头'+(tableData[r].length+1):'', colspan:1, rowspan:1, merged:false});
+  }
+  document.getElementById('colCount').value = tableData[0].length;
+  renderTable();
+}
+
+function removeCol() {
+  if (!tableData[0] || tableData[0].length <= 1) return;
+  const lastC = tableData[0].length - 1;
+  // Fix merges spanning into last col
+  for (let r = 0; r < tableData.length; r++) {
+    for (let c = 0; c < lastC; c++) {
+      const d = tableData[r][c];
+      if (!d.merged && c + d.colspan - 1 >= lastC) {
+        d.colspan = lastC - c;
+      }
+    }
+    tableData[r].pop();
+  }
+  document.getElementById('colCount').value = tableData[0].length;
+  renderTable();
+}
+
+// ===== Preview Styles =====
+function updatePreview() {
+  const wrap = document.getElementById('editorWrap');
+  const table = document.getElementById('editTable');
+  const border = document.getElementById('borderStyle').value;
+  const spacing = document.getElementById('spacingStyle').value;
+  const stripe = document.getElementById('toggleStripe').checked;
+  const hover = document.getElementById('toggleHover').checked;
+  const header = document.getElementById('toggleHeader').checked;
+  const headerColor = document.getElementById('headerColor').value;
+
+  // Remove old classes
+  table.className = '';
+  table.classList.add('preview-border-' + border);
+  if (stripe) table.classList.add('preview-striped');
+  if (hover) table.classList.add('preview-hover');
+  if (spacing === 'compact') table.classList.add('preview-compact');
+  if (spacing === 'loose') table.classList.add('preview-loose');
+
+  // Header style
+  const ths = table.querySelectorAll('th');
+  ths.forEach(th => {
+    if (header) {
+      th.style.background = headerColor;
+      th.style.color = '#fff';
+      th.style.fontWeight = '700';
+    } else {
+      th.style.background = '';
+      th.style.color = '';
+      th.style.fontWeight = '';
+    }
+  });
+
+  generateCode();
+}
+
+// ===== Generate HTML Code =====
+function generateCode() {
+  const border = document.getElementById('borderStyle').value;
+  const spacing = document.getElementById('spacingStyle').value;
+  const stripe = document.getElementById('toggleStripe').checked;
+  const hover = document.getElementById('toggleHover').checked;
+  const header = document.getElementById('toggleHeader').checked;
+  const headerColor = document.getElementById('headerColor').value;
+
+  let css = '';
+  // Table base
+  css += 'table { border-collapse: collapse; width: 100%; }\n';
+  css += 'th, td { padding: ' + (spacing==='compact'?'4px 8px':spacing==='loose'?'14px 18px':'8px 12px') + '; text-align: left; }\n';
+  // Border
+  if (border === 'thin') css += 'th, td { border: 1px solid #ddd; }\n';
+  else if (border === 'thick') css += 'th, td { border: 2px solid #999; }\n';
+  else if (border === 'double') css += 'th, td { border: 3px double #999; }\n';
+  // Header
+  if (header) css += 'th { background: ' + headerColor + '; color: #fff; font-weight: 700; }\n';
+  // Stripe
+  if (stripe) css += 'tr:nth-child(even) td { background: #f9f9f9; }\n';
+  // Hover
+  if (hover) css += 'tr:hover td { background: #f0f0f0; }\n';
+
+  let html = '<style>\n' + css + '</style>\n\n<table>\n';
+  for (let r = 0; r < tableData.length; r++) {
+    html += '  <tr>\n';
+    for (let c = 0; c < tableData[r].length; c++) {
+      const d = tableData[r][c];
+      if (d.merged) continue;
+      const tag = r === 0 ? 'th' : 'td';
+      let attrs = '';
+      if (d.colspan > 1) attrs += ' colspan="' + d.colspan + '"';
+      if (d.rowspan > 1) attrs += ' rowspan="' + d.rowspan + '"';
+      const text = escapeHtml(d.text);
+      html += '    <' + tag + attrs + '>' + text + '</' + tag + '>\n';
+    }
+    html += '  </tr>\n';
+  }
+  html += '</table>';
+
+  document.getElementById('codeOutput').textContent = html;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== Copy =====
+function copyCode() {
+  const code = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('✅ 代码已复制到剪贴板');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 代码已复制到剪贴板');
+  });
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== Init =====
+function init() {
+  initData(getRows(), getCols(), false);
+  // Set default header text
+  for (let c = 0; c < getCols(); c++) {
+    tableData[0][c].text = '表头' + (c+1);
+  }
+  renderTable();
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

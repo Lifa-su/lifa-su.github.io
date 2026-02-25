@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Check color contrast ratios against WCAG 2.1 standards. Test foreground and background color combinations for AA and AAA accessibility compliance.">
+<link rel="canonical" href="https://lifa-su.com/ai-color-contrast/">
+<title>AI Color Contrast Checker - WCAG 2.1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;line-height:1.6}
+.c{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+h1{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);margin:24px 0 8px;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:#aab;margin-bottom:32px;font-size:.95rem}
+.card{background:#16213e;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05)}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cg label{display:block;font-size:.85rem;color:#aab;margin-bottom:6px;font-weight:500}
+.ci{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.25);border-radius:12px;padding:6px 12px;border:1px solid rgba(255,255,255,.08);transition:border-color .2s}
+.ci:focus-within{border-color:#e94560}
+.ci input[type=color]{width:40px;height:40px;border:none;background:none;cursor:pointer;border-radius:8px;padding:0}
+.ci input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+.ci input[type=color]::-webkit-color-swatch{border-radius:6px;border:2px solid rgba(255,255,255,.15)}
+.ci input[type=text]{flex:1;background:none;border:none;color:#eee;font-size:1.05rem;font-family:monospace;outline:none;text-transform:uppercase;letter-spacing:1px}
+.swap{display:flex;align-items:center;justify-content:center;margin:12px auto;width:44px;height:44px;border-radius:50%;background:#0f3460;border:1px solid rgba(255,255,255,.1);color:#eee;cursor:pointer;font-size:1.2rem;transition:all .2s}
+.swap:hover{background:#e94560;transform:rotate(180deg)}
+.rn{text-align:center;font-size:clamp(2.5rem,8vw,4rem);font-weight:800;letter-spacing:-1px;padding:16px 0 4px}
+.rl{text-align:center;color:#aab;font-size:.85rem;margin-bottom:12px}
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.ri{background:rgba(0,0,0,.2);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,.05)}
+.ri .lb{font-size:.85rem;color:#aab}
+.ri .lb small{display:block;font-size:.75rem;opacity:.7}
+.b{padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.5px}
+.bp{background:rgba(46,213,115,.15);color:#2ed573;border:1px solid rgba(46,213,115,.3)}
+.bf{background:rgba(233,69,96,.15);color:#e94560;border:1px solid rgba(233,69,96,.3)}
+.pv{border-radius:12px;padding:24px;text-align:center;margin-top:8px;transition:all .3s}
+.pv .lg{font-size:1.5rem;font-weight:700;margin-bottom:6px}
+.pv .nm{font-size:1rem}
+.pv .sm{font-size:.75rem;margin-top:6px;opacity:.8}
+.sg{margin-top:8px}
+.si{display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.2);border-radius:12px;padding:12px 16px;margin-top:8px;border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .2s}
+.si:hover{border-color:#e94560;transform:translateX(4px)}
+.sw{width:36px;height:36px;border-radius:8px;border:2px solid rgba(255,255,255,.15);flex-shrink:0}
+.sn{flex:1;font-size:.85rem}
+.sn .hx{font-family:monospace;font-weight:600}
+.sn .ds{color:#aab;font-size:.78rem}
+.sb{font-size:.75rem;padding:3px 8px;border-radius:10px;background:rgba(46,213,115,.15);color:#2ed573;font-weight:600;white-space:nowrap}
+footer{text-align:center;color:#aab;font-size:.8rem;margin-top:40px;padding:20px 0;border-top:1px solid rgba(255,255,255,.05)}
+@media(max-width:560px){.row,.rg{grid-template-columns:1fr}}
+.pro-section{position:relative;margin-top:20px;margin-bottom:20px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.pro-blur{filter:blur(5px);pointer-events:none;padding:24px;background:#16213e;opacity:.6}
+.pro-blur .pro-mock-row{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:8px}
+.pro-blur .pro-mock-swatch{width:32px;height:32px;border-radius:6px;flex-shrink:0}
+.pro-blur .pro-mock-bar{height:12px;border-radius:4px;background:rgba(255,255,255,.1);flex:1}
+.pro-blur .pro-mock-badge{padding:4px 10px;border-radius:12px;font-size:.7rem;background:rgba(46,213,115,.15);color:#2ed573}
+.pro-blur .pro-mock-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:16px}
+.pro-blur .pro-mock-cell{aspect-ratio:1;border-radius:6px;background:rgba(255,255,255,.08)}
+.pro-blur .pro-mock-btn{margin-top:16px;padding:12px 24px;background:linear-gradient(135deg,#e94560,#533483);border:none;border-radius:10px;color:#fff;font-size:.9rem;width:100%}
+.pro-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.4);transition:background .2s}
+.pro-lock-overlay:hover{background:rgba(26,26,46,.3)}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-lock-text{font-size:.95rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#e94560,#533483);padding:10px 24px;border-radius:24px;box-shadow:0 4px 15px rgba(233,69,96,.3);transition:transform .2s}
+.pro-lock-overlay:hover .pro-lock-text{transform:scale(1.05)}
+.pro-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:#16213e;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);animation:proPopIn .3s ease}
+@keyframes proPopIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:#aab;margin-bottom:16px}
+.pro-features{list-style:none;text-align:left;margin:16px 0;padding:0}
+.pro-features li{padding:8px 0;font-size:.9rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pro-features li:last-child{border-bottom:none}
+.pro-features li span.pf-icon{font-size:1.1rem;flex-shrink:0}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);border:none;border-radius:12px;color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:16px;text-align:center}
+.pro-upgrade-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:#aab;cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-later-btn:hover{color:#fff}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>&#127912; Color Contrast Checker</h1>
+<p class="sub">WCAG 2.1 对比度检查 · 实时计算 · 智能建议</p>
+<div class="card">
+<h2>&#128396;&#65039; 选择颜色</h2>
+<div class="row">
+<div class="cg"><label for="fh">前景色 (文字)</label><div class="ci"><input type="color" id="fp" value="#ffffff"><input type="text" id="fh" value="#FFFFFF" maxlength="7" spellcheck="false"></div></div>
+<div class="cg"><label for="bh">背景色</label><div class="ci"><input type="color" id="bp" value="#1a1a2e"><input type="text" id="bh" value="#1A1A2E" maxlength="7" spellcheck="false"></div></div>
+</div>
+<button class="swap" id="sw" aria-label="交换颜色">&#8693;</button>
+</div>
+<div class="card">
+<h2>&#128202; 对比度结果</h2>
+<div id="rn" class="rn">-</div>
+<div class="rl">对比度比率 (最低 1:1, 最高 21:1)</div>
+<div class="rg">
+<div class="ri"><div class="lb">AA 普通文本<small>≥ 4.5:1</small></div><span id="r1" class="b bf">FAIL</span></div>
+<div class="ri"><div class="lb">AA 大文本<small>≥ 3:1</small></div><span id="r2" class="b bf">FAIL</span></div>
+<div class="ri"><div class="lb">AAA 普通文本<small>≥ 7:1</small></div><span id="r3" class="b bf">FAIL</span></div>
+<div class="ri"><div class="lb">AAA 大文本<small>≥ 4.5:1</small></div><span id="r4" class="b bf">FAIL</span></div>
+</div>
+</div>
+<div class="card">
+<h2>&#128065;&#65039; 预览效果</h2>
+<div id="pv" class="pv">
+<div class="lg">大文本预览 Large Text</div>
+<div class="nm">普通文本预览 Normal body text for reading.</div>
+<div class="sm">小文本 Small text · 辅助信息</div>
+</div>
+</div>
+<div class="card" id="sgc" style="display:none">
+<h2>&#128161; 颜色建议</h2>
+<p style="font-size:.85rem;color:#aab;margin-bottom:8px">点击建议可直接应用</p>
+<div id="sgs" class="sg"></div>
+</div>
+<!-- Pro Section -->
+<div class="pro-section" onclick="openProModal()">
+<div class="pro-blur">
+<h2 style="font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px">🚀 Pro: Batch Check & PDF Export</h2>
+<div class="pro-mock-row"><div class="pro-mock-swatch" style="background:#FF6B6B"></div><div class="pro-mock-swatch" style="background:#1A1A2E"></div><div class="pro-mock-bar"></div><div class="pro-mock-badge">4.52:1 PASS</div></div>
+<div class="pro-mock-row"><div class="pro-mock-swatch" style="background:#4ECDC4"></div><div class="pro-mock-swatch" style="background:#FFFFFF"></div><div class="pro-mock-bar"></div><div class="pro-mock-badge">2.31:1 FAIL</div></div>
+<div class="pro-mock-row"><div class="pro-mock-swatch" style="background:#2C3E50"></div><div class="pro-mock-swatch" style="background:#ECF0F1"></div><div class="pro-mock-bar"></div><div class="pro-mock-badge">11.07:1 PASS</div></div>
+<h3 style="font-size:.9rem;margin-top:20px;color:#aab">Palette Combinations Matrix</h3>
+<div class="pro-mock-grid"><div class="pro-mock-cell" style="background:#FF6B6B"></div><div class="pro-mock-cell" style="background:#4ECDC4"></div><div class="pro-mock-cell" style="background:#45B7D1"></div><div class="pro-mock-cell" style="background:#96CEB4"></div><div class="pro-mock-cell" style="background:#FFEAA7"></div><div class="pro-mock-cell" style="background:#DDA0DD"></div><div class="pro-mock-cell" style="background:#98D8C8"></div><div class="pro-mock-cell" style="background:#F7DC6F"></div><div class="pro-mock-cell" style="background:#BB8FCE"></div><div class="pro-mock-cell" style="background:#85C1E9"></div></div>
+<div class="pro-mock-btn">📄 Export PDF Report</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Unlock Pro Features</div>
+</div>
+</div>
+<!-- Pro Modal -->
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+<h2>🚀 Unlock Pro</h2>
+<p class="pro-price">One-time purchase · Lifetime access</p>
+<ul class="pro-features">
+<li><span class="pf-icon">📋</span> Batch check multiple color pairs at once</li>
+<li><span class="pf-icon">🎨</span> Full palette combination matrix</li>
+<li><span class="pf-icon">📄</span> Export detailed PDF accessibility reports</li>
+<li><span class="pf-icon">♾️</span> Lifetime updates & priority support</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="closeProModal()">Maybe later</button>
+</div>
+</div>
+<script>function openProModal(){document.getElementById('proModal').classList.add('show')}function closeProModal(){document.getElementById('proModal').classList.remove('show')}</script>
+<footer>Color Contrast Checker · WCAG 2.1 · Open Source Tool</footer>
+</div>
+<script>
+const $=s=>document.getElementById(s),hex2rgb=h=>{const r=parseInt(h.slice(1),16);return[(r>>16)&255,(r>>8)&255,r&255]},rgb2hex=([r,g,b])=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join(''),luminance=([r,g,b])=>{const a=[r,g,b].map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*a[0]+.7152*a[1]+.0722*a[2]},contrast=(fg,bg)=>{const l1=luminance(fg),l2=luminance(bg);return(Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)},isValid=h=>/^#[0-9a-f]{6}$/i.test(h);
+function hsl2rgb(h,s,l){let r,g,b;if(s===0){r=g=b=l}else{const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p};r=hue2rgb(p,q,h/360);g=hue2rgb(p,q,(h+120)/360>1?(h+120)/360-1:(h+120)/360);b=hue2rgb(p,q,(h+240)/360>1?(h+240)/360-1:(h+240)/360)}return[Math.round(r*255),Math.round(g*255),Math.round(b*255)]}
+function rgb2hsl([r,g,b]){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))*60;break;case g:h=((b-r)/d+2)*60;break;case b:h=((r-g)/d+4)*60;break}}return[h,s,l]}
+function adjustColor(rgb,bgRgb,targetRatio,isFg){const [h,s,l]=rgb2hsl(rgb);const bgL=luminance(bgRgb);let lo=0,hi=1,best=rgb,bestR=contrast(rgb,bgRgb);for(let i=0;i<50;i++){const mid=(lo+hi)/2;const test=hsl2rgb(h,s,mid);const r=isFg?contrast(test,bgRgb):contrast(bgRgb,test);if(r>=targetRatio&&r<bestR){best=test;bestR=r}const testL=luminance(test);const cr=isFg?((Math.max(testL,bgL)+.05)/(Math.min(testL,bgL)+.05)):((Math.max(testL,bgL)+.05)/(Math.min(testL,bgL)+.05));if(cr<targetRatio){if(bgL>.5)hi=mid;else lo=mid}else{if(bgL>.5)lo=mid;else hi=mid}}if(bestR<targetRatio){lo=0;hi=1;for(let i=0;i<50;i++){const mid=(lo+hi)/2;const test=hsl2rgb(h,s,mid);const r=isFg?contrast(test,bgRgb):contrast(bgRgb,test);if(r>=targetRatio){best=test;bestR=r;if(bgL>.5)lo=mid;else hi=mid}else{if(bgL>.5)hi=mid;else lo=mid}}}return bestR>=targetRatio?best:null}
+function getSuggestions(fgRgb,bgRgb,ratio){const suggestions=[];const targets=[{r:4.5,label:'AA 普通文本'},{r:7,label:'AAA 普通文本'}];for(const t of targets){if(ratio>=t.r)continue;const adjFg=adjustColor(fgRgb,bgRgb,t.r,true);if(adjFg){const cr=contrast(adjFg,bgRgb);suggestions.push({hex:rgb2hex(adjFg),ratio:cr,label:'调整前景色达到 '+t.label,type:'fg',rgb:adjFg})}const adjBg=adjustColor(bgRgb,fgRgb,t.r,false);if(adjBg){const cr=contrast(fgRgb,adjBg);suggestions.push({hex:rgb2hex(adjBg),ratio:cr,label:'调整背景色达到 '+t.label,type:'bg',rgb:adjBg})}}return suggestions}
+function update(){const fv=$('fh').value.trim(),bv=$('bh').value.trim();if(!isValid(fv)||!isValid(bv))return;const fg=hex2rgb(fv),bg=hex2rgb(bv),r=contrast(fg,bg);$('fp').value=fv.toLowerCase();$('bp').value=bv.toLowerCase();$('rn').textContent=r.toFixed(2)+' : 1';$('rn').style.color=r>=4.5?'#2ed573':r>=3?'#ffa502':'#e94560';
+const tests=[[r>=4.5,'r1'],[r>=3,'r2'],[r>=7,'r3'],[r>=4.5,'r4']];tests.forEach(([pass,id])=>{const el=$(id);el.textContent=pass?'PASS':'FAIL';el.className='b '+(pass?'bp':'bf')});
+const pv=$('pv');pv.style.backgroundColor=bv;pv.style.color=fv;
+const sgs=getSuggestions(fg,bg,r),sgc=$('sgc'),sgd=$('sgs');if(sgs.length>0){sgc.style.display='';sgd.innerHTML='';sgs.forEach(s=>{const d=document.createElement('div');d.className='si';d.innerHTML='<div class="sw" style="background:'+s.hex+'"></div><div class="sn"><span class="hx">'+s.hex.toUpperCase()+'</span><div class="ds">'+s.label+'</div></div><span class="sb">'+s.ratio.toFixed(2)+':1</span>';d.onclick=()=>{if(s.type==='fg'){$('fh').value=s.hex.toUpperCase();$('fp').value=s.hex}else{$('bh').value=s.hex.toUpperCase();$('bp').value=s.hex}update()};sgd.appendChild(d)})}else{sgc.style.display='none'}}
+['fh','bh'].forEach(id=>{$(id).addEventListener('input',function(){let v=this.value;if(v[0]!=='#')v='#'+v;if(isValid(v))update()})});
+['fp','bp'].forEach((id,i)=>{$(id).addEventListener('input',function(){const hex=this.value;const tid=i===0?'fh':'bh';$(tid).value=hex.toUpperCase();update()})});
+$('sw').onclick=()=>{const f=$('fh').value,b=$('bh').value;$('fh').value=b;$('bh').value=f;update()};
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

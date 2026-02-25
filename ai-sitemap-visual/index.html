@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Sitemap Visualizer - Interactive URL Tree Structure</title>
+<meta name="description" content="Visualize website URL structures as interactive tree diagrams. Paste URLs, generate beautiful sitemaps, export as SVG or PNG.">
+<link rel="canonical" href="https://lifa-su.com/ai-sitemap-visual/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e6f0;--text2:#8b8fa8;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00cec9;--red:#ff6b6b;--orange:#fdcb6e;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:0.95rem}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.input-section{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.input-section textarea{flex:1;min-width:280px;min-height:140px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.85rem;resize:vertical;outline:none;transition:border-color .2s}
+.input-section textarea:focus{border-color:var(--accent)}
+.input-section textarea::placeholder{color:var(--text2)}
+.controls{display:flex;flex-direction:column;gap:10px;min-width:180px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .2s;outline:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#5a4bd1);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,92,231,0.4)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-danger{background:rgba(255,107,107,0.15);color:var(--red);border:1px solid rgba(255,107,107,0.3)}
+.btn-danger:hover{background:rgba(255,107,107,0.25)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.toolbar .info{margin-left:auto;color:var(--text2);font-size:0.85rem}
+.viz-container{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:500px}
+.viz-container svg{display:block;width:100%;cursor:grab}
+.viz-container svg:active{cursor:grabbing}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;color:var(--text2);gap:12px}
+.empty-state svg{width:64px;height:64px;opacity:0.3}
+.empty-state p{font-size:1rem}
+.node-group{cursor:pointer}
+.node-rect{rx:8;ry:8;transition:filter .2s}
+.node-group:hover .node-rect{filter:brightness(1.2)}
+.node-label{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:var(--text);font-size:13px;pointer-events:none}
+.node-badge{font-family:-apple-system,sans-serif;fill:var(--text2);font-size:11px;pointer-events:none}
+.link-path{fill:none;stroke:var(--border);stroke-width:1.5;transition:stroke .2s}
+.node-group:hover ~ .link-path{stroke:var(--accent)}
+.toggle-icon{fill:var(--text2);font-size:12px;pointer-events:none}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 24px;color:var(--text);font-size:0.9rem;box-shadow:var(--shadow);transition:transform .3s ease;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px}
+.stat{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface2);border-radius:8px;font-size:0.85rem}
+.stat-num{font-weight:700;color:var(--accent2);font-size:1.1rem}
+.zoom-controls{position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:6px;z-index:10}
+.zoom-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s}
+.zoom-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text2)}
+.legend-color{width:12px;height:12px;border-radius:3px}
+footer{text-align:center;padding:30px 20px;color:var(--text2);font-size:0.8rem}
+@media(max-width:768px){
+  header h1{font-size:1.5rem}
+  .input-section{flex-direction:column}
+  .controls{flex-direction:row;flex-wrap:wrap}
+  .toolbar{flex-direction:column;align-items:flex-start}
+  .toolbar .info{margin-left:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🗺️ AI Sitemap Visualizer</h1>
+  <p>Paste URLs to generate interactive tree-structured sitemaps</p>
+</header>
+<div class="container">
+  <div class="panel">
+    <div class="input-section">
+      <textarea id="urlInput" placeholder="Paste URLs here, one per line...&#10;&#10;https://example.com&#10;https://example.com/about&#10;https://example.com/blog&#10;https://example.com/blog/post-1&#10;https://example.com/blog/post-2&#10;https://example.com/products&#10;https://example.com/products/item-1"></textarea>
+      <div class="controls">
+        <button class="btn btn-primary" id="btnGenerate" onclick="generateTree()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+          Generate Tree
+        </button>
+        <button class="btn btn-secondary" id="btnExample" onclick="loadExample()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+          Load Example
+        </button>
+        <button class="btn btn-secondary" onclick="expandAll()">Expand All</button>
+        <button class="btn btn-secondary" onclick="collapseAll()">Collapse All</button>
+        <button class="btn btn-danger" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+    <div class="stats" id="stats" style="display:none">
+      <div class="stat"><span class="stat-num" id="statUrls">0</span> URLs</div>
+      <div class="stat"><span class="stat-num" id="statDomains">0</span> Domains</div>
+      <div class="stat"><span class="stat-num" id="statDepth">0</span> Max Depth</div>
+      <div class="stat"><span class="stat-num" id="statNodes">0</span> Nodes</div>
+    </div>
+  </div>
+  <div class="panel" id="vizPanel" style="display:none">
+    <div class="toolbar">
+      <button class="btn btn-secondary" onclick="exportSVG()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export SVG
+      </button>
+      <button class="btn btn-secondary" onclick="exportPNG()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export PNG
+      </button>
+      <span class="info" id="zoomInfo">Zoom: 100%</span>
+    </div>
+    <div class="viz-container" id="vizContainer">
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+        <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+        <button class="zoom-btn" onclick="zoomReset()" title="Reset">⟲</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-color" style="background:#6c5ce7"></div> Domain (root)</div>
+      <div class="legend-item"><div class="legend-color" style="background:#00cec9"></div> Directory</div>
+      <div class="legend-item"><div class="legend-color" style="background:#fdcb6e"></div> Page (leaf)</div>
+      <div class="legend-item"><div class="legend-color" style="background:#636e72"></div> Collapsed</div>
+    </div>
+  </div>
+  <div class="panel" id="emptyPanel">
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 17H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-4m-6 0l3 3m-3-3l3-3"/></svg>
+      <p>Paste URLs above and click "Generate Tree" to visualize</p>
+    </div>
+  </div>
+</div>
+<footer>
+  <p>AI Sitemap Visualizer — Built for developers and SEO professionals</p>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+let treeData = null;
+let svgEl = null;
+let currentZoom = 1;
+let panX = 0, panY = 0;
+let isPanning = false;
+let startPan = {x:0,y:0};
+const NODE_H = 36, NODE_PAD = 14, NODE_GAP_Y = 6, LEVEL_GAP_X = 220, CHILD_INDENT = 30;
+const COLORS = {root:'#6c5ce7',dir:'#00cec9',leaf:'#fdcb6e',collapsed:'#636e72'};
+
+function parseURLs(text) {
+  const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l && (l.startsWith('http://') || l.startsWith('https://')));
+  const unique = [...new Set(lines)];
+  return unique.map(u => {try{return new URL(u)}catch{return null}}).filter(Boolean);
+}
+
+function buildTree(urls) {
+  const roots = {};
+  urls.forEach(u => {
+    const domain = u.hostname;
+    if (!roots[domain]) roots[domain] = {name: domain, fullUrl: u.origin, children: {}, _children: null, collapsed: false, isRoot: true};
+    const parts = u.pathname.split('/').filter(Boolean);
+    let node = roots[domain];
+    parts.forEach((p, i) => {
+      if (!node.children[p]) {
+        node.children[p] = {name: p, fullUrl: u.origin + '/' + parts.slice(0, i+1).join('/'), children: {}, _children: null, collapsed: false, isRoot: false};
+      }
+      node = node.children[p];
+    });
+    const search = u.search;
+    if (search) {
+      const qKey = search.substring(0,40) + (search.length > 40 ? '...' : '');
+      if (!node.children[qKey]) {
+        node.children[qKey] = {name: qKey, fullUrl: u.href, children: {}, _children: null, collapsed: false, isRoot: false};
+      }
+    }
+  });
+  function toArray(obj) {
+    const arr = Object.values(obj.children);
+    arr.forEach(c => toArray(c));
+    obj.childrenArr = arr;
+    return obj;
+  }
+  const rootArr = Object.values(roots).map(r => toArray(r));
+  return rootArr.length === 1 ? rootArr[0] : {name: 'Sites', fullUrl: '', childrenArr: rootArr, collapsed: false, isRoot: true, virtual: true};
+}
+
+function countNodes(node) {
+  let c = 1;
+  (node.childrenArr || []).forEach(ch => c += countNodes(ch));
+  return c;
+}
+
+function maxDepth(node, d) {
+  d = d || 0;
+  let m = d;
+  (node.childrenArr || []).forEach(ch => { m = Math.max(m, maxDepth(ch, d+1)); });
+  return m;
+}
+
+function getVisibleChildren(node) {
+  if (node.collapsed) return [];
+  return node.childrenArr || [];
+}
+
+function layoutTree(node, x, y) {
+  node.x = x;
+  node.y = y;
+  node.w = Math.max(100, node.name.length * 8 + NODE_PAD * 2 + 30);
+  node.h = NODE_H;
+  const children = getVisibleChildren(node);
+  if (children.length === 0) {
+    node.subtreeH = NODE_H;
+    return node;
+  }
+  let cy = y;
+  children.forEach((ch, i) => {
+    layoutTree(ch, x + LEVEL_GAP_X, cy);
+    cy += ch.subtreeH + NODE_GAP_Y;
+  });
+  const totalH = cy - y - NODE_GAP_Y;
+  node.subtreeH = Math.max(NODE_H, totalH);
+  return node;
+}
+
+function getNodeColor(node) {
+  if (node.collapsed && (node.childrenArr || []).length > 0) return COLORS.collapsed;
+  if (node.isRoot || node.virtual) return COLORS.root;
+  if ((node.childrenArr || []).length > 0) return COLORS.dir;
+  return COLORS.leaf;
+}
+
+function renderTree(node, svg, links) {
+  const children = getVisibleChildren(node);
+  children.forEach(ch => {
+    const x1 = node.x + node.w;
+    const y1 = node.y + NODE_H / 2;
+    const x2 = ch.x;
+    const y2 = ch.y + NODE_H / 2;
+    const mx = x1 + (x2 - x1) * 0.5;
+    links.push(`<path class="link-path" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"/>`);
+    renderTree(ch, svg, links);
+  });
+  const color = getNodeColor(node);
+  const hasChildren = (node.childrenArr || []).length > 0;
+  const childCount = (node.childrenArr || []).length;
+  let badge = '';
+  if (hasChildren) {
+    badge = node.collapsed
+      ? `<text class="node-badge" x="${node.x + node.w - 36}" y="${node.y + NODE_H/2 + 4}">+${childCount}</text>`
+      : '';
+  }
+  const label = node.name.length > 28 ? node.name.substring(0, 26) + '…' : node.name;
+  svg.push(`<g class="node-group" data-id="${node.fullUrl || node.name}" onclick="toggleNode(this, '${escapeAttr(node.fullUrl || node.name)}')">`);
+  svg.push(`<rect class="node-rect" x="${node.x}" y="${node.y}" width="${node.w}" height="${NODE_H}" fill="${color}22" stroke="${color}" stroke-width="1.5"/>`);
+  if (hasChildren) {
+    const icon = node.collapsed ? '▶' : '▼';
+    svg.push(`<text class="toggle-icon" x="${node.x + 10}" y="${node.y + NODE_H/2 + 4}" fill="${color}">${icon}</text>`);
+  }
+  svg.push(`<text class="node-label" x="${node.x + (hasChildren ? 26 : 12)}" y="${node.y + NODE_H/2 + 5}">${escapeHtml(label)}</text>`);
+  svg.push(badge);
+  svg.push(`<title>${escapeHtml(node.fullUrl || node.name)}</title>`);
+  svg.push('</g>');
+}
+
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+function findNode(root, id) {
+  if ((root.fullUrl || root.name) === id) return root;
+  for (const ch of (root.childrenArr || [])) {
+    const f = findNode(ch, id);
+    if (f) return f;
+  }
+  return null;
+}
+
+window.toggleNode = function(el, id) {
+  if (!treeData) return;
+  const node = findNode(treeData, id);
+  if (!node || !(node.childrenArr || []).length) return;
+  node.collapsed = !node.collapsed;
+  renderViz();
+};
+
+function renderViz() {
+  if (!treeData) return;
+  layoutTree(treeData, 40, 40);
+  const svgParts = [];
+  const linkParts = [];
+  renderTree(treeData, svgParts, linkParts);
+  const allNodes = [];
+  function collect(n) { allNodes.push(n); getVisibleChildren(n).forEach(collect); }
+  collect(treeData);
+  const maxX = Math.max(...allNodes.map(n => n.x + n.w)) + 60;
+  const maxY = Math.max(...allNodes.map(n => n.y + n.h)) + 60;
+  const container = document.getElementById('vizContainer');
+  const zoomControls = container.querySelector('.zoom-controls').outerHTML;
+  const svgContent = `<svg id="mainSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${maxX} ${maxY}" style="min-height:500px">
+    <g id="svgGroup" transform="translate(${panX},${panY}) scale(${currentZoom})">
+      ${linkParts.join('\n')}
+      ${svgParts.join('\n')}
+    </g>
+  </svg>`;
+  container.innerHTML = svgContent + zoomControls;
+  svgEl = document.getElementById('mainSvg');
+  setupPan();
+}
+
+function setupPan() {
+  if (!svgEl) return;
+  svgEl.addEventListener('mousedown', e => { isPanning = true; startPan = {x: e.clientX - panX, y: e.clientY - panY}; });
+  svgEl.addEventListener('mousemove', e => { if (!isPanning) return; panX = e.clientX - startPan.x; panY = e.clientY - startPan.y; updateTransform(); });
+  svgEl.addEventListener('mouseup', () => isPanning = false);
+  svgEl.addEventListener('mouseleave', () => isPanning = false);
+  svgEl.addEventListener('wheel', e => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    currentZoom = Math.max(0.1, Math.min(5, currentZoom * delta));
+    updateTransform();
+    document.getElementById('zoomInfo').textContent = `Zoom: ${Math.round(currentZoom * 100)}%`;
+  }, {passive: false});
+}
+
+function updateTransform() {
+  const g = document.getElementById('svgGroup');
+  if (g) g.setAttribute('transform', `translate(${panX},${panY}) scale(${currentZoom})`);
+}
+
+window.zoomIn = function() { currentZoom = Math.min(5, currentZoom * 1.2); updateTransform(); document.getElementById('zoomInfo').textContent = `Zoom: ${Math.round(currentZoom*100)}%`; };
+window.zoomOut = function() { currentZoom = Math.max(0.1, currentZoom / 1.2); updateTransform(); document.getElementById('zoomInfo').textContent = `Zoom: ${Math.round(currentZoom*100)}%`; };
+window.zoomReset = function() { currentZoom = 1; panX = 0; panY = 0; updateTransform(); document.getElementById('zoomInfo').textContent = 'Zoom: 100%'; };
+
+function generateTree() {
+  const text = document.getElementById('urlInput').value;
+  const urls = parseURLs(text);
+  if (urls.length === 0) { showToast('Please enter valid URLs (starting with http:// or https://)'); return; }
+  treeData = buildTree(urls);
+  currentZoom = 1; panX = 0; panY = 0;
+  const domains = new Set(urls.map(u => u.hostname));
+  document.getElementById('statUrls').textContent = urls.length;
+  document.getElementById('statDomains').textContent = domains.size;
+  document.getElementById('statDepth').textContent = maxDepth(treeData, 0);
+  document.getElementById('statNodes').textContent = countNodes(treeData);
+  document.getElementById('stats').style.display = 'flex';
+  document.getElementById('vizPanel').style.display = 'block';
+  document.getElementById('emptyPanel').style.display = 'none';
+  renderViz();
+  showToast(`Generated tree with ${countNodes(treeData)} nodes`);
+}
+
+function expandAll() {
+  if (!treeData) return;
+  function expand(n) { n.collapsed = false; (n.childrenArr || []).forEach(expand); }
+  expand(treeData);
+  renderViz();
+}
+
+function collapseAll() {
+  if (!treeData) return;
+  function collapse(n) { if ((n.childrenArr||[]).length) n.collapsed = true; (n.childrenArr||[]).forEach(collapse); }
+  collapse(treeData);
+  renderViz();
+}
+
+function clearAll() {
+  treeData = null;
+  document.getElementById('urlInput').value = '';
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('vizPanel').style.display = 'none';
+  document.getElementById('emptyPanel').style.display = 'block';
+}
+
+function loadExample() {
+  document.getElementById('urlInput').value = `https://example.com
+https://example.com/about
+https://example.com/about/team
+https://example.com/about/careers
+https://example.com/blog
+https://example.com/blog/2024/ai-trends
+https://example.com/blog/2024/web-design
+https://example.com/blog/2023/year-review
+https://example.com/products
+https://example.com/products/analytics
+https://example.com/products/analytics/pricing
+https://example.com/products/seo-tools
+https://example.com/products/seo-tools/features
+https://example.com/docs
+https://example.com/docs/getting-started
+https://example.com/docs/api-reference
+https://example.com/docs/api-reference/auth
+https://example.com/docs/api-reference/endpoints
+https://example.com/contact
+https://example.com/privacy
+https://example.com/terms`;
+  generateTree();
+}
+
+function getSVGString() {
+  const svg = document.getElementById('mainSvg');
+  if (!svg) return null;
+  const clone = svg.cloneNode(true);
+  const g = clone.querySelector('#svgGroup');
+  if (g) g.setAttribute('transform', 'translate(0,0) scale(1)');
+  clone.setAttribute('style', 'background:#1a1d27');
+  const style = document.createElementNS('http://www.w3.org/2000/svg','style');
+  style.textContent = `.node-rect{rx:8;ry:8}.node-label{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px}.node-badge{font-family:-apple-system,sans-serif;font-size:11px}.link-path{fill:none;stroke:#2e3348;stroke-width:1.5}.toggle-icon{font-size:12px}`;
+  clone.insertBefore(style, clone.firstChild);
+  return new XMLSerializer().serializeToString(clone);
+}
+
+function exportSVG() {
+  const str = getSVGString();
+  if (!str) { showToast('Generate a tree first'); return; }
+  const blob = new Blob([str], {type:'image/svg+xml'});
+  downloadBlob(blob, 'sitemap.svg');
+  showToast('SVG exported');
+}
+
+function exportPNG() {
+  const str = getSVGString();
+  if (!str) { showToast('Generate a tree first'); return; }
+  const canvas = document.createElement('canvas');
+  const img = new Image();
+  const svgBlob = new Blob([str], {type:'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(svgBlob);
+  img.onload = function() {
+    const scale = 2;
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1a1d27';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    canvas.toBlob(blob => { downloadBlob(blob, 'sitemap.png'); showToast('PNG exported'); }, 'image/png');
+  };
+  img.src = url;
+}
+
+function downloadBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

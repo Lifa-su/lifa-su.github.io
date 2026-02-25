@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS Transform Visualizer - Interactive tool to explore and generate CSS 2D/3D transform properties with real-time preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-transform/">
+<title>CSS Transform Visualizer</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--card:#16213e;--card2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:16px}
+header{text-align:center;padding:24px 0 16px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.lay{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:768px){.lay{grid-template-columns:1fr}.pp{position:static!important}}
+.pnl{background:var(--card);border-radius:var(--r);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.pp{position:sticky;top:16px}
+.pa{width:100%;aspect-ratio:1;background:repeating-conic-gradient(rgba(255,255,255,.03) 0% 25%,transparent 0% 50%) 0 0/20px 20px;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.pb{width:120px;height:120px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;transition:transform .05s ease-out;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:rgba(255,255,255,.7);font-weight:600}
+.cb{background:#0d1117;border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;color:#c9d1d9;position:relative;white-space:pre-wrap;word-break:break-all;border:1px solid rgba(255,255,255,.06);min-height:60px}
+.cpb{position:absolute;top:8px;right:8px;background:var(--card2);color:var(--text);border:1px solid rgba(255,255,255,.1);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.cpb:hover{background:var(--accent)}
+.cpb.ok{background:#238636}
+.cp{max-height:85vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--card2) transparent}
+.sec{margin-bottom:16px}
+.st{font-size:.85rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.st::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px}
+.cr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cr label{min-width:90px;font-size:.8rem;color:var(--text2)}
+.cr input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:6px;background:var(--card2);border-radius:3px;outline:none}
+.cr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+.cr input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+.cr .vd{min-width:65px;text-align:right;font-size:.78rem;color:var(--text2);font-family:monospace}
+.op{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.op button{background:var(--card2);color:var(--text2);border:1px solid rgba(255,255,255,.08);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.72rem;transition:all .2s}
+.op button:hover,.op button.ac{background:var(--accent);color:#fff;border-color:var(--accent)}
+.co{display:flex;gap:8px;align-items:center}
+.co input{width:60px;background:var(--card2);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:4px 8px;border-radius:6px;font-size:.78rem;text-align:center}
+.co span{color:var(--text2);font-size:.78rem}
+.acts{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.br{background:var(--card2);color:var(--text);border:1px solid rgba(255,255,255,.1)}
+.br:hover{background:var(--accent);border-color:var(--accent)}
+.b3{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+.b3:hover{opacity:.85}
+.s3{display:none}.s3.show{display:block}
+footer{text-align:center;padding:24px 0;color:var(--text2);font-size:.75rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>CSS Transform Visualizer</h1><p>Explore 2D &amp; 3D CSS transforms with real-time preview</p></header>
+<div class="lay">
+<div class="pnl pp">
+<div class="pa" id="pa"><div class="pb" id="pb">ELEMENT</div></div>
+<div class="cb" id="cb"><button class="cpb" id="cpb">Copy</button><span id="cc"></span></div>
+</div>
+<div class="pnl cp">
+<div class="sec"><div class="st">Translate</div>
+<div class="cr"><label>translateX</label><input type="range" id="tx" min="-200" max="200" value="0" oninput="u()"><span class="vd" id="tx_v">0px</span></div>
+<div class="cr"><label>translateY</label><input type="range" id="ty" min="-200" max="200" value="0" oninput="u()"><span class="vd" id="ty_v">0px</span></div>
+</div>
+<div class="sec"><div class="st">Rotate</div>
+<div class="cr"><label>rotate</label><input type="range" id="rt" min="0" max="360" value="0" oninput="u()"><span class="vd" id="rt_v">0deg</span></div>
+</div>
+<div class="sec"><div class="st">Scale</div>
+<div class="cr"><label>scaleX</label><input type="range" id="sx" min="0" max="300" value="100" oninput="u()"><span class="vd" id="sx_v">1</span></div>
+<div class="cr"><label>scaleY</label><input type="range" id="sy" min="0" max="300" value="100" oninput="u()"><span class="vd" id="sy_v">1</span></div>
+</div>
+<div class="sec"><div class="st">Skew</div>
+<div class="cr"><label>skewX</label><input type="range" id="kx" min="-90" max="90" value="0" oninput="u()"><span class="vd" id="kx_v">0deg</span></div>
+<div class="cr"><label>skewY</label><input type="range" id="ky" min="-90" max="90" value="0" oninput="u()"><span class="vd" id="ky_v">0deg</span></div>
+</div>
+<div class="sec"><div class="st">Transform Origin</div>
+<div class="op" id="op"></div>
+<div class="co"><input id="ox" value="50" oninput="setO()"><span>%</span><input id="oy" value="50" oninput="setO()"><span>%</span></div>
+</div>
+<div class="sec s3" id="s3"><div class="st">3D Transforms</div>
+<div class="cr"><label>perspective</label><input type="range" id="ps" min="100" max="2000" value="800" oninput="u()"><span class="vd" id="ps_v">800px</span></div>
+<div class="cr"><label>rotateX</label><input type="range" id="rx" min="0" max="360" value="0" oninput="u()"><span class="vd" id="rx_v">0deg</span></div>
+<div class="cr"><label>rotateY</label><input type="range" id="ry" min="0" max="360" value="0" oninput="u()"><span class="vd" id="ry_v">0deg</span></div>
+<div class="cr"><label>rotateZ</label><input type="range" id="rz" min="0" max="360" value="0" oninput="u()"><span class="vd" id="rz_v">0deg</span></div>
+</div>
+<div class="acts">
+<button class="btn br" onclick="reset()">Reset All</button>
+<button class="btn b3" id="t3" onclick="tog3d()">Enable 3D</button>
+</div>
+</div>
+</div>
+</div>
+<footer>&copy; 2025 CSS Transform Visualizer</footer>
+<script>
+const $=id=>document.getElementById(id);
+const presets=[['center','50','50'],['top-left','0','0'],['top-right','100','0'],['top','50','0'],['bottom-left','0','100'],['bottom-right','100','100'],['bottom','50','100'],['left','0','50'],['right','100','50']];
+let show3d=false;
+function init(){const op=$('op');presets.forEach(([n,x,y])=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>{$('ox').value=x;$('oy').value=y;document.querySelectorAll('.op button').forEach(e=>e.classList.remove('ac'));b.classList.add('ac');u()};if(n==='center')b.classList.add('ac');op.appendChild(b)});u()}
+function v(id){return parseFloat($(id).value)}
+function u(){
+const tx=v('tx'),ty=v('ty'),rt=v('rt'),sxv=v('sx')/100,syv=v('sy')/100,kx=v('kx'),ky=v('ky');
+$('tx_v').textContent=tx+'px';$('ty_v').textContent=ty+'px';$('rt_v').textContent=rt+'deg';
+$('sx_v').textContent=sxv.toFixed(2);$('sy_v').textContent=syv.toFixed(2);
+$('kx_v').textContent=kx+'deg';$('ky_v').textContent=ky+'deg';
+const ox=$('ox').value,oy=$('oy').value;
+let parts=[];
+if(tx!==0||ty!==0)parts.push('translate('+tx+'px, '+ty+'px)');
+if(rt!==0)parts.push('rotate('+rt+'deg)');
+if(sxv!==1||syv!==1)parts.push('scale('+sxv.toFixed(2)+', '+syv.toFixed(2)+')');
+if(kx!==0||ky!==0)parts.push('skew('+kx+'deg, '+ky+'deg)');
+let css3d='',tf3d='';
+if(show3d){const ps=v('ps'),rxv=v('rx'),ryv=v('ry'),rzv=v('rz');
+$('ps_v').textContent=ps+'px';$('rx_v').textContent=rxv+'deg';$('ry_v').textContent=ryv+'deg';$('rz_v').textContent=rzv+'deg';
+if(rxv!==0)parts.push('rotateX('+rxv+'deg)');
+if(ryv!==0)parts.push('rotateY('+ryv+'deg)');
+if(rzv!==0)parts.push('rotateZ('+rzv+'deg)');
+css3d='perspective: '+ps+'px;\n';
+$('pa').style.perspective=ps+'px';}else{$('pa').style.perspective='';}
+const tf=parts.length?parts.join(' '):'none';
+const origin=ox+'% '+oy+'%';
+$('pb').style.transform=tf;$('pb').style.transformOrigin=origin;
+let code=css3d+'transform: '+tf+';\ntransform-origin: '+origin+';';
+$('cc').textContent=code;
+document.querySelectorAll('.op button').forEach(b=>{b.classList.remove('ac')});
+presets.forEach(([n,px,py])=>{if(ox===px&&oy===py){document.querySelectorAll('.op button').forEach(b=>{if(b.textContent===n)b.classList.add('ac')})}});}
+function setO(){u()}
+function reset(){['tx','ty','rt','kx','ky','rx','ry','rz'].forEach(id=>{if($(id))$(id).value=0});
+['sx','sy'].forEach(id=>$(id).value=100);$('ps').value=800;$('ox').value=50;$('oy').value=50;u()}
+function tog3d(){show3d=!show3d;$('s3').classList.toggle('show',show3d);$('t3').textContent=show3d?'Disable 3D':'Enable 3D';if(!show3d){['rx','ry','rz'].forEach(id=>$(id).value=0);$('ps').value=800}u()}
+function copyCode(){const t=$('cc').textContent;navigator.clipboard.writeText(t).then(()=>{const b=$('cpb');b.textContent='Copied!';b.classList.add('ok');setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok')},1500)})}
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

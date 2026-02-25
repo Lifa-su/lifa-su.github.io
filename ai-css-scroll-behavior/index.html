@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Scroll Behavior - Interactive Demo Tool</title>
+<meta name="description" content="Interactive CSS Scroll Behavior demo tool. Explore smooth scrolling, scroll-margin, scroll-padding, scroll-snap, and anchor navigation with live previews and code generation.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-scroll-behavior/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#1a1a2e;--secondary:#16213e;--accent:#0f3460;--highlight:#e94560;--text:#eee;--text-muted:#999;--surface:#0f0f23;--surface2:#1a1a35;--border:#2a2a4a;--radius:8px;--code-bg:#0d0d1a}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--primary);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--highlight);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Header */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.logo{font-size:1.4rem;font-weight:700;color:var(--highlight)}
+.logo span{color:var(--text)}
+nav{display:flex;gap:0.5rem;flex-wrap:wrap}
+nav a{padding:0.4rem 0.8rem;border-radius:var(--radius);background:var(--surface2);color:var(--text-muted);font-size:0.85rem;transition:all 0.2s}
+nav a:hover,nav a.active{background:var(--highlight);color:#fff;text-decoration:none}
+
+/* Main */
+.container{max-width:1200px;margin:0 auto;padding:2rem 1.5rem}
+h1{font-size:2rem;margin-bottom:0.5rem;background:linear-gradient(135deg,var(--highlight),#ff6b8a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{color:var(--text-muted);margin-bottom:2rem;font-size:1.05rem}
+
+/* Section */
+.demo-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem}
+.demo-section h2{font-size:1.3rem;margin-bottom:0.3rem;color:var(--highlight)}
+.demo-section .desc{color:var(--text-muted);font-size:0.9rem;margin-bottom:1.2rem}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;align-items:center}
+.control-group{display:flex;flex-direction:column;gap:0.3rem}
+.control-group label{font-size:0.8rem;color:var(--text-muted)}
+.control-group input[type=range]{width:160px;accent-color:var(--highlight)}
+.control-group select{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:0.4rem 0.6rem;border-radius:var(--radius);font-size:0.85rem}
+.val{font-size:0.85rem;color:var(--highlight);font-weight:600}
+button,.btn{background:var(--highlight);color:#fff;border:none;padding:0.5rem 1rem;border-radius:var(--radius);cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+button:hover,.btn:hover{opacity:0.85;transform:translateY(-1px)}
+.btn-secondary{background:var(--accent)}
+.btn-sm{padding:0.3rem 0.7rem;font-size:0.8rem}
+
+/* Scroll containers */
+.scroll-compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.scroll-box{height:300px;overflow-y:auto;border:2px solid var(--border);border-radius:var(--radius);position:relative}
+.scroll-box.smooth{scroll-behavior:smooth}
+.scroll-box.auto-scroll{scroll-behavior:auto}
+.scroll-box-label{position:sticky;top:0;background:var(--accent);color:#fff;padding:0.5rem 1rem;font-size:0.85rem;font-weight:600;z-index:2;text-align:center}
+.scroll-item{padding:1.5rem;border-bottom:1px solid var(--border);transition:background 0.3s}
+.scroll-item:nth-child(even){background:rgba(255,255,255,0.02)}
+.scroll-item.target{background:rgba(233,69,96,0.15);border-left:3px solid var(--highlight)}
+.scroll-nav{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.scroll-nav button{font-size:0.8rem;padding:0.3rem 0.6rem}
+
+/* Scroll margin/padding demo */
+.margin-demo-container{height:300px;overflow-y:auto;border:2px solid var(--border);border-radius:var(--radius);position:relative}
+.margin-demo-container .section-target{padding:1.5rem;min-height:150px;border-bottom:1px solid var(--border)}
+.margin-demo-container .section-target h3{color:var(--highlight);margin-bottom:0.5rem}
+
+.padding-demo-container{height:300px;overflow-y:auto;border:2px solid var(--border);border-radius:var(--radius);position:relative}
+.padding-demo-container .section-target{padding:1.5rem;min-height:150px;border-bottom:1px solid var(--border)}
+.padding-demo-container .section-target h3{color:var(--highlight);margin-bottom:0.5rem}
+.padding-indicator{position:sticky;top:0;left:0;right:0;height:0;z-index:5;pointer-events:none}
+.padding-indicator .pad-vis{background:rgba(233,69,96,0.2);border-bottom:2px dashed var(--highlight);transition:height 0.3s}
+
+/* Anchor nav demo */
+.anchor-demo{position:relative}
+.anchor-nav-bar{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;padding:0.8rem;background:var(--surface2);border-radius:var(--radius)}
+.anchor-section{min-height:250px;padding:2rem;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem}
+.anchor-section h3{color:var(--highlight);font-size:1.1rem;margin-bottom:0.5rem}
+
+/* Snap demo */
+.snap-container{display:flex;overflow-x:auto;gap:0;height:280px;border:2px solid var(--border);border-radius:var(--radius);scroll-snap-type:x mandatory}
+.snap-item{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;scroll-snap-align:start;flex-shrink:0}
+.snap-item:nth-child(1){background:linear-gradient(135deg,#1a1a2e,#16213e)}
+.snap-item:nth-child(2){background:linear-gradient(135deg,#16213e,#0f3460)}
+.snap-item:nth-child(3){background:linear-gradient(135deg,#0f3460,#e94560)}
+.snap-item:nth-child(4){background:linear-gradient(135deg,#e94560,#ff6b8a)}
+.snap-item:nth-child(5){background:linear-gradient(135deg,#ff6b8a,#1a1a2e)}
+.snap-dots{display:flex;justify-content:center;gap:0.5rem;margin-top:0.8rem}
+.snap-dot{width:10px;height:10px;border-radius:50%;background:var(--border);cursor:pointer;transition:all 0.2s}
+.snap-dot.active{background:var(--highlight);transform:scale(1.3)}
+
+/* Code output */
+.code-output{position:relative;margin-top:1rem}
+.code-output pre{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;overflow-x:auto;font-size:0.85rem;color:#c9d1d9;line-height:1.5}
+.code-output .copy-btn{position:absolute;top:0.5rem;right:0.5rem;background:var(--accent);font-size:0.75rem;padding:0.3rem 0.6rem}
+.copy-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--highlight);color:#fff;padding:0.6rem 1.2rem;border-radius:var(--radius);font-size:0.85rem;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.copy-toast.show{opacity:1}
+
+/* Footer */
+.footer{text-align:center;padding:2rem;color:var(--text-muted);font-size:0.8rem;border-top:1px solid var(--border);margin-top:2rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .scroll-compare{grid-template-columns:1fr}
+  .header-inner{flex-direction:column;align-items:flex-start}
+  nav{width:100%;overflow-x:auto}
+  h1{font-size:1.5rem}
+  .container{padding:1rem}
+  .demo-section{padding:1rem}
+  .controls{flex-direction:column;align-items:flex-start}
+  .control-group input[type=range]{width:100%}
+  .snap-container{height:200px}
+}
+@media(max-width:480px){
+  .scroll-compare{grid-template-columns:1fr}
+  .scroll-box{height:220px}
+  .margin-demo-container,.padding-demo-container{height:220px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">CSS <span>Scroll Behavior</span></div>
+    <nav id="mainNav">
+      <a href="#smooth-vs-auto" class="active">Smooth vs Auto</a>
+      <a href="#scroll-margin">Scroll Margin</a>
+      <a href="#scroll-padding">Scroll Padding</a>
+      <a href="#anchor-nav">Anchor Nav</a>
+      <a href="#scroll-snap">Scroll Snap</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>CSS Scroll Behavior Demo Tool</h1>
+  <p class="subtitle">Explore and compare CSS scroll behaviors interactively. Adjust values, see live previews, and copy generated CSS code.</p>
+
+  <!-- Section 1: Smooth vs Auto -->
+  <section class="demo-section" id="smooth-vs-auto">
+    <h2>Smooth vs Auto Scroll Behavior</h2>
+    <p class="desc">Compare <code>scroll-behavior: smooth</code> and <code>scroll-behavior: auto</code> side by side. Click any item button to scroll to it in both containers.</p>
+    <div class="scroll-nav" id="scrollCompareNav"></div>
+    <div class="scroll-compare">
+      <div>
+        <div class="scroll-box smooth" id="smoothBox">
+          <div class="scroll-box-label">scroll-behavior: smooth</div>
+        </div>
+      </div>
+      <div>
+        <div class="scroll-box auto-scroll" id="autoBox">
+          <div class="scroll-box-label">scroll-behavior: auto</div>
+        </div>
+      </div>
+    </div>
+    <div class="code-output" id="codeSmooth">
+      <button class="copy-btn btn-sm" onclick="copyCode('codeSmooth')">Copy CSS</button>
+      <pre><code>.container-smooth {
+  scroll-behavior: smooth;
+  overflow-y: auto;
+}
+
+.container-auto {
+  scroll-behavior: auto;
+  overflow-y: auto;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 2: Scroll Margin -->
+  <section class="demo-section" id="scroll-margin">
+    <h2>Scroll Margin</h2>
+    <p class="desc"><code>scroll-margin</code> adds an offset around an element when it becomes a scroll target (e.g., via anchor link or <code>scrollIntoView</code>). Adjust the value and click a section to see the effect.</p>
+    <div class="controls">
+      <div class="control-group">
+        <label>scroll-margin-top: <span class="val" id="marginVal">20</span>px</label>
+        <input type="range" id="marginRange" min="0" max="100" value="20">
+      </div>
+      <div class="scroll-nav" id="marginNav"></div>
+    </div>
+    <div class="margin-demo-container" id="marginContainer"></div>
+    <div class="code-output" id="codeMargin">
+      <button class="copy-btn btn-sm" onclick="copyCode('codeMargin')">Copy CSS</button>
+      <pre><code id="codeMarginPre">.target-element {
+  scroll-margin-top: 20px;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 3: Scroll Padding -->
+  <section class="demo-section" id="scroll-padding">
+    <h2>Scroll Padding</h2>
+    <p class="desc"><code>scroll-padding</code> is set on the scroll container to define an inset from the edges. It affects where scroll-snap and <code>scrollIntoView</code> position elements. The red dashed line shows the padding area.</p>
+    <div class="controls">
+      <div class="control-group">
+        <label>scroll-padding-top: <span class="val" id="paddingVal">40</span>px</label>
+        <input type="range" id="paddingRange" min="0" max="120" value="40">
+      </div>
+      <div class="scroll-nav" id="paddingNav"></div>
+    </div>
+    <div class="padding-demo-container" id="paddingContainer" style="scroll-padding-top:40px;scroll-behavior:smooth">
+      <div class="padding-indicator"><div class="pad-vis" id="padVis" style="height:40px"></div></div>
+    </div>
+    <div class="code-output" id="codePadding">
+      <button class="copy-btn btn-sm" onclick="copyCode('codePadding')">Copy CSS</button>
+      <pre><code id="codePaddingPre">.scroll-container {
+  scroll-padding-top: 40px;
+  overflow-y: auto;
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 4: Anchor Navigation -->
+  <section class="demo-section" id="anchor-nav">
+    <h2>Anchor Navigation</h2>
+    <p class="desc">Click the navigation links to smoothly scroll to each section. This uses <code>html { scroll-behavior: smooth; }</code> combined with anchor links (<code>#id</code>).</p>
+    <div class="anchor-nav-bar" id="anchorNavBar"></div>
+    <div class="anchor-demo" id="anchorDemo"></div>
+    <div class="code-output" id="codeAnchor">
+      <button class="copy-btn btn-sm" onclick="copyCode('codeAnchor')">Copy CSS</button>
+      <pre><code>html {
+  scroll-behavior: smooth;
+}
+
+/* Navigation link */
+&lt;a href="#section-id"&gt;Go to Section&lt;/a&gt;
+
+/* Target section */
+&lt;section id="section-id"&gt;...&lt;/section&gt;</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 5: Scroll Snap -->
+  <section class="demo-section" id="scroll-snap">
+    <h2>Scroll Snap</h2>
+    <p class="desc">Scroll horizontally to see snap behavior. Adjust <code>scroll-snap-type</code> and <code>scroll-snap-align</code> to see different effects.</p>
+    <div class="controls">
+      <div class="control-group">
+        <label>scroll-snap-type</label>
+        <select id="snapType">
+          <option value="x mandatory">x mandatory</option>
+          <option value="x proximity">x proximity</option>
+          <option value="none">none</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>scroll-snap-align</label>
+        <select id="snapAlign">
+          <option value="start">start</option>
+          <option value="center">center</option>
+          <option value="end">end</option>
+        </select>
+      </div>
+    </div>
+    <div class="snap-container" id="snapContainer">
+      <div class="snap-item" style="scroll-snap-align:start">Panel 1 — Start</div>
+      <div class="snap-item" style="scroll-snap-align:start">Panel 2 — Explore</div>
+      <div class="snap-item" style="scroll-snap-align:start">Panel 3 — Create</div>
+      <div class="snap-item" style="scroll-snap-align:start">Panel 4 — Build</div>
+      <div class="snap-item" style="scroll-snap-align:start">Panel 5 — Ship</div>
+    </div>
+    <div class="snap-dots" id="snapDots"></div>
+    <div class="code-output" id="codeSnap">
+      <button class="copy-btn btn-sm" onclick="copyCode('codeSnap')">Copy CSS</button>
+      <pre><code id="codeSnapPre">.snap-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.snap-item {
+  min-width: 100%;
+  scroll-snap-align: start;
+}</code></pre>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>CSS Scroll Behavior Demo Tool &mdash; Built for learning and experimentation</p>
+  <p style="margin-top:0.3rem">Supports all modern browsers (Chrome, Firefox, Safari, Edge)</p>
+</footer>
+
+<div class="copy-toast" id="copyToast">Copied to clipboard!</div>
+
+<script>
+(function(){
+  // === Smooth vs Auto ===
+  const ITEM_COUNT = 15;
+  const smoothBox = document.getElementById('smoothBox');
+  const autoBox = document.getElementById('autoBox');
+  const scrollCompareNav = document.getElementById('scrollCompareNav');
+
+  for(let i = 1; i <= ITEM_COUNT; i++){
+    const s = document.createElement('div');
+    s.className = 'scroll-item';
+    s.id = 'smooth-item-' + i;
+    s.textContent = 'Section ' + i + ' — Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+    smoothBox.appendChild(s);
+
+    const a = document.createElement('div');
+    a.className = 'scroll-item';
+    a.id = 'auto-item-' + i;
+    a.textContent = 'Section ' + i + ' — Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+    autoBox.appendChild(a);
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-sm btn-secondary';
+    btn.textContent = '#' + i;
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.scroll-item.target').forEach(el => el.classList.remove('target'));
+      s.classList.add('target');
+      a.classList.add('target');
+      s.scrollIntoView({block:'start'});
+      a.scrollIntoView({block:'start'});
+    });
+    scrollCompareNav.appendChild(btn);
+  }
+
+  // === Scroll Margin ===
+  const marginContainer = document.getElementById('marginContainer');
+  const marginNav = document.getElementById('marginNav');
+  const marginRange = document.getElementById('marginRange');
+  const marginVal = document.getElementById('marginVal');
+  const codeMarginPre = document.getElementById('codeMarginPre');
+  const MARGIN_SECTIONS = 8;
+
+  marginContainer.style.scrollBehavior = 'smooth';
+
+  for(let i = 1; i <= MARGIN_SECTIONS; i++){
+    const sec = document.createElement('div');
+    sec.className = 'section-target';
+    sec.id = 'margin-sec-' + i;
+    sec.style.scrollMarginTop = '20px';
+    sec.innerHTML = '<h3>Section ' + i + '</h3><p>This section has <code>scroll-margin-top</code> applied. When scrolled into view, it will stop with the specified margin from the top of the container.</p><p>Adjust the slider to change the margin value and observe how the scroll position changes.</p>';
+    marginContainer.appendChild(sec);
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-sm btn-secondary';
+    btn.textContent = 'Section ' + i;
+    btn.addEventListener('click', function(){
+      document.getElementById('margin-sec-' + i).scrollIntoView({block:'start', behavior:'smooth'});
+    });
+    marginNav.appendChild(btn);
+  }
+
+  marginRange.addEventListener('input', function(){
+    const v = this.value;
+    marginVal.textContent = v;
+    marginContainer.querySelectorAll('.section-target').forEach(el => {
+      el.style.scrollMarginTop = v + 'px';
+    });
+    codeMarginPre.textContent = '.target-element {\n  scroll-margin-top: ' + v + 'px;\n}';
+  });
+
+  // === Scroll Padding ===
+  const paddingContainer = document.getElementById('paddingContainer');
+  const paddingNav = document.getElementById('paddingNav');
+  const paddingRange = document.getElementById('paddingRange');
+  const paddingVal = document.getElementById('paddingVal');
+  const codePaddingPre = document.getElementById('codePaddingPre');
+  const padVis = document.getElementById('padVis');
+  const PADDING_SECTIONS = 8;
+
+  for(let i = 1; i <= PADDING_SECTIONS; i++){
+    const sec = document.createElement('div');
+    sec.className = 'section-target';
+    sec.id = 'padding-sec-' + i;
+    sec.innerHTML = '<h3>Section ' + i + '</h3><p>This container has <code>scroll-padding-top</code> applied. The red dashed line above shows the padding area. When you scroll to this section, it aligns below the padding.</p><p>Try different padding values to see how the scroll position adjusts.</p>';
+    paddingContainer.appendChild(sec);
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-sm btn-secondary';
+    btn.textContent = 'Section ' + i;
+    btn.addEventListener('click', function(){
+      document.getElementById('padding-sec-' + i).scrollIntoView({block:'start', behavior:'smooth'});
+    });
+    paddingNav.appendChild(btn);
+  }
+
+  paddingRange.addEventListener('input', function(){
+    const v = this.value;
+    paddingVal.textContent = v;
+    paddingContainer.style.scrollPaddingTop = v + 'px';
+    padVis.style.height = v + 'px';
+    codePaddingPre.textContent = '.scroll-container {\n  scroll-padding-top: ' + v + 'px;\n  overflow-y: auto;\n}';
+  });
+
+  // === Anchor Navigation ===
+  const anchorNavBar = document.getElementById('anchorNavBar');
+  const anchorDemo = document.getElementById('anchorDemo');
+  const anchorSections = [
+    {id:'anchor-intro', title:'Introduction', color:'#1a1a2e', text:'Welcome to the anchor navigation demo. Click the links above to smoothly scroll between sections. This uses the native CSS scroll-behavior: smooth property on the html element.'},
+    {id:'anchor-features', title:'Features', color:'#16213e', text:'CSS scroll-behavior provides native smooth scrolling without JavaScript animation libraries. It works with anchor links, scrollIntoView(), and scroll-to-top buttons.'},
+    {id:'anchor-usage', title:'Usage', color:'#0f3460', text:'Simply add scroll-behavior: smooth to the html or a scrollable container element. All scroll navigations within that context will animate smoothly.'},
+    {id:'anchor-compat', title:'Compatibility', color:'#1a1a35', text:'scroll-behavior: smooth is supported in all modern browsers including Chrome, Firefox, Safari 15.4+, and Edge. For older browsers, it gracefully falls back to instant scrolling.'},
+    {id:'anchor-tips', title:'Tips & Tricks', color:'#1a1a2e', text:'Combine scroll-behavior with scroll-margin-top to account for fixed headers. Use prefers-reduced-motion media query to respect user accessibility preferences.'}
+  ];
+
+  anchorSections.forEach(function(s){
+    const link = document.createElement('a');
+    link.href = '#' + s.id;
+    link.className = 'btn btn-secondary btn-sm';
+    link.textContent = s.title;
+    link.style.textDecoration = 'none';
+    anchorNavBar.appendChild(link);
+
+    const sec = document.createElement('section');
+    sec.className = 'anchor-section';
+    sec.id = s.id;
+    sec.style.background = s.color;
+    sec.innerHTML = '<h3>' + s.title + '</h3><p>' + s.text + '</p>';
+    anchorDemo.appendChild(sec);
+  });
+
+  // === Scroll Snap ===
+  const snapContainer = document.getElementById('snapContainer');
+  const snapType = document.getElementById('snapType');
+  const snapAlign = document.getElementById('snapAlign');
+  const codeSnapPre = document.getElementById('codeSnapPre');
+  const snapDots = document.getElementById('snapDots');
+  const snapItems = snapContainer.querySelectorAll('.snap-item');
+
+  // Create dots
+  snapItems.forEach(function(_, i){
+    const dot = document.createElement('div');
+    dot.className = 'snap-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', function(){
+      snapItems[i].scrollIntoView({behavior:'smooth', inline:'start'});
+    });
+    snapDots.appendChild(dot);
+  });
+
+  // Update dots on scroll
+  snapContainer.addEventListener('scroll', function(){
+    const scrollLeft = snapContainer.scrollLeft;
+    const width = snapContainer.clientWidth;
+    const idx = Math.round(scrollLeft / width);
+    snapDots.querySelectorAll('.snap-dot').forEach(function(d, i){
+      d.classList.toggle('active', i === idx);
+    });
+  });
+
+  function updateSnapCode(){
+    const type = snapType.value;
+    const align = snapAlign.value;
+    snapContainer.style.scrollSnapType = type;
+    snapItems.forEach(function(item){
+      item.style.scrollSnapAlign = align;
+    });
+    codeSnapPre.textContent = '.snap-container {\n  display: flex;\n  overflow-x: auto;\n  scroll-snap-type: ' + type + ';\n}\n\n.snap-item {\n  min-width: 100%;\n  scroll-snap-align: ' + align + ';\n}';
+  }
+
+  snapType.addEventListener('change', updateSnapCode);
+  snapAlign.addEventListener('change', updateSnapCode);
+
+  // === Active nav highlight ===
+  const navLinks = document.querySelectorAll('#mainNav a');
+  const sections = document.querySelectorAll('.demo-section');
+
+  function updateActiveNav(){
+    let current = '';
+    sections.forEach(function(sec){
+      const top = sec.getBoundingClientRect().top;
+      if(top <= 120) current = sec.id;
+    });
+    navLinks.forEach(function(link){
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateActiveNav, {passive:true});
+
+  // === Copy ===
+  window.copyCode = function(id){
+    const code = document.querySelector('#' + id + ' code');
+    if(!code) return;
+    const text = code.textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+    }).catch(function(){
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+    });
+  };
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

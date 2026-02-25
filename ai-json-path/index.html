@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI JSON Path — JSONPath Query Tool</title>
+<meta name="description" content="Online JSONPath query tool. Paste JSON, write JSONPath expressions, get instant results.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-path/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#e0e0e0;--text2:#a0a0b0;--border:#2a2a4a;--success:#4ecca3;--error:#e94560;--mono:'SF Mono','Fira Code','Consolas',monospace}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.header{padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header h1{font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hactions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);cursor:pointer;font-size:.8rem;transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{opacity:.85}
+.main{display:flex;height:calc(100vh - 52px);overflow:hidden}
+.panel{display:flex;flex-direction:column;min-width:0}
+.panel-l{flex:1;border-right:1px solid var(--border)}
+.panel-r{flex:1;display:flex;flex-direction:column}
+.phead{padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+.phead label{font-size:.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.pbody{flex:1;overflow:auto}
+.editor{width:100%;height:100%;padding:14px;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;resize:none;outline:none;tab-size:2}
+.editor::placeholder{color:var(--text2);opacity:.6}
+.pathrow{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.pathin{flex:1;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s}
+.pathin:focus{border-color:var(--accent)}
+.result{width:100%;height:100%;padding:14px;font-family:var(--mono);font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;overflow:auto;color:var(--text)}
+.status{padding:4px 14px;background:var(--surface);border-top:1px solid var(--border);font-size:.72rem;color:var(--text2);display:flex;justify-content:space-between;flex-shrink:0}
+.cstoggle{position:relative}
+.cs{display:none;position:absolute;top:100%;right:0;width:420px;max-height:70vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,.5);margin-top:4px}
+.cs.open{display:block}
+.cs h3{font-size:.9rem;margin-bottom:10px;color:var(--accent)}
+.cs table{width:100%;border-collapse:collapse;font-size:.8rem}
+.cs th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text2)}
+.cs td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+.cs td:first-child{font-family:var(--mono);color:var(--success);cursor:pointer;white-space:nowrap}
+.cs td:first-child:hover{text-decoration:underline}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--success);color:#1a1a2e;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:600;transition:transform .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.err{color:var(--error)}.hint{color:var(--text2);font-style:italic}.mcount{color:var(--success);margin-bottom:8px;font-size:.8rem}
+.jk{color:#e06c75}.js{color:#98c379}.jn{color:#d19a66}.jb{color:#c678dd}
+@media(max-width:768px){
+.main{flex-direction:column}
+.panel-l{flex:none;height:40vh;border-right:none;border-bottom:1px solid var(--border)}
+.panel-r{flex:1}
+.cs{width:calc(100vw - 20px);right:-10px}
+.header h1{font-size:1rem}
+}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>&#9889; AI JSON Path</h1>
+<div class="hactions">
+<button class="btn" onclick="doFormat()">Format</button>
+<button class="btn" onclick="doMinify()">Minify</button>
+<button class="btn" onclick="loadSample()">Sample</button>
+<button class="btn" onclick="clearAll()">Clear</button>
+<div class="cstoggle">
+<button class="btn" onclick="toggleCS()">Cheatsheet &#9660;</button>
+<div class="cs" id="cs"></div>
+</div>
+</div>
+</div>
+<div class="main">
+<div class="panel panel-l">
+<div class="phead"><label>JSON Input</label><span id="jsonStatus" style="font-size:.75rem"></span></div>
+<div class="pbody"><textarea class="editor" id="jsonIn" placeholder="Paste your JSON here..." spellcheck="false"></textarea></div>
+</div>
+<div class="panel panel-r">
+<div class="pathrow">
+<label style="font-size:.78rem;font-weight:600;color:var(--text2)">PATH</label>
+<input class="pathin" id="pathIn" placeholder="$.store.book[*].author" value="$" spellcheck="false">
+<button class="btn primary" onclick="doQuery()">Query</button>
+<button class="btn" onclick="copyResult()">Copy</button>
+</div>
+<div class="phead"><label>Results</label><span id="matchCount" class="mcount"></span></div>
+<div class="pbody"><div class="result" id="resultOut"><span class="hint">Enter JSON and a JSONPath expression to see results...</span></div></div>
+<div class="status"><span id="statusL"></span><span id="statusR">Ready</span></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ===== JSONPath Engine (pure JS) =====
+function jsonpath(obj,expr){
+  if(!expr||expr==='$')return [obj];
+  var tokens=tokenize(expr);
+  if(!tokens)return [];
+  return evaluate(tokens,[obj]);
+}
+function tokenize(expr){
+  var t=[],i=0,s=expr;
+  if(s[0]==='$')i=1;
+  while(i<s.length){
+    if(s[i]==='.'){
+      if(s[i+1]==='.'){t.push({type:'recursive'});i+=2;}
+      else{i++;var n=readProp(s,i);if(n.val)t.push({type:'child',name:n.val});i=n.end;}
+    }else if(s[i]==='['){
+      var b=readBracket(s,i);t.push(b.token);i=b.end;
+    }else{var n=readProp(s,i);if(n.val)t.push({type:'child',name:n.val});i=n.end;}
+  }
+  return t;
+}
+function readProp(s,i){
+  var start=i;
+  while(i<s.length&&s[i]!=='.'&&s[i]!=='[')i++;
+  return {val:s.slice(start,i),end:i};
+}
+function readBracket(s,i){
+  var j=i+1,depth=1;
+  while(j<s.length&&depth>0){if(s[j]==='[')depth++;if(s[j]===']')depth--;j++;}
+  var inner=s.slice(i+1,j-1).trim();
+  if(inner==='*')return {token:{type:'wildcard'},end:j};
+  if(inner.startsWith('?(')){
+    var filterExpr=inner.slice(2,inner.length-1);
+    return {token:{type:'filter',expr:filterExpr},end:j};
+  }
+  if(inner.includes(':')){
+    var parts=inner.split(':').map(function(x){return x.trim()===''?null:parseInt(x);});
+    return {token:{type:'slice',start:parts[0],stop:parts[1],step:parts[2]||1},end:j};
+  }
+  if(inner.includes(',')){
+    var items=inner.split(',').map(function(x){return x.trim().replace(/^['"]|['"]$/g,'');});
+    return {token:{type:'union',items:items},end:j};
+  }
+  if(/^-?\d+$/.test(inner))return {token:{type:'index',idx:parseInt(inner)},end:j};
+  var name=inner.replace(/^['"]|['"]$/g,'');
+  return {token:{type:'child',name:name},end:j};
+}
+function evaluate(tokens,nodes){
+  for(var ti=0;ti<tokens.length;ti++){
+    var t=tokens[ti],next=[];
+    if(t.type==='child'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        if(n&&typeof n==='object'&&t.name in n)next.push(n[t.name]);
+      }
+    }else if(t.type==='wildcard'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        if(Array.isArray(n))for(var k=0;k<n.length;k++)next.push(n[k]);
+        else if(n&&typeof n==='object'){var ks=Object.keys(n);for(var k=0;k<ks.length;k++)next.push(n[ks[k]]);}
+      }
+    }else if(t.type==='index'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        if(Array.isArray(n)){var idx=t.idx<0?n.length+t.idx:t.idx;if(idx>=0&&idx<n.length)next.push(n[idx]);}
+      }
+    }else if(t.type==='slice'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        if(Array.isArray(n)){
+          var start=t.start!=null?(t.start<0?n.length+t.start:t.start):0;
+          var stop=t.stop!=null?(t.stop<0?n.length+t.stop:t.stop):n.length;
+          var step=t.step||1;
+          for(var k=start;k<stop;k+=step)if(k>=0&&k<n.length)next.push(n[k]);
+        }
+      }
+    }else if(t.type==='union'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        for(var ui=0;ui<t.items.length;ui++){
+          var item=t.items[ui];
+          if(/^-?\d+$/.test(item)){var idx=parseInt(item);if(Array.isArray(n)){idx=idx<0?n.length+idx:idx;if(idx>=0&&idx<n.length)next.push(n[idx]);}}
+          else if(n&&typeof n==='object'&&item in n)next.push(n[item]);
+        }
+      }
+    }else if(t.type==='filter'){
+      for(var ni=0;ni<nodes.length;ni++){
+        var n=nodes[ni];
+        if(Array.isArray(n)){
+          for(var k=0;k<n.length;k++){if(evalFilter(t.expr,n[k]))next.push(n[k]);}
+        }else if(n&&typeof n==='object'){
+          var ks=Object.keys(n);
+          for(var k=0;k<ks.length;k++){if(evalFilter(t.expr,n[ks[k]]))next.push(n[ks[k]]);}
+        }
+      }
+    }else if(t.type==='recursive'){
+      var desc=[];
+      for(var ni=0;ni<nodes.length;ni++)collectDescendants(nodes[ni],desc);
+      if(ti+1<tokens.length){
+        var nextToken=tokens[ti+1];
+        var matched=[];
+        var allCandidates=nodes.concat(desc);
+        for(var ci=0;ci<allCandidates.length;ci++){
+          var r=evaluate([nextToken],[allCandidates[ci]]);
+          for(var ri=0;ri<r.length;ri++)matched.push(r[ri]);
+        }
+        ti++;
+        next=matched;
+      }else{next=desc;}
+    }
+    nodes=next;
+  }
+  return nodes;
+}
+function collectDescendants(node,arr){
+  if(!node||typeof node!=='object')return;
+  if(Array.isArray(node)){for(var i=0;i<node.length;i++){arr.push(node[i]);collectDescendants(node[i],arr);}}
+  else{var ks=Object.keys(node);for(var i=0;i<ks.length;i++){arr.push(node[ks[i]]);collectDescendants(node[ks[i]],arr);}}
+}
+function evalFilter(expr,item){
+  try{
+    var e=expr.replace(/@\.([a-zA-Z_$][\w$]*)/g,function(_,p){
+      return '__item__["'+p+'"]';
+    });
+    e=e.replace(/@/g,'__item__');
+    var fn=new Function('__item__','try{return !!('+e+')}catch(e){return false}');
+    return fn(item);
+  }catch(ex){return false;}
+}
+
+// ===== UI Logic =====
+var jsonIn=document.getElementById('jsonIn');
+var pathIn=document.getElementById('pathIn');
+var resultOut=document.getElementById('resultOut');
+var jsonStatus=document.getElementById('jsonStatus');
+var matchCount=document.getElementById('matchCount');
+var statusL=document.getElementById('statusL');
+var statusR=document.getElementById('statusR');
+var debounceTimer=null;
+
+function doQuery(){
+  var raw=jsonIn.value.trim();
+  if(!raw){resultOut.innerHTML='<span class="hint">Paste JSON data in the left panel to get started.</span>';matchCount.textContent='';return;}
+  var data;
+  try{data=JSON.parse(raw);jsonStatus.innerHTML='<span style="color:var(--success)">&#10003; Valid</span>';}
+  catch(e){jsonStatus.innerHTML='<span class="err">&#10007; '+escHtml(e.message)+'</span>';resultOut.innerHTML='<span class="err">Invalid JSON: '+escHtml(e.message)+'</span>';matchCount.textContent='';return;}
+  var path=pathIn.value.trim();
+  if(!path){resultOut.innerHTML='<span class="hint">Enter a JSONPath expression above.</span>';matchCount.textContent='';return;}
+  try{
+    var t0=performance.now();
+    var results=jsonpath(data,path);
+    var elapsed=(performance.now()-t0).toFixed(1);
+    if(results.length===0){
+      resultOut.innerHTML='<span class="hint">No matches found.</span>';
+      matchCount.textContent='0 matches';
+    }else{
+      var display=results.length===1?results[0]:results;
+      resultOut.innerHTML=syntaxHighlight(JSON.stringify(display,null,2));
+      matchCount.textContent=results.length+' match'+(results.length>1?'es':'');
+    }
+    statusR.textContent='Query: '+elapsed+'ms';
+    statusL.textContent=formatBytes(new Blob([raw]).size);
+  }catch(e){
+    resultOut.innerHTML='<span class="err">Query error: '+escHtml(e.message)+'</span>';
+    matchCount.textContent='';
+  }
+}
+function doFormat(){
+  var raw=jsonIn.value.trim();
+  if(!raw)return;
+  try{var obj=JSON.parse(raw);jsonIn.value=JSON.stringify(obj,null,2);jsonStatus.innerHTML='<span style="color:var(--success)">&#10003; Formatted</span>';doQuery();}
+  catch(e){jsonStatus.innerHTML='<span class="err">&#10007; '+escHtml(e.message)+'</span>';toast('Invalid JSON — cannot format');}
+}
+function doMinify(){
+  var raw=jsonIn.value.trim();
+  if(!raw)return;
+  try{var obj=JSON.parse(raw);jsonIn.value=JSON.stringify(obj);jsonStatus.innerHTML='<span style="color:var(--success)">&#10003; Minified</span>';doQuery();}
+  catch(e){jsonStatus.innerHTML='<span class="err">&#10007; '+escHtml(e.message)+'</span>';toast('Invalid JSON — cannot minify');}
+}
+function loadSample(){
+  jsonIn.value=JSON.stringify({"store":{"book":[{"category":"reference","author":"Nigel Rees","title":"Sayings of the Century","price":8.95},{"category":"fiction","author":"Evelyn Waugh","title":"Sword of Honour","price":12.99},{"category":"fiction","author":"Herman Melville","title":"Moby Dick","isbn":"0-553-21311-3","price":8.99},{"category":"fiction","author":"J. R. R. Tolkien","title":"The Lord of the Rings","isbn":"0-395-19395-8","price":22.99}],"bicycle":{"color":"red","price":19.95}}},null,2);
+  pathIn.value='$.store.book[*].author';
+  jsonStatus.innerHTML='<span style="color:var(--success)">&#10003; Sample loaded</span>';
+  doQuery();
+}
+function clearAll(){jsonIn.value='';pathIn.value='$';resultOut.innerHTML='<span class="hint">Enter JSON and a JSONPath expression to see results...</span>';jsonStatus.textContent='';matchCount.textContent='';statusL.textContent='';statusR.textContent='Ready';}
+function copyResult(){
+  var text=resultOut.innerText;
+  if(!text||text.includes('Enter JSON'))return toast('Nothing to copy');
+  navigator.clipboard.writeText(text).then(function(){toast('Copied!');}).catch(function(){
+    var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copied!');
+  });
+}
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function formatBytes(b){if(b<1024)return b+' B';return (b/1024).toFixed(1)+' KB';}
+function syntaxHighlight(json){
+  return escHtml(json).replace(/"([^"\\]|\\.)*"\s*:/g,function(m){return '<span class="jk">'+m+'</span>';})
+    .replace(/"([^"\\]|\\.)*"/g,function(m){return '<span class="js">'+m+'</span>';})
+    .replace(/\b(-?\d+\.?\d*([eE][+-]?\d+)?)\b/g,'<span class="jn">$1</span>')
+    .replace(/\b(true|false)\b/g,'<span class="jb">$1</span>')
+    .replace(/\bnull\b/g,'<span class="jb">null</span>');
+}
+function setPath(p){pathIn.value=p;doQuery();var cs=document.getElementById('cs');cs.classList.remove('open');}
+function toggleCS(){document.getElementById('cs').classList.toggle('open');}
+document.addEventListener('click',function(e){var cs=document.getElementById('cs');if(cs.classList.contains('open')&&!e.target.closest('.cstoggle'))cs.classList.remove('open');});
+
+// Cheatsheet content
+document.getElementById('cs').innerHTML='<h3>JSONPath Quick Reference</h3><table><tr><th>Expression</th><th>Description</th></tr>'
++[['$','Root object'],['$.store.book[*].author','All authors'],['$..author','All authors (recursive)'],['$.store.*','All things in store'],['$..book[2]','Third book'],['$..book[-1]','Last book'],['$..book[0,1]','First two books'],['$..book[:2]','First two books (slice)'],['$..book[?(@.isbn)]','Books with ISBN'],['$..book[?(@.price<10)]','Books cheaper than 10'],['$..book[?(@.price>10)]','Books more expensive than 10'],['$..*','All members (recursive)'],['$..price','All prices'],['$.store.bicycle.color','Bicycle color']]
+.map(function(r){return '<tr><td onclick="setPath(\''+r[0].replace(/'/g,"\\'")+'\')">'+escHtml(r[0])+'</td><td>'+r[1]+'</td></tr>';}).join('')+'</table>';
+
+// Live query on input
+jsonIn.addEventListener('input',function(){clearTimeout(debounceTimer);debounceTimer=setTimeout(doQuery,300);});
+pathIn.addEventListener('input',function(){clearTimeout(debounceTimer);debounceTimer=setTimeout(doQuery,150);});
+pathIn.addEventListener('keydown',function(e){if(e.key==='Enter')doQuery();});
+
+// Tab key in editor
+jsonIn.addEventListener('keydown',function(e){
+  if(e.key==='Tab'){e.preventDefault();var s=this.selectionStart,end=this.selectionEnd;this.value=this.value.substring(0,s)+'  '+this.value.substring(end);this.selectionStart=this.selectionEnd=s+2;}
+});
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1200px;margin:20px auto;padding:0 16px}
+.pro-header{text-align:center;margin-bottom:16px}
+.pro-header h2{font-size:1.3rem;color:#e94560;display:inline-flex;align-items:center;gap:8px}
+.pro-badge{background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+.pro-mock{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .3s}
+.pro-mock:hover{border-color:var(--accent)}
+.pro-mock-content{padding:20px;filter:blur(4px);opacity:.5;pointer-events:none;user-select:none}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.pro-mock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{color:var(--success);font-size:.85rem;margin-bottom:8px}
+.pro-mock-btn{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text2);font-size:.8rem;margin:4px 2px}
+.pro-mock-list{list-style:none;font-size:.8rem;color:var(--text2)}
+.pro-mock-list li{padding:4px 0;border-bottom:1px solid var(--border)}
+.pro-mock-list li:last-child{border-bottom:none}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.35)}
+.pro-lock{font-size:3rem;margin-bottom:8px}
+.pro-overlay-text{color:#fff;font-size:1.1rem;font-weight:600}
+.pro-overlay-sub{color:#aaa;font-size:.8rem;margin-top:4px}
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.pro-modal-backdrop.open{display:flex}
+.pro-modal{background:#1e1e3a;border:1px solid #2a2a4a;border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:16px 0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✓ ';color:#00d68f;font-weight:700}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-cta{display:inline-block;background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:700;text-decoration:none;margin-top:16px;transition:opacity .2s;border:none;cursor:pointer}
+.pro-cta:hover{opacity:.85}
+.pro-later{display:block;margin-top:12px;color:#aaa;font-size:.85rem;cursor:pointer;background:none;border:none;padding:8px}
+.pro-later:hover{color:#fff}
+@media(max-width:768px){.pro-mock-row{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>⚡ Pro Features <span class="pro-badge">PRO</span></h2></div>
+<div class="pro-mock" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-overlay-text">Unlock Pro Features</div>
+<div class="pro-overlay-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>📦 Batch Query</h4>
+<div style="background:#12122a;border-radius:6px;padding:10px;font-family:var(--mono);font-size:.75rem;color:var(--text2);line-height:1.6">
+$.store.book[*].author<br>
+$.store.book[?(@.price&lt;10)]<br>
+$..isbn<br>
+$.store.bicycle.color<br>
+$.store.book[0,1].title
+</div>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">▶ Run All</span>
+<span class="pro-mock-btn">+ Add Query</span>
+</div>
+</div>
+<div class="pro-mock-card">
+<h4>📊 Result Export</h4>
+<ul class="pro-mock-list">
+<li>Export as CSV</li>
+<li>Export as Excel (.xlsx)</li>
+<li>Export as YAML</li>
+<li>Export as XML</li>
+<li>Flatten nested results</li>
+</ul>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">⬇ CSV</span>
+<span class="pro-mock-btn">⬇ Excel</span>
+<span class="pro-mock-btn">⬇ YAML</span>
+</div>
+</div>
+<div class="pro-mock-card">
+<h4>🔌 API Access</h4>
+<div style="background:#12122a;border-radius:6px;padding:10px;font-family:var(--mono);font-size:.72rem;color:#4ecca3;line-height:1.6">
+POST /api/v1/query<br><br>
+{<br>
+&nbsp;&nbsp;"json": { ... },<br>
+&nbsp;&nbsp;"paths": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"$.store.book[*]",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"$..price"<br>
+&nbsp;&nbsp;]<br>
+}
+</div>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">📋 Copy cURL</span>
+<span class="pro-mock-btn">🔑 API Key</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-backdrop" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>🚀 JSON Path Pro</h3>
+<div class="pro-price">$9</div>
+<ul>
+<li>Batch query — run multiple JSONPath expressions at once</li>
+<li>Export results as CSV, Excel, YAML, or XML</li>
+<li>REST API access with personal API key</li>
+<li>Auto-flatten nested JSON structures</li>
+<li>Query history & saved expressions</li>
+<li>Large file support (up to 50MB)</li>
+<li>Priority updates & new features</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $9</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

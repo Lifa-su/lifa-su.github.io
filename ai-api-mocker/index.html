@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI API Mocker - Mock API Endpoints Instantly</title>
+<meta name="description" content="Define mock API endpoints with custom responses, dynamic templates, and delay simulation. Free online tool for API development and testing.">
+<link rel="canonical" href="https://lifa-su.com/ai-api-mocker/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--primary:#6c5ce7;--primary-hover:#7c6ff7;--accent:#00cec9;--danger:#ff6b6b;--danger-hover:#ff5252;--success:#00b894;--warning:#fdcb6e;--text:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;--radius:10px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--primary);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.875rem;display:inline-flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap}
+.btn:hover{background:var(--border);transform:translateY(-1px)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover)}
+.btn-danger{background:transparent;border-color:var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);border-color:var(--success);color:#fff}
+.btn-success:hover{opacity:.9}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+main{padding:24px 0 80px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-value{font-size:1.8rem;font-weight:700;color:var(--primary)}
+.stat-label{font-size:.8rem;color:var(--text-secondary);margin-top:2px}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden}
+.section-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.section-title{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.section-body{padding:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.85rem;color:var(--text-secondary);font-weight:500}
+input,select,textarea{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:.9rem;font-family:inherit;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;min-height:120px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.5}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.endpoint-list{display:flex;flex-direction:column;gap:8px}
+.endpoint-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:all .2s;cursor:pointer}
+.endpoint-item:hover{border-color:var(--primary);transform:translateX(4px)}
+.endpoint-item.active{border-color:var(--primary);background:rgba(108,92,231,0.08)}
+.method-badge{padding:3px 8px;border-radius:6px;font-size:.75rem;font-weight:700;text-transform:uppercase;min-width:52px;text-align:center;color:#fff}
+.method-GET{background:#00b894}
+.method-POST{background:#6c5ce7}
+.method-PUT{background:#fdcb6e;color:#333}
+.method-DELETE{background:#ff6b6b}
+.endpoint-path{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.endpoint-meta{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:.8rem}
+.endpoint-actions{display:flex;gap:4px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{margin-bottom:16px}
+.template-vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.template-var{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:.75rem;font-family:monospace;cursor:pointer;transition:all .2s;color:var(--accent)}
+.template-var:hover{border-color:var(--accent);background:rgba(0,206,201,0.1)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:1.1rem}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;padding:4px}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:20px}
+.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;display:flex;align-items:center;gap:8px;z-index:300;transform:translateY(100px);opacity:0;transition:all .3s;box-shadow:var(--shadow)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--success)}
+.toast.error{border-color:var(--danger)}
+.delay-input{display:flex;align-items:center;gap:8px}
+.delay-input input{width:100px}
+.delay-input span{color:var(--text-muted);font-size:.85rem}
+.test-panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:16px}
+.test-panel h4{margin-bottom:12px;color:var(--text-secondary);font-size:.9rem}
+.test-result{background:var(--surface2);border-radius:8px;padding:12px;font-family:monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;margin-top:8px}
+.test-result .status{font-weight:700;margin-bottom:8px}
+.test-result .status.s2xx{color:var(--success)}
+.test-result .status.s4xx{color:var(--warning)}
+.test-result .status.s5xx{color:var(--danger)}
+.search-bar{position:relative;margin-bottom:16px}
+.search-bar input{width:100%;padding-left:36px}
+.search-bar::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.85rem}
+footer{text-align:center;padding:20px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:768px){
+.form-grid{grid-template-columns:1fr}
+.header-inner{flex-direction:column;align-items:stretch}
+.header-actions{justify-content:center}
+.stats{grid-template-columns:repeat(2,1fr)}
+.endpoint-item{flex-wrap:wrap}
+.endpoint-meta{width:100%;justify-content:flex-end}
+}
+@media(max-width:480px){
+.stats{grid-template-columns:1fr}
+.header-actions .btn span.hide-mobile{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="container header-inner">
+<div class="logo"><div class="logo-icon">⚡</div>AI API Mocker</div>
+<div class="header-actions">
+<button class="btn" onclick="importConfig()" title="Import Configuration">📥 <span class="hide-mobile">Import</span></button>
+<button class="btn" onclick="exportConfig()" title="Export Configuration">📤 <span class="hide-mobile">Export</span></button>
+<button class="btn btn-danger" onclick="clearAll()" title="Clear All Endpoints">🗑️ <span class="hide-mobile">Clear All</span></button>
+</div>
+</div>
+</header>
+
+<main class="container">
+<div class="stats">
+<div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Endpoints</div></div>
+<div class="stat-card"><div class="stat-value" id="statGet">0</div><div class="stat-label">GET</div></div>
+<div class="stat-card"><div class="stat-value" id="statPost">0</div><div class="stat-label">POST</div></div>
+<div class="stat-card"><div class="stat-value" id="statOther">0</div><div class="stat-label">PUT / DELETE</div></div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<div class="section-title">➕ Create Endpoint</div>
+<button class="btn btn-primary" onclick="saveEndpoint()">💾 Save Endpoint</button>
+</div>
+<div class="section-body">
+<div class="form-grid">
+<div class="form-group">
+<label for="epPath">Path</label>
+<input type="text" id="epPath" placeholder="/api/users" />
+</div>
+<div class="form-group">
+<label for="epMethod">Method</label>
+<select id="epMethod">
+<option value="GET">GET</option>
+<option value="POST">POST</option>
+<option value="PUT">PUT</option>
+<option value="DELETE">DELETE</option>
+</select>
+</div>
+<div class="form-group">
+<label for="epStatus">Status Code</label>
+<input type="number" id="epStatus" value="200" min="100" max="599" />
+</div>
+<div class="form-group">
+<label>Response Delay</label>
+<div class="delay-input">
+<input type="number" id="epDelay" value="0" min="0" max="30000" />
+<span>ms</span>
+</div>
+</div>
+<div class="form-group full">
+<label for="epBody">Response Body (JSON)</label>
+<textarea id="epBody" placeholder='{"message": "Hello {{uuid}}", "time": "{{timestamp}}"}'></textarea>
+<div class="template-vars">
+<span style="color:var(--text-muted);font-size:.75rem;margin-right:4px">Variables:</span>
+<span class="template-var" onclick="insertVar('{{timestamp}}')">{{timestamp}}</span>
+<span class="template-var" onclick="insertVar('{{random}}')">{{random}}</span>
+<span class="template-var" onclick="insertVar('{{uuid}}')">{{uuid}}</span>
+<span class="template-var" onclick="insertVar('{{date}}')">{{date}}</span>
+<span class="template-var" onclick="insertVar('{{randomInt}}')">{{randomInt}}</span>
+<span class="template-var" onclick="insertVar('{{lorem}}')">{{lorem}}</span>
+<span class="template-var" onclick="insertVar('{{name}}')">{{name}}</span>
+<span class="template-var" onclick="insertVar('{{email}}')">{{email}}</span>
+</div>
+</div>
+</div>
+<input type="hidden" id="editId" value="" />
+</div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<div class="section-title">📋 Endpoints <span id="endpointCount" style="color:var(--text-muted);font-weight:400"></span></div>
+</div>
+<div class="section-body">
+<div class="search-bar"><input type="text" id="searchInput" placeholder="Search endpoints..." oninput="renderEndpoints()" /></div>
+<div class="endpoint-list" id="endpointList"></div>
+</div>
+</div>
+
+<div class="section" id="testSection" style="display:none">
+<div class="section-header">
+<div class="section-title">🧪 Test Endpoint</div>
+<button class="btn btn-sm" onclick="document.getElementById('testSection').style.display='none'">✕ Close</button>
+</div>
+<div class="section-body">
+<div id="testInfo"></div>
+<button class="btn btn-success" onclick="runTest()" style="margin-top:12px">▶ Send Request</button>
+<div class="test-result" id="testResult" style="display:none"></div>
+</div>
+</div>
+</main>
+
+<div class="modal-overlay" id="importModal">
+<div class="modal">
+<div class="modal-header"><h3>📥 Import Configuration</h3><button class="modal-close" onclick="closeModal('importModal')">×</button></div>
+<div class="modal-body">
+<div class="form-group">
+<label>Paste JSON configuration or select a file</label>
+<textarea id="importData" rows="10" placeholder='[{"path":"/api/users","method":"GET","status":200,"body":"{}","delay":0}]'></textarea>
+</div>
+<div style="margin-top:12px"><input type="file" id="importFile" accept=".json" onchange="loadFile(event)" style="font-size:.85rem" /></div>
+</div>
+<div class="modal-footer">
+<button class="btn" onclick="closeModal('importModal')">Cancel</button>
+<button class="btn btn-primary" onclick="doImport()">Import</button>
+</div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<footer>
+<p>AI API Mocker — Define, test, and share mock API endpoints. Data stored locally in your browser.</p>
+</footer>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script>
+const STORAGE_KEY='ai-api-mocker-endpoints';
+let endpoints=loadEndpoints();
+let currentTestId=null;
+
+function loadEndpoints(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch{return[]}}
+function saveEndpoints(){localStorage.setItem(STORAGE_KEY,JSON.stringify(endpoints));updateStats();renderEndpoints()}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+
+function updateStats(){
+document.getElementById('statTotal').textContent=endpoints.length;
+document.getElementById('statGet').textContent=endpoints.filter(e=>e.method==='GET').length;
+document.getElementById('statPost').textContent=endpoints.filter(e=>e.method==='POST').length;
+document.getElementById('statOther').textContent=endpoints.filter(e=>e.method==='PUT'||e.method==='DELETE').length;
+}
+
+function renderEndpoints(){
+const q=document.getElementById('searchInput').value.toLowerCase();
+const filtered=endpoints.filter(e=>e.path.toLowerCase().includes(q)||e.method.toLowerCase().includes(q));
+const list=document.getElementById('endpointList');
+document.getElementById('endpointCount').textContent=filtered.length?`(${filtered.length})`:'';
+if(!filtered.length){
+list.innerHTML=`<div class="empty-state"><div class="icon">📡</div><p>${endpoints.length?'No matching endpoints':'No endpoints yet. Create your first mock endpoint above!'}</p></div>`;
+return;
+}
+list.innerHTML=filtered.map(ep=>`
+<div class="endpoint-item" onclick="testEndpoint('${ep.id}')">
+<span class="method-badge method-${ep.method}">${ep.method}</span>
+<span class="endpoint-path">${escHtml(ep.path)}</span>
+<div class="endpoint-meta">
+<span>${ep.status}</span>
+${ep.delay?`<span>⏱${ep.delay}ms</span>`:''}
+</div>
+<div class="endpoint-actions">
+<button class="btn btn-sm" onclick="event.stopPropagation();editEndpoint('${ep.id}')" title="Edit">✏️</button>
+<button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteEndpoint('${ep.id}')" title="Delete">🗑️</button>
+</div>
+</div>`).join('');
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function saveEndpoint(){
+const path=document.getElementById('epPath').value.trim();
+const method=document.getElementById('epMethod').value;
+const status=parseInt(document.getElementById('epStatus').value)||200;
+const body=document.getElementById('epBody').value;
+const delay=parseInt(document.getElementById('epDelay').value)||0;
+const editId=document.getElementById('editId').value;
+if(!path){showToast('Path is required','error');return}
+if(!path.startsWith('/')){showToast('Path must start with /','error');return}
+if(editId){
+const idx=endpoints.findIndex(e=>e.id===editId);
+if(idx>-1){endpoints[idx]={...endpoints[idx],path,method,status,body,delay}}
+document.getElementById('editId').value='';
+showToast('Endpoint updated','success');
+}else{
+endpoints.push({id:genId(),path,method,status,body,delay,created:Date.now()});
+showToast('Endpoint created','success');
+}
+saveEndpoints();clearForm();
+}
+
+function editEndpoint(id){
+const ep=endpoints.find(e=>e.id===id);
+if(!ep)return;
+document.getElementById('epPath').value=ep.path;
+document.getElementById('epMethod').value=ep.method;
+document.getElementById('epStatus').value=ep.status;
+document.getElementById('epBody').value=ep.body||'';
+document.getElementById('epDelay').value=ep.delay||0;
+document.getElementById('editId').value=ep.id;
+document.getElementById('epPath').focus();
+window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function deleteEndpoint(id){
+if(!confirm('Delete this endpoint?'))return;
+endpoints=endpoints.filter(e=>e.id!==id);
+saveEndpoints();
+showToast('Endpoint deleted','success');
+if(currentTestId===id){document.getElementById('testSection').style.display='none'}
+}
+
+function clearForm(){
+['epPath','epBody','editId'].forEach(id=>document.getElementById(id).value='');
+document.getElementById('epMethod').value='GET';
+document.getElementById('epStatus').value='200';
+document.getElementById('epDelay').value='0';
+}
+
+function clearAll(){
+if(!confirm('Delete ALL endpoints? This cannot be undone.'))return;
+endpoints=[];saveEndpoints();
+document.getElementById('testSection').style.display='none';
+showToast('All endpoints cleared','success');
+}
+
+function resolveTemplate(str){
+const names=['Alex','Jordan','Sam','Morgan','Casey','Riley','Quinn','Avery'];
+const domains=['example.com','test.io','mock.dev','demo.org'];
+return str.replace(/\{\{(\w+)\}\}/g,(_,v)=>{
+switch(v){
+case 'timestamp':return Date.now();
+case 'random':return Math.random().toFixed(6);
+case 'randomInt':return Math.floor(Math.random()*10000);
+case 'uuid':return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16)});
+case 'date':return new Date().toISOString();
+case 'lorem':return'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+case 'name':return names[Math.floor(Math.random()*names.length)];
+case 'email':return names[Math.floor(Math.random()*names.length)].toLowerCase()+'@'+domains[Math.floor(Math.random()*domains.length)];
+default:return'{{'+v+'}}';
+}});
+}
+
+function testEndpoint(id){
+const ep=endpoints.find(e=>e.id===id);
+if(!ep)return;
+currentTestId=id;
+const sec=document.getElementById('testSection');
+sec.style.display='block';
+document.getElementById('testInfo').innerHTML=`<span class="method-badge method-${ep.method}">${ep.method}</span> <code style="margin-left:8px;font-size:1rem">${escHtml(ep.path)}</code> <span style="color:var(--text-muted);margin-left:8px">Status: ${ep.status}${ep.delay?' | Delay: '+ep.delay+'ms':''}</span>`;
+document.getElementById('testResult').style.display='none';
+sec.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function runTest(){
+if(!currentTestId)return;
+const ep=endpoints.find(e=>e.id===currentTestId);
+if(!ep)return;
+const result=document.getElementById('testResult');
+result.style.display='block';
+result.innerHTML='<span style="color:var(--text-muted)">⏳ Processing...</span>';
+const start=performance.now();
+setTimeout(()=>{
+const resolved=resolveTemplate(ep.body||'');
+const elapsed=Math.round(performance.now()-start);
+let bodyDisplay=resolved;
+try{bodyDisplay=JSON.stringify(JSON.parse(resolved),null,2)}catch{}
+const sClass=ep.status<300?'s2xx':ep.status<500?'s4xx':'s5xx';
+result.innerHTML=`<div class="status ${sClass}">HTTP ${ep.status} — ${elapsed}ms</div><div>${escHtml(bodyDisplay)}</div>`;
+},ep.delay||0);
+}
+
+function exportConfig(){
+if(!endpoints.length){showToast('No endpoints to export','error');return}
+const data=JSON.stringify(endpoints,null,2);
+const blob=new Blob([data],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;a.download='api-mocker-config.json';a.click();
+URL.revokeObjectURL(url);
+showToast('Configuration exported','success');
+}
+
+function importConfig(){document.getElementById('importData').value='';document.getElementById('importFile').value='';openModal('importModal')}
+
+function loadFile(e){
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=ev=>document.getElementById('importData').value=ev.target.result;
+reader.readAsText(file);
+}
+
+function doImport(){
+const raw=document.getElementById('importData').value.trim();
+if(!raw){showToast('No data to import','error');return}
+try{
+const data=JSON.parse(raw);
+const arr=Array.isArray(data)?data:[data];
+let count=0;
+arr.forEach(item=>{
+if(item.path&&item.method){
+endpoints.push({id:genId(),path:item.path,method:item.method,status:item.status||200,body:item.body||'',delay:item.delay||0,created:Date.now()});
+count++;
+}
+});
+saveEndpoints();closeModal('importModal');
+showToast(`Imported ${count} endpoint(s)`,'success');
+}catch{showToast('Invalid JSON format','error')}
+}
+
+function insertVar(v){
+const ta=document.getElementById('epBody');
+const start=ta.selectionStart;
+ta.value=ta.value.slice(0,start)+v+ta.value.slice(ta.selectionEnd);
+ta.selectionStart=ta.selectionEnd=start+v.length;
+ta.focus();
+}
+
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+let toastTimer;
+function showToast(msg,type='success'){
+const t=document.getElementById('toast');
+t.className='toast '+type;
+t.innerHTML=(type==='success'?'✅':'❌')+' '+escHtml(msg);
+t.classList.add('show');
+clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.show').forEach(m=>m.classList.remove('show'))}
+});
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')});
+});
+
+updateStats();renderEndpoints();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

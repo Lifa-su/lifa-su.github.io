@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Timestamp - Unix Timestamp Converter</title>
+<meta name="description" content="Convert Unix timestamps to human-readable dates and vice versa. Supports seconds, milliseconds, multiple formats, and time zones.">
+<link rel="canonical" href="https://lifa-su.com/ai-timestamp/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4e;--radius:10px;--shadow:0 4px 20px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent)}
+.container{max-width:800px;margin:0 auto;padding:20px 16px 40px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.live-clock{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:24px;box-shadow:var(--shadow)}
+.live-clock .label{font-size:.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.live-clock .ts{font-size:2rem;font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--accent);margin:6px 0;cursor:pointer;transition:opacity .2s}
+.live-clock .ts:hover{opacity:.8}
+.live-clock .ts:active{opacity:.5}
+.live-clock .date{font-size:.95rem;color:var(--text2)}
+.live-clock .unit-toggle{margin-top:10px;display:flex;justify-content:center;gap:8px}
+.live-clock .unit-toggle button{background:var(--border);border:none;color:var(--text2);padding:4px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:all .2s}
+.live-clock .unit-toggle button.active{background:var(--accent);color:#fff}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.card h2{font-size:1.1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card h2 .icon{font-size:1.2rem}
+.form-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.form-row.full{flex-direction:column}
+label{font-size:.8rem;color:var(--text2);margin-bottom:4px;display:block}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:.95rem;font-family:inherit;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aab'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:transform .1s,opacity .2s;white-space:nowrap}
+.btn:hover{opacity:.9}
+.btn:active{transform:scale(.97)}
+.btn-secondary{background:var(--border);color:var(--text)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.8;word-break:break-all}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+.result-label{color:var(--text2);font-size:.75rem;min-width:90px}
+.result-value{color:var(--text);cursor:pointer;transition:color .2s;text-align:right;flex:1;margin-left:10px}
+.result-value:hover{color:var(--accent)}
+.tz-select{flex:1;min-width:200px}
+.input-group{flex:1;min-width:200px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:20px;font-size:.85rem;transition:transform .3s ease;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.custom-fmt{margin-top:8px}
+.custom-fmt input{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem}
+.custom-fmt .hint{font-size:.7rem;color:var(--text2);margin-top:4px}
+footer{text-align:center;padding:20px 0;color:var(--text2);font-size:.75rem}
+@media(max-width:600px){
+  header h1{font-size:1.4rem}
+  .live-clock .ts{font-size:1.5rem}
+  .form-row{flex-direction:column}
+  .form-row>*{width:100%}
+  .card{padding:16px}
+}
+.pro-section{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;margin-bottom:20px}
+.pro-mock{padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.7}
+.pro-mock-title{font-size:12px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;font-weight:600}
+.pro-mock-item{background:rgba(255,255,255,.05);border-radius:4px;padding:6px 10px;margin-bottom:5px;font-size:12px;color:var(--text2)}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:var(--radius);z-index:10;transition:background .2s}
+.pro-section:hover .pro-lock-overlay{background:rgba(0,0,0,.55)}
+.pro-lock-icon{font-size:32px;margin-bottom:6px}
+.pro-lock-text{font-size:13px;color:#fff;font-weight:600}
+.pro-lock-sub{font-size:11px;color:#aaa;margin-top:2px}
+#proModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+#proModal.show{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.pro-modal h2{font-size:20px;margin-bottom:4px;color:var(--accent)}
+.pro-modal .pro-price{font-size:32px;font-weight:700;color:#fff;margin:12px 0}
+.pro-modal .pro-features{text-align:left;margin:16px 0;padding:0;list-style:none}
+.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal .pro-features li:last-child{border-bottom:none}
+.pro-modal .pro-features li::before{content:'✓';color:#4ecca3;font-weight:700;font-size:16px}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;text-align:center;transition:opacity .2s}
+.pro-btn-upgrade:hover{opacity:.9}
+.pro-btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;font-size:14px;cursor:pointer;margin-top:8px}
+.pro-btn-later:hover{color:#ccc}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ AI Timestamp</h1>
+    <p>Unix Timestamp Converter — Fast, Accurate, Beautiful</p>
+  </header>
+
+  <div class="live-clock">
+    <div class="label">Current Unix Timestamp</div>
+    <div class="ts" id="liveTs" title="Click to copy">—</div>
+    <div class="date" id="liveDate">—</div>
+    <div class="unit-toggle">
+      <button class="active" data-unit="s">Seconds</button>
+      <button data-unit="ms">Milliseconds</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🔄</span> Timestamp → Date</h2>
+    <div class="form-row">
+      <div class="input-group">
+        <label for="tsInput">Unix Timestamp</label>
+        <input type="text" id="tsInput" placeholder="e.g. 1708675200 or 1708675200000" inputmode="numeric">
+      </div>
+      <div class="tz-select">
+        <label for="tz1">Time Zone</label>
+        <select id="tz1"></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <button class="btn" onclick="convertToDate()">Convert to Date</button>
+      <button class="btn btn-secondary btn-sm" onclick="useNow('tsInput')">Now</button>
+    </div>
+    <div class="custom-fmt">
+      <label for="customFmt">Custom Format</label>
+      <input type="text" id="customFmt" placeholder="YYYY-MM-DD HH:mm:ss" value="YYYY-MM-DD HH:mm:ss">
+      <div class="hint">Tokens: YYYY MM DD HH mm ss SSS ddd Z</div>
+    </div>
+    <div id="toDateResult" class="result-box" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">📅</span> Date → Timestamp</h2>
+    <div class="form-row">
+      <div class="input-group">
+        <label for="dateInput">Date & Time</label>
+        <input type="datetime-local" id="dateInput" step="1">
+      </div>
+      <div class="tz-select">
+        <label for="tz2">Time Zone</label>
+        <select id="tz2"></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <button class="btn" onclick="convertToTimestamp()">Convert to Timestamp</button>
+      <button class="btn btn-secondary btn-sm" onclick="useNowDate()">Now</button>
+    </div>
+    <div id="toTsResult" class="result-box" style="display:none"></div>
+  </div>
+
+  <div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-mock">
+<div class="pro-mock-title">&#128260; Batch Conversion</div>
+<div class="pro-mock-item">&#9654; Convert multiple timestamps at once</div>
+<div class="pro-mock-item">&#9654; CSV import &amp; export</div>
+<div class="pro-mock-title" style="margin-top:10px">&#127760; Timezone Comparison</div>
+<div class="pro-mock-item">&#9654; Side-by-side timezone view</div>
+<div class="pro-mock-item">&#9654; Meeting time planner</div>
+<div class="pro-mock-title" style="margin-top:10px">&#9889; API Access</div>
+<div class="pro-mock-item">&#9654; REST API for timestamp conversion</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">&#128274;</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+
+  <footer>
+    AI Timestamp &copy; 2026 &mdash; Open source tool for developers
+  </footer>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const TIMEZONES=[
+  'UTC',
+  'America/New_York','America/Chicago','America/Denver','America/Los_Angeles',
+  'America/Sao_Paulo','America/Argentina/Buenos_Aires',
+  'Europe/London','Europe/Paris','Europe/Berlin','Europe/Moscow',
+  'Asia/Dubai','Asia/Kolkata','Asia/Bangkok','Asia/Singapore',
+  'Asia/Shanghai','Asia/Tokyo','Asia/Seoul',
+  'Australia/Sydney','Pacific/Auckland','Pacific/Honolulu'
+];
+let liveUnit='s';
+
+function initTzSelects(){
+  const local=Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.querySelectorAll('#tz1,#tz2').forEach(sel=>{
+    TIMEZONES.forEach(tz=>{
+      const o=document.createElement('option');
+      o.value=tz;
+      o.textContent=tz.replace(/_/g,' ');
+      if(tz===local||tz==='Asia/Shanghai')o.selected=(tz===local);
+      sel.appendChild(o);
+    });
+    if(!TIMEZONES.includes(local)){
+      const o=document.createElement('option');
+      o.value=local;o.textContent=local.replace(/_/g,' ');o.selected=true;
+      sel.prepend(o);
+    }
+  });
+}
+
+function showToast(msg='Copied!'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>showToast()).catch(()=>{});
+}
+
+function formatInTz(date,tz,fmt){
+  const tokens={
+    YYYY:()=>new Intl.DateTimeFormat('en',{timeZone:tz,year:'numeric'}).format(date),
+    MM:()=>new Intl.DateTimeFormat('en',{timeZone:tz,month:'2-digit'}).format(date),
+    DD:()=>new Intl.DateTimeFormat('en',{timeZone:tz,day:'2-digit'}).format(date),
+    HH:()=>new Intl.DateTimeFormat('en',{timeZone:tz,hour:'2-digit',hour12:false}).format(date).replace(/^24/,'00'),
+    mm:()=>new Intl.DateTimeFormat('en',{timeZone:tz,minute:'2-digit'}).format(date).padStart(2,'0'),
+    ss:()=>new Intl.DateTimeFormat('en',{timeZone:tz,second:'2-digit'}).format(date).padStart(2,'0'),
+    SSS:()=>String(date.getMilliseconds()).padStart(3,'0'),
+    ddd:()=>new Intl.DateTimeFormat('en',{timeZone:tz,weekday:'short'}).format(date),
+    Z:()=>{
+      const s=new Intl.DateTimeFormat('en',{timeZone:tz,timeZoneName:'shortOffset'}).format(date);
+      const m=s.match(/GMT([+-]\d{1,2}(:\d{2})?)/);
+      return m?m[1]:'+00:00';
+    }
+  };
+  let result=fmt;
+  for(const[k,fn]of Object.entries(tokens)){
+    if(result.includes(k))result=result.replaceAll(k,fn());
+  }
+  return result;
+}
+
+function detectUnit(val){
+  const n=Number(val);
+  if(isNaN(n))return null;
+  return Math.abs(n)>1e12?'ms':'s';
+}
+
+function toMs(val){
+  const n=Number(val);
+  const unit=detectUnit(val);
+  return unit==='ms'?n:n*1000;
+}
+
+function resultRow(label,value){
+  return `<div class="result-row"><span class="result-label">${label}</span><span class="result-value" onclick="copyText('${value.replace(/'/g,"\\'")}')">${value}</span></div>`;
+}
+
+function convertToDate(){
+  const raw=document.getElementById('tsInput').value.trim();
+  if(!raw){showToast('Enter a timestamp');return;}
+  const ms=toMs(raw);
+  if(isNaN(ms)){showToast('Invalid timestamp');return;}
+  const date=new Date(ms);
+  if(isNaN(date.getTime())){showToast('Invalid timestamp');return;}
+  const tz=document.getElementById('tz1').value;
+  const fmt=document.getElementById('customFmt').value||'YYYY-MM-DD HH:mm:ss';
+  const unit=detectUnit(raw);
+  const sec=Math.floor(ms/1000);
+
+  const iso=date.toISOString();
+  const utc=date.toUTCString();
+  const local=date.toLocaleString('en-US',{timeZone:tz,dateStyle:'full',timeStyle:'long'});
+  const custom=formatInTz(date,tz,fmt);
+  const relative=getRelative(date);
+
+  const box=document.getElementById('toDateResult');
+  box.style.display='block';
+  box.innerHTML=[
+    resultRow('ISO 8601',iso),
+    resultRow('UTC',utc),
+    resultRow('Local ('+tz+')',local),
+    resultRow('Custom',custom),
+    resultRow('Seconds',String(sec)),
+    resultRow('Milliseconds',String(ms)),
+    resultRow('Relative',relative),
+  ].join('');
+}
+
+function getRelative(date){
+  const diff=Date.now()-date.getTime();
+  const abs=Math.abs(diff);
+  const future=diff<0;
+  const units=[
+    [31536e6,'year'],[2592e6,'month'],[864e5,'day'],
+    [36e5,'hour'],[6e4,'minute'],[1e3,'second']
+  ];
+  for(const[ms,name]of units){
+    const val=Math.floor(abs/ms);
+    if(val>=1)return future?`in ${val} ${name}${val>1?'s':''}`:`${val} ${name}${val>1?'s':''} ago`;
+  }
+  return 'just now';
+}
+
+function convertToTimestamp(){
+  const raw=document.getElementById('dateInput').value;
+  if(!raw){showToast('Pick a date');return;}
+  const tz=document.getElementById('tz2').value;
+  const fakeLocal=new Date(raw);
+  const utcGuess=new Date(fakeLocal.toLocaleString('en-US',{timeZone:'UTC'}));
+  const tzGuess=new Date(fakeLocal.toLocaleString('en-US',{timeZone:tz}));
+  const offset=utcGuess-tzGuess;
+  const corrected=new Date(fakeLocal.getTime()+offset);
+
+  const sec=Math.floor(corrected.getTime()/1000);
+  const ms=corrected.getTime();
+
+  const box=document.getElementById('toTsResult');
+  box.style.display='block';
+  box.innerHTML=[
+    resultRow('Seconds',String(sec)),
+    resultRow('Milliseconds',String(ms)),
+    resultRow('ISO 8601',corrected.toISOString()),
+    resultRow('UTC',corrected.toUTCString()),
+  ].join('');
+}
+
+function useNow(id){
+  const now=liveUnit==='ms'?Date.now():Math.floor(Date.now()/1000);
+  document.getElementById(id).value=now;
+}
+
+function useNowDate(){
+  const now=new Date();
+  const tz=document.getElementById('tz2').value;
+  const parts=new Intl.DateTimeFormat('en',{
+    timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false
+  }).formatToParts(now);
+  const g={};parts.forEach(p=>g[p.type]=p.value);
+  const h=g.hour==='24'?'00':g.hour;
+  document.getElementById('dateInput').value=`${g.year}-${g.month}-${g.day}T${h}:${g.minute}:${g.second}`;
+}
+
+function updateLive(){
+  const now=Date.now();
+  const display=liveUnit==='ms'?now:Math.floor(now/1000);
+  document.getElementById('liveTs').textContent=display.toLocaleString('en-US');
+  const d=new Date(now);
+  const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.getElementById('liveDate').textContent=d.toLocaleString('en-US',{
+    timeZone:tz,dateStyle:'full',timeStyle:'medium'
+  });
+}
+
+document.getElementById('liveTs').addEventListener('click',function(){
+  const now=liveUnit==='ms'?Date.now():Math.floor(Date.now()/1000);
+  copyText(String(now));
+});
+
+document.querySelectorAll('.unit-toggle button').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.unit-toggle button').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    liveUnit=this.dataset.unit;
+  });
+});
+
+document.getElementById('tsInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')convertToDate();
+});
+
+initTzSelects();
+updateLive();
+setInterval(updateLive,1000);
+</script>
+<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>&#128640; Timestamp Pro</h2>
+<div class="pro-price">$9</div>
+<ul class="pro-features">
+<li>Batch Conversion — convert multiple timestamps with CSV support</li>
+<li>Timezone Comparison — side-by-side view &amp; meeting planner</li>
+<li>API Access — REST API for automated timestamp conversion</li>
+<li>Priority support &amp; all future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+<button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

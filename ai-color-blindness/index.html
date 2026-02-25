@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Color Blindness Simulator</title>
+<meta name="description" content="Simulate 8 types of color vision deficiency on images and colors. WCAG contrast checker and accessible palette suggestions.">
+<link rel="canonical" href="https://lifa-su.com/ai-color-blindness/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f13;--sf:#1a1a24;--sf2:#242436;--bd:#2e2e44;--tx:#e4e4ef;--tx2:#9999b3;--ac:#6c5ce7;--ac2:#a29bfe;--ok:#00b894;--wn:#fdcb6e;--ng:#e17055;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6}
+a{color:var(--ac2);text-decoration:none}
+.ctn{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--ac),var(--ac2),#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;font-weight:800}
+header p{color:var(--tx2);font-size:1.05rem}
+.tabs{display:flex;gap:4px;background:var(--sf);border-radius:var(--r);padding:4px;margin-bottom:24px;overflow-x:auto}
+.tab{flex:1;padding:12px 16px;border:none;background:0 0;color:var(--tx2);font-size:.93rem;cursor:pointer;border-radius:8px;transition:.2s;white-space:nowrap;font-weight:500}
+.tab:hover{color:var(--tx);background:var(--sf2)}
+.tab.active{background:var(--ac);color:#fff}
+.pnl{display:none}.pnl.active{display:block}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.card h2{font-size:1.25rem;margin-bottom:16px;color:var(--ac2)}
+.upload-zone{border:2px dashed var(--bd);border-radius:var(--r);padding:48px 24px;text-align:center;cursor:pointer;transition:.3s}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--ac);background:rgba(108,92,231,.08)}
+.upload-zone p{color:var(--tx2)}.upload-zone .hint{font-size:.85rem;margin-top:8px}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:16px 0}
+.type-btn{padding:10px 14px;border:2px solid var(--bd);background:var(--sf2);color:var(--tx);border-radius:8px;cursor:pointer;transition:.2s;font-size:.88rem;text-align:left}
+.type-btn:hover{border-color:var(--ac)}
+.type-btn.active{border-color:var(--ac);background:rgba(108,92,231,.15)}
+.type-btn .lb{font-weight:600;display:block}.type-btn .ds{font-size:.78rem;color:var(--tx2);margin-top:2px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.cmp canvas{width:100%;border-radius:8px;background:#000}
+.cmp-lb{text-align:center;color:var(--tx2);font-size:.9rem;margin-bottom:6px}
+.cinp{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.cinp input[type=color]{width:60px;height:42px;border:2px solid var(--bd);border-radius:8px;background:var(--sf2);cursor:pointer;padding:2px}
+.cinp input[type=text]{flex:1;min-width:140px;padding:10px 14px;border:2px solid var(--bd);background:var(--sf2);color:var(--tx);border-radius:8px;font-size:.95rem;font-family:monospace}
+.cinp input[type=text]:focus{outline:none;border-color:var(--ac)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.ccard{background:var(--sf2);border-radius:8px;padding:16px;border:1px solid var(--bd)}
+.ccard .nm{font-weight:600;font-size:.9rem;margin-bottom:8px}
+.ccard .sw{display:flex;gap:8px;align-items:center}
+.ccard .swatch{width:48px;height:48px;border-radius:8px;border:2px solid var(--bd)}
+.ccard .arr{color:var(--tx2);font-size:1.2rem}
+.ccard .hx{font-family:monospace;font-size:.82rem;color:var(--tx2);margin-top:6px}
+.winp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.winp-c{background:var(--sf2);border-radius:8px;padding:16px}
+.winp-c label{display:block;font-size:.9rem;color:var(--tx2);margin-bottom:8px}
+.wprev{display:flex;align-items:center;justify-content:center;min-height:120px;border-radius:8px;margin-bottom:20px;font-size:1.4rem;font-weight:700;padding:24px;text-align:center}
+.wres{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.wr{background:var(--sf2);border-radius:8px;padding:16px;text-align:center}
+.wr .ratio{font-size:2rem;font-weight:700;margin-bottom:4px}
+.wr .level{font-size:.9rem;font-weight:600;margin-bottom:2px}
+.wr .st{font-size:.85rem;padding:4px 12px;border-radius:20px;display:inline-block;margin-top:4px}
+.pass{background:rgba(0,184,148,.15);color:var(--ok)}
+.fail{background:rgba(225,112,85,.15);color:var(--ng)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.pcard{background:var(--sf2);border-radius:8px;padding:16px;border:1px solid var(--bd)}
+.pcard h4{font-size:.95rem;margin-bottom:12px}
+.pcols{display:flex;gap:4px;margin-bottom:8px}
+.pcol{flex:1;height:40px;border-radius:6px;cursor:pointer;transition:transform .2s}
+.pcol:hover{transform:scaleY(1.2)}
+.pdesc{font-size:.82rem;color:var(--tx2)}
+footer{text-align:center;padding:40px 20px;color:var(--tx2);font-size:.85rem;border-top:1px solid var(--bd);margin-top:40px}
+@media(max-width:768px){
+.cmp,.winp{grid-template-columns:1fr}
+.type-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+header h1{font-size:1.6rem}
+.tabs{gap:2px}.tab{padding:10px 12px;font-size:.85rem}
+}
+</style>
+</head>
+<body>
+<div class="ctn">
+<header>
+<h1>&#x1f441; AI Color Blindness Simulator</h1>
+<p>Simulate color vision deficiencies, check WCAG contrast, and find accessible palettes</p>
+</header>
+
+<div class="tabs" role="tablist">
+<button class="tab active" onclick="switchTab(0)" role="tab" aria-selected="true">&#x1f5bc; Image Simulator</button>
+<button class="tab" onclick="switchTab(1)" role="tab">&#x1f3a8; Color Picker</button>
+<button class="tab" onclick="switchTab(2)" role="tab">&#x2705; WCAG Checker</button>
+<button class="tab" onclick="switchTab(3)" role="tab">&#x1f4a1; Safe Palettes</button>
+</div>
+
+<!-- Panel 0: Image Simulator -->
+<div class="pnl active" id="p0" role="tabpanel">
+<div class="card">
+<h2>Upload an Image</h2>
+<div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+<p>Drop an image here or click to upload</p>
+<p class="hint">Supports JPG, PNG, WebP, GIF</p>
+</div>
+<input type="file" id="fileInput" accept="image/*" hidden>
+</div>
+
+<div class="card" id="simCard" style="display:none">
+<h2>Select Color Vision Type</h2>
+<div class="type-grid" id="typeGrid"></div>
+<div class="cmp">
+<div><p class="cmp-lb">Original</p><canvas id="cvOrig"></canvas></div>
+<div><p class="cmp-lb" id="simLabel">Simulated</p><canvas id="cvSim"></canvas></div>
+</div>
+</div>
+</div>
+
+<!-- Panel 1: Color Picker -->
+<div class="pnl" id="p1" role="tabpanel">
+<div class="card">
+<h2>Color Vision Preview</h2>
+<p style="color:var(--tx2);margin-bottom:16px">Enter a color to see how it appears under each type of color vision deficiency.</p>
+<div class="cinp">
+<input type="color" id="colorPick" value="#e74c3c">
+<input type="text" id="colorHex" value="#e74c3c" placeholder="#hex or rgb(r,g,b)">
+</div>
+<div class="cgrid" id="colorGrid"></div>
+</div>
+</div>
+
+<!-- Panel 2: WCAG Checker -->
+<div class="pnl" id="p2" role="tabpanel">
+<div class="card">
+<h2>WCAG Contrast Ratio Checker</h2>
+<p style="color:var(--tx2);margin-bottom:16px">Check if your foreground and background colors meet WCAG 2.1 accessibility standards.</p>
+<div class="winp">
+<div class="winp-c">
+<label>Foreground (Text) Color</label>
+<div class="cinp"><input type="color" id="wcagFg" value="#ffffff"><input type="text" id="wcagFgHex" value="#ffffff"></div>
+</div>
+<div class="winp-c">
+<label>Background Color</label>
+<div class="cinp"><input type="color" id="wcagBg" value="#6c5ce7"><input type="text" id="wcagBgHex" value="#6c5ce7"></div>
+</div>
+</div>
+<div class="wprev" id="wcagPreview">Sample Text Preview</div>
+<div class="wres" id="wcagResults"></div>
+</div>
+</div>
+
+<!-- Panel 3: Safe Palettes -->
+<div class="pnl" id="p3" role="tabpanel">
+<div class="card">
+<h2>Accessible Color Palettes</h2>
+<p style="color:var(--tx2);margin-bottom:16px">These palettes are designed to be distinguishable across all types of color vision deficiency.</p>
+<div class="pgrid" id="paletteGrid"></div>
+</div>
+</div>
+
+</div>
+
+<footer>
+<p>AI Color Blindness Simulator &mdash; Built with science-based color vision matrices</p>
+<p style="margin-top:4px">Brettel, Vi&eacute;not &amp; Mollon (1999) &bull; Machado, Oliveira &amp; Fernandes (2009)</p>
+</footer>
+
+<script>
+// === Color Vision Deficiency Simulation Matrices ===
+// Based on: Vienot, Brettel & Mollon (1999), Machado, Oliveira & Fernandes (2009)
+
+const CVD_TYPES = [
+  {id:'protan',    name:'Protanopia',    desc:'Red-blind (no L-cones)',       cat:'Dichromacy'},
+  {id:'deutan',    name:'Deuteranopia',  desc:'Green-blind (no M-cones)',     cat:'Dichromacy'},
+  {id:'tritan',    name:'Tritanopia',    desc:'Blue-blind (no S-cones)',      cat:'Dichromacy'},
+  {id:'protanom',  name:'Protanomaly',   desc:'Red-weak (anomalous L-cones)', cat:'Anomalous'},
+  {id:'deutanom',  name:'Deuteranomaly', desc:'Green-weak (anomalous M)',     cat:'Anomalous'},
+  {id:'tritanom',  name:'Tritanomaly',   desc:'Blue-weak (anomalous S)',      cat:'Anomalous'},
+  {id:'achroma',   name:'Achromatopsia', desc:'Total color blindness',        cat:'Monochromacy'},
+  {id:'achromalom',name:'Achromatomaly', desc:'Partial color blindness',      cat:'Monochromacy'},
+];
+
+// Vienot, Brettel & Mollon (1999) - Dichromacy matrices
+// Machado, Oliveira & Fernandes (2009) - Anomalous trichromacy (severity ~0.6)
+const MATRICES = {
+  protan: [
+    0.152286, 1.052583, -0.204868,
+    0.114503, 0.786281,  0.099216,
+   -0.003882,-0.048116,  1.051998
+  ],
+  deutan: [
+    0.367322, 0.860646, -0.227968,
+    0.280085, 0.672501,  0.047413,
+   -0.011820, 0.042940,  0.968881
+  ],
+  tritan: [
+    1.255528,-0.076749, -0.178779,
+   -0.078411, 0.930809,  0.147602,
+    0.004733, 0.691367,  0.303900
+  ],
+  protanom: [
+    0.458064, 0.679578, -0.137642,
+    0.092785, 0.846313,  0.060902,
+   -0.007494,-0.016807,  1.024301
+  ],
+  deutanom: [
+    0.547494, 0.607765, -0.155259,
+    0.181692, 0.781742,  0.036566,
+   -0.010410, 0.027275,  0.983136
+  ],
+  tritanom: [
+    1.017277, 0.027029, -0.044306,
+   -0.006113, 0.958479,  0.047634,
+    0.006379, 0.248708,  0.744913
+  ]
+};
+
+// Apply 3x3 matrix to RGB (0-255)
+function applyMatrix(r, g, b, m) {
+  return [
+    Math.max(0, Math.min(255, m[0]*r + m[1]*g + m[2]*b)),
+    Math.max(0, Math.min(255, m[3]*r + m[4]*g + m[5]*b)),
+    Math.max(0, Math.min(255, m[6]*r + m[7]*g + m[8]*b))
+  ];
+}
+
+// Simulate CVD on a single RGB color
+function simulateCVD(r, g, b, typeId) {
+  if (typeId === 'achroma') {
+    const l = 0.2126*r + 0.7152*g + 0.0722*b;
+    return [l, l, l];
+  }
+  if (typeId === 'achromalom') {
+    const l = 0.2126*r + 0.7152*g + 0.0722*b;
+    return [r*0.618 + l*0.382, g*0.618 + l*0.382, b*0.618 + l*0.382];
+  }
+  const m = MATRICES[typeId];
+  if (!m) return [r, g, b];
+  return applyMatrix(r, g, b, m);
+}
+
+// sRGB linearization for WCAG
+function srgbToLinear(c) {
+  c = c / 255;
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+// Relative luminance (WCAG 2.1)
+function luminance(r, g, b) {
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+// Contrast ratio (WCAG 2.1)
+function contrastRatio(rgb1, rgb2) {
+  const l1 = luminance(...rgb1);
+  const l2 = luminance(...rgb2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// Hex to RGB
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const n = parseInt(hex, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+// RGB to Hex
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+}
+
+// Parse color string (hex or rgb)
+function parseColor(str) {
+  str = str.trim();
+  if (str.startsWith('#')) return hexToRgb(str);
+  const m = str.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+  if (m) return [+m[1], +m[2], +m[3]];
+  if (/^[0-9a-f]{3,6}$/i.test(str)) return hexToRgb(str);
+  return null;
+}
+
+// === Tab Switching ===
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', i===idx);
+    t.setAttribute('aria-selected', i===idx);
+  });
+  document.querySelectorAll('.pnl').forEach((p,i) => p.classList.toggle('active', i===idx));
+}
+
+// === Image Simulator ===
+let origImageData = null;
+let currentType = 'protan';
+
+function initTypeGrid() {
+  const grid = document.getElementById('typeGrid');
+  grid.innerHTML = CVD_TYPES.map(t =>
+    `<button class="type-btn${t.id==='protan'?' active':''}" data-type="${t.id}" onclick="selectType('${t.id}')">
+      <span class="lb">${t.name}</span>
+      <span class="ds">${t.desc}</span>
+    </button>`
+  ).join('');
+}
+
+function selectType(typeId) {
+  currentType = typeId;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.type===typeId));
+  const t = CVD_TYPES.find(t => t.id===typeId);
+  document.getElementById('simLabel').textContent = t ? t.name : 'Simulated';
+  if (origImageData) renderSimulation();
+}
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const cvO = document.getElementById('cvOrig');
+      const cvS = document.getElementById('cvSim');
+      const maxW = 800;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = h * maxW / w; w = maxW; }
+      cvO.width = cvS.width = w;
+      cvO.height = cvS.height = h;
+      const ctxO = cvO.getContext('2d');
+      ctxO.drawImage(img, 0, 0, w, h);
+      origImageData = ctxO.getImageData(0, 0, w, h);
+      document.getElementById('simCard').style.display = 'block';
+      renderSimulation();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderSimulation() {
+  if (!origImageData) return;
+  const cvS = document.getElementById('cvSim');
+  const ctx = cvS.getContext('2d');
+  const src = origImageData.data;
+  const out = ctx.createImageData(origImageData.width, origImageData.height);
+  const dst = out.data;
+  for (let i = 0; i < src.length; i += 4) {
+    const [r, g, b] = simulateCVD(src[i], src[i+1], src[i+2], currentType);
+    dst[i] = r; dst[i+1] = g; dst[i+2] = b; dst[i+3] = src[i+3];
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+// Drag & drop and file input
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => { if (e.target.files.length) loadImage(e.target.files[0]); });
+
+// === Color Picker ===
+function updateColorGrid() {
+  const hex = document.getElementById('colorHex').value;
+  const rgb = parseColor(hex);
+  if (!rgb) return;
+  const grid = document.getElementById('colorGrid');
+  grid.innerHTML = CVD_TYPES.map(t => {
+    const sim = simulateCVD(...rgb, t.id);
+    const simHex = rgbToHex(...sim);
+    const origHex = rgbToHex(...rgb);
+    return `<div class="ccard">
+      <div class="nm">${t.name}</div>
+      <div class="sw">
+        <div class="swatch" style="background:${origHex}" title="Original: ${origHex}"></div>
+        <span class="arr">&rarr;</span>
+        <div class="swatch" style="background:${simHex}" title="Simulated: ${simHex}"></div>
+      </div>
+      <div class="hx">${origHex} &rarr; ${simHex}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('colorPick').addEventListener('input', e => {
+  document.getElementById('colorHex').value = e.target.value;
+  updateColorGrid();
+});
+document.getElementById('colorHex').addEventListener('input', e => {
+  const rgb = parseColor(e.target.value);
+  if (rgb) {
+    document.getElementById('colorPick').value = rgbToHex(...rgb);
+    updateColorGrid();
+  }
+});
+
+// === WCAG Contrast Checker ===
+function updateWCAG() {
+  const fgHex = document.getElementById('wcagFgHex').value;
+  const bgHex = document.getElementById('wcagBgHex').value;
+  const fg = parseColor(fgHex);
+  const bg = parseColor(bgHex);
+  if (!fg || !bg) return;
+
+  const preview = document.getElementById('wcagPreview');
+  preview.style.color = rgbToHex(...fg);
+  preview.style.background = rgbToHex(...bg);
+  preview.textContent = 'Sample Text — The quick brown fox jumps over the lazy dog';
+
+  const ratio = contrastRatio(fg, bg);
+  const ratioStr = ratio.toFixed(2);
+
+  const checks = [
+    {level:'AA Normal Text', min:4.5},
+    {level:'AA Large Text', min:3},
+    {level:'AAA Normal Text', min:7},
+    {level:'AAA Large Text', min:4.5},
+  ];
+
+  const results = document.getElementById('wcagResults');
+  results.innerHTML = `<div class="wr">
+    <div class="ratio">${ratioStr}:1</div>
+    <div class="level">Contrast Ratio</div>
+  </div>` + checks.map(c => {
+    const pass = ratio >= c.min;
+    return `<div class="wr">
+      <div class="level">${c.level}</div>
+      <div class="st ${pass?'pass':'fail'}">${pass?'&#x2713; Pass':'&#x2717; Fail'} (${'>'}${c.min}:1)</div>
+    </div>`;
+  }).join('');
+}
+
+// WCAG input bindings
+['wcagFg','wcagBg'].forEach(id => {
+  const hex = id + 'Hex';
+  document.getElementById(id).addEventListener('input', e => {
+    document.getElementById(hex).value = e.target.value;
+    updateWCAG();
+  });
+  document.getElementById(hex).addEventListener('input', e => {
+    const rgb = parseColor(e.target.value);
+    if (rgb) {
+      document.getElementById(id).value = rgbToHex(...rgb);
+      updateWCAG();
+    }
+  });
+});
+
+// === Accessible Color Palettes ===
+const PALETTES = [
+  {
+    name: 'Wong (Nature, 2011)',
+    desc: 'Optimized for all forms of color blindness. Widely used in scientific publishing.',
+    colors: ['#000000','#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7']
+  },
+  {
+    name: 'Tol Bright',
+    desc: 'Paul Tol\'s bright qualitative scheme. High contrast, CVD-safe.',
+    colors: ['#4477AA','#EE6677','#228833','#CCBB44','#66CCEE','#AA3377','#BBBBBB']
+  },
+  {
+    name: 'Tol Muted',
+    desc: 'Paul Tol\'s muted scheme. Softer tones, still distinguishable.',
+    colors: ['#332288','#88CCEE','#44AA99','#117733','#999933','#DDCC77','#CC6677','#882255','#AA4499']
+  },
+  {
+    name: 'IBM Design',
+    desc: 'IBM\'s accessible palette for data visualization.',
+    colors: ['#648FFF','#785EF0','#DC267F','#FE6100','#FFB000']
+  },
+  {
+    name: 'Okabe-Ito',
+    desc: 'Classic CVD-friendly palette from Okabe & Ito (2002).',
+    colors: ['#E69F00','#56B4E9','#009E73','#F0E442','#0072B2','#D55E00','#CC79A7','#000000']
+  },
+  {
+    name: 'Safe Categorical',
+    desc: 'A general-purpose safe palette for charts and UI elements.',
+    colors: ['#1B9E77','#D95F02','#7570B3','#E7298A','#66A61E','#E6AB02']
+  },
+  {
+    name: 'High Contrast Pairs',
+    desc: 'Foreground/background pairs that pass WCAG AAA for all CVD types.',
+    colors: ['#000000','#FFFFFF','#1A1A2E','#E0E0FF','#0D3B66','#FAF0CA']
+  },
+  {
+    name: 'Sequential Blue',
+    desc: 'A CVD-safe sequential scheme for heatmaps and gradients.',
+    colors: ['#F7FBFF','#DEEBF7','#C6DBEF','#9ECAE1','#6BAED6','#4292C6','#2171B5','#084594']
+  }
+];
+
+function initPalettes() {
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = PALETTES.map(p => `
+    <div class="pcard">
+      <h4>${p.name}</h4>
+      <div class="pcols">
+        ${p.colors.map(c => `<div class="pcol" style="background:${c}" title="${c}" onclick="navigator.clipboard.writeText('${c}')"></div>`).join('')}
+      </div>
+      <div class="pdesc">${p.desc}</div>
+    </div>
+  `).join('');
+}
+
+// === Init ===
+initTypeGrid();
+updateColorGrid();
+updateWCAG();
+initPalettes();
+</script>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

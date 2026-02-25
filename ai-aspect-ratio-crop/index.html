@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Smart image cropping tool with AI. Crop images to any aspect ratio for social media, web, and print. Supports custom ratios and batch processing.">
+<link rel="canonical" href="https://lifa-su.com/ai-aspect-ratio-crop/">
+<title>AI Aspect Ratio Crop - Smart Image Cropping Tool</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--s1:#14141f;--s2:#1e1e2e;--bd:#2a2a3e;--t1:#e0e0e8;--t2:#8888a0;--ac:#6c5ce7;--ac2:#a29bfe}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+.hd{text-align:center;padding:20px 16px;border-bottom:1px solid var(--bd)}
+.hd h1{font-size:1.5rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hd p{color:var(--t2);font-size:.85rem;margin-top:4px}
+.app{max-width:1100px;margin:0 auto;padding:16px}
+#uploadZone{border:2px dashed var(--bd);border-radius:16px;padding:60px 20px;text-align:center;cursor:pointer;background:var(--s1);transition:.3s}
+#uploadZone:hover,#uploadZone.over{border-color:var(--ac);background:var(--s2)}
+#ws{display:none}#ws.on{display:flex;gap:16px;flex-wrap:wrap}
+.cvw{flex:1;min-width:300px;background:var(--s1);border-radius:12px;padding:8px;position:relative;display:flex;align-items:center;justify-content:center;min-height:400px;overflow:hidden}
+.cvw canvas{max-width:100%;max-height:70vh}
+.sb{width:260px;display:flex;flex-direction:column;gap:10px}
+.pn{background:var(--s1);border-radius:12px;padding:14px}
+.pn h3{font-size:.78rem;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.ratios{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rb{padding:9px 4px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t1);cursor:pointer;font-size:.8rem;text-align:center;transition:.2s}
+.rb:hover{border-color:var(--ac)}.rb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+.btn{padding:8px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t1);cursor:pointer;font-size:.8rem;transition:.2s}
+.btn:hover{border-color:var(--ac);background:var(--ac);color:#fff}
+.bp{background:var(--ac);border-color:var(--ac);color:#fff;width:100%;text-align:center;padding:11px;font-weight:600}
+.bd{border-color:#ff6b6b;color:#ff6b6b}.bd:hover{background:#ff6b6b;color:#fff}
+.info{font-size:.75rem;color:var(--t2);margin-top:6px}
+#ci{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.75);padding:5px 9px;border-radius:6px;font-size:.72rem;color:#ccc;display:none}
+@media(max-width:767px){.sb{width:100%}#ws.on{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="hd"><h1>✂️ AI Aspect Ratio Crop</h1><p>Upload, crop with preset ratios, rotate, flip &amp; export</p></div>
+<div class="app">
+<div id="uploadZone"><div style="font-size:48px;margin-bottom:8px">📁</div>
+<h3>Drop image here or click to upload</h3>
+<span style="color:var(--t2);font-size:.85rem">JPG, PNG, WebP, GIF</span>
+<input type="file" id="fi" accept="image/*" hidden></div>
+<div id="ws">
+<div class="cvw"><canvas id="cv"></canvas><div id="ci"></div></div>
+<div class="sb">
+<div class="pn"><h3>Aspect Ratio</h3><div class="ratios" id="ratios">
+<button class="rb on" data-r="0">Free</button><button class="rb" data-r="1">1:1</button>
+<button class="rb" data-r="1.3333">4:3</button><button class="rb" data-r="1.7778">16:9</button>
+<button class="rb" data-r="0.5625">9:16</button><button class="rb" data-r="1.5">3:2</button>
+</div></div>
+<div class="pn"><h3>Transform</h3><div class="acts">
+<button class="btn" id="rl">↺ Left</button><button class="btn" id="rr">↻ Right</button>
+<button class="btn" id="fhb">↔ Flip H</button><button class="btn" id="fvb">↕ Flip V</button>
+</div></div>
+<div class="pn"><h3>Export</h3>
+<button class="btn bp" id="dlBtn">💾 Download Cropped</button>
+<div class="acts" style="margin-top:8px">
+<button class="btn epng">PNG</button><button class="btn ejpg">JPG</button><button class="btn ewebp">WebP</button>
+</div><div class="info" id="si"></div></div>
+<div class="pn"><button class="btn bd" id="resetBtn" style="width:100%;text-align:center">✕ New Image</button></div>
+</div></div></div>
+<script>
+(function(){
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),uz=document.getElementById('uploadZone'),
+ws=document.getElementById('ws'),fi=document.getElementById('fi'),ciEl=document.getElementById('ci'),siEl=document.getElementById('si');
+var img=null,deg=0,fH=false,fV=false,ratio=0,scale=1;
+var crop={x:0,y:0,w:0,h:0},drag=null,ds={},cs={};
+
+uz.onclick=function(){fi.click()};
+fi.onchange=function(e){if(e.target.files[0])loadF(e.target.files[0])};
+uz.ondragover=function(e){e.preventDefault();uz.classList.add('over')};
+uz.ondragleave=function(){uz.classList.remove('over')};
+uz.ondrop=function(e){e.preventDefault();uz.classList.remove('over');if(e.dataTransfer.files[0])loadF(e.dataTransfer.files[0])};
+
+function loadF(file){
+  var r=new FileReader();r.onload=function(ev){
+    var i=new Image();i.onload=function(){img=i;deg=0;fH=false;fV=false;
+      uz.style.display='none';ws.classList.add('on');fitCv();initCrop();draw()};
+    i.src=ev.target.result};r.readAsDataURL(file)}
+
+function tSz(){var w=img.width,h=img.height;return deg%180?[h,w]:[w,h]}
+
+function fitCv(){
+  var s=tSz(),wrap=cv.parentElement,mw=wrap.clientWidth-16,mh=window.innerHeight*0.7;
+  scale=Math.min(mw/s[0],mh/s[1],1);
+  cv.width=Math.round(s[0]*scale);cv.height=Math.round(s[1]*scale)}
+
+function initCrop(){
+  var s=tSz(),w=s[0],h=s[1],cw=w,ch=h;
+  if(ratio>0){if(w/h>ratio){cw=Math.round(h*ratio)}else{ch=Math.round(w/ratio)}}
+  crop={x:Math.round((w-cw)/2),y:Math.round((h-ch)/2),w:cw,h:ch}}
+
+function draw(){
+  if(!img)return;var s=tSz(),w=s[0],h=s[1];
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.save();ctx.translate(cv.width/2,cv.height/2);
+  ctx.rotate(deg*Math.PI/180);
+  ctx.scale(fH?-1:1,fV?-1:1);
+  ctx.drawImage(img,-img.width*scale/2,-img.height*scale/2,img.width*scale,img.height*scale);
+  ctx.restore();
+  // dark overlay
+  ctx.fillStyle='rgba(0,0,0,0.5)';
+  ctx.fillRect(0,0,cv.width,cv.height);
+  // clear crop area
+  var cx=crop.x*scale,cy=crop.y*scale,cw=crop.w*scale,ch=crop.h*scale;
+  ctx.save();ctx.beginPath();ctx.rect(cx,cy,cw,ch);ctx.clip();
+  ctx.clearRect(cx,cy,cw,ch);
+  ctx.translate(cv.width/2,cv.height/2);
+  ctx.rotate(deg*Math.PI/180);ctx.scale(fH?-1:1,fV?-1:1);
+  ctx.drawImage(img,-img.width*scale/2,-img.height*scale/2,img.width*scale,img.height*scale);
+  ctx.restore();
+  // crop border
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(cx,cy,cw,ch);
+  // grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;
+  for(var i=1;i<3;i++){
+    ctx.beginPath();ctx.moveTo(cx+cw*i/3,cy);ctx.lineTo(cx+cw*i/3,cy+ch);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx,cy+ch*i/3);ctx.lineTo(cx+cw,cy+ch*i/3);ctx.stroke()}
+  // corner handles
+  ctx.fillStyle='#fff';var hs=8;
+  [[cx,cy],[cx+cw,cy],[cx,cy+ch],[cx+cw,cy+ch]].forEach(function(p){
+    ctx.fillRect(p[0]-hs/2,p[1]-hs/2,hs,hs)});
+  // info
+  ciEl.style.display='block';
+  ciEl.textContent=crop.w+'×'+crop.h+'px';
+  siEl.textContent='Original: '+img.width+'×'+img.height+' | Crop: '+crop.w+'×'+crop.h}
+
+function getEdge(mx,my){
+  var cx=crop.x*scale,cy=crop.y*scale,cw=crop.w*scale,ch=crop.h*scale,m=12;
+  var l=Math.abs(mx-cx)<m,r=Math.abs(mx-cx-cw)<m,t=Math.abs(my-cy)<m,b=Math.abs(my-cy-ch)<m;
+  if(t&&l)return'tl';if(t&&r)return'tr';if(b&&l)return'bl';if(b&&r)return'br';
+  if(t)return't';if(b)return'b';if(l)return'l';if(r)return'r';
+  if(mx>cx&&mx<cx+cw&&my>cy&&my<cy+ch)return'move';return null}
+
+cv.onmousedown=function(e){
+  var rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  drag=getEdge(mx,my);if(!drag)return;
+  ds={mx:mx,my:my};cs={x:crop.x,y:crop.y,w:crop.w,h:crop.h};e.preventDefault()};
+
+window.onmousemove=function(e){
+  if(!drag)return;
+  var rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  var dx=(mx-ds.mx)/scale,dy=(my-ds.my)/scale,s=tSz(),mw=s[0],mh=s[1];
+  if(drag==='move'){
+    crop.x=Math.max(0,Math.min(mw-crop.w,cs.x+dx));
+    crop.y=Math.max(0,Math.min(mh-crop.h,cs.y+dy));
+  }else{
+    var nx=cs.x,ny=cs.y,nw=cs.w,nh=cs.h;
+    if(drag.includes('l')){nx=cs.x+dx;nw=cs.w-dx}
+    if(drag.includes('r')){nw=cs.w+dx}
+    if(drag.includes('t')){ny=cs.y+dy;nh=cs.h-dy}
+    if(drag.includes('b')){nh=cs.h+dy}
+    if(ratio>0){
+      if(drag.includes('l')||drag.includes('r')){nh=nw/ratio;if(drag.includes('t'))ny=cs.y+cs.h-nh}
+      else{nw=nh*ratio;if(drag.includes('l'))nx=cs.x+cs.w-nw}}
+    if(nw>20&&nh>20&&nx>=0&&ny>=0&&nx+nw<=mw&&ny+nh<=mh){
+      crop.x=Math.round(nx);crop.y=Math.round(ny);crop.w=Math.round(nw);crop.h=Math.round(nh)}}
+  draw()};
+
+window.onmouseup=function(){drag=null};
+
+cv.ontouchstart=function(e){
+  var t=e.touches[0],rect=cv.getBoundingClientRect();
+  var mx=t.clientX-rect.left,my=t.clientY-rect.top;
+  drag=getEdge(mx,my);if(!drag)return;
+  ds={mx:mx,my:my};cs={x:crop.x,y:crop.y,w:crop.w,h:crop.h};e.preventDefault()};
+cv.ontouchmove=function(e){
+  if(!drag)return;var t=e.touches[0],rect=cv.getBoundingClientRect();
+  var fakeE={clientX:t.clientX,clientY:t.clientY};window.onmousemove(fakeE);e.preventDefault()};
+cv.ontouchend=function(){drag=null};
+
+// ratio buttons
+document.querySelectorAll('.rb').forEach(function(b){
+  b.onclick=function(){document.querySelectorAll('.rb').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');ratio=parseFloat(b.dataset.r);initCrop();draw()}});
+
+// transform
+document.getElementById('rl').onclick=function(){deg=(deg-90+360)%360;fitCv();initCrop();draw()};
+document.getElementById('rr').onclick=function(){deg=(deg+90)%360;fitCv();initCrop();draw()};
+document.getElementById('fhb').onclick=function(){fH=!fH;draw()};
+document.getElementById('fvb').onclick=function(){fV=!fV;draw()};
+
+function doExport(fmt){
+  if(!img)return;
+  var s=tSz(),oc=document.createElement('canvas');
+  oc.width=crop.w;oc.height=crop.h;var ox=oc.getContext('2d');
+  ox.translate(crop.w/2,crop.h/2);
+  ox.translate(-crop.x-crop.w/2,-crop.y-crop.h/2);
+  ox.translate(s[0]/2,s[1]/2);
+  ox.rotate(deg*Math.PI/180);ox.scale(fH?-1:1,fV?-1:1);
+  ox.drawImage(img,-img.width/2,-img.height/2);
+  var mime='image/'+fmt,q=fmt==='jpeg'?0.92:undefined;
+  var link=document.createElement('a');
+  link.download='cropped-'+crop.w+'x'+crop.h+'.'+fmt;
+  link.href=oc.toDataURL(mime,q);link.click()}
+
+document.getElementById('dlBtn').onclick=function(){doExport('png')};
+document.querySelector('.epng').onclick=function(){doExport('png')};
+document.querySelector('.ejpg').onclick=function(){doExport('jpeg')};
+document.querySelector('.ewebp').onclick=function(){doExport('webp')};
+
+document.getElementById('resetBtn').onclick=function(){
+  img=null;deg=0;fH=false;fV=false;ratio=0;
+  uz.style.display='';ws.classList.remove('on');fi.value='';
+  document.querySelectorAll('.rb').forEach(function(x){x.classList.remove('on')});
+  document.querySelector('.rb').classList.add('on');ciEl.style.display='none'};
+
+window.onresize=function(){if(img){fitCv();initCrop();draw()}};
+})();
+</script>
+<script src="https://aliyun-china.oss-cn-hangzhou.aliyuncs.com/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>

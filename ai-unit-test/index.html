@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Unit Test Generator - Auto-Generate Tests with AI</title>
+<meta name="description" content="AI-powered unit test generator. Paste your code and get comprehensive test cases with coverage estimation. Supports JavaScript, TypeScript, Python, Go, and Java.">
+<meta name="keywords" content="unit test generator, AI testing, test automation, JavaScript tests, Python tests, TypeScript tests, Go tests, Java tests, code coverage, DeepSeek">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="AI Unit Test Generator - Auto-Generate Tests with AI">
+<meta property="og:description" content="Paste your code and get comprehensive unit tests with coverage estimation. Supports JS, TS, Python, Go, Java.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-unit-test/">
+<meta property="og:image" content="https://lifa-su.com/ai-unit-test/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Unit Test Generator">
+<meta name="twitter:description" content="AI-powered unit test generator with coverage estimation. Supports multiple languages.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-unit-test/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+<link rel="canonical" href="https://lifa-su.com/ai-unit-test/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Unit Test Generator","description":"AI-powered unit test generator with coverage estimation. Supports multiple languages.","url":"https://lifa-su.com/ai-unit-test/","applicationCategory":"DeveloperApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;
+  --border:#2a2a42;--border2:#363652;
+  --text:#e8e8f4;--text2:#9898b4;--text3:#686884;
+  --accent:#a78bfa;--accent2:#818cf8;--accent-glow:rgba(167,139,250,0.15);
+  --success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent)}
+button{cursor:pointer;border:none;font-family:inherit;font-size:inherit}
+input,textarea,select{font-family:'SF Mono',monospace;font-size:inherit;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;outline:none;transition:all .25s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.app-header{background:rgba(18,18,30,0.85);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+.app-brand{display:flex;align-items:center;gap:12px}
+.app-brand .logo{font-size:1.6rem}
+.app-brand h1{font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge-free{font-size:.65rem;padding:2px 8px;border-radius:20px;font-weight:700;text-transform:uppercase;background:rgba(76,218,138,.15);color:var(--success);border:1px solid rgba(76,218,138,.3)}
+.header-actions{display:flex;gap:8px;align-items:center}
+.api-key-wrap{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px}
+.api-key-wrap input{border:none;background:transparent;padding:4px;width:180px;font-size:.8rem;color:var(--text);font-family:inherit}
+.api-key-wrap input::placeholder{color:var(--text3)}
+.api-key-wrap .dot{width:8px;height:8px;border-radius:50%;background:var(--danger);transition:background .3s}
+.api-key-wrap .dot.active{background:var(--success)}
+.btn{padding:10px 20px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;transition:all .2s;font-size:.85rem;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-family:'Inter',system-ui,sans-serif}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 2px 12px rgba(167,139,250,.3)}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(167,139,250,.5)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);padding:8px 14px}
+.btn-ghost:hover{color:var(--text);border-color:var(--text2)}
+.btn-sm{padding:6px 12px;font-size:.78rem;border-radius:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.main-content{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:0}
+.panel{display:flex;flex-direction:column;border-right:1px solid var(--border);min-height:0}
+.panel:last-child{border-right:none}
+.panel-header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
+.panel-header h2{font-size:.85rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.panel-body{flex:1;overflow:auto;position:relative}
+.config-bar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface)}
+.config-bar select{padding:6px 10px;font-size:.8rem;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239898b4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px;cursor:pointer}
+.config-bar label{font-size:.75rem;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer}
+.config-bar input[type="checkbox"]{width:14px;height:14px;accent-color:var(--accent)}
+.code-input{width:100%;height:100%;min-height:400px;padding:16px 20px;background:transparent;border:none;color:var(--text);font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;line-height:1.7;resize:none;outline:none;tab-size:2}
+.code-input::placeholder{color:var(--text3)}
+.output-wrap{width:100%;height:100%;min-height:400px;padding:16px 20px;color:#c9d1d9;font-family:'SF Mono','Fira Code',monospace;font-size:.85rem;line-height:1.7;white-space:pre;overflow:auto;tab-size:2}
+.output-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text3);text-align:center;padding:40px}
+.output-placeholder .icon{font-size:3rem;margin-bottom:16px;opacity:.5}
+.output-placeholder p{font-size:.9rem;margin-bottom:8px}
+.output-placeholder .hint{font-size:.75rem}
+.stats-bar{padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:16px;align-items:center;background:var(--surface);flex-shrink:0;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px;font-size:.78rem}
+.stat .label{color:var(--text3);text-transform:uppercase;letter-spacing:.3px}
+.stat .value{color:var(--text);font-weight:600}
+.stat .value.good{color:var(--success)}
+.stat .value.warn{color:var(--warn)}
+.stat .value.bad{color:var(--danger)}
+.loading{display:none;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--accent)}
+.loading.show{display:flex}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:linear-gradient(135deg,var(--success),#3cb878);color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:.85rem;font-weight:600;z-index:999;transition:transform .3s;box-shadow:var(--shadow)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.error{background:linear-gradient(135deg,var(--danger),#e04050)}
+.examples-bar{padding:8px 20px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;background:var(--surface);overflow-x:auto}
+.examples-bar span{font-size:.75rem;color:var(--text3);white-space:nowrap}
+.example-btn{padding:4px 10px;font-size:.72rem;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Inter',system-ui,sans-serif}
+.example-btn:hover{border-color:var(--accent);color:var(--accent)}
+.history-list{padding:12px}
+.history-item{padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all .2s}
+.history-item:hover{border-color:var(--accent);transform:translateX(2px)}
+.history-item .lang{font-size:.7rem;color:var(--accent);text-transform:uppercase;font-weight:600}
+.history-item .preview{font-size:.75rem;color:var(--text2);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-item .time{font-size:.65rem;color:var(--text3);margin-top:2px}
+/* Syntax highlighting */
+.kw{color:#c678dd}.str{color:#98c379}.cm{color:#5c6370;font-style:italic}.fn{color:#61afef}.num{color:#d19a66}.op{color:#56b6c2}
+@media(max-width:768px){
+  .main-content{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .panel{border-right:none;border-bottom:1px solid var(--border)}
+  .app-header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .api-key-wrap input{width:120px}
+  .code-input,.output-wrap{min-height:250px}
+  .config-bar{padding:8px 12px}
+  .header-actions{order:3;width:100%;justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="app-brand">
+    <span class="logo">🧪</span>
+    <h1>AI Unit Test Generator</h1>
+    <span class="badge-free">Free</span>
+  </div>
+  <div class="header-actions">
+    <div class="api-key-wrap">
+      <span class="dot" id="keyDot"></span>
+      <input type="password" id="apiKey" placeholder="DeepSeek API Key" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" id="generateBtn" onclick="generate()">🧪 Generate Tests</button>
+  </div>
+</header>
+
+<div class="main-content">
+  <!-- INPUT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>📝 Source Code</h2>
+      <button class="btn btn-ghost btn-sm" onclick="clearInput()">Clear</button>
+    </div>
+    <div class="config-bar">
+      <select id="langSelect" onchange="updateFramework()">
+        <option value="javascript">JavaScript</option>
+        <option value="typescript">TypeScript</option>
+        <option value="python">Python</option>
+        <option value="go">Go</option>
+        <option value="java">Java</option>
+      </select>
+      <select id="frameworkSelect"></select>
+      <label><input type="checkbox" id="edgeCases" checked> Edge cases</label>
+      <label><input type="checkbox" id="mocks"> Mocks</label>
+      <label><input type="checkbox" id="verbose"> Verbose</label>
+    </div>
+    <div class="examples-bar">
+      <span>Examples:</span>
+      <button class="example-btn" onclick="loadExample('calc')">Calculator</button>
+      <button class="example-btn" onclick="loadExample('fetch')">API Fetch</button>
+      <button class="example-btn" onclick="loadExample('validate')">Validator</button>
+      <button class="example-btn" onclick="loadExample('sort')">Sort</button>
+      <button class="example-btn" onclick="loadExample('auth')">Auth</button>
+    </div>
+    <div class="panel-body">
+      <textarea class="code-input" id="codeInput" placeholder="Paste your code here...&#10;&#10;// Example:&#10;function add(a, b) {&#10;  return a + b;&#10;}" spellcheck="false"></textarea>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><span class="label">Lines:</span><span class="value" id="lineCount">0</span></div>
+      <div class="stat"><span class="label">Functions:</span><span class="value" id="fnCount">0</span></div>
+    </div>
+  </div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>✅ Generated Tests</h2>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="copyOutput()">📋 Copy</button>
+        <button class="btn btn-ghost btn-sm" onclick="downloadOutput()">💾 Save</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleHistory()">📜 History</button>
+      </div>
+    </div>
+    <div class="panel-body" id="outputBody">
+      <div class="loading" id="loading"><div class="spinner"></div><span>Generating tests...</span></div>
+      <div class="output-placeholder" id="placeholder">
+        <div class="icon">🧪</div>
+        <p>Generated tests will appear here</p>
+        <p class="hint">Paste code on the left, then click Generate Tests</p>
+        <p class="hint" style="margin-top:12px">⌘/Ctrl + Enter to generate</p>
+      </div>
+      <div class="output-wrap" id="outputArea" style="display:none"></div>
+      <div class="history-list" id="historyPanel" style="display:none"></div>
+    </div>
+    <div class="stats-bar" id="coverageBar" style="display:none">
+      <div class="stat"><span class="label">Tests:</span><span class="value" id="testCount">0</span></div>
+      <div class="stat"><span class="label">Coverage:</span><span class="value" id="coverage">—</span></div>
+      <div class="stat"><span class="label">Framework:</span><span class="value" id="fwUsed">—</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer style="text-align:center;padding:24px 16px;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);">
+  <a href="https://lifa-su.com/" style="color:var(--accent);">← Back to Lifa AI Tools</a> ·
+  <a href="https://ko-fi.com/feidev" target="_blank" style="color:var(--accent);">☕ Support on Ko-fi</a> ·
+  © 2025 <a href="https://lifa-su.com" target="_blank" style="color:var(--accent);">FeiDev Tools</a>
+</footer>
+<script>
+// ═══ CONFIG ═══
+const FRAMEWORKS = {
+  javascript: ['Jest','Vitest','Mocha'],
+  typescript: ['Jest','Vitest','Mocha'],
+  python: ['pytest','unittest'],
+  go: ['testing'],
+  java: ['JUnit 5','TestNG']
+};
+
+const EXAMPLES = {
+  calc: {
+    lang:'javascript',
+    code:`class Calculator {
+  add(a, b) { return a + b; }
+  subtract(a, b) { return a - b; }
+  multiply(a, b) { return a * b; }
+  divide(a, b) {
+    if (b === 0) throw new Error('Division by zero');
+    return a / b;
+  }
+  power(base, exp) { return Math.pow(base, exp); }
+}`
+  },
+  fetch: {
+    lang:'javascript',
+    code:`async function fetchUser(id) {
+  if (!id) throw new Error('User ID required');
+  const res = await fetch(\`/api/users/\${id}\`);
+  if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
+  const data = await res.json();
+  return { id: data.id, name: data.name, email: data.email };
+}
+
+async function fetchUsers(page = 1, limit = 10) {
+  const res = await fetch(\`/api/users?page=\${page}&limit=\${limit}\`);
+  if (!res.ok) throw new Error('Failed to fetch users');
+  return res.json();
+}`
+  },
+  validate: {
+    lang:'javascript',
+    code:`function validateEmail(email) {
+  if (typeof email !== 'string') return false;
+  const re = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+  return re.test(email.trim());
+}
+
+function validatePassword(pw) {
+  if (!pw || pw.length < 8) return { valid: false, reason: 'Too short' };
+  if (!/[A-Z]/.test(pw)) return { valid: false, reason: 'Need uppercase' };
+  if (!/[0-9]/.test(pw)) return { valid: false, reason: 'Need number' };
+  if (!/[!@#$%^&*]/.test(pw)) return { valid: false, reason: 'Need special char' };
+  return { valid: true };
+}
+
+function validateAge(age) {
+  const n = Number(age);
+  if (isNaN(n) || n < 0 || n > 150 || !Number.isInteger(n)) return false;
+  return true;
+}`
+  },
+  sort: {
+    lang:'python',
+    code:`def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quicksort(left) + middle + quicksort(right)
+
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i]); i += 1
+        else:
+            result.append(right[j]); j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result`
+  },
+  auth: {
+    lang:'typescript',
+    code:`interface User { id: string; email: string; role: 'admin' | 'user'; }
+interface AuthResult { success: boolean; token?: string; error?: string; }
+
+class AuthService {
+  private users: Map<string, { password: string; user: User }> = new Map();
+
+  register(email: string, password: string): AuthResult {
+    if (!email || !password) return { success: false, error: 'Missing fields' };
+    if (this.users.has(email)) return { success: false, error: 'Already exists' };
+    if (password.length < 8) return { success: false, error: 'Password too short' };
+    const user: User = { id: crypto.randomUUID(), email, role: 'user' };
+    this.users.set(email, { password, user });
+    return { success: true, token: btoa(user.id) };
+  }
+
+  login(email: string, password: string): AuthResult {
+    const record = this.users.get(email);
+    if (!record) return { success: false, error: 'Not found' };
+    if (record.password !== password) return { success: false, error: 'Wrong password' };
+    return { success: true, token: btoa(record.user.id) };
+  }
+
+  hasPermission(user: User, action: string): boolean {
+    if (user.role === 'admin') return true;
+    const userActions = ['read', 'update-self'];
+    return userActions.includes(action);
+  }
+}`
+  }
+};
+// ═══ STATE ═══
+const apiKeyInput = document.getElementById('apiKey');
+const keyDot = document.getElementById('keyDot');
+const codeInput = document.getElementById('codeInput');
+const langSelect = document.getElementById('langSelect');
+const frameworkSelect = document.getElementById('frameworkSelect');
+let history = JSON.parse(localStorage.getItem('utHistory') || '[]');
+
+// ═══ INIT ═══
+apiKeyInput.value = localStorage.getItem('dsApiKey_ut') || '';
+updateKeyDot();
+updateFramework();
+updateStats();
+
+apiKeyInput.addEventListener('input', () => {
+  localStorage.setItem('dsApiKey_ut', apiKeyInput.value);
+  updateKeyDot();
+});
+
+codeInput.addEventListener('input', updateStats);
+
+function updateKeyDot() {
+  keyDot.classList.toggle('active', apiKeyInput.value.trim().length > 0);
+}
+
+function updateFramework() {
+  const lang = langSelect.value;
+  const fws = FRAMEWORKS[lang];
+  frameworkSelect.innerHTML = fws.map((f,i) => `<option value="${f}"${i===0?' selected':''}>${f}</option>`).join('');
+}
+
+function updateStats() {
+  const code = codeInput.value;
+  const lines = code ? code.split('\n').length : 0;
+  document.getElementById('lineCount').textContent = lines;
+  const fnPatterns = [
+    /function\s+\w+/g,
+    /\w+\s*\([^)]*\)\s*{/g,
+    /\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/g,
+    /def\s+\w+/g,
+    /func\s+\w+/g,
+    /(?:public|private|protected)\s+\w+\s+\w+\s*\(/g
+  ];
+  let fns = new Set();
+  fnPatterns.forEach(p => {
+    const m = code.match(p);
+    if (m) m.forEach(x => fns.add(x));
+  });
+  document.getElementById('fnCount').textContent = fns.size;
+}
+
+function clearInput() {
+  codeInput.value = '';
+  updateStats();
+  codeInput.focus();
+}
+
+function loadExample(name) {
+  const ex = EXAMPLES[name];
+  if (!ex) return;
+  langSelect.value = ex.lang;
+  updateFramework();
+  codeInput.value = ex.code;
+  updateStats();
+  toast('Example loaded!');
+}
+
+// ═══ TOAST ═══
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+// ═══ GENERATE ═══
+async function generate() {
+  const code = codeInput.value.trim();
+  if (!code) { toast('Paste some code first!', true); return; }
+  const key = apiKeyInput.value.trim();
+  if (!key) { toast('Enter your DeepSeek API key', true); apiKeyInput.focus(); return; }
+
+  const lang = langSelect.value;
+  const fw = frameworkSelect.value;
+  const edgeCases = document.getElementById('edgeCases').checked;
+  const mocks = document.getElementById('mocks').checked;
+  const verbose = document.getElementById('verbose').checked;
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Generating...';
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('outputArea').style.display = 'none';
+  document.getElementById('historyPanel').style.display = 'none';
+  document.getElementById('coverageBar').style.display = 'none';
+
+  const prompt = buildPrompt(code, lang, fw, edgeCases, mocks, verbose);
+
+  try {
+    const res = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: 'You are an expert test engineer. Generate comprehensive, production-quality unit tests. Output ONLY the test code, no explanations before or after. Include a comment at the end with estimated coverage percentage.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const output = data.choices?.[0]?.message?.content || 'No output received';
+    const cleaned = cleanOutput(output);
+    showOutput(cleaned, lang, fw);
+    saveHistory(code, cleaned, lang, fw);
+    toast('Tests generated!');
+  } catch (e) {
+    toast(e.message, true);
+    document.getElementById('placeholder').style.display = '';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🧪 Generate Tests';
+    document.getElementById('loading').classList.remove('show');
+  }
+}
+
+function buildPrompt(code, lang, fw, edgeCases, mocks, verbose) {
+  let p = `Generate unit tests for the following ${lang} code using ${fw}.\n\n`;
+  p += '```' + lang + '\n' + code + '\n```\n\n';
+  p += 'Requirements:\n';
+  p += `- Use ${fw} syntax and conventions\n`;
+  p += '- Test all public functions/methods\n';
+  p += '- Include positive and negative test cases\n';
+  if (edgeCases) p += '- Include edge cases (null, undefined, empty, boundary values)\n';
+  if (mocks) p += '- Use mocks/stubs for external dependencies\n';
+  if (verbose) p += '- Add descriptive test names and comments explaining each test\n';
+  p += '- At the very end, add a comment: // Estimated coverage: XX%\n';
+  p += '\nOutput ONLY the test code.';
+  return p;
+}
+
+function cleanOutput(text) {
+  let t = text.trim();
+  const m = t.match(/```(?:\w+)?\n([\s\S]*?)```/);
+  if (m) t = m[1].trim();
+  return t;
+}
+// ═══ OUTPUT ═══
+function showOutput(code, lang, fw) {
+  const area = document.getElementById('outputArea');
+  area.style.display = '';
+  area.innerHTML = highlightSyntax(escHtml(code));
+  document.getElementById('coverageBar').style.display = 'flex';
+
+  // Parse stats
+  const testPatterns = [/(?:it|test|def test_|func Test)\s*[\('"]/g, /@Test/g];
+  let count = 0;
+  testPatterns.forEach(p => { const m = code.match(p); if (m) count += m.length; });
+  document.getElementById('testCount').textContent = count || '—';
+  document.getElementById('fwUsed').textContent = fw;
+
+  const covMatch = code.match(/(?:coverage|Coverage)[:\s]*(\d+)%/);
+  const covEl = document.getElementById('coverage');
+  if (covMatch) {
+    const pct = parseInt(covMatch[1]);
+    covEl.textContent = pct + '%';
+    covEl.className = 'value ' + (pct >= 80 ? 'good' : pct >= 50 ? 'warn' : 'bad');
+  } else {
+    covEl.textContent = '—';
+    covEl.className = 'value';
+  }
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function highlightSyntax(html) {
+  // Basic syntax highlighting
+  html = html.replace(/(\/\/.*$|#.*$)/gm, '<span class="cm">$1</span>');
+  html = html.replace(/\b(function|const|let|var|return|if|else|throw|new|async|await|class|import|from|export|def|self|None|True|False|func|package|type|struct|public|private|void|static|final|interface|extends|implements|try|catch|finally)\b/g, '<span class="kw">$1</span>');
+  html = html.replace(/\b(describe|it|test|expect|assert|beforeEach|afterEach|beforeAll|afterAll|jest|vi|mock|spyOn|toBe|toEqual|toThrow|toHaveBeenCalled|pytest|unittest|TestCase|assertEqual|assertTrue|assertFalse|assertRaises)\b/g, '<span class="fn">$1</span>');
+  html = html.replace(/(["'`])(?:(?!\1).)*?\1/g, '<span class="str">$&</span>');
+  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+  return html;
+}
+
+// ═══ COPY / DOWNLOAD ═══
+function copyOutput() {
+  const area = document.getElementById('outputArea');
+  if (area.style.display === 'none') { toast('Nothing to copy', true); return; }
+  const text = area.innerText || area.textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Copied!')).catch(() => toast('Copy failed', true));
+}
+
+function downloadOutput() {
+  const area = document.getElementById('outputArea');
+  if (area.style.display === 'none') { toast('Nothing to download', true); return; }
+  const text = area.innerText || area.textContent;
+  const lang = langSelect.value;
+  const exts = { javascript: '.test.js', typescript: '.test.ts', python: '_test.py', go: '_test.go', java: 'Test.java' };
+  const filename = 'generated' + (exts[lang] || '.test.txt');
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(filename + ' downloaded!');
+}
+
+// ═══ HISTORY ═══
+function saveHistory(code, tests, lang, fw) {
+  history.unshift({ code: code.substring(0, 200), tests, lang, fw, time: Date.now() });
+  if (history.length > 20) history = history.slice(0, 20);
+  localStorage.setItem('utHistory', JSON.stringify(history));
+}
+
+function toggleHistory() {
+  const panel = document.getElementById('historyPanel');
+  const area = document.getElementById('outputArea');
+  const ph = document.getElementById('placeholder');
+  if (panel.style.display !== 'none') {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = '';
+  area.style.display = 'none';
+  ph.style.display = 'none';
+  renderHistory();
+}
+
+function renderHistory() {
+  const panel = document.getElementById('historyPanel');
+  if (!history.length) {
+    panel.innerHTML = '<div class="output-placeholder" style="min-height:200px"><div class="icon">📜</div><p>No history yet</p></div>';
+    return;
+  }
+  panel.innerHTML = history.map((h, i) => {
+    const d = new Date(h.time);
+    const time = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return `<div class="history-item" onclick="loadHistory(${i})">
+      <div class="lang">${h.lang} · ${h.fw}</div>
+      <div class="preview">${escHtml(h.code)}</div>
+      <div class="time">${time}</div>
+    </div>`;
+  }).join('');
+}
+
+function loadHistory(i) {
+  const h = history[i];
+  if (!h) return;
+  langSelect.value = h.lang;
+  updateFramework();
+  frameworkSelect.value = h.fw;
+  showOutput(h.tests, h.lang, h.fw);
+  document.getElementById('historyPanel').style.display = 'none';
+  toast('Loaded from history');
+}
+
+// ═══ KEYBOARD SHORTCUTS ═══
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); generate(); }
+});
+
+// ═══ TAB KEY IN TEXTAREA ═══
+codeInput.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = codeInput.selectionStart;
+    const end = codeInput.selectionEnd;
+    codeInput.value = codeInput.value.substring(0, s) + '  ' + codeInput.value.substring(end);
+    codeInput.selectionStart = codeInput.selectionEnd = s + 2;
+  }
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

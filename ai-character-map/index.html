@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Browse and search Unicode characters easily. Find special symbols, emojis, arrows, math operators, and copy any character to clipboard with one click.">
+<link rel="canonical" href="https://lifa-su.com/ai-character-map/">
+<title>AI Character Map - Unicode Character Browser</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d0d14;--s1:#161625;--s2:#1e1e32;--bd:#2a2a42;--tx:#e0e0f0;--tx2:#7878a0;--ac:#6c5ce7;--ac2:#a29bfe;--ok:#00cec9}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hd{background:rgba(22,22,37,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);padding:16px 0;position:sticky;top:0;z-index:100}
+.hi{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb{flex:1;min-width:180px;max-width:480px;position:relative}
+.sb input{width:100%;padding:10px 14px 10px 40px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:15px;outline:none;transition:.2s}
+.sb input:focus{border-color:var(--ac)}
+.sb svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx2);width:18px;height:18px}
+.st{color:var(--tx2);font-size:13px;white-space:nowrap}
+.cats{max-width:1400px;margin:0 auto;padding:12px 20px;display:flex;gap:8px;flex-wrap:wrap}
+.cb{padding:7px 16px;border-radius:18px;border:1px solid var(--bd);background:var(--s1);color:var(--tx2);cursor:pointer;font-size:13px;transition:.2s;white-space:nowrap}
+.cb:hover{border-color:var(--ac);color:var(--tx)}.cb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.mn{max-width:1400px;margin:0 auto;padding:8px 20px 40px}
+.stl{font-size:17px;font-weight:600;margin:20px 0 10px;color:var(--ac2)}
+.stl em{font-style:normal;font-size:13px;color:var(--tx2);font-weight:400;margin-left:8px}
+.gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px}
+.cc{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--s1);border:1px solid var(--bd);border-radius:10px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.cc:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 16px rgba(108,92,231,.2)}
+.cc .c{font-size:26px;line-height:1.2}.cc .n{font-size:8px;color:var(--tx2);margin-top:3px;text-align:center;padding:0 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.cc.cp::after{content:'\2713 Copied';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,206,201,.92);color:#fff;font-size:12px;font-weight:600;border-radius:9px;animation:fo .8s ease forwards}
+@keyframes fo{0%,60%{opacity:1}100%{opacity:0}}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.mo.sh{display:flex}
+.md{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:28px;max-width:440px;width:92%;max-height:90vh;overflow-y:auto;position:relative;animation:mi .2s ease}
+@keyframes mi{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mx{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--tx2);cursor:pointer;font-size:22px;line-height:1;padding:4px}.mx:hover{color:var(--tx)}
+.mc{font-size:64px;text-align:center;margin:8px 0 12px}
+.mn2{font-size:17px;font-weight:600;text-align:center;margin-bottom:20px}
+.mi{display:flex;flex-direction:column;gap:8px}
+.ir{display:flex;align-items:center;background:var(--bg);border-radius:8px;padding:10px 14px;gap:8px}
+.ir .l{font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;min-width:80px}
+.ir .v{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:13px;color:var(--ac2);flex:1;word-break:break-all}
+.ir .cp2{background:none;border:none;color:var(--tx2);cursor:pointer;padding:2px 6px;font-size:15px;transition:.2s;margin-left:auto;flex-shrink:0}.ir .cp2:hover{color:var(--ok)}
+.mcb{display:block;width:100%;margin-top:16px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}.mcb:hover{opacity:.9}
+.emp{text-align:center;padding:60px 20px;color:var(--tx2)}.emp i{font-size:48px;display:block;margin-bottom:12px;font-style:normal}
+.ft{text-align:center;padding:28px 20px;color:var(--tx2);font-size:12px;border-top:1px solid var(--bd);margin-top:40px}
+@media(max-width:768px){.hi{gap:10px}.logo{font-size:18px}.sb{order:3;flex-basis:100%;max-width:100%}.gr{grid-template-columns:repeat(auto-fill,minmax(58px,1fr))}.md{padding:20px}}
+@media(max-width:480px){.cc .c{font-size:20px}.cc .n{display:none}.gr{grid-template-columns:repeat(auto-fill,minmax(48px,1fr))}}
+</style>
+</head>
+<body>
+<div class="hd"><div class="hi">
+<div class="logo">&#10022; AI Character Map</div>
+<div class="sb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input id="q" type="text" placeholder="Search characters..." autocomplete="off"></div>
+<div class="st" id="st"></div>
+</div></div>
+<div class="cats" id="cats"></div>
+<div class="mn" id="mn"></div>
+<div class="mo" id="mo"><div class="md" id="md"></div></div>
+<div class="ft">AI Character Map &copy; 2025 &mdash; Unicode Character Browser</div>
+<script id="app">
+const D={
+arrows:{name:"Arrows",icon:"\u2192",chars:[
+["\u2190","Left Arrow"],["\u2192","Right Arrow"],["\u2191","Up Arrow"],["\u2193","Down Arrow"],["\u2194","Left Right Arrow"],["\u2195","Up Down Arrow"],
+["\u21D0","Left Double Arrow"],["\u21D2","Right Double Arrow"],["\u21D1","Up Double Arrow"],["\u21D3","Down Double Arrow"],["\u21D4","Left Right Double Arrow"],["\u21D5","Up Down Double Arrow"],
+["\u21E6","Left White Arrow"],["\u21E8","Right White Arrow"],["\u21E7","Up White Arrow"],["\u21E9","Down White Arrow"],
+["\u2196","North West Arrow"],["\u2197","North East Arrow"],["\u2198","South East Arrow"],["\u2199","South West Arrow"],
+["\u21A9","Left Hook Arrow"],["\u21AA","Right Hook Arrow"],["\u21B0","Up Left Arrow"],["\u21B1","Up Right Arrow"],
+["\u21B2","Down Left Arrow"],["\u21B3","Down Right Arrow"],["\u21BA","CCW Open Arrow"],["\u21BB","CW Open Arrow"],
+["\u21C4","Right Left Arrows"],["\u21C5","Up Down Arrows"],["\u21C6","Left Right Arrows"],["\u21C7","Left Paired Arrows"],
+["\u21C8","Up Paired Arrows"],["\u21C9","Right Paired Arrows"],["\u21CA","Down Paired Arrows"],
+["\u21E0","Left Dashed Arrow"],["\u21E1","Up Dashed Arrow"],["\u21E2","Right Dashed Arrow"],["\u21E3","Down Dashed Arrow"],
+["\u27A1","Black Right Arrow"],["\u2B05","Left Black Arrow"],["\u2B06","Up Black Arrow"],["\u2B07","Down Black Arrow"],
+["\u2B08","NE Black Arrow"],["\u2B09","NW Black Arrow"],["\u2B0A","SE Black Arrow"],["\u2B0B","SW Black Arrow"],
+["\u27F5","Long Left Arrow"],["\u27F6","Long Right Arrow"],["\u27F7","Long LR Arrow"]]},
+math:{name:"Math",icon:"\u00B1",chars:[
+["\u00B1","Plus Minus"],["\u00D7","Multiplication"],["\u00F7","Division"],["\u2260","Not Equal"],["\u2248","Almost Equal"],["\u2261","Identical"],
+["\u2264","Less or Equal"],["\u2265","Greater or Equal"],["\u226A","Much Less"],["\u226B","Much Greater"],
+["\u221A","Square Root"],["\u221B","Cube Root"],["\u221C","Fourth Root"],
+["\u2211","Summation"],["\u220F","Product"],["\u222B","Integral"],["\u222C","Double Integral"],["\u222D","Triple Integral"],
+["\u2202","Partial Diff"],["\u2207","Nabla"],["\u221E","Infinity"],["\u2205","Empty Set"],
+["\u2208","Element Of"],["\u2209","Not Element Of"],["\u220B","Contains"],["\u2282","Subset"],["\u2283","Superset"],["\u2286","Subset Equal"],["\u2287","Superset Equal"],
+["\u222A","Union"],["\u2229","Intersection"],["\u2227","Logical And"],["\u2228","Logical Or"],["\u00AC","Not"],
+["\u2200","For All"],["\u2203","There Exists"],["\u2204","Not Exists"],
+["\u03B1","Alpha"],["\u03B2","Beta"],["\u03B3","Gamma"],["\u03B4","Delta"],["\u03B5","Epsilon"],["\u03B6","Zeta"],
+["\u03B7","Eta"],["\u03B8","Theta"],["\u03BB","Lambda"],["\u03BC","Mu"],["\u03C0","Pi"],["\u03C3","Sigma"],["\u03C6","Phi"],["\u03C9","Omega"],
+["\u2135","Alef"],["\u2102","Complex Set"],["\u211D","Real Set"],["\u2124","Integer Set"]]},
+currency:{name:"Currency",icon:"\u00A5",chars:[
+["$","Dollar"],["\u20AC","Euro"],["\u00A3","Pound"],["\u00A5","Yen/Yuan"],["\u20B9","Indian Rupee"],
+["\u20A9","Won"],["\u20BD","Ruble"],["\u20B1","Peso"],["\u20AB","Dong"],["\u20BA","Turkish Lira"],
+["\u20B4","Hryvnia"],["\u20B5","Cedi"],["\u20B8","Tenge"],["\u20BC","Manat"],["\u20BE","Lari"],
+["\u20BF","Bitcoin"],["\u0E3F","Baht"],["\u20A0","Euro-Currency"],["\u20A1","Colon"],["\u20A2","Cruzeiro"],
+["\u20A3","French Franc"],["\u20A4","Lira"],["\u20A5","Mill"],["\u20A6","Naira"],["\u20A7","Peseta"],
+["\u20A8","Rupee"],["\u20AA","Sheqel"],["\u20AD","Kip"],["\u20AE","Tugrik"],["\u20AF","Drachma"],
+["\u20B0","Pfennig"],["\u20B2","Guarani"],["\u20B3","Austral"],["\u00A2","Cent"],["\u00A4","Currency Sign"],
+["\u0192","Florin"],["\u058F","Armenian Dram"],["\u060B","Afghani"],["\u09F3","Bengali Rupee"],["\u0AF1","Gujarati Rupee"]]},
+emoji:{name:"Emoji",icon:"\uD83D\uDE00",chars:[
+["\uD83D\uDE00","Grinning"],["\uD83D\uDE02","Joy"],["\uD83D\uDE0D","Heart Eyes"],["\uD83E\uDD23","ROFL"],["\uD83D\uDE0E","Sunglasses"],
+["\uD83E\uDD14","Thinking"],["\uD83D\uDE31","Scream"],["\uD83D\uDE4F","Pray"],["\uD83D\uDC4D","Thumbs Up"],["\uD83D\uDC4E","Thumbs Down"],
+["\uD83D\uDC4B","Wave"],["\uD83D\uDC4F","Clap"],["✌️","Victory"],["\uD83E\uDD1E","Crossed Fingers"],["\uD83E\uDD18","Rock On"],
+["\u2764\uFE0F","Red Heart"],["\uD83D\uDC94","Broken Heart"],["\uD83D\uDD25","Fire"],["\u2B50","Star"],["\uD83C\uDF1F","Glowing Star"],
+["\u26A1","Lightning"],["\uD83C\uDF08","Rainbow"],["\u2600\uFE0F","Sun"],["\uD83C\uDF19","Moon"],["\u2601\uFE0F","Cloud"],
+["\uD83C\uDF0A","Wave Water"],["\uD83C\uDF3A","Hibiscus"],["\uD83C\uDF39","Rose"],["\uD83C\uDF40","Four Leaf"],
+["\uD83C\uDF89","Party"],["\uD83C\uDF8A","Confetti"],["\uD83D\uDCA1","Light Bulb"],["\uD83D\uDCAF","100"],
+["\uD83D\uDE80","Rocket"],["\u2708\uFE0F","Airplane"],["\uD83C\uDFE0","House"],["\uD83D\uDCBB","Laptop"],
+["\uD83D\uDCF1","Phone"],["\uD83C\uDFA8","Palette"],["\uD83C\uDFB5","Music Note"],
+["\u231A","Watch"],["\uD83D\uDCDA","Books"],["\u270F\uFE0F","Pencil"],["\uD83D\uDD12","Lock"],["\uD83D\uDD11","Key"],
+["\u2705","Check Mark"],["\u274C","Cross Mark"],["\u26A0\uFE0F","Warning"],["\u267B\uFE0F","Recycle"],["\uD83D\uDC8E","Gem"]]},
+special:{name:"Special Symbols",icon:"\u00A9",chars:[
+["\u00A9","Copyright"],["\u00AE","Registered"],["\u2122","Trademark"],["\u2120","Service Mark"],
+["\u2605","Black Star"],["\u2606","White Star"],["\u2663","Club"],["\u2660","Spade"],["\u2665","Heart"],["\u2666","Diamond"],
+["\u266A","Eighth Note"],["\u266B","Beamed Notes"],["\u266C","Beamed 16th"],["\u266D","Flat"],["\u266E","Natural"],["\u266F","Sharp"],
+["\u2600","Sun"],["\u2601","Cloud"],["\u2602","Umbrella"],["\u2603","Snowman"],["\u2604","Comet"],
+["\u260E","Telephone"],["\u2615","Hot Beverage"],["\u2618","Shamrock"],["\u261D","Index Up"],["\u2620","Skull Crossbones"],
+["\u2622","Radioactive"],["\u2623","Biohazard"],["\u262E","Peace"],["\u262F","Yin Yang"],["\u2638","Dharma Wheel"],
+["\u2639","Frowning"],["\u263A","Smiling"],["\u2640","Female"],["\u2642","Male"],
+["\u2660","Spade Suit"],["\u2668","Hot Springs"],["\u267B","Recycle"],["\u267F","Wheelchair"],
+["\u2693","Anchor"],["\u2694","Swords"],["\u2695","Staff Aesculapius"],["\u2696","Scales"],
+["\u2697","Alembic"],["\u2699","Gear"],["\u269B","Atom"],["\u269C","Fleur-de-lis"],
+["\u2702","Scissors"],["\u2708","Airplane"],["\u2709","Envelope"],["\u270C","Victory Hand"],
+["\u270D","Writing Hand"],["\u270F","Pencil"],["\u2712","Black Nib"],["\u2714","Check Mark"],
+["\u2716","Heavy Multiply"],["\u271D","Latin Cross"],["\u2721","Star of David"],["\u2728","Sparkles"],
+["\u2744","Snowflake"],["\u2764","Heavy Heart"],["\u00B6","Pilcrow"],["\u00A7","Section"],
+["\u2020","Dagger"],["\u2021","Double Dagger"],["\u2022","Bullet"],["\u2026","Ellipsis"],
+["\u2030","Per Mille"],["\u2031","Per Ten Thousand"],["\u00B0","Degree"]]}
+};
+
+let cur='all';
+const $=s=>document.getElementById(s);
+const q=$('q'),cats=$('cats'),mn=$('mn'),mo=$('mo'),md=$('md'),st=$('st');
+
+let total=0;
+for(const k in D) total+=D[k].chars.length;
+st.textContent=total+' characters';
+
+function buildCats(){
+  let h='<button class="cb on" data-c="all">All</button>';
+  for(const k in D) h+='<button class="cb" data-c="'+k+'">'+D[k].icon+' '+D[k].name+'</button>';
+  cats.innerHTML=h;
+  cats.onclick=e=>{
+    const b=e.target.closest('.cb');
+    if(!b)return;
+    cur=b.dataset.c;
+    cats.querySelectorAll('.cb').forEach(x=>x.classList.toggle('on',x===b));
+    render();
+  };
+}
+
+function codeInfo(ch){
+  const cp=ch.codePointAt(0);
+  const hex=cp.toString(16).toUpperCase().padStart(4,'0');
+  return{
+    unicode:'U+'+hex,
+    html:'&#x'+hex+';',
+    css:'\\'+hex,
+    js:cp>0xFFFF?'\\u{'+hex+'}':'\\u'+hex,
+    dec:'&#'+cp+';'
+  };
+}
+
+function render(){
+  const f=q.value.toLowerCase().trim();
+  let html='',shown=0;
+  const keys=cur==='all'?Object.keys(D):[cur];
+  keys.forEach(k=>{
+    const cat=D[k];
+    const filtered=cat.chars.filter(x=>!f||x[0].includes(f)||x[1].toLowerCase().includes(f));
+    if(!filtered.length)return;
+    shown+=filtered.length;
+    html+='<div class="stl">'+cat.icon+' '+cat.name+'<em>'+filtered.length+'</em></div><div class="gr">';
+    filtered.forEach(x=>{
+      html+='<div class="cc" data-ch="'+encodeURIComponent(x[0])+'" data-nm="'+x[1]+'" role="button" tabindex="0" aria-label="'+x[1]+'">';
+      html+='<span class="c">'+x[0]+'</span><span class="n">'+x[1]+'</span></div>';
+    });
+    html+='</div>';
+  });
+  if(!shown) html='<div class="emp"><i>🔍</i>No characters found</div>';
+  mn.innerHTML=html;
+  st.textContent=shown+' / '+total+' characters';
+}
+
+function copyText(t,el){
+  navigator.clipboard.writeText(t).then(()=>{
+    if(el){el.classList.add('cp');setTimeout(()=>el.classList.remove('cp'),800);}
+  });
+}
+
+function showModal(ch,nm){
+  const info=codeInfo(ch);
+  md.innerHTML='<button class="mx" aria-label="Close">&times;</button>'
+    +'<div class="mc">'+ch+'</div>'
+    +'<div class="mn2">'+nm+'</div>'
+    +'<div class="mi">'
+    +row('Unicode',info.unicode)
+    +row('HTML Hex',info.html)
+    +row('HTML Dec',info.dec)
+    +row('CSS',info.css)
+    +row('JavaScript',info.js)
+    +'</div>'
+    +'<button class="mcb" id="mcb">Copy Character: '+ch+'</button>';
+  mo.classList.add('sh');
+  $('mcb').onclick=()=>{copyText(ch);$('mcb').textContent='Copied!';setTimeout(()=>$('mcb').textContent='Copy Character: '+ch,1200);};
+  md.querySelector('.mx').onclick=()=>mo.classList.remove('sh');
+  md.querySelectorAll('.cp2').forEach(b=>{
+    b.onclick=()=>{
+      copyText(b.dataset.v);
+      b.textContent='\u2713';setTimeout(()=>b.textContent='\uD83D\uDCCB',800);
+    };
+  });
+}
+
+function row(label,val){
+  return '<div class="ir"><span class="l">'+label+'</span><span class="v">'+val+'</span><button class="cp2" data-v="'+val.replace(/"/g,'&quot;')+'">\uD83D\uDCCB</button></div>';
+}
+
+mn.addEventListener('click',e=>{
+  const card=e.target.closest('.cc');
+  if(!card)return;
+  const ch=decodeURIComponent(card.dataset.ch);
+  const nm=card.dataset.nm;
+  if(e.detail===2){copyText(ch,card);return;}
+  showModal(ch,nm);
+});
+
+mn.addEventListener('contextmenu',e=>{
+  const card=e.target.closest('.cc');
+  if(!card)return;
+  e.preventDefault();
+  copyText(decodeURIComponent(card.dataset.ch),card);
+});
+
+mo.addEventListener('click',e=>{if(e.target===mo)mo.classList.remove('sh');});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')mo.classList.remove('sh');});
+
+let debounce;
+q.addEventListener('input',()=>{clearTimeout(debounce);debounce=setTimeout(render,150);});
+
+buildCats();
+render();
+</script>
+<script src="https://m.servedby-buysellads.com/monetization.custom.js" type="text/javascript"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

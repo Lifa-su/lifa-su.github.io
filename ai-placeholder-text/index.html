@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Placeholder Text Generator</title>
+<meta name="description" content="Generate placeholder text in multiple styles: Lorem Ipsum, Hipster, Office, Pirate, Zombie. Free online tool for designers and developers.">
+<link rel="canonical" href="https://lifa-su.com/ai-placeholder-text/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f13;--surface:#1a1a24;--surface2:#24243a;--border:#2d2d44;--text:#e4e4ef;--text2:#9494b8;--accent:#7c5cfc;--accent2:#9d7fff;--success:#34d399;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:24px 16px}
+header{text-align:center;padding:40px 0 32px}
+header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:8px;font-size:0.95rem}
+.controls{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+.control-row{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.control-row:last-child{margin-bottom:0}
+.control-group{flex:1;min-width:180px}
+.control-group label{display:block;font-size:0.8rem;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+select,input[type="number"]{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;outline:none;transition:border-color .2s}
+select:focus,input[type="number"]:focus{border-color:var(--accent)}
+select option{background:var(--surface2)}
+.btn-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.btn{padding:12px 28px;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;flex:1}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px)}
+.btn-copy{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-copy:hover{border-color:var(--accent);color:var(--accent2)}
+.btn-copy.copied{background:var(--success);color:#000;border-color:var(--success)}
+.output-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-height:200px;white-space:pre-wrap;word-wrap:break-word;font-size:0.95rem;line-height:1.8;color:var(--text2);position:relative}
+.output-area:empty::before{content:'Your generated text will appear here...';color:#555}
+.output-area code{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.88rem;color:var(--accent2)}
+.tag-options{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tag-btn{padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:0.82rem;cursor:pointer;font-family:'SF Mono',Monaco,Consolas,monospace;transition:all .2s}
+.tag-btn:hover{border-color:var(--accent)}
+.tag-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+footer{text-align:center;padding:32px 0;color:#555;font-size:0.8rem}
+@media(max-width:600px){
+  header h1{font-size:1.5rem}
+  .control-row{flex-direction:column;gap:12px}
+  .control-group{min-width:100%}
+  .btn-row{flex-direction:column}
+  .container{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>AI Placeholder Text Generator</h1>
+    <p>Generate rich placeholder text in multiple fun styles for your designs and mockups</p>
+  </header>
+  <div class="controls">
+    <div class="control-row">
+      <div class="control-group">
+        <label>Style</label>
+        <select id="style">
+          <option value="lorem">Lorem Ipsum</option>
+          <option value="hipster">Hipster</option>
+          <option value="office">Office Jargon</option>
+          <option value="pirate">Pirate</option>
+          <option value="zombie">Zombie</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Unit</label>
+        <select id="unit">
+          <option value="paragraphs">Paragraphs</option>
+          <option value="sentences">Sentences</option>
+          <option value="words">Words</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Count</label>
+        <input type="number" id="count" value="3" min="1" max="99">
+      </div>
+    </div>
+    <div class="control-row">
+      <div class="control-group">
+        <label>HTML Wrap</label>
+        <div class="tag-options">
+          <button class="tag-btn active" data-tag="none">None</button>
+          <button class="tag-btn" data-tag="p">&lt;p&gt;</button>
+          <button class="tag-btn" data-tag="li">&lt;li&gt;</button>
+          <button class="tag-btn" data-tag="div">&lt;div&gt;</button>
+          <button class="tag-btn" data-tag="span">&lt;span&gt;</button>
+          <button class="tag-btn" data-tag="blockquote">&lt;blockquote&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="generateBtn">Generate Text</button>
+    <button class="btn btn-copy" id="copyBtn">Copy to Clipboard</button>
+  </div>
+  <div class="output-area" id="output"></div>
+  <footer>
+    <p>AI Placeholder Text Generator &mdash; Free tool for designers &amp; developers</p>
+  </footer>
+</div>
+<script>
+const STYLES = {};
+
+STYLES.lorem = [
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+"Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.",
+"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit.",
+"Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.",
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet consectetur.",
+"Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam.",
+"Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae.",
+"At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.",
+"Nam libero tempore cum soluta nobis est eligendi optio cumque nihil impedit.",
+"Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet.",
+"Itaque earum rerum hic tenetur a sapiente delectus ut aut reiciendis voluptatibus.",
+"Nulla facilisi morbi tempus iaculis urna id volutpat lacus laoreet non.",
+"Viverra accumsan in nisl nisi scelerisque eu ultrices vitae auctor.",
+"Egestas dui id ornare arcu odio ut sem nulla pharetra diam.",
+"Amet consectetur adipiscing elit pellentesque habitant morbi tristique senectus et netus.",
+"Turpis egestas pretium aenean pharetra magna ac placerat vestibulum lectus.",
+"Nisl condimentum id venenatis a condimentum vitae sapien pellentesque habitant.",
+"Adipiscing commodo elit at imperdiet dui accumsan sit amet nulla facilisi.",
+"Faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis aliquam.",
+"Morbi tincidunt augue interdum velit euismod in pellentesque massa placerat duis.",
+"Pellentesque adipiscing commodo elit at imperdiet dui accumsan sit amet.",
+"Volutpat consequat mauris nunc congue nisi vitae suscipit tellus mauris.",
+"Amet venenatis urna cursus eget nunc scelerisque viverra mauris in aliquam.",
+"Eleifend mi in nulla posuere sollicitudin aliquam ultrices sagittis orci.",
+"Diam donec adipiscing tristique risus nec feugiat in fermentum posuere urna.",
+"Consequat nisl vel pretium lectus quam id leo in vitae turpis massa.",
+"Eget nulla facilisi etiam dignissim diam quis enim lobortis scelerisque.",
+"Aliquam faucibus purus in massa tempor nec feugiat nisl pretium fusce.",
+"Facilisis magna etiam tempor orci eu lobortis elementum nibh tellus molestie.",
+"Nunc sed blandit libero volutpat sed cras ornare arcu dui vivamus.",
+"Cursus euismod quis viverra nibh cras pulvinar mattis nunc sed blandit.",
+"Amet dictum sit amet justo donec enim diam vulputate ut pharetra.",
+"Sit amet tellus cras adipiscing enim eu turpis egestas pretium aenean.",
+"Viverra vitae congue eu consequat ac felis donec et odio pellentesque.",
+"Amet risus nullam eget felis eget nunc lobortis mattis aliquam faucibus.",
+"Sagittis id consectetur purus ut faucibus pulvinar elementum integer enim neque.",
+"Tortor dignissim convallis aenean et tortor at risus viverra adipiscing.",
+"Praesent semper feugiat nibh sed pulvinar proin gravida hendrerit lectus.",
+"Tristique senectus et netus et malesuada fames ac turpis egestas sed.",
+"Lectus urna duis convallis convallis tellus id interdum velit laoreet.",
+"Auctor augue mauris augue neque gravida in fermentum et sollicitudin ac.",
+"Lacinia quis vel eros donec ac odio tempor orci dapibus ultrices.",
+"Proin nibh nisl condimentum id venenatis a condimentum vitae sapien.",
+"Amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar sapien.",
+"Vel orci porta non pulvinar neque laoreet suspendisse interdum consectetur.",
+"Sit amet nisl suscipit adipiscing bibendum est ultricies integer quis auctor.",
+"Massa tincidunt dui ut ornare lectus sit amet est placerat in egestas.",
+"Feugiat in ante metus dictum at tempor commodo ullamcorper a lacus.",
+"Ultrices gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim.",
+"Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor purus."
+];
+
+
+STYLES.hipster = [
+"Artisan pour-over kombucha, craft beer actually pug tattooed thundercats.",
+"Vinyl record player aesthetic, cold-pressed juice fixie bicycle rights.",
+"Sustainable pitchfork heirloom tomato, farm-to-table quinoa meditation retreat.",
+"Microdosing palo santo dreamcatcher, vexillologist chambray everyday carry.",
+"Bushwick typewriter helvetica, raw denim shoreditch echo park gastropub.",
+"Glossier direct trade slow-carb, banjo brooklyn copper mug normcore.",
+"Pabst blue ribbon irony, flannel mustache woke street art tumblr.",
+"Chia seeds activated charcoal, single-origin coffee aesthetic tumeric latte.",
+"Cronut shabby chic polaroid, vegan leather tote bag williamsburg brunch.",
+"Kinfolk magazine flat white, avocado toast sourdough starter zero waste.",
+"Bespoke selvage denim, artisanal small batch hot chicken listicle.",
+"Tacos fixie bicycle rights, portland food truck aesthetic cliche.",
+"Hella gentrify meditation app, succulents macrame plant parent vibes.",
+"Beard oil craft cocktails, edison bulb reclaimed wood industrial chic.",
+"Neutra skateboard heirloom, wayfarers keytar synth pop-up market.",
+"Ethical fashion sustainable swap, thrift store vintage band tee normcore.",
+"Oat milk cortado aesthetic, ceramic pour-over dripper minimalist kitchen.",
+"Letterpress tote bag brooklyn, sriracha aioli gastropub brunch spot.",
+"Disrupt actually hammock, biodegradable straw kombucha on tap refillery.",
+"Chillwave lo-fi beats, cassette tape nostalgia vaporwave sunset.",
+"Adaptogen mushroom latte, wellness retreat sound bath crystal healing.",
+"Wabi-sabi interior design, japandi aesthetic neutral palette linen curtains.",
+"Sourdough discard recipe, fermented everything gut health probiotic soda.",
+"Cottagecore aesthetic garden, pressed flowers dried lavender linen apron.",
+"Plant-based everything, beyond burger impossible whopper flexitarian lifestyle.",
+"Tiny house movement, van life digital nomad remote work paradise.",
+"Upcycled furniture project, chalk paint mason jar terrarium succulent.",
+"Farmers market haul, organic heirloom vegetables canvas shopping bag.",
+"Cold brew nitro tap, third wave coffee single origin ethiopian yirgacheffe.",
+"Vinyl revival audiophile, warm analog sound tube amplifier turntable.",
+"Capsule wardrobe essentials, french tuck minimalist fashion neutral tones.",
+"Hygge cozy vibes, candlelit evening wool blanket hot cocoa reading.",
+"Matcha ceremonial grade, bamboo whisk traditional japanese tea ceremony.",
+"Zero waste bathroom, shampoo bar safety razor beeswax wrap compost.",
+"Indie bookstore finds, dog-eared pages marginalia secondhand treasures.",
+"Polaroid instant camera, film photography light leaks double exposure art.",
+"Handmade pottery wheel, ceramic glaze kiln fired stoneware mug collection.",
+"Bike commute rain gear, panniers reflective vest urban cycling culture.",
+"Rooftop urban garden, raised bed herbs cherry tomatoes pollinator friendly.",
+"Screenprinted gig poster, risograph zine small press independent publishing.",
+"Vintage denim jacket, thrifted oversized blazer retro sneakers curated look.",
+"Natural wine orange skin, pet-nat funky ferment low intervention vineyard.",
+"Foraging wild garlic, elderflower cordial hedgerow jam seasonal eating.",
+"Linen bedding stonewashed, earthy tones minimalist bedroom scandinavian design.",
+"Artisan sourdough bakery, wood-fired oven crusty loaf olive oil dip.",
+"Handpoured soy candle, essential oil blend amber jar cotton wick.",
+"Macrame wall hanging, woven tapestry bohemian living room dried pampas.",
+"Enamel pin collection, patch denim jacket lapel flair self expression.",
+"Bullet journal spread, washi tape habit tracker mood board creative planning.",
+"Slow living philosophy, intentional choices mindful consumption less is more.",
+"Craft gin botanical, small batch distillery juniper citrus peel tonic water.",
+"Vintage typewriter ribbon, love letter handwritten note fountain pen ink."
+];
+
+
+STYLES.office = [
+"Let's circle back on that and align our key stakeholders before end of quarter.",
+"We need to leverage our core competencies to drive synergistic outcomes.",
+"I'll ping you offline to discuss the bandwidth constraints on this deliverable.",
+"Can we take this offline and loop in the cross-functional team for alignment?",
+"Moving forward, we need to be more proactive about our pipeline visibility.",
+"Let's put a pin in that and revisit during our next sprint retrospective.",
+"We should double-click on that metric to understand the root cause analysis.",
+"The ask here is to streamline our workflow and reduce operational overhead.",
+"I want to make sure we're all rowing in the same direction on this initiative.",
+"Let's not boil the ocean here, we need to focus on quick wins first.",
+"We need to right-size our team to meet the evolving business requirements.",
+"Can you socialize this deck with the leadership team before the all-hands?",
+"Our north star metric is customer retention, everything else is secondary.",
+"Let's ideate on some blue-sky solutions before we get into the weeds.",
+"We need to move the needle on engagement before the board meeting.",
+"I'll cascade this information down to the individual contributors on my team.",
+"The juice isn't worth the squeeze on that particular feature request.",
+"We should sunset that legacy system and migrate to the cloud-native solution.",
+"Let's do a deep dive into the analytics and surface any actionable insights.",
+"We need to build a moat around our competitive advantage in this space.",
+"Can we get a temperature check on how the team feels about this pivot?",
+"I'm going to need you to sharpen your pencil on that budget estimate.",
+"Let's make sure we have the right guardrails in place before we scale.",
+"We should leverage our learnings from Q3 to optimize our Q4 strategy.",
+"The low-hanging fruit here is automating the manual reporting process.",
+"We need to be more intentional about our resource allocation going forward.",
+"Let's table that discussion and focus on the critical path items.",
+"Can you put together a one-pager summarizing the key takeaways from the offsite?",
+"We should dogfood our own product before pushing it to external customers.",
+"The ROI on that initiative doesn't justify the engineering investment required.",
+"Let's sync up after standup to discuss the blockers on the roadmap.",
+"We need to future-proof our architecture to handle ten-x growth scenarios.",
+"Can we get more granular on the timeline and identify the key milestones?",
+"I want to empower the team to make data-driven decisions autonomously.",
+"Let's not reinvent the wheel, there's probably an existing solution we can adopt.",
+"We should bake in some buffer time for unexpected scope creep on this project.",
+"The optics on that decision aren't great from a stakeholder management perspective.",
+"Let's run it up the flagpole and see if leadership gives us the green light.",
+"We need to break down the silos between engineering and product teams.",
+"Can you draft an RFC and get buy-in from the architecture review board?",
+"Our burn rate is unsustainable, we need to find efficiencies across the org.",
+"Let's do a pre-mortem to identify potential failure modes before launch.",
+"We should establish clear OKRs to ensure accountability across all workstreams.",
+"The feedback loop between design and development needs to be tightened.",
+"Let's leverage AI and machine learning to automate our decision-making pipeline.",
+"We need a paradigm shift in how we approach customer success metrics.",
+"Can we get alignment on the definition of done before the sprint starts?",
+"I'll follow up with an async update in Slack to keep everyone in the loop.",
+"We should create a center of excellence to standardize best practices.",
+"The total addressable market for this vertical is absolutely massive.",
+"Let's schedule a working session to hammer out the technical specifications.",
+"We need to operationalize our strategy and translate vision into execution.",
+"Can you provide a RACI matrix so we know who owns what on this project?"
+];
+
+
+STYLES.pirate = [
+"Ahoy matey, hoist the mainsail and set course for the seven seas of adventure.",
+"Shiver me timbers, that treasure map be leading us straight to Davy Jones' locker.",
+"Avast ye scallywags, the captain demands ye swab the poop deck before sundown.",
+"Yo ho ho and a bottle of rum, the pirate life be the only life for me.",
+"Batten down the hatches, a fearsome storm be brewing on the horizon tonight.",
+"Arrr, that landlubber couldn't tell port from starboard if his life depended on it.",
+"Walk the plank ye mutinous dog, there be no room for traitors on this vessel.",
+"The Jolly Roger flies high above our mast, striking fear into merchant ships.",
+"Blimey, the kraken itself couldn't stop us from reaching that island of gold.",
+"Dead men tell no tales, but this treasure chest speaks volumes of riches.",
+"By Blackbeard's ghost, I've never seen a more beautiful sunset over the Caribbean.",
+"Weigh anchor and hoist the mizzen, we sail with the morning tide tomorrow.",
+"That scurvy dog stole me last doubloon and fled to Tortuga like a coward.",
+"The crow's nest lookout spotted a galleon heavy with Spanish gold on the horizon.",
+"Fire the cannons and prepare to board, this prize ship won't escape us today.",
+"A pirate's life ain't all rum and plunder, sometimes ye gotta mend the sails.",
+"Davy Jones himself would be jealous of the bounty we've plundered this voyage.",
+"The sea be a cruel mistress, but she rewards those brave enough to sail her.",
+"Bury the treasure deep on that island and mark it with an X on the map.",
+"No quarter given and none asked, that be the pirate code we live by.",
+"The first mate spotted dolphins racing alongside our bow at dawn this morning.",
+"Splice the mainbrace lads, tonight we celebrate our greatest haul yet.",
+"That cursed compass always points to what ye desire most in this world.",
+"The port of Nassau be crawling with pirates, privateers, and scoundrels alike.",
+"Me wooden leg gives me trouble in rough seas but I wouldn't trade it.",
+"The mermaid's song lured many a sailor to the rocks but not this captain.",
+"Raise the black flag and show no mercy to those who cross our path.",
+"A good pirate knows every knot from bowline to cleat hitch by heart.",
+"The treasure fleet sails at midnight under escort of three warships of the line.",
+"Grog for everyone, the quartermaster just broke open the last barrel of rum.",
+"That parrot on me shoulder be smarter than half the crew combined I reckon.",
+"The ghost ship appeared through the fog with tattered sails and an empty helm.",
+"We'll careen the hull in that hidden cove and scrape off the barnacles.",
+"The pirate queen commanded a fleet of thirty ships across the South China Sea.",
+"Marooned on a desert island with nothing but a pistol and a single shot.",
+"The buccaneers of Hispaniola were the most feared raiders in all the Caribbean.",
+"Chart a course through the strait and mind the reef on the starboard side.",
+"That old sea dog has more stories than there are stars in the night sky.",
+"The powder monkey kept the cannons loaded faster than any lad I've ever seen.",
+"Pieces of eight, pieces of eight, the treasure room overflows with silver coins.",
+"A true pirate never abandons his crew, not even in the darkest of storms.",
+"The letters of marque gave us legal cover to plunder enemy merchant vessels.",
+"Sail ho on the horizon, she flies the colors of the East India Company.",
+"The captain's quarters held a secret compartment filled with stolen jewels and maps.",
+"We traded our plunder in the black market of Port Royal for supplies and weapons.",
+"The sea turtle carried us to safety after the shipwreck on that fateful night.",
+"Every pirate worth his salt knows the tides and reads the stars for navigation.",
+"The mutiny was swift and bloodless, the old captain was set adrift in a dinghy.",
+"Calico Jack and Anne Bonny were the most notorious pirate duo to ever sail.",
+"That volcanic island hides a network of caves perfect for stashing our loot.",
+"The pirate articles were signed by every crew member ensuring fair division of spoils.",
+"Land ho, I can smell the spices and rum of the Caribbean port from here."
+];
+
+
+STYLES.zombie = [
+"The undead horde shambled through the abandoned streets searching for fresh brains.",
+"Survivors barricaded the windows with wooden planks as groaning echoed outside.",
+"A zombie apocalypse wasn't how anyone expected the Monday morning commute to go.",
+"The last broadcast on the emergency radio warned everyone to avoid the city center.",
+"Rotting hands clawed at the chain-link fence surrounding the makeshift survivor camp.",
+"Brains are the preferred delicacy of the modern zombie, served fresh and still warm.",
+"The shopping mall seemed like a good hideout until the food court zombies woke up.",
+"Patient zero was traced back to a sketchy laboratory on the outskirts of town.",
+"The zombie shuffled past the gas station, dragging one leg behind it slowly.",
+"Headshots only, conserve your ammunition, the supply drop isn't coming until Thursday.",
+"The infection spread faster than anyone predicted, entire cities fell within hours.",
+"A lone survivor found an abandoned school bus and converted it into a mobile fortress.",
+"The zombie's jaw hung loosely as it let out a guttural moan in the darkness.",
+"Rule number one of the zombie apocalypse: cardio, you need to outrun the horde.",
+"The CDC bunker was supposed to have answers but all they found were more zombies.",
+"Canned beans and shotgun shells became the new currency in the post-apocalyptic world.",
+"The graveyard shift took on a whole new meaning when the dead started rising.",
+"Zombie-proof your home in three easy steps: boards, nails, and a really big hammer.",
+"The undead don't sleep, don't eat regular food, and absolutely never pay rent.",
+"A trail of blood led from the pharmacy to the overturned ambulance down the block.",
+"The survivors formed a council to decide whether to stay or flee to the mountains.",
+"That zombie used to be the friendly neighborhood mailman before the outbreak hit.",
+"The helicopter on the hospital roof was their only chance of escape from the city.",
+"Decomposition hadn't slowed them down one bit, if anything they seemed angrier now.",
+"The safe zone turned out to be anything but safe when the walls were breached.",
+"Someone left the back door unlocked and now there are zombies in the kitchen again.",
+"The scientist worked frantically on a cure while zombies pounded on the lab door.",
+"Night raids for supplies were dangerous but necessary to keep the group alive.",
+"The zombie horde moved like a slow-motion tidal wave consuming everything in its path.",
+"Duct tape and a baseball bat: the essential zombie survival starter kit for beginners.",
+"The radio tower on the hill was their best hope for contacting other survivors.",
+"Former office workers in tattered suits now wandered the parking garage aimlessly.",
+"The bite mark on his arm meant he had maybe twelve hours before turning.",
+"Zombie dogs were somehow even more terrifying than their human counterparts.",
+"The fortified school became a community hub where survivors shared resources and hope.",
+"Rain made the zombies slower but also made it harder to hear them approaching.",
+"The underground bunker had enough supplies for six months if they rationed carefully.",
+"A zombie stumbled into the swimming pool and just stood there, confused and groaning.",
+"The military checkpoint had been overrun weeks ago, abandoned tanks lined the highway.",
+"Silence was golden in the apocalypse because noise attracted the walking dead.",
+"The old farmer had been surviving alone for months using nothing but traps and wit.",
+"Zombie-proof gardens on the rooftop provided fresh vegetables for the survivor community.",
+"The bridge was the only way across the river but it was crawling with undead.",
+"Someone discovered that zombies were attracted to loud music, which was useful and terrifying.",
+"The winter freeze slowed the zombies to a crawl but also made survival harder.",
+"A group of survivors converted an old prison into the safest fortress in the region.",
+"The zombie virus mutated again, now the infected could run instead of just shamble.",
+"Scavenging the abandoned supermarket yielded canned goods, batteries, and one very stale donut.",
+"The watchtower guard spotted a massive horde moving slowly toward their settlement.",
+"Every sunset brought relief that they had survived another day in the wasteland.",
+"The cure was rumored to exist somewhere in a government facility three states away.",
+"Zombie-proofing a minivan involved welding metal plates and installing a cow catcher on front."
+];
+
+
+// Word pools extracted from sentences for word-mode generation
+const WORD_POOLS = {};
+Object.keys(STYLES).forEach(key => {
+  WORD_POOLS[key] = STYLES[key].join(' ').replace(/[.,!?;:'"()]/g, '').split(/\s+/).filter(w => w.length > 0);
+});
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandom(arr, count) {
+  const shuffled = shuffle(arr);
+  const result = [];
+  while (result.length < count) {
+    result.push(...shuffled);
+  }
+  return result.slice(0, count);
+}
+
+function generateSentences(style, count) {
+  return pickRandom(STYLES[style], count);
+}
+
+function generateParagraphs(style, count) {
+  const paragraphs = [];
+  for (let i = 0; i < count; i++) {
+    const sentenceCount = 4 + Math.floor(Math.random() * 4); // 4-7 sentences
+    const sentences = pickRandom(STYLES[style], sentenceCount);
+    paragraphs.push(sentences.join(' '));
+  }
+  return paragraphs;
+}
+
+function generateWords(style, count) {
+  const pool = WORD_POOLS[style];
+  const words = pickRandom(pool, count);
+  return [words.join(' ')];
+}
+
+function wrapWithTag(text, tag) {
+  if (tag === 'none') return text;
+  return '<' + tag + '>' + text + '</' + tag + '>';
+}
+
+function generate() {
+  const style = document.getElementById('style').value;
+  const unit = document.getElementById('unit').value;
+  const count = Math.max(1, Math.min(99, parseInt(document.getElementById('count').value) || 3));
+  const tag = document.querySelector('.tag-btn.active').dataset.tag;
+
+  let chunks;
+  if (unit === 'paragraphs') {
+    chunks = generateParagraphs(style, count);
+  } else if (unit === 'sentences') {
+    chunks = generateSentences(style, count);
+  } else {
+    chunks = generateWords(style, count);
+  }
+
+  const wrapped = chunks.map(c => wrapWithTag(c, tag));
+  const separator = tag === 'none' ? '\n\n' : '\n';
+  const output = wrapped.join(separator);
+
+  document.getElementById('output').textContent = output;
+  document.getElementById('copyBtn').classList.remove('copied');
+  document.getElementById('copyBtn').textContent = 'Copy to Clipboard';
+}
+
+// Copy button
+document.getElementById('copyBtn').addEventListener('click', function() {
+  const text = document.getElementById('output').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    this.classList.add('copied');
+    this.textContent = 'Copied!';
+    setTimeout(() => {
+      this.classList.remove('copied');
+      this.textContent = 'Copy to Clipboard';
+    }, 2000);
+  });
+});
+
+// Generate button
+document.getElementById('generateBtn').addEventListener('click', generate);
+
+// Tag buttons
+document.querySelectorAll('.tag-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// Generate on load
+generate();
+</script>
+<script src="https://m.servedby-buysellads.com/monetization.custom.js" type="text/javascript"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

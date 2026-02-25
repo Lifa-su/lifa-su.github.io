@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Object Position Generator</title>
+<meta name="description" content="Visual CSS object-position generator with 9-grid quick select, custom sliders, object-fit preview, and one-click code copy.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-object-position/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+a{color:var(--accent)}
+
+.container{max-width:1100px;margin:0 auto;padding:24px 16px}
+
+header{text-align:center;padding:32px 0 24px}
+header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+
+/* Controls Panel */
+.panel{background:var(--surface);border-radius:var(--radius);padding:24px;border:1px solid rgba(255,255,255,.06)}
+.panel h2{font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-size:.8rem}
+
+/* 9-Grid */
+.grid-9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:24px}
+.grid-9 button{background:var(--surface2);border:2px solid transparent;border-radius:6px;color:var(--text);padding:10px 4px;font-size:.75rem;cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap}
+.grid-9 button:hover{border-color:var(--accent);background:rgba(233,69,96,.1)}
+.grid-9 button.active{border-color:var(--accent);background:rgba(233,69,96,.2);font-weight:600}
+
+/* Sliders */
+.slider-group{margin-bottom:20px}
+.slider-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.85rem}
+.slider-label span:last-child{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--surface2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px rgba(233,69,96,.4)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
+
+/* Object-fit selector */
+.fit-options{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
+.fit-options button{background:var(--surface2);border:2px solid transparent;border-radius:6px;color:var(--text);padding:7px 14px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.fit-options button:hover{border-color:var(--accent2)}
+.fit-options button.active{border-color:var(--accent);background:rgba(233,69,96,.15);font-weight:600}
+
+/* Code output */
+.code-block{background:#0d1117;border-radius:8px;padding:16px;font-family:'SF Mono',Consolas,monospace;font-size:.85rem;position:relative;border:1px solid rgba(255,255,255,.06);margin-top:8px}
+.code-block code{color:#c9d1d9;white-space:pre;display:block;line-height:1.7}
+.code-block .prop{color:#79c0ff}
+.code-block .val{color:#a5d6ff}
+.code-block .punct{color:#8b949e}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--accent);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:.75rem;cursor:pointer;transition:all .2s;font-weight:600}
+.copy-btn:hover{opacity:.85;transform:scale(1.03)}
+.copy-btn.copied{background:#2ea043}
+
+/* Preview Panel */
+.preview-area{position:relative;width:100%;aspect-ratio:4/3;background:repeating-conic-gradient(rgba(255,255,255,.03) 0% 25%,transparent 0% 50%) 0 0/20px 20px;border-radius:8px;overflow:hidden;border:2px dashed rgba(255,255,255,.1)}
+.preview-area img{width:100%;height:100%;display:block}
+.crosshair{position:absolute;pointer-events:none;z-index:2}
+.crosshair .h,.crosshair .v{position:absolute;background:var(--accent);opacity:.5}
+.crosshair .h{height:1px;width:100%;left:0}
+.crosshair .v{width:1px;height:100%;top:0}
+.pos-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(233,69,96,.3);pointer-events:none;z-index:3}
+
+.upload-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text2);font-size:.85rem;gap:8px;cursor:pointer;transition:background .2s}
+.upload-hint:hover{background:rgba(233,69,96,.05)}
+.upload-hint svg{opacity:.4}
+.upload-hint.hidden{display:none}
+
+.image-actions{display:flex;gap:8px;margin-top:10px}
+.image-actions button{background:var(--surface2);border:1px solid rgba(255,255,255,.08);color:var(--text2);padding:6px 14px;border-radius:6px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.image-actions button:hover{border-color:var(--accent);color:var(--text)}
+
+/* Responsive */
+@media(max-width:720px){
+  .main-grid{grid-template-columns:1fr}
+  header h1{font-size:1.4rem}
+}
+
+footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:.78rem}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>CSS Object Position Generator</h1>
+    <p>Visually adjust object-position with live preview and instant code output</p>
+  </header>
+
+  <div class="main-grid">
+    <!-- Left: Controls -->
+    <div>
+      <div class="panel">
+        <h2>Quick Position (9-Grid)</h2>
+        <div class="grid-9" id="grid9"></div>
+
+        <h2>Custom Position</h2>
+        <div class="slider-group">
+          <div class="slider-label"><span>X (Horizontal)</span><span id="xVal">50%</span></div>
+          <input type="range" id="sliderX" min="0" max="100" value="50">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>Y (Vertical)</span><span id="yVal">50%</span></div>
+          <input type="range" id="sliderY" min="0" max="100" value="50">
+        </div>
+
+        <h2>Object Fit</h2>
+        <div class="fit-options" id="fitOptions"></div>
+      </div>
+
+      <div class="panel" style="margin-top:16px">
+        <h2>Generated CSS</h2>
+        <div class="code-block" id="codeBlock">
+          <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
+          <code id="codeOutput"></code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Preview -->
+    <div>
+      <div class="panel">
+        <h2>Live Preview</h2>
+        <div class="preview-area" id="previewArea">
+          <img id="previewImg" src="" alt="Preview">
+          <div class="crosshair" id="crosshair">
+            <div class="h"></div>
+            <div class="v"></div>
+          </div>
+          <div class="pos-dot" id="posDot"></div>
+          <label class="upload-hint" id="uploadHint" for="fileInput">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Click or drop an image to preview
+          </label>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
+        <div class="image-actions">
+          <button onclick="useDefaultImage()">Use Sample Image</button>
+          <button onclick="document.getElementById('fileInput').click()">Upload Image</button>
+          <button onclick="resetImage()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>&copy; 2026 CSS Object Position Generator</footer>
+</div>
+
+<script>
+const positions = [
+  {label:'Top Left',     x:0,   y:0},
+  {label:'Top Center',   x:50,  y:0},
+  {label:'Top Right',    x:100, y:0},
+  {label:'Center Left',  x:0,   y:50},
+  {label:'Center',       x:50,  y:50},
+  {label:'Center Right', x:100, y:50},
+  {label:'Bottom Left',  x:0,   y:100},
+  {label:'Bottom Center',x:50,  y:100},
+  {label:'Bottom Right', x:100, y:100},
+];
+
+const fitModes = ['cover','contain','fill','none','scale-down'];
+
+let posX = 50, posY = 50, currentFit = 'cover';
+let hasImage = false;
+
+const grid9 = document.getElementById('grid9');
+const sliderX = document.getElementById('sliderX');
+const sliderY = document.getElementById('sliderY');
+const xVal = document.getElementById('xVal');
+const yVal = document.getElementById('yVal');
+const fitOptions = document.getElementById('fitOptions');
+const previewImg = document.getElementById('previewImg');
+const codeOutput = document.getElementById('codeOutput');
+const crosshair = document.getElementById('crosshair');
+const posDot = document.getElementById('posDot');
+const uploadHint = document.getElementById('uploadHint');
+const previewArea = document.getElementById('previewArea');
+
+// Build 9-grid buttons
+positions.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = p.label;
+  btn.addEventListener('click', () => {
+    posX = p.x; posY = p.y;
+    sliderX.value = posX; sliderY.value = posY;
+    update();
+  });
+  grid9.appendChild(btn);
+});
+
+// Build fit buttons
+fitModes.forEach(mode => {
+  const btn = document.createElement('button');
+  btn.textContent = mode;
+  btn.dataset.fit = mode;
+  btn.addEventListener('click', () => {
+    currentFit = mode;
+    update();
+  });
+  fitOptions.appendChild(btn);
+});
+
+// Slider events
+sliderX.addEventListener('input', () => { posX = +sliderX.value; update(); });
+sliderY.addEventListener('input', () => { posY = +sliderY.value; update(); });
+
+// File upload
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => { setImage(ev.target.result); };
+  reader.readAsDataURL(file);
+});
+
+// Drag and drop
+previewArea.addEventListener('dragover', e => { e.preventDefault(); });
+previewArea.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = ev => { setImage(ev.target.result); };
+  reader.readAsDataURL(file);
+});
+
+function setImage(src) {
+  previewImg.src = src;
+  hasImage = true;
+  uploadHint.classList.add('hidden');
+  update();
+}
+
+function useDefaultImage() {
+  setImage('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80');
+}
+
+function resetImage() {
+  previewImg.src = '';
+  hasImage = false;
+  uploadHint.classList.remove('hidden');
+  update();
+}
+
+function update() {
+  xVal.textContent = posX + '%';
+  yVal.textContent = posY + '%';
+
+  // Update active grid button
+  grid9.querySelectorAll('button').forEach((btn, i) => {
+    const p = positions[i];
+    btn.classList.toggle('active', p.x === posX && p.y === posY);
+  });
+
+  // Update active fit button
+  fitOptions.querySelectorAll('button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.fit === currentFit);
+  });
+
+  // Apply styles to preview image
+  previewImg.style.objectPosition = posX + '% ' + posY + '%';
+  previewImg.style.objectFit = currentFit;
+
+  // Position indicator
+  crosshair.querySelector('.h').style.top = posY + '%';
+  crosshair.querySelector('.v').style.left = posX + '%';
+  posDot.style.left = posX + '%';
+  posDot.style.top = posY + '%';
+
+  // Show/hide indicators
+  const showIndicators = hasImage;
+  crosshair.style.display = showIndicators ? 'block' : 'none';
+  posDot.style.display = showIndicators ? 'block' : 'none';
+
+  // Code output
+  const objPos = posX + '% ' + posY + '%';
+  codeOutput.innerHTML =
+    '<span class="prop">object-position</span><span class="punct">: </span><span class="val">' + objPos + '</span><span class="punct">;</span>\n' +
+    '<span class="prop">object-fit</span><span class="punct">: </span><span class="val">' + currentFit + '</span><span class="punct">;</span>';
+}
+
+function copyCode() {
+  const text = 'object-position: ' + posX + '% ' + posY + '%;\nobject-fit: ' + currentFit + ';';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// Init
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

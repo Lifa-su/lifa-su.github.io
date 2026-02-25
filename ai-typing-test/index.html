@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Test your typing speed and accuracy with AI-powered analysis. Measure WPM, track errors, and improve your keyboard skills with practice exercises and stats.">
+<link rel="canonical" href="https://lifa-su.com/ai-typing-test/">
+<title>AI Typing Speed Test</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--card:#1e2746;--card2:#243054;--text:#e8e8e8;--text2:#a0a0b8;--green:#00d474;--green2:#00b864;--red:#ff4757;--accent:#00d474;--accent2:#00f5a0;--shadow:0 8px 32px rgba(0,0,0,0.3)}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.container{max-width:900px;width:100%;padding:20px}
+h1{text-align:center;font-size:2rem;margin:20px 0 5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:var(--text2);font-size:0.9rem;margin-bottom:25px}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border-radius:12px;padding:15px;text-align:center;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.05)}
+.stat-card .label{font-size:0.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.stat-card .value{font-size:1.8rem;font-weight:700;color:var(--accent)}
+.stat-card .value.red{color:var(--red)}
+.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;justify-content:center}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all 0.2s;color:#fff}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));box-shadow:0 4px 15px rgba(0,212,116,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,212,116,0.4)}
+.btn-secondary{background:var(--card2);border:1px solid rgba(255,255,255,0.1)}
+.btn-secondary:hover{background:var(--bg3)}
+.btn-secondary.active{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.typing-card{background:var(--card);border-radius:16px;padding:30px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid rgba(255,255,255,0.05)}
+#text-display{font-family:'Courier New',Courier,monospace;font-size:1.25rem;line-height:2;letter-spacing:0.5px;min-height:120px;user-select:none;position:relative;word-wrap:break-word}
+#text-display .char{transition:color 0.1s}
+#text-display .char.correct{color:var(--green)}
+#text-display .char.incorrect{color:var(--red);text-decoration:underline;text-decoration-color:var(--red)}
+#text-display .char.current{border-bottom:2px solid var(--accent);animation:blink 1s infinite;padding-bottom:2px}
+#text-display .char.pending{color:var(--text2)}
+@keyframes blink{0%,100%{border-bottom-color:var(--accent)}50%{border-bottom-color:transparent}}
+#typing-input{position:absolute;opacity:0;width:0;height:0}
+.typing-card.focus-hint{cursor:text}
+.timer-bar{height:4px;background:var(--card2);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.timer-bar .fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent2));border-radius:2px;transition:width 0.3s linear}
+.result-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:100;justify-content:center;align-items:center;backdrop-filter:blur(5px)}
+.result-overlay.show{display:flex}
+.result-card{background:var(--card);border-radius:20px;padding:40px;max-width:450px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(0,212,116,0.2)}
+.result-card h2{font-size:1.5rem;margin-bottom:25px;color:var(--accent)}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:25px}
+.result-item{background:var(--bg2);border-radius:12px;padding:15px}
+.result-item .r-label{font-size:0.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.result-item .r-value{font-size:1.6rem;font-weight:700;color:var(--text);margin-top:5px}
+.result-item .r-value.highlight{color:var(--accent)}
+.history-section{background:var(--card);border-radius:16px;padding:25px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid rgba(255,255,255,0.05)}
+.history-section h3{margin-bottom:15px;color:var(--text);font-size:1.1rem}
+#history-chart{width:100%;height:200px;border-radius:8px}
+.no-history{color:var(--text2);text-align:center;padding:30px;font-size:0.9rem}
+.click-to-start{text-align:center;color:var(--text2);font-size:0.85rem;margin-top:10px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+footer{text-align:center;color:var(--text2);font-size:0.75rem;padding:20px;margin-top:auto}
+@media(max-width:600px){
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .stat-card .value{font-size:1.4rem}
+  #text-display{font-size:1.05rem}
+  .typing-card{padding:20px}
+  .result-card{padding:25px}
+  h1{font-size:1.5rem}
+  .controls{gap:6px}
+  .btn{padding:8px 14px;font-size:0.8rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⌨️ AI Typing Speed Test</h1>
+  <p class="subtitle">Test your typing speed and track your progress</p>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="label">WPM</div><div class="value" id="wpm-display">0</div></div>
+    <div class="stat-card"><div class="label">Accuracy</div><div class="value" id="acc-display">100%</div></div>
+    <div class="stat-card"><div class="label">Errors</div><div class="value red" id="err-display">0</div></div>
+    <div class="stat-card"><div class="label">Time</div><div class="value" id="time-display">0s</div></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-secondary" onclick="setDifficulty('easy')" id="btn-easy">Easy</button>
+    <button class="btn btn-secondary active" onclick="setDifficulty('medium')" id="btn-medium">Medium</button>
+    <button class="btn btn-secondary" onclick="setDifficulty('hard')" id="btn-hard">Hard</button>
+    <span style="width:10px"></span>
+    <button class="btn btn-secondary" onclick="setTime(30)" id="btn-30">30s</button>
+    <button class="btn btn-secondary active" onclick="setTime(60)" id="btn-60">60s</button>
+    <button class="btn btn-secondary" onclick="setTime(120)" id="btn-120">120s</button>
+    <span style="width:10px"></span>
+    <button class="btn btn-primary" onclick="restartTest()" id="btn-restart">New Test</button>
+  </div>
+
+  <div class="timer-bar"><div class="fill" id="timer-fill" style="width:100%"></div></div>
+
+  <div class="typing-card focus-hint" onclick="focusInput()">
+    <div id="text-display"></div>
+    <input type="text" id="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <p class="click-to-start" id="start-hint">Click here or start typing to begin</p>
+  </div>
+
+  <div class="history-section">
+    <h3>📈 Progress History</h3>
+    <canvas id="history-chart"></canvas>
+    <div class="no-history" id="no-history">Complete a test to see your progress chart!</div>
+  </div>
+</div>
+
+<div class="result-overlay" id="result-overlay">
+  <div class="result-card">
+    <h2>🏁 Test Complete!</h2>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Speed</div><div class="r-value highlight" id="r-wpm">0 WPM</div></div>
+      <div class="result-item"><div class="r-label">Accuracy</div><div class="r-value" id="r-acc">0%</div></div>
+      <div class="result-item"><div class="r-label">Time</div><div class="r-value" id="r-time">0s</div></div>
+      <div class="result-item"><div class="r-label">Errors</div><div class="r-value" id="r-err">0</div></div>
+    </div>
+    <button class="btn btn-primary" onclick="closeResult()" style="width:100%">Try Again</button>
+  </div>
+</div>
+
+<footer>AI Typing Speed Test &copy; 2025</footer>
+
+<script>
+const paragraphs = {
+  easy: [
+    "The quick brown fox jumps over the lazy dog near the river bank.",
+    "She sells sea shells by the sea shore every morning.",
+    "I like to read books and drink tea on rainy days.",
+    "The sun is warm and the sky is blue today.",
+    "My cat likes to sleep on the soft red chair all day long.",
+    "We went to the park and had a nice time with our friends.",
+    "The dog ran fast and caught the ball in the green yard.",
+    "I need to buy some milk and bread from the store today."
+  ],
+  medium: [
+    "Programming is the art of telling another human being what one wants the computer to do.",
+    "The best way to predict the future is to invent it, according to Alan Kay.",
+    "A good programmer is someone who always looks both ways before crossing a one-way street.",
+    "The only way to learn a new programming language is by writing programs in it every day.",
+    "Simplicity is the soul of efficiency, and every great design begins with a simple idea.",
+    "Technology is best when it brings people together and helps them solve real problems.",
+    "The internet has changed the way we communicate, learn, and share information worldwide.",
+    "Artificial intelligence is transforming industries from healthcare to finance and beyond."
+  ],
+  hard: [
+    "In 2024, approximately 73.6% of developers used JavaScript as their primary language; TypeScript adoption grew by 28.3%.",
+    "The algorithm's time complexity is O(n log n), which significantly outperforms the naive O(n^2) approach.",
+    "Quantum computing leverages qubits that exist in superposition states, enabling parallel computation at an unprecedented scale (10^15 operations/sec).",
+    "The HTTP/3 protocol utilizes QUIC transport, reducing latency by ~33% compared to TCP-based HTTP/2 connections.",
+    "Machine learning models require hyperparameter tuning: learning_rate=0.001, batch_size=32, epochs=100, dropout=0.25.",
+    "Docker containers use cgroups & namespaces; Kubernetes orchestrates them across clusters with 99.99% uptime SLAs.",
+    "The RSA-2048 encryption algorithm generates keys using prime factorization: p * q = n, where |p| and |q| are each 1024 bits."
+  ]
+};
+
+let currentDifficulty = 'medium';
+let currentTime = 60;
+let currentText = '';
+let charIndex = 0;
+let errors = 0;
+let correctChars = 0;
+let totalTyped = 0;
+let isRunning = false;
+let isFinished = false;
+let timer = null;
+let timeLeft = 60;
+let startTime = null;
+
+function setDifficulty(d) {
+  if (isRunning) return;
+  currentDifficulty = d;
+  document.querySelectorAll('#btn-easy,#btn-medium,#btn-hard').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + d).classList.add('active');
+  restartTest();
+}
+
+function setTime(t) {
+  if (isRunning) return;
+  currentTime = t;
+  timeLeft = t;
+  document.querySelectorAll('#btn-30,#btn-60,#btn-120').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + t).classList.add('active');
+  document.getElementById('time-display').textContent = t + 's';
+  document.getElementById('timer-fill').style.width = '100%';
+  restartTest();
+}
+
+function getRandomText() {
+  const pool = paragraphs[currentDifficulty];
+  let text = '';
+  const used = new Set();
+  while (text.length < 200) {
+    let idx;
+    do { idx = Math.floor(Math.random() * pool.length); } while (used.has(idx) && used.size < pool.length);
+    used.add(idx);
+    if (text) text += ' ';
+    text += pool[idx];
+    if (used.size >= pool.length) used.clear();
+  }
+  return text;
+}
+
+function renderText() {
+  const display = document.getElementById('text-display');
+  display.innerHTML = '';
+  for (let i = 0; i < currentText.length; i++) {
+    const span = document.createElement('span');
+    span.className = 'char' + (i === 0 ? ' current' : ' pending');
+    span.textContent = currentText[i];
+    display.appendChild(span);
+  }
+}
+
+function restartTest() {
+  clearInterval(timer);
+  isRunning = false;
+  isFinished = false;
+  charIndex = 0;
+  errors = 0;
+  correctChars = 0;
+  totalTyped = 0;
+  timeLeft = currentTime;
+  startTime = null;
+  currentText = getRandomText();
+  renderText();
+  document.getElementById('wpm-display').textContent = '0';
+  document.getElementById('acc-display').textContent = '100%';
+  document.getElementById('err-display').textContent = '0';
+  document.getElementById('time-display').textContent = currentTime + 's';
+  document.getElementById('timer-fill').style.width = '100%';
+  document.getElementById('typing-input').value = '';
+  document.getElementById('start-hint').style.display = 'block';
+  document.getElementById('result-overlay').classList.remove('show');
+}
+
+function focusInput() {
+  document.getElementById('typing-input').focus();
+}
+
+function startTimer() {
+  if (isRunning) return;
+  isRunning = true;
+  startTime = Date.now();
+  document.getElementById('start-hint').style.display = 'none';
+  timer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    timeLeft = Math.max(0, currentTime - elapsed);
+    document.getElementById('time-display').textContent = timeLeft + 's';
+    document.getElementById('timer-fill').style.width = ((timeLeft / currentTime) * 100) + '%';
+    updateStats();
+    if (timeLeft <= 0) {
+      finishTest();
+    }
+  }, 200);
+}
+
+function updateStats() {
+  if (!startTime) return;
+  const elapsed = (Date.now() - startTime) / 1000 / 60;
+  const wpm = elapsed > 0 ? Math.round((correctChars / 5) / elapsed) : 0;
+  const acc = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
+  document.getElementById('wpm-display').textContent = wpm;
+  document.getElementById('acc-display').textContent = acc + '%';
+  document.getElementById('err-display').textContent = errors;
+}
+
+function finishTest() {
+  clearInterval(timer);
+  isRunning = false;
+  isFinished = true;
+  const elapsed = (Date.now() - startTime) / 1000;
+  const minutes = elapsed / 60;
+  const wpm = minutes > 0 ? Math.round((correctChars / 5) / minutes) : 0;
+  const acc = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
+
+  document.getElementById('r-wpm').textContent = wpm + ' WPM';
+  document.getElementById('r-acc').textContent = acc + '%';
+  document.getElementById('r-time').textContent = Math.round(elapsed) + 's';
+  document.getElementById('r-err').textContent = errors;
+  document.getElementById('result-overlay').classList.add('show');
+
+  saveHistory({ wpm, accuracy: acc, errors, time: Math.round(elapsed), difficulty: currentDifficulty, date: new Date().toISOString() });
+  drawChart();
+}
+
+function closeResult() {
+  document.getElementById('result-overlay').classList.remove('show');
+  restartTest();
+}
+
+document.getElementById('typing-input').addEventListener('input', function(e) {
+  if (isFinished) return;
+  if (!isRunning) startTimer();
+
+  const val = e.data;
+  if (val === null) return;
+
+  if (charIndex < currentText.length) {
+    const chars = document.querySelectorAll('#text-display .char');
+    totalTyped++;
+    if (val === currentText[charIndex]) {
+      chars[charIndex].classList.remove('current', 'pending');
+      chars[charIndex].classList.add('correct');
+      correctChars++;
+    } else {
+      chars[charIndex].classList.remove('current', 'pending');
+      chars[charIndex].classList.add('incorrect');
+      errors++;
+    }
+    charIndex++;
+    if (charIndex < currentText.length) {
+      chars[charIndex].classList.remove('pending');
+      chars[charIndex].classList.add('current');
+    }
+    updateStats();
+    if (charIndex >= currentText.length) {
+      finishTest();
+    }
+  }
+  this.value = '';
+});
+
+document.getElementById('typing-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Backspace') e.preventDefault();
+  if (e.key === 'Tab') { e.preventDefault(); restartTest(); focusInput(); }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (!isFinished && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+    focusInput();
+  }
+  if (e.key === 'Escape') {
+    closeResult();
+  }
+});
+
+function saveHistory(entry) {
+  let history = JSON.parse(localStorage.getItem('typing-history') || '[]');
+  history.push(entry);
+  if (history.length > 50) history = history.slice(-50);
+  localStorage.setItem('typing-history', JSON.stringify(history));
+}
+
+function getHistory() {
+  return JSON.parse(localStorage.getItem('typing-history') || '[]');
+}
+
+function drawChart() {
+  const history = getHistory();
+  const canvas = document.getElementById('history-chart');
+  const noHistory = document.getElementById('no-history');
+
+  if (history.length === 0) {
+    canvas.style.display = 'none';
+    noHistory.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  noHistory.style.display = 'none';
+
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width;
+  const H = rect.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const pad = { top: 20, right: 20, bottom: 30, left: 45 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  const wpmData = history.map(h => h.wpm);
+  const maxWpm = Math.max(...wpmData, 10);
+  const minWpm = Math.min(...wpmData, 0);
+  const range = maxWpm - minWpm || 10;
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (ch / 4) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#a0a0b8';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(maxWpm - (range / 4) * i), pad.left - 8, y + 4);
+  }
+
+  // X labels
+  ctx.fillStyle = '#a0a0b8';
+  ctx.textAlign = 'center';
+  ctx.font = '10px system-ui';
+  const step = Math.max(1, Math.floor(history.length / 6));
+  for (let i = 0; i < history.length; i += step) {
+    const x = pad.left + (i / (history.length - 1 || 1)) * cw;
+    ctx.fillText('#' + (i + 1), x, H - 8);
+  }
+
+  if (history.length < 2) {
+    const x = pad.left + cw / 2;
+    const y = pad.top + ch - ((wpmData[0] - minWpm) / range) * ch;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#00d474';
+    ctx.fill();
+    return;
+  }
+
+  // Line gradient
+  const grad = ctx.createLinearGradient(pad.left, 0, pad.left + cw, 0);
+  grad.addColorStop(0, '#00d474');
+  grad.addColorStop(1, '#00f5a0');
+
+  // Area fill
+  ctx.beginPath();
+  for (let i = 0; i < wpmData.length; i++) {
+    const x = pad.left + (i / (wpmData.length - 1)) * cw;
+    const y = pad.top + ch - ((wpmData[i] - minWpm) / range) * ch;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.lineTo(pad.left + cw, pad.top + ch);
+  ctx.lineTo(pad.left, pad.top + ch);
+  ctx.closePath();
+  const areaGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
+  areaGrad.addColorStop(0, 'rgba(0,212,116,0.2)');
+  areaGrad.addColorStop(1, 'rgba(0,212,116,0)');
+  ctx.fillStyle = areaGrad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  for (let i = 0; i < wpmData.length; i++) {
+    const x = pad.left + (i / (wpmData.length - 1)) * cw;
+    const y = pad.top + ch - ((wpmData[i] - minWpm) / range) * ch;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots
+  for (let i = 0; i < wpmData.length; i++) {
+    const x = pad.left + (i / (wpmData.length - 1)) * cw;
+    const y = pad.top + ch - ((wpmData[i] - minWpm) / range) * ch;
+    ctx.beginPath();
+    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#00d474';
+    ctx.fill();
+    ctx.strokeStyle = '#1e2746';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+}
+
+// Init
+restartTest();
+drawChart();
+window.addEventListener('resize', drawChart);
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="133652" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

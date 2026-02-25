@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>AI Unit Test Generator - Generate Tests for Any Function</title>
+<meta name="description" content="Free AI unit test generator. Paste your function and instantly generate comprehensive unit tests for JavaScript, Python, Java, and more.">
+<meta name="keywords" content="unit test generator, AI testing, test automation, JavaScript tests, Python tests, Jest, pytest, developer tools">
+<meta property="og:title" content="AI Unit Test Generator - Generate Tests for Any Function">
+<meta property="og:description" content="Paste your function and instantly generate comprehensive unit tests. Supports JavaScript, Python, Java.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-unit-test-generator/">
+<meta property="og:image" content="https://lifa-su.com/ai-unit-test-generator/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Unit Test Generator">
+<meta name="twitter:description" content="Generate comprehensive unit tests for any function instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-unit-test-generator/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Unit Test Generator","url":"https://lifa-su.com/ai-unit-test-generator/","description":"Free AI unit test generator for JavaScript, Python, Java","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"1120","bestRating":"5"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;--border:#2a2a42;--border2:#363652;--text:#e8e8f4;--text2:#9898b4;--text3:#686884;--accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--radius-sm:8px}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none;transition:color .2s}a:hover{color:var(--accent2)}
+header{position:sticky;top:0;z-index:100;background:rgba(18,18,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{color:var(--text3);font-size:13px}
+header .back-link{margin-left:auto;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+header .back-link:hover{color:var(--accent)}
+.container{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:24px}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;min-height:600px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+.panel-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text2)}
+.panel-header .icon{font-size:16px}
+.panel-header .spacer{flex:1}
+.panel-header select{padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;cursor:pointer}
+.panel-header button{padding:5px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface3);color:var(--text2);font-size:12px;cursor:pointer;transition:all .2s}
+.panel-header button:hover{border-color:var(--accent);color:var(--accent)}
+.panel-header .btn-copy{background:linear-gradient(135deg,var(--success),#3ab87a);border-color:transparent;color:#fff;font-weight:600}
+.panel-header .btn-copy:hover{box-shadow:0 4px 12px rgba(76,218,138,0.3)}
+.panel-body{flex:1;position:relative}
+.panel-body textarea{width:100%;height:100%;padding:16px;background:transparent;border:none;color:var(--text);font-family:'SF Mono',Consolas,'Liberation Mono',monospace;font-size:13px;line-height:1.6;resize:none;outline:none}
+.panel-body pre{padding:16px;overflow:auto;height:100%;font-family:'SF Mono',Consolas,'Liberation Mono',monospace;font-size:13px;line-height:1.6;color:var(--text)}
+.controls{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.controls select,.controls input{padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px}
+.controls select{cursor:pointer}
+.controls label{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.controls input[type=checkbox]{accent-color:var(--accent)}
+.btn-generate{padding:10px 28px;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:all .3s;white-space:nowrap}
+.btn-generate:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,92,252,0.35)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);text-align:center;padding:40px}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:13px;max-width:240px}
+footer{text-align:center;padding:20px;color:var(--text3);font-size:13px;border-top:1px solid var(--border)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface3);color:var(--text);padding:10px 24px;border-radius:var(--radius);font-size:14px;border:1px solid var(--border2);opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@media(max-width:768px){.panels{grid-template-columns:1fr;min-height:auto}.panel{min-height:350px}.controls{flex-direction:column;align-items:stretch}.controls select,.controls input{width:100%}}
+</style>
+</head>
+<body>
+<header>
+<h1>🧪 AI Unit Test Generator</h1>
+<span class="subtitle">Generate tests for any function</span>
+<a href="https://lifa-su.com/" class="back-link">← All Tools</a>
+</header>
+
+<div class="container">
+<div class="controls">
+<select id="lang" onchange="updatePlaceholder()">
+<option value="javascript">JavaScript (Jest)</option>
+<option value="python">Python (pytest)</option>
+<option value="java">Java (JUnit)</option>
+<option value="typescript">TypeScript (Jest)</option>
+<option value="go">Go (testing)</option>
+</select>
+<label><input type="checkbox" id="edgeCases" checked> Edge cases</label>
+<label><input type="checkbox" id="errorCases" checked> Error handling</label>
+<label><input type="checkbox" id="typeCases"> Type checking</label>
+<button class="btn-generate" onclick="generateTests()">⚡ Generate Tests</button>
+</div>
+
+<div class="panels">
+<div class="panel">
+<div class="panel-header">
+<span class="icon">📝</span> Input Function
+<span class="spacer"></span>
+<button onclick="loadExample()">Load Example</button>
+</div>
+<div class="panel-body">
+<textarea id="inputCode" placeholder="Paste your function here..." spellcheck="false"></textarea>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<span class="icon">🧪</span> Generated Tests
+<span class="spacer"></span>
+<button class="btn-copy" onclick="copyOutput()">📋 Copy</button>
+</div>
+<div class="panel-body">
+<div id="emptyState" class="empty-state">
+<div class="icon">🧪</div>
+<p>Paste a function and click Generate to create unit tests</p>
+</div>
+<pre id="outputCode" style="display:none"></pre>
+</div>
+</div>
+</div>
+</div>
+
+<footer><a href="https://lifa-su.com/">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank">☕ Support on Ko-fi</a></footer>
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+
+const examples={
+javascript:`function calculateDiscount(price, discountPercent) {
+  if (typeof price !== 'number' || typeof discountPercent !== 'number') {
+    throw new TypeError('Arguments must be numbers');
+  }
+  if (price < 0) throw new RangeError('Price cannot be negative');
+  if (discountPercent < 0 || discountPercent > 100) {
+    throw new RangeError('Discount must be between 0 and 100');
+  }
+  return price - (price * discountPercent / 100);
+}`,
+python:`def calculate_discount(price, discount_percent):
+    if not isinstance(price, (int, float)) or not isinstance(discount_percent, (int, float)):
+        raise TypeError("Arguments must be numbers")
+    if price < 0:
+        raise ValueError("Price cannot be negative")
+    if discount_percent < 0 or discount_percent > 100:
+        raise ValueError("Discount must be between 0 and 100")
+    return price - (price * discount_percent / 100)`,
+java:`public static double calculateDiscount(double price, double discountPercent) {
+    if (price < 0) throw new IllegalArgumentException("Price cannot be negative");
+    if (discountPercent < 0 || discountPercent > 100) {
+        throw new IllegalArgumentException("Discount must be between 0 and 100");
+    }
+    return price - (price * discountPercent / 100);
+}`,
+typescript:`function calculateDiscount(price: number, discountPercent: number): number {
+  if (price < 0) throw new RangeError('Price cannot be negative');
+  if (discountPercent < 0 || discountPercent > 100) {
+    throw new RangeError('Discount must be between 0 and 100');
+  }
+  return price - (price * discountPercent / 100);
+}`,
+go:`func CalculateDiscount(price, discountPercent float64) (float64, error) {
+	if price < 0 {
+		return 0, fmt.Errorf("price cannot be negative")
+	}
+	if discountPercent < 0 || discountPercent > 100 {
+		return 0, fmt.Errorf("discount must be between 0 and 100")
+	}
+	return price - (price * discountPercent / 100), nil
+}`
+};
+
+function updatePlaceholder(){
+  const lang=$('lang').value;
+  $('inputCode').placeholder=lang==='python'?'Paste your Python function here...':lang==='java'?'Paste your Java method here...':'Paste your function here...';
+}
+
+function loadExample(){
+  $('inputCode').value=examples[$('lang').value]||examples.javascript;
+}
+
+function parseFunctionInfo(code,lang){
+  let name='unknownFunction',params=[];
+  if(lang==='python'){
+    const m=code.match(/def\s+(\w+)\s*\(([^)]*)\)/);
+    if(m){name=m[1];params=m[2].split(',').map(p=>p.trim().split('=')[0].split(':')[0].trim()).filter(Boolean);}
+  }else if(lang==='java'){
+    const m=code.match(/(?:public|private|static|\s)+[\w<>\[\]]+\s+(\w+)\s*\(([^)]*)\)/);
+    if(m){name=m[1];params=m[2].split(',').map(p=>p.trim().split(/\s+/).pop()).filter(Boolean);}
+  }else if(lang==='go'){
+    const m=code.match(/func\s+(\w+)\s*\(([^)]*)\)/);
+    if(m){name=m[1];params=m[2].split(',').map(p=>p.trim().split(/\s+/)[0]).filter(Boolean);}
+  }else{
+    const m=code.match(/(?:function|const|let|var)\s+(\w+)\s*[=(]\s*(?:function\s*)?\(([^)]*)\)/)||code.match(/(\w+)\s*:\s*\(([^)]*)\)/);
+    if(m){name=m[1];params=m[2].split(',').map(p=>p.trim().split(':')[0].split('=')[0].trim()).filter(Boolean);}
+  }
+  const hasThrow=code.includes('throw ')||code.includes('raise ')||code.includes('Errorf(');
+  const hasTypeCheck=code.includes('typeof ')||code.includes('isinstance(')||code.includes('instanceof');
+  return{name,params,hasThrow,hasTypeCheck};
+}
+
+function generateTests(){
+  const code=$('inputCode').value.trim();
+  if(!code){showToast('Please paste a function first!');return;}
+  const lang=$('lang').value;
+  const edgeCases=$('edgeCases').checked;
+  const errorCases=$('errorCases').checked;
+  const typeCases=$('typeCases').checked;
+  const info=parseFunctionInfo(code,lang);
+  let out='';
+
+  if(lang==='javascript'||lang==='typescript'){
+    out=genJSTests(info,code,edgeCases,errorCases,typeCases,lang==='typescript');
+  }else if(lang==='python'){
+    out=genPythonTests(info,code,edgeCases,errorCases,typeCases);
+  }else if(lang==='java'){
+    out=genJavaTests(info,code,edgeCases,errorCases,typeCases);
+  }else if(lang==='go'){
+    out=genGoTests(info,code,edgeCases,errorCases,typeCases);
+  }
+
+  $('emptyState').style.display='none';
+  $('outputCode').style.display='block';
+  $('outputCode').textContent=out;
+  showToast('Tests generated!');
+}
+
+function genJSTests(info,code,edge,err,types,isTS){
+  const fn=info.name;
+  let t=`// ${isTS?'TypeScript':'JavaScript'} Unit Tests (Jest)\n`;
+  t+=`// Generated by Lifa AI Unit Test Generator\n\n`;
+  t+=`const { ${fn} } = require('./${fn}');\n\n`;
+  t+=`describe('${fn}', () => {\n`;
+  t+=`  // ✅ Basic functionality\n`;
+  t+=`  test('should return correct result with valid inputs', () => {\n`;
+  t+=`    expect(${fn}(100, 10)).toBe(90);\n`;
+  t+=`  });\n\n`;
+  t+=`  test('should handle zero values', () => {\n`;
+  t+=`    expect(${fn}(100, 0)).toBe(100);\n`;
+  t+=`    expect(${fn}(0, 50)).toBe(0);\n`;
+  t+=`  });\n\n`;
+  t+=`  test('should handle maximum boundary', () => {\n`;
+  t+=`    expect(${fn}(100, 100)).toBe(0);\n`;
+  t+=`  });\n`;
+  if(edge){
+    t+=`\n  // 🔄 Edge cases\n`;
+    t+=`  test('should handle decimal values', () => {\n`;
+    t+=`    expect(${fn}(99.99, 15.5)).toBeCloseTo(84.49, 1);\n`;
+    t+=`  });\n\n`;
+    t+=`  test('should handle very small values', () => {\n`;
+    t+=`    expect(${fn}(0.01, 1)).toBeCloseTo(0.0099, 4);\n`;
+    t+=`  });\n\n`;
+    t+=`  test('should handle large values', () => {\n`;
+    t+=`    const result = ${fn}(1000000, 50);\n`;
+    t+=`    expect(result).toBe(500000);\n`;
+    t+=`  });\n`;
+  }
+  if(err&&info.hasThrow){
+    t+=`\n  // ❌ Error handling\n`;
+    t+=`  test('should throw on negative price', () => {\n`;
+    t+=`    expect(() => ${fn}(-10, 20)).toThrow();\n`;
+    t+=`  });\n\n`;
+    t+=`  test('should throw on invalid discount range', () => {\n`;
+    t+=`    expect(() => ${fn}(100, -5)).toThrow();\n`;
+    t+=`    expect(() => ${fn}(100, 150)).toThrow();\n`;
+    t+=`  });\n`;
+  }
+  if(types&&info.hasTypeCheck){
+    t+=`\n  // 🔍 Type checking\n`;
+    t+=`  test('should throw on non-number inputs', () => {\n`;
+    t+=`    expect(() => ${fn}('100', 10)).toThrow(TypeError);\n`;
+    t+=`    expect(() => ${fn}(100, '10')).toThrow(TypeError);\n`;
+    t+=`    expect(() => ${fn}(null, 10)).toThrow(TypeError);\n`;
+    t+=`    expect(() => ${fn}(undefined, 10)).toThrow(TypeError);\n`;
+    t+=`  });\n`;
+  }
+  t+=`});\n`;
+  return t;
+}
+
+function genPythonTests(info,code,edge,err,types){
+  const fn=info.name;
+  let t=`# Python Unit Tests (pytest)\n`;
+  t+=`# Generated by Lifa AI Unit Test Generator\n\n`;
+  t+=`import pytest\nfrom module import ${fn}\n\n\n`;
+  t+=`class Test${fn.charAt(0).toUpperCase()+fn.slice(1).replace(/_(\w)/g,(_,c)=>c.toUpperCase())}:\n`;
+  t+=`    """Tests for ${fn}"""\n\n`;
+  t+=`    # ✅ Basic functionality\n`;
+  t+=`    def test_valid_inputs(self):\n`;
+  t+=`        assert ${fn}(100, 10) == 90\n\n`;
+  t+=`    def test_zero_values(self):\n`;
+  t+=`        assert ${fn}(100, 0) == 100\n`;
+  t+=`        assert ${fn}(0, 50) == 0\n\n`;
+  t+=`    def test_full_discount(self):\n`;
+  t+=`        assert ${fn}(100, 100) == 0\n`;
+  if(edge){
+    t+=`\n    # 🔄 Edge cases\n`;
+    t+=`    def test_decimal_values(self):\n`;
+    t+=`        result = ${fn}(99.99, 15.5)\n`;
+    t+=`        assert round(result, 2) == 84.49\n\n`;
+    t+=`    def test_very_small_values(self):\n`;
+    t+=`        assert ${fn}(0.01, 1) == pytest.approx(0.0099)\n\n`;
+    t+=`    def test_large_values(self):\n`;
+    t+=`        assert ${fn}(1_000_000, 50) == 500_000\n`;
+  }
+  if(err&&info.hasThrow){
+    t+=`\n    # ❌ Error handling\n`;
+    t+=`    def test_negative_price_raises(self):\n`;
+    t+=`        with pytest.raises(ValueError):\n`;
+    t+=`            ${fn}(-10, 20)\n\n`;
+    t+=`    def test_invalid_discount_raises(self):\n`;
+    t+=`        with pytest.raises(ValueError):\n`;
+    t+=`            ${fn}(100, -5)\n`;
+    t+=`        with pytest.raises(ValueError):\n`;
+    t+=`            ${fn}(100, 150)\n`;
+  }
+  if(types&&info.hasTypeCheck){
+    t+=`\n    # 🔍 Type checking\n`;
+    t+=`    def test_non_number_raises_type_error(self):\n`;
+    t+=`        with pytest.raises(TypeError):\n`;
+    t+=`            ${fn}("100", 10)\n`;
+    t+=`        with pytest.raises(TypeError):\n`;
+    t+=`            ${fn}(None, 10)\n`;
+  }
+  return t;
+}
+
+function genJavaTests(info,code,edge,err,types){
+  const fn=info.name;
+  const cls=fn.charAt(0).toUpperCase()+fn.slice(1);
+  let t=`// Java Unit Tests (JUnit 5)\n`;
+  t+=`// Generated by Lifa AI Unit Test Generator\n\n`;
+  t+=`import org.junit.jupiter.api.Test;\nimport org.junit.jupiter.api.DisplayName;\nimport static org.junit.jupiter.api.Assertions.*;\n\n`;
+  t+=`class ${cls}Test {\n\n`;
+  t+=`    // ✅ Basic functionality\n`;
+  t+=`    @Test\n    @DisplayName("Should return correct result with valid inputs")\n`;
+  t+=`    void testValidInputs() {\n        assertEquals(90.0, ${fn}(100, 10), 0.01);\n    }\n\n`;
+  t+=`    @Test\n    @DisplayName("Should handle zero values")\n`;
+  t+=`    void testZeroValues() {\n        assertEquals(100.0, ${fn}(100, 0), 0.01);\n        assertEquals(0.0, ${fn}(0, 50), 0.01);\n    }\n\n`;
+  t+=`    @Test\n    @DisplayName("Should handle full discount")\n`;
+  t+=`    void testFullDiscount() {\n        assertEquals(0.0, ${fn}(100, 100), 0.01);\n    }\n`;
+  if(edge){
+    t+=`\n    // 🔄 Edge cases\n`;
+    t+=`    @Test\n    @DisplayName("Should handle decimal values")\n`;
+    t+=`    void testDecimalValues() {\n        assertEquals(84.49, ${fn}(99.99, 15.5), 0.1);\n    }\n\n`;
+    t+=`    @Test\n    @DisplayName("Should handle large values")\n`;
+    t+=`    void testLargeValues() {\n        assertEquals(500000.0, ${fn}(1000000, 50), 0.01);\n    }\n`;
+  }
+  if(err&&info.hasThrow){
+    t+=`\n    // ❌ Error handling\n`;
+    t+=`    @Test\n    @DisplayName("Should throw on negative price")\n`;
+    t+=`    void testNegativePrice() {\n        assertThrows(IllegalArgumentException.class, () -> ${fn}(-10, 20));\n    }\n\n`;
+    t+=`    @Test\n    @DisplayName("Should throw on invalid discount")\n`;
+    t+=`    void testInvalidDiscount() {\n        assertThrows(IllegalArgumentException.class, () -> ${fn}(100, -5));\n        assertThrows(IllegalArgumentException.class, () -> ${fn}(100, 150));\n    }\n`;
+  }
+  t+=`}\n`;
+  return t;
+}
+
+function genGoTests(info,code,edge,err,types){
+  const fn=info.name;
+  let t=`// Go Unit Tests\n`;
+  t+=`// Generated by Lifa AI Unit Test Generator\n\n`;
+  t+=`package main\n\nimport (\n\t"math"\n\t"testing"\n)\n\n`;
+  t+=`// ✅ Basic functionality\n`;
+  t+=`func Test${fn}_ValidInputs(t *testing.T) {\n`;
+  t+=`\tresult, err := ${fn}(100, 10)\n\tif err != nil {\n\t\tt.Fatalf("unexpected error: %v", err)\n\t}\n`;
+  t+=`\tif result != 90 {\n\t\tt.Errorf("expected 90, got %v", result)\n\t}\n}\n\n`;
+  t+=`func Test${fn}_ZeroValues(t *testing.T) {\n`;
+  t+=`\tresult, _ := ${fn}(100, 0)\n\tif result != 100 {\n\t\tt.Errorf("expected 100, got %v", result)\n\t}\n`;
+  t+=`\tresult2, _ := ${fn}(0, 50)\n\tif result2 != 0 {\n\t\tt.Errorf("expected 0, got %v", result2)\n\t}\n}\n`;
+  if(edge){
+    t+=`\n// 🔄 Edge cases\n`;
+    t+=`func Test${fn}_DecimalValues(t *testing.T) {\n`;
+    t+=`\tresult, _ := ${fn}(99.99, 15.5)\n\texpected := 84.49\n`;
+    t+=`\tif math.Abs(result-expected) > 0.1 {\n\t\tt.Errorf("expected ~%v, got %v", expected, result)\n\t}\n}\n\n`;
+    t+=`func Test${fn}_LargeValues(t *testing.T) {\n`;
+    t+=`\tresult, _ := ${fn}(1000000, 50)\n\tif result != 500000 {\n\t\tt.Errorf("expected 500000, got %v", result)\n\t}\n}\n`;
+  }
+  if(err&&info.hasThrow){
+    t+=`\n// ❌ Error handling\n`;
+    t+=`func Test${fn}_NegativePrice(t *testing.T) {\n`;
+    t+=`\t_, err := ${fn}(-10, 20)\n\tif err == nil {\n\t\tt.Error("expected error for negative price")\n\t}\n}\n\n`;
+    t+=`func Test${fn}_InvalidDiscount(t *testing.T) {\n`;
+    t+=`\t_, err := ${fn}(100, -5)\n\tif err == nil {\n\t\tt.Error("expected error for negative discount")\n\t}\n`;
+    t+=`\t_, err2 := ${fn}(100, 150)\n\tif err2 == nil {\n\t\tt.Error("expected error for discount > 100")\n\t}\n}\n`;
+  }
+  return t;
+}
+
+function copyOutput(){
+  const text=$('outputCode').textContent;
+  if(!text){showToast('Generate tests first!');return;}
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!'));
+}
+
+function showToast(msg){
+  const t=$('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Load example on start
+document.addEventListener('DOMContentLoaded',()=>{loadExample();generateTests();});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Terminal - Smart Command Generator | AI-Powered CLI Assistant</title>
+<meta name="description" content="AI-powered terminal command generator. Describe what you want in plain language and get the exact shell command — with explanations, safety warnings, and pipe builder.">
+<meta name="keywords" content="AI terminal, command generator, shell commands, CLI assistant, bash, zsh, PowerShell, DevOps, Linux commands, AI developer tools">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="AI Terminal - Smart Command Generator">
+<meta property="og:description" content="Describe what you want in plain language and get the exact shell command with AI-powered explanations and safety warnings.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-terminal/">
+<meta property="og:image" content="https://lifa-su.com/ai-terminal/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Terminal - Smart Command Generator">
+<meta name="twitter:description" content="AI-powered terminal command generator. Get shell commands from plain language descriptions.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-terminal/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+<link rel="canonical" href="https://lifa-su.com/ai-terminal/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Terminal","description":"AI-powered terminal command generator with explanations and safety warnings","url":"https://lifa-su.com/ai-terminal/","applicationCategory":"DeveloperApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060a0e;--bg2:#0c1117;--bg3:#141c24;--bg4:#1a242e;
+  --green:#00ff41;--green2:#00cc33;--green-dim:rgba(0,255,65,0.1);--green-glow:rgba(0,255,65,0.25);
+  --amber:#ffb000;--amber-dim:rgba(255,176,0,0.15);
+  --red:#ff4444;--red-dim:rgba(255,68,68,0.15);
+  --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,0.15);
+  --white:#e8ecf0;--gray:#5a6a7a;--gray2:#3a4a5a;
+  --border:#1e2a36;--border2:#2a3a4a;
+  --font:'JetBrains Mono','Courier New',monospace;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 4px 24px rgba(0,0,0,0.5);
+  --transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--green);font-family:var(--font);min-height:100vh;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,255,65,0.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* Scrollbar */
+::selection{background:var(--green);color:var(--bg)}
+::-moz-selection{background:var(--green);color:var(--bg)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--green2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--green);box-shadow:0 0 6px var(--green-glow)}
+
+/* Animations */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes terminalBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@keyframes scanline{0%{top:-100%}100%{top:100%}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 5px var(--green-dim),0 0 20px rgba(0,255,65,0.05)}50%{box-shadow:0 0 10px var(--green-glow),0 0 40px rgba(0,255,65,0.1)}}
+@keyframes proGlow{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.1);opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+
+.container{max-width:960px;margin:0 auto;padding:20px 16px;position:relative;z-index:1}
+
+/* ═══ GLASSMORPHISM HEADER ═══ */
+.app-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(6,10,14,0.8);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;margin:-20px -16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  animation:slideDown 0.5s ease;
+}
+.app-header::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--green2),transparent);opacity:0.5;
+}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-brand .logo{font-size:1.5rem;filter:drop-shadow(0 0 8px var(--green-glow))}
+.header-brand h1{
+  font-family:var(--font);font-size:1.2rem;font-weight:700;
+  background:linear-gradient(135deg,var(--green),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.3px;
+}
+.header-brand .cursor{
+  display:inline-block;width:2px;height:1.2em;background:var(--green);
+  margin-left:2px;animation:terminalBlink 1s step-end infinite;vertical-align:text-bottom;
+}
+.header-badge{
+  font-family:var(--font-ui);font-size:0.65rem;padding:3px 10px;
+  border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;
+  background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,65,0.2);
+}
+.header-subtitle{
+  font-family:var(--font-ui);color:var(--gray);font-size:0.75rem;margin-top:2px;
+  font-weight:400;
+}
+
+/* ═══ API BAR ═══ */
+.api-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:8px 14px;margin-bottom:16px;
+  animation:fadeInUp 0.4s ease 0.1s both;
+  transition:var(--transition);
+}
+.api-bar:hover{border-color:var(--border2)}
+.api-bar:focus-within{border-color:var(--green2);box-shadow:0 0 12px var(--green-dim)}
+.api-bar label{color:var(--gray);font-size:0.8em;white-space:nowrap;font-family:var(--font-ui)}
+.api-bar input{
+  flex:1;border:none;background:transparent;color:var(--green);
+  font-family:var(--font);font-size:0.85em;outline:none;
+}
+.api-bar input::placeholder{color:var(--gray2)}
+.status{font-size:0.75em;padding:3px 10px;border-radius:12px;font-family:var(--font-ui);font-weight:600;white-space:nowrap}
+.status.ok{color:var(--green);background:var(--green-dim);border:1px solid rgba(0,255,65,0.2)}
+.status.no{color:var(--red);background:var(--red-dim);border:1px solid rgba(255,68,68,0.2)}
+
+/* ═══ TABS ═══ */
+.tabs{
+  display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;
+  animation:fadeInUp 0.4s ease 0.2s both;
+}
+.tab{
+  padding:10px 16px;background:var(--bg2);border:1px solid var(--border);
+  color:var(--gray);cursor:pointer;font-family:var(--font);font-size:0.82em;
+  transition:var(--transition);border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+  position:relative;user-select:none;
+}
+.tab:hover{color:var(--green);border-color:var(--green2);background:var(--bg3);transform:translateY(-1px)}
+.tab.active{
+  color:var(--green);border-color:var(--green);background:var(--bg3);
+  text-shadow:0 0 8px var(--green-glow);border-bottom-color:var(--bg3);
+}
+.tab.active::after{
+  content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;
+  background:var(--green);box-shadow:0 0 8px var(--green-glow);
+}
+
+/* ═══ PANELS ═══ */
+.panel{display:none;animation:fadeInUp 0.35s ease}
+.panel.active{display:block}
+
+/* ═══ INPUT GROUPS ═══ */
+.input-group{margin-bottom:14px}
+.input-group label{
+  display:block;color:var(--green2);font-size:0.8em;margin-bottom:6px;
+  font-family:var(--font);transition:color 0.2s;
+}
+.input-group label::before{content:'❯ ';opacity:0.6}
+textarea,input[type=text],input[type=password]{
+  width:100%;background:var(--bg2);border:1px solid var(--border);
+  color:var(--green);padding:12px 14px;font-family:var(--font);font-size:0.88em;
+  resize:vertical;outline:none;border-radius:var(--radius-sm);
+  transition:var(--transition);
+}
+textarea:hover,input[type=text]:hover,input[type=password]:hover{border-color:var(--border2)}
+textarea:focus,input[type=text]:focus,input[type=password]:focus{
+  border-color:var(--green);box-shadow:0 0 12px var(--green-dim),inset 0 0 12px rgba(0,255,65,0.03);
+}
+textarea{min-height:80px;line-height:1.5}
+textarea::placeholder,input::placeholder{color:var(--gray2)}
+
+/* ═══ PLATFORM SELECT ═══ */
+.platform-select{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.platform-btn{
+  padding:7px 16px;background:var(--bg2);border:1px solid var(--border);
+  color:var(--gray);cursor:pointer;font-family:var(--font);font-size:0.8em;
+  border-radius:var(--radius-sm);transition:var(--transition);
+}
+.platform-btn:hover{color:var(--cyan);border-color:rgba(0,229,255,0.3);background:var(--bg3)}
+.platform-btn.active{
+  color:var(--cyan);border-color:var(--cyan);
+  background:var(--cyan-dim);text-shadow:0 0 8px rgba(0,229,255,0.3);
+}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  padding:10px 24px;background:transparent;border:1px solid var(--green);
+  color:var(--green);font-family:var(--font);cursor:pointer;font-size:0.85em;
+  transition:var(--transition);border-radius:var(--radius-sm);
+  position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(0,255,65,0.1),transparent);
+  transition:left 0.5s;
+}
+.btn:hover::before{left:100%}
+.btn:hover{
+  background:var(--green);color:var(--bg);text-shadow:none;
+  box-shadow:0 0 20px var(--green-glow),0 0 40px rgba(0,255,65,0.1);
+  transform:translateY(-1px);
+}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn:disabled:hover{background:transparent;color:var(--green);box-shadow:none}
+.btn:disabled::before{display:none}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ═══ OUTPUT ═══ */
+.output{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:16px;margin-top:14px;min-height:60px;white-space:pre-wrap;
+  font-size:0.85em;line-height:1.7;position:relative;
+  transition:var(--transition);
+}
+.output.visible{animation:fadeInUp 0.4s ease}
+.output .cmd{color:var(--cyan);font-weight:600}
+.output .warn{color:var(--red);font-weight:600}
+.output .explain{color:var(--amber)}
+.output .label{color:var(--green2);font-weight:600}
+
+/* ═══ COPY BUTTON ═══ */
+.copy-btn{
+  position:absolute;top:8px;right:8px;padding:5px 12px;font-size:0.75em;
+  background:var(--bg3);border:1px solid var(--border);color:var(--gray);
+  cursor:pointer;font-family:var(--font);border-radius:var(--radius-sm);
+  transition:var(--transition);
+}
+.copy-btn:hover{color:var(--green);border-color:var(--green);background:var(--green-dim)}
+.copy-btn.copied{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-dim)}
+
+/* ═══ DANGER BANNER ═══ */
+.danger-banner{
+  background:var(--red-dim);border:1px solid rgba(255,68,68,0.3);border-radius:var(--radius-sm);
+  color:var(--red);padding:10px 14px;margin-top:10px;font-size:0.82em;
+  animation:fadeIn 0.3s ease;
+}
+.danger-banner::before{content:'⚠ Warning: ';font-weight:700}
+
+/* ═══ LOADING ═══ */
+.loading{color:var(--green2);animation:pulse 1.2s ease-in-out infinite}
+.loading::after{
+  content:'';display:inline-block;width:12px;text-align:left;
+  animation:dots 1.5s steps(4,end) infinite;
+}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+/* ═══ HISTORY ═══ */
+.history-item{
+  padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;
+  font-size:0.82em;display:flex;justify-content:space-between;align-items:center;
+  transition:var(--transition);border-radius:var(--radius-sm);margin-bottom:2px;
+}
+.history-item:hover{background:var(--bg3);border-color:var(--border2)}
+.history-item .time{color:var(--gray);font-size:0.75em}
+.history-item .del{
+  color:var(--gray2);cursor:pointer;padding:4px 8px;border-radius:4px;
+  transition:var(--transition);
+}
+.history-item .del:hover{color:var(--red);background:var(--red-dim)}
+
+/* ═══ REFERENCE GRID ═══ */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.ref-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;transition:var(--transition);
+}
+.ref-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+.ref-card h3{
+  color:var(--green);font-size:0.9em;margin-bottom:10px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.cmd-line{
+  display:flex;justify-content:space-between;padding:6px 8px;cursor:pointer;
+  font-size:0.82em;border-radius:4px;transition:var(--transition);margin:2px 0;
+}
+.cmd-line:hover{background:var(--bg3);color:var(--cyan)}
+.cmd-line .desc{color:var(--gray);font-size:0.85em;text-align:right;max-width:50%}
+
+/* ═══ PIPE BUILDER ═══ */
+.pipe-step{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.pipe-step input{flex:1}
+.pipe-sym{color:var(--amber);font-weight:bold;font-size:1.1em;text-shadow:0 0 6px var(--amber-dim)}
+.pipe-remove{
+  color:var(--red);cursor:pointer;padding:4px 8px;border-radius:4px;
+  transition:var(--transition);
+}
+.pipe-remove:hover{background:var(--red-dim)}
+
+/* ═══ PRO SECTION ═══ */
+.pro-section{
+  margin-top:32px;
+  background:linear-gradient(135deg,rgba(0,30,15,0.8),rgba(0,50,30,0.6));
+  border:1px solid rgba(0,204,51,0.3);border-radius:var(--radius);
+  padding:28px 24px;position:relative;overflow:hidden;
+  animation:fadeInUp 0.5s ease 0.3s both;
+}
+.pro-section::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(0,255,65,0.04) 0%,transparent 70%);
+  animation:proGlow 6s ease-in-out infinite;pointer-events:none;
+}
+.pro-section::after{
+  content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(0,255,65,0.03),transparent);
+  animation:shimmer 8s ease-in-out infinite;pointer-events:none;
+}
+.pro-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--green),var(--cyan));
+  color:var(--bg);padding:5px 14px;border-radius:20px;
+  font-size:0.8em;font-weight:700;margin-bottom:16px;
+  font-family:var(--font-ui);letter-spacing:0.5px;
+  box-shadow:0 2px 12px var(--green-glow);
+}
+.pro-features{list-style:none;margin-bottom:20px}
+.pro-features li{
+  padding:8px 0;font-size:0.85em;color:var(--green2);
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-ui);
+  border-bottom:1px solid rgba(0,204,51,0.1);
+}
+.pro-features li:last-child{border:none}
+.pro-features li::before{content:'✓';color:var(--cyan);font-weight:700;font-size:1em}
+.pro-btn{
+  display:inline-flex;align-items:center;gap:10px;padding:12px 28px;
+  background:linear-gradient(135deg,var(--green),var(--cyan));
+  color:var(--bg);border:none;font-family:var(--font-ui);font-size:0.9em;
+  font-weight:700;cursor:pointer;border-radius:50px;text-decoration:none;
+  transition:all 0.3s;box-shadow:0 4px 20px var(--green-glow);
+}
+.pro-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 30px rgba(0,255,65,0.4);
+  color:var(--bg);
+}
+
+/* ═══ KO-FI FOOTER ═══ */
+.kofi-footer{
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:28px 24px;text-align:center;margin-top:32px;
+  border-radius:var(--radius) var(--radius) 0 0;
+}
+.kofi-footer p{color:var(--gray);font-size:0.85rem;margin-bottom:14px;font-family:var(--font-ui)}
+.kofi-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 24px;
+  background:linear-gradient(135deg,#ff5e5b,#ff4757);color:#fff;
+  border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none;
+  transition:all 0.3s;box-shadow:0 4px 16px rgba(255,71,87,0.3);
+  font-family:var(--font-ui);
+}
+.kofi-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,71,87,0.5);color:#fff}
+
+/* ═══ SITE FOOTER ═══ */
+.site-footer{
+  text-align:center;padding:20px 16px;
+  color:var(--gray);font-size:0.78rem;
+  border-top:1px solid var(--border);
+  font-family:var(--font-ui);
+}
+.site-footer a{color:var(--green2);text-decoration:none;transition:color 0.2s}
+.site-footer a:hover{color:var(--green)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:768px){
+  .container{padding:12px 10px}
+  .app-header{padding:12px 14px;margin:-12px -10px 16px;flex-direction:column;gap:10px;align-items:flex-start}
+  .header-brand h1{font-size:1rem}
+  .tabs{gap:2px}
+  .tab{padding:8px 10px;font-size:0.78em}
+  .platform-select{gap:4px}
+  .platform-btn{padding:6px 10px;font-size:0.75em}
+  .ref-grid{grid-template-columns:1fr}
+  .btn{padding:10px 16px;width:100%}
+  .btn-row{flex-direction:column}
+  .pro-section{padding:20px 16px}
+  .output{font-size:0.8em;padding:12px}
+  .api-bar{flex-wrap:wrap}
+  .api-bar input{min-width:0}
+}
+@media(max-width:480px){
+  .app-header{padding:10px 12px}
+  .header-brand h1{font-size:0.9rem}
+  .header-subtitle{font-size:0.7rem}
+  .tab{padding:7px 8px;font-size:0.74em}
+  .platform-btn{padding:5px 8px;font-size:0.72em;flex:1;text-align:center}
+  textarea{min-height:70px}
+  .cmd-line{flex-direction:column;gap:2px}
+  .cmd-line .desc{text-align:left;max-width:100%}
+  .history-item{flex-direction:column;align-items:flex-start;gap:4px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="app-header">
+  <div class="header-brand">
+    <span class="logo">💻</span>
+    <h1>AI Terminal<span class="cursor"></span></h1>
+  </div>
+  <div class="header-actions">
+    <span class="header-badge">
+      <span class="header-badge-dot"></span>
+      AI-Powered
+    </span>
+  </div>
+</header>
+
+<div class="api-bar">
+  <label style="color:var(--gray);font-size:.8em;white-space:nowrap;font-family:var(--font-ui)">🔑 API Key:</label>
+  <input type="password" id="apiKey" placeholder="Enter DeepSeek API Key" style="border:none;background:transparent">
+  <span id="apiStatus" class="status no">Not set</span>
+</div>
+
+<div class="tabs" role="tablist">
+  <div class="tab active" data-tab="generate" role="tab" aria-selected="true">⌨ Generate</div>
+  <div class="tab" data-tab="explain" role="tab">📖 Explain</div>
+  <div class="tab" data-tab="pipe" role="tab">🔗 Pipe Builder</div>
+  <div class="tab" data-tab="reference" role="tab">📋 Cheat Sheet</div>
+  <div class="tab" data-tab="history" role="tab">🕐 History</div>
+</div>
+
+<!-- Generate Command Panel -->
+<div class="panel active" id="panel-generate" role="tabpanel">
+  <div class="platform-select">
+    <div class="platform-btn active" data-p="bash">Linux/Bash</div>
+    <div class="platform-btn" data-p="zsh">macOS/Zsh</div>
+    <div class="platform-btn" data-p="powershell">Windows/PS</div>
+  </div>
+  <div class="input-group">
+    <label>Describe what you want to do</label>
+    <textarea id="genInput" placeholder="e.g. Find all files larger than 100MB in current directory and sort by size" rows="3"></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generateCmd()">
+      <span class="btn-icon">▶</span> Generate Command
+    </button>
+    <span class="shortcut-hint">⌘+Enter</span>
+  </div>
+  <div id="genOutput" class="output" style="display:none"></div>
+</div>
+
+<!-- Explain Command Panel -->
+<div class="panel" id="panel-explain" role="tabpanel">
+  <div class="input-group">
+    <label>Paste the command to explain</label>
+    <textarea id="explainInput" placeholder="e.g. find . -name '*.log' -mtime +30 -exec rm {} \;" rows="3"></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="explainCmd()">
+      <span class="btn-icon">🔍</span> Explain Command
+    </button>
+    <span class="shortcut-hint">⌘+Enter</span>
+  </div>
+  <div id="explainOutput" class="output" style="display:none"></div>
+</div>
+
+<!-- Pipe Builder Panel -->
+<div class="panel" id="panel-pipe" role="tabpanel">
+  <div class="platform-select">
+    <div class="platform-btn active" data-p="bash">Linux/Bash</div>
+    <div class="platform-btn" data-p="zsh">macOS/Zsh</div>
+    <div class="platform-btn" data-p="powershell">Windows/PS</div>
+  </div>
+  <div class="input-group">
+    <label>Describe the pipe workflow</label>
+    <textarea id="pipeInput" placeholder="e.g. Read access.log, filter 404 errors, count occurrences per IP, sort descending, show top 10" rows="3"></textarea>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generatePipe()">
+      <span class="btn-icon">🔗</span> Build Pipe Command
+    </button>
+    <span class="shortcut-hint">⌘+Enter</span>
+  </div>
+  <div id="pipeOutput" class="output" style="display:none"></div>
+</div>
+
+<!-- Cheat Sheet Panel -->
+<div class="panel" id="panel-reference" role="tabpanel">
+  <div id="refGrid" class="ref-grid"></div>
+</div>
+
+<!-- History Panel -->
+<div class="panel" id="panel-history" role="tabpanel">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <button class="btn btn-ghost" onclick="clearHistory()" style="font-size:.78em;padding:5px 12px">🗑 Clear All</button>
+  </div>
+  <div id="historyList"></div>
+</div>
+
+<!-- Pro Section -->
+<div class="pro-section">
+  <div class="pro-glow"></div>
+  <div class="pro-content">
+    <div class="pro-badge">⚡ PRO</div>
+    <ul class="pro-features">
+      <li><span class="check">✓</span> Unlimited AI command generations</li>
+      <li><span class="check">✓</span> Advanced pipe builder with multi-step chains</li>
+      <li><span class="check">✓</span> Custom command templates & snippets</li>
+      <li><span class="check">✓</span> Priority support & early access to new features</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="pro-btn">☕ Unlock Pro on Ko-fi</a>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<!-- Ko-fi Support Footer -->
+<div class="kofi-footer">
+  <p>Enjoying this tool? Support the developer ❤️</p>
+  <a class="kofi-btn" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">
+    ☕ Buy me a Coffee on Ko-fi
+  </a>
+</div>
+
+<!-- Site Footer -->
+<footer class="site-footer">
+  © 2025 <a href="https://lifa-su.com" target="_blank">FeiDev Tools</a> · Made with ❤️ · <a href="https://ko-fi.com/feidev" target="_blank">Support on Ko-fi</a>
+</footer>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// AI TERMINAL — Smart Command Generator
+// ═══════════════════════════════════════════════════════════════
+
+const DANGEROUS_PATTERNS = [
+  {p:/rm\s+(-[a-z]*f[a-z]*\s+)?(-[a-z]*r[a-z]*\s+|--recursive)/i, m:'rm -rf may delete many files irreversibly'},
+  {p:/rm\s+(-[a-z]*r[a-z]*\s+)?(-[a-z]*f[a-z]*)/i, m:'rm -rf may delete many files irreversibly'},
+  {p:/rm\s+-rf\s*\//i, m:'rm -rf / will destroy the entire system! Extremely dangerous'},
+  {p:/chmod\s+777/i, m:'chmod 777 grants full permissions to all users — security risk'},
+  {p:/chmod\s+-R\s+777/i, m:'Recursive chmod 777 is extremely dangerous'},
+  {p:/mkfs\./i, m:'mkfs will format the disk — all data will be lost'},
+  {p:/dd\s+if=.*of=\/dev/i, m:'dd writes directly to device — may overwrite entire disk'},
+  {p:/>\s*\/dev\/sd[a-z]/i, m:'Writing directly to disk device — data will be lost'},
+  {p:/:.*\(\)\s*\{.*\|.*\}/i, m:'Possible fork bomb — will exhaust system resources'},
+  {p:/curl.*\|\s*(ba)?sh/i, m:'Downloading and executing script from network — security risk'},
+  {p:/wget.*\|\s*(ba)?sh/i, m:'Downloading and executing script from network — security risk'},
+  {p:/shutdown|reboot|init\s+[06]/i, m:'Will shut down or reboot the system'},
+  {p:/kill\s+-9\s+-1/i, m:'Will kill all processes'},
+  {p:/>\s*\/etc\//i, m:'Overwriting system config files — may break the system'},
+];
+
+const REFERENCE = {
+  '📁 File Operations': [
+    ['ls -la', 'List all files (incl. hidden)'],
+    ['find . -name "*.txt"', 'Find txt files'],
+    ['cp -r src/ dst/', 'Copy directory recursively'],
+    ['mv old new', 'Move / rename'],
+    ['du -sh *', 'Show directory sizes'],
+    ['df -h', 'Show disk space'],
+    ['tar -czf a.tar.gz dir/', 'Compress directory'],
+    ['tar -xzf a.tar.gz', 'Extract archive'],
+  ],
+  '🌐 Network': [
+    ['curl -I url', 'View HTTP headers'],
+    ['wget -c url', 'Resume download'],
+    ['ping -c 4 host', 'Ping test'],
+    ['netstat -tlnp', 'Show listening ports'],
+    ['ss -tlnp', 'Show ports (modern)'],
+    ['scp file user@host:path', 'Remote copy'],
+    ['ssh user@host', 'SSH connect'],
+    ['dig domain', 'DNS lookup'],
+  ],
+  '⚙ Process Management': [
+    ['ps aux', 'List all processes'],
+    ['top / htop', 'Real-time process monitor'],
+    ['kill -9 PID', 'Force kill process'],
+    ['nohup cmd &', 'Run in background'],
+    ['jobs / fg / bg', 'Job control'],
+    ['lsof -i :8080', 'Check port usage'],
+    ['systemctl status svc', 'Service status'],
+    ['crontab -e', 'Edit cron jobs'],
+  ],
+  '🔀 Git': [
+    ['git log --oneline -10', 'Compact log'],
+    ['git diff --staged', 'View staged changes'],
+    ['git stash / pop', 'Stash / restore changes'],
+    ['git branch -a', 'List all branches'],
+    ['git reset --soft HEAD~1', 'Undo last commit'],
+    ['git cherry-pick hash', 'Cherry-pick commit'],
+    ['git rebase -i HEAD~3', 'Interactive rebase'],
+    ['git reflog', 'Reference log'],
+  ],
+  '🐳 Docker': [
+    ['docker ps -a', 'List all containers'],
+    ['docker images', 'List images'],
+    ['docker logs -f ctn', 'Stream logs'],
+    ['docker exec -it ctn sh', 'Enter container'],
+    ['docker-compose up -d', 'Start services'],
+    ['docker system prune', 'Clean up resources'],
+    ['docker build -t name .', 'Build image'],
+    ['docker volume ls', 'List volumes'],
+  ],
+  '🔍 Text Processing': [
+    ['grep -rn "text" .', 'Recursive text search'],
+    ["awk '{print $1}'", 'Extract first column'],
+    ['sed -i "s/old/new/g" f', 'Replace text'],
+    ['sort | uniq -c', 'Sort, dedupe & count'],
+    ['wc -l file', 'Count lines'],
+    ['head -n 20 / tail -n 20', 'View head / tail'],
+    ['cut -d":" -f1', 'Split by delimiter'],
+    ['jq ".key" file.json', 'Parse JSON'],
+  ],
+};
+
+let platform = 'bash';
+let history = JSON.parse(localStorage.getItem('cmdHistory') || '[]');
+
+// ═══ TABS ═══
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => { x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    t.setAttribute('aria-selected','true');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+    if (t.dataset.tab === 'history') renderHistory();
+    if (t.dataset.tab === 'reference') renderRef();
+  });
+});
+
+// ═══ PLATFORM ═══
+document.querySelectorAll('.platform-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    b.parentElement.querySelectorAll('.platform-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    platform = b.dataset.p;
+  });
+});
+
+// ═══ API KEY ═══
+const apiKeyInput = document.getElementById('apiKey');
+const apiStatus = document.getElementById('apiStatus');
+apiKeyInput.value = localStorage.getItem('deepseekKey') || '';
+updateApiStatus();
+apiKeyInput.addEventListener('input', () => {
+  localStorage.setItem('deepseekKey', apiKeyInput.value);
+  updateApiStatus();
+});
+function updateApiStatus() {
+  if (apiKeyInput.value.trim()) {
+    apiStatus.textContent = 'Connected ✓';
+    apiStatus.className = 'status ok';
+  } else {
+    apiStatus.textContent = 'Not set';
+    apiStatus.className = 'status no';
+  }
+}
+
+// ═══ API CALL ═══
+async function callAPI(messages) {
+  const key = apiKeyInput.value.trim();
+  if (!key) { alert('Please set your DeepSeek API Key first'); return null; }
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+    body: JSON.stringify({ model: 'deepseek-chat', messages, temperature: 0.3, max_tokens: 2000 })
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error('API Error: ' + res.status + ' ' + e); }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+// ═══ DANGER CHECK ═══
+function checkDanger(cmd) {
+  const warnings = [];
+  DANGEROUS_PATTERNS.forEach(d => { if (d.p.test(cmd)) warnings.push(d.m); });
+  return warnings;
+}
+
+// ═══ OUTPUT HELPERS ═══
+function showOutput(el, html, cmd) {
+  el.style.display = 'block';
+  el.classList.remove('result-enter');
+  void el.offsetWidth;
+  el.classList.add('result-enter');
+  const dangers = cmd ? checkDanger(cmd) : [];
+  let dangerHtml = dangers.map(d => '<div class="danger-banner">' + d + '</div>').join('');
+  const escapedCmd = cmd ? cmd.replace(/`/g, '\\`').replace(/\\/g, '\\\\') : '';
+  el.innerHTML = html + dangerHtml + (cmd ? '<button class="copy-btn" onclick="copyCmd(this,`' + escapedCmd + '`)">📋 Copy</button>' : '');
+}
+
+function showRawOutput(el, html) {
+  el.style.display = 'block';
+  el.classList.remove('result-enter');
+  void el.offsetWidth;
+  el.classList.add('result-enter');
+  el.innerHTML = html;
+}
+
+function showLoading(el, text) {
+  el.style.display = 'block';
+  el.innerHTML = '<div class="loading-indicator"><div class="loading-dots"><span></span><span></span><span></span></div><span class="loading-text">' + text + '</span></div>';
+}
+
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+function addHistory(type, input, output) {
+  history.unshift({ type, input, output, time: new Date().toLocaleString('en-US') });
+  if (history.length > 50) history.pop();
+  localStorage.setItem('cmdHistory', JSON.stringify(history));
+}
+
+// ═══ GENERATE COMMAND ═══
+async function generateCmd() {
+  const input = document.getElementById('genInput').value.trim();
+  if (!input) return;
+  const out = document.getElementById('genOutput');
+  showLoading(out, 'Generating command');
+  try {
+    const messages = [
+      { role: 'system', content: `You are an expert terminal/shell command specialist with deep knowledge of ${platform} (and Linux/macOS/Windows CLI tools). Your job is to generate precise, safe, and efficient commands.
+
+RULES:
+- Output ONLY the command(s) inside a single code block (triple backticks)
+- After the code block, add a brief "Explanation:" section with 1-2 sentences per command
+- If a command is potentially destructive, add a "⚠ Warning:" line explaining the risk
+- Prefer safe alternatives (e.g., use 'trash' over 'rm' when possible, use '--dry-run' flags)
+- For complex tasks, chain commands with pipes or use && for sequential execution
+- Add brief inline comments with # for multi-line scripts
+- Always use the most modern/portable version of commands
+- If the task is ambiguous, generate the most common interpretation
+- Never generate commands that could cause data loss without explicit user intent` },
+      { role: 'user', content: input }
+    ];
+    const result = await callAPI(messages);
+    if (!result) return;
+    const cmdMatch = result.match(/```[\w]*\n([\s\S]*?)```/) || [null, result];
+    const cmd = cmdMatch[1].trim();
+    const explanationMatch = result.match(/```[\s\S]*?```\s*([\s\S]*)/);
+    const explanation = explanationMatch ? explanationMatch[1].trim() : '';
+    let html = '<span class="label">[' + platform.toUpperCase() + '] Generated Command:</span>\n\n<span class="cmd">' + escHtml(cmd) + '</span>';
+    if (explanation) html += '\n\n<span class="explain">' + escHtml(explanation) + '</span>';
+    showOutput(out, html, cmd);
+    addHistory('generate', input, cmd);
+  } catch (e) {
+    showRawOutput(out, '<span class="warn">✖ Error: ' + escHtml(e.message) + '</span>');
+  }
+}
+
+// ═══ EXPLAIN COMMAND ═══
+async function explainCmd() {
+  const input = document.getElementById('explainInput').value.trim();
+  if (!input) return;
+  const out = document.getElementById('explainOutput');
+  showLoading(out, 'Analyzing command');
+  try {
+    const messages = [
+      { role: 'system', content: `You are an expert terminal command analyst. Your job is to break down shell commands into clear, educational explanations.
+
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+1. Start with "Overview:" followed by a one-sentence summary of what the command does
+2. Then "Breakdown:" followed by each component explained on its own line:
+   - command_name — what it does
+   - -flag — what this flag means
+   - | pipe — what data flows between commands
+3. If there are dangerous operations, end with "⚠ Warning:" explaining the risks
+4. If there are common gotchas or tips, add a "💡 Tip:" line
+
+Keep explanations concise but thorough. Use plain English. Assume the reader is a developer who may not be familiar with this specific command.` },
+      { role: 'user', content: 'Explain this command: ' + input }
+    ];
+    const result = await callAPI(messages);
+    if (!result) return;
+    const dangers = checkDanger(input);
+    let dangerHtml = dangers.map(d => '<div class="danger-banner">' + d + '</div>').join('');
+    showRawOutput(out, '<span class="label">[Command Explanation]</span>\n\n<span class="explain">' + escHtml(result) + '</span>' + dangerHtml);
+    addHistory('explain', input, result);
+  } catch (e) {
+    showRawOutput(out, '<span class="warn">✖ Error: ' + escHtml(e.message) + '</span>');
+  }
+}
+
+// ═══ PIPE BUILDER ═══
+async function generatePipe() {
+  const input = document.getElementById('pipeInput').value.trim();
+  if (!input) return;
+  const out = document.getElementById('pipeOutput');
+  showLoading(out, 'Building pipe command');
+  try {
+    const messages = [
+      { role: 'system', content: `You are an expert at building Unix/Linux pipe chains for ${platform}. You excel at composing elegant, efficient data processing pipelines.
+
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+1. First, output the complete pipe command inside a code block (triple backticks)
+2. Then "Pipeline Breakdown:" explaining each stage:
+   Stage 1: command — what it does to the data
+   Stage 2: command — what it does to the data
+   (continue for each pipe stage)
+3. Add "Data Flow:" showing what the data looks like at each stage (abbreviated)
+4. If applicable, add "💡 Alternative:" with a different approach
+
+RULES:
+- Build efficient pipelines — avoid unnecessary steps
+- Use the most appropriate tool for each stage (awk vs cut vs sed etc.)
+- Prefer streaming/memory-efficient approaches for large data
+- For ${platform === 'powershell' ? 'PowerShell, use object pipeline with Select-Object, Where-Object, Sort-Object, Group-Object etc.' : 'Unix shells, use standard coreutils + common tools (grep, awk, sed, sort, uniq, cut, tr, wc, head, tail, xargs, jq)'}` },
+      { role: 'user', content: input }
+    ];
+    const result = await callAPI(messages);
+    if (!result) return;
+    const cmdMatch = result.match(/```[\w]*\n([\s\S]*?)```/);
+    const cmd = cmdMatch ? cmdMatch[1].trim() : result.split('\n')[0];
+    const explanationMatch = result.match(/```[\s\S]*?```\s*([\s\S]*)/);
+    const explanation = explanationMatch ? explanationMatch[1].trim() : '';
+    let html = '<span class="label">[' + platform.toUpperCase() + '] Pipe Command:</span>\n\n<span class="cmd">' + escHtml(cmd) + '</span>';
+    if (explanation) html += '\n\n<span class="explain">' + escHtml(explanation) + '</span>';
+    showOutput(out, html, cmd);
+    const dangers = checkDanger(cmd);
+    if (dangers.length) out.innerHTML += dangers.map(d => '<div class="danger-banner">' + d + '</div>').join('');
+    addHistory('pipe', input, cmd);
+  } catch (e) {
+    showRawOutput(out, '<span class="warn">✖ Error: ' + escHtml(e.message) + '</span>');
+  }
+}
+
+// ═══ REFERENCE ═══
+function renderRef() {
+  const grid = document.getElementById('refGrid');
+  grid.innerHTML = '';
+  for (const [cat, cmds] of Object.entries(REFERENCE)) {
+    let html = '<div class="ref-card"><h3>' + cat + '</h3>';
+    cmds.forEach(([c, d]) => {
+      html += '<div class="cmd-line" onclick="copyRef(this,\'' + escAttr(c) + '\')"><span>' + escHtml(c) + '</span><span class="desc">' + d + '</span></div>';
+    });
+    html += '</div>';
+    grid.innerHTML += html;
+  }
+}
+function copyRef(el, cmd) {
+  navigator.clipboard.writeText(cmd).then(() => {
+    const orig = el.querySelector('span').textContent;
+    el.querySelector('span').textContent = 'Copied ✓';
+    el.querySelector('span').style.color = 'var(--cyan)';
+    setTimeout(() => { el.querySelector('span').textContent = orig; el.querySelector('span').style.color = ''; }, 1000);
+  });
+}
+
+// ═══ HISTORY ═══
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!history.length) {
+    list.innerHTML = '<div style="color:var(--gray);padding:30px;text-align:center;font-family:var(--font-ui)">No history yet. Start generating commands!</div>';
+    return;
+  }
+  list.innerHTML = history.map((h, i) =>
+    '<div class="history-item" onclick="restoreHistory(' + i + ')">' +
+    '<div><span style="color:var(--cyan)">[' + h.type + ']</span> ' + escHtml(h.input.substring(0, 60)) + (h.input.length > 60 ? '...' : '') + '</div>' +
+    '<div><span class="time">' + h.time + '</span><span class="del" onclick="event.stopPropagation();delHistory(' + i + ')">✕</span></div>' +
+    '</div>'
+  ).join('');
+}
+function restoreHistory(i) {
+  const h = history[i];
+  if (h.type === 'generate') {
+    switchTab('generate');
+    document.getElementById('genInput').value = h.input;
+  } else if (h.type === 'explain') {
+    switchTab('explain');
+    document.getElementById('explainInput').value = h.input;
+  } else {
+    switchTab('pipe');
+    document.getElementById('pipeInput').value = h.input;
+  }
+}
+function delHistory(i) {
+  history.splice(i, 1);
+  localStorage.setItem('cmdHistory', JSON.stringify(history));
+  renderHistory();
+}
+function clearHistory() {
+  if (!confirm('Clear all history?')) return;
+  history = [];
+  localStorage.setItem('cmdHistory', '[]');
+  renderHistory();
+}
+
+// ═══ TAB SWITCH ═══
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => {
+    const isActive = t.dataset.tab === name;
+    t.classList.toggle('active', isActive);
+    t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+}
+
+// ═══ UTILITIES ═══
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ═══ KEYBOARD SHORTCUTS ═══
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    const active = document.querySelector('.panel.active');
+    if (active.id === 'panel-generate') generateCmd();
+    else if (active.id === 'panel-explain') explainCmd();
+    else if (active.id === 'panel-pipe') generatePipe();
+  }
+});
+
+// ═══ INIT ═══
+renderRef();
+renderHistory();
+</script>
+<footer style="text-align:center;padding:24px 16px;color:var(--gray);font-size:0.8rem;border-top:1px solid var(--border);">
+  <a href="https://lifa-su.com/" style="color:var(--cyan);">← Back to Lifa AI Tools</a> ·
+  <a href="https://ko-fi.com/feidev" target="_blank" style="color:var(--cyan);">☕ Support on Ko-fi</a> ·
+  © 2025 <a href="https://lifa-su.com" target="_blank" style="color:var(--cyan);">FeiDev Tools</a>
+</footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

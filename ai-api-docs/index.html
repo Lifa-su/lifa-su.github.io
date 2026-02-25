@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI API Documentation Generator - Create Beautiful API Docs</title>
+<meta name="description" content="Free AI-powered API documentation generator. Build interactive REST API docs with endpoint definitions, request/response examples, and live preview. Export as HTML or JSON.">
+<meta name="keywords" content="API documentation, API docs generator, REST API, Swagger alternative, OpenAPI, interactive docs, developer tools">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="AI API Documentation Generator">
+<meta property="og:description" content="Build interactive REST API documentation with endpoint definitions, examples, and live preview. Free and browser-based.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-api-docs/">
+<meta property="og:image" content="https://lifa-su.com/ai-api-docs/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI API Documentation Generator">
+<meta name="twitter:description" content="Build interactive REST API docs with live preview. Free Swagger alternative.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-api-docs/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>📋</text></svg>">
+<link rel="canonical" href="https://lifa-su.com/ai-api-docs/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI API Documentation Generator","description":"Free API documentation generator with live preview and export","url":"https://lifa-su.com/ai-api-docs/","applicationCategory":"DeveloperApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;
+  --border:#2a2a42;--border2:#363652;
+  --text:#e8e8f4;--text2:#9898b4;--text3:#686884;
+  --accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);
+  --success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--pro:#f5a623;
+  --get:#238636;--post:#1f6feb;--put:#d29922;--delete:#da3633;--patch:#8957e5;--head:#8b949e;--options:#8b949e;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);--shadow-lg:0 8px 48px rgba(0,0,0,0.5);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+
+/* ═══ HEADER ═══ */
+.app-header{
+  background:rgba(18,18,30,0.85);border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.app-brand{display:flex;align-items:center;gap:12px}
+.app-brand .logo-icon{font-size:1.6rem}
+.app-brand h1{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.3px}
+.app-brand .badge{font-size:0.65rem;padding:2px 8px;border-radius:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.badge-free{background:rgba(76,218,138,0.15);color:var(--success);border:1px solid rgba(76,218,138,0.3)}
+.header-actions{display:flex;gap:8px;align-items:center}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  padding:10px 20px;border:none;border-radius:var(--radius-sm);font-weight:600;
+  cursor:pointer;transition:all .25s ease;font-size:0.85rem;
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 2px 12px rgba(124,92,252,0.3)}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(124,92,252,0.5)}
+.btn-success{background:linear-gradient(135deg,var(--success),#3cb878);color:#fff;box-shadow:0 2px 12px rgba(76,218,138,0.3)}
+.btn-success:hover{box-shadow:0 4px 20px rgba(76,218,138,0.5)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--text2);transform:none}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(252,92,108,0.3)}
+.btn-danger:hover{background:rgba(252,92,108,0.1);border-color:var(--danger)}
+.btn-sm{padding:6px 12px;font-size:0.78rem;border-radius:6px}
+.btn-xs{padding:4px 8px;font-size:0.72rem;border-radius:5px}
+
+/* ═══ LAYOUT ═══ */
+.app-container{display:flex;height:calc(100vh - 53px)}
+.panel{overflow-y:auto;padding:20px}
+.panel-editor{width:45%;border-right:1px solid var(--border);background:var(--bg)}
+.panel-preview{width:55%;background:var(--surface)}
+
+/* ═══ CARDS & SECTIONS ═══ */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;transition:border-color .3s,box-shadow .3s;
+}
+.card:hover{border-color:var(--border2)}
+.section-title{
+  font-size:0.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;
+  letter-spacing:0.6px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;
+}
+.section-title .count{font-size:0.78rem;color:var(--accent);font-weight:700}
+
+/* ═══ FORMS ═══ */
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:0.75rem;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:10px 12px;background:var(--surface3);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);outline:none;transition:all .2s;font-family:inherit;font-size:0.85rem;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text3);opacity:0.8}
+.form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239898b4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-group textarea{resize:vertical;min-height:80px;font-family:'SF Mono',Monaco,Consolas,'Liberation Mono',monospace;font-size:0.78rem;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ═══ ENDPOINT CARDS ═══ */
+.endpoint-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:12px;overflow:hidden;transition:all .3s ease;
+}
+.endpoint-card:hover{border-color:var(--border2);box-shadow:0 2px 16px rgba(0,0,0,0.2)}
+.endpoint-header{
+  display:flex;align-items:center;padding:12px 16px;gap:10px;cursor:pointer;
+  user-select:none;transition:background .2s;
+}
+.endpoint-header:hover{background:var(--surface2)}
+.method-badge{
+  padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:800;color:#fff;
+  min-width:70px;text-align:center;text-transform:uppercase;letter-spacing:0.5px;
+  transition:all .2s;
+}
+.method-badge.GET{background:var(--get);box-shadow:0 2px 8px rgba(35,134,54,0.3)}
+.method-badge.POST{background:var(--post);box-shadow:0 2px 8px rgba(31,111,235,0.3)}
+.method-badge.PUT{background:var(--put);box-shadow:0 2px 8px rgba(210,153,34,0.3)}
+.method-badge.DELETE{background:var(--delete);box-shadow:0 2px 8px rgba(218,54,51,0.3)}
+.method-badge.PATCH{background:var(--patch);box-shadow:0 2px 8px rgba(137,87,229,0.3)}
+.method-badge.HEAD{background:var(--head)}
+.method-badge.OPTIONS{background:var(--options)}
+.endpoint-path{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.85rem;flex:1;word-break:break-all;color:var(--text)}
+.endpoint-desc-preview{font-size:0.75rem;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.endpoint-actions{display:flex;gap:6px}
+.chevron{transition:transform .3s ease;color:var(--text3);font-size:1.1rem}
+.chevron.open{transform:rotate(90deg)}
+.endpoint-body{
+  max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease,opacity .3s ease;
+  opacity:0;border-top:0px solid transparent;
+}
+.endpoint-body.open{
+  max-height:2000px;opacity:1;padding:16px;border-top:1px solid var(--border);
+}
+
+/* ═══ METHOD SELECT ═══ */
+.method-select{width:auto;min-width:100px;font-weight:700;padding:8px 30px 8px 12px}
+.method-select.GET{color:var(--get);border-color:var(--get)}
+.method-select.POST{color:var(--post);border-color:var(--post)}
+.method-select.PUT{color:var(--put);border-color:var(--put)}
+.method-select.DELETE{color:var(--delete);border-color:var(--delete)}
+.method-select.PATCH{color:var(--patch);border-color:var(--patch)}
+
+/* ═══ PARAMETERS ═══ */
+.param-row{display:grid;grid-template-columns:2fr 1fr 60px 3fr 32px;gap:8px;margin-bottom:6px;align-items:center}
+.param-row input,.param-row select{padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;outline:none;transition:all .2s}
+.param-row input:focus,.param-row select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.param-row select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239898b4' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.param-header{display:grid;grid-template-columns:2fr 1fr 60px 3fr 32px;gap:8px;padding:0 0 6px;font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;font-weight:700}
+.remove-btn{
+  width:28px;height:28px;border:none;background:transparent;color:var(--danger);
+  cursor:pointer;border-radius:6px;font-size:1rem;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;opacity:0.5;
+}
+.remove-btn:hover{background:rgba(252,92,108,0.15);opacity:1}
+
+/* ═══ TABS ═══ */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:12px}
+.tab{
+  padding:8px 16px;font-size:0.82rem;color:var(--text3);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;font-weight:600;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ═══ STATUS ROW ═══ */
+.status-row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
+.status-row input{flex:1}
+.status-row select{width:80px;flex:none}
+
+/* ═══ PRO SECTION ═══ */
+.pro-section{
+  background:linear-gradient(135deg,rgba(124,92,252,0.08),rgba(92,140,252,0.12));
+  border:1px solid rgba(124,92,252,0.2);border-radius:var(--radius);
+  padding:24px;margin:20px 0;position:relative;overflow:hidden;
+}
+.pro-section::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle,rgba(124,92,252,0.06) 0%,transparent 70%);
+  animation:proGlow 6s ease-in-out infinite;
+}
+@keyframes proGlow{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
+.pro-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--pro),#f7c948);color:#1a1a2e;
+  padding:4px 14px;border-radius:20px;font-size:0.72rem;font-weight:800;
+  margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;
+}
+.pro-features{list-style:none;margin-bottom:16px}
+.pro-features li{padding:4px 0;font-size:0.82rem;color:var(--text2);position:relative;padding-left:20px}
+.pro-features li::before{content:'✦';position:absolute;left:0;color:var(--accent)}
+.pro-btn{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 28px;
+  background:linear-gradient(135deg,var(--pro),#f7c948);color:#1a1a2e;
+  border:none;font-size:0.85rem;font-weight:700;cursor:pointer;border-radius:var(--radius-sm);
+  text-decoration:none;transition:all .3s;box-shadow:0 2px 12px rgba(245,166,35,0.3);
+}
+.pro-btn:hover{transform:translateY(-2px);box-shadow:0 4px 24px rgba(245,166,35,0.5)}
+
+/* ═══ FOOTER ═══ */
+.app-footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:20px 24px;text-align:center;
+}
+.app-footer p{font-size:0.82rem;color:var(--text3);margin-bottom:6px}
+.app-footer a{color:var(--accent2);text-decoration:none;transition:color .2s}
+.app-footer a:hover{color:var(--accent)}
+.footer-links{display:flex;justify-content:center;gap:16px;align-items:center;flex-wrap:wrap}
+.footer-sep{color:var(--border2)}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  padding:12px 24px;border-radius:var(--radius-sm);color:#fff;font-size:0.85rem;font-weight:600;
+  z-index:9999;transition:all .4s cubic-bezier(0.34,1.56,0.64,1);opacity:0;
+  box-shadow:var(--shadow-lg);pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ═══ MOBILE TOGGLE ═══ */
+.mobile-toggle{display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px}
+.mobile-toggle-btns{display:flex;gap:0;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)}
+.mobile-toggle-btn{
+  flex:1;padding:10px;text-align:center;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:all .2s;color:var(--text3);background:var(--surface);
+}
+.mobile-toggle-btn.active{background:var(--accent);color:#fff}
+.mobile-toggle-btn:hover:not(.active){background:var(--surface2);color:var(--text)}
+
+/* ═══ KO-FI FLOAT ═══ */
+.kofi-float{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  display:flex;align-items:center;gap:8px;
+  padding:12px 20px;border-radius:50px;
+  background:linear-gradient(135deg,#ff5e5b,#ff4081);color:#fff;
+  font-weight:700;font-size:0.85rem;text-decoration:none;
+  box-shadow:0 4px 20px rgba(255,94,91,0.4);transition:all .3s;
+  animation:kofi-bounce 0.5s ease-out;
+}
+.kofi-float:hover{transform:translateY(-3px);box-shadow:0 6px 28px rgba(255,94,91,0.5);color:#fff}
+@keyframes kofi-bounce{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:500px}}
+.animate-in{animation:fadeInUp .3s ease-out}
+
+/* ═══ PREVIEW STYLES ═══ */
+.preview-container{padding:32px;animation:fadeIn .3s ease}
+.preview-header{margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid var(--border)}
+.preview-api-title{
+  font-size:2rem;font-weight:800;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--text),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.preview-api-desc{font-size:0.95rem;color:var(--text2);margin-bottom:16px;line-height:1.7}
+.preview-api-meta{display:flex;gap:16px;flex-wrap:wrap}
+.preview-meta-item{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+  font-size:0.78rem;color:var(--text2);
+}
+.preview-meta-item code{
+  font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--accent2);font-weight:600;
+}
+.preview-endpoint{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:20px;overflow:hidden;transition:all .3s;
+}
+.preview-endpoint:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.preview-endpoint-header{
+  display:flex;align-items:center;gap:12px;padding:16px 20px;
+  border-bottom:1px solid var(--border);
+}
+.preview-method{
+  padding:6px 14px;border-radius:6px;font-size:0.75rem;font-weight:800;color:#fff;
+  min-width:75px;text-align:center;text-transform:uppercase;letter-spacing:0.5px;
+}
+.preview-method.GET{background:var(--get)}
+.preview-method.POST{background:var(--post)}
+.preview-method.PUT{background:var(--put)}
+.preview-method.DELETE{background:var(--delete)}
+.preview-method.PATCH{background:var(--patch)}
+.preview-method.HEAD{background:var(--head)}
+.preview-method.OPTIONS{background:var(--options)}
+.preview-path{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.92rem;font-weight:600;color:var(--text)}
+.preview-endpoint-body{padding:20px}
+.preview-desc{font-size:0.88rem;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.preview-subtitle{font-size:0.78rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.preview-subtitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.preview-param-table{width:100%;border-collapse:separate;border-spacing:0;font-size:0.82rem;margin-bottom:20px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.preview-param-table th{
+  text-align:left;padding:10px 14px;background:var(--surface3);color:var(--text2);
+  font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);
+}
+.preview-param-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2)}
+.preview-param-table tr:last-child td{border-bottom:none}
+.preview-param-table .param-name{font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--accent2);font-weight:600}
+.preview-param-table .param-type{color:var(--text3);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.75rem}
+.preview-param-table .param-required{color:var(--danger);font-weight:700;font-size:0.72rem}
+.preview-param-table .param-optional{color:var(--text3);font-size:0.72rem}
+.preview-code-block{
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:16px;margin-bottom:16px;overflow-x:auto;position:relative;
+}
+.preview-code-block code{
+  font-family:'SF Mono',Monaco,Consolas,'Liberation Mono',monospace;
+  font-size:0.78rem;color:var(--text);line-height:1.6;white-space:pre;
+}
+.preview-code-label{
+  position:absolute;top:8px;right:12px;font-size:0.65rem;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.5px;font-weight:700;
+}
+.preview-status-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 10px;
+  border-radius:4px;font-size:0.72rem;font-weight:700;
+}
+.preview-status-badge.s2xx{background:rgba(35,134,54,0.15);color:var(--success)}
+.preview-status-badge.s3xx{background:rgba(210,153,34,0.15);color:var(--warn)}
+.preview-status-badge.s4xx{background:rgba(218,54,51,0.15);color:var(--danger)}
+.preview-status-badge.s5xx{background:rgba(218,54,51,0.15);color:var(--danger)}
+.preview-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;min-height:400px;color:var(--text3);text-align:center;
+}
+.preview-empty .empty-icon{font-size:4rem;margin-bottom:16px;opacity:0.5}
+.preview-empty h3{font-size:1.1rem;color:var(--text2);margin-bottom:8px}
+.preview-empty p{font-size:0.85rem;max-width:300px;line-height:1.6}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:768px){
+  .app-header{padding:10px 16px;flex-wrap:wrap;gap:8px}
+  .app-brand h1{font-size:1.1rem}
+  .header-actions{gap:4px}
+  .header-actions .btn{padding:8px 12px;font-size:0.75rem}
+  .header-actions .btn .btn-label{display:none}
+  .mobile-toggle{display:block}
+  .app-container{flex-direction:column;height:auto;min-height:calc(100vh - 53px - 45px)}
+  .panel-editor,.panel-preview{width:100%;border-right:none}
+  .panel-editor{border-bottom:1px solid var(--border)}
+  .panel-editor.hidden,.panel-preview.hidden{display:none}
+  .param-row{grid-template-columns:1fr 1fr;gap:6px}
+  .param-header{display:none}
+  .param-row input,.param-row select{font-size:0.78rem}
+  .endpoint-header{padding:10px 12px;gap:8px}
+  .method-badge{min-width:60px;font-size:0.68rem;padding:3px 8px}
+  .endpoint-path{font-size:0.78rem}
+  .endpoint-desc-preview{display:none}
+  .preview-container{padding:16px}
+  .preview-api-title{font-size:1.4rem}
+  .preview-endpoint-header{padding:12px 14px;gap:8px;flex-wrap:wrap}
+  .preview-method{min-width:65px;font-size:0.7rem;padding:4px 10px}
+  .preview-path{font-size:0.82rem}
+  .preview-param-table{font-size:0.75rem}
+  .preview-param-table th,.preview-param-table td{padding:8px 10px}
+  .preview-code-block{padding:12px}
+  .preview-code-block code{font-size:0.72rem}
+  .pro-section{margin:12px 0;padding:16px}
+  .kofi-float{bottom:16px;right:16px;padding:10px 16px;font-size:0.78rem}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .app-brand .badge{display:none}
+  .preview-api-meta{flex-direction:column;gap:8px}
+  .preview-endpoint-header{flex-direction:column;align-items:flex-start;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="app-header">
+  <div class="app-brand">
+    <span class="logo-icon">📋</span>
+    <h1>API Documentation Generator</h1>
+    <span class="badge badge-free">Free</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="loadSample()" title="Load sample API">📦 <span class="btn-label">Sample</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="importJSON()" title="Import JSON">⬆ <span class="btn-label">Import</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportJSON()" title="Export JSON">💾 <span class="btn-label">JSON</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportHTML()" title="Export HTML">📄 <span class="btn-label">HTML</span></button>
+    <button class="btn btn-primary btn-sm" onclick="addEndpoint()">+ <span class="btn-label">Endpoint</span></button>
+  </div>
+</header>
+
+<!-- ═══ MOBILE TOGGLE ═══ -->
+<div class="mobile-toggle">
+  <div class="mobile-toggle-btns">
+    <div class="mobile-toggle-btn active" onclick="showPanel('editor')">✏️ Editor</div>
+    <div class="mobile-toggle-btn" onclick="showPanel('preview')">👁️ Preview</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="app-container">
+
+  <!-- EDITOR PANEL -->
+  <div class="panel panel-editor" id="editorPanel">
+
+    <!-- API Info -->
+    <div class="card animate-in">
+      <div class="section-title">📡 API Information</div>
+      <div class="form-group">
+        <label>API Title</label>
+        <input type="text" id="apiTitle" value="My API" oninput="renderPreview()" placeholder="e.g. Pet Store API">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="apiDesc" value="API documentation generated with AI API Docs" oninput="renderPreview()" placeholder="Brief description of your API">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Base URL</label>
+          <input type="text" id="apiBase" value="https://api.example.com/v1" oninput="renderPreview()" placeholder="https://api.example.com/v1">
+        </div>
+        <div class="form-group">
+          <label>Version</label>
+          <input type="text" id="apiVersion" value="1.0.0" oninput="renderPreview()" placeholder="1.0.0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Endpoints -->
+    <div class="section-title" style="padding:0 4px">
+      🔗 Endpoints <span class="count" id="endpointCount">0</span>
+    </div>
+    <div id="endpointList"></div>
+    <button class="btn btn-primary" onclick="addEndpoint()" style="width:100%;justify-content:center;margin-top:4px;margin-bottom:16px">+ Add New Endpoint</button>
+
+    <!-- Pro Section -->
+    <div class="pro-section">
+      <div class="pro-badge">⚡ PRO</div>
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;position:relative">Unlock Advanced Features</h3>
+      <ul class="pro-features">
+        <li>Import OpenAPI / Swagger specs</li>
+        <li>Auto-generate docs from cURL commands</li>
+        <li>Custom themes &amp; branding</li>
+        <li>Authentication flow documentation</li>
+        <li>Priority support &amp; early access</li>
+      </ul>
+      <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="pro-btn">☕ Unlock Pro on Ko-fi</a>
+    </div>
+
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <div class="panel panel-preview" id="previewPanel"></div>
+
+</div>
+<!-- END MAIN LAYOUT -->
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="app-footer">
+  <div class="footer-links">
+    <a href="https://lifa-su.com/">Part of FeiDev Tools</a>
+    <span class="footer-sep">·</span>
+    <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">☕ Support on Ko-fi</a>
+    <span class="footer-sep">·</span>
+    <span style="color:var(--text3);font-size:0.78rem">Built with ❤️ for developers</span>
+  </div>
+</footer>
+
+<!-- KO-FI FLOAT -->
+<a class="kofi-float" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">☕ Support</a>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- IMPORT INPUT -->
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+let endpoints = [];
+let expandedEndpoints = new Set();
+let nextId = 1;
+let activePanel = 'editor';
+
+function generateId() { return nextId++; }
+
+/* ═══ MOBILE PANEL TOGGLE ═══ */
+function showPanel(panel) {
+  activePanel = panel;
+  const editor = document.getElementById('editorPanel');
+  const preview = document.getElementById('previewPanel');
+  const btns = document.querySelectorAll('.mobile-toggle-btn');
+  if (panel === 'editor') {
+    editor.classList.remove('hidden');
+    preview.classList.add('hidden');
+    btns[0].classList.add('active');
+    btns[1].classList.remove('active');
+  } else {
+    editor.classList.add('hidden');
+    preview.classList.remove('hidden');
+    btns[1].classList.add('active');
+    btns[0].classList.remove('active');
+    renderPreview();
+  }
+}
+
+/* ═══ ADD ENDPOINT ═══ */
+function addEndpoint(data) {
+  const id = generateId();
+  const ep = {
+    id,
+    method: (data && data.method) || 'GET',
+    path: (data && data.path) || '/endpoint',
+    description: (data && data.description) || '',
+    parameters: (data && data.parameters) || [],
+    requestBody: (data && data.requestBody) || '',
+    responseExample: (data && data.responseExample) || '',
+    statusCode: (data && data.statusCode) || '200'
+  };
+  endpoints.push(ep);
+  if (!data) expandedEndpoints.add(id);
+  renderEndpoints();
+  renderPreview();
+  return id;
+}
+
+/* ═══ REMOVE ENDPOINT ═══ */
+function removeEndpoint(id) {
+  endpoints = endpoints.filter(e => e.id !== id);
+  expandedEndpoints.delete(id);
+  renderEndpoints();
+  renderPreview();
+  showToast('Endpoint removed');
+}
+
+/* ═══ TOGGLE ENDPOINT ═══ */
+function toggleEndpoint(id) {
+  if (expandedEndpoints.has(id)) {
+    expandedEndpoints.delete(id);
+  } else {
+    expandedEndpoints.add(id);
+  }
+  renderEndpoints();
+}
+
+/* ═══ MOVE ENDPOINT ═══ */
+function moveEndpoint(id, dir) {
+  const idx = endpoints.findIndex(e => e.id === id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= endpoints.length) return;
+  [endpoints[idx], endpoints[newIdx]] = [endpoints[newIdx], endpoints[idx]];
+  renderEndpoints();
+  renderPreview();
+}
+
+/* ═══ ADD PARAMETER ═══ */
+function addParam(epId) {
+  const ep = endpoints.find(e => e.id === epId);
+  if (!ep) return;
+  ep.parameters.push({ name: '', type: 'string', required: false, description: '' });
+  renderEndpoints();
+}
+
+/* ═══ REMOVE PARAMETER ═══ */
+function removeParam(epId, pIdx) {
+  const ep = endpoints.find(e => e.id === epId);
+  if (!ep) return;
+  ep.parameters.splice(pIdx, 1);
+  renderEndpoints();
+  renderPreview();
+}
+
+/* ═══ UPDATE ENDPOINT FIELD ═══ */
+function updateEndpoint(id, field, value) {
+  const ep = endpoints.find(e => e.id === id);
+  if (!ep) return;
+  ep[field] = value;
+  if (field === 'method') renderEndpoints();
+  renderPreview();
+}
+
+/* ═══ UPDATE PARAMETER ═══ */
+function updateParam(epId, pIdx, field, value) {
+  const ep = endpoints.find(e => e.id === epId);
+  if (!ep || !ep.parameters[pIdx]) return;
+  if (field === 'required') {
+    ep.parameters[pIdx][field] = value === 'true';
+  } else {
+    ep.parameters[pIdx][field] = value;
+  }
+  renderPreview();
+}
+
+/* ═══ RENDER ENDPOINTS ═══ */
+function renderEndpoints() {
+  const list = document.getElementById('endpointList');
+  document.getElementById('endpointCount').textContent = endpoints.length;
+  list.innerHTML = endpoints.map(ep => {
+    const isOpen = expandedEndpoints.has(ep.id);
+    return `
+    <div class="endpoint-card animate-in">
+      <div class="endpoint-header" onclick="toggleEndpoint(${ep.id})">
+        <span class="method-badge ${ep.method}">${ep.method}</span>
+        <span class="endpoint-path">${escHtml(ep.path)}</span>
+        ${ep.description && !isOpen ? `<span class="endpoint-desc-preview">${escHtml(ep.description)}</span>` : ''}
+        <div class="endpoint-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-xs btn-ghost" onclick="moveEndpoint(${ep.id},-1)" title="Move up">↑</button>
+          <button class="btn btn-xs btn-ghost" onclick="moveEndpoint(${ep.id},1)" title="Move down">↓</button>
+          <button class="btn btn-xs btn-danger" onclick="removeEndpoint(${ep.id})" title="Delete">✕</button>
+        </div>
+        <span class="chevron ${isOpen ? 'open' : ''}">›</span>
+      </div>
+      <div class="endpoint-body ${isOpen ? 'open' : ''}">
+        ${isOpen ? renderEndpointForm(ep) : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEndpointForm(ep) {
+  const methods = ['GET','POST','PUT','DELETE','PATCH','HEAD','OPTIONS'];
+  return `
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group">
+        <label>Method</label>
+        <select class="form-group method-select ${ep.method}" onchange="updateEndpoint(${ep.id},'method',this.value);this.className='form-group method-select '+this.value" style="width:100%;padding:10px 30px 10px 12px;background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-weight:700;font-size:0.85rem;cursor:pointer;appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239898b4' d='M6 8L1 3h10z'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 12px center;outline:none;transition:all .2s">
+          ${methods.map(m => `<option value="${m}" ${ep.method === m ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Path</label>
+        <input type="text" value="${escAttr(ep.path)}" oninput="updateEndpoint(${ep.id},'path',this.value)" placeholder="/users/{id}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" value="${escAttr(ep.description)}" oninput="updateEndpoint(${ep.id},'description',this.value)" placeholder="What does this endpoint do?">
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab(this,'params-${ep.id}')">Parameters</div>
+      <div class="tab" onclick="switchTab(this,'request-${ep.id}')">Request Body</div>
+      <div class="tab" onclick="switchTab(this,'response-${ep.id}')">Response</div>
+    </div>
+
+    <div id="params-${ep.id}" class="tab-content">
+      ${ep.parameters.length > 0 ? `
+        <div class="param-header">
+          <span>Name</span><span>Type</span><span>Req?</span><span>Description</span><span></span>
+        </div>` : ''}
+      ${ep.parameters.map((p, i) => `
+        <div class="param-row">
+          <input type="text" value="${escAttr(p.name)}" placeholder="name" oninput="updateParam(${ep.id},${i},'name',this.value)">
+          <select onchange="updateParam(${ep.id},${i},'type',this.value)">
+            ${['string','integer','number','boolean','array','object'].map(t => `<option ${p.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+          <select onchange="updateParam(${ep.id},${i},'required',this.value)">
+            <option value="false" ${!p.required?'selected':''}>No</option>
+            <option value="true" ${p.required?'selected':''}>Yes</option>
+          </select>
+          <input type="text" value="${escAttr(p.description)}" placeholder="Description" oninput="updateParam(${ep.id},${i},'description',this.value)">
+          <button class="remove-btn" onclick="removeParam(${ep.id},${i})" title="Remove">✕</button>
+        </div>
+      `).join('')}
+      <button class="btn btn-ghost btn-xs" onclick="addParam(${ep.id})" style="margin-top:6px">+ Add Parameter</button>
+    </div>
+
+    <div id="request-${ep.id}" class="tab-content" style="display:none">
+      <div class="form-group">
+        <label>Request Body (JSON)</label>
+        <textarea oninput="updateEndpoint(${ep.id},'requestBody',this.value)" placeholder='{\n  "key": "value"\n}'>${escHtml(ep.requestBody)}</textarea>
+      </div>
+    </div>
+
+    <div id="response-${ep.id}" class="tab-content" style="display:none">
+      <div class="status-row" style="margin-bottom:12px">
+        <div class="form-group" style="flex:1;margin-bottom:0">
+          <label>Status Code</label>
+          <input type="text" value="${escAttr(ep.statusCode)}" oninput="updateEndpoint(${ep.id},'statusCode',this.value)" placeholder="200">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Response Example (JSON)</label>
+        <textarea oninput="updateEndpoint(${ep.id},'responseExample',this.value)" placeholder='{\n  "id": 1,\n  "result": "success"\n}'>${escHtml(ep.responseExample)}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══ TAB SWITCHING ═══ */
+function switchTab(el, showId) {
+  const bar = el.parentElement;
+  const body = bar.parentElement;
+  bar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  body.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
+  document.getElementById(showId).style.display = 'block';
+}
+
+/* ═══ RENDER PREVIEW ═══ */
+function renderPreview() {
+  const panel = document.getElementById('previewPanel');
+  const title = document.getElementById('apiTitle').value;
+  const desc = document.getElementById('apiDesc').value;
+  const base = document.getElementById('apiBase').value;
+  const version = document.getElementById('apiVersion').value;
+
+  if (endpoints.length === 0) {
+    panel.innerHTML = `
+      <div class="preview-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:400px;color:var(--text3);text-align:center;padding:40px">
+        <div class="empty-icon" style="font-size:4rem;margin-bottom:16px;opacity:0.5">📋</div>
+        <h3 style="font-size:1.1rem;color:var(--text2);margin-bottom:8px">No endpoints yet</h3>
+        <p style="font-size:0.85rem;max-width:300px;line-height:1.6">Add your first endpoint or load a sample API to see the live documentation preview.</p>
+      </div>`;
+    return;
+  }
+
+  let html = `<div class="preview-container">`;
+  html += `<div class="preview-header">`;
+  html += `<div class="preview-api-title">${escHtml(title)}</div>`;
+  if (desc) html += `<div class="preview-api-desc">${escHtml(desc)}</div>`;
+  html += `<div class="preview-api-meta">`;
+  if (base) html += `<span class="preview-meta-item">🌐 <code>${escHtml(base)}</code></span>`;
+  if (version) html += `<span class="preview-meta-item">📌 v${escHtml(version)}</span>`;
+  html += `<span class="preview-meta-item">📊 ${endpoints.length} endpoint${endpoints.length !== 1 ? 's' : ''}</span>`;
+  html += `</div></div>`;
+
+  endpoints.forEach(ep => {
+    const statusClass = ep.statusCode.startsWith('2') ? 's2xx' : ep.statusCode.startsWith('3') ? 's3xx' : ep.statusCode.startsWith('4') ? 's4xx' : 's5xx';
+    html += `<div class="preview-endpoint">`;
+    html += `<div class="preview-endpoint-header">`;
+    html += `<span class="preview-method ${ep.method}">${ep.method}</span>`;
+    html += `<span class="preview-path">${escHtml(ep.path)}</span>`;
+    if (ep.statusCode) html += `<span class="preview-status-badge ${statusClass}" style="margin-left:auto">${escHtml(ep.statusCode)}</span>`;
+    html += `</div>`;
+    html += `<div class="preview-endpoint-body">`;
+
+    if (ep.description) {
+      html += `<div class="preview-desc">${escHtml(ep.description)}</div>`;
+    }
+
+    if (ep.parameters.length > 0) {
+      html += `<div class="preview-subtitle">Parameters</div>`;
+      html += `<table class="preview-param-table"><thead><tr>`;
+      html += `<th>Name</th><th>Type</th><th>Required</th><th>Description</th>`;
+      html += `</tr></thead><tbody>`;
+      ep.parameters.forEach(p => {
+        html += `<tr>`;
+        html += `<td class="param-name">${escHtml(p.name || '—')}</td>`;
+        html += `<td class="param-type">${escHtml(p.type)}</td>`;
+        html += `<td>${p.required ? '<span class="param-required">Required</span>' : '<span class="param-optional">Optional</span>'}</td>`;
+        html += `<td>${escHtml(p.description || '—')}</td>`;
+        html += `</tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+
+    if (ep.requestBody && ep.requestBody.trim()) {
+      html += `<div class="preview-subtitle">Request Body</div>`;
+      html += `<div class="preview-code-block"><span class="preview-code-label">JSON</span><code>${escHtml(ep.requestBody)}</code></div>`;
+    }
+
+    if (ep.responseExample && ep.responseExample.trim()) {
+      html += `<div class="preview-subtitle">Response ${ep.statusCode ? '(' + escHtml(ep.statusCode) + ')' : ''}</div>`;
+      html += `<div class="preview-code-block"><span class="preview-code-label">JSON</span><code>${escHtml(ep.responseExample)}</code></div>`;
+    }
+
+    html += `</div></div>`;
+  });
+
+  html += `</div>`;
+  panel.innerHTML = html;
+}
+
+/* ═══ HELPERS ═══ */
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ═══ EXPORT JSON ═══ */
+function exportJSON() {
+  const data = {
+    title: document.getElementById('apiTitle').value,
+    description: document.getElementById('apiDesc').value,
+    baseUrl: document.getElementById('apiBase').value,
+    version: document.getElementById('apiVersion').value,
+    endpoints: endpoints.map(ep => ({
+      method: ep.method,
+      path: ep.path,
+      description: ep.description,
+      parameters: ep.parameters,
+      requestBody: ep.requestBody,
+      responseExample: ep.responseExample,
+      statusCode: ep.statusCode
+    }))
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (data.title || 'api-docs').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('JSON exported!');
+}
+
+/* ═══ EXPORT HTML ═══ */
+function exportHTML() {
+  const title = document.getElementById('apiTitle').value;
+  const desc = document.getElementById('apiDesc').value;
+  const base = document.getElementById('apiBase').value;
+  const version = document.getElementById('apiVersion').value;
+
+  let html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escHtml(title)} - API Documentation</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0b0b12;color:#e8e8f4;line-height:1.6;padding:40px 20px}
+.container{max-width:900px;margin:0 auto}
+h1{font-size:2rem;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#e8e8f4,#5c8cfc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.desc{color:#9898b4;margin-bottom:16px;font-size:0.95rem}
+.meta{display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+.meta span{padding:6px 14px;background:#1a1a2c;border:1px solid #2a2a42;border-radius:20px;font-size:0.78rem;color:#9898b4}
+.meta code{color:#5c8cfc;font-weight:600}
+.endpoint{background:#1a1a2c;border:1px solid #2a2a42;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.ep-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #2a2a42}
+.method{padding:6px 14px;border-radius:6px;font-size:0.75rem;font-weight:800;color:#fff;min-width:75px;text-align:center;text-transform:uppercase}
+.GET{background:#238636}.POST{background:#1f6feb}.PUT{background:#d29922}.DELETE{background:#da3633}.PATCH{background:#8957e5}.HEAD,.OPTIONS{background:#8b949e}
+.path{font-family:monospace;font-size:0.92rem;font-weight:600}
+.ep-body{padding:20px}
+.ep-desc{color:#9898b4;margin-bottom:16px;font-size:0.88rem}
+.subtitle{font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;color:#e8e8f4}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:0.82rem;margin-bottom:20px;border-radius:8px;overflow:hidden;border:1px solid #2a2a42}
+th{text-align:left;padding:10px 14px;background:#222238;color:#9898b4;font-weight:700;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #2a2a42}
+td{padding:10px 14px;border-bottom:1px solid #2a2a42;color:#9898b4}
+tr:last-child td{border-bottom:none}
+.pname{font-family:monospace;color:#5c8cfc;font-weight:600}
+.ptype{font-family:monospace;color:#686884;font-size:0.75rem}
+.req{color:#fc5c6c;font-weight:700;font-size:0.72rem}
+.opt{color:#686884;font-size:0.72rem}
+pre{background:#0b0b12;border:1px solid #2a2a42;border-radius:8px;padding:16px;overflow-x:auto;margin-bottom:16px}
+code{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.78rem;color:#e8e8f4;line-height:1.6}
+.status{display:inline-flex;padding:3px 10px;border-radius:4px;font-size:0.72rem;font-weight:700}
+.s2{background:rgba(76,218,138,0.15);color:#4cda8a}
+.s3{background:rgba(92,140,252,0.15);color:#5c8cfc}
+.s4{background:rgba(252,92,108,0.15);color:#fc5c6c}
+.s5{background:rgba(252,92,108,0.15);color:#fc5c6c}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>${escHtml(title)}</h1>`;
+  if (desc) html += `\n<p class="desc">${escHtml(desc)}</p>`;
+  html += `\n<div class="meta">`;
+  if (base) html += `<span>🌐 <code>${escHtml(base)}</code></span>`;
+  if (version) html += `<span>📌 v${escHtml(version)}</span>`;
+  html += `</div>`;
+
+  endpoints.forEach(ep => {
+    const sc = ep.statusCode || '';
+    const scClass = sc.startsWith('2') ? 's2' : sc.startsWith('3') ? 's3' : sc.startsWith('4') ? 's4' : 's5';
+    html += `\n<div class="endpoint">
+<div class="ep-header">
+<span class="method ${ep.method}">${ep.method}</span>
+<span class="path">${escHtml(ep.path)}</span>
+${sc ? `<span class="status ${scClass}" style="margin-left:auto">${escHtml(sc)}</span>` : ''}
+</div>
+<div class="ep-body">`;
+    if (ep.description) html += `\n<p class="ep-desc">${escHtml(ep.description)}</p>`;
+    if (ep.parameters.length > 0) {
+      html += `\n<div class="subtitle">Parameters</div>\n<table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>`;
+      ep.parameters.forEach(p => {
+        html += `\n<tr><td class="pname">${escHtml(p.name||'—')}</td><td class="ptype">${escHtml(p.type)}</td><td>${p.required?'<span class="req">Required</span>':'<span class="opt">Optional</span>'}</td><td>${escHtml(p.description||'—')}</td></tr>`;
+      });
+      html += `\n</tbody></table>`;
+    }
+    if (ep.requestBody && ep.requestBody.trim()) {
+      html += `\n<div class="subtitle">Request Body</div>\n<pre><code>${escHtml(ep.requestBody)}</code></pre>`;
+    }
+    if (ep.responseExample && ep.responseExample.trim()) {
+      html += `\n<div class="subtitle">Response${sc ? ' ('+escHtml(sc)+')' : ''}</div>\n<pre><code>${escHtml(ep.responseExample)}</code></pre>`;
+    }
+    html += `\n</div></div>`;
+  });
+
+  html += `\n</div>\n<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>\n</html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (title || 'api-docs').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('HTML exported!');
+}
+
+/* ═══ IMPORT JSON ═══ */
+function importJSON() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.title) document.getElementById('apiTitle').value = data.title;
+      if (data.description) document.getElementById('apiDesc').value = data.description;
+      if (data.baseUrl) document.getElementById('apiBase').value = data.baseUrl;
+      if (data.version) document.getElementById('apiVersion').value = data.version;
+      endpoints = [];
+      expandedEndpoints.clear();
+      nextId = 1;
+      if (data.endpoints && Array.isArray(data.endpoints)) {
+        data.endpoints.forEach(ep => addEndpoint(ep));
+      }
+      showToast('API imported successfully!');
+    } catch (err) {
+      showToast('Invalid JSON file', true);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ═══ EXPORT MARKDOWN ═══ */
+function exportMarkdown() {
+  const title = document.getElementById('apiTitle').value;
+  const desc = document.getElementById('apiDesc').value;
+  const base = document.getElementById('apiBase').value;
+  const version = document.getElementById('apiVersion').value;
+  let md = `# ${title}\n\n`;
+  if (desc) md += `${desc}\n\n`;
+  if (base) md += `**Base URL:** \`${base}\`\n\n`;
+  if (version) md += `**Version:** ${version}\n\n`;
+  md += `---\n\n`;
+  endpoints.forEach(ep => {
+    md += `## ${ep.method} ${ep.path}\n\n`;
+    if (ep.description) md += `${ep.description}\n\n`;
+    if (ep.statusCode) md += `**Status:** ${ep.statusCode}\n\n`;
+    if (ep.parameters.length > 0) {
+      md += `### Parameters\n\n`;
+      md += `| Name | Type | Required | Description |\n`;
+      md += `|------|------|----------|-------------|\n`;
+      ep.parameters.forEach(p => {
+        md += `| \`${p.name}\` | ${p.type} | ${p.required ? 'Yes' : 'No'} | ${p.description} |\n`;
+      });
+      md += `\n`;
+    }
+    if (ep.requestBody && ep.requestBody.trim()) {
+      md += `### Request Body\n\n\`\`\`json\n${ep.requestBody}\n\`\`\`\n\n`;
+    }
+    if (ep.responseExample && ep.responseExample.trim()) {
+      md += `### Response\n\n\`\`\`json\n${ep.responseExample}\n\`\`\`\n\n`;
+    }
+    md += `---\n\n`;
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (title || 'api-docs').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.md';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Markdown exported!');
+}
+
+/* ═══ LOAD SAMPLE ═══ */
+function loadSample() {
+  document.getElementById('apiTitle').value = 'Pet Store API';
+  document.getElementById('apiDesc').value = 'A sample API for managing pets in a store. Demonstrates CRUD operations with authentication.';
+  document.getElementById('apiBase').value = 'https://api.petstore.io/v1';
+  document.getElementById('apiVersion').value = '1.0.0';
+  endpoints = [];
+  expandedEndpoints.clear();
+  nextId = 1;
+
+  addEndpoint({
+    method: 'GET', path: '/pets', description: 'List all pets in the store with optional filtering',
+    parameters: [
+      { name: 'limit', type: 'integer', required: false, description: 'Maximum number of pets to return (default: 20, max: 100)' },
+      { name: 'status', type: 'string', required: false, description: 'Filter by status: available, pending, sold' },
+      { name: 'species', type: 'string', required: false, description: 'Filter by species: dog, cat, bird, fish' }
+    ],
+    requestBody: '',
+    responseExample: '[\n  {\n    "id": 1,\n    "name": "Buddy",\n    "species": "dog",\n    "breed": "Golden Retriever",\n    "age": 3,\n    "status": "available"\n  },\n  {\n    "id": 2,\n    "name": "Whiskers",\n    "species": "cat",\n    "breed": "Persian",\n    "age": 2,\n    "status": "available"\n  }\n]',
+    statusCode: '200'
+  });
+
+  addEndpoint({
+    method: 'POST', path: '/pets', description: 'Add a new pet to the store',
+    parameters: [],
+    requestBody: '{\n  "name": "Buddy",\n  "species": "dog",\n  "breed": "Golden Retriever",\n  "age": 3,\n  "status": "available"\n}',
+    responseExample: '{\n  "id": 1,\n  "name": "Buddy",\n  "species": "dog",\n  "breed": "Golden Retriever",\n  "age": 3,\n  "status": "available",\n  "createdAt": "2025-01-15T10:30:00Z"\n}',
+    statusCode: '201'
+  });
+
+  addEndpoint({
+    method: 'GET', path: '/pets/{petId}', description: 'Get detailed information about a specific pet',
+    parameters: [
+      { name: 'petId', type: 'integer', required: true, description: 'The unique ID of the pet' }
+    ],
+    requestBody: '',
+    responseExample: '{\n  "id": 1,\n  "name": "Buddy",\n  "species": "dog",\n  "breed": "Golden Retriever",\n  "age": 3,\n  "status": "available"\n}',
+    statusCode: '200'
+  });
+
+  addEndpoint({
+    method: 'PUT', path: '/pets/{petId}', description: 'Update an existing pet\'s information',
+    parameters: [
+      { name: 'petId', type: 'integer', required: true, description: 'The unique ID of the pet to update' }
+    ],
+    requestBody: '{\n  "name": "Buddy",\n  "status": "sold"\n}',
+    responseExample: '{\n  "id": 1,\n  "name": "Buddy",\n  "species": "dog",\n  "status": "sold",\n  "updatedAt": "2025-01-15T12:00:00Z"\n}',
+    statusCode: '200'
+  });
+
+  addEndpoint({
+    method: 'DELETE', path: '/pets/{petId}', description: 'Remove a pet from the store',
+    parameters: [
+      { name: 'petId', type: 'integer', required: true, description: 'The unique ID of the pet to delete' }
+    ],
+    requestBody: '',
+    responseExample: '',
+    statusCode: '204'
+  });
+
+  showToast('Sample API loaded!');
+}
+
+/* ═══ TOAST ═══ */
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError
+    ? 'linear-gradient(135deg, var(--danger), #e04050)'
+    : 'linear-gradient(135deg, var(--success), #3cb878)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ═══ INIT ═══ */
+renderPreview();
+</script>
+<footer style="text-align:center;padding:24px 16px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);">
+  <a href="https://lifa-su.com/" style="color:var(--accent);">← Back to Lifa AI Tools</a> ·
+  <a href="https://ko-fi.com/feidev" target="_blank" style="color:var(--accent);">☕ Support on Ko-fi</a> ·
+  © 2025 <a href="https://lifa-su.com" target="_blank" style="color:var(--accent);">FeiDev Tools</a>
+</footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Gap Generator - Row Gap & Column Gap Tool</title>
+<meta name="description" content="Generate CSS gap, row-gap, and column-gap properties for Flexbox and Grid layouts with live preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-gap/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+header{text-align:center;padding:32px 16px 24px}
+header h1{font-size:clamp(1.5rem,4vw,2.2rem);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+@media(max-width:768px){.main-grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.panel h2{font-size:1rem;margin-bottom:14px;color:var(--accent)}
+.control-group{margin-bottom:16px}
+.control-group>label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px}
+.slider-row{display:flex;align-items:center;gap:8px}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent)}
+.slider-row input[type=number]{width:58px;background:var(--bg);border:1px solid rgba(255,255,255,.12);color:var(--text);border-radius:6px;padding:5px;font-size:.85rem;text-align:center}
+.slider-row input[type=number]:focus{outline:2px solid var(--accent);border-color:transparent}
+select{background:var(--bg);color:var(--text);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:6px 10px;font-size:.85rem;cursor:pointer}
+select:focus{outline:2px solid var(--accent)}
+.unit-select{width:66px;flex-shrink:0}
+.toggle-row{display:flex;gap:8px}
+.toggle-btn{flex:1;padding:10px;border:1px solid rgba(255,255,255,.12);background:var(--bg);color:var(--text2);border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.2s}
+.toggle-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toggle-btn:hover:not(.active){border-color:var(--accent);color:var(--text)}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.preset-btn{padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--text2);cursor:pointer;font-size:.8rem;transition:.2s}
+.preset-btn:hover,.preset-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.preview-area{min-height:300px;background:var(--bg);border-radius:var(--radius);padding:16px;border:1px dashed rgba(255,255,255,.12);overflow:auto}
+.preview-container{width:100%;min-height:260px}
+.preview-item{border-radius:8px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:rgba(0,0,0,.55)}
+.code-block{position:relative;margin-top:20px}
+.code-block pre{background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px;font-family:'SF Mono',Consolas,monospace;font-size:.85rem;color:#7fdbca;overflow-x:auto;white-space:pre;line-height:1.7}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.78rem;cursor:pointer;font-weight:600;transition:.2s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#2ecc71}
+.extra-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.extra-row label{font-size:.85rem;color:var(--text2);white-space:nowrap}
+.extra-row input[type=range]{flex:1;accent-color:var(--accent)}
+.extra-row span{font-size:.85rem;min-width:20px;text-align:center}
+.extra-row select{flex:1}
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.85rem;color:var(--text2)}
+.check-row input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+footer{text-align:center;padding:32px 16px;color:var(--text2);font-size:.78rem}
+</style>
+</head>
+<body>
+<header>
+<h1>&#127912; CSS Gap Generator</h1>
+<p>Generate row-gap &amp; column-gap for Flexbox and Grid layouts with live preview</p>
+</header>
+<div class="container">
+<div class="main-grid">
+
+<!-- Left: Controls -->
+<div class="panel">
+<h2>&#9881;&#65039; Settings</h2>
+
+<div class="control-group">
+<label>Layout Mode</label>
+<div class="toggle-row">
+<button class="toggle-btn active" data-mode="flex" onclick="setMode('flex')">Flexbox</button>
+<button class="toggle-btn" data-mode="grid" onclick="setMode('grid')">Grid</button>
+</div>
+</div>
+
+<div class="control-group">
+<label>Row Gap</label>
+<div class="slider-row">
+<input type="range" id="rowGapRange" min="0" max="100" value="16" oninput="syncGap('row')">
+<input type="number" id="rowGapNum" min="0" max="200" value="16" oninput="syncGapNum('row')">
+<select id="rowUnit" class="unit-select" onchange="update()"><option>px</option><option>em</option><option>rem</option><option>%</option></select>
+</div>
+</div>
+
+<div class="control-group">
+<label>Column Gap</label>
+<div class="slider-row">
+<input type="range" id="colGapRange" min="0" max="100" value="16" oninput="syncGap('col')">
+<input type="number" id="colGapNum" min="0" max="200" value="16" oninput="syncGapNum('col')">
+<select id="colUnit" class="unit-select" onchange="update()"><option>px</option><option>em</option><option>rem</option><option>%</option></select>
+</div>
+</div>
+
+<div class="control-group">
+<label>Quick Presets</label>
+<div class="presets" id="presets"></div>
+</div>
+
+<div class="extra-row">
+<label>Items</label>
+<input type="range" id="itemCount" min="2" max="20" value="9" oninput="update()">
+<span id="itemCountVal">9</span>
+</div>
+
+<div id="gridColsWrap" class="extra-row" style="display:none">
+<label>Columns</label>
+<select id="gridCols" onchange="update()">
+<option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
+</select>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="flexWrap" checked onchange="update()">
+<label for="flexWrap">Flex Wrap</label>
+</div>
+
+<div class="check-row">
+<input type="checkbox" id="useShorthand" onchange="update()">
+<label for="useShorthand">Use shorthand <code style="color:var(--accent)">gap</code> when equal</label>
+</div>
+</div>
+
+<!-- Right: Preview + Code -->
+<div>
+<div class="panel">
+<h2>&#128064; Live Preview</h2>
+<div class="preview-area">
+<div class="preview-container" id="preview"></div>
+</div>
+</div>
+
+<div class="panel code-block">
+<h2>&#128203; Generated CSS</h2>
+<button class="copy-btn" onclick="copyCSS()">Copy</button>
+<pre id="codeOutput"></pre>
+</div>
+</div>
+
+</div>
+</div>
+
+<footer>
+<p>CSS Gap Generator &mdash; A free tool for web developers</p>
+</footer>
+
+<script>
+const PRESETS = [4,8,12,16,24,32,48,64];
+const COLORS = ['#e94560','#533483','#0f3460','#e9c46a','#2a9d8f','#e76f51','#264653','#f4a261','#606c38','#bc6c25','#6a4c93','#1982c4','#8ac926','#ff595e','#ffca3a','#6a0572','#ab83a1','#3a86a7','#f72585','#4cc9f0'];
+let mode = 'flex';
+
+function init() {
+  const wrap = document.getElementById('presets');
+  PRESETS.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'preset-btn';
+    b.textContent = v + 'px';
+    b.onclick = () => applyPreset(v);
+    wrap.appendChild(b);
+  });
+  update();
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === m);
+  });
+  document.getElementById('gridColsWrap').style.display = m === 'grid' ? 'flex' : 'none';
+  update();
+}
+
+function syncGap(which) {
+  const r = document.getElementById(which === 'row' ? 'rowGapRange' : 'colGapRange');
+  const n = document.getElementById(which === 'row' ? 'rowGapNum' : 'colGapNum');
+  n.value = r.value;
+  update();
+}
+
+function syncGapNum(which) {
+  const r = document.getElementById(which === 'row' ? 'rowGapRange' : 'colGapRange');
+  const n = document.getElementById(which === 'row' ? 'rowGapNum' : 'colGapNum');
+  r.value = Math.min(n.value, 100);
+  update();
+}
+
+function applyPreset(v) {
+  document.getElementById('rowGapRange').value = Math.min(v, 100);
+  document.getElementById('rowGapNum').value = v;
+  document.getElementById('colGapRange').value = Math.min(v, 100);
+  document.getElementById('colGapNum').value = v;
+  document.getElementById('rowUnit').value = 'px';
+  document.getElementById('colUnit').value = 'px';
+  document.querySelectorAll('.preset-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === v + 'px');
+  });
+  update();
+}
+
+function update() {
+  const rowVal = document.getElementById('rowGapNum').value;
+  const colVal = document.getElementById('colGapNum').value;
+  const rowU = document.getElementById('rowUnit').value;
+  const colU = document.getElementById('colUnit').value;
+  const count = parseInt(document.getElementById('itemCount').value);
+  const wrap = document.getElementById('flexWrap').checked;
+  const shorthand = document.getElementById('useShorthand').checked;
+  const cols = document.getElementById('gridCols').value;
+
+  document.getElementById('itemCountVal').textContent = count;
+
+  // Preview
+  const pv = document.getElementById('preview');
+  const rowGapPx = rowU === 'px' ? rowVal : rowVal * 16;
+  const colGapPx = colU === 'px' ? colVal : colVal * 16;
+
+  if (mode === 'flex') {
+    pv.style.display = 'flex';
+    pv.style.flexWrap = wrap ? 'wrap' : 'nowrap';
+    pv.style.rowGap = rowGapPx + 'px';
+    pv.style.columnGap = colGapPx + 'px';
+    pv.style.gridTemplateColumns = '';
+  } else {
+    pv.style.display = 'grid';
+    pv.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+    pv.style.rowGap = rowGapPx + 'px';
+    pv.style.columnGap = colGapPx + 'px';
+    pv.style.flexWrap = '';
+  }
+
+  // Items
+  while (pv.children.length > count) pv.removeChild(pv.lastChild);
+  while (pv.children.length < count) {
+    const d = document.createElement('div');
+    d.className = 'preview-item';
+    pv.appendChild(d);
+  }
+  for (let i = 0; i < count; i++) {
+    const el = pv.children[i];
+    el.style.background = COLORS[i % COLORS.length];
+    el.textContent = i + 1;
+    if (mode === 'flex') {
+      el.style.width = '72px';
+      el.style.height = '72px';
+      el.style.flex = '';
+    } else {
+      el.style.width = '';
+      el.style.height = '72px';
+      el.style.flex = '';
+    }
+  }
+
+  // Code
+  const rowStr = rowVal + rowU;
+  const colStr = colVal + colU;
+  let css = '';
+  if (mode === 'flex') {
+    css += '.container {\n';
+    css += '  display: flex;\n';
+    if (wrap) css += '  flex-wrap: wrap;\n';
+  } else {
+    css += '.container {\n';
+    css += '  display: grid;\n';
+    css += '  grid-template-columns: repeat(' + cols + ', 1fr);\n';
+  }
+
+  if (shorthand && rowStr === colStr) {
+    css += '  gap: ' + rowStr + ';\n';
+  } else {
+    css += '  row-gap: ' + rowStr + ';\n';
+    css += '  column-gap: ' + colStr + ';\n';
+  }
+  css += '}';
+
+  document.getElementById('codeOutput').textContent = css;
+}
+
+function copyCSS() {
+  const text = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

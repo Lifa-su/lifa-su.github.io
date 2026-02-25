@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Create stunning gradient text effects with CSS. Pick colors, adjust direction and style, then copy the generated CSS code for colorful text headings.">
+<link rel="canonical" href="https://lifa-su.com/ai-color-gradient-text/">
+<title>AI Color Gradient Text Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--s1:#14141f;--s2:#1e1e2e;--bd:#2a2a3e;--t1:#e0e0e8;--t2:#8888a0;--ac:#e84393;--ac2:#fd79a8}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+.hd{text-align:center;padding:20px 16px;border-bottom:1px solid var(--bd)}
+.hd h1{font-size:1.5rem;background:linear-gradient(135deg,var(--ac),#6c5ce7,#00cec9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hd p{color:var(--t2);font-size:.85rem;margin-top:4px}
+.app{max-width:1000px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.preview-box{background:var(--s1);border-radius:16px;padding:40px 20px;min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+#previewText{font-size:64px;font-weight:700;line-height:1.2;word-break:break-word;transition:.3s}
+.controls{display:flex;gap:16px;flex-wrap:wrap}
+.col{flex:1;min-width:280px;display:flex;flex-direction:column;gap:12px}
+.pn{background:var(--s1);border-radius:12px;padding:16px}
+.pn h3{font-size:.78rem;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.8rem;color:var(--t2);margin-bottom:4px}
+.field input[type=text],.field textarea,.field select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t1);font-size:.9rem;outline:none}
+.field textarea{resize:vertical;min-height:60px;font-family:inherit}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--ac)}
+.color-row{display:flex;gap:8px;align-items:center}
+.color-row input[type=color]{width:50px;height:36px;border:1px solid var(--bd);border-radius:6px;background:var(--s2);cursor:pointer;padding:2px}
+.color-row span{font-size:.8rem;color:var(--t2);flex:1}
+.dirs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dir-btn{padding:8px 4px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t1);cursor:pointer;font-size:.75rem;text-align:center;transition:.2s}
+.dir-btn:hover{border-color:var(--ac)}.dir-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.preset{height:32px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.2s}
+.preset:hover,.preset.on{border-color:#fff}
+.range-row{display:flex;align-items:center;gap:8px}
+.range-row input[type=range]{flex:1;accent-color:var(--ac)}
+.range-row span{font-size:.8rem;color:var(--t2);min-width:40px;text-align:right}
+.btn{padding:10px 16px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t1);cursor:pointer;font-size:.85rem;transition:.2s;text-align:center}
+.btn:hover{border-color:var(--ac);background:var(--ac);color:#fff}
+.bp{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.code-box{background:#0d0d1a;border:1px solid var(--bd);border-radius:8px;padding:12px;font-family:'SF Mono',Monaco,monospace;font-size:.78rem;color:#a29bfe;white-space:pre-wrap;word-break:break-all;max-height:150px;overflow-y:auto;position:relative;cursor:pointer}
+.code-box:hover::after{content:'Click to copy';position:absolute;top:4px;right:8px;font-size:.7rem;color:var(--ac)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){#previewText{font-size:36px}.controls{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="hd"><h1>🎨 AI Gradient Text Generator</h1><p>Create beautiful gradient text with CSS code export</p></div>
+<div class="app">
+<div class="preview-box"><div id="previewText">Hello World</div></div>
+<div class="controls">
+<div class="col">
+<div class="pn"><h3>Text</h3>
+<div class="field"><label>Content</label><textarea id="txtInput" rows="2">Hello World</textarea></div>
+<div class="field"><label>Font Family</label>
+<select id="fontSel">
+<option value="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">System</option>
+<option value="Georgia,serif">Georgia</option>
+<option value="'Courier New',monospace">Courier</option>
+<option value="Impact,sans-serif">Impact</option>
+<option value="'Comic Sans MS',cursive">Comic Sans</option>
+<option value="'Times New Roman',serif">Times</option>
+</select></div>
+<div class="field"><label>Font Size</label>
+<div class="range-row"><input type="range" id="fontSize" min="16" max="150" value="64"><span id="fsVal">64px</span></div></div>
+<div class="field"><label>Font Weight</label>
+<div class="range-row"><input type="range" id="fontWeight" min="100" max="900" step="100" value="700"><span id="fwVal">700</span></div></div>
+</div>
+<div class="pn"><h3>Gradient Colors</h3>
+<div class="presets" id="presets"></div>
+<div class="color-row"><input type="color" id="c1" value="#e84393"><span>Color 1</span></div>
+<div class="color-row" style="margin-top:6px"><input type="color" id="c2" value="#6c5ce7"><span>Color 2</span></div>
+<div class="color-row" style="margin-top:6px"><input type="color" id="c3" value="#00cec9"><span>Color 3 (optional)</span>
+<button class="btn" id="toggleC3" style="padding:4px 10px;font-size:.75rem">Off</button></div>
+</div>
+</div>
+<div class="col">
+<div class="pn"><h3>Gradient Direction</h3><div class="dirs" id="dirs">
+<button class="dir-btn on" data-d="to right">→</button>
+<button class="dir-btn" data-d="to left">←</button>
+<button class="dir-btn" data-d="to bottom">↓</button>
+<button class="dir-btn" data-d="to top">↑</button>
+<button class="dir-btn" data-d="to bottom right">↘</button>
+<button class="dir-btn" data-d="to bottom left">↙</button>
+<button class="dir-btn" data-d="to top right">↗</button>
+<button class="dir-btn" data-d="to top left">↖</button>
+</div></div>
+<div class="pn"><h3>CSS Code</h3><div class="code-box" id="codeBox"></div></div>
+<div class="pn"><h3>Export</h3><div class="acts">
+<button class="btn bp" id="dlPng" style="flex:1">💾 Download PNG</button>
+<button class="btn" id="copyBtn" style="flex:1">📋 Copy CSS</button>
+</div></div>
+</div>
+</div>
+</div>
+<button class="dir-btn" data-d="to top left">↖</button>
+</div></div>
+<div class="pn"><h3>CSS Code</h3><div class="code-box" id="codeBox" onclick="copyCode()"></div></div>
+<div class="pn"><h3>Export</h3>
+<div class="acts">
+<button class="btn bp" onclick="exportPNG()" style="flex:1">💾 Export PNG</button>
+<button class="btn" onclick="copyCode()">📋 Copy CSS</button>
+</div></div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+var pt=document.getElementById('previewText'),ti=document.getElementById('txtInput'),
+fs=document.getElementById('fontSize'),fw=document.getElementById('fontWeight'),
+ff=document.getElementById('fontSel'),c1=document.getElementById('c1'),c2=document.getElementById('c2'),
+c3=document.getElementById('c3'),cb=document.getElementById('codeBox'),tc3=document.getElementById('toggleC3');
+var dir='to right',useC3=false;
+
+var presets=[
+['#e84393','#6c5ce7'],['#f39c12','#e74c3c'],['#00cec9','#6c5ce7'],['#fd79a8','#fdcb6e'],
+['#0984e3','#00cec9'],['#e17055','#fdcb6e'],['#a29bfe','#fd79a8'],['#00b894','#0984e3']
+];
+var presetsEl=document.getElementById('presets');
+presets.forEach(function(p,i){
+  var d=document.createElement('div');d.className='preset';
+  d.style.background='linear-gradient(to right,'+p[0]+','+p[1]+')';
+  d.onclick=function(){c1.value=p[0];c2.value=p[1];update()};
+  presetsEl.appendChild(d)});
+
+tc3.onclick=function(){useC3=!useC3;tc3.textContent=useC3?'On':'Off';
+  tc3.style.background=useC3?'var(--ac)':'';update()};
+
+function getGrad(){
+  var colors=c1.value+', '+c2.value;
+  if(useC3)colors=c1.value+', '+c2.value+', '+c3.value;
+  return'linear-gradient('+dir+', '+colors+')'}
+
+function update(){
+  var txt=ti.value||'Hello World';
+  pt.textContent=txt;
+  pt.style.fontFamily=ff.value;
+  pt.style.fontSize=fs.value+'px';
+  pt.style.fontWeight=fw.value;
+  var grad=getGrad();
+  pt.style.background=grad;
+  pt.style.webkitBackgroundClip='text';
+  pt.style.webkitTextFillColor='transparent';
+  pt.style.backgroundClip='text';
+  document.getElementById('fsVal').textContent=fs.value+'px';
+  document.getElementById('fwVal').textContent=fw.value;
+  // code
+  cb.textContent='.gradient-text {\n  background: '+grad+';\n  -webkit-background-clip: text;\n  -webkit-text-fill-color: transparent;\n  background-clip: text;\n  font-size: '+fs.value+'px;\n  font-weight: '+fw.value+';\n  font-family: '+ff.value+';\n}'}
+
+ti.oninput=update;fs.oninput=update;fw.oninput=update;ff.onchange=update;
+c1.oninput=update;c2.oninput=update;c3.oninput=update;
+
+document.querySelectorAll('.dir-btn').forEach(function(b){
+  b.onclick=function(){document.querySelectorAll('.dir-btn').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');dir=b.dataset.d;update()}});
+
+window.copyCode=function(){
+  navigator.clipboard.writeText(cb.textContent).then(function(){
+    var orig=cb.style.borderColor;cb.style.borderColor='#51cf66';
+    setTimeout(function(){cb.style.borderColor=orig},1000)})};
+
+window.exportPNG=function(){
+  var canvas=document.createElement('canvas');
+  var pad=40,text=ti.value||'Hello World';
+  canvas.width=1200;canvas.height=400;
+  var cx=canvas.getContext('2d');
+  cx.fillStyle='#0a0a0f';cx.fillRect(0,0,1200,400);
+  cx.font=fw.value+' '+fs.value+'px '+ff.value;
+  cx.textAlign='center';cx.textBaseline='middle';
+  // gradient
+  var gx1=0,gy1=200,gx2=1200,gy2=200;
+  if(dir.includes('bottom'))gy2=400;if(dir.includes('top')){gy1=400;gy2=0}
+  if(dir.includes('left')){gx1=1200;gx2=0}
+  var g=cx.createLinearGradient(gx1,gy1,gx2,gy2);
+  g.addColorStop(0,c1.value);g.addColorStop(useC3?0.5:1,c2.value);
+  if(useC3)g.addColorStop(1,c3.value);
+  cx.fillStyle=g;
+  // wrap text
+  var words=text.split(''),lines=[],line='';
+  cx.font=fw.value+' '+fs.value+'px sans-serif';
+  for(var i=0;i<text.length;i++){
+    var test=line+text[i];
+    if(cx.measureText(test).width>1120&&line){lines.push(line);line=text[i]}
+    else line=test}
+  lines.push(line);
+  var lh=parseInt(fs.value)*1.3,startY=200-(lines.length-1)*lh/2;
+  lines.forEach(function(l,i){cx.fillText(l,600,startY+i*lh)});
+  var link=document.createElement('a');link.download='gradient-text.png';
+  link.href=canvas.toDataURL('image/png');link.click()};
+
+update()})();
+</script>
+<script src="https://aliyun-china.oss-cn-hangzhou.aliyuncs.com/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>

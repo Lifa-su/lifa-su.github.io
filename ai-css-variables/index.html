@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI CSS variables generator for theme systems. Create light and dark mode themes with custom properties. Configure colors, spacing, and typography tokens.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-variables/">
+<title>AI CSS Variables Generator - Theme System Configurator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--text:#e0e0e0;--text2:#a0a0b0;--accent:#e94560;--accent2:#533483;--border:#2a2a4a;--radius:8px;--shadow:0 2px 8px rgba(0,0,0,0.3)}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.header{background:var(--bg2);padding:20px;text-align:center;border-bottom:2px solid var(--accent)}
+.header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text2);font-size:0.9rem;margin-top:4px}
+.container{max-width:1400px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:900px){.container{grid-template-columns:1fr}}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.panel h2{font-size:1.1rem;margin-bottom:15px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.section{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--border)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section h3{font-size:0.95rem;margin-bottom:10px;color:var(--text)}
+.var-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.var-row label{min-width:140px;font-size:0.85rem;color:var(--text2)}
+.var-row input[type="color"]{width:40px;height:32px;border:1px solid var(--border);border-radius:4px;background:var(--bg);cursor:pointer;padding:2px}
+.var-row input[type="text"],.var-row input[type="number"],.var-row select{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:6px 10px;color:var(--text);font-size:0.85rem;flex:1;min-width:80px}
+.var-row input:focus,.var-row select:focus{outline:none;border-color:var(--accent)}
+.theme-tabs{display:flex;gap:8px;margin-bottom:15px}
+.theme-tab{padding:8px 16px;border:1px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text2);cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+.theme-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.theme-tab:hover{border-color:var(--accent)}
+.btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63851}
+.btn-secondary{background:var(--bg3);color:var(--text)}
+.btn-secondary:hover{background:#1a4a7a}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.preview-box{border-radius:var(--radius);padding:20px;transition:all 0.3s}
+.preview-card{border-radius:8px;padding:16px;margin-bottom:12px;transition:all 0.3s}
+.preview-btn{padding:8px 20px;border:none;border-radius:4px;cursor:pointer;margin-right:8px;margin-bottom:8px;transition:all 0.3s}
+.code-output{background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);padding:15px;font-family:'Fira Code',monospace;font-size:0.8rem;color:#c9d1d9;white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;line-height:1.5}
+.toast{position:fixed;bottom:20px;right:20px;background:#2ea043;color:#fff;padding:12px 20px;border-radius:8px;font-size:0.9rem;opacity:0;transform:translateY(20px);transition:all 0.3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.preview-text-sm{font-size:0.85rem;margin:4px 0}
+.preview-text-lg{font-size:1.2rem;margin:4px 0;font-weight:600}
+.preview-shadow-box{width:80px;height:80px;border-radius:8px;display:inline-block;margin:8px 8px 8px 0}
+.full-width{grid-column:1/-1}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🎨 AI CSS Variables Generator</h1>
+<p>Visual CSS Custom Properties Generator &amp; Theme System Configurator</p>
+</div>
+<div class="container">
+<!-- Left: Controls -->
+<div class="panel">
+<h2>⚙️ Variable Configuration</h2>
+<div class="theme-tabs">
+<button class="theme-tab active" onclick="switchTheme('light')">☀️ Light Theme</button>
+<button class="theme-tab" onclick="switchTheme('dark')">🌙 Dark Theme</button>
+</div>
+
+<div class="section">
+<h3>🎨 Colors</h3>
+<div class="var-row"><label>--color-primary</label><input type="color" id="c-primary-l" value="#6366f1" oninput="update()"><input type="text" id="ct-primary-l" value="#6366f1" oninput="syncFromText(this,'c-primary-l')"></div>
+<div class="var-row"><label>--color-secondary</label><input type="color" id="c-secondary-l" value="#8b5cf6" oninput="update()"><input type="text" id="ct-secondary-l" value="#8b5cf6" oninput="syncFromText(this,'c-secondary-l')"></div>
+<div class="var-row"><label>--color-accent</label><input type="color" id="c-accent-l" value="#ec4899" oninput="update()"><input type="text" id="ct-accent-l" value="#ec4899" oninput="syncFromText(this,'c-accent-l')"></div>
+<div class="var-row"><label>--color-background</label><input type="color" id="c-bg-l" value="#ffffff" oninput="update()"><input type="text" id="ct-bg-l" value="#ffffff" oninput="syncFromText(this,'c-bg-l')"></div>
+<div class="var-row"><label>--color-surface</label><input type="color" id="c-surface-l" value="#f8fafc" oninput="update()"><input type="text" id="ct-surface-l" value="#f8fafc" oninput="syncFromText(this,'c-surface-l')"></div>
+<div class="var-row"><label>--color-text</label><input type="color" id="c-text-l" value="#1e293b" oninput="update()"><input type="text" id="ct-text-l" value="#1e293b" oninput="syncFromText(this,'c-text-l')"></div>
+<div class="var-row"><label>--color-text-secondary</label><input type="color" id="c-text2-l" value="#64748b" oninput="update()"><input type="text" id="ct-text2-l" value="#64748b" oninput="syncFromText(this,'c-text2-l')"></div>
+<div class="var-row"><label>--color-border</label><input type="color" id="c-border-l" value="#e2e8f0" oninput="update()"><input type="text" id="ct-border-l" value="#e2e8f0" oninput="syncFromText(this,'c-border-l')"></div>
+<!-- Dark theme colors (hidden by default) -->
+<div class="var-row" style="display:none"><label>--color-primary</label><input type="color" id="c-primary-d" value="#818cf8" oninput="update()"><input type="text" id="ct-primary-d" value="#818cf8" oninput="syncFromText(this,'c-primary-d')"></div>
+<div class="var-row" style="display:none"><label>--color-secondary</label><input type="color" id="c-secondary-d" value="#a78bfa" oninput="update()"><input type="text" id="ct-secondary-d" value="#a78bfa" oninput="syncFromText(this,'c-secondary-d')"></div>
+<div class="var-row" style="display:none"><label>--color-accent</label><input type="color" id="c-accent-d" value="#f472b6" oninput="update()"><input type="text" id="ct-accent-d" value="#f472b6" oninput="syncFromText(this,'c-accent-d')"></div>
+<div class="var-row" style="display:none"><label>--color-background</label><input type="color" id="c-bg-d" value="#0f172a" oninput="update()"><input type="text" id="ct-bg-d" value="#0f172a" oninput="syncFromText(this,'c-bg-d')"></div>
+<div class="var-row" style="display:none"><label>--color-surface</label><input type="color" id="c-surface-d" value="#1e293b" oninput="update()"><input type="text" id="ct-surface-d" value="#1e293b" oninput="syncFromText(this,'c-surface-d')"></div>
+<div class="var-row" style="display:none"><label>--color-text</label><input type="color" id="c-text-d" value="#f1f5f9" oninput="update()"><input type="text" id="ct-text-d" value="#f1f5f9" oninput="syncFromText(this,'c-text-d')"></div>
+<div class="var-row" style="display:none"><label>--color-text-secondary</label><input type="color" id="c-text2-d" value="#94a3b8" oninput="update()"><input type="text" id="ct-text2-d" value="#94a3b8" oninput="syncFromText(this,'c-text2-d')"></div>
+<div class="var-row" style="display:none"><label>--color-border</label><input type="color" id="c-border-d" value="#334155" oninput="update()"><input type="text" id="ct-border-d" value="#334155" oninput="syncFromText(this,'c-border-d')"></div>
+</div>
+
+<div class="section">
+<h3>📏 Spacing Scale</h3>
+<div class="var-row"><label>--space-xs</label><input type="number" id="sp-xs" value="4" min="0" max="100" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--space-sm</label><input type="number" id="sp-sm" value="8" min="0" max="100" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--space-md</label><input type="number" id="sp-md" value="16" min="0" max="200" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--space-lg</label><input type="number" id="sp-lg" value="24" min="0" max="200" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--space-xl</label><input type="number" id="sp-xl" value="32" min="0" max="300" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--space-2xl</label><input type="number" id="sp-2xl" value="48" min="0" max="400" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+</div>
+
+<div class="section">
+<h3>🔤 Typography</h3>
+<div class="var-row"><label>--font-family</label><select id="ff" oninput="update()"><option value="'Inter', system-ui, sans-serif">Inter / System UI</option><option value="'Roboto', sans-serif">Roboto</option><option value="'Open Sans', sans-serif">Open Sans</option><option value="Georgia, serif">Georgia (Serif)</option><option value="'Fira Code', monospace">Fira Code (Mono)</option><option value="system-ui, sans-serif">System Default</option></select></div>
+<div class="var-row"><label>--font-size-sm</label><input type="number" id="fs-sm" value="14" min="8" max="40" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--font-size-base</label><input type="number" id="fs-base" value="16" min="8" max="40" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--font-size-lg</label><input type="number" id="fs-lg" value="20" min="8" max="60" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--font-size-xl</label><input type="number" id="fs-xl" value="28" min="8" max="80" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--font-weight-normal</label><select id="fw-normal" oninput="update()"><option value="300">300 Light</option><option value="400" selected>400 Normal</option><option value="500">500 Medium</option></select></div>
+<div class="var-row"><label>--font-weight-bold</label><select id="fw-bold" oninput="update()"><option value="500">500 Medium</option><option value="600" selected>600 Semi-Bold</option><option value="700">700 Bold</option><option value="800">800 Extra-Bold</option></select></div>
+</div>
+
+<div class="section">
+<h3>🔲 Border &amp; Radius</h3>
+<div class="var-row"><label>--border-width</label><input type="number" id="bw" value="1" min="0" max="10" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--radius-sm</label><input type="number" id="r-sm" value="4" min="0" max="50" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--radius-md</label><input type="number" id="r-md" value="8" min="0" max="50" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--radius-lg</label><input type="number" id="r-lg" value="16" min="0" max="80" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+<div class="var-row"><label>--radius-full</label><input type="number" id="r-full" value="9999" min="0" max="9999" oninput="update()"><span style="color:var(--text2);font-size:0.8rem">px</span></div>
+</div>
+
+<div class="section">
+<h3>🌫️ Shadows</h3>
+<div class="var-row"><label>--shadow-sm</label><input type="text" id="sh-sm" value="0 1px 2px rgba(0,0,0,0.05)" oninput="update()"></div>
+<div class="var-row"><label>--shadow-md</label><input type="text" id="sh-md" value="0 4px 6px rgba(0,0,0,0.1)" oninput="update()"></div>
+<div class="var-row"><label>--shadow-lg</label><input type="text" id="sh-lg" value="0 10px 25px rgba(0,0,0,0.15)" oninput="update()"></div>
+<div class="var-row"><label>--shadow-xl</label><input type="text" id="sh-xl" value="0 20px 50px rgba(0,0,0,0.25)" oninput="update()"></div>
+</div>
+</div>
+
+<!-- Right: Preview -->
+<div class="panel">
+<h2>👁️ Live Preview</h2>
+<div id="preview" class="preview-box">
+<div id="preview-card" class="preview-card">
+<p id="preview-title" class="preview-text-lg">Card Title</p>
+<p id="preview-body" class="preview-text-sm">This is a preview of your theme. Adjust the variables on the left to see changes in real time.</p>
+<div style="margin-top:12px">
+<button id="prev-btn1" class="preview-btn">Primary</button>
+<button id="prev-btn2" class="preview-btn">Secondary</button>
+<button id="prev-btn3" class="preview-btn">Accent</button>
+</div>
+</div>
+<div id="preview-card2" class="preview-card" style="margin-top:12px">
+<p id="preview-sub" class="preview-text-sm">Secondary text preview with border and shadow styling.</p>
+<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+<div id="sh-box1" class="preview-shadow-box"></div>
+<div id="sh-box2" class="preview-shadow-box"></div>
+<div id="sh-box3" class="preview-shadow-box"></div>
+</div>
+</div>
+<div id="preview-spacing" style="margin-top:12px;display:flex;gap:4px;flex-wrap:wrap"></div>
+</div>
+</div>
+
+<!-- Full width: Code Output -->
+<div class="panel full-width">
+<h2>📋 Generated CSS Code</h2>
+<div class="btn-group" style="margin-bottom:12px">
+<button class="btn btn-primary" onclick="copyCSS()">📋 Copy to Clipboard</button>
+<button class="btn btn-secondary" onclick="downloadCSS()">💾 Download CSS File</button>
+<button class="btn btn-secondary" onclick="toggleOutput()">🔄 Toggle Light/Dark/Both</button>
+</div>
+<div id="code-output" class="code-output"></div>
+</div>
+</div>
+
+<div id="toast" class="toast">Copied to clipboard!</div>
+
+<script>
+let currentTheme='light',outputMode='both';
+const S=id=>document.getElementById(id);
+const colors=['primary','secondary','accent','bg','surface','text','text2','border'];
+const colorNames=['color-primary','color-secondary','color-accent','color-background','color-surface','color-text','color-text-secondary','color-border'];
+
+function switchTheme(t){
+  currentTheme=t;
+  document.querySelectorAll('.theme-tab').forEach((b,i)=>{b.classList.toggle('active',i===(t==='light'?0:1))});
+  const sec=document.querySelector('.section');
+  const rows=sec.querySelectorAll('.var-row');
+  rows.forEach((r,i)=>{r.style.display=(i<8&&t==='light')||(i>=8&&t==='dark')?'flex':'none'});
+  update();
+}
+
+function syncFromText(el,colorId){
+  const v=el.value;
+  if(/^#[0-9a-fA-F]{6}$/.test(v)){S(colorId).value=v;update()}
+}
+
+function getVals(suffix){
+  return{
+    colors:colors.map((c,i)=>({name:colorNames[i],val:S('c-'+c+'-'+suffix).value})),
+    spacing:[
+      {name:'space-xs',val:S('sp-xs').value+'px'},
+      {name:'space-sm',val:S('sp-sm').value+'px'},
+      {name:'space-md',val:S('sp-md').value+'px'},
+      {name:'space-lg',val:S('sp-lg').value+'px'},
+      {name:'space-xl',val:S('sp-xl').value+'px'},
+      {name:'space-2xl',val:S('sp-2xl').value+'px'}
+    ],
+    typography:[
+      {name:'font-family',val:S('ff').value},
+      {name:'font-size-sm',val:S('fs-sm').value+'px'},
+      {name:'font-size-base',val:S('fs-base').value+'px'},
+      {name:'font-size-lg',val:S('fs-lg').value+'px'},
+      {name:'font-size-xl',val:S('fs-xl').value+'px'},
+      {name:'font-weight-normal',val:S('fw-normal').value},
+      {name:'font-weight-bold',val:S('fw-bold').value}
+    ],
+    border:[
+      {name:'border-width',val:S('bw').value+'px'},
+      {name:'radius-sm',val:S('r-sm').value+'px'},
+      {name:'radius-md',val:S('r-md').value+'px'},
+      {name:'radius-lg',val:S('r-lg').value+'px'},
+      {name:'radius-full',val:S('r-full').value+'px'}
+    ],
+    shadow:[
+      {name:'shadow-sm',val:S('sh-sm').value},
+      {name:'shadow-md',val:S('sh-md').value},
+      {name:'shadow-lg',val:S('sh-lg').value},
+      {name:'shadow-xl',val:S('sh-xl').value}
+    ]
+  };
+}
+
+function genCSS(selector,vals){
+  let css=selector+' {\n';
+  [...vals.colors,...vals.spacing,...vals.typography,...vals.border,...vals.shadow].forEach(v=>{
+    css+='  --'+v.name+': '+v.val+';\n';
+  });
+  return css+'}\n';
+}
+
+function generateFullCSS(){
+  const light=getVals('l'),dark=getVals('d');
+  if(outputMode==='light') return genCSS(':root',light);
+  if(outputMode==='dark') return genCSS(':root',dark);
+  return '/* Light Theme */\n'+genCSS(':root',light)+'\n/* Dark Theme */\n'+genCSS('[data-theme="dark"]',dark);
+}
+
+function update(){
+  const suffix=currentTheme==='light'?'l':'d';
+  // sync text inputs
+  colors.forEach(c=>{
+    const v=S('c-'+c+'-'+suffix).value;
+    S('ct-'+c+'-'+suffix).value=v;
+  });
+  const vals=getVals(suffix);
+  const cv=n=>vals.colors.find(c=>c.name===n).val;
+  const p=S('preview'),card=S('preview-card'),card2=S('preview-card2');
+  p.style.background=cv('color-background');
+  p.style.fontFamily=vals.typography[0].val;
+  p.style.padding=vals.spacing[2].val;
+  p.style.borderRadius=vals.border[2].val;
+  card.style.background=cv('color-surface');
+  card.style.border=vals.border[0].val+' solid '+cv('color-border');
+  card.style.borderRadius=vals.border[2].val;
+  card.style.boxShadow=vals.shadow[1].val;
+  card.style.padding=vals.spacing[3].val;
+  S('preview-title').style.color=cv('color-text');
+  S('preview-title').style.fontSize=vals.typography[3].val;
+  S('preview-title').style.fontWeight=vals.typography[6].val;
+  S('preview-body').style.color=cv('color-text-secondary');
+  S('preview-body').style.fontSize=vals.typography[2].val;
+  S('prev-btn1').style.cssText='background:'+cv('color-primary')+';color:#fff;border:none;border-radius:'+vals.border[1].val+';padding:'+vals.spacing[1].val+' '+vals.spacing[2].val+';font-size:'+vals.typography[1].val;
+  S('prev-btn2').style.cssText='background:'+cv('color-secondary')+';color:#fff;border:none;border-radius:'+vals.border[1].val+';padding:'+vals.spacing[1].val+' '+vals.spacing[2].val+';font-size:'+vals.typography[1].val;
+  S('prev-btn3').style.cssText='background:'+cv('color-accent')+';color:#fff;border:none;border-radius:'+vals.border[1].val+';padding:'+vals.spacing[1].val+' '+vals.spacing[2].val+';font-size:'+vals.typography[1].val;
+  card2.style.background=cv('color-surface');
+  card2.style.border=vals.border[0].val+' solid '+cv('color-border');
+  card2.style.borderRadius=vals.border[2].val;
+  card2.style.padding=vals.spacing[3].val;
+  S('preview-sub').style.color=cv('color-text-secondary');
+  S('preview-sub').style.fontSize=vals.typography[1].val;
+  S('sh-box1').style.cssText='background:'+cv('color-surface')+';border:'+vals.border[0].val+' solid '+cv('color-border')+';box-shadow:'+vals.shadow[0].val+';border-radius:'+vals.border[1].val;
+  S('sh-box2').style.cssText='background:'+cv('color-surface')+';border:'+vals.border[0].val+' solid '+cv('color-border')+';box-shadow:'+vals.shadow[1].val+';border-radius:'+vals.border[2].val;
+  S('sh-box3').style.cssText='background:'+cv('color-surface')+';border:'+vals.border[0].val+' solid '+cv('color-border')+';box-shadow:'+vals.shadow[2].val+';border-radius:'+vals.border[3].val;
+  // spacing preview
+  const sp=S('preview-spacing');
+  sp.innerHTML='';
+  vals.spacing.forEach(s=>{
+    const d=document.createElement('div');
+    d.style.cssText='width:'+s.val+';height:'+s.val+';background:'+cv('color-primary')+';border-radius:'+vals.border[1].val+';opacity:0.6';
+    d.title=s.name+': '+s.val;
+    sp.appendChild(d);
+  });
+  S('code-output').textContent=generateFullCSS();
+}
+
+function copyCSS(){
+  navigator.clipboard.writeText(generateFullCSS()).then(()=>{
+    const t=S('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);
+  });
+}
+
+function downloadCSS(){
+  const blob=new Blob([generateFullCSS()],{type:'text/css'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='css-variables.css';a.click();
+}
+
+function toggleOutput(){
+  const modes=['both','light','dark'];
+  outputMode=modes[(modes.indexOf(outputMode)+1)%3];
+  const t=S('toast');t.textContent='Output: '+outputMode.charAt(0).toUpperCase()+outputMode.slice(1)+' theme'+(outputMode==='both'?'s':'');
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);
+  update();
+}
+
+update();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1400px;margin:30px auto 0;padding:0 20px}
+.pro-header{text-align:center;margin-bottom:20px}
+.pro-header h2{font-size:1.3rem;color:var(--accent,#e94560)}
+.pro-header p{color:var(--text2,#a0a0b0);font-size:.9rem}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--border,#2a2a4a)}
+.pro-blur-content{filter:blur(6px);pointer-events:none;padding:24px;background:var(--bg2,#16213e);opacity:.7}
+.pro-blur-content .pro-mock-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.pro-blur-content .pro-mock-item{flex:1;min-width:140px;background:rgba(233,69,96,.08);border:1px solid rgba(233,69,96,.15);border-radius:8px;padding:14px;font-size:.85rem;color:var(--text2,#a0a0b0)}
+.pro-blur-content .pro-mock-item strong{display:block;color:var(--text,#e0e0e0);margin-bottom:4px}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);z-index:2}
+.pro-lock-overlay .lock-icon{font-size:2.5rem;margin-bottom:10px}
+.pro-lock-overlay .lock-text{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-lock-overlay .lock-sub{font-size:.85rem;color:var(--text2,#a0a0b0);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--bg2,#16213e);border:1px solid var(--border,#2a2a4a);border-radius:16px;padding:36px;max-width:480px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:10px 0}
+.pro-modal ul{text-align:left;margin:20px 0;padding:0;list-style:none}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:var(--text2,#a0a0b0)}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:10px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{display:inline-block;margin-top:14px;background:none;border:none;color:var(--text2,#a0a0b0);cursor:pointer;font-size:.9rem;padding:8px 16px}
+.pro-modal .btn-later:hover{color:#fff}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>🔒 Pro Features</h2><p>Unlock advanced design system capabilities</p></div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-blur-content">
+<div class="pro-mock-row">
+<div class="pro-mock-item"><strong>🎨 Design System Generator</strong>Auto-generate complete design systems with semantic tokens, scales & documentation</div>
+<div class="pro-mock-item"><strong>🎯 Figma Token Export</strong>Export variables as Figma Design Tokens for seamless design-dev handoff</div>
+</div>
+<div class="pro-mock-row">
+<div class="pro-mock-item"><strong>👥 Team Sharing</strong>Share theme configurations with your team via shareable links & JSON import/export</div>
+<div class="pro-mock-item"><strong>📐 Advanced Scales</strong>Type scales, spacing systems & color palettes with WCAG contrast checking</div>
+</div>
+</div>
+<div class="pro-lock-overlay"><div class="lock-icon">🔒</div><div class="lock-text">Pro Features Locked</div><div class="lock-sub">Click to unlock — $9 one-time</div></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal">
+<div class="pro-modal">
+<h3>⚡ Upgrade to Pro</h3>
+<div class="pro-price">$9</div>
+<p style="color:var(--text2,#a0a0b0);font-size:.9rem">One-time payment · Lifetime access</p>
+<ul>
+<li>Complete design system generator</li>
+<li>Figma Design Token export (.json)</li>
+<li>Team sharing via links & JSON</li>
+<li>Type scale & spacing system builder</li>
+<li>WCAG contrast ratio checker</li>
+<li>Tailwind CSS & SCSS variable output</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-upgrade">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script>document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

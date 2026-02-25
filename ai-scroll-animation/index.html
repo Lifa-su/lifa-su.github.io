@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI scroll animation generator. Create scroll-triggered CSS animations with intersection observer. Build fade, slide, and zoom effects for engaging web pages.">
+<link rel="canonical" href="https://lifa-su.com/ai-scroll-animation/">
+<title>AI Scroll Animation Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1a1a24;--border:#2a2a3a;--primary:#6c5ce7;--accent:#00cec9;--text:#e0e0e0;--text-dim:#888;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.app{display:flex;min-height:100vh}
+.panel{width:340px;min-width:340px;background:var(--surface);border-right:1px solid var(--border);padding:24px;overflow-y:auto;position:sticky;top:0;height:100vh}
+.preview{flex:1;padding:40px;overflow-y:auto;height:100vh}
+.logo{font-size:1.4rem;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:.8rem;color:var(--text-dim);margin-bottom:28px}
+.section{margin-bottom:24px}
+.section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:12px;font-weight:600}
+.control-group{margin-bottom:14px}
+.control-group label{display:block;font-size:.82rem;color:var(--text-dim);margin-bottom:6px}
+select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.85rem;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus{border-color:var(--primary)}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--border);cursor:pointer;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 0 8px rgba(108,92,231,.4)}
+.range-row{display:flex;align-items:center;gap:10px}
+.range-row input{flex:1}
+.range-val{font-size:.8rem;color:var(--accent);min-width:48px;text-align:right}
+.anim-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.anim-btn{padding:10px 8px;background:var(--surface2);border:2px solid var(--border);border-radius:8px;color:var(--text);font-size:.78rem;cursor:pointer;transition:all .2s;text-align:center}
+.anim-btn:hover{border-color:var(--primary);background:rgba(108,92,231,.1)}
+.anim-btn.active{border-color:var(--primary);background:rgba(108,92,231,.15);color:#fff}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(108,92,231,.4)}
+.btn-copy{background:linear-gradient(135deg,var(--accent),#00b894);color:#fff}
+.btn-copy:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,206,201,.4)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--primary)}
+.preview-header{text-align:center;margin-bottom:40px;padding:60px 20px}
+.preview-header h2{font-size:2rem;margin-bottom:12px;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.preview-header p{color:var(--text-dim);max-width:500px;margin:0 auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;padding-bottom:200px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;opacity:0;transform:translateY(40px)}
+.card:hover{box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.card.animated{animation-fill-mode:forwards}
+.card-icon{font-size:2.5rem;margin-bottom:16px}
+.card h3{font-size:1.1rem;margin-bottom:8px;color:#fff}
+.card p{font-size:.85rem;color:var(--text-dim);line-height:1.7}
+.code-output{margin-top:16px}
+.code-tabs{display:flex;gap:4px;margin-bottom:8px}
+.code-tab{padding:6px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px 6px 0 0;color:var(--text-dim);font-size:.78rem;cursor:pointer;border-bottom:none}
+.code-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.code-block{background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:monospace;font-size:.78rem;color:#a0e8af;overflow-x:auto;max-height:300px;overflow-y:auto;white-space:pre;line-height:1.6;margin-bottom:8px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--primary);color:#fff;padding:12px 28px;border-radius:8px;font-size:.85rem;transition:transform .3s ease;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(-60px)}to{opacity:1;transform:translateY(0)}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes flipIn{from{opacity:0;transform:perspective(400px) rotateY(90deg)}to{opacity:1;transform:perspective(400px) rotateY(0)}}
+@media(max-width:768px){.app{flex-direction:column}.panel{width:100%;min-width:unset;height:auto;position:relative}.preview{padding:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="panel">
+<div class="logo">&#10024; AI Scroll Animation</div>
+<div class="subtitle">Generate scroll-triggered animations with ease</div>
+
+<div class="section">
+<div class="section-title">Animation Type</div>
+<div class="anim-grid" id="animGrid">
+<button class="anim-btn active" data-anim="fadeIn">&#128065; Fade In</button>
+<button class="anim-btn" data-anim="slideInLeft">&#8592; Slide Left</button>
+<button class="anim-btn" data-anim="slideInRight">&#8594; Slide Right</button>
+<button class="anim-btn" data-anim="slideInUp">&#8593; Slide Up</button>
+<button class="anim-btn" data-anim="slideInDown">&#8595; Slide Down</button>
+<button class="anim-btn" data-anim="zoomIn">&#128269; Zoom In</button>
+<button class="anim-btn" data-anim="flipIn">&#128260; Flip In</button>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Trigger Point</div>
+<div class="control-group">
+<label>Viewport Threshold</label>
+<div class="range-row">
+<input type="range" id="threshold" min="0" max="100" value="20">
+<span class="range-val" id="thresholdVal">20%</span>
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Parameters</div>
+<div class="control-group">
+<label>Duration</label>
+<div class="range-row">
+<input type="range" id="duration" min="100" max="3000" value="600" step="100">
+<span class="range-val" id="durationVal">0.6s</span>
+</div>
+</div>
+<div class="control-group">
+<label>Delay</label>
+<div class="range-row">
+<input type="range" id="delay" min="0" max="2000" value="0" step="50">
+<span class="range-val" id="delayVal">0s</span>
+</div>
+</div>
+<div class="control-group">
+<label>Easing</label>
+<select id="easing">
+<option value="ease">ease</option>
+<option value="ease-in">ease-in</option>
+<option value="ease-out">ease-out</option>
+<option value="ease-in-out">ease-in-out</option>
+<option value="linear">linear</option>
+<option value="cubic-bezier(0.68,-0.55,0.265,1.55)" selected>bounce</option>
+<option value="cubic-bezier(0.25,0.46,0.45,0.94)">smooth</option>
+</select>
+</div>
+</div>
+
+<div class="section">
+<button class="btn btn-primary" onclick="applyAnimation()">&#9654; Apply &amp; Preview</button>
+<button class="btn btn-secondary" onclick="resetCards()">&#8635; Reset Preview</button>
+</div>
+
+<div class="section">
+<div class="section-title">Generated Code</div>
+<div class="code-tabs">
+<button class="code-tab active" onclick="showTab('css',this)">CSS</button>
+<button class="code-tab" onclick="showTab('js',this)">JavaScript</button>
+</div>
+<div class="code-block" id="codeCSS"></div>
+<div class="code-block" id="codeJS" style="display:none"></div>
+<button class="btn btn-copy" onclick="copyCode()">&#128203; Copy Code</button>
+</div>
+</div>
+
+<div class="preview" id="previewArea">
+<div class="preview-header">
+<h2>Scroll Down to See Animations</h2>
+<p>Adjust settings on the left panel, click Apply, then scroll to see the effect on the cards below.</p>
+</div>
+<div class="cards" id="cardContainer"></div>
+</div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const cardData=[
+{icon:"&#128640;",title:"Launch Ready",desc:"Build scroll animations that captivate users from the first interaction."},
+{icon:"&#127912;",title:"Creative Design",desc:"Express your creativity with smooth, eye-catching scroll effects."},
+{icon:"&#9889;",title:"Lightning Fast",desc:"Optimized animations that run at 60fps for buttery smooth performance."},
+{icon:"&#128736;",title:"Easy Integration",desc:"Copy the generated code and paste it directly into your project."},
+{icon:"&#127760;",title:"Cross Browser",desc:"Works seamlessly across all modern browsers and devices."},
+{icon:"&#128272;",title:"Accessible",desc:"Built with accessibility in mind, respects prefers-reduced-motion."},
+{icon:"&#128202;",title:"Performance",desc:"Lightweight implementation using Intersection Observer API."},
+{icon:"&#128161;",title:"Customizable",desc:"Fine-tune every parameter to match your design vision perfectly."},
+{icon:"&#127775;",title:"Production Ready",desc:"Clean, well-structured code ready for production deployment."}
+];
+
+let currentAnim="fadeIn",currentTab="css";
+const container=document.getElementById("cardContainer");
+
+function createCards(){
+container.innerHTML="";
+cardData.forEach(d=>{
+const c=document.createElement("div");
+c.className="card";
+c.innerHTML=\`<div class="card-icon">\${d.icon}</div><h3>\${d.title}</h3><p>\${d.desc}</p>\`;
+container.appendChild(c);
+});
+}
+createCards();
+
+document.querySelectorAll(".anim-btn").forEach(b=>{
+b.addEventListener("click",()=>{
+document.querySelectorAll(".anim-btn").forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+currentAnim=b.dataset.anim;
+generateCode();
+});
+});
+
+document.getElementById("threshold").addEventListener("input",e=>{
+document.getElementById("thresholdVal").textContent=e.target.value+"%";
+generateCode();
+});
+document.getElementById("duration").addEventListener("input",e=>{
+document.getElementById("durationVal").textContent=(e.target.value/1000)+"s";
+generateCode();
+});
+document.getElementById("delay").addEventListener("input",e=>{
+document.getElementById("delayVal").textContent=(e.target.value/1000)+"s";
+generateCode();
+});
+document.getElementById("easing").addEventListener("change",()=>generateCode());
+
+function getParams(){
+return{
+anim:currentAnim,
+threshold:parseInt(document.getElementById("threshold").value)/100,
+duration:parseInt(document.getElementById("duration").value),
+delay:parseInt(document.getElementById("delay").value),
+easing:document.getElementById("easing").value
+};
+}
+
+function generateCode(){
+const p=getParams();
+const easingName=document.getElementById("easing").selectedOptions[0].text;
+
+const keyframes={
+fadeIn:"@keyframes fadeIn {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}",
+slideInLeft:"@keyframes slideInLeft {\n  from { opacity: 0; transform: translateX(-60px); }\n  to { opacity: 1; transform: translateX(0); }\n}",
+slideInRight:"@keyframes slideInRight {\n  from { opacity: 0; transform: translateX(60px); }\n  to { opacity: 1; transform: translateX(0); }\n}",
+slideInUp:"@keyframes slideInUp {\n  from { opacity: 0; transform: translateY(60px); }\n  to { opacity: 1; transform: translateY(0); }\n}",
+slideInDown:"@keyframes slideInDown {\n  from { opacity: 0; transform: translateY(-60px); }\n  to { opacity: 1; transform: translateY(0); }\n}",
+zoomIn:"@keyframes zoomIn {\n  from { opacity: 0; transform: scale(0.6); }\n  to { opacity: 1; transform: scale(1); }\n}",
+flipIn:"@keyframes flipIn {\n  from { opacity: 0; transform: perspective(400px) rotateY(90deg); }\n  to { opacity: 1; transform: perspective(400px) rotateY(0); }\n}"
+};
+
+const css=\`/* Scroll Animation: \${p.anim} */
+.scroll-animate {
+  opacity: 0;
+}
+
+.scroll-animate.animated {
+  animation: \${p.anim} \${p.duration}ms \${p.easing} \${p.delay}ms forwards;
+}
+
+\${keyframes[p.anim]}\`;
+
+const js=\`// Scroll Animation Observer
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('animated');
+      scrollObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: \${p.threshold} });
+
+document.querySelectorAll('.scroll-animate').forEach(el => {
+  scrollObserver.observe(el);
+});\`;
+
+document.getElementById("codeCSS").textContent=css;
+document.getElementById("codeJS").textContent=js;
+}
+generateCode();
+
+function showTab(tab,btn){
+currentTab=tab;
+document.querySelectorAll(".code-tab").forEach(t=>t.classList.remove("active"));
+btn.classList.add("active");
+document.getElementById("codeCSS").style.display=tab==="css"?"block":"none";
+document.getElementById("codeJS").style.display=tab==="js"?"block":"none";
+}
+
+function copyCode(){
+const text=currentTab==="css"?document.getElementById("codeCSS").textContent:document.getElementById("codeJS").textContent;
+navigator.clipboard.writeText(text).then(()=>{
+const t=document.getElementById("toast");
+t.textContent="Copied!";
+t.classList.add("show");
+setTimeout(()=>t.classList.remove("show"),2000);
+});
+}
+
+function resetCards(){
+document.querySelectorAll(".card").forEach(c=>{
+c.classList.remove("animated");
+c.style.animation="";
+c.style.opacity="0";
+c.style.transform="translateY(40px)";
+});
+setTimeout(()=>applyAnimation(),100);
+}
+
+function applyAnimation(){
+const p=getParams();
+const previewArea=document.getElementById("previewArea");
+
+document.querySelectorAll(".card").forEach(c=>{
+c.classList.remove("animated");
+c.style.animation="";
+c.style.opacity="0";
+c.style.transform="translateY(40px)";
+});
+
+const observer=new IntersectionObserver((entries)=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+const card=entry.target;
+card.style.animation=\`\${p.anim} \${p.duration}ms \${p.easing} \${p.delay}ms forwards\`;
+card.classList.add("animated");
+observer.unobserve(card);
+}
+});
+},{threshold:p.threshold,root:previewArea});
+
+document.querySelectorAll(".card").forEach(c=>observer.observe(c));
+}
+
+applyAnimation();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

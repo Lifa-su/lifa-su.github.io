@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Transform typed text into realistic handwriting. AI text to handwriting generator with multiple pen styles, paper textures, and customizable writing effects.">
+<link rel="canonical" href="https://lifa-su.com/ai-text-to-handwriting/">
+<title>AI Text to Handwriting Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Indie+Flower&family=Shadows+Into+Light&family=Patrick+Hand&family=Kalam:wght@400;700&family=Architects+Daughter&family=Satisfy&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f13;--sf:#1a1a24;--sf2:#22223a;--bd:#2e2e4a;--tx:#e4e4ef;--tx2:#9999b3;--ac:#7c6aef;--ac2:#9b8afb;--r:12px}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;line-height:1.6}
+.app{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+header{text-align:center;padding:28px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);font-size:.92rem;margin-top:4px}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px}
+.st{font-size:.83rem;color:var(--ac2);font-weight:600;margin-bottom:2px}
+textarea{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:10px;font-size:.92rem;resize:vertical;min-height:100px;font-family:inherit;width:100%}
+textarea:focus{outline:none;border-color:var(--ac)}
+.rr{display:flex;align-items:center;gap:8px}
+.rr input[type=range]{flex:1;accent-color:var(--ac)}
+.rv{background:var(--sf2);border-radius:6px;padding:2px 8px;font-size:.78rem;min-width:40px;text-align:center;color:var(--ac2)}
+.cr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sw{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.15s}
+.sw:hover,.sw.on{transform:scale(1.15);border-color:var(--ac2)}
+input[type=color]{width:28px;height:28px;padding:0;border:2px solid var(--bd);border-radius:50%;cursor:pointer;background:none;-webkit-appearance:none}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:none;border-radius:50%}
+.po{display:flex;gap:6px}
+.po div{flex:1;padding:8px 0;text-align:center;border-radius:8px;background:var(--sf2);border:2px solid var(--bd);cursor:pointer;font-size:.76rem;color:var(--tx2);transition:.15s}
+.po div:hover{border-color:var(--ac)}
+.po div.on{border-color:var(--ac);color:var(--ac2);background:rgba(124,106,239,.1)}
+.po .ic{font-size:1.1rem;display:block;margin-bottom:1px}
+.fc{display:flex;flex-wrap:wrap;gap:5px}
+.fc span{padding:3px 10px;border-radius:16px;font-size:.8rem;background:var(--sf2);border:1px solid var(--bd);cursor:pointer;color:var(--tx);transition:.15s;white-space:nowrap}
+.fc span:hover{border-color:var(--ac)}
+.fc span.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.br{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:9px 18px;border:none;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;transition:.2s}
+.b1{background:var(--ac);color:#fff}
+.b1:hover{background:var(--ac2);transform:translateY(-1px)}
+.b2{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}
+.b2:hover{border-color:var(--ac);color:var(--ac2)}
+.cw{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;overflow:auto}
+.cw canvas{display:block;margin:0 auto;border-radius:4px;max-width:100%;height:auto}
+footer{text-align:center;padding:36px 0 12px;color:var(--tx2);font-size:.76rem}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>✍️ AI Text to Handwriting</h1><p>Transform typed text into beautiful handwriting</p></header>
+<div class="grid">
+<div class="panel">
+  <div><div class="st">📝 Your Text</div>
+  <textarea id="txt" placeholder="Type or paste text here...">The quick brown fox jumps over the lazy dog.</textarea></div>
+  <div><div class="st">🖋️ Font</div><div class="fc" id="fc"></div></div>
+  <div><div class="st">📄 Paper</div>
+  <div class="po" id="po">
+    <div class="on" data-v="blank"><span class="ic">📃</span>Blank</div>
+    <div data-v="lined"><span class="ic">📄</span>Lined</div>
+    <div data-v="grid"><span class="ic">📐</span>Grid</div>
+  </div></div>
+  <div><div class="st">🎨 Ink Color</div>
+  <div class="cr" id="cr"></div></div>
+  <div><div class="st">🔤 Font Size: <span id="fsv">24</span>px</div>
+  <div class="rr"><input type="range" id="fs" min="14" max="48" value="24"><div class="rv" id="fsv2">24</div></div></div>
+  <div><div class="st">↕️ Line Height: <span id="lhv">1.8</span></div>
+  <div class="rr"><input type="range" id="lh" min="12" max="30" value="18" step="1"><div class="rv" id="lhv2">1.8</div></div></div>
+  <div><div class="st">📐 Margins: <span id="mgv">40</span>px</div>
+  <div class="rr"><input type="range" id="mg" min="10" max="80" value="40"><div class="rv" id="mgv2">40</div></div></div>
+  <div class="br">
+    <button class="btn b1" onclick="render()">✍️ Generate</button>
+    <button class="btn b2" onclick="expPNG()">📥 PNG</button>
+    <button class="btn b2" onclick="expPDF()">📄 PDF</button>
+  </div>
+</div>
+<div class="cw"><canvas id="cv" width="800" height="1060"></canvas></div>
+</div>
+</div>
+<footer>AI Text to Handwriting Generator &mdash; Free Online Tool</footer>
+<script>
+const fonts=['Caveat','Dancing Script','Indie Flower','Shadows Into Light','Patrick Hand','Kalam','Architects Daughter','Satisfy'];
+const colors=[{n:'Black',v:'#1a1a2e'},{n:'Blue',v:'#1a3a8a'},{n:'Red',v:'#8b1a1a'},{n:'Green',v:'#1a6b3a'},{n:'Purple',v:'#5b2180'}];
+let cfg={font:'Caveat',paper:'blank',color:'#1a1a2e',size:24,lh:1.8,margin:40};
+
+// Init font chips
+const fcEl=document.getElementById('fc');
+fonts.forEach((f,i)=>{
+  const s=document.createElement('span');
+  s.textContent=f;s.style.fontFamily=`'${f}',cursive`;
+  if(i===0)s.classList.add('on');
+  s.onclick=()=>{fcEl.querySelectorAll('span').forEach(x=>x.classList.remove('on'));s.classList.add('on');cfg.font=f;render()};
+  fcEl.appendChild(s);
+});
+
+// Init color swatches
+const crEl=document.getElementById('cr');
+colors.forEach((c,i)=>{
+  const d=document.createElement('div');d.className='sw'+(i===0?' on':'');
+  d.style.background=c.v;d.title=c.n;
+  d.onclick=()=>{crEl.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));d.classList.add('on');cfg.color=c.v;render()};
+  crEl.appendChild(d);
+});
+const cp=document.createElement('input');cp.type='color';cp.value='#1a1a2e';
+cp.oninput=()=>{crEl.querySelectorAll('.sw').forEach(x=>x.classList.remove('on'));cfg.color=cp.value;render()};
+crEl.appendChild(cp);
+
+// Paper options
+document.getElementById('po').onclick=e=>{
+  const t=e.target.closest('[data-v]');if(!t)return;
+  document.querySelectorAll('#po div').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');cfg.paper=t.dataset.v;render();
+};
+
+// Sliders
+document.getElementById('fs').oninput=function(){cfg.size=+this.value;document.getElementById('fsv').textContent=this.value;document.getElementById('fsv2').textContent=this.value;render()};
+document.getElementById('lh').oninput=function(){cfg.lh=this.value/10;document.getElementById('lhv').textContent=cfg.lh.toFixed(1);document.getElementById('lhv2').textContent=cfg.lh.toFixed(1);render()};
+document.getElementById('mg').oninput=function(){cfg.margin=+this.value;document.getElementById('mgv').textContent=this.value;document.getElementById('mgv2').textContent=this.value;render()};
+
+// Text input
+document.getElementById('txt').oninput=()=>render();
+
+function drawPaper(ctx,w,h){
+  // Paper background
+  ctx.fillStyle='#fffef9';ctx.fillRect(0,0,w,h);
+  // Subtle texture
+  ctx.fillStyle='rgba(0,0,0,0.01)';
+  for(let i=0;i<200;i++){ctx.fillRect(Math.random()*w,Math.random()*h,1,1)}
+
+  const lineH=cfg.size*cfg.lh;
+  if(cfg.paper==='lined'){
+    ctx.strokeStyle='#c8d8e8';ctx.lineWidth=0.8;
+    // Red margin line
+    ctx.strokeStyle='#e8a0a0';ctx.beginPath();ctx.moveTo(cfg.margin-8,0);ctx.lineTo(cfg.margin-8,h);ctx.stroke();
+    // Blue lines
+    ctx.strokeStyle='#c8d8e8';
+    const startY=cfg.margin+lineH;
+    for(let y=startY;y<h-20;y+=lineH){ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(w-20,y);ctx.stroke()}
+  }else if(cfg.paper==='grid'){
+    ctx.strokeStyle='#d8e0e8';ctx.lineWidth=0.5;
+    const gs=lineH;
+    for(let x=cfg.margin;x<w-10;x+=gs){ctx.beginPath();ctx.moveTo(x,cfg.margin);ctx.lineTo(x,h-10);ctx.stroke()}
+    for(let y=cfg.margin;y<h-10;y+=gs){ctx.beginPath();ctx.moveTo(cfg.margin,y);ctx.lineTo(w-10,y);ctx.stroke()}
+  }
+}
+
+function render(){
+  const cv=document.getElementById('cv');const ctx=cv.getContext('2d');
+  const text=document.getElementById('txt').value||'';
+  const W=800,lineH=cfg.size*cfg.lh,m=cfg.margin;
+
+  // Measure needed height
+  ctx.font=`${cfg.size}px '${cfg.font}', cursive`;
+  const maxW=W-m*2;
+  const lines=[];
+  text.split('\n').forEach(para=>{
+    if(para===''){lines.push('');return}
+    let words=para.split(/(\s+)/);let line='';
+    for(let w of words){
+      const test=line+w;
+      if(ctx.measureText(test).width>maxW&&line){lines.push(line);line=w}
+      else line=test;
+    }
+    if(line)lines.push(line);
+  });
+
+  const H=Math.max(1060,m*2+lines.length*lineH+40);
+  cv.width=W;cv.height=H;
+
+  drawPaper(ctx,W,H);
+
+  // Draw text
+  ctx.font=`${cfg.size}px '${cfg.font}', cursive`;
+  ctx.fillStyle=cfg.color;
+  ctx.textBaseline='top';
+
+  let y=m;
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    // Slight random offset for natural feel
+    const ox=(Math.random()-0.5)*1.5;
+    const oy=(Math.random()-0.5)*1;
+    // Draw char by char with slight variation
+    let x=m+ox;
+    for(let c=0;c<line.length;c++){
+      const ch=line[c];
+      const dx=(Math.random()-0.5)*0.8;
+      const dy=(Math.random()-0.5)*0.6;
+      const rot=(Math.random()-0.5)*0.02;
+      ctx.save();
+      ctx.translate(x+dx,y+oy+dy);
+      ctx.rotate(rot);
+      ctx.fillText(ch,0,0);
+      ctx.restore();
+      x+=ctx.measureText(ch).width+dx*0.3;
+    }
+    y+=lineH;
+  }
+}
+
+function expPNG(){
+  render();
+  const cv=document.getElementById('cv');
+  const a=document.createElement('a');a.download='handwriting.png';a.href=cv.toDataURL('image/png');a.click();
+}
+
+function expPDF(){
+  render();
+  const cv=document.getElementById('cv');
+  const {jsPDF}=window.jspdf;
+  const imgData=cv.toDataURL('image/png');
+  const ratio=cv.width/cv.height;
+  const pw=210,ph=pw/ratio;
+  const pdf=new jsPDF({unit:'mm',format:[pw,ph]});
+  pdf.addImage(imgData,'PNG',0,0,pw,ph);
+  pdf.save('handwriting.pdf');
+}
+
+// Initial render after fonts load
+document.fonts.ready.then(()=>render());
+setTimeout(render,500);
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

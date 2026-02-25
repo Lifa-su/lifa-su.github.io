@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Visualize regular expressions as railroad diagrams. Understand complex regex patterns with interactive visual breakdowns and step-by-step match explanations.">
+<link rel="canonical" href="https://lifa-su.com/ai-regex-visualizer/">
+<title>AI Regex Visualizer - Railroad Diagram Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.container{max-width:1100px;margin:0 auto;padding:20px;width:100%;flex:1}
+h1{text-align:center;color:#e94560;font-size:1.8em;margin-bottom:6px}
+.subtitle{text-align:center;color:#888;font-size:.9em;margin-bottom:24px}
+.panel{background:#16213e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #0f3460}
+.panel-title{color:#e94560;font-size:1.1em;margin-bottom:12px;font-weight:600}
+.input-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.input-row input,.input-row select{flex:1;min-width:200px;padding:10px 14px;background:#0f3460;border:1px solid #1a4080;border-radius:8px;color:#e0e0e0;font-size:.95em;outline:none;transition:border-color .2s}
+.input-row input:focus{border-color:#e94560}
+.input-row select{cursor:pointer}
+.input-row select option{background:#0f3460;color:#e0e0e0}
+.btn{padding:10px 20px;background:#e94560;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.95em;font-weight:600;transition:background .2s}
+.btn:hover{background:#c73652}
+.flags-row{display:flex;gap:14px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.flags-row label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.9em;color:#aaa}
+.flags-row input[type=checkbox]{accent-color:#e94560}
+#regexError{color:#ff6b6b;font-size:.85em;min-height:1.2em;margin-top:4px}
+#diagramBox{background:#0d1b36;border-radius:10px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow-x:auto;padding:20px;border:1px solid #1a4080}
+#diagramBox svg{max-width:100%}
+.placeholder-text{color:#555;font-style:italic}
+#testInput{width:100%;padding:10px 14px;background:#0f3460;border:1px solid #1a4080;border-radius:8px;color:#e0e0e0;font-size:.95em;outline:none;margin-bottom:12px;transition:border-color .2s}
+#testInput:focus{border-color:#e94560}
+#matchResult{background:#0d1b36;border-radius:10px;padding:16px;min-height:50px;border:1px solid #1a4080;line-height:1.8;font-size:.95em;word-break:break-all}
+#matchResult .match{background:#e9456040;border:1px solid #e94560;border-radius:3px;padding:1px 3px}
+#groupsBox{margin-top:12px}
+.group-item{display:inline-block;background:#0f3460;border:1px solid #1a4080;border-radius:6px;padding:4px 10px;margin:4px;font-size:.85em}
+.group-item .gn{color:#e94560;font-weight:600}
+.group-item .gv{color:#7ec8e3}
+.no-match{color:#666;font-style:italic}
+footer{text-align:center;padding:16px;color:#444;font-size:.8em}
+footer a{color:#e94560;text-decoration:none}
+@media(max-width:600px){.container{padding:12px}h1{font-size:1.4em}.input-row{flex-direction:column}.input-row input,.input-row select{min-width:auto}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔍 AI Regex Visualizer</h1>
+<p class="subtitle">Railroad Diagram Generator &amp; Pattern Tester</p>
+
+<div class="panel">
+<div class="panel-title">Regular Expression</div>
+<div class="input-row">
+<input type="text" id="regexInput" placeholder="Enter regex, e.g. ^[a-z]+(\d{2,4})$" value="(hello|world)+\d{2,4}?" spellcheck="false">
+<select id="presets" aria-label="Common regex presets">
+<option value="">-- Presets --</option>
+<option value="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$">Email</option>
+<option value="https?:\/\/(www\.)?[\w\-]+(\.[\w\-]+)+[\/\w\-._~:?#\[\]@!$&'()*+,;=%]*">URL</option>
+<option value="^1[3-9]\d{9}$">Phone (CN)</option>
+<option value="^(\d{1,3}\.){3}\d{1,3}$">IPv4</option>
+<option value="^\d{4}[-\/](0[1-9]|1[0-2])[-\/](0[1-9]|[12]\d|3[01])$">Date (YYYY-MM-DD)</option>
+<option value="^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">Hex Color</option>
+<option value="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$">Strong Password</option>
+</select>
+</div>
+<div class="flags-row">
+<label><input type="checkbox" id="flagG" checked> global (g)</label>
+<label><input type="checkbox" id="flagI"> ignoreCase (i)</label>
+<label><input type="checkbox" id="flagM"> multiline (m)</label>
+<label><input type="checkbox" id="flagS"> dotAll (s)</label>
+<button class="btn" onclick="visualize()">Visualize</button>
+</div>
+<div id="regexError"></div>
+</div>
+
+<div class="panel">
+<div class="panel-title">Railroad Diagram</div>
+<div id="diagramBox"><span class="placeholder-text">Enter a regex and click Visualize</span></div>
+</div>
+
+<div class="panel">
+<div class="panel-title">Test String</div>
+<input type="text" id="testInput" placeholder="Enter test string to match against..." spellcheck="false">
+<div id="matchResult"><span class="no-match">Enter a test string above</span></div>
+<div id="groupsBox"></div>
+</div>
+</div>
+
+<footer>
+AI Regex Visualizer &mdash; Pure JS/SVG Railroad Diagrams &mdash; <a href="https://github.com/Lifa-su/ai-regex-visualizer" target="_blank">GitHub</a>
+</footer>
+
+<script>
+// ===== Regex Parser =====
+const T={LITERAL:'literal',CHARSET:'charset',DOT:'dot',GROUP:'group',ALTERNATION:'alt',QUANTIFIER:'quant',ANCHOR:'anchor',BACKREF:'backref',LOOKAHEAD:'lookahead'};
+
+function parseRegex(str){
+  let pos=0;
+  function parseAlt(){
+    let branches=[parseSeq()];
+    while(pos<str.length&&str[pos]==='|'){pos++;branches.push(parseSeq())}
+    return branches.length===1?branches[0]:{type:T.ALTERNATION,branches};
+  }
+  function parseSeq(){
+    let items=[];
+    while(pos<str.length&&str[pos]!==')'&&str[pos]!=='|'){
+      let node=parseAtom();
+      if(!node)break;
+      node=parseQuant(node);
+      items.push(node);
+    }
+    return items.length===1?items[0]:{type:'seq',items};
+  }
+  function parseAtom(){
+    if(pos>=str.length)return null;
+    let c=str[pos];
+    if(c==='('){return parseGroup()}
+    if(c==='['){return parseCharset()}
+    if(c==='.'){pos++;return{type:T.DOT}}
+    if(c==='^'||c==='$'){pos++;return{type:T.ANCHOR,value:c}}
+    if(c==='\\'){return parseEscape()}
+    if(c===')'||c==='|')return null;
+    if(c==='{'||c==='?'||c==='*'||c==='+')return null;
+    pos++;return{type:T.LITERAL,value:c};
+  }
+  function parseGroup(){
+    pos++; // skip (
+    let label='group';let capturing=true;
+    if(pos<str.length&&str[pos]==='?'){
+      if(str[pos+1]===':'){label='non-capture';capturing=false;pos+=2}
+      else if(str[pos+1]==='='){label='lookahead (?=)';capturing=false;pos+=2}
+      else if(str[pos+1]==='!'){label='neg lookahead (?!)';capturing=false;pos+=2}
+      else if(str[pos+1]==='<'&&str[pos+2]==='='){label='lookbehind (?<=)';capturing=false;pos+=3}
+      else if(str[pos+1]==='<'&&str[pos+2]==='!'){label='neg lookbehind (?<!)';capturing=false;pos+=3}
+      else{pos++}
+    }
+    let body=parseAlt();
+    if(pos<str.length&&str[pos]===')'){pos++}
+    return{type:T.GROUP,label,capturing,body};
+  }
+  function parseCharset(){
+    let start=pos;pos++;
+    let neg=false;
+    if(pos<str.length&&str[pos]==='^'){neg=true;pos++}
+    while(pos<str.length&&str[pos]!==']'){
+      if(str[pos]==='\\')pos++;
+      pos++;
+    }
+    if(pos<str.length)pos++;
+    return{type:T.CHARSET,value:str.slice(start,pos),negated:neg};
+  }
+  function parseEscape(){
+    pos++;
+    if(pos>=str.length)return{type:T.LITERAL,value:'\\'};
+    let c=str[pos];pos++;
+    let specials={d:'\\d digit',D:'\\D non-digit',w:'\\w word',W:'\\W non-word',s:'\\s space',S:'\\S non-space',b:'\\b boundary',B:'\\B non-boundary',n:'\\n newline',t:'\\t tab',r:'\\r return'};
+    if(specials[c])return{type:T.LITERAL,value:specials[c].split(' ')[0],label:specials[c]};
+    if(c>='1'&&c<='9')return{type:T.BACKREF,value:'\\'+c};
+    return{type:T.LITERAL,value:c==='/'?'/':'\\'+c};
+  }
+  function parseQuant(node){
+    if(pos>=str.length)return node;
+    let c=str[pos],min,max;
+    if(c==='?'){pos++;min=0;max=1}
+    else if(c==='*'){pos++;min=0;max=Infinity}
+    else if(c==='+'){pos++;min=1;max=Infinity}
+    else if(c==='{'){
+      let m=str.slice(pos).match(/^\{(\d+)(?:,(\d*))?\}/);
+      if(m){pos+=m[0].length;min=parseInt(m[1]);max=m[2]===undefined?min:m[2]===''?Infinity:parseInt(m[2])}
+      else return node;
+    }
+    else return node;
+    let lazy=false;
+    if(pos<str.length&&str[pos]==='?'){lazy=true;pos++}
+    return{type:T.QUANTIFIER,body:node,min,max,lazy};
+  }
+  try{let ast=parseAlt();return{ok:true,ast}}
+  catch(e){return{ok:false,error:e.message}}
+}
+
+// ===== SVG Railroad Diagram Renderer =====
+const CFG={h:30,pad:10,rx:8,ry:8,fontSize:14,fontFamily:'monospace',nodeH:28,nodeMinW:40,gapX:16,gapY:12,lineColor:'#4a6fa5',nodeStroke:'#e94560',nodeFill:'#16213e',textColor:'#e0e0e0',altGap:10,quantLoopR:10,groupColor:'#0f3460',groupStroke:'#4a6fa5',anchorFill:'#e94560'};
+
+function createSVGEl(tag,attrs){
+  let el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(let k in attrs)el.setAttribute(k,attrs[k]);
+  return el;
+}
+
+function measureText(text){
+  return Math.max(CFG.nodeMinW,text.length*CFG.fontSize*0.62+16);
+}
+
+function renderNode(text,extra){
+  let w=measureText(text),h=CFG.nodeH;
+  let g=createSVGEl('g',{});
+  let fill=extra?.fill||CFG.nodeFill;
+  let stroke=extra?.stroke||CFG.nodeStroke;
+  let r=createSVGEl('rect',{x:0,y:-h/2,width:w,height:h,rx:CFG.rx,ry:CFG.ry,fill,stroke,'stroke-width':1.5});
+  let t=createSVGEl('text',{x:w/2,y:5,'text-anchor':'middle',fill:CFG.textColor,'font-size':CFG.fontSize,'font-family':CFG.fontFamily});
+  t.textContent=text;
+  g.appendChild(r);g.appendChild(t);
+  return{el:g,w,h,inY:0};
+}
+
+function renderLine(x1,y1,x2,y2){
+  return createSVGEl('line',{x1,y1,x2,y2,stroke:CFG.lineColor,'stroke-width':2});
+}
+
+function renderPath(d){
+  return createSVGEl('path',{d,stroke:CFG.lineColor,'stroke-width':2,fill:'none'});
+}
+
+function renderAST(node){
+  if(!node)return renderNode('(empty)');
+  switch(node.type){
+    case 'seq':return renderSeq(node);
+    case T.ALTERNATION:return renderAlt(node);
+    case T.LITERAL:return renderNode(node.label||node.value);
+    case T.DOT:return renderNode('.  any',{stroke:'#7ec8e3'});
+    case T.CHARSET:return renderNode(node.value,{stroke:'#f0a500'});
+    case T.ANCHOR:return renderNode(node.value==='$'?'$ end':'^ start',{fill:CFG.anchorFill,stroke:CFG.anchorFill});
+    case T.BACKREF:return renderNode(node.value,{stroke:'#a855f7'});
+    case T.GROUP:return renderGroup(node);
+    case T.QUANTIFIER:return renderQuant(node);
+    default:return renderNode('?');
+  }
+}
+
+function renderSeq(node){
+  let items=node.items.map(renderAST);
+  let totalW=items.reduce((s,it)=>s+it.w+CFG.gapX,0)-CFG.gapX;
+  let maxH=Math.max(...items.map(it=>it.h));
+  let g=createSVGEl('g',{});
+  let x=0;
+  items.forEach((it,i)=>{
+    let wrap=createSVGEl('g',{transform:`translate(${x},0)`});
+    wrap.appendChild(it.el);
+    g.appendChild(wrap);
+    if(i<items.length-1){
+      g.appendChild(renderLine(x+it.w,0,x+it.w+CFG.gapX,0));
+    }
+    x+=it.w+CFG.gapX;
+  });
+  return{el:g,w:totalW,h:maxH,inY:0};
+}
+
+function renderAlt(node){
+  let branches=node.branches.map(renderAST);
+  let maxW=Math.max(...branches.map(b=>b.w));
+  let padSide=24;
+  let totalW=maxW+padSide*2;
+  let gap=CFG.altGap;
+  let totalH=branches.reduce((s,b)=>s+b.h+gap,0)-gap;
+  let g=createSVGEl('g',{});
+  let y=-totalH/2;
+  branches.forEach((b,i)=>{
+    let cy=y+b.h/2;
+    let bx=padSide+(maxW-b.w)/2;
+    let wrap=createSVGEl('g',{transform:`translate(${bx},${cy})`});
+    wrap.appendChild(b.el);
+    g.appendChild(wrap);
+    // left curve
+    g.appendChild(renderPath(`M0,0 Q${padSide/2},0 ${padSide/2},${cy} L${padSide},${cy}`));
+    // right curve
+    let rx=padSide+maxW;
+    g.appendChild(renderPath(`M${rx},${cy} L${rx+padSide/2},${cy} Q${totalW},${cy} ${totalW},0`));
+    y+=b.h+gap;
+  });
+  return{el:g,w:totalW,h:totalH,inY:0};
+}
+
+function renderGroup(node){
+  let inner=renderAST(node.body);
+  let padX=12,padY=20,labelH=16;
+  let totalW=inner.w+padX*2;
+  let totalH=inner.h+padY*2+labelH;
+  let g=createSVGEl('g',{});
+  let rect=createSVGEl('rect',{x:0,y:-totalH/2,width:totalW,height:totalH,rx:6,ry:6,fill:CFG.groupColor,stroke:CFG.groupStroke,'stroke-width':1,'stroke-dasharray':'4,3'});
+  g.appendChild(rect);
+  let label=createSVGEl('text',{x:6,y:-totalH/2+labelH-2,fill:'#888','font-size':11,'font-family':CFG.fontFamily});
+  label.textContent=node.label;
+  g.appendChild(label);
+  let wrap=createSVGEl('g',{transform:`translate(${padX},${labelH/2})`});
+  wrap.appendChild(inner.el);
+  g.appendChild(wrap);
+  // entry/exit lines
+  g.appendChild(renderLine(-CFG.gapX,0,0,0));
+  g.appendChild(renderLine(totalW,0,totalW+CFG.gapX,0));
+  return{el:g,w:totalW,h:totalH,inY:0};
+}
+
+function renderQuant(node){
+  let inner=renderAST(node.body);
+  let {min,max,lazy}=node;
+  let label=min===0&&max===1?'?':min===0&&max===Infinity?'*':min===1&&max===Infinity?'+':max===Infinity?`{${min},}`:min===max?`{${min}}`:`{${min},${max}}`;
+  if(lazy)label+='?';
+  let loopH=20;
+  let padSide=20;
+  let totalW=inner.w+padSide*2;
+  let g=createSVGEl('g',{});
+  // main path
+  let wrap=createSVGEl('g',{transform:`translate(${padSide},0)`});
+  wrap.appendChild(inner.el);
+  g.appendChild(wrap);
+  g.appendChild(renderLine(0,0,padSide,0));
+  g.appendChild(renderLine(padSide+inner.w,0,totalW,0));
+  // loop back (for + and *)
+  if(max>1){
+    let ly=inner.h/2+loopH;
+    let r=10;
+    g.appendChild(renderPath(`M${padSide+inner.w},0 Q${padSide+inner.w+r},0 ${padSide+inner.w+r},${r} L${padSide+inner.w+r},${ly-r} Q${padSide+inner.w+r},${ly} ${padSide+inner.w},${ly} L${padSide},${ly} Q${padSide-r},${ly} ${padSide-r},${ly-r} L${padSide-r},${r} Q${padSide-r},0 ${padSide},0`));
+    let lt=createSVGEl('text',{x:totalW/2,y:ly+14,'text-anchor':'middle',fill:'#e94560','font-size':11,'font-family':CFG.fontFamily});
+    lt.textContent=label+' loop';
+    g.appendChild(lt);
+  }
+  // skip path (for ? and *)
+  if(min===0){
+    let sy=-(inner.h/2+loopH);
+    let r=10;
+    g.appendChild(renderPath(`M0,0 Q-${r},0 -${r},${-r} L-${r},${sy+r} Q-${r},${sy} 0,${sy} L${totalW},${sy} Q${totalW+r},${sy} ${totalW+r},${sy+r} L${totalW+r},${-r} Q${totalW+r},0 ${totalW},0`));
+    let st=createSVGEl('text',{x:totalW/2,y:sy-4,'text-anchor':'middle',fill:'#888','font-size':11,'font-family':CFG.fontFamily});
+    st.textContent='skip (optional)';
+    g.appendChild(st);
+  }
+  // quantifier label
+  if(max<=1&&min>0){
+    let lt=createSVGEl('text',{x:totalW/2,y:inner.h/2+18,'text-anchor':'middle',fill:'#e94560','font-size':11,'font-family':CFG.fontFamily});
+    lt.textContent=label;
+    g.appendChild(lt);
+  }
+  let totalH=inner.h+loopH*2+20;
+  return{el:g,w:totalW,h:totalH,inY:0};
+}
+
+function buildDiagram(regexStr){
+  let result=parseRegex(regexStr);
+  if(!result.ok)return{error:result.error};
+  let rendered=renderAST(result.ast);
+  let padX=40,padY=40;
+  let svgW=rendered.w+padX*2+40;
+  let svgH=Math.max(rendered.h+padY*2+40,100);
+  let svg=createSVGEl('svg',{width:svgW,height:svgH,viewBox:`0 0 ${svgW} ${svgH}`});
+  let bg=createSVGEl('rect',{width:svgW,height:svgH,fill:'#0d1b36',rx:8});
+  svg.appendChild(bg);
+  let cy=svgH/2;
+  // start circle
+  let sc=createSVGEl('circle',{cx:padX/2,cy,r:6,fill:CFG.anchorFill});
+  svg.appendChild(sc);
+  svg.appendChild(renderLine(padX/2+6,cy,padX,cy));
+  // main content
+  let mainG=createSVGEl('g',{transform:`translate(${padX},${cy})`});
+  mainG.appendChild(rendered.el);
+  svg.appendChild(mainG);
+  // end
+  let ex=padX+rendered.w;
+  svg.appendChild(renderLine(ex,cy,ex+20,cy));
+  let ec=createSVGEl('circle',{cx:ex+26,cy,r:6,fill:'none',stroke:CFG.anchorFill,'stroke-width':2});
+  svg.appendChild(ec);
+  let ec2=createSVGEl('circle',{cx:ex+26,cy,r:3,fill:CFG.anchorFill});
+  svg.appendChild(ec2);
+  return{svg};
+}
+
+// ===== Main Logic =====
+function getFlags(){
+  let f='';
+  if(document.getElementById('flagG').checked)f+='g';
+  if(document.getElementById('flagI').checked)f+='i';
+  if(document.getElementById('flagM').checked)f+='m';
+  if(document.getElementById('flagS').checked)f+='s';
+  return f;
+}
+
+function visualize(){
+  let regexStr=document.getElementById('regexInput').value.trim();
+  let errEl=document.getElementById('regexError');
+  let box=document.getElementById('diagramBox');
+  errEl.textContent='';
+  if(!regexStr){box.innerHTML='<span class="placeholder-text">Enter a regex pattern</span>';return}
+  // validate regex
+  try{new RegExp(regexStr,getFlags())}catch(e){errEl.textContent='Invalid regex: '+e.message;return}
+  let result=buildDiagram(regexStr);
+  if(result.error){errEl.textContent='Parse error: '+result.error;return}
+  box.innerHTML='';
+  box.appendChild(result.svg);
+  testMatch();
+}
+
+function testMatch(){
+  let regexStr=document.getElementById('regexInput').value.trim();
+  let testStr=document.getElementById('testInput').value;
+  let resultEl=document.getElementById('matchResult');
+  let groupsEl=document.getElementById('groupsBox');
+  if(!regexStr||!testStr){
+    resultEl.innerHTML='<span class="no-match">Enter both regex and test string</span>';
+    groupsEl.innerHTML='';
+    return;
+  }
+  let flags=getFlags();
+  let re;
+  try{re=new RegExp(regexStr,flags)}catch(e){resultEl.innerHTML='<span class="no-match">Invalid regex</span>';groupsEl.innerHTML='';return}
+  // find all matches
+  let matches=[];
+  if(flags.includes('g')){
+    let m;
+    while((m=re.exec(testStr))!==null){
+      matches.push({index:m.index,length:m[0].length,groups:m.slice(1)});
+      if(m[0].length===0)re.lastIndex++;
+    }
+  }else{
+    let m=re.exec(testStr);
+    if(m)matches.push({index:m.index,length:m[0].length,groups:m.slice(1)});
+  }
+  if(matches.length===0){
+    resultEl.innerHTML='<span class="no-match">No matches found</span>';
+    groupsEl.innerHTML='';
+    return;
+  }
+  // build highlighted string
+  let html='';let last=0;
+  matches.forEach(m=>{
+    if(m.index>last)html+=escHtml(testStr.slice(last,m.index));
+    html+=`<span class="match">${escHtml(testStr.slice(m.index,m.index+m.length))}</span>`;
+    last=m.index+m.length;
+  });
+  if(last<testStr.length)html+=escHtml(testStr.slice(last));
+  resultEl.innerHTML=html+`<div style="margin-top:8px;color:#888;font-size:.85em">${matches.length} match${matches.length>1?'es':''} found</div>`;
+  // groups
+  let hasGroups=matches.some(m=>m.groups.length>0);
+  if(hasGroups){
+    let gh='<div style="margin-top:8px;color:#888;font-size:.85em;margin-bottom:6px">Capture Groups:</div>';
+    matches.forEach((m,mi)=>{
+      if(m.groups.length>0){
+        if(matches.length>1)gh+=`<div style="color:#aaa;font-size:.8em;margin-top:4px">Match ${mi+1}:</div>`;
+        m.groups.forEach((gv,gi)=>{
+          if(gv!==undefined)gh+=`<span class="group-item"><span class="gn">$${gi+1}</span> = <span class="gv">${escHtml(gv)}</span></span>`;
+        });
+      }
+    });
+    groupsEl.innerHTML=gh;
+  }else{groupsEl.innerHTML=''}
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// Event listeners
+document.getElementById('regexInput').addEventListener('input',()=>{visualize()});
+document.getElementById('testInput').addEventListener('input',()=>{testMatch()});
+document.getElementById('presets').addEventListener('change',function(){
+  if(this.value){document.getElementById('regexInput').value=this.value;visualize();this.selectedIndex=0}
+});
+['flagG','flagI','flagM','flagS'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',()=>{visualize()})
+});
+
+// Initial render
+visualize();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Compare JSON objects side by side and find differences. AI JSON diff tool highlights added, removed, and modified keys with a clear visual diff view.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-diff/">
+<title>AI JSON Diff - Compare JSON Objects</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin-bottom:6px;background:linear-gradient(135deg,#00d2ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:#888;font-size:.9rem;margin-bottom:20px}
+.input-row{display:flex;gap:16px;margin-bottom:16px}
+.input-col{flex:1;display:flex;flex-direction:column}
+.input-col label{font-weight:600;margin-bottom:6px;font-size:.95rem;color:#b0b0d0}
+textarea{flex:1;min-height:220px;background:#16213e;border:1px solid #333;border-radius:8px;color:#e0e0e0;font-family:'Fira Code','Cascadia Code',monospace;font-size:.85rem;padding:12px;resize:vertical;line-height:1.5;transition:border-color .2s}
+textarea:focus{outline:none;border-color:#7b2ff7}
+textarea.error{border-color:#ff4757}
+.error-msg{color:#ff4757;font-size:.8rem;margin-top:4px;min-height:1.2em}
+.btn-row{display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+button{padding:10px 24px;border:none;border-radius:6px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+button:hover{transform:translateY(-1px)}
+.btn-compare{background:linear-gradient(135deg,#7b2ff7,#00d2ff);color:#fff}
+.btn-compare:hover{box-shadow:0 4px 15px rgba(123,47,247,.4)}
+.btn-s{background:#2d2d5e;color:#b0b0d0;border:1px solid #444}
+.btn-s:hover{background:#3d3d6e}
+.stats{display:flex;gap:12px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.stat{padding:8px 18px;border-radius:6px;font-size:.85rem;font-weight:600;background:#16213e;border:1px solid #333}
+.stat-a{color:#2ed573;border-color:#2ed57344}
+.stat-r{color:#ff4757;border-color:#ff475744}
+.stat-m{color:#ffa502;border-color:#ffa50244}
+.stat-t{color:#00d2ff;border-color:#00d2ff44}
+.diff-row{display:flex;gap:16px}
+.diff-col{flex:1;background:#16213e;border:1px solid #333;border-radius:8px;overflow:auto;max-height:600px}
+.diff-col h3{padding:10px 14px;font-size:.85rem;color:#888;border-bottom:1px solid #333;position:sticky;top:0;background:#16213e;z-index:1}
+.dc{padding:4px 0;font-family:'Fira Code','Cascadia Code',monospace;font-size:.82rem;white-space:pre;line-height:1.6}
+.dl{padding:1px 14px;min-height:1.6em}
+.la{background:rgba(46,213,115,.12);color:#2ed573}
+.lr{background:rgba(255,71,87,.12);color:#ff4757}
+.lm{background:rgba(255,165,2,.12);color:#ffa502}
+.lu{color:#999}
+.ph{text-align:center;color:#555;padding:40px;font-size:.9rem}
+@media(max-width:768px){.input-row,.diff-row{flex-direction:column}textarea{min-height:150px}.container{padding:12px}h1{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>AI JSON Diff</h1>
+<p class="subtitle">Deep compare JSON objects &middot; Highlight differences</p>
+<div class="input-row">
+<div class="input-col">
+<label for="jl">Left JSON (Original)</label>
+<textarea id="jl" placeholder="Paste or type JSON here..."></textarea>
+<div class="error-msg" id="el"></div>
+</div>
+<div class="input-col">
+<label for="jr">Right JSON (Modified)</label>
+<textarea id="jr" placeholder="Paste or type JSON here..."></textarea>
+<div class="error-msg" id="er"></div>
+</div>
+</div>
+<div class="btn-row">
+<button class="btn-compare" onclick="doCompare()">&#9654; Compare</button>
+<button class="btn-s" onclick="fmt('jl','el')">Format Left</button>
+<button class="btn-s" onclick="fmt('jr','er')">Format Right</button>
+<button class="btn-s" onclick="doSwap()">&#8646; Swap</button>
+<button class="btn-s" onclick="doClear()">Clear</button>
+</div>
+<div class="stats" id="stats" style="display:none">
+<div class="stat stat-a" id="sa">+ Added: 0</div>
+<div class="stat stat-r" id="sr">- Removed: 0</div>
+<div class="stat stat-m" id="sm">~ Modified: 0</div>
+<div class="stat stat-t" id="st">Total: 0</div>
+</div>
+<div class="diff-row">
+<div class="diff-col"><h3>Left (Original)</h3><div class="dc" id="dl"><div class="ph">Results will appear here after comparing</div></div></div>
+<div class="diff-col"><h3>Right (Modified)</h3><div class="dc" id="dr"><div class="ph">Results will appear here after comparing</div></div></div>
+</div>
+</div>
+<script>
+var C={a:0,r:0,m:0},LL=[],RL=[];
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function mk(t,c){return{t:t,c:c}}
+function pb(t,c){LL.push(mk(t,c));RL.push(mk(t,c))}
+function jstr(v){return JSON.stringify(v)}
+function indent(n){return '  '.repeat(n)}
+
+function diffObj(a,b,dep){
+  var ak=Object.keys(a),bk=Object.keys(b),all=new Set([...ak,...bk]),keys=[...all].sort();
+  pb(indent(dep)+'{','lu');
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],comma=i<keys.length-1?',':'';
+    if(!(k in a)){
+      C.a++;
+      LL.push(mk(indent(dep+1)+'','lu'));
+      RL.push(mk(indent(dep+1)+esc(jstr(k))+': '+esc(jstr(b[k]))+comma,'la'));
+    }else if(!(k in b)){
+      C.r++;
+      LL.push(mk(indent(dep+1)+esc(jstr(k))+': '+esc(jstr(a[k]))+comma,'lr'));
+      RL.push(mk(indent(dep+1)+'','lu'));
+    }else{
+      diffKeyVal(k,a[k],b[k],dep+1,comma);
+    }
+  }
+  pb(indent(dep)+'}','lu');
+}
+
+function diffArr(a,b,dep){
+  var mx=Math.max(a.length,b.length);
+  pb(indent(dep)+'[','lu');
+  for(var i=0;i<mx;i++){
+    var comma=i<mx-1?',':'';
+    if(i>=a.length){
+      C.a++;
+      LL.push(mk(indent(dep+1)+'','lu'));
+      RL.push(mk(indent(dep+1)+esc(jstr(b[i]))+comma,'la'));
+    }else if(i>=b.length){
+      C.r++;
+      LL.push(mk(indent(dep+1)+esc(jstr(a[i]))+comma,'lr'));
+      RL.push(mk(indent(dep+1)+'','lu'));
+    }else{
+      diffVal(a[i],b[i],dep+1,comma);
+    }
+  }
+  pb(indent(dep)+']','lu');
+}
+
+function diffKeyVal(k,av,bv,dep,comma){
+  var prefix=esc(jstr(k))+': ';
+  if(av===null||bv===null||typeof av!==typeof bv||typeof av!=='object'){
+    if(av===bv){
+      pb(indent(dep)+prefix+esc(jstr(av))+comma,'lu');
+    }else{
+      C.m++;
+      LL.push(mk(indent(dep)+prefix+esc(jstr(av))+comma,'lm'));
+      RL.push(mk(indent(dep)+prefix+esc(jstr(bv))+comma,'lm'));
+    }
+    return;
+  }
+  if(Array.isArray(av)&&Array.isArray(bv)){
+    pb(indent(dep)+prefix+'[','lu');
+    var mx=Math.max(av.length,bv.length);
+    for(var i=0;i<mx;i++){
+      var c2=i<mx-1?',':'';
+      if(i>=av.length){C.a++;LL.push(mk(indent(dep+1)+'','lu'));RL.push(mk(indent(dep+1)+esc(jstr(bv[i]))+c2,'la'))}
+      else if(i>=bv.length){C.r++;LL.push(mk(indent(dep+1)+esc(jstr(av[i]))+c2,'lr'));RL.push(mk(indent(dep+1)+'','lu'))}
+      else{diffVal(av[i],bv[i],dep+1,c2)}
+    }
+    pb(indent(dep)+']'+comma,'lu');
+  }else if(!Array.isArray(av)&&!Array.isArray(bv)){
+    pb(indent(dep)+prefix+'{','lu');
+    var ak2=Object.keys(av),bk2=Object.keys(bv),all2=new Set([...ak2,...bk2]),ks=[...all2].sort();
+    for(var j=0;j<ks.length;j++){
+      var k2=ks[j],c3=j<ks.length-1?',':'';
+      if(!(k2 in av)){C.a++;LL.push(mk(indent(dep+2)+'','lu'));RL.push(mk(indent(dep+2)+esc(jstr(k2))+': '+esc(jstr(bv[k2]))+c3,'la'))}
+      else if(!(k2 in bv)){C.r++;LL.push(mk(indent(dep+2)+esc(jstr(av[k2]))+c3,'lr'));RL.push(mk(indent(dep+2)+'','lu'))}
+      else{diffKeyVal(k2,av[k2],bv[k2],dep+2,c3)}
+    }
+    pb(indent(dep)+'}'+comma,'lu');
+  }else{
+    C.m++;
+    LL.push(mk(indent(dep)+prefix+esc(jstr(av))+comma,'lm'));
+    RL.push(mk(indent(dep)+prefix+esc(jstr(bv))+comma,'lm'));
+  }
+}
+
+function diffVal(a,b,dep,comma){
+  if(a===null||b===null||typeof a!==typeof b||typeof a!=='object'){
+    if(a===b){pb(indent(dep)+esc(jstr(a))+comma,'lu')}
+    else{C.m++;LL.push(mk(indent(dep)+esc(jstr(a))+comma,'lm'));RL.push(mk(indent(dep)+esc(jstr(b))+comma,'lm'))}
+    return;
+  }
+  if(Array.isArray(a)&&Array.isArray(b)){
+    pb(indent(dep)+'[','lu');
+    var mx=Math.max(a.length,b.length);
+    for(var i=0;i<mx;i++){
+      var c=i<mx-1?',':'';
+      if(i>=a.length){C.a++;LL.push(mk(indent(dep+1)+'','lu'));RL.push(mk(indent(dep+1)+esc(jstr(b[i]))+c,'la'))}
+      else if(i>=b.length){C.r++;LL.push(mk(indent(dep+1)+esc(jstr(a[i]))+c,'lr'));RL.push(mk(indent(dep+1)+'','lu'))}
+      else{diffVal(a[i],b[i],dep+1,c)}
+    }
+    pb(indent(dep)+']'+comma,'lu');
+  }else if(!Array.isArray(a)&&!Array.isArray(b)){
+    pb(indent(dep)+'{','lu');
+    var ak=Object.keys(a),bk=Object.keys(b),all=new Set([...ak,...bk]),ks=[...all].sort();
+    for(var j=0;j<ks.length;j++){
+      var k=ks[j],c2=j<ks.length-1?',':'';
+      if(!(k in a)){C.a++;LL.push(mk(indent(dep+1)+'','lu'));RL.push(mk(indent(dep+1)+esc(jstr(k))+': '+esc(jstr(b[k]))+c2,'la'))}
+      else if(!(k in b)){C.r++;LL.push(mk(indent(dep+1)+esc(jstr(k))+': '+esc(jstr(a[k]))+c2,'lr'));RL.push(mk(indent(dep+1)+'','lu'))}
+      else{diffKeyVal(k,a[k],b[k],dep+1,c2)}
+    }
+    pb(indent(dep)+'}'+comma,'lu');
+  }else{
+    C.m++;LL.push(mk(indent(dep)+esc(jstr(a))+comma,'lm'));RL.push(mk(indent(dep)+esc(jstr(b))+comma,'lm'));
+  }
+}
+
+function render(lines,el){
+  el.innerHTML=lines.map(function(l){return '<div class="dl '+l.c+'">'+l.t+'</div>'}).join('');
+}
+
+function fmt(tid,eid){
+  var ta=document.getElementById(tid),ee=document.getElementById(eid);
+  ee.textContent='';ta.classList.remove('error');
+  try{
+    var v=ta.value.trim();if(!v)return;
+    ta.value=JSON.stringify(JSON.parse(v),null,2);
+  }catch(e){ee.textContent='Parse error: '+e.message;ta.classList.add('error')}
+}
+
+function doSwap(){
+  var l=document.getElementById('jl').value,r=document.getElementById('jr').value;
+  document.getElementById('jl').value=r;document.getElementById('jr').value=l;
+}
+
+function doClear(){
+  document.getElementById('jl').value='';document.getElementById('jr').value='';
+  document.getElementById('el').textContent='';document.getElementById('er').textContent='';
+  document.getElementById('jl').classList.remove('error');document.getElementById('jr').classList.remove('error');
+  document.getElementById('dl').innerHTML='<div class="ph">Results will appear here after comparing</div>';
+  document.getElementById('dr').innerHTML='<div class="ph">Results will appear here after comparing</div>';
+  document.getElementById('stats').style.display='none';
+}
+
+function doCompare(){
+  var ls=document.getElementById('jl').value,rs=document.getElementById('jr').value;
+  document.getElementById('el').textContent='';document.getElementById('er').textContent='';
+  document.getElementById('jl').classList.remove('error');document.getElementById('jr').classList.remove('error');
+  var lv,rv,ok=true;
+  try{if(!ls.trim())throw new Error('Empty input');lv=JSON.parse(ls)}catch(e){document.getElementById('el').textContent='Parse error: '+e.message;document.getElementById('jl').classList.add('error');ok=false}
+  try{if(!rs.trim())throw new Error('Empty input');rv=JSON.parse(rs)}catch(e){document.getElementById('er').textContent='Parse error: '+e.message;document.getElementById('jr').classList.add('error');ok=false}
+  if(!ok)return;
+  C={a:0,r:0,m:0};LL=[];RL=[];
+  if(typeof lv==='object'&&lv!==null&&typeof rv==='object'&&rv!==null&&!Array.isArray(lv)&&!Array.isArray(rv)){
+    diffObj(lv,rv,0);
+  }else if(Array.isArray(lv)&&Array.isArray(rv)){
+    diffArr(lv,rv,0);
+  }else if(lv===rv){
+    pb(esc(jstr(lv)),'lu');
+  }else{
+    C.m++;LL.push(mk(esc(jstr(lv)),'lm'));RL.push(mk(esc(jstr(rv)),'lm'));
+  }
+  render(LL,document.getElementById('dl'));
+  render(RL,document.getElementById('dr'));
+  var tot=C.a+C.r+C.m;
+  document.getElementById('sa').textContent='+ Added: '+C.a;
+  document.getElementById('sr').textContent='- Removed: '+C.r;
+  document.getElementById('sm').textContent='~ Modified: '+C.m;
+  document.getElementById('st').textContent='Total: '+tot;
+  document.getElementById('stats').style.display='flex';
+}
+})();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1400px;margin:40px auto 0;padding:0 20px 40px;position:relative}
+.pro-hd{text-align:center;margin-bottom:20px}
+.pro-hd h2{font-size:1.5rem;color:#7b2ff7;margin-bottom:4px}
+.pro-hd p{color:#888;font-size:.9rem}
+.pro-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden}
+.pro-blur{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;filter:blur(6px);opacity:.6;pointer-events:none;user-select:none}
+.pro-card{background:#16213e;border:1px solid #333;border-radius:10px;padding:20px}
+.pro-card h3{font-size:1rem;color:#00d2ff;margin-bottom:8px}
+.pro-card p{color:#999;font-size:.85rem;line-height:1.5}
+.pro-card .mock-bar{height:8px;background:#2d2d5e;border-radius:4px;margin-top:10px}
+.pro-card .mock-bar span{display:block;height:100%;width:65%;background:linear-gradient(90deg,#7b2ff7,#00d2ff);border-radius:4px}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);z-index:2}
+.pro-lock-icon{font-size:3rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.1rem;font-weight:600;color:#e0e0e0}
+.pro-lock-sub{font-size:.85rem;color:#888;margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:#16213e;border:1px solid #333;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#7b2ff7,#00d2ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.95rem;border-bottom:1px solid #2a2a4a}
+.pro-modal ul li::before{content:"✅ ";margin-right:6px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#7b2ff7,#00d2ff);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:8px}
+.pro-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(123,47,247,.4)}
+.pro-btn-later{background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-btn-later:hover{color:#ccc}
+@media(max-width:768px){.pro-blur{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-hd"><h2>🔒 Pro Features</h2><p>Unlock advanced JSON comparison tools</p></div>
+<div class="pro-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-blur">
+<div class="pro-card"><h3>📁 Folder Diff</h3><p>Compare entire folders of JSON files at once. Recursive directory scanning with summary report.</p><div class="mock-bar"><span></span></div></div>
+<div class="pro-card"><h3>🔀 Merge Tool</h3><p>Interactive 3-way merge with conflict resolution. Accept left, right, or edit manually.</p><div class="mock-bar"><span style="width:80%"></span></div></div>
+<div class="pro-card"><h3>📊 Export Report</h3><p>Export diff results as HTML, PDF, or Markdown. Share comparison reports with your team.</p><div class="mock-bar"><span style="width:45%"></span></div></div>
+</div>
+<div class="pro-lock"><div class="pro-lock-icon">🔒</div><div class="pro-lock-text">Pro Features Locked</div><div class="pro-lock-sub">Click to unlock</div></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>Unlock Pro Features</h3>
+<div class="pro-price">$14</div>
+<ul>
+<li>Folder Diff — compare entire directories</li>
+<li>Merge Tool — interactive 3-way merge</li>
+<li>Export Report — HTML, PDF, Markdown</li>
+<li>Priority updates & support</li>
+</ul>
+<a class="pro-btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $14</a>
+<br><button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

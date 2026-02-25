@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI TOML Editor - Online TOML Editor, Validator & Converter</title>
+<meta name="description" content="Free online TOML editor with syntax highlighting, real-time validation, TOML to JSON conversion, and formatting.">
+<link rel="canonical" href="https://lifa-su.com/ai-toml-editor/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;
+  --text:#e0e0e0;--text2:#a0a0b0;--green:#4ecca3;--yellow:#f0c040;--red:#e94560;
+  --blue:#4fc3f7;--orange:#ff9800;--purple:#ce93d8;--border:#2a2a4a;
+  --font:'SF Mono','Cascadia Code','Fira Code',Consolas,monospace;
+  --radius:8px;
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text)}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);gap:10px}
+header h1{font-size:1.2rem;font-weight:700}
+header h1 span{color:var(--accent)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-family:var(--font);font-size:.8rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#c73a52}
+.btn.green{background:var(--green);border-color:var(--green);color:#111}
+.btn.green:hover{background:#3db88e}
+.panels{display:flex;flex:1;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border)}
+.panel:last-child{border-right:none}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:.8rem;color:var(--text2)}
+.panel-header strong{color:var(--text);font-size:.85rem}
+.editor-wrap{position:relative;flex:1;overflow:hidden}
+.editor-wrap textarea,.editor-wrap pre{position:absolute;top:0;left:0;width:100%;height:100%;padding:14px;font-family:var(--font);font-size:13px;line-height:1.6;border:none;resize:none;white-space:pre;overflow:auto;tab-size:2}
+.editor-wrap textarea{background:transparent;color:transparent;caret-color:var(--text);z-index:2;outline:none;-webkit-text-fill-color:transparent}
+.editor-wrap textarea::selection{background:rgba(233,69,96,.3);-webkit-text-fill-color:var(--text)}
+.editor-wrap pre{z-index:1;background:var(--bg);color:var(--text);margin:0;pointer-events:none}
+.json-output{flex:1;padding:14px;font-family:var(--font);font-size:13px;line-height:1.6;background:var(--bg);color:var(--text);overflow:auto;white-space:pre;border:none}
+.status{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:.75rem;color:var(--text2);gap:12px;flex-wrap:wrap}
+.status .indicator{display:flex;align-items:center;gap:6px}
+.status .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--green)}.dot.err{background:var(--red)}.dot.idle{background:var(--text2)}
+.hl-comment{color:#6a6a8a;font-style:italic}
+.hl-key{color:var(--blue)}
+.hl-string{color:var(--green)}
+.hl-number{color:var(--orange)}
+.hl-bool{color:var(--purple);font-weight:700}
+.hl-date{color:var(--yellow)}
+.hl-table{color:var(--accent);font-weight:700}
+.hl-bracket{color:var(--accent2)}
+.hl-eq{color:var(--text2)}
+.jk{color:var(--blue)}.js{color:var(--green)}.jn{color:var(--orange)}.jb{color:var(--purple);font-weight:700}.jl{color:var(--text2)}
+.error-msg{color:var(--red);padding:14px;font-size:.85rem;white-space:pre-wrap;line-height:1.5}
+@media(max-width:768px){
+  .panels{flex-direction:column}
+  .panel{border-right:none;border-bottom:1px solid var(--border);min-height:40vh}
+  header{padding:10px 12px}
+  .toolbar{gap:5px}
+  .btn{padding:5px 10px;font-size:.75rem}
+}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>&#9881; AI <span>TOML</span> Editor</h1>
+    <div class="toolbar">
+      <button class="btn green" onclick="loadExample()">&#128196; Example</button>
+      <button class="btn primary" onclick="convertToJSON()">TOML &#8594; JSON</button>
+      <button class="btn" onclick="convertToTOML()">JSON &#8594; TOML</button>
+      <button class="btn" onclick="formatTOML()">&#10024; Format</button>
+      <button class="btn" onclick="clearAll()">&#128465; Clear</button>
+      <button class="btn" onclick="copyJSON()">&#128203; Copy JSON</button>
+    </div>
+  </header>
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-header"><strong>TOML Input</strong><span id="toml-size">0 chars</span></div>
+      <div class="editor-wrap">
+        <pre id="highlight" aria-hidden="true"></pre>
+        <textarea id="toml-input" spellcheck="false" placeholder="Enter or paste TOML here..."></textarea>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><strong>JSON Output</strong><span id="json-size">0 chars</span></div>
+      <div id="json-output" class="json-output"></div>
+    </div>
+  </div>
+  <div class="status">
+    <div class="indicator"><div class="dot idle" id="status-dot"></div><span id="status-text">Ready</span></div>
+    <span>AI TOML Editor</span>
+  </div>
+</div>
+
+<script type="module">
+import TOML from 'https://esm.sh/smol-toml@1.3.1';
+
+const input = document.getElementById('toml-input');
+const highlightEl = document.getElementById('highlight');
+const jsonOutput = document.getElementById('json-output');
+const statusDot = document.getElementById('status-dot');
+const statusText = document.getElementById('status-text');
+const tomlSize = document.getElementById('toml-size');
+const jsonSize = document.getElementById('json-size');
+
+let debounceTimer = null;
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlightTOML(code) {
+  return code.split('\n').map(line => {
+    if (/^\s*#/.test(line)) return '<span class="hl-comment">' + escapeHtml(line) + '</span>';
+    if (/^\s*\[\[.+\]\]\s*$/.test(line)) return '<span class="hl-table">' + escapeHtml(line) + '</span>';
+    if (/^\s*\[.+\]\s*$/.test(line)) return '<span class="hl-table">' + escapeHtml(line) + '</span>';
+    let result = '';
+    let i = 0;
+    const len = line.length;
+    let eqFound = false;
+    while (i < len) {
+      if (!eqFound && line[i] === '=') {
+        result += '<span class="hl-eq">=</span>';
+        eqFound = true;
+        i++;
+        continue;
+      }
+      if (!eqFound) {
+        let keyEnd = line.indexOf('=', i);
+        if (keyEnd === -1) { result += escapeHtml(line.slice(i)); break; }
+        result += '<span class="hl-key">' + escapeHtml(line.slice(i, keyEnd)) + '</span>';
+        i = keyEnd;
+        continue;
+      }
+      if (line[i] === '#') {
+        result += '<span class="hl-comment">' + escapeHtml(line.slice(i)) + '</span>';
+        break;
+      }
+      if (line[i] === '"' || line[i] === "'") {
+        const q = line[i];
+        let triple = (line.slice(i, i+3) === q+q+q);
+        let end;
+        if (triple) {
+          end = line.indexOf(q+q+q, i+3);
+          end = end === -1 ? len : end + 3;
+        } else {
+          end = i + 1;
+          while (end < len && line[end] !== q) { if (line[end] === '\\') end++; end++; }
+          if (end < len) end++;
+        }
+        result += '<span class="hl-string">' + escapeHtml(line.slice(i, end)) + '</span>';
+        i = end;
+        continue;
+      }
+      const rest = line.slice(i).trim();
+      if (/^(true|false)/.test(rest)) {
+        const m = rest.match(/^(true|false)/);
+        const ws = line.slice(i).length - line.slice(i).trimStart().length;
+        result += escapeHtml(line.slice(i, i + ws)) + '<span class="hl-bool">' + m[1] + '</span>';
+        i += ws + m[1].length;
+        continue;
+      }
+      if (/^\d{4}-\d{2}/.test(rest)) {
+        const m = rest.match(/^[\d\-T:\.Z+]+/);
+        if (m) {
+          const ws = line.slice(i).length - line.slice(i).trimStart().length;
+          result += escapeHtml(line.slice(i, i + ws)) + '<span class="hl-date">' + escapeHtml(m[0]) + '</span>';
+          i += ws + m[0].length;
+          continue;
+        }
+      }
+      if (/^[+-]?[\d]/.test(rest) || /^[+-]?(inf|nan)/.test(rest)) {
+        const m = rest.match(/^[+-]?(?:0x[\da-fA-F_]+|0o[0-7_]+|0b[01_]+|[\d_]+(?:\.[\d_]+)?(?:[eE][+-]?\d+)?|inf|nan)/);
+        if (m) {
+          const ws = line.slice(i).length - line.slice(i).trimStart().length;
+          result += escapeHtml(line.slice(i, i + ws)) + '<span class="hl-number">' + escapeHtml(m[0]) + '</span>';
+          i += ws + m[0].length;
+          continue;
+        }
+      }
+      if (line[i] === '[' || line[i] === ']' || line[i] === '{' || line[i] === '}') {
+        result += '<span class="hl-bracket">' + escapeHtml(line[i]) + '</span>';
+        i++;
+        continue;
+      }
+      result += escapeHtml(line[i]);
+      i++;
+    }
+    return result;
+  }).join('\n');
+}
+
+function highlightJSON(json) {
+  return json.replace(/("(?:\\.|[^"\\])*")\s*:/g, '<span class="jk">$1</span>:')
+    .replace(/:(\s*)("(?:\\.|[^"\\])*")/g, ':<span class="js">$2</span>')
+    .replace(/:\s*(-?\d+\.?\d*(?:[eE][+-]?\d+)?)/g, ': <span class="jn">$1</span>')
+    .replace(/:\s*(true|false)/g, ': <span class="jb">$1</span>')
+    .replace(/:\s*(null)/g, ': <span class="jb">$1</span>');
+}
+
+function setStatus(type, msg) {
+  statusDot.className = 'dot ' + type;
+  statusText.textContent = msg;
+}
+
+function updateHighlight() {
+  const code = input.value;
+  highlightEl.innerHTML = highlightTOML(code) + '\n';
+  tomlSize.textContent = code.length + ' chars';
+}
+
+function syncScroll() {
+  highlightEl.scrollTop = input.scrollTop;
+  highlightEl.scrollLeft = input.scrollLeft;
+}
+
+function validate() {
+  const code = input.value.trim();
+  if (!code) { setStatus('idle', 'Ready'); return; }
+  try {
+    TOML.parse(code);
+    setStatus('ok', 'Valid TOML');
+  } catch (e) {
+    setStatus('err', 'Error: ' + e.message);
+  }
+}
+
+function onInput() {
+  updateHighlight();
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    validate();
+    autoConvert();
+  }, 400);
+}
+
+function autoConvert() {
+  const code = input.value.trim();
+  if (!code) { jsonOutput.textContent = ''; jsonSize.textContent = '0 chars'; return; }
+  try {
+    const obj = TOML.parse(code);
+    const json = JSON.stringify(obj, null, 2);
+    jsonOutput.innerHTML = highlightJSON(escapeHtml(json));
+    jsonSize.textContent = json.length + ' chars';
+  } catch (e) {
+    // don't update JSON on error
+  }
+}
+
+window.convertToJSON = function() {
+  const code = input.value.trim();
+  if (!code) return;
+  try {
+    const obj = TOML.parse(code);
+    const json = JSON.stringify(obj, null, 2);
+    jsonOutput.innerHTML = highlightJSON(escapeHtml(json));
+    jsonSize.textContent = json.length + ' chars';
+    setStatus('ok', 'Converted to JSON');
+  } catch (e) {
+    jsonOutput.innerHTML = '<span class="error-msg">Parse Error:\n' + escapeHtml(e.message) + '</span>';
+    setStatus('err', 'Parse error');
+  }
+};
+
+window.convertToTOML = function() {
+  const jsonText = jsonOutput.textContent.trim();
+  if (!jsonText) return;
+  try {
+    const obj = JSON.parse(jsonText);
+    const toml = TOML.stringify(obj);
+    input.value = toml;
+    updateHighlight();
+    setStatus('ok', 'Converted JSON to TOML');
+    validate();
+  } catch (e) {
+    setStatus('err', 'JSON parse error: ' + e.message);
+  }
+};
+
+window.formatTOML = function() {
+  const code = input.value.trim();
+  if (!code) return;
+  try {
+    const obj = TOML.parse(code);
+    const formatted = TOML.stringify(obj);
+    input.value = formatted;
+    updateHighlight();
+    setStatus('ok', 'Formatted');
+    autoConvert();
+  } catch (e) {
+    setStatus('err', 'Cannot format: ' + e.message);
+  }
+};
+
+window.clearAll = function() {
+  input.value = '';
+  jsonOutput.textContent = '';
+  updateHighlight();
+  setStatus('idle', 'Ready');
+  tomlSize.textContent = '0 chars';
+  jsonSize.textContent = '0 chars';
+};
+
+window.copyJSON = function() {
+  const text = jsonOutput.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    setStatus('ok', 'JSON copied to clipboard');
+  }).catch(() => {
+    setStatus('err', 'Copy failed');
+  });
+};
+
+window.loadExample = function() {
+  input.value = `# AI TOML Editor - Example Configuration
+
+title = "My Awesome Project"
+version = "2.1.0"
+description = "A sample TOML configuration file"
+
+[owner]
+name = "Alice Johnson"
+email = "alice@example.com"
+joined = 2024-06-15T09:30:00Z
+
+[database]
+enabled = true
+ports = [8001, 8001, 8002]
+connection_max = 5000
+data_path = "/var/lib/data"
+
+[database.credentials]
+user = "admin"
+password_env = "DB_PASSWORD"
+
+[servers]
+
+[servers.alpha]
+ip = "10.0.0.1"
+role = "frontend"
+cores = 4
+
+[servers.beta]
+ip = "10.0.0.2"
+role = "backend"
+cores = 8
+
+[[products]]
+name = "Hammer"
+sku = 738594937
+color = "red"
+
+[[products]]
+name = "Nail"
+sku = 284758393
+color = "grey"
+
+[logging]
+level = "info"
+format = "json"
+outputs = ["stdout", "file"]
+max_size_mb = 100.5
+rotate = true`;
+  updateHighlight();
+  validate();
+  autoConvert();
+};
+
+input.addEventListener('input', onInput);
+input.addEventListener('scroll', syncScroll);
+input.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+    this.selectionStart = this.selectionEnd = start + 2;
+    onInput();
+  }
+});
+
+// Load example on start
+window.loadExample();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1200px;margin:0 auto;cursor:pointer;border-radius:0 0 12px 12px;overflow:hidden;border:1px solid var(--border);border-top:none}
+.pro-blur{filter:blur(4px);opacity:.7;padding:24px;background:var(--bg2);pointer-events:none;user-select:none}
+.pro-blur h3{color:var(--accent);font-size:1rem;margin-bottom:12px}
+.pro-blur .mock-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.pro-blur .mock-tab{padding:6px 14px;background:var(--bg3);border-radius:6px;font-size:.8rem;color:var(--text2)}
+.pro-blur .mock-tab.active{background:var(--accent);color:#fff}
+.pro-blur .mock-validation{background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px}
+.pro-blur .mock-vrow{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.8rem;color:var(--text2)}
+.pro-blur .mock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pro-blur .mock-dot.ok{background:var(--green)}.pro-blur .mock-dot.err{background:var(--red)}
+.pro-blur .mock-export{display:flex;gap:8px;flex-wrap:wrap}
+.pro-blur .mock-ebtn{padding:8px 16px;background:var(--bg3);border-radius:6px;font-size:.8rem;color:var(--text2)}
+.pro-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(0,0,0,.55)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{color:#fff;font-size:1.15rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-sublabel{color:rgba(255,255,255,.7);font-size:.85rem;margin-top:4px}
+.pro-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pro-modal-box h3{font-size:1.3rem;color:#fff;margin-bottom:4px}
+.pro-modal-box .pro-price{font-size:2rem;font-weight:800;color:var(--accent);margin:12px 0}
+.pro-modal-box .pro-desc{color:var(--text2);font-size:.85rem;margin-bottom:8px}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem;color:#ccc}
+.pro-modal-box ul li:last-child{border-bottom:none}
+.pro-modal-box ul li::before{content:'✓ ';color:var(--accent);font-weight:700}
+.pro-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;border-radius:10px;font-size:1.05rem;font-weight:700;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-btn:hover{opacity:.9}
+.pro-close{background:none;border:none;color:#888;font-size:.9rem;margin-top:12px;cursor:pointer;padding:8px}
+.pro-close:hover{color:#fff}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').style.display='flex'">
+<div class="pro-blur">
+<h3>🛡️ Schema Validation</h3>
+<div class="mock-validation">
+<div class="mock-vrow"><span class="mock-dot ok"></span> [server] — All fields valid</div>
+<div class="mock-vrow"><span class="mock-dot ok"></span> [database] — Types match schema</div>
+<div class="mock-vrow"><span class="mock-dot err"></span> [logging.level] — Expected enum: debug|info|warn|error</div>
+<div class="mock-vrow"><span class="mock-dot ok"></span> [products] — Array structure valid</div>
+</div>
+<h3>📁 Multi-file Management</h3>
+<div class="mock-row">
+<span class="mock-tab active">config.toml</span>
+<span class="mock-tab">production.toml</span>
+<span class="mock-tab">staging.toml</span>
+<span class="mock-tab">+ New File</span>
+</div>
+<h3>📤 Export Configurations</h3>
+<div class="mock-export">
+<span class="mock-ebtn">→ YAML</span>
+<span class="mock-ebtn">→ ENV</span>
+<span class="mock-ebtn">→ INI</span>
+<span class="mock-ebtn">→ XML</span>
+<span class="mock-ebtn">→ HCL</span>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock schema validation, multi-file & export</div>
+</div>
+</div>
+<div id="proModal" class="pro-modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="pro-modal-box">
+<h3>⚡ TOML Editor Pro</h3>
+<div class="pro-desc">Professional TOML editing with advanced features</div>
+<div class="pro-price">$9</div>
+<ul>
+<li>Schema Validation — validate TOML against custom schemas in real-time</li>
+<li>Multi-file Management — edit and compare multiple TOML files side by side</li>
+<li>Export Configurations — convert TOML to YAML, ENV, INI, XML & more</li>
+<li>Priority support & lifetime updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn">Upgrade to Pro — $9</a>
+<button class="pro-close" onclick="event.stopPropagation();document.getElementById('proModal').style.display='none'">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

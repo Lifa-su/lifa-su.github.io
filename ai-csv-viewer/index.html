@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered CSV file viewer and editor. Upload CSV files, sort columns, filter rows, search data, and export results. Fast browser-based spreadsheet tool.">
+<link rel="canonical" href="https://lifa-su.com/ai-csv-viewer/">
+<title>AI CSV Viewer</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--surface:#1e2746;--surface2:#253256;--text:#e0e0e0;--text2:#a0a0b8;--accent:#e94560;--accent2:#ff6b6b;--border:#2a3a5c;--row-hover:#1e2f50;--highlight:#e9456040}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh}
+.header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.header h1{font-size:18px;font-weight:700;color:var(--accent);white-space:nowrap}
+.info{font-size:13px;color:var(--text2)}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.search-box{position:relative}
+.search-box input{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px 6px 28px;color:var(--text);font-size:13px;width:180px;outline:none}
+.search-box input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:13px}
+.btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text);font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.dropzone{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+.dz-inner{border:2px dashed var(--border);border-radius:16px;padding:60px 40px;text-align:center;cursor:pointer;transition:all .3s;max-width:500px;width:100%}
+.dz-inner:hover,.dz-inner.over{border-color:var(--accent);background:rgba(233,69,96,0.06)}
+.dz-inner h2{font-size:20px;margin-bottom:8px}
+.dz-inner p{font-size:14px;color:var(--text2)}
+#fileInput{display:none}
+.table-wrap{flex:1;display:none;flex-direction:column;overflow:hidden}
+.thead-wrap{overflow:hidden;background:var(--bg2);border-bottom:2px solid var(--border);flex-shrink:0}
+.thead{display:flex;min-width:max-content}
+.th{position:relative;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;border-right:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:4px}
+.th:hover{background:var(--surface2)}
+.sort-arrow{font-size:10px;color:var(--text2)}
+.sort-arrow.on{color:var(--accent)}
+.fbtn{margin-left:auto;background:none;border:none;color:var(--text2);cursor:pointer;font-size:11px;padding:0 2px}
+.fbtn:hover,.fbtn.on{color:var(--accent)}
+.fpop{position:absolute;top:100%;left:0;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.fpop input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text);font-size:12px;outline:none}
+.fpop .fa{display:flex;gap:4px;margin-top:6px}
+.fpop .fa .btn{padding:3px 10px;font-size:11px}
+.tbody-wrap{flex:1;overflow:auto}
+.tbody-wrap::-webkit-scrollbar{width:8px;height:8px}
+.tbody-wrap::-webkit-scrollbar-track{background:var(--bg)}
+.tbody-wrap::-webkit-scrollbar-thumb{background:#4a5a8c;border-radius:4px}
+.tbody{position:relative;min-width:max-content}
+.row{display:flex;border-bottom:1px solid var(--border);position:absolute;left:0;right:0;min-width:max-content}
+.row:hover{background:var(--row-hover)}
+.cell{padding:8px 12px;font-size:13px;border-right:1px solid var(--border);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative}
+.cell mark{background:var(--highlight);color:var(--text);border-radius:2px}
+.cell-ed{background:var(--bg);color:var(--text);border:2px solid var(--accent);padding:6px 10px;font-size:13px;font-family:inherit;outline:none;width:100%;height:100%;position:absolute;top:0;left:0;z-index:10;box-sizing:border-box}
+.rn{color:var(--text2);font-size:11px;text-align:right;width:50px;min-width:50px;flex-shrink:0}
+.th.rn{cursor:default}
+.status{display:flex;gap:16px;padding:6px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:12px;color:var(--text2);flex-shrink:0}
+@media(max-width:640px){.header{padding:8px;gap:6px}.header h1{font-size:15px}.search-box input{width:120px}.toolbar{margin-left:0;width:100%}.cell,.th{padding:6px 8px;font-size:12px}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="header">
+<h1>&#128202; AI CSV Viewer</h1>
+<span class="info" id="fileInfo"></span>
+<div class="toolbar" id="toolbar" style="display:none">
+<div class="search-box"><span class="search-icon">&#128269;</span><input type="text" id="searchInput" placeholder="Search..." aria-label="Search"></div>
+<button class="btn" id="exportBtn">Export CSV</button>
+<button class="btn" id="resetBtn">New File</button>
+</div>
+</div>
+<div class="dropzone" id="dropzone">
+<div class="dz-inner" id="dzInner">
+<h2>Drop CSV file here</h2>
+<p>or click to select a file</p>
+</div>
+<input type="file" id="fileInput" accept=".csv,.tsv,.txt">
+</div>
+<div class="table-wrap" id="tableWrap">
+<div class="thead-wrap" id="theadWrap"><div class="thead" id="thead"></div></div>
+<div class="tbody-wrap" id="tbodyWrap"><div class="tbody" id="tbody"></div></div>
+<div class="status" id="status"></div>
+</div>
+</div>
+<script>
+(function(){
+const ROW_H=33,BUFFER=10;
+let headers=[],data=[],filtered=[],colW=[],sortCol=-1,sortAsc=true,filters={},searchTerm='',editCell=null;
+const $=id=>document.getElementById(id);
+const dropzone=$('dropzone'),dzInner=$('dzInner'),fileInput=$('fileInput'),toolbar=$('toolbar');
+const tableWrap=$('tableWrap'),thead=$('thead'),theadWrap=$('theadWrap'),tbody=$('tbody'),tbodyWrap=$('tbodyWrap');
+const searchInput=$('searchInput'),fileInfo=$('fileInfo'),status=$('status');
+
+// CSV Parser - handles quotes, commas, newlines
+function parseCSV(text){
+  const rows=[];let row=[],cell='',inQ=false,i=0;
+  while(i<text.length){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'){if(text[i+1]==='"'){cell+='"';i+=2}else{inQ=false;i++}}
+      else{cell+=c;i++}
+    }else{
+      if(c==='"'){inQ=true;i++}
+      else if(c===','){row.push(cell);cell='';i++}
+      else if(c==='\r'||c==='\n'){
+        if(c==='\r'&&text[i+1]==='\n')i++;
+        row.push(cell);if(row.length>1||row[0]!=='')rows.push(row);row=[];cell='';i++}
+      else{cell+=c;i++}
+    }
+  }
+  row.push(cell);if(row.length>1||row[0]!=='')rows.push(row);
+  return rows;
+}
+
+// Load CSV
+function loadCSV(text,name){
+  const rows=parseCSV(text);
+  if(rows.length<1)return;
+  headers=rows[0];
+  data=rows.slice(1);
+  // Normalize row lengths
+  const len=headers.length;
+  data.forEach(r=>{while(r.length<len)r.push('');if(r.length>len)r.length=len});
+  // Calculate column widths
+  colW=headers.map((h,i)=>{
+    let max=h.length;
+    for(let j=0;j<Math.min(data.length,200);j++){
+      if(data[j][i]&&data[j][i].length>max)max=data[j][i].length;
+    }
+    return Math.max(80,Math.min(max*8+24,300));
+  });
+  sortCol=-1;sortAsc=true;filters={};searchTerm='';searchInput.value='';
+  fileInfo.textContent=name+' \u2014 '+headers.length+' cols, '+data.length.toLocaleString()+' rows';
+  dropzone.style.display='none';tableWrap.style.display='flex';toolbar.style.display='flex';
+  applyFilters();
+}
+
+// Filtering & sorting
+function applyFilters(){
+  filtered=data.filter((row,idx)=>{
+    row._idx=idx;
+    for(const ci in filters){
+      const f=filters[ci].toLowerCase();
+      if(!(row[ci]||'').toLowerCase().includes(f))return false;
+    }
+    if(searchTerm){
+      const s=searchTerm.toLowerCase();
+      if(!row.some(c=>(c||'').toLowerCase().includes(s)))return false;
+    }
+    return true;
+  });
+  if(sortCol>=0){
+    const c=sortCol,asc=sortAsc;
+    filtered.sort((a,b)=>{
+      let va=a[c]||'',vb=b[c]||'';
+      const na=parseFloat(va),nb=parseFloat(vb);
+      if(!isNaN(na)&&!isNaN(nb))return asc?na-nb:nb-na;
+      return asc?va.localeCompare(vb):vb.localeCompare(va);
+    });
+  }
+  renderHeader();
+  renderBody();
+  updateStatus();
+}
+
+function renderHeader(){
+  thead.innerHTML='';
+  const rn=document.createElement('div');rn.className='th rn';rn.textContent='#';thead.appendChild(rn);
+  headers.forEach((h,i)=>{
+    const th=document.createElement('div');th.className='th';th.style.width=colW[i]+'px';
+    const label=document.createElement('span');label.textContent=h;th.appendChild(label);
+    const arrow=document.createElement('span');arrow.className='sort-arrow'+(sortCol===i?' on':'');
+    arrow.textContent=sortCol===i?(sortAsc?' \u25B2':' \u25BC'):' \u25B7';th.appendChild(arrow);
+    const fb=document.createElement('button');fb.className='fbtn'+(filters[i]?' on':'');fb.textContent='\u2AF6';
+    fb.setAttribute('aria-label','Filter '+h);
+    fb.addEventListener('click',e=>{e.stopPropagation();toggleFilter(th,i)});
+    th.appendChild(fb);
+    th.addEventListener('click',()=>{
+      if(sortCol===i)sortAsc=!sortAsc;else{sortCol=i;sortAsc=true}
+      applyFilters();
+    });
+    thead.appendChild(th);
+  });
+}
+
+function toggleFilter(th,ci){
+  const existing=th.querySelector('.fpop');
+  if(existing){existing.remove();return}
+  document.querySelectorAll('.fpop').forEach(e=>e.remove());
+  const pop=document.createElement('div');pop.className='fpop';
+  const inp=document.createElement('input');inp.type='text';inp.placeholder='Filter...';inp.value=filters[ci]||'';
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){filters[ci]=inp.value||undefined;if(!inp.value)delete filters[ci];pop.remove();applyFilters()}});
+  pop.appendChild(inp);
+  const acts=document.createElement('div');acts.className='fa';
+  const apply=document.createElement('button');apply.className='btn';apply.textContent='Apply';
+  apply.addEventListener('click',()=>{filters[ci]=inp.value||undefined;if(!inp.value)delete filters[ci];pop.remove();applyFilters()});
+  const clear=document.createElement('button');clear.className='btn';clear.textContent='Clear';
+  clear.addEventListener('click',()=>{delete filters[ci];pop.remove();applyFilters()});
+  acts.appendChild(apply);acts.appendChild(clear);pop.appendChild(acts);
+  th.appendChild(pop);
+  pop.addEventListener('click',e=>e.stopPropagation());
+  setTimeout(()=>inp.focus(),0);
+}
+
+// Virtual scroll rendering
+let lastStart=-1,lastEnd=-1;
+function renderBody(){
+  const total=filtered.length;
+  tbody.style.height=total*ROW_H+'px';
+  lastStart=-1;lastEnd=-1;
+  tbody.innerHTML='';
+  onScroll();
+}
+
+function onScroll(){
+  const scrollTop=tbodyWrap.scrollTop;
+  const viewH=tbodyWrap.clientHeight;
+  let start=Math.floor(scrollTop/ROW_H)-BUFFER;
+  let end=Math.ceil((scrollTop+viewH)/ROW_H)+BUFFER;
+  if(start<0)start=0;if(end>filtered.length)end=filtered.length;
+  if(start===lastStart&&end===lastEnd)return;
+  // Sync horizontal scroll
+  theadWrap.scrollLeft=tbodyWrap.scrollLeft;
+  // Remove out-of-range rows
+  const existing=tbody.children;
+  for(let i=existing.length-1;i>=0;i--){
+    const ri=parseInt(existing[i].dataset.ri);
+    if(ri<start||ri>=end)existing[i].remove();
+  }
+  // Track which rows exist
+  const has=new Set();
+  for(const el of tbody.children)has.add(parseInt(el.dataset.ri));
+  // Add missing rows
+  const frag=document.createDocumentFragment();
+  const sLow=searchTerm?searchTerm.toLowerCase():'';
+  for(let i=start;i<end;i++){
+    if(has.has(i))continue;
+    const r=filtered[i];
+    const rowEl=document.createElement('div');rowEl.className='row';rowEl.dataset.ri=i;
+    rowEl.style.top=i*ROW_H+'px';rowEl.style.height=ROW_H+'px';
+    const rn=document.createElement('div');rn.className='cell rn';rn.textContent=r._idx+1;rowEl.appendChild(rn);
+    for(let j=0;j<headers.length;j++){
+      const cell=document.createElement('div');cell.className='cell';cell.style.width=colW[j]+'px';
+      const val=r[j]||'';
+      if(sLow&&val.toLowerCase().includes(sLow)){
+        cell.innerHTML=highlightText(val,sLow);
+      }else{cell.textContent=val}
+      cell.addEventListener('dblclick',()=>startEdit(cell,r._idx,j));
+      rowEl.appendChild(cell);
+    }
+    frag.appendChild(rowEl);
+  }
+  tbody.appendChild(frag);
+  lastStart=start;lastEnd=end;
+}
+
+function highlightText(text,term){
+  let result='',i=0;const low=text.toLowerCase();
+  while(i<text.length){
+    const idx=low.indexOf(term,i);
+    if(idx===-1){result+=escHtml(text.slice(i));break}
+    result+=escHtml(text.slice(i,idx))+'<mark>'+escHtml(text.slice(idx,idx+term.length))+'</mark>';
+    i=idx+term.length;
+  }
+  return result;
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// Edit cell
+function startEdit(cell,rowIdx,colIdx){
+  if(cell.querySelector('.cell-ed'))return;
+  const val=data[rowIdx][colIdx]||'';
+  const inp=document.createElement('input');inp.className='cell-ed';inp.value=val;
+  cell.appendChild(inp);inp.focus();inp.select();
+  function commit(){data[rowIdx][colIdx]=inp.value;inp.remove();applyFilters()}
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape')inp.remove()});
+  inp.addEventListener('blur',commit);
+}
+
+function updateStatus(){
+  status.textContent='Showing '+filtered.length.toLocaleString()+' of '+data.length.toLocaleString()+' rows'
+    +(Object.keys(filters).length?' | '+Object.keys(filters).length+' filter(s) active':'')
+    +(searchTerm?' | Search: "'+searchTerm+'"':'');
+}
+
+// Export CSV
+function exportCSV(){
+  let csv=headers.map(q).join(',')+'\n';
+  const src=filtered.length<data.length?filtered:data;
+  src.forEach(r=>{csv+=r.slice(0,headers.length).map(q).join(',')+'\n'});
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='export.csv';a.click();URL.revokeObjectURL(a.href);
+}
+function q(v){v=String(v??'');return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+
+// Events
+tbodyWrap.addEventListener('scroll',onScroll);
+let searchTimer;
+searchInput.addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{searchTerm=searchInput.value;applyFilters()},200)});
+$('exportBtn').addEventListener('click',exportCSV);
+$('resetBtn').addEventListener('click',()=>{
+  dropzone.style.display='flex';tableWrap.style.display='none';toolbar.style.display='none';
+  headers=[];data=[];filtered=[];fileInfo.textContent='';
+});
+
+// Drag & drop
+dzInner.addEventListener('click',()=>fileInput.click());
+dzInner.addEventListener('dragover',e=>{e.preventDefault();dzInner.classList.add('over')});
+dzInner.addEventListener('dragleave',()=>dzInner.classList.remove('over'));
+dzInner.addEventListener('drop',e=>{e.preventDefault();dzInner.classList.remove('over');if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])readFile(fileInput.files[0])});
+// Also allow drop on whole page when table is hidden
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0])});
+
+function readFile(f){
+  const reader=new FileReader();
+  reader.onload=()=>loadCSV(reader.result,f.name);
+  reader.readAsText(f);
+}
+
+// Close filter popups on outside click
+document.addEventListener('click',()=>document.querySelectorAll('.fpop').forEach(e=>e.remove()));
+
+// Resize observer for re-render
+new ResizeObserver(()=>{if(filtered.length){lastStart=-1;onScroll()}}).observe(tbodyWrap);
+})();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130647" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

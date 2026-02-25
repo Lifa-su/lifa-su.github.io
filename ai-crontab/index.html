@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Crontab - Cron Expression Generator</title>
+<meta name="description" content="Visual cron expression generator. Build, parse, and preview crontab schedules with an intuitive UI.">
+<link rel="canonical" href="https://lifa-su.com/ai-crontab/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4e;--card:#1e1e3a;--input-bg:#12122a;--success:#00d68f;--hover:#2a2a5e}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:6px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.card h2{font-size:1rem;color:var(--accent);margin-bottom:14px}
+.expr-box{text-align:center;padding:24px 20px}
+.cron-input{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:2rem;color:#fff;letter-spacing:4px;padding:12px 24px;background:var(--input-bg);border-radius:8px;border:2px solid var(--border);text-align:center;width:100%;max-width:420px}
+.cron-input:focus{border-color:var(--accent);outline:none}
+.desc{color:var(--success);margin-top:10px;font-size:.95rem}
+.copy-btn{margin-top:10px;background:var(--accent);color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:.85rem}
+.copy-btn:hover{opacity:.85}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.presets button{background:var(--bg2);color:var(--text);border:1px solid var(--border);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:all .2s;white-space:nowrap}
+.presets button:hover{background:var(--accent);border-color:var(--accent)}
+.field-sec{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.field-sec:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.field-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.field-hdr label{font-weight:600;font-size:.9rem}
+.field-hdr .fval{font-family:monospace;color:var(--accent);font-size:.85rem}
+.ftypes{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ftypes button{background:var(--input-bg);color:var(--text2);border:1px solid var(--border);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.78rem;transition:all .2s}
+.ftypes button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ftypes button:hover:not(.active){background:var(--hover)}
+.fopts{display:none;padding:8px 0}
+.fopts.visible{display:block}
+.vgrid{display:flex;flex-wrap:wrap;gap:4px}
+.vgrid button{width:38px;height:32px;background:var(--input-bg);color:var(--text2);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:.78rem;transition:all .15s}
+.vgrid button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.vgrid button:hover:not(.sel){background:var(--hover)}
+.irow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.irow input{background:var(--input-bg);color:var(--text);border:1px solid var(--border);padding:6px 10px;border-radius:6px;width:70px;font-size:.85rem;text-align:center}
+.irow input:focus{border-color:var(--accent);outline:none}
+.irow span{color:var(--text2);font-size:.85rem}
+.nruns{list-style:none}
+.nruns li{padding:6px 0;border-bottom:1px solid var(--border);font-family:monospace;font-size:.85rem;color:var(--text2)}
+.nruns li:last-child{border-bottom:none}
+.nruns li::before{content:'▸ ';color:var(--accent)}
+.footer{text-align:center;padding:30px 0 20px;color:var(--text2);font-size:.8rem}
+@media(max-width:600px){
+.container{padding:12px}
+header h1{font-size:1.4rem}
+.cron-input{font-size:1.3rem;letter-spacing:2px}
+.vgrid button{width:34px;height:30px;font-size:.72rem}
+.presets button{padding:5px 10px;font-size:.75rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>&#9200; AI Crontab Generator</h1><p>Build and visualize cron expressions with ease</p></header>
+<div class="card expr-box">
+<input type="text" class="cron-input" id="cronInput" value="* * * * *" spellcheck="false" autocomplete="off">
+<div class="desc" id="cronDesc">Every minute</div>
+<button class="copy-btn" id="copyBtn">Copy Expression</button>
+</div>
+<div class="card"><h2>Quick Presets</h2><div class="presets" id="presets"></div></div>
+<div class="card"><h2>Visual Editor</h2><div id="editor"></div></div>
+<div class="card"><h2>Next 5 Executions</h2><ul class="nruns" id="nextRuns"></ul></div>
+<div class="footer">AI Crontab Generator</div>
+</div>
+<script>
+(function(){
+var FIELDS=[
+{name:"Minute",key:"minute",min:0,max:59},
+{name:"Hour",key:"hour",min:0,max:23},
+{name:"Day of Month",key:"dom",min:1,max:31},
+{name:"Month",key:"month",min:1,max:12},
+{name:"Day of Week",key:"dow",min:0,max:6}
+];
+var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var MON=["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var PRESETS=[
+["Every minute","* * * * *"],
+["Every 5 minutes","*/5 * * * *"],
+["Every 15 minutes","*/15 * * * *"],
+["Every 30 minutes","*/30 * * * *"],
+["Every hour","0 * * * *"],
+["Every day at midnight","0 0 * * *"],
+["Every day at 9 AM","0 9 * * *"],
+["Every Monday","0 0 * * 1"],
+["Every weekday","0 0 * * 1-5"],
+["1st of every month","0 0 1 * *"],
+["Every January 1st","0 0 1 1 *"]
+];
+var state=[
+{type:"every",values:[],rangeStart:0,rangeEnd:59,step:1,stepStart:0},
+{type:"every",values:[],rangeStart:0,rangeEnd:23,step:1,stepStart:0},
+{type:"every",values:[],rangeStart:1,rangeEnd:31,step:1,stepStart:1},
+{type:"every",values:[],rangeStart:1,rangeEnd:12,step:1,stepStart:1},
+{type:"every",values:[],rangeStart:0,rangeEnd:6,step:1,stepStart:0}
+];
+var inputEl=document.getElementById("cronInput");
+var descEl=document.getElementById("cronDesc");
+var copyBtn=document.getElementById("copyBtn");
+var presetsEl=document.getElementById("presets");
+var editorEl=document.getElementById("editor");
+var runsEl=document.getElementById("nextRuns");
+var updating=false;
+
+function buildPresets(){
+PRESETS.forEach(function(p){
+var b=document.createElement("button");
+b.textContent=p[0];
+b.onclick=function(){inputEl.value=p[1];parseInput();};
+presetsEl.appendChild(b);
+});
+}
+
+function buildEditor(){
+editorEl.innerHTML="";
+FIELDS.forEach(function(f,i){
+var sec=document.createElement("div");
+sec.className="field-sec";
+var hdr=document.createElement("div");
+hdr.className="field-hdr";
+hdr.innerHTML='<label>'+f.name+' ('+f.min+'-'+f.max+')</label><span class="fval" id="fval'+i+'">*</span>';
+sec.appendChild(hdr);
+var types=document.createElement("div");
+types.className="ftypes";
+["every","specific","range","interval"].forEach(function(t){
+var btn=document.createElement("button");
+btn.textContent=t==="every"?"Every (*)":t==="specific"?"Specific":t==="range"?"Range":t==="interval"?"Interval (/)":"";
+btn.setAttribute("data-type",t);
+btn.setAttribute("data-field",i);
+if(state[i].type===t)btn.className="active";
+btn.onclick=function(){
+state[i].type=t;
+renderFieldOptions(i);
+updateFromState();
+};
+types.appendChild(btn);
+});
+sec.appendChild(types);
+var opts=document.createElement("div");
+opts.className="fopts";
+opts.id="fopts"+i;
+sec.appendChild(opts);
+editorEl.appendChild(sec);
+renderFieldOptions(i);
+});
+}
+
+function renderFieldOptions(i){
+var f=FIELDS[i];
+var s=state[i];
+var opts=document.getElementById("fopts"+i);
+opts.innerHTML="";
+opts.className="fopts";
+var parent=opts.parentElement;
+parent.querySelectorAll(".ftypes button").forEach(function(b){
+b.className=b.getAttribute("data-type")===s.type?"active":"";
+});
+if(s.type==="every"){return;}
+opts.className="fopts visible";
+if(s.type==="specific"){
+var grid=document.createElement("div");
+grid.className="vgrid";
+for(var v=f.min;v<=f.max;v++){
+(function(val){
+var btn=document.createElement("button");
+var label=String(val);
+if(i===4)label=DOW[val];
+else if(i===3)label=MON[val];
+btn.textContent=label;
+if(s.values.indexOf(val)!==-1)btn.className="sel";
+btn.onclick=function(){
+var idx=s.values.indexOf(val);
+if(idx===-1)s.values.push(val);
+else s.values.splice(idx,1);
+s.values.sort(function(a,b){return a-b;});
+renderFieldOptions(i);
+updateFromState();
+};
+grid.appendChild(btn);
+})(v);
+}
+opts.appendChild(grid);
+}else if(s.type==="range"){
+var row=document.createElement("div");
+row.className="irow";
+row.innerHTML='<span>From</span><input type="number" min="'+f.min+'" max="'+f.max+'" value="'+s.rangeStart+'" id="rs'+i+'"><span>to</span><input type="number" min="'+f.min+'" max="'+f.max+'" value="'+s.rangeEnd+'" id="re'+i+'">';
+opts.appendChild(row);
+document.getElementById("rs"+i).onchange=function(){s.rangeStart=parseInt(this.value)||f.min;updateFromState();};
+document.getElementById("re"+i).onchange=function(){s.rangeEnd=parseInt(this.value)||f.max;updateFromState();};
+}else if(s.type==="interval"){
+var row2=document.createElement("div");
+row2.className="irow";
+row2.innerHTML='<span>Every</span><input type="number" min="1" max="'+f.max+'" value="'+s.step+'" id="iv'+i+'"><span>starting at</span><input type="number" min="'+f.min+'" max="'+f.max+'" value="'+s.stepStart+'" id="is'+i+'">';
+opts.appendChild(row2);
+document.getElementById("iv"+i).onchange=function(){s.step=parseInt(this.value)||1;updateFromState();};
+document.getElementById("is"+i).onchange=function(){s.stepStart=parseInt(this.value)||f.min;updateFromState();};
+}
+}
+
+function stateToExpr(){
+var parts=[];
+for(var i=0;i<5;i++){
+var s=state[i],f=FIELDS[i];
+if(s.type==="every")parts.push("*");
+else if(s.type==="specific"){
+if(s.values.length===0)parts.push("*");
+else parts.push(s.values.join(","));
+}else if(s.type==="range"){
+parts.push(s.rangeStart+"-"+s.rangeEnd);
+}else if(s.type==="interval"){
+if(s.stepStart===f.min||s.stepStart===0)parts.push("*/"+s.step);
+else parts.push(s.stepStart+"/"+s.step);
+}
+}
+return parts.join(" ");
+}
+
+function updateFromState(){
+if(updating)return;
+updating=true;
+var expr=stateToExpr();
+inputEl.value=expr;
+for(var i=0;i<5;i++){
+var el=document.getElementById("fval"+i);
+if(el)el.textContent=expr.split(" ")[i];
+}
+descEl.textContent=describe(expr);
+showNextRuns(expr);
+updating=false;
+}
+
+function parseInput(){
+if(updating)return;
+updating=true;
+var expr=inputEl.value.trim();
+var parts=expr.split(/\s+/);
+if(parts.length!==5){descEl.textContent="Invalid expression (need 5 fields)";runsEl.innerHTML="";updating=false;return;}
+for(var i=0;i<5;i++){
+var p=parts[i],f=FIELDS[i],s=state[i];
+s.values=[];
+if(p==="*"){s.type="every";}
+else if(p.indexOf("/")!==-1){
+s.type="interval";
+var sp=p.split("/");
+s.step=parseInt(sp[1])||1;
+if(sp[0]==="*")s.stepStart=f.min;
+else s.stepStart=parseInt(sp[0])||f.min;
+}else if(p.indexOf("-")!==-1&&p.indexOf(",")===-1){
+s.type="range";
+var rp=p.split("-");
+s.rangeStart=parseInt(rp[0])||f.min;
+s.rangeEnd=parseInt(rp[1])||f.max;
+}else if(p.indexOf(",")!==-1||/^\d+$/.test(p)){
+s.type="specific";
+s.values=p.split(",").map(function(v){return parseInt(v);}).filter(function(v){return !isNaN(v);});
+s.values.sort(function(a,b){return a-b;});
+}else{s.type="every";}
+}
+buildEditor();
+for(var j=0;j<5;j++){
+var el=document.getElementById("fval"+j);
+if(el)el.textContent=parts[j];
+}
+descEl.textContent=describe(expr);
+showNextRuns(expr);
+updating=false;
+}
+
+function expandField(part,min,max){
+if(part==="*")return null;
+var vals=[];
+part.split(",").forEach(function(seg){
+if(seg.indexOf("/")!==-1){
+var sp=seg.split("/");
+var step=parseInt(sp[1])||1;
+var start=sp[0]==="*"?min:(parseInt(sp[0])||min);
+for(var v=start;v<=max;v+=step)vals.push(v);
+}else if(seg.indexOf("-")!==-1){
+var rp=seg.split("-");
+var a=parseInt(rp[0]),b=parseInt(rp[1]);
+for(var v2=a;v2<=b;v2++)vals.push(v2);
+}else{
+vals.push(parseInt(seg));
+}
+});
+return vals.filter(function(v){return !isNaN(v)&&v>=min&&v<=max;});
+}
+
+function matchField(val,part,min,max){
+if(part==="*")return true;
+var vals=expandField(part,min,max);
+return vals?vals.indexOf(val)!==-1:false;
+}
+
+function getNextRuns(expr,count){
+var parts=expr.trim().split(/\s+/);
+if(parts.length!==5)return[];
+var results=[];
+var d=new Date();
+d.setSeconds(0,0);
+d=new Date(d.getTime()+60000);
+var limit=525600;
+while(results.length<count&&limit-->0){
+var mm=d.getMinutes(),hh=d.getHours(),dd=d.getDate(),mo=d.getMonth()+1,dw=d.getDay();
+if(matchField(mm,parts[0],0,59)&&matchField(hh,parts[1],0,23)&&matchField(dd,parts[2],1,31)&&matchField(mo,parts[3],1,12)&&matchField(dw,parts[4],0,6)){
+results.push(new Date(d));
+}
+d=new Date(d.getTime()+60000);
+}
+return results;
+}
+
+function showNextRuns(expr){
+runsEl.innerHTML="";
+var runs=getNextRuns(expr,5);
+if(runs.length===0){
+runsEl.innerHTML="<li>No upcoming executions found</li>";
+return;
+}
+runs.forEach(function(d){
+var li=document.createElement("li");
+li.textContent=d.toLocaleString("en-US",{weekday:"short",year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:true});
+runsEl.appendChild(li);
+});
+}
+
+function describe(expr){
+var p=expr.trim().split(/\s+/);
+if(p.length!==5)return"Invalid expression";
+var mi=p[0],hr=p[1],dm=p[2],mo=p[3],dw=p[4];
+if(mi==="*"&&hr==="*"&&dm==="*"&&mo==="*"&&dw==="*")return"Every minute";
+if(mi.indexOf("/")!==-1&&hr==="*"&&dm==="*"&&mo==="*"&&dw==="*"){
+var n=mi.split("/")[1];return"Every "+n+" minute"+(n==="1"?"":"s");
+}
+if(/^\d+$/.test(mi)&&hr==="*"&&dm==="*"&&mo==="*"&&dw==="*")return"At minute "+mi+" of every hour";
+if(/^\d+$/.test(mi)&&/^\d+$/.test(hr)){
+var h=parseInt(hr),m=parseInt(mi);
+var ampm=h>=12?"PM":"AM";
+var h12=h%12||12;
+var timeStr=h12+":"+(m<10?"0":"")+m+" "+ampm;
+if(dm==="*"&&mo==="*"&&dw==="*")return"At "+timeStr+" every day";
+if(dm==="*"&&mo==="*"&&/^\d+$/.test(dw))return"At "+timeStr+" every "+DOW[parseInt(dw)];
+if(dm==="*"&&mo==="*"&&dw.indexOf("-")!==-1){
+var ds=dw.split("-");return"At "+timeStr+" "+DOW[parseInt(ds[0])]+" through "+DOW[parseInt(ds[1])];
+}
+if(/^\d+$/.test(dm)&&mo==="*"&&dw==="*")return"At "+timeStr+" on day "+dm+" of every month";
+if(/^\d+$/.test(dm)&&/^\d+$/.test(mo)&&dw==="*")return"At "+timeStr+" on "+MON[parseInt(mo)]+" "+dm;
+}
+if(/^\d+$/.test(mi)&&hr==="*")return"At minute "+mi+" of every hour";
+if(mi==="0"&&hr==="*")return"Every hour at minute 0";
+var desc="";
+if(mi!=="*")desc+="minute "+mi;
+if(hr!=="*")desc+=(desc?", ":"")+"hour "+hr;
+if(dm!=="*")desc+=(desc?", ":"")+"day "+dm;
+if(mo!=="*")desc+=(desc?", ":"")+"month "+mo;
+if(dw!=="*")desc+=(desc?", ":"")+"weekday "+dw;
+return desc||"Custom schedule";
+}
+
+copyBtn.onclick=function(){
+navigator.clipboard.writeText(inputEl.value).then(function(){
+copyBtn.textContent="Copied!";
+setTimeout(function(){copyBtn.textContent="Copy Expression";},1500);
+});
+};
+
+inputEl.addEventListener("input",function(){parseInput();});
+inputEl.addEventListener("keydown",function(e){if(e.key==="Enter")e.preventDefault();});
+
+buildPresets();
+buildEditor();
+descEl.textContent=describe(inputEl.value);
+showNextRuns(inputEl.value);
+})();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:900px;margin:0 auto 20px;padding:0 20px}
+.pro-header{text-align:center;margin-bottom:16px}
+.pro-header h2{font-size:1.3rem;color:#e94560;display:inline-flex;align-items:center;gap:8px}
+.pro-badge{background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+.pro-mock{position:relative;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .3s}
+.pro-mock:hover{border-color:var(--accent)}
+.pro-mock-content{padding:20px;filter:blur(4px);opacity:.5;pointer-events:none;user-select:none}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.pro-mock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{color:var(--success);font-size:.85rem;margin-bottom:8px}
+.pro-mock-btn{display:inline-block;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text2);font-size:.8rem;margin:4px 2px}
+.pro-mock-list{list-style:none;font-size:.8rem;color:var(--text2)}
+.pro-mock-list li{padding:4px 0;border-bottom:1px solid var(--border)}
+.pro-mock-list li:last-child{border-bottom:none}
+.pro-mock-table{width:100%;border-collapse:collapse;font-size:.75rem;color:var(--text2)}
+.pro-mock-table th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);color:var(--text);font-size:.7rem}
+.pro-mock-table td{padding:4px 6px;border-bottom:1px solid var(--border)}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.35)}
+.pro-lock{font-size:3rem;margin-bottom:8px}
+.pro-overlay-text{color:#fff;font-size:1.1rem;font-weight:600}
+.pro-overlay-sub{color:#aaa;font-size:.8rem;margin-top:4px}
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.pro-modal-backdrop.open{display:flex}
+.pro-modal{background:#1e1e3a;border:1px solid #2a2a4a;border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:16px 0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✓ ';color:#00d68f;font-weight:700}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-cta{display:inline-block;background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:700;text-decoration:none;margin-top:16px;transition:opacity .2s;border:none;cursor:pointer}
+.pro-cta:hover{opacity:.85}
+.pro-later{display:block;margin-top:12px;color:#aaa;font-size:.85rem;cursor:pointer;background:none;border:none;padding:8px}
+.pro-later:hover{color:#fff}
+@media(max-width:768px){.pro-mock-row{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>⚡ Pro Features <span class="pro-badge">PRO</span></h2></div>
+<div class="pro-mock" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-overlay-text">Unlock Pro Features</div>
+<div class="pro-overlay-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>📋 Multi-Task Manager</h4>
+<table class="pro-mock-table">
+<tr><th>Name</th><th>Schedule</th><th>Status</th></tr>
+<tr><td>DB Backup</td><td>0 2 * * *</td><td style="color:#00d68f">● Active</td></tr>
+<tr><td>Log Rotate</td><td>0 0 * * 0</td><td style="color:#00d68f">● Active</td></tr>
+<tr><td>Cache Clear</td><td>*/30 * * * *</td><td style="color:#f5c542">● Paused</td></tr>
+<tr><td>Health Check</td><td>*/5 * * * *</td><td style="color:#00d68f">● Active</td></tr>
+<tr><td>Report Gen</td><td>0 9 * * 1</td><td style="color:#00d68f">● Active</td></tr>
+</table>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">+ Add Task</span>
+<span class="pro-mock-btn">⬇ Export</span>
+</div>
+</div>
+<div class="pro-mock-card">
+<h4>🔔 Webhook Notifications</h4>
+<ul class="pro-mock-list">
+<li>🔗 https://hooks.slack.com/T0...</li>
+<li>🔗 https://discord.com/api/we...</li>
+<li>📧 alerts@company.com</li>
+</ul>
+<div style="background:var(--bg2);border-radius:6px;padding:8px;margin-top:8px;font-size:.72rem;color:var(--text2)">
+<div>Trigger: On execution / On failure</div>
+<div>Format: JSON payload</div>
+<div>Retry: 3 attempts</div>
+</div>
+<span class="pro-mock-btn">+ Add Webhook</span>
+</div>
+<div class="pro-mock-card">
+<h4>📅 Calendar View</h4>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:.65rem">
+<div style="color:var(--accent);padding:2px">Sun</div>
+<div style="color:var(--text2);padding:2px">Mon</div>
+<div style="color:var(--text2);padding:2px">Tue</div>
+<div style="color:var(--text2);padding:2px">Wed</div>
+<div style="color:var(--text2);padding:2px">Thu</div>
+<div style="color:var(--text2);padding:2px">Fri</div>
+<div style="color:var(--text2);padding:2px">Sat</div>
+<div style="padding:4px;border-radius:3px">1</div>
+<div style="padding:4px;border-radius:3px;background:rgba(0,214,143,.2);color:#00d68f">2</div>
+<div style="padding:4px;border-radius:3px">3</div>
+<div style="padding:4px;border-radius:3px;background:rgba(0,214,143,.2);color:#00d68f">4</div>
+<div style="padding:4px;border-radius:3px">5</div>
+<div style="padding:4px;border-radius:3px">6</div>
+<div style="padding:4px;border-radius:3px;background:rgba(233,69,96,.2);color:var(--accent)">7</div>
+<div style="padding:4px;border-radius:3px">8</div>
+<div style="padding:4px;border-radius:3px;background:rgba(0,214,143,.2);color:#00d68f">9</div>
+<div style="padding:4px;border-radius:3px">10</div>
+<div style="padding:4px;border-radius:3px;background:rgba(0,214,143,.2);color:#00d68f">11</div>
+<div style="padding:4px;border-radius:3px">12</div>
+<div style="padding:4px;border-radius:3px">13</div>
+<div style="padding:4px;border-radius:3px;background:rgba(233,69,96,.2);color:var(--accent)">14</div>
+</div>
+<div style="margin-top:8px;font-size:.7rem;color:var(--text2)">
+<span style="color:#00d68f">●</span> 8 scheduled &nbsp;
+<span style="color:var(--accent)">●</span> 2 weekly
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-backdrop" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>🚀 Crontab Pro</h3>
+<div class="pro-price">$9</div>
+<ul>
+<li>Multi-task manager — organize all your cron jobs</li>
+<li>Webhook notifications (Slack, Discord, email)</li>
+<li>Calendar view — visualize execution schedule</li>
+<li>Task dependencies & chaining</li>
+<li>Execution history & failure alerts</li>
+<li>Export as crontab file or systemd timers</li>
+<li>Priority updates & new features</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $9</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

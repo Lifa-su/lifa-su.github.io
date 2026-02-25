@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CORS Tester - Test Cross-Origin Resource Sharing Configuration Online</title>
+<meta name="description" content="Free online CORS testing tool. Test CORS headers, diagnose cross-origin issues, and get fix suggestions for Nginx, Apache, Node.js, and Express servers.">
+<meta name="keywords" content="CORS tester, cross-origin, CORS headers, CORS checker, Access-Control-Allow-Origin, CORS fix">
+<link rel="canonical" href="https://lifa-su.com/ai-cors-tester/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--green:#00d474;--yellow:#f5a623;--red:#e94560;--border:#2a2a4a}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:2em;margin:20px 0 5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:var(--text2);margin-bottom:30px;font-size:.95em}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.card h2{font-size:1.15em;margin-bottom:16px;color:var(--accent)}
+label{display:block;font-size:.85em;color:var(--text2);margin-bottom:6px;margin-top:12px}
+label:first-child{margin-top:0}
+input[type=text],input[type=url],select,textarea{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.95em;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select{cursor:pointer;appearance:auto}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:200px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border:none;border-radius:8px;font-size:1em;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;width:100%;margin-top:20px}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-sm{padding:6px 14px;font-size:.8em;border-radius:6px}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+.btn-copy{background:var(--bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;padding:4px 10px;border-radius:4px;font-size:.75em}
+.btn-copy:hover{border-color:var(--accent);color:var(--text)}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.85em;font-weight:600}
+.status-allowed{background:rgba(0,212,116,.15);color:var(--green)}
+.status-denied{background:rgba(233,69,96,.15);color:var(--red)}
+.status-partial{background:rgba(245,166,35,.15);color:var(--yellow)}
+.headers-table{width:100%;border-collapse:collapse;font-size:.85em}
+.headers-table th,.headers-table td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.headers-table th{color:var(--text2);font-weight:500}
+.headers-table td:first-child{color:var(--accent);font-family:monospace;white-space:nowrap}
+.headers-table tr.cors-header td:first-child{color:var(--green)}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;overflow-x:auto;font-size:.85em;line-height:1.5;position:relative;margin-top:8px}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:.85em;transition:all .2s}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tab:hover:not(.active){border-color:var(--accent);color:var(--text)}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border .2s;font-size:.9em}
+.history-item:hover{border-color:var(--accent)}
+.history-item .url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:12px;font-family:monospace;font-size:.85em}
+.history-item .meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.error-box{background:rgba(233,69,96,.1);border:1px solid var(--red);border-radius:8px;padding:14px;margin-top:12px;font-size:.9em}
+.info-box{background:rgba(83,52,131,.15);border:1px solid var(--accent2);border-radius:8px;padding:14px;margin-top:12px;font-size:.9em}
+.curl-cmd{font-family:monospace;font-size:.85em;background:var(--bg);padding:10px;border-radius:6px;margin-top:8px;word-break:break-all}
+footer{text-align:center;color:var(--text2);font-size:.8em;padding:30px 0 20px;border-top:1px solid var(--border);margin-top:40px}
+.copy-wrap{position:relative}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:.75em}.copy-btn:hover{color:var(--text);border-color:var(--accent)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75em;margin-right:4px}
+.tag-get{background:rgba(0,212,116,.15);color:var(--green)}
+.tag-post{background:rgba(245,166,35,.15);color:var(--yellow)}
+.tag-put{background:rgba(83,52,131,.3);color:#b388ff}
+.tag-delete{background:rgba(233,69,96,.15);color:var(--red)}
+.tag-options{background:rgba(0,150,255,.15);color:#64b5f6}
+@media(max-width:600px){.container{padding:12px}h1{font-size:1.5em}.card{padding:16px}.row{flex-direction:column}.row>*{min-width:100%}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#127760; AI CORS Tester</h1>
+<p class="subtitle">Test Cross-Origin Resource Sharing configuration &amp; get AI-powered fix suggestions</p>
+</div>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
+@media(max-width:600px){.container{padding:12px}h1{font-size:1.5em}.card{padding:16px}.row{flex-direction:column}.row>*{min-width:100%}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#x1F310; AI CORS Tester</h1>
+<p class="subtitle">Test Cross-Origin Resource Sharing configuration &amp; get AI-powered fix suggestions</p>
+
+<div class="card">
+<h2>&#x1F50D; Test Configuration</h2>
+<label for="url">Target URL</label>
+<input type="url" id="url" placeholder="https://api.example.com/endpoint" autocomplete="url">
+<div class="row">
+<div>
+<label for="method">HTTP Method</label>
+<select id="method">
+<option value="GET">GET</option>
+<option value="POST">POST</option>
+<option value="PUT">PUT</option>
+<option value="DELETE">DELETE</option>
+<option value="OPTIONS">OPTIONS (Preflight)</option>
+</select>
+</div>
+<div>
+<label for="origin">Custom Origin (optional)</label>
+<input type="text" id="origin" placeholder="https://yourdomain.com">
+</div>
+</div>
+<label for="headers">Custom Headers (one per line, key: value)</label>
+<textarea id="headers" rows="2" placeholder="Authorization: Bearer token&#10;Content-Type: application/json" style="resize:vertical"></textarea>
+<button class="btn btn-primary" id="testBtn" onclick="runTest()">&#x1F680; Run CORS Test</button>
+</div>
+
+<div class="card hidden" id="resultCard">
+<h2>&#x1F4CB; Test Results</h2>
+<div id="statusArea" style="margin-bottom:16px"></div>
+<div id="loadingArea" class="hidden"><span class="spinner"></span> Testing CORS configuration...</div>
+
+<div id="resultsContent" class="hidden">
+<div style="margin-bottom:16px">
+<h3 style="font-size:.95em;color:var(--text2);margin-bottom:8px">Response Headers</h3>
+<div style="overflow-x:auto">
+<table class="headers-table" id="headersTable">
+<thead><tr><th>Header</th><th>Value</th></tr></thead>
+<tbody id="headersBody"></tbody>
+</table>
+</div>
+</div>
+
+<div style="margin-bottom:16px">
+<h3 style="font-size:.95em;color:var(--text2);margin-bottom:8px">&#x1F9E0; CORS Analysis</h3>
+<div id="analysisArea"></div>
+</div>
+
+<div style="margin-bottom:16px">
+<h3 style="font-size:.95em;color:var(--text2);margin-bottom:8px">&#x1F4BB; Equivalent cURL Command</h3>
+<div class="copy-wrap">
+<pre id="curlCmd"></pre>
+<button class="copy-btn" onclick="copyText(document.getElementById('curlCmd').textContent)">Copy</button>
+</div>
+</div>
+
+<div id="fixSection" class="hidden">
+<h3 style="font-size:.95em;color:var(--text2);margin-bottom:12px">&#x1F527; Fix Suggestions</h3>
+<div class="tab-bar" id="fixTabs"></div>
+<div id="fixContent"></div>
+</div>
+</div>
+</div>
+
+<div class="card hidden" id="errorCard">
+<h2 style="color:var(--red)">&#x26A0;&#xFE0F; Error</h2>
+<div id="errorContent"></div>
+</div>
+
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h2 style="margin-bottom:0">&#x1F4DC; Test History</h2>
+<button class="btn btn-sm btn-outline" onclick="clearHistory()">Clear All</button>
+</div>
+<div id="historyList"><p style="color:var(--text2);font-size:.9em;text-align:center;padding:20px 0">No tests yet. Run your first CORS test above.</p></div>
+</div>
+
+<div class="card">
+<h2>&#x2139;&#xFE0F; About CORS</h2>
+<div class="info-box" style="border:none;background:transparent;padding:0">
+<p style="margin-bottom:12px">Cross-Origin Resource Sharing (CORS) is a security mechanism that allows or restricts web applications from making requests to a different domain than the one serving the web page.</p>
+<p style="margin-bottom:12px"><strong>Common CORS Headers:</strong></p>
+<ul style="padding-left:20px;color:var(--text2);font-size:.9em">
+<li><code style="color:var(--green)">Access-Control-Allow-Origin</code> — Specifies which origins can access the resource</li>
+<li><code style="color:var(--green)">Access-Control-Allow-Methods</code> — Allowed HTTP methods</li>
+<li><code style="color:var(--green)">Access-Control-Allow-Headers</code> — Allowed request headers</li>
+<li><code style="color:var(--green)">Access-Control-Allow-Credentials</code> — Whether credentials (cookies) are allowed</li>
+<li><code style="color:var(--green)">Access-Control-Max-Age</code> — How long preflight results can be cached</li>
+<li><code style="color:var(--green)">Access-Control-Expose-Headers</code> — Headers the browser can access</li>
+</ul>
+<p style="margin-top:12px;font-size:.9em;color:var(--text2)"><strong>Note:</strong> Due to browser security restrictions, some CORS tests may be limited. For comprehensive testing, use the generated cURL command in your terminal.</p>
+</div>
+</div>
+
+<footer>
+<p>AI CORS Tester &mdash; Free online tool for testing CORS configurations</p>
+<p style="margin-top:4px">Built with &#x2764;&#xFE0F; for developers</p>
+</footer>
+</div>
+
+<script>
+const CORS_HEADERS = ['access-control-allow-origin','access-control-allow-methods','access-control-allow-headers','access-control-allow-credentials','access-control-max-age','access-control-expose-headers'];
+
+function getHistory(){try{return JSON.parse(localStorage.getItem('cors-history')||'[]')}catch(e){return[]}}
+function saveHistory(h){localStorage.setItem('cors-history',JSON.stringify(h.slice(0,50)))}
+function clearHistory(){localStorage.removeItem('cors-history');renderHistory()}
+
+function renderHistory(){
+  const list=document.getElementById('historyList'),h=getHistory();
+  if(!h.length){list.innerHTML='<p style="color:var(--text2);font-size:.9em;text-align:center;padding:20px 0">No tests yet. Run your first CORS test above.</p>';return}
+  list.innerHTML=h.map((item,i)=>{
+    const tagClass={'GET':'tag-get','POST':'tag-post','PUT':'tag-put','DELETE':'tag-delete','OPTIONS':'tag-options'}[item.method]||'tag-get';
+    const statusClass=item.status==='allowed'?'status-allowed':item.status==='denied'?'status-denied':'status-partial';
+    const statusLabel=item.status==='allowed'?'Allowed':item.status==='denied'?'Denied':'Partial';
+    return `<div class="history-item" onclick="rerunFromHistory(${i})"><span class="tag ${tagClass}">${item.method}</span><span class="url">${escHtml(item.url)}</span><div class="meta"><span class="status-badge ${statusClass}">${statusLabel}</span><span style="color:var(--text2);font-size:.75em">${new Date(item.time).toLocaleString()}</span></div></div>`;
+  }).join('');
+}
+
+function rerunFromHistory(i){
+  const h=getHistory(),item=h[i];if(!item)return;
+  document.getElementById('url').value=item.url;
+  document.getElementById('method').value=item.method;
+  if(item.origin)document.getElementById('origin').value=item.origin;
+  runTest();
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+}
+
+function buildCurlCmd(url,method,origin,customHeaders){
+  let cmd=`curl -i -X ${method}`;
+  if(origin)cmd+=` -H "Origin: ${origin}"`;
+  if(method==='OPTIONS'){cmd+=` -H "Access-Control-Request-Method: GET"`;cmd+=` -H "Access-Control-Request-Headers: Content-Type"`}
+  if(customHeaders){customHeaders.split('\n').filter(l=>l.trim()).forEach(l=>{cmd+=` -H "${l.trim()}"`})}
+  cmd+=` "${url}"`;
+  return cmd;
+}
+
+function analyzeCors(headers,method,origin){
+  const analysis=[];
+  const acao=headers['access-control-allow-origin'];
+  const acam=headers['access-control-allow-methods'];
+  const acah=headers['access-control-allow-headers'];
+  const acac=headers['access-control-allow-credentials'];
+  const acma=headers['access-control-max-age'];
+  const aceh=headers['access-control-expose-headers'];
+  let status='denied';
+
+  if(acao){
+    if(acao==='*'){
+      analysis.push({label:'Origin: Wildcard (*)',desc:'All origins are allowed. This is permissive but note that credentials (cookies) cannot be used with wildcard origin.',type:'warn'});
+      status='allowed';
+    }else if(origin && acao.includes(origin)){
+      analysis.push({label:'Origin: Specific Match',desc:`The server explicitly allows origin "${origin}". This is the recommended secure configuration.`,type:'ok'});
+      status='allowed';
+    }else if(acao){
+      analysis.push({label:'Origin: '+acao,desc:'The server returns a specific origin. Make sure it matches your requesting origin.',type:'ok'});
+      status='partial';
+    }
+  }else{
+    analysis.push({label:'No Access-Control-Allow-Origin header',desc:'The server does not include CORS headers. Cross-origin requests will be blocked by the browser.',type:'error'});
+  }
+
+  if(acam){
+    analysis.push({label:'Allowed Methods: '+acam,desc:'These HTTP methods are permitted for cross-origin requests.',type:'ok'});
+  }else if(method==='OPTIONS'){
+    analysis.push({label:'No Access-Control-Allow-Methods header',desc:'The preflight response should include allowed methods. Browsers may reject non-simple requests.',type:'error'});
+  }
+
+  if(acah){
+    analysis.push({label:'Allowed Headers: '+acah,desc:'These custom headers are permitted in cross-origin requests.',type:'ok'});
+  }
+
+  if(acac==='true'){
+    if(acao==='*'){
+      analysis.push({label:'Credentials + Wildcard Origin',desc:'WARNING: Access-Control-Allow-Credentials is true but origin is *. Browsers will reject this combination. Use a specific origin instead.',type:'error'});
+      status='denied';
+    }else{
+      analysis.push({label:'Credentials Allowed',desc:'The server allows cookies and authentication headers in cross-origin requests.',type:'ok'});
+    }
+  }
+
+  if(acma){
+    const secs=parseInt(acma);
+    analysis.push({label:`Preflight Cache: ${acma}s (${Math.round(secs/60)}min)`,desc:'Preflight results are cached for this duration, reducing OPTIONS requests.',type:'ok'});
+  }
+
+  if(aceh){
+    analysis.push({label:'Exposed Headers: '+aceh,desc:'These response headers are accessible to JavaScript in the browser.',type:'ok'});
+  }
+
+  if(!acao && !acam && !acah){status='denied'}
+  else if(acao && status!=='denied'){status=analysis.some(a=>a.type==='error')?'partial':status}
+
+  return {analysis,status};
+}
+
+function getFixConfigs(origin){
+  const safeOrigin=origin||'https://yourdomain.com';
+  return {
+    nginx:{label:'Nginx',config:`# Add to your server or location block
+location /api/ {
+    # Handle preflight OPTIONS requests
+    if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '${safeOrigin}';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Max-Age' 86400;
+        add_header 'Content-Type' 'text/plain; charset=utf-8';
+        add_header 'Content-Length' 0;
+        return 204;
+    }
+
+    add_header 'Access-Control-Allow-Origin' '${safeOrigin}' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization' always;
+    add_header 'Access-Control-Allow-Credentials' 'true' always;
+    add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+}`},
+    apache:{label:'Apache',config:`# Add to .htaccess or Apache config
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "${safeOrigin}"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Max-Age "86400"
+
+    # Handle preflight requests
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>`},
+    nodejs:{label:'Node.js',config:`// Native Node.js HTTP server CORS middleware
+function corsMiddleware(req, res) {
+  const allowedOrigin = '${safeOrigin}';
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return true;
+  }
+  return false;
+}
+
+// Usage in your server:
+const server = http.createServer((req, res) => {
+  if (corsMiddleware(req, res)) return;
+  // ... your routes
+});`},
+    express:{label:'Express.js',config:`// Option 1: Using the cors package
+const cors = require('cors');
+app.use(cors({
+  origin: '${safeOrigin}',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['DNT','User-Agent','X-Requested-With','If-Modified-Since','Cache-Control','Content-Type','Range','Authorization'],
+  credentials: true,
+  maxAge: 86400
+}));
+
+// Option 2: Manual middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '${safeOrigin}');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});`}
+  };
+}
+
+async function runTest(){
+  const url=document.getElementById('url').value.trim();
+  if(!url){alert('Please enter a URL to test');return}
+  try{new URL(url)}catch(e){alert('Please enter a valid URL');return}
+
+  const method=document.getElementById('method').value;
+  const origin=document.getElementById('origin').value.trim()||window.location.origin;
+  const customHeaders=document.getElementById('headers').value.trim();
+  const btn=document.getElementById('testBtn');
+  const resultCard=document.getElementById('resultCard');
+  const errorCard=document.getElementById('errorCard');
+  const loadingArea=document.getElementById('loadingArea');
+  const resultsContent=document.getElementById('resultsContent');
+
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Testing...';
+  resultCard.classList.remove('hidden');errorCard.classList.add('hidden');
+  loadingArea.classList.remove('hidden');resultsContent.classList.add('hidden');
+
+  const fetchOpts={method:method==='OPTIONS'?'OPTIONS':method,mode:'cors',cache:'no-cache'};
+  const hdrs=new Headers();
+  if(customHeaders){customHeaders.split('\n').filter(l=>l.includes(':')).forEach(l=>{const[k,...v]=l.split(':');try{hdrs.append(k.trim(),v.join(':').trim())}catch(e){}})}
+
+  fetchOpts.headers=hdrs;
+
+  let responseHeaders={};let fetchError=null;let httpStatus=0;let statusText='';let usedOpaque=false;
+
+  try{
+    const resp=await fetch(url,fetchOpts);
+    httpStatus=resp.status;statusText=resp.statusText;
+    resp.headers.forEach((v,k)=>{responseHeaders[k.toLowerCase()]=v});
+  }catch(e){
+    fetchError=e.message||'Network error';
+    try{
+      const resp2=await fetch(url,{method:'GET',mode:'no-cors',cache:'no-cache'});
+      usedOpaque=true;httpStatus=0;
+    }catch(e2){fetchError=e2.message||'Network error'}
+  }
+
+  btn.disabled=false;btn.innerHTML='&#x1F680; Run CORS Test';
+  loadingArea.classList.add('hidden');
+
+  const curlCmd=buildCurlCmd(url,method==='OPTIONS'?'OPTIONS':method,origin,customHeaders);
+  document.getElementById('curlCmd').textContent=curlCmd;
+
+  if(fetchError && !usedOpaque){
+    resultsContent.classList.add('hidden');
+    errorCard.classList.remove('hidden');
+    document.getElementById('errorContent').innerHTML=`
+      <div class="error-box" style="border:none;background:transparent;padding:0">
+        <p><strong>CORS request failed:</strong> ${escHtml(fetchError)}</p>
+        <p style="margin-top:8px;color:var(--text2)">This typically means the server does not allow cross-origin requests from this origin, or the server is unreachable.</p>
+        <p style="margin-top:12px;color:var(--text2)">Try the cURL command below in your terminal for a more detailed test:</p>
+        <div class="copy-wrap"><pre>${escHtml(curlCmd)}</pre><button class="copy-btn" onclick="copyText('${curlCmd.replace(/'/g,"\\'")}')">Copy</button></div>
+      </div>`;
+    addToHistory({url,method,origin,status:'denied',time:Date.now(),error:fetchError});
+    showFixSuggestions(origin);
+    document.getElementById('statusArea').innerHTML='<span class="status-badge status-denied">CORS Denied</span> <span style="color:var(--text2);font-size:.9em;margin-left:8px">Request blocked by browser</span>';
+    resultsContent.classList.remove('hidden');
+    return;
+  }
+
+  if(usedOpaque){
+    document.getElementById('statusArea').innerHTML='<span class="status-badge status-denied">CORS Denied (Opaque Response)</span>';
+    document.getElementById('headersBody').innerHTML='<tr><td colspan="2" style="color:var(--text2)">No headers available — browser blocked CORS access. The server responded but did not include proper CORS headers. Use the cURL command for full details.</td></tr>';
+    document.getElementById('analysisArea').innerHTML=`<div style="padding:10px 0"><div style="font-weight:600;margin-bottom:4px;color:var(--red)">CORS headers missing</div><div style="color:var(--text2);font-size:.9em">The server is reachable but does not return CORS headers. The browser blocks JavaScript from reading the response. This is the most common CORS issue.</div></div>`;
+    addToHistory({url,method,origin,status:'denied',time:Date.now()});
+    showFixSuggestions(origin);
+    resultsContent.classList.remove('hidden');
+    return;
+  }
+
+  // Display headers
+  const tbody=document.getElementById('headersBody');
+  tbody.innerHTML='';
+  const sortedHeaders=Object.entries(responseHeaders).sort((a,b)=>{
+    const aIsCors=CORS_HEADERS.includes(a[0]);const bIsCors=CORS_HEADERS.includes(b[0]);
+    if(aIsCors&&!bIsCors)return -1;if(!aIsCors&&bIsCors)return 1;return a[0].localeCompare(b[0]);
+  });
+  sortedHeaders.forEach(([k,v])=>{
+    const isCors=CORS_HEADERS.includes(k);
+    const tr=document.createElement('tr');
+    if(isCors)tr.className='cors-header';
+    tr.innerHTML=`<td>${escHtml(k)}${isCors?' &#x2705;':''}</td><td>${escHtml(v)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Analyze
+  const {analysis,status}=analyzeCors(responseHeaders,method,origin);
+  const analysisArea=document.getElementById('analysisArea');
+  analysisArea.innerHTML=analysis.map(a=>{
+    const color=a.type==='ok'?'var(--green)':a.type==='warn'?'var(--yellow)':'var(--red)';
+    const icon=a.type==='ok'?'&#x2705;':a.type==='warn'?'&#x26A0;&#xFE0F;':'&#x274C;';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="font-weight:600;margin-bottom:4px">${icon} ${escHtml(a.label)}</div><div style="color:var(--text2);font-size:.9em">${escHtml(a.desc)}</div></div>`;
+  }).join('');
+
+  const statusBadge=status==='allowed'?'<span class="status-badge status-allowed">CORS Allowed</span>':status==='partial'?'<span class="status-badge status-partial">Partially Configured</span>':'<span class="status-badge status-denied">CORS Denied</span>';
+  document.getElementById('statusArea').innerHTML=`${statusBadge} <span style="color:var(--text2);font-size:.9em;margin-left:8px">HTTP ${httpStatus} ${statusText}</span>`;
+
+  if(status!=='allowed'){showFixSuggestions(origin)}else{document.getElementById('fixSection').classList.add('hidden')}
+
+  addToHistory({url,method,origin,status,time:Date.now(),httpStatus});
+  resultsContent.classList.remove('hidden');
+}
+
+function showFixSuggestions(origin){
+  const fixSection=document.getElementById('fixSection');
+  const fixTabs=document.getElementById('fixTabs');
+  const fixContent=document.getElementById('fixContent');
+  fixSection.classList.remove('hidden');
+
+  const configs=getFixConfigs(origin);
+  const keys=Object.keys(configs);
+  fixTabs.innerHTML=keys.map((k,i)=>`<div class="tab${i===0?' active':''}" onclick="switchFixTab('${k}',this)">${configs[k].label}</div>`).join('');
+  fixContent.innerHTML=`<div class="copy-wrap"><pre><code>${escHtml(configs[keys[0]].config)}</code></pre><button class="copy-btn" onclick="copyText(this.previousElementSibling.textContent)">Copy</button></div>`;
+}
+
+function switchFixTab(key,el){
+  el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const origin=document.getElementById('origin').value.trim()||window.location.origin;
+  const configs=getFixConfigs(origin);
+  document.getElementById('fixContent').innerHTML=`<div class="copy-wrap"><pre><code>${escHtml(configs[key].config)}</code></pre><button class="copy-btn" onclick="copyText(this.previousElementSibling.textContent)">Copy</button></div>`;
+}
+
+function addToHistory(item){
+  const h=getHistory();
+  h.unshift(item);
+  saveHistory(h);
+  renderHistory();
+}
+
+// Init
+renderHistory();
+document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')runTest()});
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

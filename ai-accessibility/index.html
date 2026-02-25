@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered web accessibility inspector. Analyze pages for A11y issues, check ARIA roles, color contrast, and keyboard navigation compliance.">
+<link rel="canonical" href="https://lifa-su.com/ai-accessibility/">
+<title>A11y Inspector - AI-Powered Web Accessibility Checker</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;
+  --text:#e4e7f1;--text2:#9ca3bf;--accent:#6c5ce7;--accent2:#a29bfe;
+  --green:#00b894;--yellow:#fdcb6e;--red:#e17055;--blue:#74b9ff;
+  --radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3);
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent2);text-decoration:none}
+button{cursor:pointer;font-family:var(--font)}
+::selection{background:var(--accent);color:#fff}
+:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+header{background:rgba(26,29,39,.92);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+header .container{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;font-weight:700}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav button{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:8px 16px;border-radius:8px;font-size:.875rem;transition:all .2s}
+nav button:hover,nav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+main{padding:32px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel-header h2{font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.panel-body{padding:20px}
+textarea{width:100%;min-height:400px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:.85rem;padding:16px;resize:vertical;transition:border-color .2s;line-height:1.5}
+textarea:focus{border-color:var(--accent);outline:none}
+textarea::placeholder{color:var(--text2)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;font-size:.875rem;font-weight:600;border:none;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#7c6cf0);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,92,231,.4)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.score-ring{position:relative;width:140px;height:140px;margin:0 auto 16px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring circle{fill:none;stroke-width:8}
+.score-ring .bg{stroke:var(--surface2)}
+.score-ring .fg{stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .3s}
+.score-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:2.5rem;font-weight:800}
+.score-value small{font-size:.75rem;font-weight:400;color:var(--text2)}
+.score-label{text-align:center;font-size:.9rem;font-weight:600;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--bg);border-radius:8px;padding:12px;text-align:center}
+.stat .num{font-size:1.5rem;font-weight:700}
+.stat .label{font-size:.75rem;color:var(--text2);margin-top:2px}
+.stat.critical .num{color:var(--red)}
+.stat.major .num{color:var(--yellow)}
+.stat.minor .num{color:var(--blue)}
+.issue{background:var(--bg);border-radius:8px;margin-bottom:12px;border-left:4px solid var(--border);overflow:hidden}
+.issue.critical{border-left-color:var(--red)}
+.issue.major{border-left-color:var(--yellow)}
+.issue.minor{border-left-color:var(--blue)}
+.issue-header{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none}
+.issue-header:hover{background:var(--surface2)}
+.issue-badge{font-size:.7rem;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:4px;letter-spacing:.5px}
+.issue.critical .issue-badge{background:rgba(225,112,85,.15);color:var(--red)}
+.issue.major .issue-badge{background:rgba(253,203,110,.15);color:var(--yellow)}
+.issue.minor .issue-badge{background:rgba(116,185,255,.15);color:var(--blue)}
+.issue-title{flex:1;font-size:.875rem;font-weight:500}
+.issue-toggle{color:var(--text2);transition:transform .2s;font-size:.8rem}
+.issue.open .issue-toggle{transform:rotate(180deg)}
+.issue-body{padding:0 16px 16px;display:none;font-size:.85rem;color:var(--text2);line-height:1.7}
+.issue.open .issue-body{display:block}
+.issue-body code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:.8rem;color:var(--accent2)}
+.issue-body pre{background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0;font-size:.8rem;line-height:1.5}
+.issue-body pre code{background:none;padding:0}
+.wcag-ref{display:inline-block;background:var(--surface2);padding:2px 8px;border-radius:4px;font-size:.75rem;color:var(--accent2);margin-top:4px}
+.tab-section{display:none}
+.tab-section.active{display:block}
+/* Color Contrast Tool */
+.contrast-tool{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.contrast-tool{grid-template-columns:1fr}}
+.color-input-group{display:flex;flex-direction:column;gap:8px}
+.color-input-group label{font-size:.85rem;font-weight:600}
+.color-row{display:flex;gap:8px;align-items:center}
+.color-row input[type=color]{width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;background:none}
+.color-row input[type=text]{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:.85rem}
+.contrast-preview{grid-column:1/-1;border-radius:12px;padding:24px;text-align:center;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border)}
+.contrast-ratio{font-size:2rem;font-weight:800}
+.contrast-results{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.contrast-check{background:var(--bg);border-radius:8px;padding:12px;display:flex;align-items:center;gap:8px}
+.contrast-check .icon{font-size:1.2rem}
+.contrast-check .info{font-size:.8rem}
+.contrast-check .info strong{display:block;font-size:.85rem;color:var(--text)}
+/* API Key */
+.api-key-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.api-key-bar label{font-size:.85rem;font-weight:600;white-space:nowrap}
+.api-key-bar input{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--mono);font-size:.85rem}
+.api-key-bar input:focus{border-color:var(--accent);outline:none}
+/* Loading */
+.loading{display:flex;align-items:center;gap:12px;padding:20px;color:var(--text2)}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:.5}
+.empty-state p{font-size:.9rem;max-width:400px;margin:0 auto}
+/* Footer */
+footer{border-top:1px solid var(--border);padding:24px 0;margin-top:48px;text-align:center;color:var(--text2);font-size:.8rem}
+/* Scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:.85rem;box-shadow:var(--shadow);z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon" aria-hidden="true">&#9881;</div>
+    <span>A11y Inspector</span>
+  </div>
+  <nav aria-label="Main tools">
+    <button class="active" onclick="switchTab('checker')" id="tab-checker">HTML Checker</button>
+    <button onclick="switchTab('contrast')" id="tab-contrast">Contrast Checker</button>
+    <button onclick="switchTab('about')" id="tab-about">WCAG 2.2 Guide</button>
+  </nav>
+</div>
+</header>
+
+<main class="container">
+  <div class="api-key-bar">
+    <label for="apiKey">&#128273; DeepSeek API Key:</label>
+    <input type="password" id="apiKey" placeholder="sk-..." aria-label="DeepSeek API key">
+    <button class="btn btn-sm btn-secondary" onclick="toggleKeyVisibility()" id="toggleKey" aria-label="Show API key">Show</button>
+    <button class="btn btn-sm btn-secondary" onclick="saveApiKey()">Save</button>
+  </div>
+
+  <!-- HTML Checker Tab -->
+  <div class="tab-section active" id="section-checker">
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>&#128196; HTML Input</h2>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-secondary" onclick="loadSample()">Load Sample</button>
+            <button class="btn btn-sm btn-secondary" onclick="clearInput()">Clear</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <textarea id="htmlInput" placeholder="Paste your HTML code here..." aria-label="HTML code input"></textarea>
+          <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-primary" onclick="runCheck()" id="checkBtn">
+              &#9889; Run Accessibility Check
+            </button>
+            <label style="font-size:.85rem;display:flex;align-items:center;gap:6px;color:var(--text2)">
+              <select id="levelSelect" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:.85rem" aria-label="WCAG conformance level">
+                <option value="AA">WCAG 2.2 AA</option>
+                <option value="AAA">WCAG 2.2 AAA</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h2>&#128202; Results</h2>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-secondary" onclick="exportMarkdown()" id="exportMd" disabled>Export MD</button>
+            <button class="btn btn-sm btn-secondary" onclick="exportPDF()" id="exportPdf" disabled>Export PDF</button>
+          </div>
+        </div>
+        <div class="panel-body" id="resultsPanel">
+          <div class="empty-state">
+            <div class="icon">&#128269;</div>
+            <p>Paste HTML code and click "Run Accessibility Check" to analyze your code against WCAG 2.2 standards.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contrast Checker Tab -->
+  <div class="tab-section" id="section-contrast">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>&#127912; Color Contrast Checker</h2>
+      </div>
+      <div class="panel-body">
+        <div class="contrast-tool">
+          <div class="color-input-group">
+            <label for="fgColor">Foreground (Text) Color</label>
+            <div class="color-row">
+              <input type="color" id="fgPicker" value="#6c5ce7" aria-label="Foreground color picker">
+              <input type="text" id="fgColor" value="#6c5ce7" aria-label="Foreground color hex value" maxlength="7">
+            </div>
+          </div>
+          <div class="color-input-group">
+            <label for="bgColor">Background Color</label>
+            <div class="color-row">
+              <input type="color" id="bgPicker" value="#0f1117" aria-label="Background color picker">
+              <input type="text" id="bgColor" value="#0f1117" aria-label="Background color hex value" maxlength="7">
+            </div>
+          </div>
+          <div class="contrast-preview" id="contrastPreview">
+            <div class="contrast-ratio" id="contrastRatio">—</div>
+            <div style="font-size:.85rem" id="contrastLabel">Enter colors to check contrast</div>
+          </div>
+          <div class="contrast-results" id="contrastResults"></div>
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn btn-secondary" onclick="swapColors()">&#8644; Swap Colors</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WCAG 2.2 Guide Tab -->
+  <div class="tab-section" id="section-about">
+    <div class="panel">
+      <div class="panel-header"><h2>&#128214; WCAG 2.2 Quick Reference (2025-2026)</h2></div>
+      <div class="panel-body" style="line-height:1.8;font-size:.9rem;color:var(--text2)">
+        <p style="margin-bottom:16px"><strong style="color:var(--text)">WCAG 2.2</strong> is the current W3C Recommendation (October 2023), now adopted as <strong style="color:var(--text)">ISO/IEC 40500:2026</strong>. It adds 9 new success criteria on top of WCAG 2.1, focusing on cognitive accessibility, mobile usability, and authentication. WCAG 2.2 AA is the recommended legal standard for ADA, Section 508, and the European Accessibility Act (EAA, effective June 2025).</p>
+        <h3 style="color:var(--text);margin:20px 0 12px;font-size:1rem">9 New Success Criteria in WCAG 2.2</h3>
+        <div id="wcagGuide"></div>
+        <p style="margin-top:20px;font-size:.8rem;color:var(--text2)">Source: W3C WCAG 2.2 Recommendation &bull; Data verified February 2026</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    A11y Inspector &mdash; AI-Powered Accessibility Checker &bull; Built with DeepSeek API &bull; WCAG 2.2 (2025-2026)
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== A11y Inspector - Core JavaScript =====
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+// State
+let currentTab = 'checker';
+let lastResults = null;
+let apiKey = localStorage.getItem('deepseek_api_key') || '';
+
+// Tab Navigation
+$$('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    currentTab = tab;
+    $$('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    $$('.tab-content').forEach(t => t.classList.remove('active'));
+    $(`#tab-${tab}`).classList.add('active');
+  });
+});
+
+// Toast
+function toast(msg, type='info') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// API Key
+function saveApiKey() {
+  apiKey = $('#apiKeyInput').value.trim();
+  if (apiKey) {
+    localStorage.setItem('deepseek_api_key', apiKey);
+    toast('API key saved!', 'success');
+  }
+}
+if (apiKey) { const el = $('#apiKeyInput'); if(el) el.value = apiKey; }
+
+// ===== LOCAL ACCESSIBILITY CHECKS =====
+function runLocalChecks(html) {
+  const issues = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // 1. Images without alt
+  doc.querySelectorAll('img').forEach((img, i) => {
+    if (!img.hasAttribute('alt')) {
+      issues.push({
+        severity: 'critical', category: 'Images',
+        wcag: '1.1.1 Non-text Content (A)',
+        title: `Image missing alt attribute`,
+        element: img.outerHTML.substring(0, 120),
+        description: 'All images must have an alt attribute. Decorative images should use alt="".',
+        fix: img.outerHTML.replace('<img', '<img alt="Descriptive text here"').substring(0, 150)
+      });
+    } else if (img.alt === '' && !img.hasAttribute('role')) {
+      issues.push({
+        severity: 'minor', category: 'Images',
+        wcag: '1.1.1 Non-text Content (A)',
+        title: 'Image with empty alt may need role="presentation"',
+        element: img.outerHTML.substring(0, 120),
+        description: 'If this image is decorative, add role="presentation" or role="none". If it conveys information, provide descriptive alt text.',
+        fix: img.outerHTML.replace('<img', '<img role="presentation"').substring(0, 150)
+      });
+    }
+  });
+
+  // 2. Form inputs without labels
+  doc.querySelectorAll('input,select,textarea').forEach(el => {
+    if (['hidden','submit','button','reset','image'].includes(el.type)) return;
+    const id = el.id;
+    const hasLabel = id && doc.querySelector(`label[for="${id}"]`);
+    const hasAriaLabel = el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby');
+    const wrappedInLabel = el.closest('label');
+    const hasTitle = el.hasAttribute('title');
+    if (!hasLabel && !hasAriaLabel && !wrappedInLabel && !hasTitle) {
+      issues.push({
+        severity: 'critical', category: 'Forms',
+        wcag: '1.3.1 Info and Relationships (A) / 4.1.2 Name, Role, Value (A)',
+        title: `Form ${el.tagName.toLowerCase()} missing accessible label`,
+        element: el.outerHTML.substring(0, 120),
+        description: 'Every form control needs an associated label. Use <label for="id">, aria-label, or aria-labelledby.',
+        fix: `<label for="${id || 'myInput'}">Label text</label>\n${el.outerHTML}`
+      });
+    }
+  });
+
+  // 3. Missing document language
+  if (!html.match(/<html[^>]*\slang\s*=/i)) {
+    issues.push({
+      severity: 'critical', category: 'Document',
+      wcag: '3.1.1 Language of Page (A)',
+      title: 'Missing document language attribute',
+      element: '&lt;html&gt;',
+      description: 'The html element must have a lang attribute to identify the primary language of the page.',
+      fix: '<html lang="en">'
+    });
+  }
+
+  // 4. Missing page title
+  if (!doc.querySelector('title') || !doc.querySelector('title')?.textContent.trim()) {
+    issues.push({
+      severity: 'critical', category: 'Document',
+      wcag: '2.4.2 Page Titled (A)',
+      title: 'Missing or empty page title',
+      element: '&lt;head&gt;...&lt;/head&gt;',
+      description: 'Pages must have a descriptive title that identifies the page purpose.',
+      fix: '<title>Descriptive Page Title</title>'
+    });
+  }
+
+  // 5. Heading hierarchy
+  const headings = doc.querySelectorAll('h1,h2,h3,h4,h5,h6');
+  let prevLevel = 0;
+  let h1Count = 0;
+  headings.forEach(h => {
+    const level = parseInt(h.tagName[1]);
+    if (level === 1) h1Count++;
+    if (prevLevel > 0 && level > prevLevel + 1) {
+      issues.push({
+        severity: 'major', category: 'Headings',
+        wcag: '1.3.1 Info and Relationships (A)',
+        title: `Heading level skipped: h${prevLevel} to h${level}`,
+        element: h.outerHTML.substring(0, 100),
+        description: `Heading levels should not skip (e.g., h${prevLevel} to h${level}). Use sequential heading levels.`,
+        fix: h.outerHTML.replace(`h${level}`, `h${prevLevel + 1}`)
+      });
+    }
+    prevLevel = level;
+  });
+  if (h1Count === 0 && headings.length > 0) {
+    issues.push({
+      severity: 'major', category: 'Headings',
+      wcag: '1.3.1 Info and Relationships (A)',
+      title: 'No h1 heading found',
+      element: 'Document',
+      description: 'Each page should have exactly one h1 heading that describes the main content.',
+      fix: '<h1>Main Page Heading</h1>'
+    });
+  }
+  if (h1Count > 1) {
+    issues.push({
+      severity: 'minor', category: 'Headings',
+      wcag: '1.3.1 Info and Relationships (A)',
+      title: `Multiple h1 headings found (${h1Count})`,
+      element: 'Document',
+      description: 'Best practice is to have a single h1 per page. Multiple h1s can confuse screen reader users.',
+      fix: 'Keep one h1 and change others to h2 or appropriate level.'
+    });
+  }
+
+  // 6. Links without discernible text
+  doc.querySelectorAll('a').forEach(a => {
+    const text = (a.textContent || '').trim();
+    const ariaLabel = a.getAttribute('aria-label') || '';
+    const ariaLabelledby = a.getAttribute('aria-labelledby') || '';
+    const img = a.querySelector('img[alt]');
+    const title = a.getAttribute('title') || '';
+    if (!text && !ariaLabel && !ariaLabelledby && !img && !title) {
+      issues.push({
+        severity: 'critical', category: 'Links',
+        wcag: '2.4.4 Link Purpose (A) / 4.1.2 Name, Role, Value (A)',
+        title: 'Link has no discernible text',
+        element: a.outerHTML.substring(0, 120),
+        description: 'Links must have text content, aria-label, or contain an image with alt text.',
+        fix: a.outerHTML.replace('>', ' aria-label="Descriptive link text">')
+      });
+    }
+    if (['click here', 'here', 'read more', 'more', 'link'].includes(text.toLowerCase())) {
+      issues.push({
+        severity: 'minor', category: 'Links',
+        wcag: '2.4.4 Link Purpose (A)',
+        title: `Non-descriptive link text: "${text}"`,
+        element: a.outerHTML.substring(0, 120),
+        description: 'Link text should describe the destination or purpose. Avoid generic text like "click here".',
+        fix: `<a href="${a.href}">Descriptive text about destination</a>`
+      });
+    }
+  });
+
+  // 7. Missing landmark regions
+  const hasMain = doc.querySelector('main') || doc.querySelector('[role="main"]');
+  const hasNav = doc.querySelector('nav') || doc.querySelector('[role="navigation"]');
+  if (!hasMain) {
+    issues.push({
+      severity: 'major', category: 'Landmarks',
+      wcag: '1.3.1 Info and Relationships (A)',
+      title: 'No main landmark found',
+      element: 'Document structure',
+      description: 'Use <main> or role="main" to identify the primary content area.',
+      fix: '<main>\n  <!-- Primary page content -->\n</main>'
+    });
+  }
+
+  // 8. ARIA checks
+  doc.querySelectorAll('[role]').forEach(el => {
+    const role = el.getAttribute('role');
+    const validRoles = ['alert','alertdialog','application','article','banner','button','cell','checkbox','columnheader','combobox','complementary','contentinfo','definition','dialog','directory','document','feed','figure','form','grid','gridcell','group','heading','img','link','list','listbox','listitem','log','main','marquee','math','menu','menubar','menuitem','menuitemcheckbox','menuitemradio','meter','navigation','none','note','option','presentation','progressbar','radio','radiogroup','region','row','rowgroup','rowheader','scrollbar','search','searchbox','separator','slider','spinbutton','status','switch','tab','table','tablist','tabpanel','term','textbox','timer','toolbar','tooltip','tree','treegrid','treeitem'];
+    if (!validRoles.includes(role)) {
+      issues.push({
+        severity: 'major', category: 'ARIA',
+        wcag: '4.1.2 Name, Role, Value (A)',
+        title: `Invalid ARIA role: "${role}"`,
+        element: el.outerHTML.substring(0, 120),
+        description: `"${role}" is not a valid WAI-ARIA role. Use a valid role from the ARIA specification.`,
+        fix: 'Remove the invalid role or replace with a valid one.'
+      });
+    }
+  });
+
+  // Check aria-hidden on focusable elements
+  doc.querySelectorAll('[aria-hidden="true"]').forEach(el => {
+    const focusable = el.querySelectorAll('a[href],button,input,select,textarea,[tabindex]');
+    if (focusable.length > 0) {
+      issues.push({
+        severity: 'critical', category: 'ARIA',
+        wcag: '4.1.2 Name, Role, Value (A)',
+        title: 'Focusable elements inside aria-hidden',
+        element: el.outerHTML.substring(0, 120),
+        description: 'Elements with aria-hidden="true" must not contain focusable elements. This creates a confusing experience for screen reader users.',
+        fix: 'Remove aria-hidden or remove focusable elements from within.'
+      });
+    }
+  });
+
+  // 9. Tables without headers
+  doc.querySelectorAll('table').forEach(table => {
+    if (!table.querySelector('th') && !table.querySelector('[role="columnheader"]')) {
+      issues.push({
+        severity: 'major', category: 'Tables',
+        wcag: '1.3.1 Info and Relationships (A)',
+        title: 'Table missing header cells',
+        element: '<table>...</table>',
+        description: 'Data tables must use <th> elements to identify header cells.',
+        fix: '<table>\n  <thead>\n    <tr><th>Header 1</th><th>Header 2</th></tr>\n  </thead>\n  <tbody>...</tbody>\n</table>'
+      });
+    }
+    if (!table.querySelector('caption') && !table.getAttribute('aria-label') && !table.getAttribute('aria-labelledby')) {
+      issues.push({
+        severity: 'minor', category: 'Tables',
+        wcag: '2.4.6 Headings and Labels (AA)',
+        title: 'Table missing caption or accessible name',
+        element: '<table>...</table>',
+        description: 'Tables should have a <caption> or aria-label to describe their purpose.',
+        fix: '<table>\n  <caption>Description of table data</caption>\n  ...\n</table>'
+      });
+    }
+  });
+
+  // 10. Semantic HTML checks
+  const divButtons = doc.querySelectorAll('div[onclick],span[onclick]');
+  divButtons.forEach(el => {
+    issues.push({
+      severity: 'major', category: 'Semantics',
+      wcag: '4.1.2 Name, Role, Value (A)',
+      title: `Interactive ${el.tagName.toLowerCase()} should be a button or link`,
+      element: el.outerHTML.substring(0, 120),
+      description: 'Use native HTML elements (<button>, <a>) for interactive elements instead of div/span with onclick.',
+      fix: `<button type="button">${el.textContent.substring(0, 50)}</button>`
+    });
+  });
+
+  // 11. Keyboard: tabindex > 0
+  doc.querySelectorAll('[tabindex]').forEach(el => {
+    const val = parseInt(el.getAttribute('tabindex'));
+    if (val > 0) {
+      issues.push({
+        severity: 'major', category: 'Keyboard',
+        wcag: '2.4.3 Focus Order (A)',
+        title: `Positive tabindex value (${val}) disrupts natural tab order`,
+        element: el.outerHTML.substring(0, 120),
+        description: 'Avoid tabindex values greater than 0. They override the natural DOM order and create confusing navigation.',
+        fix: el.outerHTML.replace(/tabindex="\d+"/, 'tabindex="0"')
+      });
+    }
+  });
+
+  // 12. Auto-playing media
+  doc.querySelectorAll('video[autoplay],audio[autoplay]').forEach(el => {
+    issues.push({
+      severity: 'critical', category: 'Media',
+      wcag: '1.4.2 Audio Control (A)',
+      title: `Auto-playing ${el.tagName.toLowerCase()} detected`,
+      element: el.outerHTML.substring(0, 120),
+      description: 'Auto-playing media can be disorienting. Provide controls to pause/stop and adjust volume.',
+      fix: el.outerHTML.replace('autoplay', '').replace('<' + el.tagName.toLowerCase(), '<' + el.tagName.toLowerCase() + ' controls')
+    });
+  });
+
+  // 13. WCAG 2.2: Target size check (inline styles)
+  doc.querySelectorAll('button,a,[role="button"],[role="link"],input[type="submit"],input[type="button"]').forEach(el => {
+    const style = el.getAttribute('style') || '';
+    const widthMatch = style.match(/width\s*:\s*(\d+)px/);
+    const heightMatch = style.match(/height\s*:\s*(\d+)px/);
+    if (widthMatch && heightMatch) {
+      const w = parseInt(widthMatch[1]);
+      const h = parseInt(heightMatch[1]);
+      if (w < 24 || h < 24) {
+        issues.push({
+          severity: 'major', category: 'Target Size',
+          wcag: '2.5.8 Target Size Minimum (AA) [WCAG 2.2]',
+          title: `Interactive element too small (${w}x${h}px, minimum 24x24px)`,
+          element: el.outerHTML.substring(0, 120),
+          description: 'WCAG 2.2 requires interactive targets to be at least 24x24 CSS pixels for adequate touch/click targets.',
+          fix: `min-width: 24px; min-height: 24px;`
+        });
+      }
+    }
+  });
+
+  // 14. WCAG 2.2: Focus not obscured - check for position:fixed/sticky
+  const stickyEls = doc.querySelectorAll('[style*="position: fixed"],[style*="position:fixed"],[style*="position: sticky"],[style*="position:sticky"]');
+  if (stickyEls.length > 0) {
+    issues.push({
+      severity: 'minor', category: 'Focus',
+      wcag: '2.4.11 Focus Not Obscured (AA) [WCAG 2.2]',
+      title: 'Fixed/sticky positioned elements may obscure focused content',
+      element: 'Elements with position: fixed/sticky',
+      description: 'WCAG 2.2 requires that focused elements are not completely hidden by sticky headers/footers. Add scroll-padding to account for fixed elements.',
+      fix: 'html { scroll-padding-top: [header-height]px; scroll-padding-bottom: [footer-height]px; }'
+    });
+  }
+
+  // 15. Missing skip navigation
+  const firstLink = doc.querySelector('a');
+  if (firstLink && !firstLink.getAttribute('href')?.startsWith('#')) {
+    const hasSkipLink = Array.from(doc.querySelectorAll('a')).some(a =>
+      a.getAttribute('href')?.startsWith('#') && /skip|main|content/i.test(a.textContent)
+    );
+    if (!hasSkipLink && doc.querySelectorAll('a').length > 3) {
+      issues.push({
+        severity: 'major', category: 'Navigation',
+        wcag: '2.4.1 Bypass Blocks (A)',
+        title: 'No skip navigation link found',
+        element: 'Document',
+        description: 'Provide a "Skip to main content" link as the first focusable element to help keyboard users bypass repeated navigation.',
+        fix: '<a href="#main-content" class="skip-link">Skip to main content</a>'
+      });
+    }
+  }
+
+  // 16. Color contrast in inline styles
+  doc.querySelectorAll('[style*="color"]').forEach(el => {
+    const style = el.getAttribute('style') || '';
+    const colorMatch = style.match(/(?:^|;)\s*color\s*:\s*(#[0-9a-fA-F]{3,8}|rgb[a]?\([^)]+\))/);
+    const bgMatch = style.match(/background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8}|rgb[a]?\([^)]+\))/);
+    if (colorMatch && bgMatch) {
+      try {
+        const fg = parseColor(colorMatch[1]);
+        const bg = parseColor(bgMatch[1]);
+        if (fg && bg) {
+          const ratio = getContrastRatio(fg, bg);
+          if (ratio < 4.5) {
+            issues.push({
+              severity: ratio < 3 ? 'critical' : 'major',
+              category: 'Color Contrast',
+              wcag: '1.4.3 Contrast Minimum (AA)',
+              title: `Insufficient color contrast ratio: ${ratio.toFixed(2)}:1`,
+              element: el.outerHTML.substring(0, 120),
+              description: `Normal text requires at least 4.5:1 contrast ratio (AA). Current ratio is ${ratio.toFixed(2)}:1.`,
+              fix: 'Adjust foreground or background color to meet 4.5:1 minimum contrast ratio.'
+            });
+          }
+        }
+      } catch(e) {}
+    }
+  });
+
+  return issues;
+}
+
+// ===== COLOR CONTRAST UTILITIES =====
+function parseColor(str) {
+  if (!str) return null;
+  str = str.trim();
+  if (str.startsWith('#')) {
+    let hex = str.slice(1);
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length === 6 || hex.length === 8) {
+      return {
+        r: parseInt(hex.substring(0,2), 16),
+        g: parseInt(hex.substring(2,4), 16),
+        b: parseInt(hex.substring(4,6), 16)
+      };
+    }
+  }
+  const rgbMatch = str.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgbMatch) {
+    return { r: parseInt(rgbMatch[1]), g: parseInt(rgbMatch[2]), b: parseInt(rgbMatch[3]) };
+  }
+  return null;
+}
+
+function sRGBtoLinear(c) {
+  c = c / 255;
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function relativeLuminance(rgb) {
+  return 0.2126 * sRGBtoLinear(rgb.r) + 0.7152 * sRGBtoLinear(rgb.g) + 0.0722 * sRGBtoLinear(rgb.b);
+}
+
+function getContrastRatio(fg, bg) {
+  const l1 = relativeLuminance(fg);
+  const l2 = relativeLuminance(bg);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// Color contrast checker UI
+function updateContrastCheck() {
+  const fgInput = $('#fgColor');
+  const bgInput = $('#bgColor');
+  if (!fgInput || !bgInput) return;
+  const fg = parseColor(fgInput.value);
+  const bg = parseColor(bgInput.value);
+  if (!fg || !bg) {
+    $('#contrastResult').innerHTML = '<p style="color:var(--text2)">Enter valid hex colors (e.g., #333333)</p>';
+    return;
+  }
+  const ratio = getContrastRatio(fg, bg);
+  const aaSmall = ratio >= 4.5;
+  const aaLarge = ratio >= 3;
+  const aaaSmall = ratio >= 7;
+  const aaaLarge = ratio >= 4.5;
+
+  const pass = '<span style="color:var(--green)">&#10003; Pass</span>';
+  const fail = '<span style="color:var(--red)">&#10007; Fail</span>';
+
+  $('#contrastResult').innerHTML = `
+    <div style="display:flex;gap:20px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <div style="background:${bgInput.value};color:${fgInput.value};padding:16px 24px;border-radius:8px;font-size:1.1rem;font-weight:600;border:1px solid var(--border)">
+        Sample Text Aa
+      </div>
+      <div>
+        <div style="font-size:2rem;font-weight:800">${ratio.toFixed(2)}:1</div>
+        <div style="color:var(--text2);font-size:.85rem">Contrast Ratio</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 0">AA Normal Text (4.5:1)</td><td style="text-align:right;padding:8px 0">${aaSmall ? pass : fail}</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 0">AA Large Text (3:1)</td><td style="text-align:right;padding:8px 0">${aaLarge ? pass : fail}</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 0">AAA Normal Text (7:1)</td><td style="text-align:right;padding:8px 0">${aaaSmall ? pass : fail}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0">AAA Large Text (4.5:1)</td><td style="text-align:right;padding:8px 0">${aaaLarge ? pass : fail}</td>
+      </tr>
+    </table>
+  `;
+
+  // Update color pickers
+  try {
+    $('#fgPicker').value = fgInput.value.length === 7 ? fgInput.value : '#000000';
+    $('#bgPicker').value = bgInput.value.length === 7 ? bgInput.value : '#ffffff';
+  } catch(e) {}
+}
+
+// Sync color pickers
+function syncPicker(pickerId, inputId) {
+  const picker = $(pickerId);
+  const input = $(inputId);
+  if (picker && input) {
+    picker.addEventListener('input', () => { input.value = picker.value; updateContrastCheck(); });
+    input.addEventListener('input', updateContrastCheck);
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  syncPicker('#fgPicker', '#fgColor');
+  syncPicker('#bgPicker', '#bgColor');
+});
+
+
+// ===== DEEPSEEK AI ANALYSIS =====
+async function runAIAnalysis(html) {
+  if (!apiKey) {
+    toast('Please set your DeepSeek API key first', 'error');
+    return [];
+  }
+
+  const prompt = `You are an expert web accessibility auditor. Analyze the following HTML code for accessibility issues based on WCAG 2.2 (2025-2026 standards).
+
+Check for ALL of these categories:
+1. WCAG 2.2 NEW criteria: Focus Not Obscured (2.4.11/2.4.12), Focus Appearance (2.4.13), Dragging Movements (2.5.7), Target Size Minimum (2.5.8), Consistent Help (3.2.6), Redundant Entry (3.3.7), Accessible Authentication (3.3.8/3.3.9)
+2. Images: alt text quality, decorative vs informative
+3. ARIA: correct usage, roles, states, properties, ARIA landmarks
+4. Keyboard Navigation: focus management, tab order, keyboard traps
+5. Forms: labels, error handling, required fields, autocomplete
+6. Semantic HTML: proper use of landmarks, sections, nav, main, article
+7. Color & Contrast: potential contrast issues in inline styles
+8. Links: descriptive text, distinguishable from surrounding text
+9. Tables: headers, captions, scope attributes
+10. Media: captions, audio descriptions
+11. Dynamic Content: live regions, status messages
+
+For each issue found, return a JSON array of objects with these exact fields:
+- severity: "critical" | "major" | "minor"
+- category: string (e.g., "Images", "ARIA", "Forms", "Keyboard", "Semantic HTML", "WCAG 2.2")
+- wcag: string (the WCAG criterion, e.g., "2.4.11 Focus Not Obscured (AA)")
+- title: string (brief description)
+- element: string (the problematic HTML snippet, max 120 chars)
+- description: string (detailed explanation)
+- fix: string (suggested fix code or description)
+
+Also suggest alt text for any images found (provide descriptive suggestions based on context).
+
+Return ONLY valid JSON array. No markdown, no explanation outside the JSON.
+
+HTML to analyze:
+\`\`\`html
+${html.substring(0, 12000)}
+\`\`\``;
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: 'You are an expert web accessibility auditor. Return only valid JSON arrays.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`API error ${resp.status}: ${err}`);
+    }
+
+    const data = await resp.json();
+    let content = data.choices?.[0]?.message?.content || '[]';
+    // Clean markdown fences if present
+    content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    const aiIssues = JSON.parse(content);
+    return Array.isArray(aiIssues) ? aiIssues : [];
+  } catch (e) {
+    console.error('AI analysis error:', e);
+    toast('AI analysis failed: ' + e.message, 'error');
+    return [];
+  }
+}
+
+// ===== SCORE CALCULATION =====
+function calculateScore(issues) {
+  if (issues.length === 0) return 100;
+  let deductions = 0;
+  issues.forEach(issue => {
+    switch (issue.severity) {
+      case 'critical': deductions += 15; break;
+      case 'major': deductions += 8; break;
+      case 'minor': deductions += 3; break;
+    }
+  });
+  return Math.max(0, Math.min(100, 100 - deductions));
+}
+
+function getScoreColor(score) {
+  if (score >= 90) return 'var(--green)';
+  if (score >= 70) return 'var(--yellow)';
+  return 'var(--red)';
+}
+
+function getScoreLabel(score) {
+  if (score >= 90) return 'Excellent';
+  if (score >= 80) return 'Good';
+  if (score >= 70) return 'Needs Improvement';
+  if (score >= 50) return 'Poor';
+  return 'Critical Issues';
+}
+
+// ===== RENDER RESULTS =====
+function renderResults(issues, score) {
+  lastResults = { issues, score };
+  const critical = issues.filter(i => i.severity === 'critical').length;
+  const major = issues.filter(i => i.severity === 'major').length;
+  const minor = issues.filter(i => i.severity === 'minor').length;
+
+  // Score ring
+  const circumference = 2 * Math.PI * 58;
+  const offset = circumference - (score / 100) * circumference;
+  const color = getScoreColor(score);
+
+  let html = `
+    <div class="score-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="58"/>
+        <circle class="fg" cx="70" cy="70" r="58"
+          stroke="${color}"
+          stroke-dasharray="${circumference}"
+          stroke-dashoffset="${offset}"/>
+      </svg>
+      <div class="score-value" style="color:${color}">
+        ${score}<small>/ 100</small>
+      </div>
+    </div>
+    <div class="score-label" style="color:${color}">${getScoreLabel(score)}</div>
+    <div class="stats">
+      <div class="stat critical"><div class="num">${critical}</div><div class="label">Critical</div></div>
+      <div class="stat major"><div class="num">${major}</div><div class="label">Major</div></div>
+      <div class="stat minor"><div class="num">${minor}</div><div class="label">Minor</div></div>
+    </div>
+    <div class="btn-group" style="margin-bottom:20px">
+      <button class="btn btn-secondary btn-sm" onclick="exportMarkdown()">&#128196; Export Markdown</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportPDF()">&#128462; Export PDF</button>
+    </div>
+  `;
+
+  // Filter buttons
+  html += `<div class="btn-group" style="margin-bottom:16px">
+    <button class="btn btn-sm filter-btn active" onclick="filterIssues('all',this)">All (${issues.length})</button>
+    <button class="btn btn-sm filter-btn" onclick="filterIssues('critical',this)" style="color:var(--red)">Critical (${critical})</button>
+    <button class="btn btn-sm filter-btn" onclick="filterIssues('major',this)" style="color:var(--yellow)">Major (${major})</button>
+    <button class="btn btn-sm filter-btn" onclick="filterIssues('minor',this)" style="color:var(--blue)">Minor (${minor})</button>
+  </div>`;
+
+  // Issues list
+  const sorted = [...issues].sort((a, b) => {
+    const order = { critical: 0, major: 1, minor: 2 };
+    return (order[a.severity] || 2) - (order[b.severity] || 2);
+  });
+
+  sorted.forEach((issue, idx) => {
+    html += `
+    <div class="issue ${issue.severity}" data-severity="${issue.severity}">
+      <div class="issue-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="issue-badge">${issue.severity}</span>
+        <span class="issue-title">${escapeHtml(issue.title)}</span>
+        <span class="issue-toggle">&#9660;</span>
+      </div>
+      <div class="issue-body">
+        <p><span class="wcag-ref">WCAG ${escapeHtml(issue.wcag)}</span></p>
+        <p style="margin-top:8px">${escapeHtml(issue.description)}</p>
+        ${issue.element ? `<p style="margin-top:8px"><strong style="color:var(--text)">Element:</strong></p><pre><code>${escapeHtml(issue.element)}</code></pre>` : ''}
+        ${issue.fix ? `<p><strong style="color:var(--green)">&#9989; Suggested Fix:</strong></p><pre><code>${escapeHtml(issue.fix)}</code></pre>` : ''}
+      </div>
+    </div>`;
+  });
+
+  if (issues.length === 0) {
+    html += '<div style="text-align:center;padding:40px;color:var(--green)"><div style="font-size:3rem;margin-bottom:12px">&#9989;</div><p style="font-size:1.1rem;font-weight:600">No accessibility issues found!</p><p style="color:var(--text2);margin-top:8px">Your HTML looks accessible. Consider manual testing with screen readers for complete coverage.</p></div>';
+  }
+
+  $('#results').innerHTML = html;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function filterIssues(severity, btn) {
+  $$('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  $$('.issue').forEach(el => {
+    el.style.display = (severity === 'all' || el.dataset.severity === severity) ? '' : 'none';
+  });
+}
+
+// ===== MAIN RUN =====
+async function runCheck() {
+  const html = $('#htmlInput').value.trim();
+  if (!html) { toast('Please paste some HTML code first', 'error'); return; }
+
+  const btn = $('#runBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+  $('#results').innerHTML = '<div style="text-align:center;padding:60px;color:var(--text2)"><div class="spinner" style="margin:0 auto 16px"></div><p>Running accessibility checks...</p><p style="font-size:.8rem;margin-top:8px">Local checks + AI analysis via DeepSeek</p></div>';
+
+  try {
+    // Run local checks
+    const localIssues = runLocalChecks(html);
+
+    // Run AI analysis in parallel
+    let aiIssues = [];
+    if (apiKey) {
+      aiIssues = await runAIAnalysis(html);
+    }
+
+    // Merge and deduplicate
+    const allIssues = deduplicateIssues([...localIssues, ...aiIssues]);
+    const score = calculateScore(allIssues);
+    renderResults(allIssues, score);
+    toast(`Found ${allIssues.length} issues. Score: ${score}/100`, allIssues.length === 0 ? 'success' : 'info');
+  } catch (e) {
+    console.error(e);
+    toast('Analysis failed: ' + e.message, 'error');
+    $('#results').innerHTML = `<div style="text-align:center;padding:40px;color:var(--red)">Analysis failed: ${escapeHtml(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#9889; Run Accessibility Check';
+  }
+}
+
+function deduplicateIssues(issues) {
+  const seen = new Set();
+  return issues.filter(issue => {
+    const key = `${issue.severity}:${issue.title}:${(issue.element||'').substring(0,50)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// ===== EXPORT =====
+function exportMarkdown() {
+  if (!lastResults) { toast('Run a check first', 'error'); return; }
+  const { issues, score } = lastResults;
+  let md = `# A11y Inspector - Accessibility Report\n\n`;
+  md += `**Date:** ${new Date().toISOString().split('T')[0]}\n`;
+  md += `**Score:** ${score}/100 (${getScoreLabel(score)})\n\n`;
+  md += `## Summary\n\n`;
+  md += `| Severity | Count |\n|----------|-------|\n`;
+  md += `| Critical | ${issues.filter(i=>i.severity==='critical').length} |\n`;
+  md += `| Major | ${issues.filter(i=>i.severity==='major').length} |\n`;
+  md += `| Minor | ${issues.filter(i=>i.severity==='minor').length} |\n`;
+  md += `| **Total** | **${issues.length}** |\n\n`;
+  md += `## Issues\n\n`;
+  issues.forEach((issue, i) => {
+    md += `### ${i+1}. [${issue.severity.toUpperCase()}] ${issue.title}\n\n`;
+    md += `- **WCAG:** ${issue.wcag}\n`;
+    md += `- **Category:** ${issue.category}\n`;
+    if (issue.element) md += `- **Element:** \`${issue.element}\`\n`;
+    md += `- **Description:** ${issue.description}\n`;
+    if (issue.fix) md += `- **Fix:** \`\`\`\n${issue.fix}\n\`\`\`\n`;
+    md += `\n`;
+  });
+  md += `\n---\n*Generated by A11y Inspector | WCAG 2.2 (2025-2026)*\n`;
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `a11y-report-${Date.now()}.md`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('Markdown report downloaded!', 'success');
+}
+
+function exportPDF() {
+  if (!lastResults) { toast('Run a check first', 'error'); return; }
+  const { issues, score } = lastResults;
+
+  const styles = `
+    body{font-family:Helvetica,Arial,sans-serif;padding:40px;color:#1a1a2e;line-height:1.6;max-width:800px;margin:0 auto}
+    h1{color:#6c5ce7;border-bottom:3px solid #6c5ce7;padding-bottom:12px;margin-bottom:24px}
+    h2{color:#2d3436;margin-top:32px;margin-bottom:16px}
+    .score{font-size:48px;font-weight:800;text-align:center;margin:24px 0}
+    .score.good{color:#00b894}.score.ok{color:#fdcb6e}.score.bad{color:#e17055}
+    table{width:100%;border-collapse:collapse;margin:16px 0}
+    th,td{border:1px solid #ddd;padding:10px;text-align:left}
+    th{background:#f8f9fa}
+    .issue{margin:16px 0;padding:16px;border-left:4px solid #ddd;background:#f8f9fa;border-radius:0 8px 8px 0}
+    .issue.critical{border-left-color:#e17055}.issue.major{border-left-color:#fdcb6e}.issue.minor{border-left-color:#74b9ff}
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;text-transform:uppercase;color:#fff}
+    .badge.critical{background:#e17055}.badge.major{background:#fdcb6e;color:#333}.badge.minor{background:#74b9ff}
+    code{background:#e9ecef;padding:2px 6px;border-radius:4px;font-size:13px}
+    pre{background:#2d3436;color:#dfe6e9;padding:12px;border-radius:8px;overflow-x:auto;font-size:13px}
+    .meta{color:#636e72;font-size:14px}
+  `;
+
+  let body = `<h1>&#9855; A11y Inspector Report</h1>`;
+  body += `<p class="meta">Generated: ${new Date().toLocaleString()} | Standard: WCAG 2.2 AA/AAA</p>`;
+  const sc = score >= 90 ? 'good' : score >= 70 ? 'ok' : 'bad';
+  body += `<div class="score ${sc}">${score}/100</div>`;
+  body += `<p style="text-align:center;font-weight:600;color:${score>=90?'#00b894':score>=70?'#fdcb6e':'#e17055'}">${getScoreLabel(score)}</p>`;
+
+  body += `<h2>Summary</h2><table><tr><th>Severity</th><th>Count</th></tr>`;
+  body += `<tr><td>Critical</td><td>${issues.filter(i=>i.severity==='critical').length}</td></tr>`;
+  body += `<tr><td>Major</td><td>${issues.filter(i=>i.severity==='major').length}</td></tr>`;
+  body += `<tr><td>Minor</td><td>${issues.filter(i=>i.severity==='minor').length}</td></tr>`;
+  body += `<tr><th>Total</th><th>${issues.length}</th></tr></table>`;
+
+  body += `<h2>Issues</h2>`;
+  issues.forEach((issue, i) => {
+    body += `<div class="issue ${issue.severity}">`;
+    body += `<span class="badge ${issue.severity}">${issue.severity}</span> `;
+    body += `<strong>${escapeHtml(issue.title)}</strong><br>`;
+    body += `<small style="color:#636e72">WCAG ${escapeHtml(issue.wcag)} | ${escapeHtml(issue.category)}</small>`;
+    body += `<p>${escapeHtml(issue.description)}</p>`;
+    if (issue.element) body += `<p><strong>Element:</strong> <code>${escapeHtml(issue.element)}</code></p>`;
+    if (issue.fix) body += `<p><strong>Fix:</strong></p><pre>${escapeHtml(issue.fix)}</pre>`;
+    body += `</div>`;
+  });
+
+  body += `<hr><p class="meta" style="text-align:center">A11y Inspector &mdash; AI-Powered Accessibility Checker &bull; WCAG 2.2 (2025-2026)</p>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>A11y Report</title><style>${styles}</style></head><body>${body}<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>`);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 500);
+  toast('PDF report opened for printing', 'success');
+}
+
+// ===== SAMPLE HTML =====
+function loadSample() {
+  $('#htmlInput').value = `<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <div onclick="navigate()">Click here</div>
+  <img src="hero.jpg">
+  <img src="decoration.png" alt="">
+  <h1>Welcome</h1>
+  <h3>About Us</h3>
+  <form>
+    <input type="text" placeholder="Name">
+    <input type="email">
+    <select>
+      <option>Choose...</option>
+    </select>
+    <div style="color: #999; background: #fff;">Light gray text</div>
+    <button></button>
+    <a href="/page">click here</a>
+    <a href="/other"></a>
+    <div role="button">Fake button</div>
+    <marquee>Breaking news!</marquee>
+    <table>
+      <tr><td>Name</td><td>Age</td></tr>
+      <tr><td>Alice</td><td>30</td></tr>
+    </table>
+    <div tabindex="5">Custom tab order</div>
+    <video src="video.mp4"></video>
+    <iframe src="widget.html"></iframe>
+  </form>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>`;
+  toast('Sample HTML loaded - click Run to analyze', 'info');
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  if (apiKey) {
+    const el = $('#apiKeyInput');
+    if (el) el.value = apiKey;
+  }
+  // Initial contrast check
+  updateContrastCheck();
+});
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

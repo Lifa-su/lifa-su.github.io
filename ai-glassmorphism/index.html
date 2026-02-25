@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Glassmorphism Generator - CSS Glass Effect Tool</title>
+<meta name="description" content="Design beautiful glassmorphism effects with real-time preview. Customize blur, opacity, borders, and backgrounds. Free CSS glass generator.">
+<meta name="keywords" content="glassmorphism generator, glass effect CSS, frosted glass, backdrop filter, CSS generator, glassmorphism CSS, UI design tool">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-glassmorphism/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Glassmorphism Generator - CSS Glass Effect Tool">
+<meta property="og:description" content="Design beautiful glassmorphism effects with real-time preview. Customize blur, opacity, borders, and backgrounds.">
+<meta property="og:url" content="https://lifa-su.com/ai-glassmorphism/">
+<meta property="og:site_name" content="FeiDev Tools">
+<meta property="og:image" content="https://lifa-su.com/ai-glassmorphism/og-image.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Glassmorphism Generator - CSS Glass Effect Tool">
+<meta name="twitter:description" content="Design beautiful glassmorphism effects with real-time preview. Customize blur, opacity, borders, and backgrounds.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-glassmorphism/og-image.png">
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"AI Glassmorphism Generator","url":"https://lifa-su.com/ai-glassmorphism/","description":"Design beautiful glassmorphism effects with real-time preview. Customize blur, opacity, borders, and backgrounds.","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"FeiDev Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","ratingCount":"1120"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg-primary:#0a0a1a;--bg-secondary:#12122a;--bg-card:#1a1a3e;
+--text-primary:#e8e8ff;--text-secondary:#a0a0cc;--text-muted:#6a6a99;
+--accent:#7c5cff;--accent-hover:#9b7fff;--accent-glow:rgba(124,92,255,0.3);
+--border-color:rgba(255,255,255,0.08);--success:#4ade80;--radius:12px;
+}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.header{padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-color);background:rgba(10,10,26,0.8);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px;font-size:1.4rem;font-weight:700}
+.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ff6bca);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.header-links{display:flex;gap:16px;align-items:center}
+.header-links a{color:var(--text-secondary);font-size:0.9rem;transition:color 0.2s}
+.header-links a:hover{color:var(--text-primary)}
+.gh-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border-color);color:var(--text-primary);font-size:0.85rem;transition:all 0.2s;cursor:pointer}
+.gh-btn:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15)}
+
+/* Layout */
+.app{display:flex;height:calc(100vh - 73px)}
+.preview-section{flex:1;padding:32px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.controls-section{width:380px;border-left:1px solid var(--border-color);background:var(--bg-secondary);overflow-y:auto;padding:24px}
+
+/* Preview */
+.preview-container{flex:1;border-radius:var(--radius);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;background:#1a1a2e;border:1px solid var(--border-color)}
+.preview-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:background 0.5s}
+.preview-bg.solid{background-size:initial}
+.glass-card{position:relative;width:340px;padding:40px;border-radius:16px;transition:all 0.15s ease;cursor:move;z-index:2}
+.glass-card h2{font-size:1.5rem;margin-bottom:12px;font-weight:600}
+.glass-card p{font-size:0.95rem;line-height:1.6;opacity:0.85;margin-bottom:16px}
+.glass-card .demo-btn{display:inline-block;padding:10px 24px;border-radius:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.9rem;cursor:default;backdrop-filter:blur(4px)}
+.glass-card .demo-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ff6bca);margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+
+/* Controls */
+.section-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:12px;margin-top:24px}
+.section-title:first-child{margin-top:0}
+.control-group{margin-bottom:16px}
+.control-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:0.85rem;color:var(--text-secondary)}
+.control-value{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,0.08);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 10px var(--accent-glow)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
+
+/* Presets */
+.presets-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preset-btn{padding:10px 12px;border-radius:8px;border:1px solid var(--border-color);background:rgba(255,255,255,0.03);color:var(--text-secondary);font-size:0.8rem;cursor:pointer;transition:all 0.2s;text-align:center}
+.preset-btn:hover{border-color:var(--accent);color:var(--text-primary);background:rgba(124,92,255,0.08)}
+.preset-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(124,92,255,0.12)}
+
+/* Background options */
+.bg-options{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bg-option{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid transparent;cursor:pointer;transition:all 0.2s;background-size:cover;background-position:center;overflow:hidden}
+.bg-option:hover{border-color:rgba(255,255,255,0.3);transform:scale(1.05)}
+.bg-option.active{border-color:var(--accent);box-shadow:0 0 12px var(--accent-glow)}
+.bg-option.solid-opt{display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--text-muted)}
+
+/* Color picker row */
+.color-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.color-row input[type=color]{-webkit-appearance:none;width:36px;height:36px;border:2px solid var(--border-color);border-radius:8px;cursor:pointer;background:transparent;padding:2px}
+.color-row input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.color-row input[type=color]::-webkit-color-swatch{border:none;border-radius:5px}
+.color-row label{font-size:0.8rem;color:var(--text-secondary)}
+
+/* Code output */
+.code-output{margin-top:24px;border-top:1px solid var(--border-color);padding-top:24px}
+.code-block{background:rgba(0,0,0,0.4);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.78rem;line-height:1.7;color:#c8c8ff;overflow-x:auto;white-space:pre;max-height:260px;overflow-y:auto}
+.copy-btn{width:100%;margin-top:10px;padding:12px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.copy-btn:hover{background:var(--accent-hover);box-shadow:0 4px 20px var(--accent-glow)}
+.copy-btn.copied{background:var(--success)}
+
+/* Scrollbar */
+.controls-section::-webkit-scrollbar{width:4px}
+.controls-section::-webkit-scrollbar-track{background:transparent}
+.controls-section::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+/* Responsive */
+@media(max-width:900px){
+.app{flex-direction:column;height:auto}
+.preview-section{min-height:50vh}
+.controls-section{width:100%;border-left:none;border-top:1px solid var(--border-color)}
+}
+@media(max-width:600px){
+.header{padding:16px 20px;flex-wrap:wrap;gap:12px}
+.preview-section{padding:16px;min-height:40vh}
+.controls-section{padding:20px}
+.glass-card{width:260px;padding:28px}
+.bg-options{grid-template-columns:repeat(4,1fr)}
+}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.controls-section .section-title,.controls-section .control-group,.controls-section .presets-grid,.controls-section .bg-options{animation:fadeIn 0.4s ease both}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">◈</div>
+    <span>AI Glassmorphism</span>
+  </div>
+  <div class="header-links">
+    <a href="https://github.com/Lifa-su/ai-glassmorphism" class="gh-btn" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<div class="app">
+  <div class="preview-section">
+    <div class="preview-container">
+      <div class="preview-bg" id="previewBg"></div>
+      <div class="glass-card" id="glassCard">
+        <div class="demo-avatar">✦</div>
+        <h2>Glass Effect</h2>
+        <p>This is a preview of your glassmorphism effect. Adjust the controls to customize.</p>
+        <div class="demo-btn">Explore More</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-section">
+    <div class="section-title">Presets</div>
+    <div class="presets-grid" id="presetsGrid"></div>
+
+    <div class="section-title">Background</div>
+    <div class="bg-options" id="bgOptions"></div>
+    <div class="color-row">
+      <input type="color" id="customBgColor" value="#1a1a2e">
+      <label for="customBgColor">Custom solid color</label>
+    </div>
+
+    <div class="section-title">Glass Properties</div>
+
+    <div class="control-group">
+      <div class="control-label"><span>Blur</span><span class="control-value" id="blurVal">12px</span></div>
+      <input type="range" id="blur" min="0" max="40" value="12">
+    </div>
+    <div class="control-group">
+      <div class="control-label"><span>Opacity</span><span class="control-value" id="opacityVal">0.15</span></div>
+      <input type="range" id="opacity" min="0" max="100" value="15">
+    </div>
+    <div class="control-group">
+      <div class="control-label"><span>Saturation</span><span class="control-value" id="saturationVal">180%</span></div>
+      <input type="range" id="saturation" min="100" max="300" value="180">
+    </div>
+
+    <div class="section-title">Glass Color</div>
+    <div class="color-row" style="margin-top:0">
+      <input type="color" id="glassColor" value="#ffffff">
+      <label for="glassColor">Glass tint color</label>
+    </div>
+
+    <div class="section-title">Border</div>
+    <div class="control-group">
+      <div class="control-label"><span>Border Width</span><span class="control-value" id="borderWidthVal">1px</span></div>
+      <input type="range" id="borderWidth" min="0" max="4" value="1" step="0.5">
+    </div>
+    <div class="control-group">
+      <div class="control-label"><span>Border Opacity</span><span class="control-value" id="borderOpacityVal">0.18</span></div>
+      <input type="range" id="borderOpacity" min="0" max="100" value="18">
+    </div>
+    <div class="control-group">
+      <div class="control-label"><span>Border Radius</span><span class="control-value" id="borderRadiusVal">16px</span></div>
+      <input type="range" id="borderRadius" min="0" max="40" value="16">
+    </div>
+
+    <div class="section-title">Shadow</div>
+    <div class="control-group">
+      <div class="control-label"><span>Shadow Blur</span><span class="control-value" id="shadowBlurVal">32px</span></div>
+      <input type="range" id="shadowBlur" min="0" max="80" value="32">
+    </div>
+    <div class="control-group">
+      <div class="control-label"><span>Shadow Opacity</span><span class="control-value" id="shadowOpacityVal">0.20</span></div>
+      <input type="range" id="shadowOpacity" min="0" max="60" value="20">
+    </div>
+
+    <div class="code-output">
+      <div class="section-title">Generated CSS</div>
+      <div class="code-block" id="codeBlock"></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyCSS()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy CSS
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Preset backgrounds
+const backgrounds = [
+  { type:'image', url:'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&q=80', label:'Gradient' },
+  { type:'image', url:'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&q=80', label:'Space' },
+  { type:'image', url:'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=1200&q=80', label:'Mountains' },
+  { type:'image', url:'https://images.unsplash.com/photo-1557683316-973673baf926?w=1200&q=80', label:'Abstract' },
+  { type:'solid', color:'linear-gradient(135deg,#0f0c29,#302b63,#24243e)', label:'Indigo' },
+  { type:'solid', color:'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)', label:'Navy' },
+  { type:'solid', color:'linear-gradient(135deg,#2d1b69,#11998e)', label:'Teal' },
+  { type:'solid', color:'linear-gradient(135deg,#0c0c0c,#1a1a1a,#2d2d2d)', label:'Dark' },
+];
+
+// Glass presets
+const presets = [
+  { name:'Frosted', blur:16, opacity:12, saturation:180, glassColor:'#ffffff', borderWidth:1, borderOpacity:20, borderRadius:16, shadowBlur:32, shadowOpacity:20 },
+  { name:'Clear', blur:8, opacity:6, saturation:120, glassColor:'#ffffff', borderWidth:1, borderOpacity:30, borderRadius:16, shadowBlur:20, shadowOpacity:10 },
+  { name:'Tinted', blur:20, opacity:20, saturation:200, glassColor:'#7c5cff', borderWidth:1, borderOpacity:25, borderRadius:16, shadowBlur:40, shadowOpacity:25 },
+  { name:'Dark Glass', blur:14, opacity:35, saturation:150, glassColor:'#000000', borderWidth:1, borderOpacity:12, borderRadius:16, shadowBlur:40, shadowOpacity:30 },
+  { name:'Soft Glow', blur:24, opacity:10, saturation:220, glassColor:'#ff6bca', borderWidth:0.5, borderOpacity:15, borderRadius:20, shadowBlur:50, shadowOpacity:15 },
+  { name:'Crystal', blur:4, opacity:5, saturation:140, glassColor:'#ffffff', borderWidth:1.5, borderOpacity:35, borderRadius:12, shadowBlur:16, shadowOpacity:8 },
+  { name:'Smoke', blur:30, opacity:18, saturation:100, glassColor:'#333333', borderWidth:0, borderOpacity:0, borderRadius:20, shadowBlur:60, shadowOpacity:25 },
+  { name:'Aurora', blur:18, opacity:15, saturation:250, glassColor:'#00ffa3', borderWidth:1, borderOpacity:22, borderRadius:16, shadowBlur:36, shadowOpacity:18 },
+];
+
+let activePreset = 0;
+let activeBg = 0;
+
+// DOM refs
+const card = document.getElementById('glassCard');
+const previewBg = document.getElementById('previewBg');
+const codeBlock = document.getElementById('codeBlock');
+const presetsGrid = document.getElementById('presetsGrid');
+const bgOptionsEl = document.getElementById('bgOptions');
+
+// Slider IDs
+const sliders = ['blur','opacity','saturation','borderWidth','borderOpacity','borderRadius','shadowBlur','shadowOpacity'];
+
+// Init presets
+presets.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn' + (i === 0 ? ' active' : '');
+  btn.textContent = p.name;
+  btn.onclick = () => applyPreset(i);
+  presetsGrid.appendChild(btn);
+});
+
+// Init backgrounds
+backgrounds.forEach((bg, i) => {
+  const div = document.createElement('div');
+  div.className = 'bg-option' + (i === 0 ? ' active' : '');
+  if (bg.type === 'image') {
+    div.style.backgroundImage = `url(${bg.url})`;
+  } else {
+    div.style.background = bg.color;
+    div.classList.add('solid-opt');
+  }
+  div.title = bg.label;
+  div.onclick = () => setBg(i);
+  bgOptionsEl.appendChild(div);
+});
+
+// Custom bg color
+document.getElementById('customBgColor').addEventListener('input', (e) => {
+  document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
+  previewBg.style.backgroundImage = 'none';
+  previewBg.style.background = e.target.value;
+  previewBg.classList.add('solid');
+  activeBg = -1;
+});
+
+// Glass color
+document.getElementById('glassColor').addEventListener('input', () => updateGlass());
+
+function setBg(i) {
+  activeBg = i;
+  document.querySelectorAll('.bg-option').forEach(o => o.classList.remove('active'));
+  bgOptionsEl.children[i].classList.add('active');
+  const bg = backgrounds[i];
+  if (bg.type === 'image') {
+    previewBg.style.background = 'none';
+    previewBg.style.backgroundImage = `url(${bg.url})`;
+    previewBg.style.backgroundSize = 'cover';
+    previewBg.style.backgroundPosition = 'center';
+    previewBg.classList.remove('solid');
+  } else {
+    previewBg.style.backgroundImage = 'none';
+    previewBg.style.background = bg.color;
+    previewBg.classList.add('solid');
+  }
+}
+
+function applyPreset(i) {
+  activePreset = i;
+  const p = presets[i];
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  presetsGrid.children[i].classList.add('active');
+
+  document.getElementById('blur').value = p.blur;
+  document.getElementById('opacity').value = p.opacity;
+  document.getElementById('saturation').value = p.saturation;
+  document.getElementById('glassColor').value = p.glassColor;
+  document.getElementById('borderWidth').value = p.borderWidth;
+  document.getElementById('borderOpacity').value = p.borderOpacity;
+  document.getElementById('borderRadius').value = p.borderRadius;
+  document.getElementById('shadowBlur').value = p.shadowBlur;
+  document.getElementById('shadowOpacity').value = p.shadowOpacity;
+
+  updateGlass();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+
+function getValues() {
+  return {
+    blur: +document.getElementById('blur').value,
+    opacity: +document.getElementById('opacity').value / 100,
+    saturation: +document.getElementById('saturation').value,
+    glassColor: document.getElementById('glassColor').value,
+    borderWidth: +document.getElementById('borderWidth').value,
+    borderOpacity: +document.getElementById('borderOpacity').value / 100,
+    borderRadius: +document.getElementById('borderRadius').value,
+    shadowBlur: +document.getElementById('shadowBlur').value,
+    shadowOpacity: +document.getElementById('shadowOpacity').value / 100,
+  };
+}
+
+function updateGlass() {
+  const v = getValues();
+  const rgb = hexToRgb(v.glassColor);
+
+  // Update display values
+  document.getElementById('blurVal').textContent = v.blur + 'px';
+  document.getElementById('opacityVal').textContent = v.opacity.toFixed(2);
+  document.getElementById('saturationVal').textContent = v.saturation + '%';
+  document.getElementById('borderWidthVal').textContent = v.borderWidth + 'px';
+  document.getElementById('borderOpacityVal').textContent = v.borderOpacity.toFixed(2);
+  document.getElementById('borderRadiusVal').textContent = v.borderRadius + 'px';
+  document.getElementById('shadowBlurVal').textContent = v.shadowBlur + 'px';
+  document.getElementById('shadowOpacityVal').textContent = v.shadowOpacity.toFixed(2);
+
+  // Apply to card
+  card.style.background = `rgba(${rgb.r},${rgb.g},${rgb.b},${v.opacity})`;
+  card.style.backdropFilter = `blur(${v.blur}px) saturate(${v.saturation}%)`;
+  card.style.webkitBackdropFilter = `blur(${v.blur}px) saturate(${v.saturation}%)`;
+  card.style.border = `${v.borderWidth}px solid rgba(255,255,255,${v.borderOpacity})`;
+  card.style.borderRadius = v.borderRadius + 'px';
+  card.style.boxShadow = `0 8px ${v.shadowBlur}px rgba(0,0,0,${v.shadowOpacity})`;
+
+  // Generate CSS code
+  const css = `.glass {
+  background: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${v.opacity});
+  backdrop-filter: blur(${v.blur}px) saturate(${v.saturation}%);
+  -webkit-backdrop-filter: blur(${v.blur}px) saturate(${v.saturation}%);
+  border-radius: ${v.borderRadius}px;
+  border: ${v.borderWidth}px solid rgba(255, 255, 255, ${v.borderOpacity});
+  box-shadow: 0 8px ${v.shadowBlur}px rgba(0, 0, 0, ${v.shadowOpacity});
+}`;
+  codeBlock.textContent = css;
+}
+
+function copyCSS() {
+  const btn = document.getElementById('copyBtn');
+  navigator.clipboard.writeText(codeBlock.textContent).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy CSS';
+    }, 2000);
+  });
+}
+
+// Attach slider events
+sliders.forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    updateGlass();
+  });
+});
+
+// Init
+setBg(0);
+applyPreset(0);
+</script>
+<footer style="text-align:center;padding:24px 20px 16px;color:var(--text-muted);font-size:.8rem">
+<p>AI Glassmorphism Generator &mdash; Free Online Tool</p>
+<p style="margin-top:6px"><a href="https://lifa-su.com/" style="color:var(--accent);text-decoration:none">← Back to FeiDev Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Support on Ko-fi</a></p>
+</footer>
+<!-- Pro Features -->
+<style>
+.pro-teaser{position:relative;margin:20px 0 0;padding:0;border-radius:12px;cursor:pointer;overflow:hidden;border:1px dashed rgba(108,92,231,0.3);transition:all .3s}
+.pro-teaser:hover{border-color:rgba(108,92,231,0.6);box-shadow:0 0 24px rgba(108,92,231,0.12)}
+.pro-teaser-content{padding:16px;filter:blur(3px);opacity:0.5;pointer-events:none;user-select:none}
+.pro-teaser-content .pm-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:#7c5cff;margin-bottom:10px;font-weight:600}
+.pro-teaser-content .pm-row{display:flex;gap:8px;margin-bottom:8px}
+.pro-teaser-content .pm-block{flex:1;height:28px;background:rgba(124,92,255,0.1);border-radius:6px}
+.pro-teaser-content .pm-line{height:10px;background:rgba(124,92,255,0.07);border-radius:4px;margin-bottom:6px}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,26,0.35);z-index:2}
+.pro-lock .pl-icon{font-size:1.6rem;margin-bottom:4px}
+.pro-lock .pl-badge{font-size:.65rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#7c5cff,#a29bfe);padding:3px 12px;border-radius:20px;letter-spacing:1.5px}
+.pro-lock .pl-hint{font-size:.68rem;color:#8888aa;margin-top:6px}
+.pro-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center}
+.pro-overlay.show{display:flex}
+.pro-card{background:linear-gradient(160deg,#1e1e38,#14142a);border:1px solid rgba(124,92,255,0.25);border-radius:20px;padding:36px 30px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.pro-card h2{font-size:1.45rem;margin-bottom:4px;background:linear-gradient(135deg,#7c5cff,#a29bfe,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-card .pc-sub{color:#8888aa;font-size:.85rem;margin-bottom:16px}
+.pro-card .pc-price{font-size:2.5rem;font-weight:800;color:#7c5cff;margin:8px 0 2px}
+.pro-card .pc-note{font-size:.76rem;color:#666;margin-bottom:20px}
+.pro-card ul{text-align:left;list-style:none;margin:0 0 24px;padding:0}
+.pro-card ul li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.87rem;color:#c0c0e0;display:flex;align-items:center;gap:10px}
+.pro-card ul li::before{content:'✓';color:#51cf66;font-weight:700;flex-shrink:0}
+.pro-card ul li:last-child{border-bottom:none}
+.pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#7c5cff,#a29bfe);color:#fff;border:none;border-radius:12px;font-size:1.02rem;font-weight:700;cursor:pointer;transition:all .25s;text-decoration:none;text-align:center}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,92,255,0.45)}
+.pro-skip{display:inline-block;margin-top:14px;padding:8px 20px;background:none;border:none;color:#555;cursor:pointer;font-size:.84rem;transition:color .2s}
+.pro-skip:hover{color:#ccc}
+</style>
+<div class="pro-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-card">
+<h2>🔓 Unlock Pro Features</h2>
+<p class="pc-sub">Take your glassmorphism designs to the next level</p>
+<div class="pc-price">$9</div>
+<p class="pc-note">One-time payment · Lifetime access</p>
+<ul>
+<li>Animated glass transition effects</li>
+<li>Multi-layer glass stacking & blending</li>
+<li>Figma plugin export integration</li>
+<li>Advanced blur & saturation presets</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $9</a>
+<button class="pro-skip" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var t=document.createElement('div');t.className='pro-teaser';
+t.onclick=function(){document.getElementById('proModal').classList.add('show')};
+t.innerHTML='<div class="pro-lock"><div class="pl-icon">🔒</div><div class="pl-badge">PRO</div><div class="pl-hint">Click to unlock</div></div><div class="pro-teaser-content"><div class="pm-title">✨ Pro Features</div><div class="pm-row"><div class="pm-block"></div><div class="pm-block"></div></div><div class="pm-line" style="width:90%"></div><div class="pm-line" style="width:75%"></div><div class="pm-row"><div class="pm-block" style="height:22px"></div><div class="pm-block" style="height:22px"></div><div class="pm-block" style="height:22px"></div></div><div class="pm-line" style="width:60%"></div></div>';
+var s=document.querySelector('.controls-section');if(s)s.appendChild(t);
+})();
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

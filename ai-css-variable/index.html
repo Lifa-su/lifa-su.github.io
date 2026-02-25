@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Manage CSS custom properties with an interactive variable manager. Organize design tokens, create theme systems, and export CSS variable declarations.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-variable/">
+<title>AI CSS Variable Manager - CSS变量管理器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--app-bg:#1a1a2e;--app-surface:#16213e;--app-card:#0f3460;--app-primary:#e94560;--app-primary-hover:#d63851;--app-text:#eee;--app-text-secondary:#a0a0b8;--app-border:#2a2a4a;--app-input-bg:#1a1a3e;--app-success:#4ecca3;--app-radius:10px;--app-shadow:0 4px 20px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--app-bg);color:var(--app-text);min-height:100vh;line-height:1.6}
+.container{max-width:1400px;margin:0 auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--app-border);margin-bottom:24px}
+header h1{font-size:1.6rem;background:linear-gradient(135deg,var(--app-primary),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:10px}
+header h1 span{font-size:1.8rem;-webkit-text-fill-color:initial}
+.theme-toggle{background:var(--app-surface);border:1px solid var(--app-border);color:var(--app-text);padding:8px 16px;border-radius:20px;cursor:pointer;font-size:.9rem;transition:all .2s}
+.theme-toggle:hover{border-color:var(--app-primary);background:var(--app-card)}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+.panel{background:var(--app-surface);border:1px solid var(--app-border);border-radius:var(--app-radius);padding:20px;box-shadow:var(--app-shadow)}
+.panel-title{font-size:1.1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--app-text)}
+.panel-title .icon{font-size:1.2rem}
+.add-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--app-border)}
+.add-form .full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:.75rem;color:var(--app-text-secondary);text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select{background:var(--app-input-bg);border:1px solid var(--app-border);color:var(--app-text);padding:8px 12px;border-radius:6px;font-size:.9rem;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--app-primary)}
+.form-group select{cursor:pointer}
+.color-input-wrap{display:flex;gap:8px;align-items:center}
+.color-input-wrap input[type=color]{width:40px;height:36px;border:1px solid var(--app-border);border-radius:6px;cursor:pointer;background:transparent;padding:2px}
+.color-input-wrap input[type=text]{flex:1}
+.btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--app-primary);color:#fff}
+.btn-primary:hover{background:var(--app-primary-hover);transform:translateY(-1px)}
+.btn-success{background:var(--app-success);color:#1a1a2e}
+.btn-success:hover{opacity:.9;transform:translateY(-1px)}
+.btn-danger{background:transparent;color:var(--app-primary);border:1px solid var(--app-primary)}
+.btn-danger:hover{background:var(--app-primary);color:#fff}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+.var-list{display:flex;flex-direction:column;gap:8px;max-height:500px;overflow-y:auto;padding-right:4px}
+.var-list::-webkit-scrollbar{width:6px}
+.var-list::-webkit-scrollbar-track{background:transparent}
+.var-list::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
+.var-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--app-input-bg);border:1px solid var(--app-border);border-radius:8px;transition:all .2s}
+.var-item:hover{border-color:var(--app-primary);background:rgba(233,69,96,.05)}
+.var-color-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--app-border);flex-shrink:0}
+.var-info{flex:1;min-width:0}
+.var-name{font-size:.85rem;font-weight:600;color:var(--app-primary);font-family:'Fira Code',monospace;word-break:break-all}
+.var-value{font-size:.8rem;color:var(--app-text-secondary);font-family:'Fira Code',monospace}
+.var-type-badge{font-size:.65rem;padding:2px 8px;border-radius:10px;background:var(--app-card);color:var(--app-text-secondary);text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
+.var-actions{display:flex;gap:4px;flex-shrink:0}
+.code-panel{margin-top:24px}
+.code-block{background:#0d1117;border:1px solid var(--app-border);border-radius:8px;padding:16px;font-family:'Fira Code',Consolas,monospace;font-size:.82rem;line-height:1.8;color:#c9d1d9;max-height:400px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+.code-block .kw{color:#ff7b72}
+.code-block .prop{color:#79c0ff}
+.code-block .val{color:#a5d6ff}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.preview-section{margin-top:24px}
+.preview-theme-bar{display:flex;gap:8px;margin-bottom:16px}
+.preview-theme-btn{padding:6px 14px;border:1px solid var(--app-border);background:transparent;color:var(--app-text);border-radius:6px;cursor:pointer;font-size:.82rem;transition:all .2s}
+.preview-theme-btn.active{background:var(--app-primary);border-color:var(--app-primary);color:#fff}
+.preview-area{border:1px solid var(--app-border);border-radius:var(--app-radius);padding:24px;transition:all .3s}
+.preview-card{border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.15);transition:all .3s}
+.preview-card h3{margin-bottom:8px;transition:all .3s}
+.preview-card p{margin-bottom:12px;transition:all .3s}
+.preview-btns{display:flex;gap:10px;flex-wrap:wrap}
+.preview-btn{padding:10px 24px;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:500;transition:all .3s}
+.preview-btn.primary{color:#fff}
+.preview-btn.outline{background:transparent;border:2px solid}
+.preview-text-samples{margin-top:16px}
+.preview-text-samples h4{margin-bottom:8px;transition:all .3s}
+.preview-text-samples p{margin-bottom:4px;transition:all .3s}
+.preview-input-sample{margin-top:16px}
+.preview-input-sample input{width:100%;padding:10px 14px;border-radius:6px;border:2px solid;font-size:.9rem;outline:none;transition:all .3s}
+.toast{position:fixed;bottom:30px;right:30px;background:var(--app-success);color:#1a1a2e;padding:12px 24px;border-radius:8px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.toast.show{transform:translateY(0);opacity:1}
+.empty-state{text-align:center;padding:40px 20px;color:var(--app-text-secondary)}
+.empty-state .icon{font-size:2.5rem;margin-bottom:12px}
+.edit-input{background:var(--app-input-bg);border:1px solid var(--app-primary);color:var(--app-text);padding:4px 8px;border-radius:4px;font-size:.8rem;font-family:'Fira Code',monospace;width:100%}
+footer{text-align:center;padding:30px 0 10px;color:var(--app-text-secondary);font-size:.8rem;border-top:1px solid var(--app-border);margin-top:30px}
+body.light-mode{--app-bg:#f0f2f5;--app-surface:#fff;--app-card:#f8f9fa;--app-text:#1a1a2e;--app-text-secondary:#666;--app-border:#ddd;--app-input-bg:#f5f5f5;--app-shadow:0 4px 20px rgba(0,0,0,.08)}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1><span>🎨</span> CSS Variable Manager</h1>
+    <button class="theme-toggle" onclick="toggleAppTheme()" id="appThemeBtn">🌙 暗色模式</button>
+  </header>
+  <div class="main-grid">
+    <div>
+      <div class="panel">
+        <div class="panel-title"><span class="icon">⚙️</span> 变量管理</div>
+        <div class="add-form">
+          <div class="form-group">
+            <label>变量名</label>
+            <input type="text" id="varName" placeholder="如: primary-color" />
+          </div>
+          <div class="form-group">
+            <label>类型</label>
+            <select id="varType" onchange="onTypeChange()">
+              <option value="color">🎨 颜色</option>
+              <option value="size">📏 尺寸</option>
+              <option value="font">🔤 字体</option>
+              <option value="custom">✏️ 自定义</option>
+            </select>
+          </div>
+          <div class="form-group full" id="valueGroup">
+            <label>值</label>
+            <div class="color-input-wrap" id="colorWrap">
+              <input type="color" id="colorPicker" value="#e94560" oninput="document.getElementById('varValue').value=this.value" />
+              <input type="text" id="varValue" placeholder="#e94560" oninput="syncColorPicker()" />
+            </div>
+          </div>
+          <div class="form-group" id="unitGroup" style="display:none">
+            <label>单位</label>
+            <select id="varUnit">
+              <option value="px">px</option>
+              <option value="rem">rem</option>
+              <option value="em">em</option>
+              <option value="%">%</option>
+              <option value="vw">vw</option>
+              <option value="vh">vh</option>
+            </select>
+          </div>
+          <div class="full" style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-primary" onclick="addVariable()">➕ 添加变量</button>
+            <button class="btn btn-success" onclick="addPresets()">📦 加载预设</button>
+          </div>
+        </div>
+        <div class="var-list" id="varList"></div>
+      </div>
+      <div class="panel code-panel">
+        <div class="code-header">
+          <div class="panel-title" style="margin-bottom:0"><span class="icon">📋</span> 生成的CSS代码</div>
+          <button class="btn btn-success btn-sm" onclick="copyCSS()">📋 复制代码</button>
+        </div>
+        <div class="code-block" id="codeOutput"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel preview-section">
+        <div class="panel-title"><span class="icon">👁️</span> 实时预览</div>
+        <div class="preview-theme-bar">
+          <button class="preview-theme-btn active" onclick="setPreviewTheme('light',this)">☀️ 亮色预览</button>
+          <button class="preview-theme-btn" onclick="setPreviewTheme('dark',this)">🌙 暗色预览</button>
+        </div>
+        <div class="preview-area" id="previewArea">
+          <div class="preview-card" id="previewCard">
+            <h3 id="previewTitle">示例卡片标题</h3>
+            <p id="previewText">这是一段示例文字，用于展示CSS变量的实际效果。你可以通过左侧面板修改变量值，这里会实时更新。</p>
+            <div class="preview-btns">
+              <button class="preview-btn primary" id="previewBtnPrimary">主要按钮</button>
+              <button class="preview-btn outline" id="previewBtnOutline">次要按钮</button>
+            </div>
+          </div>
+          <div class="preview-text-samples">
+            <h4 id="previewH4">文字样式预览</h4>
+            <p id="previewSmall" style="opacity:.7">次要文字 · Secondary Text</p>
+            <p id="previewBody">正文内容展示 — Body text sample for preview.</p>
+          </div>
+          <div class="preview-input-sample">
+            <input type="text" id="previewInput" placeholder="输入框样式预览..." />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>CSS Variable Manager — 快速生成和管理CSS自定义属性</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let variables = [];
+let editingId = null;
+let previewTheme = 'light';
+
+const defaultPresets = [
+  {name:'primary-color',type:'color',value:'#e94560'},
+  {name:'secondary-color',type:'color',value:'#4ecca3'},
+  {name:'bg-color',type:'color',value:'#ffffff'},
+  {name:'text-color',type:'color',value:'#1a1a2e'},
+  {name:'text-secondary',type:'color',value:'#666666'},
+  {name:'border-color',type:'color',value:'#e0e0e0'},
+  {name:'font-size-base',type:'size',value:'16px'},
+  {name:'font-size-lg',type:'size',value:'1.25rem'},
+  {name:'font-size-sm',type:'size',value:'0.875rem'},
+  {name:'font-family',type:'font',value:'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'},
+  {name:'border-radius',type:'size',value:'8px'},
+  {name:'spacing',type:'size',value:'16px'},
+  {name:'shadow',type:'custom',value:'0 2px 12px rgba(0,0,0,0.1)'},
+];
+
+function generateId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function onTypeChange(){
+  const t=document.getElementById('varType').value;
+  const cw=document.getElementById('colorWrap');
+  const ug=document.getElementById('unitGroup');
+  const vi=document.getElementById('varValue');
+  const cp=document.getElementById('colorPicker');
+  if(t==='color'){
+    cw.style.display='flex';cp.style.display='';vi.placeholder='#e94560';ug.style.display='none';
+  }else if(t==='size'){
+    cw.style.display='flex';cp.style.display='none';vi.placeholder='16';ug.style.display='';
+  }else if(t==='font'){
+    cw.style.display='flex';cp.style.display='none';vi.placeholder='Arial, sans-serif';ug.style.display='none';
+  }else{
+    cw.style.display='flex';cp.style.display='none';vi.placeholder='任意CSS值';ug.style.display='none';
+  }
+}
+
+function syncColorPicker(){
+  const v=document.getElementById('varValue').value;
+  if(/^#[0-9a-fA-F]{6}$/.test(v))document.getElementById('colorPicker').value=v;
+}
+
+function addVariable(){
+  const nameEl=document.getElementById('varName');
+  const typeEl=document.getElementById('varType');
+  const valEl=document.getElementById('varValue');
+  const unitEl=document.getElementById('varUnit');
+  let name=nameEl.value.trim().replace(/^-+/,'').replace(/\s+/g,'-');
+  if(!name){showToast('⚠️ 请输入变量名');return}
+  let value=valEl.value.trim();
+  if(!value){showToast('⚠️ 请输入变量值');return}
+  if(typeEl.value==='size'&&!/[a-z%]/.test(value))value+=unitEl.value;
+  if(variables.find(v=>v.name===name)){showToast('⚠️ 变量名已存在');return}
+  variables.push({id:generateId(),name,type:typeEl.value,value});
+  nameEl.value='';valEl.value='';
+  render();
+  showToast('✅ 变量已添加');
+}
+
+function deleteVariable(id){
+  variables=variables.filter(v=>v.id!==id);
+  render();
+}
+
+function startEdit(id){
+  editingId=id;
+  render();
+}
+
+function saveEdit(id){
+  const input=document.querySelector(`.edit-val-${id}`);
+  if(input){
+    const v=variables.find(x=>x.id===id);
+    if(v)v.value=input.value;
+  }
+  editingId=null;
+  render();
+}
+
+function cancelEdit(){editingId=null;render()}
+
+function addPresets(){
+  let added=0;
+  defaultPresets.forEach(p=>{
+    if(!variables.find(v=>v.name===p.name)){
+      variables.push({id:generateId(),...p});added++;
+    }
+  });
+  render();
+  showToast(added?`✅ 已加载 ${added} 个预设变量`:'ℹ️ 预设变量已全部存在');
+}
+
+function getTypeLabel(t){return{color:'颜色',size:'尺寸',font:'字体',custom:'自定义'}[t]||t}
+function getTypeEmoji(t){return{color:'🎨',size:'📏',font:'🔤',custom:'✏️'}[t]||'📌'}
+
+function render(){
+  renderList();
+  renderCode();
+  renderPreview();
+}
+
+function renderList(){
+  const el=document.getElementById('varList');
+  if(!variables.length){
+    el.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>还没有变量<br>点击"加载预设"快速开始</p></div>';
+    return;
+  }
+  el.innerHTML=variables.map(v=>{
+    const isColor=v.type==='color';
+    const isEditing=editingId===v.id;
+    const dot=isColor?`<div class="var-color-dot" style="background:${v.value}"></div>`:'';
+    const valueDisplay=isEditing
+      ?`<input class="edit-input edit-val-${v.id}" value="${v.value}" onkeydown="if(event.key==='Enter')saveEdit('${v.id}');if(event.key==='Escape')cancelEdit()" autofocus />`
+      :`<div class="var-value">${v.value}</div>`;
+    const actions=isEditing
+      ?`<button class="btn btn-success btn-sm" onclick="saveEdit('${v.id}')">✓</button><button class="btn btn-sm btn-danger" onclick="cancelEdit()">✕</button>`
+      :`<button class="btn btn-sm" style="background:var(--app-card);color:var(--app-text)" onclick="startEdit('${v.id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="deleteVariable('${v.id}')">🗑️</button>`;
+    return`<div class="var-item">${dot}<div class="var-info"><div class="var-name">--${v.name}</div>${valueDisplay}</div><span class="var-type-badge">${getTypeEmoji(v.type)} ${getTypeLabel(v.type)}</span><div class="var-actions">${actions}</div></div>`;
+  }).join('');
+  if(editingId){const inp=document.querySelector(`.edit-val-${editingId}`);if(inp)inp.focus()}
+}
+
+function renderCode(){
+  const el=document.getElementById('codeOutput');
+  if(!variables.length){el.innerHTML='<span style="color:#666">// 添加变量后这里会生成CSS代码</span>';return}
+  const lines=variables.map(v=>`  <span class="prop">--${v.name}</span>: <span class="val">${v.value}</span>;`).join('\n');
+  el.innerHTML=`<span class="kw">:root</span> {\n${lines}\n}`;
+}
+
+function getPlainCSS(){
+  if(!variables.length)return'';
+  return':root {\n'+variables.map(v=>`  --${v.name}: ${v.value};`).join('\n')+'\n}';
+}
+
+function copyCSS(){
+  const css=getPlainCSS();
+  if(!css){showToast('⚠️ 没有可复制的代码');return}
+  navigator.clipboard.writeText(css).then(()=>showToast('✅ CSS代码已复制到剪贴板')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=css;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('✅ CSS代码已复制到剪贴板');
+  });
+}
+
+function getVar(name,fallback){const v=variables.find(x=>x.name===name);return v?v.value:fallback}
+
+function renderPreview(){
+  const area=document.getElementById('previewArea');
+  const card=document.getElementById('previewCard');
+  const isDark=previewTheme==='dark';
+  const primary=getVar('primary-color','#e94560');
+  const secondary=getVar('secondary-color','#4ecca3');
+  const bg=isDark?'#1a1a2e':getVar('bg-color','#ffffff');
+  const text=isDark?'#eeeeee':getVar('text-color','#1a1a2e');
+  const textSec=isDark?'#a0a0b8':getVar('text-secondary','#666666');
+  const radius=getVar('border-radius','8px');
+  const font=getVar('font-family','-apple-system, sans-serif');
+  const fsBase=getVar('font-size-base','16px');
+  const fsLg=getVar('font-size-lg','1.25rem');
+  const fsSm=getVar('font-size-sm','0.875rem');
+  const spacing=getVar('spacing','16px');
+  const shadow=getVar('shadow','0 2px 12px rgba(0,0,0,0.1)');
+  const border=isDark?'#2a2a4a':getVar('border-color','#e0e0e0');
+
+  area.style.cssText=`background:${bg};font-family:${font};font-size:${fsBase};color:${text};border-color:${border}`;
+  card.style.cssText=`background:${isDark?'#16213e':'#f8f9fa'};border-radius:${radius};padding:${spacing};box-shadow:${shadow};border:1px solid ${border}`;
+  document.getElementById('previewTitle').style.cssText=`color:${primary};font-size:${fsLg}`;
+  document.getElementById('previewText').style.cssText=`color:${textSec};font-size:${fsBase}`;
+  const btnP=document.getElementById('previewBtnPrimary');
+  btnP.style.cssText=`background:${primary};border-radius:${radius};color:#fff`;
+  const btnO=document.getElementById('previewBtnOutline');
+  btnO.style.cssText=`border-radius:${radius};border:2px solid ${secondary};color:${secondary};background:transparent`;
+  document.getElementById('previewH4').style.cssText=`color:${text};font-size:${fsLg}`;
+  document.getElementById('previewSmall').style.cssText=`color:${textSec};font-size:${fsSm}`;
+  document.getElementById('previewBody').style.cssText=`color:${text};font-size:${fsBase}`;
+  const inp=document.getElementById('previewInput');
+  inp.style.cssText=`background:${isDark?'#1a1a3e':bg};color:${text};border:2px solid ${border};border-radius:${radius};font-family:${font};font-size:${fsBase}`;
+}
+
+function setPreviewTheme(theme,btn){
+  previewTheme=theme;
+  document.querySelectorAll('.preview-theme-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPreview();
+}
+
+function toggleAppTheme(){
+  document.body.classList.toggle('light-mode');
+  const isLight=document.body.classList.contains('light-mode');
+  document.getElementById('appThemeBtn').textContent=isLight?'🌙 暗色模式':'☀️ 亮色模式';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Init
+onTypeChange();
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

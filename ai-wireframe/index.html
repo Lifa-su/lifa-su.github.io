@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI wireframe design tool for rapid prototyping. Drag and drop UI components to create website and app wireframes. Export designs as images or HTML code.">
+<link rel="canonical" href="https://lifa-su.com/ai-wireframe/">
+<title>AI Wireframe Tool</title>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#252836;--border:#2e3348;--text:#e4e6f0;--text2:#8b8fa3;--accent:#6c5ce7;--accent2:#a29bfe;--danger:#ff6b6b;--success:#51cf66}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;user-select:none}
+#app{display:flex;height:100vh;flex-direction:column}
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);height:48px;flex-shrink:0}
+.toolbar h1{font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.toolbar-actions{display:flex;gap:8px}
+.btn{padding:6px 14px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.btn:hover{background:var(--border);border-color:var(--accent)}
+.btn-danger{border-color:var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent2)}
+.main{display:flex;flex:1;overflow:hidden}
+.panel{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:12px;overflow-y:auto;flex-shrink:0}
+.panel h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:12px;font-weight:600}
+.component-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:grab;transition:all .2s}
+.component-item:hover{border-color:var(--accent);background:#2a2d3e}
+.component-item:active{cursor:grabbing;transform:scale(0.97)}
+.comp-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:6px;font-size:15px;flex-shrink:0}
+.comp-label{font-size:13px;font-weight:500}
+.canvas-wrapper{flex:1;position:relative;overflow:auto;background:var(--bg);background-image:radial-gradient(circle,#1e2030 1px,transparent 1px);background-size:20px 20px}
+#canvas{position:relative;width:1200px;height:800px;background:#1a1d2e;border:2px dashed var(--border);margin:40px;border-radius:8px;transition:border-color .2s}
+#canvas.drag-over{border-color:var(--accent);border-style:solid}
+.guide-line{position:absolute;z-index:9999;pointer-events:none;display:none}
+.guide-h{left:0;width:100%;height:1px;background:var(--accent)}
+.guide-v{top:0;height:100%;width:1px;background:var(--accent)}
+.wf-el{position:absolute;cursor:move;min-width:20px;min-height:20px;z-index:1}
+.wf-el:hover{outline:1px solid rgba(108,92,231,0.4);outline-offset:1px}
+.wf-el.selected{outline:2px solid var(--accent);outline-offset:2px;z-index:2}
+.resize-handle{position:absolute;width:8px;height:8px;background:var(--accent);border:1.5px solid #fff;border-radius:2px;z-index:10;display:none}
+.wf-el.selected .resize-handle{display:block}
+.rh-nw{top:-5px;left:-5px;cursor:nw-resize}
+.rh-ne{top:-5px;right:-5px;cursor:ne-resize}
+.rh-sw{bottom:-5px;left:-5px;cursor:sw-resize}
+.rh-se{bottom:-5px;right:-5px;cursor:se-resize}
+.rh-n{top:-5px;left:50%;margin-left:-4px;cursor:n-resize}
+.rh-s{bottom:-5px;left:50%;margin-left:-4px;cursor:s-resize}
+.rh-e{right:-5px;top:50%;margin-top:-4px;cursor:e-resize}
+.rh-w{left:-5px;top:50%;margin-top:-4px;cursor:w-resize}
+.wf-button{background:#3a3f5c;border:1px solid #5a5f7c;border-radius:6px;color:var(--text);display:flex;align-items:center;justify-content:center;font-size:13px;width:100%;height:100%}
+.wf-input{background:#22263a;border:1px solid #3a3f5c;border-radius:6px;color:var(--text2);display:flex;align-items:center;padding:0 12px;font-size:13px;width:100%;height:100%}
+.wf-input::before{content:'';width:8px;height:8px;border-left:2px solid var(--text2);border-bottom:2px solid var(--text2);margin-right:8px;opacity:.5}
+.wf-image{background:#1e2240;border:2px dashed #3a3f5c;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:13px;width:100%;height:100%;flex-direction:column;gap:4px}
+.wf-text{color:var(--text);font-size:14px;line-height:1.6;padding:8px;width:100%;height:100%;overflow:hidden}
+.wf-navbar{background:#1e2240;border:1px solid #3a3f5c;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;width:100%;height:100%}
+.wf-nav-logo{font-weight:700;font-size:14px;color:var(--accent2)}
+.wf-nav-links{display:flex;gap:16px;font-size:12px;color:var(--text2)}
+.wf-card{background:#1e2240;border:1px solid #3a3f5c;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;width:100%;height:100%}
+.wf-card-img{height:50%;background:#161830;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px}
+.wf-card-body{padding:12px;flex:1}
+.wf-card-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.wf-card-desc{font-size:11px;color:var(--text2);line-height:1.4}
+.empty-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--text2);pointer-events:none;opacity:.5}
+.empty-hint svg{width:48px;height:48px;margin-bottom:8px;stroke:currentColor;fill:none;stroke-width:1.5}
+.empty-hint p{font-size:14px}
+.props-panel{width:200px;background:var(--surface);border-left:1px solid var(--border);padding:12px;overflow-y:auto;flex-shrink:0}
+.props-panel h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:12px;font-weight:600}
+.prop-row{margin-bottom:10px}
+.prop-label{font-size:11px;color:var(--text2);margin-bottom:4px;display:block}
+.prop-val{width:100%;padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;outline:none}
+.prop-val:focus{border-color:var(--accent)}
+.no-select{font-size:12px;color:var(--text2);text-align:center;margin-top:40px}
+@media(max-width:900px){.panel{width:180px}.props-panel{display:none}}
+@media(max-width:600px){.panel{width:60px}.comp-label{display:none}.component-item{justify-content:center;padding:10px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="toolbar">
+    <h1>AI Wireframe Tool</h1>
+    <div class="toolbar-actions">
+      <button class="btn btn-accent" onclick="exportPNG()">Export PNG</button>
+      <button class="btn btn-danger" onclick="clearCanvas()">Clear All</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="panel">
+      <h2>Components</h2>
+      <div class="component-item" draggable="true" data-type="button">
+        <div class="comp-icon">🔘</div>
+        <span class="comp-label">Button</span>
+      </div>
+      <div class="component-item" draggable="true" data-type="input">
+        <div class="comp-icon">📝</div>
+        <span class="comp-label">Input</span>
+      </div>
+      <div class="component-item" draggable="true" data-type="image">
+        <div class="comp-icon">🖼️</div>
+        <span class="comp-label">Image</span>
+      </div>
+      <div class="component-item" draggable="true" data-type="text">
+        <div class="comp-icon">📄</div>
+        <span class="comp-label">Text Block</span>
+      </div>
+      <div class="component-item" draggable="true" data-type="navbar">
+        <div class="comp-icon">🧭</div>
+        <span class="comp-label">Navbar</span>
+      </div>
+      <div class="component-item" draggable="true" data-type="card">
+        <div class="comp-icon">🃏</div>
+        <span class="comp-label">Card</span>
+      </div>
+    </div>
+    <div class="canvas-wrapper">
+      <div id="canvas">
+        <div class="empty-hint" id="emptyHint">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <p>Drag components here to start designing</p>
+        </div>
+      </div>
+    </div>
+    <div class="props-panel" id="propsPanel">
+      <h2>Properties</h2>
+      <div id="propsContent"><p class="no-select">Select an element to edit properties</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('canvas');
+  const emptyHint = document.getElementById('emptyHint');
+  const propsContent = document.getElementById('propsContent');
+  let selected = null;
+  let elements = [];
+  let idCounter = 0;
+  const SNAP = 5;
+  const guides = {h:[], v:[]};
+
+  // Create guide lines
+  for(let i=0;i<10;i++){
+    const h=document.createElement('div');h.className='guide-line guide-h';canvas.appendChild(h);guides.h.push(h);
+    const v=document.createElement('div');v.className='guide-line guide-v';canvas.appendChild(v);guides.v.push(v);
+  }
+
+  function hideGuides(){guides.h.forEach(g=>g.style.display='none');guides.v.forEach(g=>g.style.display='none')}
+
+  const defaults={
+    button:{w:120,h:40},input:{w:200,h:40},image:{w:200,h:150},
+    text:{w:200,h:80},navbar:{w:500,h:50},card:{w:220,h:260}
+  };
+
+  function createInner(type){
+    switch(type){
+      case 'button': return '<div class="wf-button">Button</div>';
+      case 'input': return '<div class="wf-input">Text input...</div>';
+      case 'image': return '<div class="wf-image"><span style="font-size:28px">🖼️</span><span style="font-size:11px">Image</span></div>';
+      case 'text': return '<div class="wf-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.</div>';
+      case 'navbar': return '<div class="wf-navbar"><span class="wf-nav-logo">Logo</span><div class="wf-nav-links"><span>Home</span><span>About</span><span>Contact</span></div></div>';
+      case 'card': return '<div class="wf-card"><div class="wf-card-img">🖼️</div><div class="wf-card-body"><div class="wf-card-title">Card Title</div><div class="wf-card-desc">Card description text goes here with some details.</div></div></div>';
+    }
+  }
+
+  function addElement(type, x, y){
+    const d = defaults[type];
+    const el = document.createElement('div');
+    el.className = 'wf-el';
+    el.dataset.type = type;
+    el.dataset.id = ++idCounter;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.width = d.w + 'px';
+    el.style.height = d.h + 'px';
+    el.innerHTML = createInner(type) +
+      '<div class="resize-handle rh-nw" data-dir="nw"></div>' +
+      '<div class="resize-handle rh-ne" data-dir="ne"></div>' +
+      '<div class="resize-handle rh-sw" data-dir="sw"></div>' +
+      '<div class="resize-handle rh-se" data-dir="se"></div>' +
+      '<div class="resize-handle rh-n" data-dir="n"></div>' +
+      '<div class="resize-handle rh-s" data-dir="s"></div>' +
+      '<div class="resize-handle rh-e" data-dir="e"></div>' +
+      '<div class="resize-handle rh-w" data-dir="w"></div>';
+    canvas.appendChild(el);
+    elements.push(el);
+    updateEmpty();
+    selectEl(el);
+    return el;
+  }
+
+  function updateEmpty(){emptyHint.style.display=elements.length?'none':'block'}
+
+  function selectEl(el){
+    if(selected) selected.classList.remove('selected');
+    selected = el;
+    if(el){el.classList.add('selected');showProps(el)}
+    else{propsContent.innerHTML='<p class="no-select">Select an element to edit properties</p>'}
+  }
+
+  function showProps(el){
+    const type = el.dataset.type;
+    const x = parseInt(el.style.left);
+    const y = parseInt(el.style.top);
+    const w = parseInt(el.style.width);
+    const h = parseInt(el.style.height);
+    propsContent.innerHTML = `
+      <div class="prop-row"><label class="prop-label">Type</label><input class="prop-val" value="${type}" disabled></div>
+      <div class="prop-row"><label class="prop-label">X</label><input class="prop-val" type="number" data-prop="x" value="${x}"></div>
+      <div class="prop-row"><label class="prop-label">Y</label><input class="prop-val" type="number" data-prop="y" value="${y}"></div>
+      <div class="prop-row"><label class="prop-label">Width</label><input class="prop-val" type="number" data-prop="w" value="${w}"></div>
+      <div class="prop-row"><label class="prop-label">Height</label><input class="prop-val" type="number" data-prop="h" value="${h}"></div>
+      <div class="prop-row" style="margin-top:16px"><button class="btn btn-danger" style="width:100%" onclick="window._deleteSelected()">Delete</button></div>
+    `;
+    propsContent.querySelectorAll('input[data-prop]').forEach(inp=>{
+      inp.addEventListener('change',function(){
+        const p=this.dataset.prop, v=parseInt(this.value)||0;
+        if(p==='x')el.style.left=v+'px';
+        if(p==='y')el.style.top=v+'px';
+        if(p==='w')el.style.width=Math.max(20,v)+'px';
+        if(p==='h')el.style.height=Math.max(20,v)+'px';
+      });
+    });
+  }
+
+  window._deleteSelected = function(){
+    if(!selected)return;
+    selected.remove();
+    elements=elements.filter(e=>e!==selected);
+    selectEl(null);
+    updateEmpty();
+  };
+
+  // Drag from panel
+  document.querySelectorAll('.component-item').forEach(item=>{
+    item.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('text/plain', item.dataset.type);
+      e.dataTransfer.effectAllowed='copy';
+    });
+  });
+
+  canvas.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';canvas.classList.add('drag-over')});
+  canvas.addEventListener('dragleave',()=>canvas.classList.remove('drag-over'));
+  canvas.addEventListener('drop',e=>{
+    e.preventDefault();
+    canvas.classList.remove('drag-over');
+    const type=e.dataTransfer.getData('text/plain');
+    if(!type||!defaults[type])return;
+    const rect=canvas.getBoundingClientRect();
+    const d=defaults[type];
+    let x=e.clientX-rect.left-d.w/2;
+    let y=e.clientY-rect.top-d.h/2;
+    x=Math.max(0,Math.min(x,canvas.offsetWidth-d.w));
+    y=Math.max(0,Math.min(y,canvas.offsetHeight-d.h));
+    addElement(type,Math.round(x),Math.round(y));
+  });
+
+  // Click to select / deselect
+  canvas.addEventListener('mousedown',e=>{
+    const el=e.target.closest('.wf-el');
+    if(el){selectEl(el)}
+    else if(e.target===canvas||e.target===emptyHint){selectEl(null)}
+  });
+
+  // Move and resize
+  let drag=null;
+  canvas.addEventListener('mousedown',e=>{
+    const handle=e.target.closest('.resize-handle');
+    const el=e.target.closest('.wf-el');
+    if(handle && el && el===selected){
+      e.preventDefault();e.stopPropagation();
+      drag={type:'resize',el,dir:handle.dataset.dir,
+        startX:e.clientX,startY:e.clientY,
+        origX:parseInt(el.style.left),origY:parseInt(el.style.top),
+        origW:parseInt(el.style.width),origH:parseInt(el.style.height)};
+    } else if(el && !handle){
+      e.preventDefault();
+      drag={type:'move',el,
+        startX:e.clientX,startY:e.clientY,
+        origX:parseInt(el.style.left),origY:parseInt(el.style.top)};
+    }
+  });
+
+  document.addEventListener('mousemove',e=>{
+    if(!drag)return;
+    e.preventDefault();
+    const dx=e.clientX-drag.startX, dy=e.clientY-drag.startY;
+    if(drag.type==='move'){
+      let nx=drag.origX+dx, ny=drag.origY+dy;
+      const w=parseInt(drag.el.style.width), h=parseInt(drag.el.style.height);
+      // Snap to other elements
+      const snap=getSnap(drag.el,nx,ny,w,h);
+      nx=snap.x; ny=snap.y;
+      // Clamp
+      nx=Math.max(0,Math.min(nx,canvas.offsetWidth-w));
+      ny=Math.max(0,Math.min(ny,canvas.offsetHeight-h));
+      drag.el.style.left=nx+'px';
+      drag.el.style.top=ny+'px';
+      if(selected===drag.el)showProps(drag.el);
+    } else if(drag.type==='resize'){
+      let {origX:ox,origY:oy,origW:ow,origH:oh,dir}=drag;
+      let nx=ox,ny=oy,nw=ow,nh=oh;
+      if(dir.includes('e'))nw=Math.max(20,ow+dx);
+      if(dir.includes('w')){nw=Math.max(20,ow-dx);nx=ox+ow-nw}
+      if(dir.includes('s'))nh=Math.max(20,oh+dy);
+      if(dir.includes('n')){nh=Math.max(20,oh-dy);ny=oy+oh-nh}
+      drag.el.style.left=nx+'px';drag.el.style.top=ny+'px';
+      drag.el.style.width=nw+'px';drag.el.style.height=nh+'px';
+      if(selected===drag.el)showProps(drag.el);
+    }
+  });
+
+  document.addEventListener('mouseup',()=>{
+    if(drag){drag=null;hideGuides()}
+  });
+
+  // Alignment snap
+  function getSnap(el,x,y,w,h){
+    hideGuides();
+    let ghi=0,gvi=0;
+    const edges={l:x,r:x+w,cx:x+w/2,t:y,b:y+h,cy:y+h/2};
+    let bestDx=Infinity,bestDy=Infinity,snapX=x,snapY=y;
+    elements.forEach(other=>{
+      if(other===el)return;
+      const ol=parseInt(other.style.left),ot=parseInt(other.style.top);
+      const ow=parseInt(other.style.width),oh=parseInt(other.style.height);
+      const oe={l:ol,r:ol+ow,cx:ol+ow/2,t:ot,b:ot+oh,cy:ot+oh/2};
+      // Vertical guides (x alignment)
+      [[edges.l,oe.l],[edges.l,oe.r],[edges.l,oe.cx],
+       [edges.r,oe.l],[edges.r,oe.r],[edges.r,oe.cx],
+       [edges.cx,oe.cx],[edges.cx,oe.l],[edges.cx,oe.r]].forEach(([a,b])=>{
+        const d=Math.abs(a-b);
+        if(d<SNAP && d<=Math.abs(bestDx)){
+          bestDx=b-a;
+          if(gvi<guides.v.length){
+            const g=guides.v[gvi++];
+            g.style.left=b+'px';g.style.display='block';
+          }
+        }
+      });
+      // Horizontal guides (y alignment)
+      [[edges.t,oe.t],[edges.t,oe.b],[edges.t,oe.cy],
+       [edges.b,oe.t],[edges.b,oe.b],[edges.b,oe.cy],
+       [edges.cy,oe.cy],[edges.cy,oe.t],[edges.cy,oe.b]].forEach(([a,b])=>{
+        const d=Math.abs(a-b);
+        if(d<SNAP && d<=Math.abs(bestDy)){
+          bestDy=b-a;
+          if(ghi<guides.h.length){
+            const g=guides.h[ghi++];
+            g.style.top=b+'px';g.style.display='block';
+          }
+        }
+      });
+    });
+    // Canvas edge snap
+    [[edges.l,0],[edges.r,canvas.offsetWidth],[edges.cx,canvas.offsetWidth/2]].forEach(([a,b])=>{
+      const d=Math.abs(a-b);if(d<SNAP&&d<=Math.abs(bestDx)){bestDx=b-a}
+    });
+    [[edges.t,0],[edges.b,canvas.offsetHeight],[edges.cy,canvas.offsetHeight/2]].forEach(([a,b])=>{
+      const d=Math.abs(a-b);if(d<SNAP&&d<=Math.abs(bestDy)){bestDy=b-a}
+    });
+    if(Math.abs(bestDx)<SNAP)snapX=x+bestDx;
+    if(Math.abs(bestDy)<SNAP)snapY=y+bestDy;
+    return{x:snapX,y:snapY};
+  }
+
+  // Keyboard
+  document.addEventListener('keydown',e=>{
+    if(!selected)return;
+    if(e.key==='Delete'||e.key==='Backspace'){
+      if(document.activeElement.tagName==='INPUT')return;
+      e.preventDefault();window._deleteSelected();
+    }
+    const step=e.shiftKey?10:1;
+    if(e.key==='ArrowLeft'){e.preventDefault();selected.style.left=(parseInt(selected.style.left)-step)+'px';showProps(selected)}
+    if(e.key==='ArrowRight'){e.preventDefault();selected.style.left=(parseInt(selected.style.left)+step)+'px';showProps(selected)}
+    if(e.key==='ArrowUp'){e.preventDefault();selected.style.top=(parseInt(selected.style.top)-step)+'px';showProps(selected)}
+    if(e.key==='ArrowDown'){e.preventDefault();selected.style.top=(parseInt(selected.style.top)+step)+'px';showProps(selected)}
+  });
+
+  // Export PNG
+  window.exportPNG = function(){
+    if(selected)selectEl(null);
+    hideGuides();
+    emptyHint.style.display='none';
+    html2canvas(canvas,{backgroundColor:'#1a1d2e',scale:2,useCORS:true}).then(c=>{
+      const a=document.createElement('a');
+      a.download='wireframe.png';a.href=c.toDataURL('image/png');a.click();
+    }).catch(err=>alert('Export failed: '+err.message)).finally(()=>updateEmpty());
+  };
+
+  // Clear
+  window.clearCanvas = function(){
+    if(elements.length===0)return;
+    if(!confirm('Clear all elements?'))return;
+    elements.forEach(e=>e.remove());
+    elements=[];selectEl(null);updateEmpty();
+  };
+})();
+</script>
+<!-- Pro Features -->
+<style>
+.pro-teaser{position:relative;margin:12px 0 0;padding:0;border-radius:10px;cursor:pointer;overflow:hidden;border:1px dashed rgba(108,92,231,0.3);transition:all .3s}
+.pro-teaser:hover{border-color:rgba(108,92,231,0.6);box-shadow:0 0 24px rgba(108,92,231,0.12)}
+.pro-teaser-content{padding:12px;filter:blur(3px);opacity:0.5;pointer-events:none;user-select:none}
+.pro-teaser-content .pm-title{font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:#6c5ce7;margin-bottom:8px;font-weight:600}
+.pro-teaser-content .pm-row{display:flex;gap:6px;margin-bottom:6px}
+.pro-teaser-content .pm-block{flex:1;height:24px;background:rgba(108,92,231,0.1);border-radius:5px}
+.pro-teaser-content .pm-line{height:8px;background:rgba(108,92,231,0.07);border-radius:3px;margin-bottom:5px}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,26,0.35);z-index:2}
+.pro-lock .pl-icon{font-size:1.4rem;margin-bottom:3px}
+.pro-lock .pl-badge{font-size:.6rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#6c5ce7,#a29bfe);padding:2px 10px;border-radius:20px;letter-spacing:1.5px}
+.pro-lock .pl-hint{font-size:.6rem;color:#8888aa;margin-top:4px}
+.pro-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center}
+.pro-overlay.show{display:flex}
+.pro-card{background:linear-gradient(160deg,#1e1e38,#14142a);border:1px solid rgba(108,92,231,0.25);border-radius:20px;padding:36px 30px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.pro-card h2{font-size:1.45rem;margin-bottom:4px;background:linear-gradient(135deg,#6c5ce7,#a29bfe,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-card .pc-sub{color:#8888aa;font-size:.85rem;margin-bottom:16px}
+.pro-card .pc-price{font-size:2.5rem;font-weight:800;color:#6c5ce7;margin:8px 0 2px}
+.pro-card .pc-note{font-size:.76rem;color:#666;margin-bottom:20px}
+.pro-card ul{text-align:left;list-style:none;margin:0 0 24px;padding:0}
+.pro-card ul li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.87rem;color:#c0c0e0;display:flex;align-items:center;gap:10px}
+.pro-card ul li::before{content:'✓';color:#51cf66;font-weight:700;flex-shrink:0}
+.pro-card ul li:last-child{border-bottom:none}
+.pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:12px;font-size:1.02rem;font-weight:700;cursor:pointer;transition:all .25s;text-decoration:none;text-align:center}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.45)}
+.pro-skip{display:inline-block;margin-top:14px;padding:8px 20px;background:none;border:none;color:#555;cursor:pointer;font-size:.84rem;transition:color .2s}
+.pro-skip:hover{color:#ccc}
+</style>
+<div class="pro-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-card">
+<h2>🔓 Unlock Pro Features</h2>
+<p class="pc-sub">Professional wireframing with team collaboration</p>
+<div class="pc-price">$19</div>
+<p class="pc-note">One-time payment · Lifetime access</p>
+<ul>
+<li>Real-time team collaboration</li>
+<li>Extended component library</li>
+<li>Figma export integration</li>
+<li>Version history & snapshots</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $19</a>
+<button class="pro-skip" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var t=document.createElement('div');t.className='pro-teaser';
+t.onclick=function(){document.getElementById('proModal').classList.add('show')};
+t.innerHTML='<div class="pro-lock"><div class="pl-icon">🔒</div><div class="pl-badge">PRO</div><div class="pl-hint">Click to unlock</div></div><div class="pro-teaser-content"><div class="pm-title">👥 Team & Export</div><div class="pm-row"><div class="pm-block" style="height:20px"></div><div class="pm-block" style="height:20px"></div></div><div class="pm-line" style="width:85%"></div><div class="pm-row"><div class="pm-block" style="height:18px"></div></div><div class="pm-line" style="width:60%"></div></div>';
+var s=document.querySelector('.panel');if(s)s.appendChild(t);
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

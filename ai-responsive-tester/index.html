@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Test responsive web design across multiple devices. Preview your website on phone, tablet, laptop, and desktop screens simultaneously in one view.">
+<link rel="canonical" href="https://lifa-su.com/ai-responsive-tester/">
+<title>AI Responsive Tester - Multi-Device Preview Tool</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--sf:#12121a;--sf2:#1a1a2e;--bd:#2a2a4a;--tx:#e0e0f0;--tx2:#8888aa;--ac:#6c5ce7;--ac2:#a29bfe;--dg:#ff6b6b;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+.hd{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ub{flex:1;min-width:250px;display:flex;gap:8px}
+.ub input{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:8px 14px;color:var(--tx);font-size:.95rem;outline:none}
+.ub input:focus{border-color:var(--ac)}
+.btn{background:var(--ac);color:#fff;border:none;border-radius:var(--r);padding:8px 18px;font-size:.9rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{opacity:.85}.btn-s{padding:6px 12px;font-size:.8rem}
+.btn-o{background:transparent;border:1px solid var(--bd);color:var(--tx2)}
+.btn-o:hover{border-color:var(--ac);color:var(--ac2)}
+.btn-o.on{border-color:var(--ac);background:var(--ac);color:#fff}
+.tb{background:var(--sf);border-bottom:1px solid var(--bd);padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dp{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.pb{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:4px 10px;font-size:.75rem;color:var(--tx2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.pb:hover{border-color:var(--ac);color:var(--tx)}
+.pb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.sp{width:1px;height:24px;background:var(--bd);margin:0 4px}
+.cs{display:flex;align-items:center;gap:6px}
+.cs input{width:65px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-size:.8rem;text-align:center;outline:none}
+.cs span{color:var(--tx2);font-size:.8rem}
+.mn{flex:1;padding:20px;overflow:auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-content:flex-start}
+.df{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;display:inline-flex;flex-direction:column;flex-shrink:0}
+.dh{padding:6px 12px;background:var(--sf2);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd)}
+.dn{font-size:.75rem;color:var(--tx2);flex:1}.ds{font-size:.7rem;color:var(--tx2);opacity:.7}
+.dc{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.85rem;padding:2px 6px;border-radius:4px}
+.dc:hover{background:var(--dg);color:#fff}
+.db{background:#000;overflow:hidden}
+.db iframe{border:none;display:block;background:#fff}
+.ph{display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:.85rem;text-align:center;padding:20px}
+.ft{background:var(--sf);border-top:1px solid var(--bd);padding:8px 20px;text-align:center;font-size:.7rem;color:var(--tx2)}
+.es{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--tx2);padding:60px 20px;text-align:center;width:100%}
+.es h2{font-size:1.2rem;color:var(--tx);font-weight:500}
+.es p{font-size:.9rem;max-width:400px;line-height:1.5}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+@media(max-width:768px){.hd,.tb{padding:8px 12px}.mn{padding:12px}}
+</style>
+</head>
+<body>
+<div class="hd">
+<div class="logo">📱 AI Responsive Tester</div>
+<div class="ub">
+<input type="url" id="url" placeholder="Enter URL to preview (e.g. https://example.com)" spellcheck="false">
+<button class="btn" onclick="go()">▶ Preview</button>
+<button class="btn btn-o btn-s" onclick="rotate()" title="Toggle portrait/landscape">🔄 Rotate</button>
+</div>
+</div>
+<div class="tb">
+<div class="dp" id="presets"></div>
+<div class="sp"></div>
+<div class="cs">
+<input type="number" id="cw" placeholder="W" min="200" max="3840">
+<span>×</span>
+<input type="number" id="ch" placeholder="H" min="200" max="2160">
+<button class="btn btn-s btn-o" onclick="addC()">+ Add</button>
+</div>
+</div>
+<div class="mn" id="vp">
+<div class="es" id="empty">
+<div style="font-size:4rem;opacity:.3">📐</div>
+<h2>Multi-Device Responsive Preview</h2>
+<p>Enter a URL above and select device presets to preview your site across different screen sizes.</p>
+</div>
+</div>
+<div class="ft">AI Responsive Tester — Preview responsive designs across devices</div>
+<script>
+const D=[
+{n:"iPhone SE",w:375,h:667,i:"📱"},
+{n:"iPhone 14 Pro",w:393,h:852,i:"📱"},
+{n:"iPhone 15 Pro Max",w:430,h:932,i:"📱"},
+{n:"Pixel 7",w:412,h:915,i:"📱"},
+{n:"Galaxy S23",w:360,h:780,i:"📱"},
+{n:"iPad Mini",w:768,h:1024,i:"📋"},
+{n:"iPad Pro 12.9",w:1024,h:1366,i:"📋"},
+{n:"MacBook Air",w:1440,h:900,i:"💻"},
+{n:"Desktop 1080p",w:1920,h:1080,i:"🖥️"},
+{n:"Desktop 1440p",w:2560,h:1440,i:"🖥️"}
+];
+let landscape=false, active=new Set(), url='', scale=0.3;
+const $=s=>document.querySelector(s),vp=$('#vp'),pr=$('#presets');
+
+function init(){
+D.forEach((d,i)=>{
+const b=document.createElement('button');
+b.className='pb';b.textContent=d.i+' '+d.n;
+b.onclick=()=>toggle(i,b);
+pr.appendChild(b);
+});
+$('#url').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+}
+
+function toggle(i,b){
+if(active.has(i)){active.delete(i);b.classList.remove('on');removeFrame(i)}
+else{active.add(i);b.classList.add('on');if(url)addFrame(D[i],i)}
+updateEmpty();
+}
+
+function go(){
+let u=$('#url').value.trim();
+if(!u)return;
+if(!/^https?:\/\//i.test(u))u='https://'+u;
+$('#url').value=u;url=u;
+document.querySelectorAll('.df').forEach(f=>f.remove());
+active.forEach(i=>addFrame(D[i],i));
+updateEmpty();
+}
+
+function addFrame(d,id){
+const el=document.getElementById('frame-'+id);if(el)el.remove();
+const f=document.createElement('div');f.className='df';f.id='frame-'+id;
+const w=landscape?d.h:d.w, h=landscape?d.w:d.h;
+const sw=Math.min(w*scale,window.innerWidth-60);
+const sh=sw*(h/w);
+f.innerHTML=`<div class="dh"><span class="dn">${d.i} ${d.n}</span><span class="ds">${w}×${h}</span><button class="dc" onclick="closeFrame(${id})">✕</button></div><div class="db" style="width:${sw}px;height:${sh}px"><iframe src="${url}" style="width:${w}px;height:${h}px;transform:scale(${sw/w});transform-origin:0 0"></iframe></div>`;
+vp.appendChild(f);
+}
+
+function removeFrame(id){const el=document.getElementById('frame-'+id);if(el)el.remove()}
+
+function closeFrame(id){
+active.delete(id);
+const btns=pr.querySelectorAll('.pb');if(btns[id])btns[id].classList.remove('on');
+removeFrame(id);updateEmpty();
+}
+
+function updateEmpty(){
+const e=$('#empty');
+if(!e)return;
+e.style.display=(active.size===0||!url)?'flex':'none';
+}
+
+function rotate(){
+landscape=!landscape;
+if(!url)return;
+document.querySelectorAll('.df').forEach(f=>f.remove());
+active.forEach(i=>addFrame(D[i],i));
+}
+
+function addC(){
+const w=parseInt($('#cw').value),h=parseInt($('#ch').value);
+if(!w||!h||w<200||h<200)return alert('Enter valid dimensions (min 200)');
+const id=D.length;
+D.push({n:`Custom ${w}×${h}`,w,h,i:'📏'});
+const b=document.createElement('button');
+b.className='pb on';b.textContent='📏 Custom '+w+'×'+h;
+b.onclick=()=>toggle(id,b);
+pr.appendChild(b);
+active.add(id);
+if(url)addFrame(D[id],id);
+updateEmpty();$('#cw').value='';$('#ch').value='';
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive HSL color picker tool. Select colors using hue, saturation, and lightness sliders. Convert between HSL, RGB, and HEX color formats easily.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-hsl/">
+<title>HSL Color Picker - AI CSS HSL</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.6rem;margin-bottom:20px;color:#fff;text-align:center}
+.container{width:100%;max-width:480px}
+.preview{width:100%;height:180px;border-radius:16px;margin-bottom:20px;border:2px solid rgba(255,255,255,.1);transition:background-color .1s}
+.sliders{background:rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:20px}
+.sg{margin-bottom:16px}.sg:last-child{margin-bottom:0}
+.sl{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.9rem}
+.sl span:first-child{font-weight:600}.sl span:last-child{color:#aaa;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.3);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+#hue{background:linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%))}
+.vals{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.vr{display:flex;align-items:center;background:rgba(255,255,255,.05);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .2s;user-select:none}
+.vr:hover{background:rgba(255,255,255,.1)}.vr:active{background:rgba(255,255,255,.15)}
+.vl{font-size:.75rem;font-weight:700;color:#888;width:36px;flex-shrink:0}
+.vt{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.95rem;flex:1}
+.ch{font-size:.7rem;color:#666;margin-left:8px}.copied{color:#4ade80!important}
+.hist{background:rgba(255,255,255,.05);border-radius:16px;padding:16px}
+.ht{font-size:.85rem;font-weight:600;color:#888;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.hc{font-size:.7rem;color:#666;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
+.hc:hover{background:rgba(255,255,255,.1);color:#aaa}
+.hg{display:flex;flex-wrap:wrap;gap:8px}
+.hi{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .15s}
+.hi:hover{border-color:rgba(255,255,255,.4);transform:scale(1.1)}
+.eh{font-size:.8rem;color:#555;text-align:center;padding:10px 0}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(74,222,128,.9);color:#000;padding:8px 20px;border-radius:20px;font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:500px){body{padding:12px}h1{font-size:1.3rem}.preview{height:140px}}
+</style>
+</head>
+<body>
+<h1>&#127912; HSL Color Picker</h1>
+<div class="container">
+<div class="preview" id="preview"></div>
+<div class="sliders">
+<div class="sg"><div class="sl"><span>H (色相)</span><span id="hV">180°</span></div><input type="range" id="hue" min="0" max="360" value="180"></div>
+<div class="sg"><div class="sl"><span>S (饱和度)</span><span id="sV">80%</span></div><input type="range" id="sat" min="0" max="100" value="80"></div>
+<div class="sg"><div class="sl"><span>L (亮度)</span><span id="lV">55%</span></div><input type="range" id="lit" min="0" max="100" value="55"></div>
+</div>
+<div class="vals">
+<div class="vr" onclick="cp('hsl')"><span class="vl">HSL</span><span class="vt" id="oH"></span><span class="ch" id="cH">点击复制</span></div>
+<div class="vr" onclick="cp('rgb')"><span class="vl">RGB</span><span class="vt" id="oR"></span><span class="ch" id="cR">点击复制</span></div>
+<div class="vr" onclick="cp('hex')"><span class="vl">HEX</span><span class="vt" id="oX"></span><span class="ch" id="cX">点击复制</span></div>
+</div>
+<div class="hist">
+<div class="ht"><span>历史记录</span><span class="hc" onclick="clrH()">清空</span></div>
+<div class="hg" id="hGrid"><div class="eh">暂无历史颜色</div></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var E=function(id){return document.getElementById(id)};
+var hueR=E('hue'),satR=E('sat'),litR=E('lit'),prev=E('preview');
+var hist=JSON.parse(localStorage.getItem('hsl-hist')||'[]');
+var stm;
+function h2r(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);function f(n){var k=(n+h/30)%12;return l-a*Math.max(Math.min(k-3,9-k,1),-1)}return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)]}
+function r2h(r,g,b){return'#'+[r,g,b].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+function upd(){
+var h=+hueR.value,s=+satR.value,l=+litR.value;
+prev.style.backgroundColor='hsl('+h+','+s+'%,'+l+'%)';
+E('hV').textContent=h+'°';E('sV').textContent=s+'%';E('lV').textContent=l+'%';
+satR.style.background='linear-gradient(to right,hsl('+h+',0%,'+l+'%),hsl('+h+',100%,'+l+'%))';
+litR.style.background='linear-gradient(to right,hsl('+h+','+s+'%,0%),hsl('+h+','+s+'%,50%),hsl('+h+','+s+'%,100%))';
+var rgb=h2r(h,s,l),hex=r2h(rgb[0],rgb[1],rgb[2]);
+E('oH').textContent='hsl('+h+', '+s+'%, '+l+'%)';
+E('oR').textContent='rgb('+rgb[0]+', '+rgb[1]+', '+rgb[2]+')';
+E('oX').textContent=hex;
+clearTimeout(stm);stm=setTimeout(function(){addH(h,s,l,hex)},800);
+}
+function addH(h,s,l,hex){
+var key=h+','+s+','+l;
+hist=hist.filter(function(c){return c.k!==key});
+hist.unshift({k:key,h:h,s:s,l:l,hex:hex});
+if(hist.length>20)hist=hist.slice(0,20);
+localStorage.setItem('hsl-hist',JSON.stringify(hist));
+renH();
+}
+function renH(){
+var g=E('hGrid');
+if(!hist.length){g.innerHTML='<div class="eh">暂无历史颜色</div>';return}
+g.innerHTML='';
+hist.forEach(function(c){
+var d=document.createElement('div');d.className='hi';
+d.style.backgroundColor=c.hex;d.title=c.hex;
+d.onclick=function(){hueR.value=c.h;satR.value=c.s;litR.value=c.l;upd()};
+g.appendChild(d);
+});
+}
+function cp(t){
+var txt=t==='hsl'?E('oH').textContent:t==='rgb'?E('oR').textContent:E('oX').textContent;
+var hid=t==='hsl'?'cH':t==='rgb'?'cR':'cX';
+navigator.clipboard.writeText(txt).then(function(){toast('已复制 '+txt);var el=E(hid);el.textContent='已复制!';el.classList.add('copied');setTimeout(function(){el.textContent='点击复制';el.classList.remove('copied')},1500)});
+}
+function clrH(){hist=[];localStorage.removeItem('hsl-hist');renH()}
+function toast(m){var t=E('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+hueR.addEventListener('input',upd);satR.addEventListener('input',upd);litR.addEventListener('input',upd);
+upd();renH();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

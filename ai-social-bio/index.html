@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI social media bio generator. Create compelling bios for Twitter, Instagram, LinkedIn, and TikTok. Get multiple variations optimized for each platform.">
+<link rel="canonical" href="https://lifa-su.com/ai-social-bio/">
+<title>AI Social Bio Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;
+  --text:#e4e4ef;--text2:#9494a8;--accent:#7c5cfc;--accent2:#5c8cfc;
+  --success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;
+}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:24px 16px}
+h1{text-align:center;font-size:2rem;font-weight:700;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:var(--text2);margin-bottom:36px;font-size:.95rem}
+.section-title{font-size:1.1rem;font-weight:600;margin-bottom:14px;color:var(--text)}
+/* Platform Cards */
+.platforms{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.platform-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .25s ease;user-select:none}
+.platform-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,92,252,.15)}
+.platform-card.active{border-color:var(--accent);background:rgba(124,92,252,.1);box-shadow:0 4px 16px rgba(124,92,252,.2)}
+.platform-card .icon{font-size:2rem;margin-bottom:6px;display:block}
+.platform-card .name{font-weight:600;font-size:.9rem}
+.platform-card .limit{font-size:.75rem;color:var(--text2);margin-top:2px}
+/* Form */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:6px}
+.form-group input,.form-group textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;color:var(--text);font-family:inherit;font-size:.95rem;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text2);opacity:.6}
+/* Tone selector */
+.tone-options{display:flex;flex-wrap:wrap;gap:10px}
+.tone-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:8px 18px;color:var(--text);cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:500;transition:all .2s}
+.tone-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tone-btn.active{border-color:var(--accent);background:rgba(124,92,252,.12);color:var(--accent)}
+/* Generate button */
+.generate-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;transition:all .25s;margin-top:8px;margin-bottom:32px}
+.generate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,92,252,.35)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+/* Results */
+.results-section{display:none}
+.results-section.show{display:block}
+.bio-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;position:relative;transition:border-color .2s}
+.bio-card:hover{border-color:rgba(124,92,252,.3)}
+.bio-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.bio-style{font-size:.8rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.bio-text{font-size:.95rem;line-height:1.7;color:var(--text);word-break:break-word;white-space:pre-wrap}
+.bio-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.char-count{font-size:.8rem;color:var(--text2)}
+.char-count.over{color:var(--danger);font-weight:600}
+.copy-btn{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:6px 16px;color:var(--text);cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:500;transition:all .2s;display:flex;align-items:center;gap:5px}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.copied{border-color:var(--success);color:var(--success);background:rgba(76,218,138,.08)}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#0a0a0f;padding:10px 24px;border-radius:var(--radius);font-size:.85rem;font-weight:600;opacity:0;transition:all .35s ease;pointer-events:none;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+/* Footer */
+.footer{text-align:center;color:var(--text2);font-size:.75rem;margin-top:48px;padding-bottom:24px}
+.footer a{color:var(--accent);text-decoration:none}
+@media(max-width:600px){
+  h1{font-size:1.5rem}
+  .platforms{grid-template-columns:repeat(3,1fr);gap:8px}
+  .platform-card{padding:12px 8px}
+  .platform-card .icon{font-size:1.5rem}
+  .tone-options{gap:6px}
+  .tone-btn{padding:6px 14px;font-size:.8rem}
+  .container{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>✨ AI Social Bio Generator</h1>
+  <p class="subtitle">Generate the perfect bio for any social platform in seconds</p>
+
+  <div class="section-title">1. Choose Platform</div>
+  <div class="platforms" id="platforms">
+    <div class="platform-card active" data-platform="twitter" data-limit="160">
+      <span class="icon">𝕏</span>
+      <div class="name">Twitter / X</div>
+      <div class="limit">160 characters</div>
+    </div>
+    <div class="platform-card" data-platform="linkedin" data-limit="2600">
+      <span class="icon">💼</span>
+      <div class="name">LinkedIn</div>
+      <div class="limit">2,600 characters</div>
+    </div>
+    <div class="platform-card" data-platform="instagram" data-limit="150">
+      <span class="icon">📸</span>
+      <div class="name">Instagram</div>
+      <div class="limit">150 characters</div>
+    </div>
+    <div class="platform-card" data-platform="tiktok" data-limit="80">
+      <span class="icon">🎵</span>
+      <div class="name">TikTok</div>
+      <div class="limit">80 characters</div>
+    </div>
+    <div class="platform-card" data-platform="github" data-limit="160">
+      <span class="icon">🐙</span>
+      <div class="name">GitHub</div>
+      <div class="limit">160 characters</div>
+    </div>
+  </div>
+
+  <div class="section-title">2. Tell Us About You</div>
+  <div class="form-group">
+    <label>Keywords (comma separated)</label>
+    <input type="text" id="keywords" placeholder="e.g. AI, startup, design, coffee lover">
+  </div>
+  <div class="form-group">
+    <label>Profession / Role</label>
+    <input type="text" id="profession" placeholder="e.g. Full-stack Developer, Marketing Manager">
+  </div>
+  <div class="form-group">
+    <label>Interests / Hobbies</label>
+    <input type="text" id="interests" placeholder="e.g. photography, hiking, open source, gaming">
+  </div>
+
+  <div class="section-title" style="margin-top:24px">3. Choose Tone</div>
+  <div class="tone-options" id="tones">
+    <button class="tone-btn active" data-tone="professional">🎯 Professional</button>
+    <button class="tone-btn" data-tone="humorous">😄 Humorous</button>
+    <button class="tone-btn" data-tone="creative">🎨 Creative</button>
+    <button class="tone-btn" data-tone="concise">⚡ Concise</button>
+  </div>
+
+  <button class="generate-btn" id="generateBtn" onclick="generateBios()">🚀 Generate Bios</button>
+
+  <div class="results-section" id="results">
+    <div class="section-title">Your Generated Bios</div>
+    <div id="bioCards"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Copied to clipboard!</div>
+
+<div class="footer">
+  Built with ❤️ — AI Social Bio Generator
+</div>
+
+<script>
+// Platform selection
+const platformCards = document.querySelectorAll('.platform-card');
+let selectedPlatform = 'twitter';
+let selectedLimit = 160;
+platformCards.forEach(card => {
+  card.addEventListener('click', () => {
+    platformCards.forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedPlatform = card.dataset.platform;
+    selectedLimit = parseInt(card.dataset.limit);
+  });
+});
+
+// Tone selection
+const toneBtns = document.querySelectorAll('.tone-btn');
+let selectedTone = 'professional';
+toneBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    toneBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  });
+});
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '✓ Copied to clipboard!';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Copy
+function copyBio(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✓ Copied';
+    showToast();
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋 Copy'; }, 2000);
+  });
+}
+
+// Template engine
+const templates = {
+  twitter: {
+    professional: [
+      (p, k, i) => `${p} | ${k[0]} enthusiast | ${i[0]} in my free time`,
+      (p, k, i) => `${p} passionate about ${k.slice(0,2).join(' & ')}. ${i[0]} lover.`,
+      (p, k, i) => `${p}. Building with ${k[0]}. Exploring ${i[0]}.`,
+      (p, k, i) => `${p} → ${k.slice(0,2).join(', ')} | Fueled by ${i[0]} ☕`,
+    ],
+    humorous: [
+      (p, k, i) => `Professional ${p} by day, ${i[0]} addict by night 🌙 ${k[0]} is my love language`,
+      (p, k, i) => `${p} who accidentally became a ${k[0]} nerd 🤓 Also into ${i[0]}`,
+      (p, k, i) => `Surviving on ${i[0]} and ${k[0]} | ${p} (allegedly) 😂`,
+      (p, k, i) => `${p}. ${k[0]} pays the bills. ${i[0]} keeps me sane. 🙃`,
+    ],
+    creative: [
+      (p, k, i) => `✦ ${p} ✦ Weaving ${k[0]} into everything I touch | ${i[0]} dreamer`,
+      (p, k, i) => `🌊 ${p} riding the ${k[0]} wave | ${i[0]} is my muse`,
+      (p, k, i) => `${p} × ${k[0]} × ${i[0]} = this bio ✨`,
+      (p, k, i) => `Crafting stories through ${k[0]} | ${p} | ${i[0]} soul 🎭`,
+    ],
+    concise: [
+      (p, k, i) => `${p}. ${k[0]}. ${i[0]}.`,
+      (p, k, i) => `${p} | ${k[0]} | ${i[0]}`,
+      (p, k, i) => `${k[0]} ${p}. Into ${i[0]}.`,
+      (p, k, i) => `${p} → ${k[0]} + ${i[0]}`,
+    ]
+  },
+  linkedin: {
+    professional: [
+      (p, k, i) => `${p} with deep expertise in ${k.join(', ')}. I help organizations leverage ${k[0]} to drive meaningful results. When I'm not working, you'll find me exploring ${i.join(' and ')}.\n\nLet's connect and build something impactful together.`,
+      (p, k, i) => `As a ${p}, I specialize in ${k.slice(0,3).join(', ')}. My mission is to bridge the gap between innovation and execution. Outside of work, I'm passionate about ${i.join(', ')}.\n\nOpen to collaborations and new opportunities.`,
+      (p, k, i) => `Experienced ${p} focused on ${k[0]} and ${k.length > 1 ? k[1] : 'innovation'}. I believe in continuous learning and pushing boundaries. My interests in ${i.join(', ')} keep me creative and inspired.\n\nFeel free to reach out — always happy to chat.`,
+      (p, k, i) => `${p} | ${k.join(' • ')}\n\nDriven by a passion for ${k[0]}, I bring a unique perspective shaped by my love for ${i.join(' and ')}. I thrive in environments where creativity meets strategy.\n\nLet's connect!`,
+    ],
+    humorous: [
+      (p, k, i) => `${p} who somehow convinced people I know what I'm doing with ${k.join(', ')} 😅\n\nWhen LinkedIn isn't watching, I'm probably doing ${i[0]}. My superpower? Making ${k[0]} sound exciting at parties.\n\nDMs open for collabs (and ${i[0]} tips).`,
+      (p, k, i) => `They call me a ${p}. I call myself a professional ${k[0]} enthusiast who gets paid. Also really into ${i.join(' and ')}.\n\nIf my profile made you smile, let's connect. Life's too short for boring bios.`,
+      (p, k, i) => `${p} by title, ${k[0]} nerd by nature, ${i[0]} lover by choice.\n\nI've spent years figuring out ${k.join(' and ')}, and I'm still learning. At least my ${i[0]} skills are on point.\n\nLet's chat!`,
+      (p, k, i) => `Plot twist: I'm a ${p} who actually enjoys ${k[0]}. Wild, right?\n\nAlso passionate about ${i.join(', ')}. I bring the same energy to work as I do to ${i[0]} — which is a lot.\n\nAlways up for a good conversation.`,
+    ],
+    creative: [
+      (p, k, i) => `🌟 ${p} at the intersection of ${k.join(' and ')}\n\nI see the world through the lens of ${k[0]}, and I create through the spirit of ${i[0]}. Every project is a canvas, every challenge an opportunity to innovate.\n\nLet's paint something extraordinary together.`,
+      (p, k, i) => `Imagine a ${p} who dreams in ${k[0]} and creates with ${i[0]}. That's me.\n\nI believe ${k.join(', ')} aren't just skills — they're art forms. My journey is about blending technical excellence with creative vision.\n\nCurious? Let's connect.`,
+      (p, k, i) => `${p} ✦ ${k.join(' ✦ ')}\n\nI don't just work in ${k[0]} — I live it. My passion for ${i.join(' and ')} fuels my creativity and keeps my perspective fresh.\n\nEvery connection is a new story waiting to unfold.`,
+      (p, k, i) => `The world needs more ${p}s who care about ${k[0]} and love ${i[0]}. I'm trying to be one of them.\n\nMy work sits at the crossroads of ${k.join(', ')} — and I wouldn't have it any other way.\n\n✨ Open to creative collaborations.`,
+    ],
+    concise: [
+      (p, k, i) => `${p} specializing in ${k.join(', ')}. Passionate about ${i.join(' and ')}. Let's connect.`,
+      (p, k, i) => `${p} | ${k.join(' | ')}\nInterests: ${i.join(', ')}\nOpen to opportunities.`,
+      (p, k, i) => `${p}. Expert in ${k[0]}. Lover of ${i[0]}. Building what matters.`,
+      (p, k, i) => `${p} focused on ${k.join(' & ')}. Outside work: ${i.join(', ')}. Always learning.`,
+    ]
+  },
+  instagram: {
+    professional: [
+      (p, k, i) => `${p} ✨\n${k[0]} is my craft\n${i[0]} is my escape`,
+      (p, k, i) => `${p} 💫 ${k.slice(0,2).join(' + ')}\n🎯 ${i[0]} enthusiast`,
+      (p, k, i) => `${p}\n📍 ${k[0]} world\n❤️ ${i[0]}`,
+      (p, k, i) => `✦ ${p} ✦\n${k[0]} · ${i[0]}`,
+    ],
+    humorous: [
+      (p, k, i) => `${p} but make it ✨aesthetic✨\n${k[0]} pays rent\n${i[0]} feeds my soul 🍕`,
+      (p, k, i) => `professional ${k[0]} overthinker\n${p} by accident\n${i[0]} > everything 😂`,
+      (p, k, i) => `${p} 🤷\n${k[0]} addict\n${i[0]} when nobody's watching`,
+      (p, k, i) => `50% ${p}\n30% ${k[0]}\n20% ${i[0]}\n100% chaos 🌀`,
+    ],
+    creative: [
+      (p, k, i) => `◐ ${p} ◑\n∿ ${k[0]} dreamer\n❋ ${i[0]} soul`,
+      (p, k, i) => `${p} 🌙\npainting life with ${k[0]}\n${i[0]} is my palette 🎨`,
+      (p, k, i) => `✧ ${p} ✧\n${k[0]} × ${i[0]}\ncreating magic daily ✨`,
+      (p, k, i) => `[ ${p} ]\n→ ${k[0]}\n→ ${i[0]}\n→ vibes only 🌊`,
+    ],
+    concise: [
+      (p, k, i) => `${p} | ${k[0]} | ${i[0]}`,
+      (p, k, i) => `${p}. ${k[0]}. ${i[0]}.`,
+      (p, k, i) => `${p} ⚡ ${k[0]}`,
+      (p, k, i) => `${k[0]} ${p} 🚀`,
+    ]
+  },
+  tiktok: {
+    professional: [
+      (p, k, i) => `${p} | ${k[0]} tips 🎯`,
+      (p, k, i) => `${p} sharing ${k[0]} 💡`,
+      (p, k, i) => `${k[0]} ${p} ✨`,
+      (p, k, i) => `${p} × ${k[0]} 🚀`,
+    ],
+    humorous: [
+      (p, k, i) => `${k[0]} nerd 🤓 ${i[0]} addict`,
+      (p, k, i) => `${p} but funny 😂`,
+      (p, k, i) => `unhinged ${p} 🫠 ${k[0]}`,
+      (p, k, i) => `${k[0]} chaos 🌀 ${i[0]}`,
+    ],
+    creative: [
+      (p, k, i) => `✦ ${k[0]} creator ✦`,
+      (p, k, i) => `${p} 🌊 ${k[0]} vibes`,
+      (p, k, i) => `dreaming in ${k[0]} ✨`,
+      (p, k, i) => `${k[0]} × ${i[0]} 🎭`,
+    ],
+    concise: [
+      (p, k, i) => `${p} | ${k[0]}`,
+      (p, k, i) => `${k[0]} ⚡`,
+      (p, k, i) => `${p}. ${k[0]}.`,
+      (p, k, i) => `${k[0]} 🔥`,
+    ]
+  },
+  github: {
+    professional: [
+      (p, k, i) => `${p} | Building with ${k.join(', ')} | ${i[0]} enthusiast`,
+      (p, k, i) => `${p} specializing in ${k[0]}. Open source contributor. ${i[0]} on the side.`,
+      (p, k, i) => `${p} → ${k.join(' / ')} | Passionate about ${i[0]}`,
+      (p, k, i) => `${p}. ${k[0]} developer. ${i[0]} lover. Always shipping.`,
+    ],
+    humorous: [
+      (p, k, i) => `${p} who writes ${k[0]} code and pretends to understand ${k.length > 1 ? k[1] : 'git rebase'} 😅`,
+      (p, k, i) => `I turn ☕ into ${k[0]} code | ${p} | ${i[0]} when CI is green`,
+      (p, k, i) => `${p}. My code works, I just don't know why. ${k[0]} enthusiast.`,
+      (p, k, i) => `Professional googler & ${p} | ${k[0]} | ${i[0]} 🤓`,
+    ],
+    creative: [
+      (p, k, i) => `🛠 ${p} crafting digital experiences with ${k.join(' & ')} | ${i[0]} inspires my code`,
+      (p, k, i) => `Code poet & ${p} | ${k[0]} artisan | ${i[0]} fuels creativity ✨`,
+      (p, k, i) => `${p} at the intersection of ${k[0]} and ${i[0]} | Building the future`,
+      (p, k, i) => `✦ ${p} ✦ ${k.join(' · ')} · ${i[0]}`,
+    ],
+    concise: [
+      (p, k, i) => `${p}. ${k.join(', ')}. ${i[0]}.`,
+      (p, k, i) => `${p} | ${k[0]}`,
+      (p, k, i) => `${k[0]} ${p}`,
+      (p, k, i) => `${p} — ${k.join(' / ')}`,
+    ]
+  }
+};
+
+const toneLabels = {
+  professional: '🎯 Professional',
+  humorous: '😄 Humorous',
+  creative: '🎨 Creative',
+  concise: '⚡ Concise'
+};
+
+function generateBios() {
+  const keywords = document.getElementById('keywords').value.trim();
+  const profession = document.getElementById('profession').value.trim();
+  const interests = document.getElementById('interests').value.trim();
+
+  if (!keywords && !profession && !interests) {
+    showToast('⚠️ Please fill in at least one field');
+    return;
+  }
+
+  const kw = keywords ? keywords.split(/[,，]/).map(s => s.trim()).filter(Boolean) : ['tech'];
+  const prof = profession || 'Creator';
+  const int = interests ? interests.split(/[,，]/).map(s => s.trim()).filter(Boolean) : ['learning'];
+
+  // Ensure arrays have enough items
+  while (kw.length < 3) kw.push(kw[0]);
+  while (int.length < 3) int.push(int[0]);
+
+  const allTones = ['professional', 'humorous', 'creative', 'concise'];
+  const container = document.getElementById('bioCards');
+  container.innerHTML = '';
+
+  allTones.forEach(tone => {
+    const tpls = templates[selectedPlatform][tone];
+    // Pick a random template for each tone
+    const idx = Math.floor(Math.random() * tpls.length);
+    const bio = tpls[idx](prof, kw, int);
+    const charCount = bio.length;
+    const isOver = charCount > selectedLimit;
+
+    const card = document.createElement('div');
+    card.className = 'bio-card';
+    card.innerHTML = `
+      <div class="bio-header">
+        <span class="bio-style">${toneLabels[tone]}</span>
+      </div>
+      <div class="bio-text">${escapeHtml(bio)}</div>
+      <div class="bio-footer">
+        <span class="char-count ${isOver ? 'over' : ''}">${charCount} / ${selectedLimit} chars${isOver ? ' ⚠️ Over limit!' : ''}</span>
+        <button class="copy-btn" onclick="copyBio(\`${escapeJs(bio)}\`, this)">📋 Copy</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  const results = document.getElementById('results');
+  results.classList.add('show');
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeJs(str) {
+  return str.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+}
+</script>
+<script src="https://cdn.jsdelivr.net/gh/nicepkg/nicepkg@main/packages/monetize/dist/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

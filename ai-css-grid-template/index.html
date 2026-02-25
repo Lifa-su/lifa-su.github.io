@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS Grid template generator with visual editor. Define rows, columns, gaps, and alignment. Preview responsive grid layouts and export clean CSS code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-grid-template/">
+<title>CSS Grid Template Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--cell-bg:#1e2746;--success:#4ecca3;--warn:#f0a500}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{display:flex;flex-direction:column;min-height:100vh}
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+header h1{font-size:1.3rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{color:var(--text2);font-size:.8rem}
+.main{display:flex;flex:1;overflow:hidden}
+.panel{padding:16px;overflow-y:auto}
+.panel-left{width:280px;min-width:280px;background:var(--bg2);border-right:1px solid var(--border)}
+.panel-center{flex:1;display:flex;flex-direction:column;padding:16px;overflow:auto}
+.panel-right{width:380px;min-width:380px;background:var(--bg2);border-left:1px solid var(--border)}
+.section{margin-bottom:16px}
+.section-title{font-size:.85rem;font-weight:600;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.form-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.form-row label{font-size:.8rem;color:var(--text2);min-width:80px}
+.form-row input[type="number"],.form-row input[type="text"],.form-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:4px;font-size:.8rem}
+.form-row input[type="number"]{width:70px}
+.form-row select{cursor:pointer}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:.8rem;transition:all .2s}
+button:hover{opacity:.85}
+button.secondary{background:var(--accent2)}
+button.small{padding:4px 8px;font-size:.75rem}
+button.outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+button.outline:hover{border-color:var(--accent);color:var(--text)}
+button.outline.active{border-color:var(--accent);color:var(--accent);background:rgba(233,69,96,.1)}
+.breakpoint-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.breakpoint-bar button{flex:1;min-width:80px}
+.grid-wrapper{border:2px dashed var(--border);border-radius:8px;padding:8px;margin:0 auto;transition:width .3s;max-width:100%;overflow:auto}
+.grid-editor{display:grid;width:100%;min-height:300px}
+.grid-cell{background:var(--cell-bg);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text2);cursor:pointer;min-height:50px;transition:all .15s;position:relative;user-select:none}
+.grid-cell:hover{border-color:var(--accent);z-index:1}
+.grid-cell.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(233,69,96,.3)}
+.grid-cell .cell-label{font-size:.65rem;pointer-events:none;text-align:center;word-break:break-all;padding:2px}
+.size-editor{display:flex;flex-direction:column;gap:4px}
+.size-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.size-row label{font-size:.7rem;color:var(--text2);min-width:28px}
+.size-row input{width:50px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;border-radius:3px;font-size:.75rem}
+.size-row select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px;border-radius:3px;font-size:.75rem;cursor:pointer}
+.area-list{display:flex;flex-direction:column;gap:4px}
+.area-item{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--bg);border-radius:4px;border:1px solid var(--border);cursor:pointer}
+.area-item.active{border-color:var(--accent)}
+.area-color{width:16px;height:16px;border-radius:3px;flex-shrink:0}
+.area-item input{flex:1;background:transparent;border:none;color:var(--text);font-size:.8rem;outline:none;min-width:0}
+.code-output{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'Fira Code',Consolas,monospace;font-size:.75rem;color:#c9d1d9;overflow:auto;max-height:500px;white-space:pre;line-height:1.5}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--success);color:#000;padding:10px 20px;border-radius:6px;font-size:.85rem;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.preview-frame{border:2px solid var(--border);border-radius:6px;background:var(--bg);overflow:hidden;margin-top:8px}
+.preview-header{background:var(--bg3);padding:6px 10px;font-size:.7rem;color:var(--text2);display:flex;justify-content:space-between;border-bottom:1px solid var(--border)}
+.preview-content{padding:10px;overflow:auto}
+.preview-grid .preview-cell{border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:rgba(255,255,255,.8);padding:4px;min-height:30px}
+.toolbar{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.minmax-group{display:flex;gap:2px;align-items:center}
+.minmax-group input{width:40px!important}
+.minmax-group span{font-size:.65rem;color:var(--text2)}
+.eraser-mode .grid-cell:hover{border-color:var(--warn)}
+.tab-bar{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid var(--border)}
+.tab-bar button{border-radius:4px 4px 0 0;border:1px solid var(--border);border-bottom:none;background:var(--bg);color:var(--text2);padding:6px 14px;font-size:.8rem;margin-bottom:-1px}
+.tab-bar button.active{background:var(--bg2);color:var(--accent);border-color:var(--accent)}
+@media(max-width:1100px){.main{flex-direction:column}.panel-left,.panel-right{width:100%;min-width:unset;border:none;border-bottom:1px solid var(--border)}.panel-right{border-top:1px solid var(--border)}}
+@media(max-width:600px){header{padding:8px 12px}header h1{font-size:1.1rem}.panel{padding:10px}.grid-cell{min-height:35px;font-size:.6rem}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div><h1>&#9638; CSS Grid Template Generator</h1><div class="subtitle">Visual grid layout builder with area editor</div></div>
+</header>
+<div class="main">
+<div class="panel panel-left">
+<div class="section">
+<div class="section-title">Grid Settings</div>
+<div class="form-row"><label>Columns</label><input type="number" id="colCount" min="1" max="12" value="3" onchange="updateGrid()"></div>
+<div class="form-row"><label>Rows</label><input type="number" id="rowCount" min="1" max="12" value="3" onchange="updateGrid()"></div>
+<div class="form-row"><label>Column Gap</label><input type="number" id="colGap" min="0" max="100" value="10" onchange="updateGrid()"><span style="font-size:.75rem;color:var(--text2)">px</span></div>
+<div class="form-row"><label>Row Gap</label><input type="number" id="rowGap" min="0" max="100" value="10" onchange="updateGrid()"><span style="font-size:.75rem;color:var(--text2)">px</span></div>
+</div>
+<div class="section">
+<div class="section-title">Column Sizes</div>
+<div id="colSizes" class="size-editor"></div>
+</div>
+<div class="section">
+<div class="section-title">Row Sizes</div>
+<div id="rowSizes" class="size-editor"></div>
+</div>
+<div class="section">
+<div class="section-title">Areas</div>
+<div class="toolbar">
+<button class="small" onclick="addArea()">+ Add Area</button>
+<button class="small outline" id="eraserBtn" onclick="toggleEraser()">&#9003; Eraser</button>
+</div>
+<div id="areaList" class="area-list"></div>
+<div style="margin-top:8px;font-size:.7rem;color:var(--text2)">Click an area, then click/drag on grid cells to assign. Use eraser to clear cells.</div>
+</div>
+</div>
+<div class="panel panel-center">
+<div class="breakpoint-bar">
+<button class="outline active" data-bp="desktop" onclick="setBreakpoint('desktop')">&#128421; Desktop 1200px</button>
+<button class="outline" data-bp="tablet" onclick="setBreakpoint('tablet')">&#128241; Tablet 768px</button>
+<button class="outline" data-bp="mobile" onclick="setBreakpoint('mobile')">&#128242; Mobile 375px</button>
+</div>
+<div class="grid-wrapper" id="gridWrapper">
+<div class="grid-editor" id="gridEditor"></div>
+</div>
+</div>
+<div class="panel panel-right">
+<div class="section">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<div class="section-title" style="margin:0">Generated CSS</div>
+<button class="small" onclick="copyCSS()">&#128203; Copy CSS</button>
+</div>
+<div class="code-output" id="codeOutput"></div>
+</div>
+<div class="section">
+<div class="section-title">Preview</div>
+<div class="preview-frame">
+<div class="preview-header"><span id="previewLabel">Desktop - 1200px</span></div>
+<div class="preview-content"><div class="preview-grid" id="previewGrid"></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>&#9638; CSS Grid Template Generator</h1>
+    <div class="subtitle">Visual grid layout builder with area editor &amp; responsive preview</div>
+  </div>
+  <div class="breakpoint-bar">
+    <button class="outline" onclick="setBreakpoint('mobile')">&#128241; Mobile 375px</button>
+    <button class="outline active" onclick="setBreakpoint('desktop')">&#128187; Desktop 1200px</button>
+    <button class="outline" onclick="setBreakpoint('tablet')">&#128195; Tablet 768px</button>
+  </div>
+</header>
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="panel panel-left">
+    <div class="section">
+      <div class="section-title">Grid Settings</div>
+      <div class="form-row">
+        <label>Columns</label>
+        <input type="number" id="colCount" min="1" max="12" value="3" onchange="updateGrid()">
+      </div>
+      <div class="form-row">
+        <label>Rows</label>
+        <input type="number" id="rowCount" min="1" max="12" value="3" onchange="updateGrid()">
+      </div>
+      <div class="form-row">
+        <label>Col Gap</label>
+        <input type="number" id="colGap" min="0" max="100" value="10" onchange="render()"> <span style="font-size:.75rem;color:var(--text2)">px</span>
+      </div>
+      <div class="form-row">
+        <label>Row Gap</label>
+        <input type="number" id="rowGap" min="0" max="100" value="10" onchange="render()"> <span style="font-size:.75rem;color:var(--text2)">px</span>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Column Sizes</div>
+      <div id="colSizes" class="size-editor"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Row Sizes</div>
+      <div id="rowSizes" class="size-editor"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Areas</div>
+      <div class="toolbar">
+        <button class="small" onclick="addArea()">+ Add Area</button>
+        <button class="small outline" id="eraserBtn" onclick="toggleEraser()">&#9003; Eraser</button>
+      </div>
+      <div id="areaList" class="area-list"></div>
+    </div>
+  </div>
+  <!-- CENTER PANEL -->
+  <div class="panel panel-center">
+    <div style="font-size:.8rem;color:var(--text2);margin-bottom:8px">
+      Click cells to assign the selected area. Drag across cells to paint. Use eraser to clear.
+    </div>
+    <div class="grid-wrapper" id="gridWrapper">
+      <div class="grid-editor" id="gridEditor"></div>
+    </div>
+  </div>
+  <!-- RIGHT PANEL -->
+  <div class="panel panel-right">
+    <div class="section">
+      <div class="section-title">Preview</div>
+      <div class="preview-frame">
+        <div class="preview-header">
+          <span id="previewLabel">Desktop - 1200px</span>
+          <span id="previewSize"></span>
+        </div>
+        <div class="preview-content" id="previewContent">
+          <div class="preview-grid" id="previewGrid"></div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="section-title" style="margin-bottom:0">Generated CSS</div>
+        <button class="small" onclick="copyCSS()">&#128203; Copy CSS</button>
+      </div>
+      <div class="code-output" id="codeOutput"></div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ===== STATE =====
+const AREA_COLORS = [
+  '#e94560','#533483','#4ecca3','#f0a500','#3498db','#e74c3c','#2ecc71','#9b59b6',
+  '#1abc9c','#e67e22','#00cec9','#fd79a8','#6c5ce7','#00b894','#fdcb6e','#d63031',
+  '#0984e3','#b2bec3','#a29bfe','#ffeaa7','#dfe6e9','#fab1a0','#74b9ff','#55efc4'
+];
+let state = {
+  cols: 3, rows: 3,
+  colGap: 10, rowGap: 10,
+  colSizes: ['1fr','1fr','1fr'],
+  rowSizes: ['1fr','1fr','1fr'],
+  areas: [], // 2D array [row][col] = areaName or '.'
+  areaList: [], // [{name, color}]
+  selectedArea: null,
+  eraserMode: false,
+  breakpoints: {
+    desktop: null,
+    tablet: null,
+    mobile: null
+  },
+  currentBP: 'desktop'
+};
+let isDragging = false;
+
+function init() {
+  state.areas = Array.from({length:3}, () => Array(3).fill('.'));
+  state.breakpoints.desktop = cloneConfig();
+  state.breakpoints.tablet = cloneConfig();
+  state.breakpoints.mobile = cloneConfig();
+  updateGrid();
+}
+
+function cloneConfig() {
+  return {
+    cols: state.cols, rows: state.rows,
+    colGap: state.colGap, rowGap: state.rowGap,
+    colSizes: [...state.colSizes],
+    rowSizes: [...state.rowSizes],
+    areas: state.areas.map(r => [...r]),
+    areaList: state.areaList.map(a => ({...a}))
+  };
+}
+
+function saveToBreakpoint() {
+  state.breakpoints[state.currentBP] = cloneConfig();
+}
+
+function loadFromBreakpoint(bp) {
+  const c = state.breakpoints[bp];
+  if (!c) return;
+  state.cols = c.cols; state.rows = c.rows;
+  state.colGap = c.colGap; state.rowGap = c.rowGap;
+  state.colSizes = [...c.colSizes];
+  state.rowSizes = [...c.rowSizes];
+  state.areas = c.areas.map(r => [...r]);
+  state.areaList = c.areaList.map(a => ({...a}));
+  document.getElementById('colCount').value = state.cols;
+  document.getElementById('rowCount').value = state.rows;
+  document.getElementById('colGap').value = state.colGap;
+  document.getElementById('rowGap').value = state.rowGap;
+}
+
+function setBreakpoint(bp) {
+  saveToBreakpoint();
+  state.currentBP = bp;
+  loadFromBreakpoint(bp);
+  document.querySelectorAll('.breakpoint-bar button').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(bp));
+  });
+  const labels = {mobile:'Mobile - 375px',tablet:'Tablet - 768px',desktop:'Desktop - 1200px'};
+  document.getElementById('previewLabel').textContent = labels[bp];
+  render();
+}
+
+function updateGrid() {
+  const newCols = parseInt(document.getElementById('colCount').value) || 3;
+  const newRows = parseInt(document.getElementById('rowCount').value) || 3;
+  // Resize colSizes
+  while (state.colSizes.length < newCols) state.colSizes.push('1fr');
+  state.colSizes.length = newCols;
+  // Resize rowSizes
+  while (state.rowSizes.length < newRows) state.rowSizes.push('1fr');
+  state.rowSizes.length = newRows;
+  // Resize areas
+  const newAreas = [];
+  for (let r = 0; r < newRows; r++) {
+    newAreas[r] = [];
+    for (let c = 0; c < newCols; c++) {
+      newAreas[r][c] = (state.areas[r] && state.areas[r][c]) ? state.areas[r][c] : '.';
+    }
+  }
+  state.areas = newAreas;
+  state.cols = newCols;
+  state.rows = newRows;
+  // Clean up areas that no longer exist in grid
+  cleanupAreas();
+  render();
+}
+
+function cleanupAreas() {
+  const usedNames = new Set();
+  state.areas.forEach(row => row.forEach(cell => { if (cell !== '.') usedNames.add(cell); }));
+  // Don't remove areas from list, just let them be available for painting
+}
+
+function render() {
+  renderSizeEditors();
+  renderAreaList();
+  renderGrid();
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+function renderSizeEditors() {
+  const colContainer = document.getElementById('colSizes');
+  const rowContainer = document.getElementById('rowSizes');
+  colContainer.innerHTML = state.colSizes.map((s, i) => sizeRowHTML('C'+(i+1), s, 'col', i)).join('');
+  rowContainer.innerHTML = state.rowSizes.map((s, i) => sizeRowHTML('R'+(i+1), s, 'row', i)).join('');
+}
+
+function sizeRowHTML(label, value, type, idx) {
+  const parsed = parseSize(value);
+  const isMinmax = parsed.unit === 'minmax';
+  let minVal = '100', minUnit = 'px', maxVal = '1', maxUnit = 'fr';
+  if (isMinmax) {
+    const m = value.match(/minmax\(([^,]+),\s*([^)]+)\)/);
+    if (m) {
+      const pMin = parseSize(m[1].trim());
+      const pMax = parseSize(m[2].trim());
+      minVal = pMin.num; minUnit = pMin.unit;
+      maxVal = pMax.num; maxUnit = pMax.unit;
+    }
+  }
+  return '<div class="size-row">' +
+    '<label>' + label + '</label>' +
+    '<select onchange="changeSizeUnit(this,\'' + type + '\',' + idx + ')">' +
+      '<option value="fr"' + (parsed.unit==='fr'?' selected':'') + '>fr</option>' +
+      '<option value="px"' + (parsed.unit==='px'?' selected':'') + '>px</option>' +
+      '<option value="auto"' + (parsed.unit==='auto'?' selected':'') + '>auto</option>' +
+      '<option value="minmax"' + (isMinmax?' selected':'') + '>minmax</option>' +
+    '</select>' +
+    (isMinmax ?
+      '<div class="minmax-group"><span>(</span>' +
+      '<input type="number" value="' + minVal + '" min="0" onchange="updateMinmax(\'' + type + '\',' + idx + ')">' +
+      '<select onchange="updateMinmax(\'' + type + '\',' + idx + ')">' +
+        '<option value="px"' + (minUnit==='px'?' selected':'') + '>px</option>' +
+        '<option value="fr"' + (minUnit==='fr'?' selected':'') + '>fr</option>' +
+      '</select><span>,</span>' +
+      '<input type="number" value="' + maxVal + '" min="0" onchange="updateMinmax(\'' + type + '\',' + idx + ')">' +
+      '<select onchange="updateMinmax(\'' + type + '\',' + idx + ')">' +
+        '<option value="fr"' + (maxUnit==='fr'?' selected':'') + '>fr</option>' +
+        '<option value="px"' + (maxUnit==='px'?' selected':'') + '>px</option>' +
+      '</select><span>)</span></div>'
+    : parsed.unit !== 'auto' ?
+      '<input type="number" value="' + parsed.num + '" min="0" onchange="changeSizeVal(this,\'' + type + '\',' + idx + ')">'
+    : '') +
+  '</div>';
+}
+
+function parseSize(s) {
+  if (!s || s === 'auto') return {num:'', unit:'auto'};
+  if (s.startsWith('minmax')) return {num:'', unit:'minmax'};
+  const m = s.match(/^([\d.]+)(fr|px)$/);
+  if (m) return {num:m[1], unit:m[2]};
+  return {num:'1', unit:'fr'};
+}
+
+function changeSizeUnit(sel, type, idx) {
+  const unit = sel.value;
+  const arr = type === 'col' ? state.colSizes : state.rowSizes;
+  if (unit === 'auto') arr[idx] = 'auto';
+  else if (unit === 'minmax') arr[idx] = 'minmax(100px, 1fr)';
+  else if (unit === 'fr') arr[idx] = '1fr';
+  else arr[idx] = '100px';
+  render();
+}
+
+function changeSizeVal(input, type, idx) {
+  const arr = type === 'col' ? state.colSizes : state.rowSizes;
+  const parsed = parseSize(arr[idx]);
+  arr[idx] = input.value + parsed.unit;
+  render();
+}
+
+function updateMinmax(type, idx) {
+  const arr = type === 'col' ? state.colSizes : state.rowSizes;
+  const container = type === 'col' ? document.getElementById('colSizes') : document.getElementById('rowSizes');
+  const row = container.children[idx];
+  const inputs = row.querySelectorAll('.minmax-group input');
+  const selects = row.querySelectorAll('.minmax-group select');
+  const minV = inputs[0].value + selects[0].value;
+  const maxV = inputs[1].value + selects[1].value;
+  arr[idx] = 'minmax(' + minV + ', ' + maxV + ')';
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+function changeSizeUnit(sel, type, idx) {
+  const unit = sel.value;
+  const sizes = type === 'col' ? state.colSizes : state.rowSizes;
+  if (unit === 'auto') sizes[idx] = 'auto';
+  else if (unit === 'minmax') sizes[idx] = 'minmax(100px, 1fr)';
+  else if (unit === 'fr') sizes[idx] = '1fr';
+  else sizes[idx] = '100px';
+  render();
+}
+
+function changeSizeVal(input, type, idx) {
+  const sizes = type === 'col' ? state.colSizes : state.rowSizes;
+  const parsed = parseSize(sizes[idx]);
+  sizes[idx] = input.value + parsed.unit;
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+function updateMinmax(type, idx) {
+  const sizes = type === 'col' ? state.colSizes : state.rowSizes;
+  const container = type === 'col' ? document.getElementById('colSizes') : document.getElementById('rowSizes');
+  const row = container.children[idx];
+  const inputs = row.querySelectorAll('.minmax-group input');
+  const selects = row.querySelectorAll('.minmax-group select');
+  if (inputs.length >= 2 && selects.length >= 2) {
+    sizes[idx] = 'minmax(' + inputs[0].value + selects[0].value + ', ' + inputs[1].value + selects[1].value + ')';
+  }
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+// ===== AREA MANAGEMENT =====
+function addArea() {
+  const idx = state.areaList.length;
+  const name = 'area' + (idx + 1);
+  const color = AREA_COLORS[idx % AREA_COLORS.length];
+  state.areaList.push({name, color});
+  state.selectedArea = name;
+  state.eraserMode = false;
+  render();
+}
+
+function selectArea(name) {
+  state.selectedArea = name;
+  state.eraserMode = false;
+  document.getElementById('eraserBtn').classList.remove('active');
+  renderAreaList();
+  renderGrid();
+}
+
+function deleteArea(idx) {
+  const name = state.areaList[idx].name;
+  state.areaList.splice(idx, 1);
+  // Clear from grid
+  for (let r = 0; r < state.rows; r++)
+    for (let c = 0; c < state.cols; c++)
+      if (state.areas[r][c] === name) state.areas[r][c] = '.';
+  if (state.selectedArea === name) state.selectedArea = state.areaList.length > 0 ? state.areaList[0].name : null;
+  render();
+}
+
+function renameArea(idx, newName) {
+  newName = newName.replace(/[^a-zA-Z0-9_-]/g, '').trim();
+  if (!newName) return;
+  const oldName = state.areaList[idx].name;
+  // Check duplicate
+  if (state.areaList.some((a, i) => i !== idx && a.name === newName)) {
+    showToast('Area name already exists!');
+    return;
+  }
+  state.areaList[idx].name = newName;
+  // Update grid
+  for (let r = 0; r < state.rows; r++)
+    for (let c = 0; c < state.cols; c++)
+      if (state.areas[r][c] === oldName) state.areas[r][c] = newName;
+  if (state.selectedArea === oldName) state.selectedArea = newName;
+  render();
+}
+
+function toggleEraser() {
+  state.eraserMode = !state.eraserMode;
+  if (state.eraserMode) state.selectedArea = null;
+  document.getElementById('eraserBtn').classList.toggle('active', state.eraserMode);
+  renderAreaList();
+  renderGrid();
+}
+
+function getAreaColor(name) {
+  const a = state.areaList.find(a => a.name === name);
+  return a ? a.color : '#555';
+}
+
+function renderAreaList() {
+  const container = document.getElementById('areaList');
+  container.innerHTML = state.areaList.map((a, i) =>
+    '<div class="area-item' + (state.selectedArea === a.name ? ' active' : '') + '" onclick="selectArea(\'' + a.name + '\')">' +
+      '<div class="area-color" style="background:' + a.color + '"></div>' +
+      '<input value="' + a.name + '" onclick="event.stopPropagation()" onchange="renameArea(' + i + ',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()">' +
+      '<button class="small outline" onclick="event.stopPropagation();deleteArea(' + i + ')">&#10005;</button>' +
+    '</div>'
+  ).join('');
+}
+
+// ===== GRID EDITOR =====
+function renderGrid() {
+  const editor = document.getElementById('gridEditor');
+  const wrapper = document.getElementById('gridWrapper');
+  editor.style.gridTemplateColumns = state.colSizes.map(s => {
+    if (s === 'auto' || s.startsWith('minmax')) return '1fr';
+    return s;
+  }).join(' ');
+  editor.style.gridTemplateRows = state.rowSizes.map(s => {
+    if (s === 'auto' || s.startsWith('minmax')) return '1fr';
+    return s;
+  }).join(' ');
+  editor.style.gap = state.rowGap + 'px ' + state.colGap + 'px';
+
+  // Set wrapper width based on breakpoint
+  const widths = {mobile:'375px',tablet:'768px',desktop:'100%'};
+  wrapper.style.maxWidth = widths[state.currentBP];
+
+  let html = '';
+  for (let r = 0; r < state.rows; r++) {
+    for (let c = 0; c < state.cols; c++) {
+      const areaName = state.areas[r][c];
+      const color = areaName !== '.' ? getAreaColor(areaName) : '';
+      const bg = color ? 'background:' + color + '33;border-color:' + color : '';
+      const label = areaName !== '.' ? areaName : (r+1) + ',' + (c+1);
+      html += '<div class="grid-cell' + (state.eraserMode ? ' eraser' : '') + '" data-r="' + r + '" data-c="' + c + '" style="' + bg + '">' +
+        '<span class="cell-label">' + label + '</span></div>';
+    }
+  }
+  editor.innerHTML = html;
+
+  // Add event listeners
+  editor.querySelectorAll('.grid-cell').forEach(cell => {
+    cell.addEventListener('mousedown', onCellMouseDown);
+    cell.addEventListener('mouseenter', onCellMouseEnter);
+    cell.addEventListener('touchstart', onCellTouchStart, {passive:false});
+    cell.addEventListener('touchmove', onCellTouchMove, {passive:false});
+  });
+}
+
+function paintCell(r, c) {
+  if (state.eraserMode) {
+    state.areas[r][c] = '.';
+  } else if (state.selectedArea) {
+    state.areas[r][c] = state.selectedArea;
+  }
+}
+
+function onCellMouseDown(e) {
+  e.preventDefault();
+  isDragging = true;
+  const r = parseInt(e.currentTarget.dataset.r);
+  const c = parseInt(e.currentTarget.dataset.c);
+  paintCell(r, c);
+  renderGrid();
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+function onCellMouseEnter(e) {
+  if (!isDragging) return;
+  const r = parseInt(e.currentTarget.dataset.r);
+  const c = parseInt(e.currentTarget.dataset.c);
+  paintCell(r, c);
+  renderGrid();
+  renderPreview();
+  renderCode();
+  saveToBreakpoint();
+}
+
+document.addEventListener('mouseup', () => { isDragging = false; });
+
+function onCellTouchStart(e) {
+  e.preventDefault();
+  isDragging = true;
+  const r = parseInt(e.currentTarget.dataset.r);
+  const c = parseInt(e.currentTarget.dataset.c);
+  paintCell(r, c);
+  renderGrid();
+  renderPreview();
+  renderCode();
+}
+
+function onCellTouchMove(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el && el.classList.contains('grid-cell')) {
+    const r = parseInt(el.dataset.r);
+    const c = parseInt(el.dataset.c);
+    paintCell(r, c);
+    renderGrid();
+    renderPreview();
+    renderCode();
+  }
+}
+
+document.addEventListener('touchend', () => { isDragging = false; saveToBreakpoint(); });
+
+// ===== PREVIEW =====
+function renderPreview() {
+  const grid = document.getElementById('previewGrid');
+  const colTemplate = state.colSizes.join(' ');
+  const rowTemplate = state.rowSizes.join(' ');
+  grid.style.gridTemplateColumns = colTemplate;
+  grid.style.gridTemplateRows = rowTemplate;
+  grid.style.gap = state.rowGap + 'px ' + state.colGap + 'px';
+
+  // Build template areas string
+  const areasStr = buildAreasString();
+  if (areasStr) {
+    grid.style.gridTemplateAreas = areasStr;
+  } else {
+    grid.style.gridTemplateAreas = '';
+  }
+
+  // Collect unique areas
+  const usedAreas = [];
+  const seen = new Set();
+  state.areas.forEach(row => row.forEach(cell => {
+    if (cell !== '.' && !seen.has(cell)) {
+      seen.add(cell);
+      usedAreas.push(cell);
+    }
+  }));
+
+  if (usedAreas.length > 0 && areasStr) {
+    grid.innerHTML = usedAreas.map(name => {
+      const color = getAreaColor(name);
+      return '<div class="preview-cell" style="grid-area:' + name + ';background:' + color + '55">' + name + '</div>';
+    }).join('');
+  } else {
+    // Show numbered cells
+    let cells = '';
+    for (let r = 0; r < state.rows; r++) {
+      for (let c = 0; c < state.cols; c++) {
+        const areaName = state.areas[r][c];
+        const color = areaName !== '.' ? getAreaColor(areaName) + '55' : 'rgba(255,255,255,.05)';
+        const label = areaName !== '.' ? areaName : '';
+        cells += '<div class="preview-cell" style="background:' + color + '">' + label + '</div>';
+      }
+    }
+    grid.innerHTML = cells;
+  }
+
+  // Update preview size label
+  const widths = {mobile:375,tablet:768,desktop:1200};
+  document.getElementById('previewSize').textContent = widths[state.currentBP] + ' x auto';
+}
+
+function buildAreasString() {
+  // Validate areas - each area must form a rectangle
+  const areaNames = new Set();
+  state.areas.forEach(row => row.forEach(cell => { if (cell !== '.') areaNames.add(cell); }));
+
+  for (const name of areaNames) {
+    if (!isRectangular(name)) return '';
+  }
+
+  return state.areas.map(row => '"' + row.join(' ') + '"').join(' ');
+}
+
+function isRectangular(name) {
+  let minR = Infinity, maxR = -1, minC = Infinity, maxC = -1;
+  for (let r = 0; r < state.rows; r++) {
+    for (let c = 0; c < state.cols; c++) {
+      if (state.areas[r][c] === name) {
+        minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+        minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+      }
+    }
+  }
+  if (maxR === -1) return true;
+  for (let r = minR; r <= maxR; r++)
+    for (let c = minC; c <= maxC; c++)
+      if (state.areas[r][c] !== name) return false;
+  return true;
+}
+
+// ===== CSS CODE GENERATION =====
+function renderCode() {
+  const output = document.getElementById('codeOutput');
+  let css = '';
+
+  // Check if we have multiple breakpoints with different configs
+  const bps = ['desktop', 'tablet', 'mobile'];
+  const bpWidths = {desktop: 1200, tablet: 768, mobile: 375};
+
+  // Generate for current breakpoint first, then media queries
+  const allBPs = {};
+  for (const bp of bps) {
+    allBPs[bp] = bp === state.currentBP ? cloneConfig() : state.breakpoints[bp];
+  }
+
+  // Main container CSS (desktop first)
+  const main = allBPs.desktop || allBPs[state.currentBP];
+  css += '.grid-container {\n';
+  css += '  display: grid;\n';
+  css += '  grid-template-columns: ' + (main ? main.colSizes.join(' ') : state.colSizes.join(' ')) + ';\n';
+  css += '  grid-template-rows: ' + (main ? main.rowSizes.join(' ') : state.rowSizes.join(' ')) + ';\n';
+
+  const mainAreas = main ? main.areas : state.areas;
+  const mainAreaList = main ? main.areaList : state.areaList;
+  const mainAreasStr = buildAreasStringFrom(mainAreas, main ? main.rows : state.rows, main ? main.cols : state.cols);
+  if (mainAreasStr) {
+    css += '  grid-template-areas:\n';
+    const areaLines = mainAreas.map(row => '    "' + row.join(' ') + '"');
+    css += areaLines.join('\n') + ';\n';
+  }
+  css += '  gap: ' + (main ? main.rowGap : state.rowGap) + 'px ' + (main ? main.colGap : state.colGap) + 'px;\n';
+  css += '}\n';
+
+  // Child elements with grid-area
+  const usedAreas = new Set();
+  if (mainAreas) mainAreas.forEach(row => row.forEach(cell => { if (cell !== '.') usedAreas.add(cell); }));
+  // Also collect from other breakpoints
+  for (const bp of bps) {
+    const c = allBPs[bp];
+    if (c && c.areas) c.areas.forEach(row => row.forEach(cell => { if (cell !== '.') usedAreas.add(cell); }));
+  }
+
+  if (usedAreas.size > 0) {
+    css += '\n';
+    for (const name of usedAreas) {
+      css += '.' + name + ' {\n  grid-area: ' + name + ';\n}\n';
+    }
+  }
+
+  // Media queries for tablet and mobile
+  for (const bp of ['tablet', 'mobile']) {
+    const c = allBPs[bp];
+    if (!c) continue;
+    const bpAreas = buildAreasStringFrom(c.areas, c.rows, c.cols);
+    css += '\n@media (max-width: ' + bpWidths[bp] + 'px) {\n';
+    css += '  .grid-container {\n';
+    css += '    grid-template-columns: ' + c.colSizes.join(' ') + ';\n';
+    css += '    grid-template-rows: ' + c.rowSizes.join(' ') + ';\n';
+    if (bpAreas) {
+      css += '    grid-template-areas:\n';
+      const areaLines = c.areas.map(row => '      "' + row.join(' ') + '"');
+      css += areaLines.join('\n') + ';\n';
+    }
+    css += '    gap: ' + c.rowGap + 'px ' + c.colGap + 'px;\n';
+    css += '  }\n';
+    css += '}\n';
+  }
+
+  output.textContent = css;
+}
+
+function buildAreasStringFrom(areas, rows, cols) {
+  if (!areas) return '';
+  const areaNames = new Set();
+  areas.forEach(row => row.forEach(cell => { if (cell !== '.') areaNames.add(cell); }));
+  if (areaNames.size === 0) return '';
+
+  for (const name of areaNames) {
+    let minR = Infinity, maxR = -1, minC = Infinity, maxC = -1;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (areas[r][c] === name) {
+          minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+          minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+        }
+      }
+    }
+    if (maxR === -1) continue;
+    for (let r = minR; r <= maxR; r++)
+      for (let c = minC; c <= maxC; c++)
+        if (areas[r][c] !== name) return '';
+  }
+  return areas.map(row => '"' + row.join(' ') + '"').join(' ');
+}
+
+// ===== COPY =====
+function copyCSS() {
+  const code = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('CSS copied to clipboard!');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('CSS copied to clipboard!');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== INIT =====
+document.addEventListener('mouseup', () => { isDragging = false; });
+document.addEventListener('touchend', () => { isDragging = false; });
+init();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
+
+// ===== COPY =====
+function copyCSS() {
+  const code = document.getElementById('codeOutput').textContent;
+  if (!code) { showToast('No CSS to copy'); return; }
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('CSS copied to clipboard!');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('CSS copied to clipboard!');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== INIT =====
+document.addEventListener('mouseup', () => { isDragging = false; });
+document.addEventListener('touchend', () => { isDragging = false; });
+
+// Prevent text selection while dragging
+document.addEventListener('selectstart', (e) => {
+  if (isDragging) e.preventDefault();
+});
+
+init();
+</script>
+
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;margin:32px 20px;border-radius:12px;overflow:hidden;cursor:pointer}
+.pro-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:32px;filter:blur(4px);pointer-events:none;user-select:none}
+.pro-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px 16px;text-align:center}
+.pro-card-icon{font-size:2rem;margin-bottom:8px}
+.pro-card-title{font-size:.95rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.pro-card-desc{font-size:.75rem;color:var(--text2)}
+.pro-overlay{position:absolute;inset:0;background:rgba(22,33,62,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:10}
+.pro-overlay .lock-icon{font-size:2.5rem}
+.pro-overlay .lock-text{font-size:1.1rem;font-weight:700;color:var(--text);letter-spacing:1px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:10000;align-items:center;justify-content:center}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px;max-width:400px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.3rem;margin-bottom:20px;color:var(--text)}
+.pro-modal ul{list-style:none;text-align:left;margin-bottom:20px;padding:0}
+.pro-modal ul li{padding:8px 0;font-size:.9rem;color:var(--text);border-bottom:1px solid var(--border)}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li .check{color:var(--success);margin-right:8px;font-weight:700}
+.pro-modal .price{font-size:2rem;font-weight:800;color:var(--accent);margin-bottom:20px}
+.pro-modal .btn-upgrade{display:inline-block;background:var(--accent);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:700;text-decoration:none;transition:opacity .2s}
+.pro-modal .btn-upgrade:hover{opacity:.85}
+.pro-modal .btn-later{display:block;margin-top:14px;background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;padding:6px}
+.pro-modal .btn-later:hover{color:var(--text)}
+@media(max-width:600px){.pro-preview{grid-template-columns:1fr;gap:10px;padding:20px}.pro-modal{padding:24px}}
+</style>
+
+<div class="pro-section" id="proSection" onclick="document.getElementById('proModal').classList.add('open')">
+  <div class="pro-preview">
+    <div class="pro-card"><div class="pro-card-icon">📐</div><div class="pro-card-title">Template Library</div><div class="pro-card-desc">50+ ready-made grid layouts for common UI patterns</div></div>
+    <div class="pro-card"><div class="pro-card-icon">📱</div><div class="pro-card-title">Responsive Export</div><div class="pro-card-desc">Export CSS for all breakpoints in one click</div></div>
+    <div class="pro-card"><div class="pro-card-icon">⚛️</div><div class="pro-card-title">React Components</div><div class="pro-card-desc">Export grid layouts as ready-to-use React components</div></div>
+  </div>
+  <div class="pro-overlay"><span class="lock-icon">🔒</span><span class="lock-text">Pro Features</span></div>
+</div>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pro-modal">
+    <h2>Unlock Pro Features</h2>
+    <ul>
+      <li><span class="check">✓</span>Template Library (50+ layouts)</li>
+      <li><span class="check">✓</span>Responsive Export (all breakpoints)</li>
+      <li><span class="check">✓</span>React Component Export</li>
+    </ul>
+    <div class="price">$14</div>
+    <a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $14</a>
+    <button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+  </div>
+</div>
+
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

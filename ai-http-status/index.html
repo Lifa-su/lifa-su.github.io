@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP Status Codes Reference - Complete Guide for Developers</title>
+<meta name="description" content="Complete HTTP status codes reference with descriptions, use cases, and examples. Covers all 1xx-5xx status codes for web developers.">
+<link rel="canonical" href="https://lifa-su.com/ai-http-status/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;color:#fff;margin-bottom:8px}
+header p{color:#a0a0b8;font-size:1.05rem}
+.search-box{position:relative;margin:20px 0}
+.search-box input{width:100%;padding:14px 20px 14px 48px;border:2px solid #2a2a4a;border-radius:12px;background:#16213e;color:#fff;font-size:1rem;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:#6c5ce7}
+.search-box input::placeholder{color:#666}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#666;font-size:1.2rem}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 24px;justify-content:center}
+.filter-btn{padding:8px 18px;border:2px solid #2a2a4a;border-radius:20px;background:transparent;color:#a0a0b8;cursor:pointer;font-size:.9rem;transition:all .2s}
+.filter-btn:hover{border-color:#6c5ce7;color:#fff}
+.filter-btn.active{background:#6c5ce7;border-color:#6c5ce7;color:#fff}
+.filter-btn[data-cat="1xx"].active{background:#6c5ce7;border-color:#6c5ce7}
+.filter-btn[data-cat="2xx"].active{background:#00b894;border-color:#00b894}
+.filter-btn[data-cat="3xx"].active{background:#0984e3;border-color:#0984e3}
+.filter-btn[data-cat="4xx"].active{background:#e17055;border-color:#e17055}
+.filter-btn[data-cat="5xx"].active{background:#d63031;border-color:#d63031}
+.count{text-align:center;color:#666;margin-bottom:16px;font-size:.9rem}
+.card{background:#16213e;border:1px solid #2a2a4a;border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.card:hover{border-color:#3a3a5a}
+.card.hidden{display:none}
+.card-header{display:flex;align-items:center;padding:14px 18px;cursor:pointer;gap:12px;flex-wrap:wrap}
+.card-title{display:flex;align-items:center;gap:10px;flex:1;min-width:200px}
+.code-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-weight:700;font-size:1rem;color:#fff;min-width:52px;text-align:center}
+.code-name{font-size:1rem;color:#e0e0e0;font-weight:500}
+.cat-tag{font-size:.75rem;padding:3px 10px;border:1px solid;border-radius:12px;white-space:nowrap}
+.chevron{color:#666;font-size:.7rem;transition:transform .3s;margin-left:auto}
+.card.open .chevron{transform:rotate(180deg)}
+.card-body{display:none;padding:0 18px 18px;border-top:1px solid #2a2a4a}
+.card.open .card-body{display:block}
+.section{margin-top:16px}
+.section h4{color:#6c5ce7;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.section p{color:#b0b0c8;line-height:1.6;font-size:.95rem}
+pre{background:#0f0f23;border:1px solid #2a2a4a;border-radius:8px;padding:14px;overflow-x:auto;margin-top:4px}
+code{color:#a0e0a0;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.5;white-space:pre}
+.no-results{text-align:center;padding:60px 20px;color:#666}
+.no-results span{font-size:3rem;display:block;margin-bottom:12px}
+footer{text-align:center;padding:40px 0 20px;color:#555;font-size:.8rem}
+@media(max-width:600px){
+  .container{padding:12px}
+  header{padding:24px 0 16px}
+  header h1{font-size:1.5rem}
+  .card-header{padding:12px 14px}
+  .code-name{font-size:.9rem}
+  .cat-tag{display:none}
+  pre{padding:10px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>&#128268; HTTP Status Codes</h1>
+<p>Complete reference for web developers &mdash; all standard HTTP response codes</p>
+</header>
+<div class="search-box">
+<span class="search-icon">&#128269;</span>
+<input type="text" id="search" placeholder="Search by code or description..." autocomplete="off">
+</div>
+<div class="filters">
+<button class="filter-btn active" data-cat="all" onclick="setFilter('all',this)">All</button>
+<button class="filter-btn" data-cat="1xx" onclick="setFilter('1xx',this)">1xx Informational</button>
+<button class="filter-btn" data-cat="2xx" onclick="setFilter('2xx',this)">2xx Success</button>
+<button class="filter-btn" data-cat="3xx" onclick="setFilter('3xx',this)">3xx Redirection</button>
+<button class="filter-btn" data-cat="4xx" onclick="setFilter('4xx',this)">4xx Client Error</button>
+<button class="filter-btn" data-cat="5xx" onclick="setFilter('5xx',this)">5xx Server Error</button>
+</div>
+<div class="count" id="count"></div>
+<div id="cards">
+<div class="card" data-code="100" data-cat="1xx" data-search="100 continue the server has received the request headers and the client should proceed to send the request body.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#6c5ce7">100</span>
+      <span class="code-name">Continue</span>
+    </div>
+    <span class="cat-tag" style="border-color:#6c5ce7;color:#6c5ce7">1xx Informational</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has received the request headers and the client should proceed to send the request body.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in large file uploads where the client sends an Expect: 100-continue header before sending the body.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /upload HTTP/1.1
+Host: example.com
+Expect: 100-continue
+
+HTTP/1.1 100 Continue</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="101" data-cat="1xx" data-search="101 switching protocols the server is switching protocols as requested by the client via the upgrade header.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#6c5ce7">101</span>
+      <span class="code-name">Switching Protocols</span>
+    </div>
+    <span class="cat-tag" style="border-color:#6c5ce7;color:#6c5ce7">1xx Informational</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is switching protocols as requested by the client via the Upgrade header.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when upgrading from HTTP to WebSocket connections.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /chat HTTP/1.1
+Host: example.com
+Upgrade: websocket
+Connection: Upgrade
+
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="102" data-cat="1xx" data-search="102 processing the server has received and is processing the request, but no response is available yet.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#6c5ce7">102</span>
+      <span class="code-name">Processing</span>
+    </div>
+    <span class="cat-tag" style="border-color:#6c5ce7;color:#6c5ce7">1xx Informational</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has received and is processing the request, but no response is available yet.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV when a request may take a long time to process, preventing the client from timing out.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PROPFIND /files HTTP/1.1
+Host: example.com
+Depth: infinity
+
+HTTP/1.1 102 Processing</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="103" data-cat="1xx" data-search="103 early hints used to return some response headers before the final http message, allowing the browser to preload resources.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#6c5ce7">103</span>
+      <span class="code-name">Early Hints</span>
+    </div>
+    <span class="cat-tag" style="border-color:#6c5ce7;color:#6c5ce7">1xx Informational</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Used to return some response headers before the final HTTP message, allowing the browser to preload resources.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Allows the server to send Link headers early so the browser can start preloading stylesheets, scripts, or fonts.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET / HTTP/1.1
+Host: example.com
+
+HTTP/1.1 103 Early Hints
+Link: &lt;/style.css&gt;; rel=preload; as=style
+
+HTTP/1.1 200 OK</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="200" data-cat="2xx" data-search="200 ok the request has succeeded. the meaning depends on the http method used.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">200</span>
+      <span class="code-name">OK</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request has succeeded. The meaning depends on the HTTP method used.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Standard response for successful HTTP requests. GET returns the resource, POST returns the result of the action.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/users/1 HTTP/1.1
+Host: api.example.com
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{&quot;id&quot;: 1, &quot;name&quot;: &quot;John&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="201" data-cat="2xx" data-search="201 created the request has been fulfilled and a new resource has been created.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">201</span>
+      <span class="code-name">Created</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request has been fulfilled and a new resource has been created.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned after a successful POST request that creates a new resource. Should include a Location header.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/users HTTP/1.1
+Content-Type: application/json
+
+{&quot;name&quot;: &quot;Jane&quot;}
+
+HTTP/1.1 201 Created
+Location: /api/users/2</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="202" data-cat="2xx" data-search="202 accepted the request has been accepted for processing, but the processing has not been completed.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">202</span>
+      <span class="code-name">Accepted</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request has been accepted for processing, but the processing has not been completed.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for asynchronous operations where the server queues the request for later processing.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/reports/generate HTTP/1.1
+
+HTTP/1.1 202 Accepted
+{&quot;status&quot;: &quot;queued&quot;, &quot;jobId&quot;: &quot;abc123&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="203" data-cat="2xx" data-search="203 non-authoritative information the returned metadata is not exactly the same as available from the origin server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">203</span>
+      <span class="code-name">Non-Authoritative Information</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The returned metadata is not exactly the same as available from the origin server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used by transforming proxies that modify the response headers or body from the origin server.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /page HTTP/1.1
+
+HTTP/1.1 203 Non-Authoritative Information
+Content-Type: text/html
+(modified by proxy)</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="204" data-cat="2xx" data-search="204 no content the server has successfully fulfilled the request and there is no additional content to send.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">204</span>
+      <span class="code-name">No Content</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has successfully fulfilled the request and there is no additional content to send.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Common response for DELETE requests or PUT/PATCH updates where no body needs to be returned.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>DELETE /api/users/1 HTTP/1.1
+
+HTTP/1.1 204 No Content</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="205" data-cat="2xx" data-search="205 reset content the server has fulfilled the request and the client should reset the document view.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">205</span>
+      <span class="code-name">Reset Content</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has fulfilled the request and the client should reset the document view.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used to tell the browser to clear the form that caused the request to be sent.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/form HTTP/1.1
+
+HTTP/1.1 205 Reset Content</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="206" data-cat="2xx" data-search="206 partial content the server is delivering only part of the resource due to a range header sent by the client.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">206</span>
+      <span class="code-name">Partial Content</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is delivering only part of the resource due to a Range header sent by the client.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for resumable downloads and video streaming where only a portion of the file is requested.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /video.mp4 HTTP/1.1
+Range: bytes=0-1023
+
+HTTP/1.1 206 Partial Content
+Content-Range: bytes 0-1023/146515</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="207" data-cat="2xx" data-search="207 multi-status conveys information about multiple resources where multiple status codes might be appropriate.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">207</span>
+      <span class="code-name">Multi-Status</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Conveys information about multiple resources where multiple status codes might be appropriate.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV to return status for multiple sub-requests in a single response body.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PROPFIND /files HTTP/1.1
+
+HTTP/1.1 207 Multi-Status
+Content-Type: application/xml
+(multiple status elements)</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="208" data-cat="2xx" data-search="208 already reported used inside a dav: propstat response to avoid enumerating internal members of multiple bindings.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">208</span>
+      <span class="code-name">Already Reported</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Used inside a DAV: propstat response to avoid enumerating internal members of multiple bindings.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Prevents duplicate enumeration of the same resource in WebDAV binding operations.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PROPFIND /collection HTTP/1.1
+
+HTTP/1.1 207 Multi-Status
+(208 Already Reported for repeated bindings)</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="226" data-cat="2xx" data-search="226 im used the server has fulfilled a get request and the response is a representation of one or more instance-manipulations.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#00b894">226</span>
+      <span class="code-name">IM Used</span>
+    </div>
+    <span class="cat-tag" style="border-color:#00b894;color:#00b894">2xx Success</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has fulfilled a GET request and the response is a representation of one or more instance-manipulations.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used with delta encoding to send only the changes to a resource rather than the full representation.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /resource HTTP/1.1
+A-IM: feed
+
+HTTP/1.1 226 IM Used
+IM: feed</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="300" data-cat="3xx" data-search="300 multiple choices the request has more than one possible response. the user or user agent should choose one of them.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">300</span>
+      <span class="code-name">Multiple Choices</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request has more than one possible response. The user or user agent should choose one of them.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Rarely used. Indicates multiple representations of a resource, such as different formats or languages.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /document HTTP/1.1
+
+HTTP/1.1 300 Multiple Choices
+Link: &lt;/document.pdf&gt;; type=&quot;application/pdf&quot;
+Link: &lt;/document.html&gt;; type=&quot;text/html&quot;</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="301" data-cat="3xx" data-search="301 moved permanently the url of the requested resource has been changed permanently. the new url is given in the response.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">301</span>
+      <span class="code-name">Moved Permanently</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The URL of the requested resource has been changed permanently. The new URL is given in the response.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for permanent URL redirects. Search engines will update their index to the new URL.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /old-page HTTP/1.1
+
+HTTP/1.1 301 Moved Permanently
+Location: /new-page</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="302" data-cat="3xx" data-search="302 found the uri of the requested resource has been changed temporarily. the client should continue to use the original uri.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">302</span>
+      <span class="code-name">Found</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The URI of the requested resource has been changed temporarily. The client should continue to use the original URI.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for temporary redirects. Common after form submissions to redirect to a success page.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /login HTTP/1.1
+
+HTTP/1.1 302 Found
+Location: /dashboard</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="303" data-cat="3xx" data-search="303 see other the server sent this response to direct the client to get the requested resource at another uri with a get request.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">303</span>
+      <span class="code-name">See Other</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server sent this response to direct the client to get the requested resource at another URI with a GET request.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used after a POST or PUT to redirect the client to a different resource using GET.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/orders HTTP/1.1
+
+HTTP/1.1 303 See Other
+Location: /api/orders/123</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="304" data-cat="3xx" data-search="304 not modified the resource has not been modified since the version specified by the request headers.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">304</span>
+      <span class="code-name">Not Modified</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The resource has not been modified since the version specified by the request headers.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for caching. The client can use its cached version when the server confirms nothing has changed.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /style.css HTTP/1.1
+If-None-Match: &quot;abc123&quot;
+
+HTTP/1.1 304 Not Modified</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="305" data-cat="3xx" data-search="305 use proxy the requested resource must be accessed through the proxy given by the location header. deprecated.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">305</span>
+      <span class="code-name">Use Proxy</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The requested resource must be accessed through the proxy given by the Location header. Deprecated.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Deprecated due to security concerns. Was used to indicate that a proxy must be used.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /resource HTTP/1.1
+
+HTTP/1.1 305 Use Proxy
+Location: http://proxy.example.com</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="307" data-cat="3xx" data-search="307 temporary redirect the server sends this response to direct the client to get the requested resource at another uri with the same method.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">307</span>
+      <span class="code-name">Temporary Redirect</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server sends this response to direct the client to get the requested resource at another URI with the same method.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Like 302 but guarantees the HTTP method will not change. POST stays POST after redirect.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/v1/data HTTP/1.1
+
+HTTP/1.1 307 Temporary Redirect
+Location: /api/v2/data</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="308" data-cat="3xx" data-search="308 permanent redirect the resource is now permanently located at another uri. the method and body will not change in the redirect.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#0984e3">308</span>
+      <span class="code-name">Permanent Redirect</span>
+    </div>
+    <span class="cat-tag" style="border-color:#0984e3;color:#0984e3">3xx Redirection</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The resource is now permanently located at another URI. The method and body will not change in the redirect.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Like 301 but guarantees the HTTP method will not change. Useful for API versioning.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/v1/submit HTTP/1.1
+
+HTTP/1.1 308 Permanent Redirect
+Location: /api/v2/submit</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="400" data-cat="4xx" data-search="400 bad request the server cannot process the request due to something perceived to be a client error.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">400</span>
+      <span class="code-name">Bad Request</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server cannot process the request due to something perceived to be a client error.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when the request has malformed syntax, invalid parameters, or missing required fields.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/users HTTP/1.1
+Content-Type: application/json
+
+{invalid json}
+
+HTTP/1.1 400 Bad Request
+{&quot;error&quot;: &quot;Invalid JSON in request body&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="401" data-cat="4xx" data-search="401 unauthorized the client must authenticate itself to get the requested response.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">401</span>
+      <span class="code-name">Unauthorized</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The client must authenticate itself to get the requested response.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when authentication is required but not provided or invalid credentials were sent.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/profile HTTP/1.1
+
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer
+{&quot;error&quot;: &quot;Authentication required&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="402" data-cat="4xx" data-search="402 payment required reserved for future use. originally intended for digital payment systems.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">402</span>
+      <span class="code-name">Payment Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Reserved for future use. Originally intended for digital payment systems.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Sometimes used by APIs to indicate that a paid subscription or credits are required.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/premium/data HTTP/1.1
+
+HTTP/1.1 402 Payment Required
+{&quot;error&quot;: &quot;Subscription required&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="403" data-cat="4xx" data-search="403 forbidden the client does not have access rights to the content. unlike 401, the client&#x27;s identity is known.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">403</span>
+      <span class="code-name">Forbidden</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The client does not have access rights to the content. Unlike 401, the client&#x27;s identity is known.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when the authenticated user does not have permission to access the requested resource.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>DELETE /api/admin/users HTTP/1.1
+Authorization: Bearer user-token
+
+HTTP/1.1 403 Forbidden
+{&quot;error&quot;: &quot;Admin access required&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="404" data-cat="4xx" data-search="404 not found the server cannot find the requested resource. the url is not recognized.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">404</span>
+      <span class="code-name">Not Found</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server cannot find the requested resource. The URL is not recognized.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>The most common error response. Returned when the requested URL or resource does not exist.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/users/99999 HTTP/1.1
+
+HTTP/1.1 404 Not Found
+{&quot;error&quot;: &quot;User not found&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="405" data-cat="4xx" data-search="405 method not allowed the request method is known by the server but is not supported by the target resource.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">405</span>
+      <span class="code-name">Method Not Allowed</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request method is known by the server but is not supported by the target resource.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when using an unsupported HTTP method on an endpoint, e.g., DELETE on a read-only resource.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>DELETE /api/logs HTTP/1.1
+
+HTTP/1.1 405 Method Not Allowed
+Allow: GET, HEAD</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="406" data-cat="4xx" data-search="406 not acceptable the server cannot produce a response matching the list of acceptable values in the request headers.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">406</span>
+      <span class="code-name">Not Acceptable</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server cannot produce a response matching the list of acceptable values in the request headers.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the server cannot serve content matching the Accept headers sent by the client.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+Accept: application/xml
+
+HTTP/1.1 406 Not Acceptable
+{&quot;error&quot;: &quot;Only application/json is supported&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="407" data-cat="4xx" data-search="407 proxy authentication required similar to 401 but authentication is needed to be done by a proxy.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">407</span>
+      <span class="code-name">Proxy Authentication Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Similar to 401 but authentication is needed to be done by a proxy.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned by a proxy server when the client has not provided valid proxy authentication credentials.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET http://example.com/ HTTP/1.1
+
+HTTP/1.1 407 Proxy Authentication Required
+Proxy-Authenticate: Basic realm=&quot;proxy&quot;</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="408" data-cat="4xx" data-search="408 request timeout the server would like to shut down this unused connection.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">408</span>
+      <span class="code-name">Request Timeout</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server would like to shut down this unused connection.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Sent when the server did not receive a complete request within the time it was prepared to wait.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+(client too slow sending request)
+
+HTTP/1.1 408 Request Timeout</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="409" data-cat="4xx" data-search="409 conflict the request conflicts with the current state of the server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">409</span>
+      <span class="code-name">Conflict</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request conflicts with the current state of the server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when a request would cause a conflict, such as duplicate entries or version mismatches.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PUT /api/users/1 HTTP/1.1
+If-Match: &quot;old-etag&quot;
+
+HTTP/1.1 409 Conflict
+{&quot;error&quot;: &quot;Resource has been modified&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="410" data-cat="4xx" data-search="410 gone the content has been permanently deleted from the server with no forwarding address.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">410</span>
+      <span class="code-name">Gone</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The content has been permanently deleted from the server with no forwarding address.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Like 404 but indicates the resource existed before and was intentionally removed permanently.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/v1/deprecated-endpoint HTTP/1.1
+
+HTTP/1.1 410 Gone
+{&quot;error&quot;: &quot;This endpoint has been permanently removed&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="411" data-cat="4xx" data-search="411 length required the server rejected the request because the content-length header field is not defined.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">411</span>
+      <span class="code-name">Length Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server rejected the request because the Content-Length header field is not defined.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the server requires a Content-Length header that the client did not send.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/upload HTTP/1.1
+(no Content-Length header)
+
+HTTP/1.1 411 Length Required</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="412" data-cat="4xx" data-search="412 precondition failed the client has indicated preconditions in its headers which the server does not meet.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">412</span>
+      <span class="code-name">Precondition Failed</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The client has indicated preconditions in its headers which the server does not meet.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used with conditional requests (If-Match, If-Unmodified-Since) when conditions are not satisfied.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PUT /api/doc HTTP/1.1
+If-Unmodified-Since: Sat, 01 Jan 2024
+
+HTTP/1.1 412 Precondition Failed</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="413" data-cat="4xx" data-search="413 content too large the request entity is larger than limits defined by the server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">413</span>
+      <span class="code-name">Content Too Large</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request entity is larger than limits defined by the server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the request body exceeds the server&#x27;s maximum allowed size.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/upload HTTP/1.1
+Content-Length: 1073741824
+
+HTTP/1.1 413 Content Too Large
+{&quot;error&quot;: &quot;Max upload size is 10MB&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="414" data-cat="4xx" data-search="414 uri too long the uri requested by the client is longer than the server is willing to interpret.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">414</span>
+      <span class="code-name">URI Too Long</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The URI requested by the client is longer than the server is willing to interpret.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the URL exceeds the server&#x27;s length limit, often from excessive query parameters.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /search?q=very...long...query HTTP/1.1
+
+HTTP/1.1 414 URI Too Long</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="415" data-cat="4xx" data-search="415 unsupported media type the media format of the requested data is not supported by the server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">415</span>
+      <span class="code-name">Unsupported Media Type</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The media format of the requested data is not supported by the server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the Content-Type of the request body is not supported by the endpoint.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/data HTTP/1.1
+Content-Type: text/plain
+
+HTTP/1.1 415 Unsupported Media Type
+{&quot;error&quot;: &quot;Expected application/json&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="416" data-cat="4xx" data-search="416 range not satisfiable the range specified by the range header in the request cannot be fulfilled.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">416</span>
+      <span class="code-name">Range Not Satisfiable</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The range specified by the Range header in the request cannot be fulfilled.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the client requests a byte range that is outside the size of the resource.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /file.pdf HTTP/1.1
+Range: bytes=9999999-
+
+HTTP/1.1 416 Range Not Satisfiable
+Content-Range: bytes */5000</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="417" data-cat="4xx" data-search="417 expectation failed the expectation given in the expect request header could not be met by the server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">417</span>
+      <span class="code-name">Expectation Failed</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The expectation given in the Expect request header could not be met by the server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the server cannot meet the requirements of the Expect header field.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /upload HTTP/1.1
+Expect: 100-continue
+
+HTTP/1.1 417 Expectation Failed</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="418" data-cat="4xx" data-search="418 i&#x27;m a teapot the server refuses the attempt to brew coffee with a teapot. an april fools&#x27; joke from rfc 2324.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">418</span>
+      <span class="code-name">I&#x27;m a Teapot</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server refuses the attempt to brew coffee with a teapot. An April Fools&#x27; joke from RFC 2324.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>A humorous status code from the Hyper Text Coffee Pot Control Protocol. Not expected in production.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>BREW /coffee HTTP/1.1
+
+HTTP/1.1 418 I&#x27;m a Teapot
+{&quot;error&quot;: &quot;I can only brew tea&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="421" data-cat="4xx" data-search="421 misdirected request the request was directed at a server that is not able to produce a response.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">421</span>
+      <span class="code-name">Misdirected Request</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request was directed at a server that is not able to produce a response.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when the server is not configured to produce responses for the combination of scheme and authority in the request URI.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /resource HTTP/2
+Host: wrong-host.example.com
+
+HTTP/2 421 Misdirected Request</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="422" data-cat="4xx" data-search="422 unprocessable content the request was well-formed but was unable to be followed due to semantic errors.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">422</span>
+      <span class="code-name">Unprocessable Content</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request was well-formed but was unable to be followed due to semantic errors.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Common in APIs when the request body is valid JSON/XML but contains invalid field values or logic.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/users HTTP/1.1
+{&quot;email&quot;: &quot;not-an-email&quot;}
+
+HTTP/1.1 422 Unprocessable Content
+{&quot;errors&quot;: {&quot;email&quot;: &quot;Invalid format&quot;}}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="423" data-cat="4xx" data-search="423 locked the resource that is being accessed is locked.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">423</span>
+      <span class="code-name">Locked</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The resource that is being accessed is locked.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV when a resource is locked by another user or process.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PUT /files/doc.txt HTTP/1.1
+
+HTTP/1.1 423 Locked
+{&quot;error&quot;: &quot;Resource is locked by another user&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="424" data-cat="4xx" data-search="424 failed dependency the request failed because it depended on another request that failed.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">424</span>
+      <span class="code-name">Failed Dependency</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request failed because it depended on another request that failed.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV when an action on a resource fails because a previous required action failed.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>COPY /files/ HTTP/1.1
+
+HTTP/1.1 424 Failed Dependency
+{&quot;error&quot;: &quot;Copy failed: source file locked&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="425" data-cat="4xx" data-search="425 too early the server is unwilling to risk processing a request that might be replayed.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">425</span>
+      <span class="code-name">Too Early</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is unwilling to risk processing a request that might be replayed.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used with TLS Early Data (0-RTT) to prevent replay attacks on non-idempotent requests.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>POST /api/payment HTTP/1.1
+(via TLS 0-RTT)
+
+HTTP/1.1 425 Too Early</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="426" data-cat="4xx" data-search="426 upgrade required the server refuses to perform the request using the current protocol.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">426</span>
+      <span class="code-name">Upgrade Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server refuses to perform the request using the current protocol.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>The server requires the client to upgrade to a different protocol, such as TLS or HTTP/2.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /secure HTTP/1.1
+
+HTTP/1.1 426 Upgrade Required
+Upgrade: TLS/1.3
+Connection: Upgrade</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="428" data-cat="4xx" data-search="428 precondition required the origin server requires the request to be conditional.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">428</span>
+      <span class="code-name">Precondition Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The origin server requires the request to be conditional.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used to prevent lost updates. The server requires If-Match or If-Unmodified-Since headers.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PUT /api/doc HTTP/1.1
+(no conditional headers)
+
+HTTP/1.1 428 Precondition Required
+{&quot;error&quot;: &quot;If-Match header required&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="429" data-cat="4xx" data-search="429 too many requests the user has sent too many requests in a given amount of time (rate limiting).">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">429</span>
+      <span class="code-name">Too Many Requests</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The user has sent too many requests in a given amount of time (rate limiting).</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used for rate limiting. Should include a Retry-After header indicating when to retry.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+{&quot;error&quot;: &quot;Rate limit exceeded&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="431" data-cat="4xx" data-search="431 request header fields too large the server is unwilling to process the request because its header fields are too large.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">431</span>
+      <span class="code-name">Request Header Fields Too Large</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is unwilling to process the request because its header fields are too large.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when request headers (often cookies) exceed the server&#x27;s size limits.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET / HTTP/1.1
+Cookie: (very large cookie)
+
+HTTP/1.1 431 Request Header Fields Too Large</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="451" data-cat="4xx" data-search="451 unavailable for legal reasons the user agent requested a resource that cannot legally be provided.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#e17055">451</span>
+      <span class="code-name">Unavailable For Legal Reasons</span>
+    </div>
+    <span class="cat-tag" style="border-color:#e17055;color:#e17055">4xx Client Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The user agent requested a resource that cannot legally be provided.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used when access is denied due to legal demands such as government censorship or court orders.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /blocked-content HTTP/1.1
+
+HTTP/1.1 451 Unavailable For Legal Reasons
+Link: &lt;https://example.com/legal&gt;; rel=&quot;blocked-by&quot;</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="500" data-cat="5xx" data-search="500 internal server error the server has encountered a situation it does not know how to handle.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">500</span>
+      <span class="code-name">Internal Server Error</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has encountered a situation it does not know how to handle.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Generic server error when an unexpected condition prevents the request from being fulfilled.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+
+HTTP/1.1 500 Internal Server Error
+{&quot;error&quot;: &quot;An unexpected error occurred&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="501" data-cat="5xx" data-search="501 not implemented the request method is not supported by the server and cannot be handled.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">501</span>
+      <span class="code-name">Not Implemented</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The request method is not supported by the server and cannot be handled.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the server does not recognize the request method or lacks the ability to fulfill it.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PATCH /api/resource HTTP/1.1
+
+HTTP/1.1 501 Not Implemented
+{&quot;error&quot;: &quot;PATCH method not supported&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="502" data-cat="5xx" data-search="502 bad gateway the server, while acting as a gateway, got an invalid response from the upstream server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">502</span>
+      <span class="code-name">Bad Gateway</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server, while acting as a gateway, got an invalid response from the upstream server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Common with reverse proxies and load balancers when the backend server returns an invalid response.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+
+HTTP/1.1 502 Bad Gateway
+{&quot;error&quot;: &quot;Upstream server returned invalid response&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="503" data-cat="5xx" data-search="503 service unavailable the server is not ready to handle the request, often due to maintenance or overload.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">503</span>
+      <span class="code-name">Service Unavailable</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is not ready to handle the request, often due to maintenance or overload.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used during server maintenance or when the server is overloaded. Should include Retry-After header.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/data HTTP/1.1
+
+HTTP/1.1 503 Service Unavailable
+Retry-After: 300
+{&quot;error&quot;: &quot;Server under maintenance&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="504" data-cat="5xx" data-search="504 gateway timeout the server is acting as a gateway and cannot get a response from the upstream server in time.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">504</span>
+      <span class="code-name">Gateway Timeout</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is acting as a gateway and cannot get a response from the upstream server in time.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Common with reverse proxies when the backend server takes too long to respond.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /api/slow-query HTTP/1.1
+
+HTTP/1.1 504 Gateway Timeout
+{&quot;error&quot;: &quot;Upstream server timed out&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="505" data-cat="5xx" data-search="505 http version not supported the http version used in the request is not supported by the server.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">505</span>
+      <span class="code-name">HTTP Version Not Supported</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The HTTP version used in the request is not supported by the server.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Returned when the client uses an HTTP version the server does not support.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET / HTTP/3.0
+
+HTTP/1.1 505 HTTP Version Not Supported</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="506" data-cat="5xx" data-search="506 variant also negotiates the server has an internal configuration error: transparent content negotiation results in a circular reference.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">506</span>
+      <span class="code-name">Variant Also Negotiates</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server has an internal configuration error: transparent content negotiation results in a circular reference.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Indicates a misconfiguration in server-driven content negotiation.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /resource HTTP/1.1
+Accept: text/html
+
+HTTP/1.1 506 Variant Also Negotiates</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="507" data-cat="5xx" data-search="507 insufficient storage the server is unable to store the representation needed to complete the request.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">507</span>
+      <span class="code-name">Insufficient Storage</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server is unable to store the representation needed to complete the request.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV when the server cannot store the resource due to insufficient storage space.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PUT /files/large-file.zip HTTP/1.1
+
+HTTP/1.1 507 Insufficient Storage
+{&quot;error&quot;: &quot;Not enough disk space&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="508" data-cat="5xx" data-search="508 loop detected the server detected an infinite loop while processing the request.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">508</span>
+      <span class="code-name">Loop Detected</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The server detected an infinite loop while processing the request.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used in WebDAV when a PROPFIND with Depth: infinity encounters a loop in resource bindings.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>PROPFIND /collection HTTP/1.1
+Depth: infinity
+
+HTTP/1.1 508 Loop Detected</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="510" data-cat="5xx" data-search="510 not extended further extensions to the request are required for the server to fulfill it.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">510</span>
+      <span class="code-name">Not Extended</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>Further extensions to the request are required for the server to fulfill it.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>The server requires additional extensions in the request that were not provided by the client.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET /resource HTTP/1.1
+
+HTTP/1.1 510 Not Extended
+{&quot;error&quot;: &quot;Missing required extension&quot;}</code></pre></div>
+  </div>
+</div>
+<div class="card" data-code="511" data-cat="5xx" data-search="511 network authentication required the client needs to authenticate to gain network access, typically from a captive portal.">
+  <div class="card-header" onclick="toggleCard(this)">
+    <div class="card-title">
+      <span class="code-badge" style="background:#d63031">511</span>
+      <span class="code-name">Network Authentication Required</span>
+    </div>
+    <span class="cat-tag" style="border-color:#d63031;color:#d63031">5xx Server Error</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="card-body">
+    <div class="section"><h4>Description</h4><p>The client needs to authenticate to gain network access, typically from a captive portal.</p></div>
+    <div class="section"><h4>Common Use Cases</h4><p>Used by captive portals (e.g., hotel/airport WiFi) to redirect users to a login page.</p></div>
+    <div class="section"><h4>Example</h4><pre><code>GET / HTTP/1.1
+
+HTTP/1.1 511 Network Authentication Required
+Location: /login-portal</code></pre></div>
+  </div>
+</div>
+
+</div>
+<div class="no-results" id="no-results" style="display:none">
+<span>&#128533;</span>
+<p>No status codes found matching your search.</p>
+</div>
+<footer>
+<p>HTTP Status Codes Reference &copy; 2025. Built for developers, by developers.</p>
+</footer>
+</div>
+<script>
+const cards=document.querySelectorAll('.card');
+const searchInput=document.getElementById('search');
+const countEl=document.getElementById('count');
+const noResults=document.getElementById('no-results');
+let currentFilter='all';
+
+function toggleCard(header){
+  header.parentElement.classList.toggle('open');
+}
+
+function setFilter(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters(){
+  const q=searchInput.value.toLowerCase().trim();
+  let visible=0;
+  cards.forEach(card=>{
+    const matchCat=currentFilter==='all'||card.dataset.cat===currentFilter;
+    const matchSearch=!q||card.dataset.search.includes(q);
+    if(matchCat&&matchSearch){card.classList.remove('hidden');visible++}
+    else{card.classList.add('hidden');card.classList.remove('open')}
+  });
+  countEl.textContent=`Showing ${visible} of ${cards.length} status codes`;
+  noResults.style.display=visible===0?'block':'none';
+}
+
+searchInput.addEventListener('input',applyFilters);
+applyFilters();
+</script>
+
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:900px;margin:40px auto 0;padding:0 20px;position:relative}
+.pro-section h2{text-align:center;color:#fff;font-size:1.5rem;margin-bottom:20px}
+.pro-preview{position:relative;cursor:pointer;border-radius:16px;overflow:hidden}
+.pro-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;filter:blur(5px);pointer-events:none;padding:24px}
+@media(max-width:600px){.pro-cards{grid-template-columns:1fr;gap:12px;padding:16px}}
+.pro-card{background:#16213e;border:1px solid #2a2a4a;border-radius:12px;padding:24px;text-align:center}
+.pro-card .pro-icon{font-size:2.2rem;margin-bottom:12px}
+.pro-card h3{color:#fff;font-size:1rem;margin-bottom:8px}
+.pro-card p{color:#a0a0b8;font-size:.85rem;line-height:1.5}
+.pro-overlay{position:absolute;inset:0;background:rgba(26,26,46,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:16px;transition:background .2s}
+.pro-preview:hover .pro-overlay{background:rgba(26,26,46,.55)}
+.pro-overlay .lock-icon{font-size:3rem;margin-bottom:10px}
+.pro-overlay .lock-text{color:#fff;font-size:1.3rem;font-weight:600;letter-spacing:.5px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:#16213e;border:1px solid #2a2a4a;border-radius:16px;padding:36px;max-width:420px;width:90%;text-align:center;position:relative;animation:proFadeIn .25s ease}
+@keyframes proFadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.pro-modal h3{color:#fff;font-size:1.4rem;margin-bottom:20px}
+.pro-modal ul{list-style:none;text-align:left;margin:0 0 24px;padding:0}
+.pro-modal ul li{color:#e0e0e0;padding:8px 0;font-size:1rem;display:flex;align-items:center;gap:10px}
+.pro-modal ul li::before{content:'✓';color:#00b894;font-weight:700;font-size:1.1rem;flex-shrink:0}
+.pro-modal .price{color:#6c5ce7;font-size:2rem;font-weight:700;margin-bottom:20px}
+.pro-modal .upgrade-btn{display:inline-block;width:100%;padding:14px;background:#6c5ce7;color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s}
+.pro-modal .upgrade-btn:hover{background:#5a4bd1}
+.pro-modal .later-btn{display:inline-block;margin-top:14px;background:none;border:none;color:#666;font-size:.9rem;cursor:pointer;padding:6px 12px;transition:color .2s}
+.pro-modal .later-btn:hover{color:#a0a0b8}
+</style>
+
+<div class="pro-section">
+<h2>⚡ Pro Features</h2>
+<div class="pro-preview" onclick="document.getElementById('proModal').classList.add('show')">
+  <div class="pro-cards">
+    <div class="pro-card">
+      <div class="pro-icon">📡</div>
+      <h3>API Monitoring</h3>
+      <p>Monitor your API endpoints in real-time. Get instant alerts when status codes change.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">📊</div>
+      <h3>Status Code Analytics</h3>
+      <p>Track status code distribution across your services with visual dashboards.</p>
+    </div>
+    <div class="pro-card">
+      <div class="pro-icon">🔔</div>
+      <h3>Webhook Notifications</h3>
+      <p>Set up webhook alerts for specific status codes. Integrate with Slack, Discord & more.</p>
+    </div>
+  </div>
+  <div class="pro-overlay">
+    <span class="lock-icon">🔒</span>
+    <span class="lock-text">Pro Features</span>
+  </div>
+</div>
+</div>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+  <h3>Unlock Pro Features</h3>
+  <ul>
+    <li>Real-time API Monitoring</li>
+    <li>Status Code Analytics Dashboard</li>
+    <li>Webhook Notifications</li>
+  </ul>
+  <div class="price">$9</div>
+  <a href="https://ko-fi.com/feidev" target="_blank" class="upgrade-btn">Upgrade to Pro — $9</a>
+  <button class="later-btn" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

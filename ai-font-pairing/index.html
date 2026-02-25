@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI font pairing tool. Find perfect Google Fonts combinations for headings and body text. Preview typography pairs and get CSS import code instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-font-pairing/">
+<title>AI Font Pairing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh}
+.header{text-align:center;padding:40px 20px 20px}
+.header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text2);margin-top:8px}
+.container{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:320px 1fr;gap:24px}
+@media(max-width:800px){.container{grid-template-columns:1fr}}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.panel{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.panel h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:14px}
+.pairing-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.pairing-item{padding:10px 14px;border-radius:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;background:rgba(255,255,255,.03)}
+.pairing-item:hover{background:rgba(233,69,96,.1);border-color:rgba(233,69,96,.3)}
+.pairing-item.active{background:rgba(233,69,96,.15);border-color:var(--accent)}
+.pi-heading{font-size:.95rem;font-weight:600;margin-bottom:2px}
+.pi-body{font-size:.78rem;color:var(--text2)}
+.pi-tag{display:inline-block;font-size:.65rem;background:var(--accent2);color:#fff;padding:2px 8px;border-radius:10px;margin-top:4px}
+.control-group{margin-bottom:14px}
+.control-group:last-child{margin-bottom:0}
+.control-group label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:6px}
+.control-group label span{color:var(--text);font-weight:600}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.1);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+select{width:100%;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:var(--surface);color:var(--text);font-size:.85rem}
+.preview-area{display:flex;flex-direction:column;gap:20px}
+.preview-card{background:var(--surface);border-radius:var(--radius);padding:40px;border:1px solid rgba(255,255,255,.06);min-height:400px}
+.preview-heading{margin-bottom:16px;line-height:1.2}
+.preview-body{line-height:1.6;color:var(--text2)}
+.export-area{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.export-area h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px}
+.code-block{background:var(--bg);border-radius:8px;padding:16px;font-family:monospace;font-size:.82rem;color:#7fdbca;white-space:pre-wrap;word-break:break-all;position:relative;border:1px solid rgba(255,255,255,.06)}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.75rem}
+.copy-btn.copied{background:#2ecc71}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>&#10022; AI Font Pairing</h1>
+  <p>10 curated font pairings &mdash; preview, customize, and export CSS</p>
+</div>
+<div class="container">
+  <div class="sidebar">
+    <div class="panel">
+      <h3>Font Pairings</h3>
+      <div class="pairing-list" id="pairingList"></div>
+    </div>
+    <div class="panel">
+      <h3>Customize</h3>
+      <div class="control-group">
+        <label>Heading Size <span id="headingSizeVal">42px</span></label>
+        <input type="range" id="headingSize" min="20" max="80" value="42">
+      </div>
+      <div class="control-group">
+        <label>Body Size <span id="bodySizeVal">16px</span></label>
+        <input type="range" id="bodySize" min="12" max="32" value="16">
+      </div>
+      <div class="control-group">
+        <label>Line Height <span id="lineHeightVal">1.6</span></label>
+        <input type="range" id="lineHeight" min="1" max="2.5" step="0.1" value="1.6">
+      </div>
+      <div class="control-group">
+        <label>Heading Weight</label>
+        <select id="headingWeight">
+          <option value="400">400</option><option value="500">500</option>
+          <option value="600">600</option><option value="700" selected>700</option>
+          <option value="800">800</option><option value="900">900</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Body Weight</label>
+        <select id="bodyWeight">
+          <option value="300">300</option><option value="400" selected>400</option>
+          <option value="500">500</option><option value="600">600</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="preview-area">
+    <div class="preview-card">
+      <div class="preview-heading" id="previewHeading">The Quick Brown Fox</div>
+      <div class="preview-body" id="previewBody">Typography is the art and technique of arranging type to make written language legible, readable and appealing when displayed. The arrangement of type involves selecting typefaces, point sizes, line lengths, line-spacing, and letter-spacing.</div>
+    </div>
+    <div class="export-area">
+      <h3>Export CSS</h3>
+      <div class="code-block"><button class="copy-btn" id="copyBtn" onclick="copyCSS()">Copy</button><code id="codeContent"></code></div>
+    </div>
+  </div>
+</div>
+<script>
+const PAIRINGS=[
+{heading:"Playfair Display",body:"Source Sans 3",tag:"Editorial"},
+{heading:"Montserrat",body:"Merriweather",tag:"Modern"},
+{heading:"Oswald",body:"Quattrocento",tag:"Bold"},
+{heading:"Raleway",body:"Roboto",tag:"Clean"},
+{heading:"Lora",body:"Open Sans",tag:"Classic"},
+{heading:"Poppins",body:"Lora",tag:"Friendly"},
+{heading:"Cormorant Garamond",body:"Fira Sans",tag:"Elegant"},
+{heading:"Space Grotesk",body:"Inter",tag:"Tech"},
+{heading:"DM Serif Display",body:"DM Sans",tag:"Minimal"},
+{heading:"Bitter",body:"Nunito Sans",tag:"Warm"}
+];
+let current=0;
+const loadedFonts=new Set();
+const $=id=>document.getElementById(id);
+
+function loadFont(name,weights){
+  const key=name+weights.join(',');
+  if(loadedFonts.has(key))return;
+  loadedFonts.add(key);
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='https://fonts.googleapis.com/css2?family='+encodeURIComponent(name)+':wght@'+weights.join(';')+'&display=swap';
+  document.head.appendChild(link);
+}
+
+function renderList(){
+  const list=$('pairingList');
+  list.innerHTML=PAIRINGS.map((p,i)=>
+    `<div class="pairing-item${i===current?' active':''}" onclick="selectPairing(${i})">
+      <div class="pi-heading" style="font-family:'${p.heading}',serif">${p.heading}</div>
+      <div class="pi-body">${p.body}</div>
+      <span class="pi-tag">${p.tag}</span>
+    </div>`
+  ).join('');
+  PAIRINGS.forEach(p=>{
+    loadFont(p.heading,[400,500,600,700,800,900]);
+    loadFont(p.body,[300,400,500,600]);
+  });
+}
+
+function selectPairing(i){
+  current=i;
+  renderList();
+  updatePreview();
+}
+
+function updatePreview(){
+  const p=PAIRINGS[current];
+  const hSize=$('headingSize').value;
+  const bSize=$('bodySize').value;
+  const lh=$('lineHeight').value;
+  const hw=$('headingWeight').value;
+  const bw=$('bodyWeight').value;
+  $('headingSizeVal').textContent=hSize+'px';
+  $('bodySizeVal').textContent=bSize+'px';
+  $('lineHeightVal').textContent=lh;
+  const ph=$('previewHeading');
+  ph.style.fontFamily="'"+p.heading+"',serif";
+  ph.style.fontSize=hSize+'px';
+  ph.style.fontWeight=hw;
+  const pb=$('previewBody');
+  pb.style.fontFamily="'"+p.body+"',sans-serif";
+  pb.style.fontSize=bSize+'px';
+  pb.style.lineHeight=lh;
+  pb.style.fontWeight=bw;
+  updateExport();
+}
+
+function updateExport(){
+  const p=PAIRINGS[current];
+  const hw=$('headingWeight').value;
+  const bw=$('bodyWeight').value;
+  const hSize=$('headingSize').value;
+  const bSize=$('bodySize').value;
+  const lh=$('lineHeight').value;
+  const hEnc=encodeURIComponent(p.heading);
+  const bEnc=encodeURIComponent(p.body);
+  const code=`@import url('https://fonts.googleapis.com/css2?family=${hEnc}:wght@${hw}&family=${bEnc}:wght@${bw}&display=swap');
+
+h1, h2, h3 {
+  font-family: '${p.heading}', serif;
+  font-weight: ${hw};
+  font-size: ${hSize}px;
+}
+
+body, p {
+  font-family: '${p.body}', sans-serif;
+  font-weight: ${bw};
+  font-size: ${bSize}px;
+  line-height: ${lh};
+}`;
+  $('codeContent').textContent=code;
+}
+
+function copyCSS(){
+  const text=$('codeContent').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=$('copyBtn');
+    btn.textContent='Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+['headingSize','bodySize','lineHeight','headingWeight','bodyWeight'].forEach(id=>{
+  $(id).addEventListener('input',updatePreview);
+});
+
+renderList();
+updatePreview();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1200px;width:100%;margin:30px auto 0;padding:0 20px;position:relative;cursor:pointer}
+.pro-blur{background:var(--surface);border-radius:var(--radius);padding:24px;filter:blur(3px);pointer-events:none;opacity:.6;border:1px solid rgba(255,255,255,.06)}
+.pro-blur-inner{display:flex;gap:16px;flex-wrap:wrap}
+.pro-blur-card{flex:1;min-width:200px;background:var(--bg);border-radius:10px;padding:20px;text-align:center}
+.pro-blur-card h4{color:var(--accent);font-size:.95rem;margin-bottom:8px}
+.pro-blur-card p{color:var(--text2);font-size:.8rem}
+.pro-lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2}
+.pro-lock .lock-icon{font-size:2.5rem;display:block;margin-bottom:8px}
+.pro-lock .lock-text{color:#fff;font-size:1.1rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.pro-lock .lock-sub{color:#aab;font-size:.8rem;margin-top:4px}
+.pro-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-overlay.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:1.8rem;font-weight:800;color:var(--accent);margin:10px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.pro-modal ul li::before{content:'✓ ';color:var(--accent);font-weight:700}
+.pro-modal .btn-pro{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:16px;text-decoration:none;transition:opacity .2s}
+.pro-modal .btn-pro:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.85rem;cursor:pointer;margin-top:8px}
+.pro-modal .btn-later:hover{color:#bbb}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-inner">
+<div class="pro-blur-card"><h4>📤 Custom Font Upload</h4><p>Upload your own fonts and preview pairings with any typeface</p></div>
+<div class="pro-blur-card"><h4>🏢 Brand Font System</h4><p>Generate complete brand typography systems with hierarchy and guidelines</p></div>
+<div class="pro-blur-card"><h4>📋 Style Guide Export</h4><p>Export full typography style guides for your design team</p></div>
+</div>
+</div>
+<div class="pro-lock">
+<span class="lock-icon">🔒</span>
+<span class="lock-text">Pro Features</span>
+<span class="lock-sub">Click to unlock</span>
+</div>
+</div>
+<div class="pro-overlay" id="proModal">
+<div class="pro-modal">
+<h2>✦ Font Pairing Pro</h2>
+<div class="price">$9</div>
+<p style="color:#aab;font-size:.85rem">One-time payment · Lifetime access</p>
+<ul>
+<li>Upload and pair custom fonts (OTF, TTF, WOFF2)</li>
+<li>Generate complete brand font systems</li>
+<li>Typography hierarchy recommendations</li>
+<li>Export style guides (PDF & Figma)</li>
+<li>Unlimited font combinations</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});</script>
+<script src="https://cdn.buysellads.com/pub/lifa.js" async></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

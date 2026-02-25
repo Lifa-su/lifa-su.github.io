@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI Meal Planner - Generate personalized weekly meal plans with nutrition tracking, shopping lists, and dietary preference support.">
+<meta name="keywords" content="AI meal planner, meal prep, weekly meal plan, nutrition tracker, diet planner, healthy eating">
+<link rel="canonical" href="https://lifa-su.com/ai-meal-planner/">
+<meta property="og:title" content="AI Meal Planner">
+<meta property="og:description" content="Generate personalized weekly meal plans with nutrition tracking, shopping lists, and dietary preference support.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-meal-planner/">
+<meta property="og:image" content="https://lifa-su.com/ai-meal-planner/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Meal Planner">
+<meta name="twitter:description" content="Generate personalized weekly meal plans with nutrition tracking, shopping lists, and dietary preference support.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-meal-planner/og-image.png">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a0a0f">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Meal Planner","url":"https://lifa-su.com/ai-meal-planner/","description":"Generate personalized weekly meal plans with nutrition tracking, shopping lists, and dietary preference support.","applicationCategory":"HealthApplication","operatingSystem":"Web","browserRequirements":"Requires JavaScript","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"},"featureList":["Personalized weekly meal plans","Nutrition tracking","Shopping list generation","Dietary preference support","Allergen filtering","Export meal plans"],"screenshot":"https://lifa-su.com/ai-meal-planner/og-image.png","softwareVersion":"1.0","inLanguage":["en","zh"]}
+</script>
+<title>AI 膳食计划生成器 | AI Meal Planner</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;--text:#e4e4ef;--text2:#9494a8;--accent:#7c5cfc;--accent2:#5c8cfc;--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 0;transition:box-shadow .3s}
+header.scrolled{box-shadow:var(--shadow)}
+.header-inner{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+header h1{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{font-size:.78rem;color:var(--text2)}
+.container{max-width:1200px;margin:0 auto;padding:24px 20px 60px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-1px);box-shadow:0 6px 32px rgba(0,0,0,0.4)}
+.card-title{font-size:1.1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:.9rem;font-weight:500;margin-bottom:8px;color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.85rem;transition:all .2s;user-select:none}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 2px 12px rgba(124,92,252,0.3)}
+.chip-check{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.82rem;transition:all .2s;user-select:none;display:inline-flex;align-items:center;gap:5px}
+.chip-check:hover{border-color:var(--danger);color:var(--text)}
+.chip-check.active{background:rgba(252,92,108,0.15);color:var(--danger);border-color:var(--danger)}
+.slider-wrap input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--surface2);outline:none;margin:12px 0}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;box-shadow:0 2px 8px rgba(124,92,252,0.4)}
+.slider-val{text-align:center;font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.slider-labels{display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-top:4px}
+.counter{display:flex;align-items:center;gap:12px;justify-content:center}
+.counter button{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.counter button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.counter span{font-size:2rem;font-weight:700;min-width:50px;text-align:center}
+.btn{padding:14px 32px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(124,92,252,0.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,0.5)}
+.btn:active{transform:translateY(0)}
+.btn-full{width:100%;justify-content:center;padding:16px;font-size:1.1rem}
+.btn-sm{padding:8px 16px;font-size:.85rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);box-shadow:none}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);box-shadow:none;transform:none}
+.btn-success{background:linear-gradient(135deg,var(--success),#3cb878);box-shadow:0 4px 16px rgba(76,218,138,0.3)}
+#results{display:none;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.day-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;scrollbar-width:none}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{padding:10px 18px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.9rem;font-weight:500;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.day-tab:hover{border-color:var(--accent);color:var(--text)}
+.day-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.meal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.meal-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:all .3s;animation:slideIn .3s ease}
+.meal-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.meal-type{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);font-weight:600;margin-bottom:6px}
+.meal-name{font-size:1.05rem;font-weight:600;margin-bottom:8px}
+.meal-ingredients{font-size:.8rem;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.meal-macros{display:flex;gap:8px;flex-wrap:wrap}
+.macro-tag{padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:500}
+.macro-cal{background:rgba(124,92,252,0.15);color:var(--accent)}
+.macro-protein{background:rgba(76,218,138,0.15);color:var(--success)}
+.macro-carbs{background:rgba(252,180,76,0.15);color:var(--warn)}
+.macro-fat{background:rgba(252,92,108,0.15);color:var(--danger)}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.summary-item{background:var(--surface2);border-radius:var(--radius);padding:16px;text-align:center;border:1px solid var(--border)}
+.summary-item .val{font-size:1.5rem;font-weight:700;margin-bottom:2px}
+.summary-item .lbl{font-size:.75rem;color:var(--text2)}
+.chart-container{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+@media(max-width:768px){.chart-container{grid-template-columns:1fr}}
+.chart-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.chart-box h3{font-size:.9rem;margin-bottom:12px;color:var(--text2)}
+canvas{width:100%;height:auto}
+.shopping-list{list-style:none}
+.shopping-list li{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:.9rem;transition:all .2s;cursor:pointer}
+.shopping-list li:hover{background:var(--surface2)}
+.shopping-list li.checked{opacity:.5;text-decoration:line-through}
+.shopping-list li .cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.shopping-list li.checked .cb{background:var(--success);border-color:var(--success)}
+.shopping-list li.checked .cb::after{content:"\2713";color:#fff;font-size:.75rem}
+.shopping-cat{font-size:.85rem;font-weight:600;color:var(--accent);padding:12px 14px 6px;text-transform:uppercase;letter-spacing:1px}
+.actions-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.loading{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px}
+.loading .spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--success);color:var(--success);padding:14px 24px;border-radius:var(--radius);box-shadow:var(--shadow);z-index:200;animation:fadeIn .3s ease;font-size:.9rem}
+.weekly-toggle{display:flex;gap:8px;margin-bottom:16px}
+.weekly-toggle button{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.85rem;transition:all .2s}
+.weekly-toggle button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.section-title{font-size:1.4rem;font-weight:700;margin:32px 0 16px;display:flex;align-items:center;gap:10px}
+footer{text-align:center;padding:24px;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.btn-pro{padding:6px 14px;border-radius:20px;border:1px solid #f5a623;background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;margin-left:auto;flex-shrink:0}
+.btn-pro:hover{transform:scale(1.05);box-shadow:0 2px 12px rgba(245,166,35,0.4)}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:300;display:none;align-items:center;justify-content:center;animation:fadeIn .3s ease}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:440px;width:90%;max-height:85vh;overflow-y:auto;position:relative;box-shadow:0 8px 48px rgba(0,0,0,0.5)}
+.modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:1.4rem;cursor:pointer}
+.modal-close:hover{color:var(--text)}
+.modal h2{font-size:1.3rem;margin-bottom:16px;text-align:center}
+.pro-features{list-style:none;margin:16px 0}
+.pro-features li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.95rem;display:flex;align-items:center;gap:10px}
+.pro-features li:last-child{border-bottom:none}
+.pro-price{text-align:center;margin:20px 0 8px;font-size:2rem;font-weight:700;background:linear-gradient(135deg,#f5a623,#f7c948);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-price-sub{text-align:center;color:var(--text2);font-size:.85rem;margin-bottom:20px}
+.btn-cta{display:block;width:100%;padding:14px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;font-size:1.05rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;transition:all .3s}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(245,166,35,0.4)}
+.pro-teaser{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;overflow:hidden;text-align:center}
+.pro-teaser-blur{filter:blur(4px);pointer-events:none;opacity:.5;padding:12px 0}
+.pro-teaser-cta{margin-top:12px}
+.pro-teaser-cta a{color:#f5a623;font-weight:600;text-decoration:none;font-size:.95rem}
+.pro-teaser-cta a:hover{text-decoration:underline}
+.history-list{list-style:none;max-height:400px;overflow-y:auto}
+.history-list li{padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .2s;font-size:.9rem}
+.history-list li:hover{background:var(--surface2)}
+.history-list li .hist-time{font-size:.75rem;color:var(--text2);margin-bottom:4px}
+.history-list li .hist-info{display:flex;gap:8px;flex-wrap:wrap}
+.history-list li .hist-tag{padding:2px 8px;border-radius:8px;font-size:.75rem;background:var(--surface2);border:1px solid var(--border)}
+.history-empty{text-align:center;color:var(--text2);padding:40px 20px;font-size:.9rem}
+
+/* Page load fade-in */
+body{opacity:0;animation:pageLoad .6s ease .1s forwards}
+@keyframes pageLoad{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.container>.card,.container>.section-title{opacity:0;animation:cardEnter .5s ease forwards}
+.container>.card:nth-child(1){animation-delay:.2s}
+.container>.card:nth-child(2){animation-delay:.35s}
+.container>.card:nth-child(3){animation-delay:.5s}
+@keyframes cardEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* Skeleton loading screen */
+.skeleton-wrap{padding:20px}
+.skeleton-title{height:20px;width:40%;background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;border-radius:6px;margin-bottom:20px;animation:shimmer 1.5s infinite}
+.skeleton-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.skeleton-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;animation:shimmerCard 1.5s infinite}
+.skeleton-card .sk-line{height:12px;background:linear-gradient(90deg,var(--border) 25%,#3a3a4e 50%,var(--border) 75%);background-size:200% 100%;border-radius:4px;margin-bottom:10px;animation:shimmer 1.5s infinite}
+.skeleton-card .sk-line:nth-child(1){width:30%;height:10px;margin-bottom:8px}
+.skeleton-card .sk-line:nth-child(2){width:70%;height:16px;margin-bottom:12px}
+.skeleton-card .sk-line:nth-child(3){width:90%}
+.skeleton-card .sk-line:nth-child(4){width:60%;margin-bottom:14px}
+.skeleton-card .sk-macros{display:flex;gap:8px;margin-top:6px}
+.skeleton-card .sk-macros span{height:22px;width:60px;border-radius:10px;background:linear-gradient(90deg,var(--border) 25%,#3a3a4e 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton-card:nth-child(2) .sk-line{animation-delay:.15s}
+.skeleton-card:nth-child(3) .sk-line{animation-delay:.3s}
+.skeleton-card:nth-child(4) .sk-line{animation-delay:.45s}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes shimmerCard{0%{opacity:.7}50%{opacity:1}100%{opacity:.7}}
+
+/* Staggered meal card entrance */
+.meal-card{opacity:0;animation:mealCardIn .4s ease forwards}
+.meal-card:nth-child(1){animation-delay:.05s}
+.meal-card:nth-child(2){animation-delay:.12s}
+.meal-card:nth-child(3){animation-delay:.19s}
+.meal-card:nth-child(4){animation-delay:.26s}
+@keyframes mealCardIn{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Button micro-animations */
+.btn{transition:all .25s cubic-bezier(.4,0,.2,1)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,0.5)}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.1s}
+.btn-outline:hover{transform:translateY(-1px)}
+.btn-outline:active{transform:translateY(0) scale(.97)}
+.btn-pro{transition:all .25s cubic-bezier(.4,0,.2,1)}
+.btn-pro:active{transform:scale(.95);transition-duration:.1s}
+.chip{transition:all .2s cubic-bezier(.4,0,.2,1)}
+.chip:active{transform:scale(.95)}
+.chip-check{transition:all .2s cubic-bezier(.4,0,.2,1)}
+.chip-check:active{transform:scale(.95)}
+.day-tab{transition:all .2s cubic-bezier(.4,0,.2,1)}
+.day-tab:active{transform:scale(.96)}
+.btn-cta{transition:all .25s cubic-bezier(.4,0,.2,1)}
+.btn-cta:active{transform:translateY(0) scale(.97);transition-duration:.1s}
+</style>
+</head>
+<body>
+<header id="header"><div class="header-inner"><div class="logo">🍽️</div><div><h1>AI 膳食计划生成器</h1><p>智能定制您的一周健康饮食方案</p></div><button class="btn-pro" onclick="document.getElementById('proModal').classList.add('show')">⭐ Pro</button></div></header>
+<div class="container">
+<div class="card">
+<div class="card-title"><span style="font-size:1.3rem">⚙️</span> 定制您的膳食计划</div>
+<div class="form-group"><label>🥗 饮食偏好</label>
+<div class="chip-group" id="dietGroup">
+<div class="chip active" data-val="balanced">均衡饮食</div>
+<div class="chip" data-val="vegetarian">🌱 素食</div>
+<div class="chip" data-val="lowcarb">🥩 低碳水</div>
+<div class="chip" data-val="highprotein">💪 高蛋白</div>
+<div class="chip" data-val="mediterranean">🫒 地中海</div>
+<div class="chip" data-val="keto">🥑 生酮</div>
+</div></div>
+<div class="form-group"><label>⚠️ 过敏原（选择需要排除的）</label>
+<div class="chip-group" id="allergenGroup">
+<div class="chip-check" data-val="nuts">🥜 坚果</div>
+<div class="chip-check" data-val="dairy">🥛 乳制品</div>
+<div class="chip-check" data-val="gluten">🌾 麸质</div>
+<div class="chip-check" data-val="seafood">🦐 海鲜</div>
+<div class="chip-check" data-val="eggs">🥚 鸡蛋</div>
+<div class="chip-check" data-val="soy">🫘 大豆</div>
+</div></div>
+<div class="form-row">
+<div class="form-group"><label>🔥 每日卡路里目标</label>
+<div class="slider-wrap"><div class="slider-val" id="calVal">2000 kcal</div>
+<input type="range" id="calSlider" min="1200" max="3500" step="50" value="2000">
+<div class="slider-labels"><span>1200</span><span>2000</span><span>3500</span></div></div></div>
+<div class="form-group"><label>👥 用餐人数</label>
+<div class="counter"><button onclick="adjustPeople(-1)">−</button><span id="peopleVal">2</span><button onclick="adjustPeople(1)">+</button></div></div>
+</div>
+<button class="btn btn-full" onclick="generatePlan()">✨ 生成一周膳食计划</button>
+</div>
+<div id="loading" style="display:none"><div class="skeleton-wrap"><div class="skeleton-title"></div><div class="skeleton-grid"><div class="skeleton-card"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-macros"><span></span><span></span><span></span><span></span></div></div><div class="skeleton-card"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-macros"><span></span><span></span><span></span><span></span></div></div><div class="skeleton-card"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-macros"><span></span><span></span><span></span><span></span></div></div><div class="skeleton-card"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-macros"><span></span><span></span><span></span><span></span></div></div></div><p style="text-align:center;color:var(--text2);margin-top:20px;font-size:.9rem">✨ 正在为您智能生成膳食计划...</p></div></div>
+<div id="results">
+<h2 class="section-title">📋 一周膳食计划</h2>
+<div class="day-tabs" id="dayTabs"></div>
+<div id="mealContent"></div>
+<h2 class="section-title">📊 营养成分汇总</h2>
+<div class="card"><div class="weekly-toggle" id="summaryToggle"><button class="active" onclick="showSummary('daily')">每日汇总</button><button onclick="showSummary('weekly')">每周总计</button></div><div id="summaryContent"></div></div>
+<h2 class="section-title">📈 营养可视化</h2>
+<div class="chart-container"><div class="chart-box"><h3>卡路里分布</h3><canvas id="barChart"></canvas></div><div class="chart-box"><h3>宏量营养素比例</h3><canvas id="pieChart"></canvas></div></div>
+<h2 class="section-title">🛒 购物清单</h2>
+<div class="card"><div id="shoppingContent"></div></div>
+<div class="pro-teaser">
+<div style="font-size:1.1rem;font-weight:600;margin-bottom:8px">🔒 Pro 专属功能</div>
+<div class="pro-teaser-blur">
+<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+<span>📊 详细宏量追踪</span><span>📥 导出PDF/Excel</span><span>🛒 智能价格清单</span>
+</div>
+</div>
+<div class="pro-teaser-cta"><a href="javascript:void(0)" onclick="document.getElementById('proModal').classList.add('show')">⭐ 解锁 Pro 版 — 仅需 $9 →</a></div>
+</div>
+<div class="actions-bar"><button class="btn" onclick="exportPlan()">📥 导出计划</button><button class="btn btn-success" onclick="exportShoppingList()">🛒 导出购物清单</button><button class="btn btn-outline" onclick="generatePlan()">🔄 重新生成</button><button class="btn btn-outline" onclick="renderHistory();document.getElementById('historyModal').classList.add('show')">📜 历史记录</button></div>
+</div>
+</div>
+<footer>AI Meal Planner — Built by FeiDev · <a href="https://ko-fi.com/feidev" target="_blank">☕ Support this project</a></footer>
+
+<div class="modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="modal">
+<button class="modal-close" onclick="document.getElementById('proModal').classList.remove('show')">✕</button>
+<h2>⭐ Upgrade to Pro</h2>
+<ul class="pro-features">
+<li>🍽️ 200+ premium recipes</li>
+<li>📊 Detailed macro tracking</li>
+<li>📥 Export to PDF/Excel</li>
+<li>🛒 Smart shopping list with prices</li>
+<li>👨‍🍳 Custom recipe import</li>
+<li>♾️ Lifetime access</li>
+</ul>
+<div class="pro-price">$9</div>
+<div class="pro-price-sub">One-time payment · Lifetime access</div>
+<a class="btn-cta" href="https://ko-fi.com/feidev" target="_blank">🚀 Get Pro Now</a>
+</div>
+</div>
+
+<div class="modal-overlay" id="historyModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="modal">
+<button class="modal-close" onclick="document.getElementById('historyModal').classList.remove('show')">✕</button>
+<h2>📜 历史记录</h2>
+<div id="historyContent"></div>
+</div>
+</div>
+<script>
+const RECIPES={
+breakfast:[
+{name:"燕麦粥配蓝莓",cal:320,p:12,c:52,f:8,ing:["燕麦片","蓝莓","蜂蜜","牛奶","肉桂粉"],alg:["gluten","dairy"],diet:["balanced","vegetarian","mediterranean"]},
+{name:"牛油果吐司配煎蛋",cal:380,p:16,c:32,f:22,ing:["全麦面包","牛油果","鸡蛋","橄榄油","黑胡椒"],alg:["gluten","eggs"],diet:["balanced","mediterranean","highprotein"]},
+{name:"希腊酸奶水果碗",cal:290,p:18,c:38,f:8,ing:["希腊酸奶","草莓","香蕉","蜂蜜","格兰诺拉"],alg:["dairy","gluten"],diet:["balanced","vegetarian","highprotein","mediterranean"]},
+{name:"蛋白煎蛋卷",cal:220,p:26,c:6,f:10,ing:["蛋白","菠菜","蘑菇","番茄","低脂奶酪"],alg:["eggs","dairy"],diet:["balanced","lowcarb","highprotein","keto"]},
+{name:"豆浆配油条",cal:410,p:14,c:58,f:14,ing:["豆浆","油条","白糖"],alg:["soy","gluten"],diet:["balanced","vegetarian"]},
+{name:"小米粥配咸鸭蛋",cal:340,p:14,c:48,f:10,ing:["小米","咸鸭蛋","枸杞"],alg:["eggs"],diet:["balanced"]},
+{name:"全麦煎饼配枫糖",cal:360,p:10,c:54,f:12,ing:["全麦面粉","鸡蛋","牛奶","枫糖浆","黄油"],alg:["gluten","eggs","dairy"],diet:["balanced","vegetarian"]},
+{name:"烟熏三文鱼贝果",cal:420,p:24,c:40,f:18,ing:["贝果","烟熏三文鱼","奶油芝士","洋葱"],alg:["gluten","seafood","dairy"],diet:["balanced","highprotein","mediterranean"]},
+{name:"椰子奇亚籽布丁",cal:280,p:8,c:24,f:18,ing:["奇亚籽","椰奶","芒果","蜂蜜"],alg:[],diet:["balanced","vegetarian","keto","lowcarb","mediterranean"]},
+{name:"番茄鸡蛋面",cal:390,p:16,c:52,f:12,ing:["面条","番茄","鸡蛋","葱","盐"],alg:["gluten","eggs"],diet:["balanced","vegetarian"]},
+{name:"杏仁黄油香蕉吐司",cal:350,p:10,c:42,f:16,ing:["全麦面包","杏仁黄油","香蕉","蜂蜜"],alg:["gluten","nuts"],diet:["balanced","vegetarian"]},
+{name:"蔬菜鸡蛋饼",cal:300,p:18,c:22,f:16,ing:["鸡蛋","胡萝卜","西葫芦","葱","面粉"],alg:["eggs","gluten"],diet:["balanced","vegetarian","highprotein"]},
+{name:"牛油果鸡蛋杯",cal:310,p:14,c:8,f:26,ing:["牛油果","鸡蛋","培根碎","盐","黑胡椒"],alg:["eggs"],diet:["balanced","lowcarb","highprotein","keto"]},
+{name:"水果奶昔",cal:260,p:8,c:46,f:6,ing:["香蕉","草莓","蓝莓","酸奶","蜂蜜"],alg:["dairy"],diet:["balanced","vegetarian","mediterranean"]},
+{name:"培根芝士蛋松饼",cal:440,p:22,c:30,f:26,ing:["英式松饼","培根","鸡蛋","切达芝士"],alg:["gluten","eggs","dairy"],diet:["balanced","highprotein"]},
+{name:"豆腐蔬菜粥",cal:240,p:12,c:36,f:6,ing:["大米","豆腐","胡萝卜","芹菜","姜"],alg:["soy"],diet:["balanced","vegetarian","lowcarb"]}
+],
+lunch:[
+{name:"鸡胸肉凯撒沙拉",cal:420,p:36,c:18,f:24,ing:["鸡胸肉","生菜","帕玛森芝士","面包丁","凯撒酱"],alg:["dairy","gluten","eggs"],diet:["balanced","highprotein","lowcarb"]},
+{name:"糙米照烧鸡饭",cal:520,p:32,c:62,f:14,ing:["鸡腿肉","糙米","西兰花","胡萝卜","照烧酱"],alg:["soy","gluten"],diet:["balanced","highprotein"]},
+{name:"地中海藜麦碗",cal:440,p:16,c:52,f:20,ing:["藜麦","鹰嘴豆","黄瓜","番茄","橄榄","羊奶酪","橄榄油"],alg:["dairy"],diet:["balanced","vegetarian","mediterranean"]},
+{name:"番茄牛肉面",cal:550,p:30,c:60,f:20,ing:["牛腩","面条","番茄","洋葱","姜","八角"],alg:["gluten"],diet:["balanced","highprotein"]},
+{name:"蔬菜炒饭",cal:420,p:12,c:58,f:16,ing:["米饭","鸡蛋","胡萝卜","豌豆","玉米","葱","酱油"],alg:["eggs","soy"],diet:["balanced","vegetarian"]},
+{name:"日式三文鱼饭",cal:480,p:28,c:50,f:18,ing:["三文鱼","寿司米","牛油果","黄瓜","海苔","酱油"],alg:["seafood","soy"],diet:["balanced","highprotein","mediterranean"]},
+{name:"宫保鸡丁配米饭",cal:530,p:28,c:56,f:20,ing:["鸡胸肉","花生","干辣椒","黄瓜","葱","酱油","米饭"],alg:["nuts","soy"],diet:["balanced","highprotein"]},
+{name:"希腊沙拉配皮塔饼",cal:380,p:12,c:40,f:20,ing:["番茄","黄瓜","橄榄","羊奶酪","洋葱","皮塔饼","橄榄油"],alg:["dairy","gluten"],diet:["balanced","vegetarian","mediterranean"]},
+{name:"牛肉西兰花",cal:460,p:34,c:28,f:24,ing:["牛肉","西兰花","蒜","姜","酱油","蚝油","米饭"],alg:["soy"],diet:["balanced","highprotein","lowcarb"]},
+{name:"素食佛碗",cal:400,p:14,c:52,f:16,ing:["糙米","烤红薯","鹰嘴豆","羽衣甘蓝","牛油果","芝麻酱"],alg:[],diet:["balanced","vegetarian","mediterranean"]},
+{name:"鸡肉卷饼",cal:450,p:28,c:38,f:20,ing:["全麦饼皮","鸡胸肉","生菜","番茄","牛油果","酸奶酱"],alg:["gluten","dairy"],diet:["balanced","highprotein"]},
+{name:"味噌豆腐汤配饭团",cal:360,p:16,c:48,f:12,ing:["味噌","豆腐","海带","葱","米饭","海苔"],alg:["soy"],diet:["balanced","vegetarian"]},
+{name:"虾仁炒西葫芦",cal:320,p:28,c:16,f:16,ing:["虾仁","西葫芦","蒜","橄榄油","柠檬汁"],alg:["seafood"],diet:["balanced","highprotein","lowcarb","keto","mediterranean"]},
+{name:"西兰花鸡肉意面",cal:510,p:30,c:58,f:16,ing:["意面","鸡胸肉","西兰花","蒜","橄榄油","帕玛森芝士"],alg:["gluten","dairy"],diet:["balanced","highprotein","mediterranean"]},
+{name:"麻辣香锅",cal:580,p:26,c:42,f:34,ing:["豆腐","藕片","土豆","木耳","花椒","干辣椒","酱油"],alg:["soy"],diet:["balanced","vegetarian"]}
+],
+dinner:[
+{name:"烤三文鱼配芦笋",cal:450,p:38,c:12,f:28,ing:["三文鱼","芦笋","柠檬","橄榄油","蒜","迷迭香"],alg:["seafood"],diet:["balanced","highprotein","lowcarb","keto","mediterranean"]},
+{name:"番茄炖牛腩",cal:520,p:36,c:24,f:32,ing:["牛腩","番茄","土豆","胡萝卜","洋葱","八角","桂皮"],alg:[],diet:["balanced","highprotein"]},
+{name:"清蒸鲈鱼",cal:280,p:34,c:6,f:14,ing:["鲈鱼","姜","葱","酱油","料酒","香油"],alg:["seafood","soy"],diet:["balanced","highprotein","lowcarb","keto","mediterranean"]},
+{name:"烤鸡胸配烤蔬菜",cal:420,p:38,c:22,f:20,ing:["鸡胸肉","甜椒","西葫芦","洋葱","橄榄油","迷迭香","百里香"],alg:[],diet:["balanced","highprotein","lowcarb","keto","mediterranean"]},
+{name:"意式肉酱面",cal:560,p:28,c:62,f:22,ing:["意面","牛肉末","番茄酱","洋葱","蒜","胡萝卜","芹菜","帕玛森芝士"],alg:["gluten","dairy"],diet:["balanced","highprotein"]},
+{name:"麻婆豆腐配米饭",cal:480,p:20,c:54,f:22,ing:["豆腐","猪肉末","豆瓣酱","花椒","葱","姜","蒜","米饭"],alg:["soy"],diet:["balanced"]},
+{name:"烤羊排配薄荷酱",cal:520,p:36,c:8,f:38,ing:["羊排","薄荷","蒜","橄榄油","柠檬汁","迷迭香"],alg:[],diet:["balanced","highprotein","lowcarb","keto","mediterranean"]},
+{name:"蒜蓉虾配糙米",cal:420,p:30,c:48,f:12,ing:["大虾","蒜","黄油","柠檬","糙米","欧芹"],alg:["seafood","dairy"],diet:["balanced","highprotein","mediterranean"]},
+{name:"红烧排骨",cal:580,p:32,c:28,f:38,ing:["猪排骨","酱油","冰糖","姜","葱","八角","桂皮","料酒"],alg:["soy"],diet:["balanced","highprotein"]},
+{name:"地中海烤蔬菜配鹰嘴豆",cal:380,p:14,c:44,f:18,ing:["茄子","甜椒","西葫芦","番茄","鹰嘴豆","橄榄油","牛至"],alg:[],diet:["balanced","vegetarian","mediterranean"]},
+{name:"咖喱鸡配印度饼",cal:540,p:30,c:48,f:24,ing:["鸡腿肉","咖喱粉","椰奶","洋葱","番茄","姜","蒜","印度饼"],alg:["gluten"],diet:["balanced","highprotein"]},
+{name:"西红柿炒鸡蛋配米饭",cal:440,p:18,c:52,f:18,ing:["番茄","鸡蛋","葱","糖","盐","米饭"],alg:["eggs"],diet:["balanced","vegetarian"]},
+{name:"黑椒牛柳",cal:460,p:36,c:16,f:28,ing:["牛里脊","黑胡椒","洋葱","甜椒","蒜","酱油","蚝油"],alg:["soy"],diet:["balanced","highprotein","lowcarb"]},
+{name:"素食咖喱配糙米",cal:420,p:12,c:58,f:16,ing:["土豆","花椰菜","胡萝卜","豌豆","椰奶","咖喱粉","糙米"],alg:[],diet:["balanced","vegetarian","mediterranean"]},
+{name:"柠檬草虾",cal:340,p:30,c:14,f:18,ing:["大虾","柠檬草","蒜","辣椒","鱼露","青柠"],alg:["seafood"],diet:["balanced","highprotein","lowcarb","keto"]},
+{name:"回锅肉",cal:520,p:24,c:18,f:40,ing:["五花肉","青蒜","甜椒","豆瓣酱","酱油","料酒"],alg:["soy"],diet:["balanced","highprotein","lowcarb","keto"]}
+],
+snack:[
+{name:"混合坚果",cal:180,p:6,c:8,f:16,ing:["杏仁","核桃","腰果","蔓越莓干"],alg:["nuts"],diet:["balanced","vegetarian","lowcarb","keto","mediterranean"]},
+{name:"希腊酸奶配蜂蜜",cal:150,p:12,c:18,f:4,ing:["希腊酸奶","蜂蜜"],alg:["dairy"],diet:["balanced","vegetarian","highprotein","mediterranean"]},
+{name:"水果拼盘",cal:120,p:2,c:28,f:1,ing:["苹果","橙子","葡萄","猕猴桃"],alg:[],diet:["balanced","vegetarian","mediterranean"]},
+{name:"蛋白棒",cal:200,p:20,c:22,f:8,ing:["乳清蛋白","燕麦","蜂蜜","杏仁"],alg:["dairy","gluten","nuts"],diet:["balanced","highprotein"]},
+{name:"芹菜配花生酱",cal:160,p:6,c:8,f:12,ing:["芹菜","花生酱"],alg:["nuts"],diet:["balanced","vegetarian","lowcarb","keto"]},
+{name:"毛豆",cal:120,p:12,c:8,f:5,ing:["毛豆","海盐"],alg:["soy"],diet:["balanced","vegetarian","highprotein","lowcarb","mediterranean"]},
+{name:"黑巧克力",cal:170,p:3,c:16,f:12,ing:["85%黑巧克力"],alg:[],diet:["balanced","vegetarian","lowcarb","keto","mediterranean"]},
+{name:"鹰嘴豆泥配蔬菜条",cal:140,p:6,c:16,f:7,ing:["鹰嘴豆泥","胡萝卜","黄瓜","甜椒"],alg:[],diet:["balanced","vegetarian","mediterranean"]},
+{name:"杏仁小饼干",cal:160,p:4,c:18,f:9,ing:["杏仁粉","蜂蜜","椰子油"],alg:["nuts"],diet:["balanced","vegetarian"]},
+{name:"蓝莓酸奶杯",cal:140,p:10,c:20,f:3,ing:["酸奶","蓝莓","格兰诺拉"],alg:["dairy","gluten"],diet:["balanced","vegetarian","highprotein","mediterranean"]},
+{name:"牛油果奶昔",cal:200,p:4,c:14,f:16,ing:["牛油果","椰奶","蜂蜜","冰块"],alg:[],diet:["balanced","vegetarian","keto","lowcarb"]},
+{name:"烤鹰嘴豆",cal:130,p:7,c:18,f:3,ing:["鹰嘴豆","橄榄油","孜然","辣椒粉"],alg:[],diet:["balanced","vegetarian","highprotein","mediterranean"]}
+]};
+const DAYS=["周一","周二","周三","周四","周五","周六","周日"];
+const MEALS=["breakfast","lunch","dinner","snack"];
+const ML={breakfast:"🌅 早餐",lunch:"☀️ 午餐",dinner:"🌙 晚餐",snack:"🍪 零食"};
+const CR={breakfast:0.25,lunch:0.35,dinner:0.30,snack:0.10};
+let plan=null,curDay=0,sumMode='daily',ppl=2;
+
+document.getElementById('calSlider').addEventListener('input',function(){document.getElementById('calVal').textContent=this.value+' kcal'});
+document.querySelectorAll('#dietGroup .chip').forEach(c=>{c.addEventListener('click',function(){document.querySelectorAll('#dietGroup .chip').forEach(x=>x.classList.remove('active'));this.classList.add('active')})});
+document.querySelectorAll('#allergenGroup .chip-check').forEach(c=>{c.addEventListener('click',function(){this.classList.toggle('active')})});
+window.addEventListener('scroll',()=>{document.getElementById('header').classList.toggle('scrolled',window.scrollY>10)});
+
+function adjustPeople(d){ppl=Math.max(1,Math.min(8,ppl+d));document.getElementById('peopleVal').textContent=ppl}
+function getDiet(){const e=document.querySelector('#dietGroup .chip.active');return e?e.dataset.val:'balanced'}
+function getAllergens(){return[...document.querySelectorAll('#allergenGroup .chip-check.active')].map(e=>e.dataset.val)}
+
+function filterR(mt,diet,alg){
+return RECIPES[mt].filter(r=>{
+if(!r.diet.includes(diet))return false;
+for(const a of alg){if(r.alg.includes(a))return false}
+return true;
+})}
+
+function scaleM(r,tc){
+const ratio=tc/r.cal;
+return{name:r.name,ing:r.ing,cal:Math.round(r.cal*ratio),p:Math.round(r.p*ratio),c:Math.round(r.c*ratio),f:Math.round(r.f*ratio)}}
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+
+function generatePlan(){
+const diet=getDiet(),alg=getAllergens(),tc=parseInt(document.getElementById('calSlider').value);
+ppl=parseInt(document.getElementById('peopleVal').textContent);
+for(const mt of MEALS){if(filterR(mt,diet,alg).length<3){showToast('⚠️ '+ML[mt].slice(2)+'可用食谱不足，请调整设置');return}}
+document.getElementById('loading').style.display='block';
+document.getElementById('results').style.display='none';
+setTimeout(()=>{
+const p=[];
+for(let d=0;d<7;d++){
+const dp={};
+for(const mt of MEALS){
+const avail=filterR(mt,diet,alg);
+const sh=shuffle(avail);
+let pick=sh[0];
+for(const r of sh){const used=p.map(x=>x[mt]?.name).filter(Boolean);if(!used.includes(r.name)){pick=r;break}}
+dp[mt]=scaleM(pick,tc*CR[mt]);
+}
+p.push(dp);
+}
+plan=p;curDay=0;
+renderAll();
+document.getElementById('loading').style.display='none';
+document.getElementById('results').style.display='block';
+document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+savePlanHistory();
+},800);
+}
+
+function renderAll(){renderTabs();renderMeals();renderSummary();renderCharts();renderShop()}
+
+function renderTabs(){
+document.getElementById('dayTabs').innerHTML=DAYS.map((d,i)=>'<div class="day-tab'+(i===curDay?' active':'')+'" onclick="selDay('+i+')">'+d+'</div>').join('')}
+
+function selDay(i){curDay=i;renderTabs();renderMeals();renderSummary();renderCharts()}
+
+function renderMeals(){
+const day=plan[curDay];
+let h='<div class="meal-grid">';
+for(const mt of MEALS){
+const m=day[mt];
+h+='<div class="meal-card"><div class="meal-type">'+ML[mt]+'</div><div class="meal-name">'+m.name+'</div><div class="meal-ingredients">🧾 '+m.ing.join("、")+(ppl>1?'（'+ppl+'人份）':'')+'</div><div class="meal-macros"><span class="macro-tag macro-cal">🔥 '+(m.cal*ppl)+' kcal</span><span class="macro-tag macro-protein">蛋白 '+(m.p*ppl)+'g</span><span class="macro-tag macro-carbs">碳水 '+(m.c*ppl)+'g</span><span class="macro-tag macro-fat">脂肪 '+(m.f*ppl)+'g</span></div></div>';
+}
+h+='</div>';
+document.getElementById('mealContent').innerHTML=h;
+}
+
+function renderSummary(){
+const ct=document.getElementById('summaryContent');
+if(sumMode==='daily'){
+const day=plan[curDay];let tCal=0,tP=0,tC=0,tF=0;
+for(const mt of MEALS){tCal+=day[mt].cal*ppl;tP+=day[mt].p*ppl;tC+=day[mt].c*ppl;tF+=day[mt].f*ppl}
+ct.innerHTML='<div class="summary-grid"><div class="summary-item"><div class="val" style="color:var(--accent)">'+tCal+'</div><div class="lbl">总卡路里 (kcal)</div></div><div class="summary-item"><div class="val" style="color:var(--success)">'+tP+'g</div><div class="lbl">蛋白质</div></div><div class="summary-item"><div class="val" style="color:var(--warn)">'+tC+'g</div><div class="lbl">碳水化合物</div></div><div class="summary-item"><div class="val" style="color:var(--danger)">'+tF+'g</div><div class="lbl">脂肪</div></div></div>';
+}else{
+let tCal=0,tP=0,tC=0,tF=0;
+for(let d=0;d<7;d++)for(const mt of MEALS){tCal+=plan[d][mt].cal*ppl;tP+=plan[d][mt].p*ppl;tC+=plan[d][mt].c*ppl;tF+=plan[d][mt].f*ppl}
+const aC=Math.round(tCal/7),aP=Math.round(tP/7),aCC=Math.round(tC/7),aF=Math.round(tF/7);
+ct.innerHTML='<div class="summary-grid"><div class="summary-item"><div class="val" style="color:var(--accent)">'+tCal+'</div><div class="lbl">周总卡路里</div></div><div class="summary-item"><div class="val" style="color:var(--success)">'+tP+'g</div><div class="lbl">周总蛋白质</div></div><div class="summary-item"><div class="val" style="color:var(--warn)">'+tC+'g</div><div class="lbl">周总碳水</div></div><div class="summary-item"><div class="val" style="color:var(--danger)">'+tF+'g</div><div class="lbl">周总脂肪</div></div></div><div class="summary-grid"><div class="summary-item"><div class="val" style="color:var(--accent)">'+aC+'</div><div class="lbl">日均卡路里</div></div><div class="summary-item"><div class="val" style="color:var(--success)">'+aP+'g</div><div class="lbl">日均蛋白质</div></div><div class="summary-item"><div class="val" style="color:var(--warn)">'+aCC+'g</div><div class="lbl">日均碳水</div></div><div class="summary-item"><div class="val" style="color:var(--danger)">'+aF+'g</div><div class="lbl">日均脂肪</div></div></div>';
+}}
+
+function showSummary(mode){sumMode=mode;document.querySelectorAll('#summaryToggle button').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderSummary();renderCharts()}
+function renderCharts(){renderBar();renderPie()}
+function renderBar(){
+const cv=document.getElementById('barChart'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+cv.width=cv.offsetWidth*dpr;cv.height=260*dpr;cv.style.height='260px';ctx.scale(dpr,dpr);
+const W=cv.offsetWidth,H=260;ctx.clearRect(0,0,W,H);
+const data=[];
+if(sumMode==='daily'){
+const day=plan[curDay];
+for(const mt of MEALS){data.push({label:ML[mt].slice(2),cal:day[mt].cal*ppl,p:day[mt].p*ppl,c:day[mt].c*ppl,f:day[mt].f*ppl})}
+}else{
+for(let d=0;d<7;d++){let cal=0,p=0,c=0,f=0;for(const mt of MEALS){cal+=plan[d][mt].cal*ppl;p+=plan[d][mt].p*ppl;c+=plan[d][mt].c*ppl;f+=plan[d][mt].f*ppl}data.push({label:DAYS[d],cal,p,c,f})}
+}
+const maxV=Math.max(...data.map(d=>d.cal))*1.15;
+const pad={t:20,r:20,b:40,l:50},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+const bGW=cW/data.length,bW=Math.min(bGW*0.6,40);
+ctx.strokeStyle='#2a2a3e';ctx.lineWidth=0.5;ctx.font='11px sans-serif';ctx.fillStyle='#9494a8';ctx.textAlign='right';
+for(let i=0;i<=4;i++){const y=pad.t+cH-(cH*i/4),val=Math.round(maxV*i/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();ctx.fillText(val,pad.l-6,y+4)}
+ctx.textAlign='center';
+data.forEach((d,i)=>{
+const x=pad.l+bGW*i+(bGW-bW)/2,h=(d.cal/maxV)*cH,y=pad.t+cH-h;
+const grad=ctx.createLinearGradient(x,y,x,pad.t+cH);grad.addColorStop(0,'#7c5cfc');grad.addColorStop(1,'#5c8cfc');
+ctx.fillStyle=grad;ctx.beginPath();ctx.roundRect(x,y,bW,h,[4,4,0,0]);ctx.fill();
+ctx.fillStyle='#e4e4ef';ctx.font='10px sans-serif';ctx.fillText(d.cal,x+bW/2,y-6);
+ctx.fillStyle='#9494a8';ctx.font='11px sans-serif';ctx.fillText(d.label,x+bW/2,H-pad.b+18);
+})}
+
+function renderPie(){
+const cv=document.getElementById('pieChart'),ctx=cv.getContext('2d'),dpr=window.devicePixelRatio||1;
+cv.width=cv.offsetWidth*dpr;cv.height=260*dpr;cv.style.height='260px';ctx.scale(dpr,dpr);
+const W=cv.offsetWidth,H=260;ctx.clearRect(0,0,W,H);
+let tP=0,tC=0,tF=0;
+if(sumMode==='daily'){const day=plan[curDay];for(const mt of MEALS){tP+=day[mt].p*ppl;tC+=day[mt].c*ppl;tF+=day[mt].f*ppl}}
+else{for(let d=0;d<7;d++)for(const mt of MEALS){tP+=plan[d][mt].p*ppl;tC+=plan[d][mt].c*ppl;tF+=plan[d][mt].f*ppl}}
+const total=tP+tC+tF;if(total===0)return;
+const slices=[{label:'蛋白质',val:tP,color:'#4cda8a'},{label:'碳水',val:tC,color:'#fcb44c'},{label:'脂肪',val:tF,color:'#fc5c6c'}];
+const cx=W*0.38,cy=H/2,r=Math.min(cx-20,cy-20);
+let startA=-Math.PI/2;
+slices.forEach(s=>{
+const angle=(s.val/total)*Math.PI*2;
+ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startA,startA+angle);ctx.closePath();ctx.fillStyle=s.color;ctx.fill();
+ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,startA,startA+angle);ctx.closePath();ctx.strokeStyle='#14141f';ctx.lineWidth=2;ctx.stroke();
+startA+=angle;
+});
+ctx.beginPath();ctx.arc(cx,cy,r*0.55,0,Math.PI*2);ctx.fillStyle='#14141f';ctx.fill();
+ctx.fillStyle='#e4e4ef';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText(total+'g',cx,cy+5);
+let ly=H/2-40;const lx=W*0.65;
+slices.forEach(s=>{
+const pct=Math.round(s.val/total*100);
+ctx.fillStyle=s.color;ctx.beginPath();ctx.roundRect(lx,ly-4,14,14,[3]);ctx.fill();
+ctx.fillStyle='#e4e4ef';ctx.font='13px sans-serif';ctx.textAlign='left';
+ctx.fillText(s.label+' '+s.val+'g ('+pct+'%)',lx+20,ly+8);ly+=28;
+})}
+function renderShop(){
+const cats={'蛋白质类':['鸡胸肉','鸡腿肉','牛腩','牛肉','牛肉末','牛里脊','猪排骨','猪肉末','五花肉','羊排','培根','培根碎','三文鱼','烟熏三文鱼','鲈鱼','大虾','虾仁','鸡蛋','蛋白','咸鸭蛋','豆腐','乳清蛋白'],
+'蔬菜水果':['番茄','西兰花','芦笋','菠菜','生菜','羽衣甘蓝','胡萝卜','西葫芦','洋葱','甜椒','青蒜','蘑菇','茄子','土豆','烤红薯','藕片','木耳','芹菜','黄瓜','花椰菜','蓝莓','草莓','香蕉','苹果','橙子','葡萄','猕猴桃','芒果','牛油果','柠檬','青柠','蔓越莓干','枸杞'],
+'主食谷物':['米饭','糙米','寿司米','大米','面条','意面','全麦面包','贝果','英式松饼','全麦饼皮','皮塔饼','印度饼','全麦面粉','面粉','燕麦片','燕麦','藜麦','小米','格兰诺拉','面包丁','油条','奇亚籽','杏仁粉'],
+'乳制品':['牛奶','酸奶','希腊酸奶','奶油芝士','帕玛森芝士','切达芝士','低脂奶酪','羊奶酪','黄油','椰奶'],
+'调味料':['酱油','蚝油','料酒','豆瓣酱','照烧酱','凯撒酱','番茄酱','咖喱粉','花椒','干辣椒','辣椒片','辣椒','黑胡椒','盐','糖','白糖','冰糖','蜂蜜','枫糖浆','橄榄油','香油','椰子油','鱼露','芥末','迷迭香','百里香','牛至','肉桂粉','薄荷','柠檬草','八角','桂皮','孜然','辣椒粉','欧芹','芝麻','姜','蒜','葱','海盐','柠檬汁','酸奶酱','芝麻酱'],
+'豆类坚果':['鹰嘴豆','鹰嘴豆泥','豌豆','毛豆','花生','花生酱','杏仁','杏仁黄油','核桃','腰果','豆浆'],
+'其他':['海苔','海带','味噌','85%黑巧克力','冰块','玉米','橄榄']};
+const iMap={};
+for(let d=0;d<7;d++)for(const mt of MEALS){const m=plan[d][mt];for(const ig of m.ing){iMap[ig]=(iMap[ig]||0)+ppl}}
+let h='';
+const allCat=Object.values(cats).flat();
+for(const[cat,items]of Object.entries(cats)){
+const matched=items.filter(i=>iMap[i]);
+if(!matched.length)continue;
+h+='<div class="shopping-cat">'+cat+'</div><ul class="shopping-list">';
+for(const item of matched){h+='<li onclick="this.classList.toggle(\'checked\')"><div class="cb"></div><span>'+item+' × '+iMap[item]+' 份</span></li>'}
+h+='</ul>';
+}
+const uncat=Object.keys(iMap).filter(i=>!allCat.includes(i));
+if(uncat.length){h+='<div class="shopping-cat">其他食材</div><ul class="shopping-list">';for(const item of uncat){h+='<li onclick="this.classList.toggle(\'checked\')"><div class="cb"></div><span>'+item+' × '+iMap[item]+' 份</span></li>'}h+='</ul>'}
+document.getElementById('shoppingContent').innerHTML=h;
+}
+
+function exportPlan(){
+if(!plan)return;
+let t='═══════════════════════════════════════\n       AI 膳食计划 - 一周方案\n═══════════════════════════════════════\n用餐人数: '+ppl+' 人\n饮食偏好: '+getDiet()+'\n\n';
+for(let d=0;d<7;d++){
+t+='───────── '+DAYS[d]+' ─────────\n';
+for(const mt of MEALS){const m=plan[d][mt];t+='\n'+ML[mt]+': '+m.name+'\n  食材: '+m.ing.join('、')+'\n  热量: '+(m.cal*ppl)+' kcal | 蛋白质: '+(m.p*ppl)+'g | 碳水: '+(m.c*ppl)+'g | 脂肪: '+(m.f*ppl)+'g\n'}
+let dc=0,dp=0,dcc=0,df=0;for(const mt of MEALS){dc+=plan[d][mt].cal*ppl;dp+=plan[d][mt].p*ppl;dcc+=plan[d][mt].c*ppl;df+=plan[d][mt].f*ppl}
+t+='\n📊 当日合计: '+dc+' kcal | 蛋白质 '+dp+'g | 碳水 '+dcc+'g | 脂肪 '+df+'g\n\n';
+}
+let wC=0,wP=0,wCC=0,wF=0;for(let d=0;d<7;d++)for(const mt of MEALS){wC+=plan[d][mt].cal*ppl;wP+=plan[d][mt].p*ppl;wCC+=plan[d][mt].c*ppl;wF+=plan[d][mt].f*ppl}
+t+='═══════════════════════════════════════\n📊 每周总计\n总卡路里: '+wC+' kcal\n总蛋白质: '+wP+'g | 总碳水: '+wCC+'g | 总脂肪: '+wF+'g\n日均: '+Math.round(wC/7)+' kcal\n═══════════════════════════════════════\n\n由 AI 膳食计划生成器 生成\n';
+const blob=new Blob([t],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);
+const a=document.createElement('a');a.href=url;a.download='meal-plan-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(url);
+showToast('✅ 膳食计划已导出！');
+}
+
+function exportShoppingList(){
+if(!plan)return;
+const cats={'蛋白质类':['鸡胸肉','鸡腿肉','牛腩','牛肉','牛肉末','牛里脊','猪排骨','猪肉末','五花肉','羊排','培根','培根碎','三文鱼','烟熏三文鱼','鲈鱼','大虾','虾仁','鸡蛋','蛋白','咸鸭蛋','豆腐','乳清蛋白'],
+'蔬菜水果':['番茄','西兰花','芦笋','菠菜','生菜','羽衣甘蓝','胡萝卜','西葫芦','洋葱','甜椒','青蒜','蘑菇','茄子','土豆','烤红薯','藕片','木耳','芹菜','黄瓜','花椰菜','蓝莓','草莓','香蕉','苹果','橙子','葡萄','猕猴桃','芒果','牛油果','柠檬','青柠','蔓越莓干','枸杞'],
+'主食谷物':['米饭','糙米','寿司米','大米','面条','意面','全麦面包','贝果','英式松饼','全麦饼皮','皮塔饼','印度饼','全麦面粉','面粉','燕麦片','燕麦','藜麦','小米','格兰诺拉','面包丁','油条','奇亚籽','杏仁粉'],
+'乳制品':['牛奶','酸奶','希腊酸奶','奶油芝士','帕玛森芝士','切达芝士','低脂奶酪','羊奶酪','黄油','椰奶'],
+'调味料':['酱油','蚝油','料酒','豆瓣酱','照烧酱','凯撒酱','番茄酱','咖喱粉','花椒','干辣椒','辣椒片','辣椒','黑胡椒','盐','糖','白糖','冰糖','蜂蜜','枫糖浆','橄榄油','香油','椰子油','鱼露','芥末','迷迭香','百里香','牛至','肉桂粉','薄荷','柠檬草','八角','桂皮','孜然','辣椒粉','欧芹','芝麻','姜','蒜','葱','海盐','柠檬汁','酸奶酱','芝麻酱'],
+'豆类坚果':['鹰嘴豆','鹰嘴豆泥','豌豆','毛豆','花生','花生酱','杏仁','杏仁黄油','核桃','腰果','豆浆'],
+'其他':['海苔','海带','味噌','85%黑巧克力','冰块','玉米','橄榄']};
+const iMap={};
+for(let d=0;d<7;d++)for(const mt of MEALS){const m=plan[d][mt];for(const ig of m.ing){iMap[ig]=(iMap[ig]||0)+ppl}}
+let t='═══════════════════════════════════════\n       🛒 AI 膳食计划 - 购物清单\n═══════════════════════════════════════\n用餐人数: '+ppl+' 人\n\n';
+const allCat=Object.values(cats).flat();
+for(const[cat,items]of Object.entries(cats)){
+const matched=items.filter(i=>iMap[i]);
+if(!matched.length)continue;
+t+='── '+cat+' ──\n';
+for(const item of matched){t+='  □ '+item+' × '+iMap[item]+' 份\n'}
+t+='\n';
+}
+const uncat=Object.keys(iMap).filter(i=>!allCat.includes(i));
+if(uncat.length){t+='── 其他食材 ──\n';for(const item of uncat){t+='  □ '+item+' × '+iMap[item]+' 份\n'}t+='\n'}
+t+='═══════════════════════════════════════\n由 AI 膳食计划生成器 生成\n';
+const blob=new Blob([t],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);
+const a=document.createElement('a');a.href=url;a.download='shopping-list-'+new Date().toISOString().slice(0,10)+'.txt';a.click();URL.revokeObjectURL(url);
+showToast('✅ 购物清单已导出！');
+}
+
+function showToast(msg){
+const ex=document.querySelector('.toast');if(ex)ex.remove();
+const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+window.addEventListener('resize',()=>{if(plan)renderCharts()});
+
+function savePlanHistory(){
+const diet=getDiet(),alg=getAllergens(),cal=parseInt(document.getElementById('calSlider').value);
+const entry={diet,allergens:alg,calories:cal,people:ppl,timestamp:Date.now(),plan:plan};
+let hist=[];try{hist=JSON.parse(localStorage.getItem('meal_history'))||[]}catch(e){}
+hist.unshift(entry);
+if(hist.length>10)hist=hist.slice(0,10);
+try{localStorage.setItem('meal_history',JSON.stringify(hist))}catch(e){
+hist[0].plan=null;
+try{localStorage.setItem('meal_history',JSON.stringify(hist))}catch(e2){}
+}
+}
+
+function renderHistory(){
+const ct=document.getElementById('historyContent');
+let hist=[];try{hist=JSON.parse(localStorage.getItem('meal_history'))||[]}catch(e){}
+if(!hist.length){ct.innerHTML='<div class="history-empty">暂无历史记录<br>生成膳食计划后会自动保存</div>';return}
+const dietNames={balanced:'均衡饮食',vegetarian:'🌱 素食',lowcarb:'🥩 低碳水',highprotein:'💪 高蛋白',mediterranean:'🫒 地中海',keto:'🥑 生酮'};
+let h='<ul class="history-list">';
+hist.forEach((e,i)=>{
+const d=new Date(e.timestamp);
+const ts=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+h+='<li onclick="loadHistory('+i+')"><div class="hist-time">'+ts+(e.plan?' · ✅ 可恢复':' · 🔄 重新生成')+'</div><div class="hist-info"><span class="hist-tag">'+(dietNames[e.diet]||e.diet)+'</span><span class="hist-tag">🔥 '+e.calories+' kcal</span><span class="hist-tag">👥 '+e.people+'人</span>'+(e.allergens&&e.allergens.length?'<span class="hist-tag">⚠️ '+e.allergens.length+'项过敏原</span>':'')+'</div></li>';
+});
+h+='</ul>';
+ct.innerHTML=h;
+}
+
+function loadHistory(idx){
+let hist=[];try{hist=JSON.parse(localStorage.getItem('meal_history'))||[]}catch(e){}
+const e=hist[idx];if(!e)return;
+document.querySelectorAll('#dietGroup .chip').forEach(c=>{c.classList.toggle('active',c.dataset.val===e.diet)});
+document.querySelectorAll('#allergenGroup .chip-check').forEach(c=>{c.classList.toggle('active',(e.allergens||[]).includes(c.dataset.val))});
+document.getElementById('calSlider').value=e.calories;
+document.getElementById('calVal').textContent=e.calories+' kcal';
+ppl=e.people;document.getElementById('peopleVal').textContent=ppl;
+document.getElementById('historyModal').classList.remove('show');
+if(e.plan){
+plan=e.plan;curDay=0;
+renderAll();
+document.getElementById('results').style.display='block';
+document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+showToast('✅ 已恢复历史膳食计划');
+}else{
+generatePlan();
+}
+}
+
+document.getElementById('historyModal').addEventListener('click',function(ev){if(ev.target===this)renderHistory()});
+</script>
+<script async src="https://cdn.siteanalyze.io/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

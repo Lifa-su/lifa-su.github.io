@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Favicon Checker - Detect, Preview &amp; Download Favicons</title>
+<meta name="description" content="Check any website's favicon. Detect all sizes, preview, download individually or as a zip.">
+<link rel="canonical" href="https://lifa-su.com/ai-favicon-checker/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#242836;--bd:#2e3348;--tx:#e4e6f0;--tx2:#9498b0;--ac:#6c5ce7;--ac2:#a29bfe;--gn:#00cec9;--rd:#ff6b6b;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+a{color:var(--ac2);text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:20px}
+header{text-align:center;padding:48px 20px 32px}
+header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--ac),var(--ac2),var(--gn));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--tx2);font-size:1rem}
+.sbox{display:flex;gap:10px;max-width:600px;margin:32px auto 0}
+.sbox input{flex:1;padding:14px 18px;border-radius:var(--r);border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-size:1rem;outline:none;transition:border .2s}
+.sbox input:focus{border-color:var(--ac)}
+.sbox input::placeholder{color:var(--tx2)}
+.btn{padding:14px 28px;border-radius:var(--r);border:none;background:var(--ac);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{background:var(--ac2);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bs{padding:8px 14px;font-size:.82rem;border-radius:8px}
+.bo{background:transparent;border:1px solid var(--bd);color:var(--tx2)}
+.bo:hover{border-color:var(--ac);color:var(--ac2);background:transparent}
+.bg{background:var(--gn);color:#000}
+.bg:hover{background:#00b5b0}
+#status{text-align:center;margin:24px 0;color:var(--tx2);font-size:.95rem;display:none}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#results{display:none}
+.st{font-size:1.1rem;font-weight:600;margin:28px 0 14px;display:flex;align-items:center;gap:8px}
+.badge{font-size:.72rem;padding:3px 10px;border-radius:20px;background:var(--ac);color:#fff;font-weight:500}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.fi{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px;transition:border .2s}
+.fi:hover{border-color:var(--ac)}
+.fp{width:64px;height:64px;display:flex;align-items:center;justify-content:center;background:var(--sf2);border-radius:8px;overflow:hidden}
+.fp img{max-width:100%;max-height:100%;image-rendering:pixelated}
+.fm{text-align:center;width:100%}
+.fm .t{font-size:.72rem;color:var(--ac2);text-transform:uppercase;font-weight:600;letter-spacing:.5px}
+.fm .u{font-size:.75rem;color:var(--tx2);word-break:break-all;margin:4px 0;max-height:2.4em;overflow:hidden}
+.fm .s{font-size:.8rem;color:var(--tx2)}
+.fa{display:flex;gap:6px;margin-top:6px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;transition:border .2s}
+.sc:hover{border-color:var(--ac)}
+.sc .lb{font-size:.8rem;color:var(--tx2);margin-bottom:8px}
+.sc .pv{display:flex;align-items:center;justify-content:center;min-height:40px;margin-bottom:6px}
+.sc .pv img{image-rendering:pixelated}
+.sc.miss{border-color:rgba(255,107,107,.4);opacity:.65}
+.sc.miss .lb{color:var(--rd)}
+.sc.ok{border-color:var(--gn)}
+.sc.ok .lb{color:var(--gn)}
+.db{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.72rem;font-weight:600}
+.tg{background:rgba(0,206,201,.15);color:var(--gn)}
+.tm{background:rgba(255,107,107,.15);color:var(--rd)}
+.ta{background:rgba(108,92,231,.15);color:var(--ac2)}
+.sb{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+.sb div{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:12px 20px;text-align:center;min-width:100px}
+.sb .n{font-size:1.5rem;font-weight:700;color:var(--ac2)}
+.sb .l{font-size:.78rem;color:var(--tx2)}
+footer{text-align:center;padding:40px 20px;color:var(--tx2);font-size:.85rem;border-top:1px solid var(--bd);margin-top:48px}
+@media(max-width:600px){.sbox{flex-direction:column}.fg{grid-template-columns:1fr}.sg{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}header h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<header>
+<h1>&#128269; AI Favicon Checker</h1>
+<p>Detect, preview and download favicons from any website</p>
+</header>
+<div class="wrap">
+<div class="sbox">
+<input type="text" id="urlIn" placeholder="Enter website URL (e.g. github.com)" autofocus>
+<button class="btn" id="checkBtn" onclick="doCheck()">Check</button>
+</div>
+<div id="status"></div>
+<div id="results"></div>
+</div>
+<footer>
+<p>AI Favicon Checker &mdash; Free online favicon detection tool</p>
+</footer>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script>
+const REC=[16,32,48,64,128,180,192,512];
+const PATHS=['/favicon.ico','/favicon.png','/favicon.svg','/apple-touch-icon.png',
+'/apple-touch-icon-precomposed.png','/favicon-16x16.png','/favicon-32x32.png',
+'/favicon-48x48.png','/favicon-96x96.png','/favicon-128x128.png',
+'/favicon-192x192.png','/favicon-512x512.png','/mstile-150x150.png',
+'/safari-pinned-tab.svg','/site.webmanifest'];
+const SIZES=[16,32,48,64,128,256];
+
+let found=[];
+
+document.getElementById('urlIn').addEventListener('keydown',e=>{if(e.key==='Enter')doCheck()});
+
+function getDomain(u){
+  u=u.trim();
+  if(!/^https?:\/\//i.test(u))u='https://'+u;
+  try{return new URL(u).hostname}catch{return u.replace(/^https?:\/\//i,'').split('/')[0]}
+}
+function getOrigin(u){
+  u=u.trim();
+  if(!/^https?:\/\//i.test(u))u='https://'+u;
+  try{return new URL(u).origin}catch{return 'https://'+getDomain(u)}
+}
+function ext(u){
+  const m=u.match(/\.(ico|png|svg|gif|jpg|jpeg|webp)(\?|$)/i);
+  return m?m[1].toLowerCase():'unknown';
+}
+function setStatus(msg,spin){
+  const el=document.getElementById('status');
+  el.style.display='block';
+  el.innerHTML=(spin?'<span class="spin"></span>':'')+msg;
+}
+function hideStatus(){document.getElementById('status').style.display='none'}
+
+function probeImg(url,timeout){
+  return new Promise(res=>{
+    const img=new Image();
+    const t=setTimeout(()=>{img.src='';res(null)},timeout||5000);
+    img.onload=()=>{clearTimeout(t);res({url,w:img.naturalWidth,h:img.naturalHeight})};
+    img.onerror=()=>{clearTimeout(t);res(null)};
+    img.src=url;
+  });
+}
+
+async function doCheck(){
+  const input=document.getElementById('urlIn').value.trim();
+  if(!input)return;
+  const btn=document.getElementById('checkBtn');
+  btn.disabled=true;
+  found=[];
+  document.getElementById('results').style.display='none';
+  const domain=getDomain(input);
+  const origin=getOrigin(input);
+  setStatus('Checking favicons for <b>'+domain+'</b> ...',true);
+
+  // 1) Probe common paths
+  setStatus('Probing common favicon paths...',true);
+  const probes=PATHS.map(p=>probeImg(origin+p,6000));
+  const probeRes=await Promise.all(probes);
+  probeRes.forEach((r,i)=>{
+    if(r)found.push({url:origin+PATHS[i],w:r.w,h:r.h,source:'direct',type:ext(PATHS[i])});
+  });
+
+  // 2) Google Favicon API
+  setStatus('Checking Google Favicon API...',true);
+  for(const sz of SIZES){
+    const url='https://www.google.com/s2/favicons?domain='+domain+'&sz='+sz;
+    const r=await probeImg(url,5000);
+    if(r&&r.w>1&&r.h>1){
+      found.push({url,w:r.w,h:r.h,source:'google',type:'png'});
+    }
+  }
+
+  // 3) DuckDuckGo API
+  setStatus('Checking DuckDuckGo Favicon API...',true);
+  const ddg='https://icons.duckduckgo.com/ip3/'+domain+'.ico';
+  const ddgR=await probeImg(ddg,5000);
+  if(ddgR&&ddgR.w>1)found.push({url:ddg,w:ddgR.w,h:ddgR.h,source:'duckduckgo',type:'ico'});
+
+  // Dedupe by URL
+  const seen=new Set();
+  found=found.filter(f=>{if(seen.has(f.url))return false;seen.add(f.url);return true});
+
+  btn.disabled=false;
+  if(found.length===0){
+    setStatus('No favicons found for <b>'+domain+'</b>. The site may block cross-origin requests.',false);
+    return;
+  }
+  hideStatus();
+  renderResults(domain);
+}
+
+function renderResults(domain){
+  const el=document.getElementById('results');
+  el.style.display='block';
+  const directCount=found.filter(f=>f.source==='direct').length;
+  const apiCount=found.filter(f=>f.source!=='direct').length;
+
+  // Summary
+  let h='<div class="sb">';
+  h+='<div><div class="n">'+found.length+'</div><div class="l">Total Found</div></div>';
+  h+='<div><div class="n">'+directCount+'</div><div class="l">Direct</div></div>';
+  h+='<div><div class="n">'+apiCount+'</div><div class="l">API</div></div>';
+  h+='</div>';
+
+  // Found favicons
+  h+='<div class="st">Found Favicons <span class="badge">'+found.length+'</span></div>';
+  h+='<div class="db">';
+  h+='<button class="btn bs bg" onclick="downloadAll()">&#11015; Download All</button>';
+  h+='</div>';
+  h+='<div class="fg">';
+  found.forEach((f,i)=>{
+    const srcTag=f.source==='direct'?'<span class="tag tg">Direct</span>':
+      f.source==='google'?'<span class="tag ta">Google API</span>':
+      '<span class="tag ta">DuckDuckGo</span>';
+    h+='<div class="fi">';
+    h+='<div class="fp"><img src="'+f.url+'" alt="favicon" loading="lazy"></div>';
+    h+='<div class="fm">';
+    h+='<div class="t">'+f.type+' '+srcTag+'</div>';
+    h+='<div class="s">'+(f.w&&f.h?f.w+'x'+f.h:'unknown size')+'</div>';
+    h+='<div class="u" title="'+f.url+'">'+f.url+'</div>';
+    h+='</div>';
+    h+='<div class="fa">';
+    h+='<button class="btn bs bo" onclick="dlOne('+i+')">&#11015; Download</button>';
+    h+='<button class="btn bs bo" onclick="copyUrl('+i+')">&#128203; Copy URL</button>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+
+  // Size preview
+  h+='<div class="st">Size Preview</div>';
+  h+='<div class="sg">';
+  const bestIcon=found.find(f=>f.source==='direct')||found[0];
+  REC.forEach(sz=>{
+    const match=found.find(f=>f.source==='direct'&&f.w===sz&&f.h===sz);
+    const cls=match?'ok':'miss';
+    const label=match?'&#10003; '+sz+'x'+sz:'&#10007; '+sz+'x'+sz;
+    const src=match?match.url:bestIcon.url;
+    const dispSz=Math.min(sz,64);
+    h+='<div class="sc '+cls+'">';
+    h+='<div class="lb">'+label+'</div>';
+    h+='<div class="pv"><img src="'+src+'" width="'+dispSz+'" height="'+dispSz+'" alt="'+sz+'x'+sz+'"></div>';
+    if(!match)h+='<div style="font-size:.7rem;color:var(--rd)">Missing</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+
+  // Missing sizes
+  const missing=REC.filter(sz=>!found.some(f=>f.source==='direct'&&f.w===sz&&f.h===sz));
+  if(missing.length>0){
+    h+='<div class="st">Missing Recommended Sizes <span class="badge" style="background:var(--rd)">'+missing.length+'</span></div>';
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    missing.forEach(sz=>{h+='<span class="tag tm">'+sz+'x'+sz+'</span>'});
+    h+='</div>';
+  }
+
+  el.innerHTML=h;
+}
+
+function dlOne(i){
+  const f=found[i];
+  const a=document.createElement('a');
+  a.href=f.url;a.target='_blank';a.download='favicon-'+f.w+'x'+f.h+'.'+f.type;
+  a.click();
+}
+function copyUrl(i){
+  navigator.clipboard.writeText(found[i].url).then(()=>alert('URL copied!')).catch(()=>{});
+}
+async function downloadAll(){
+  for(let i=0;i<found.length;i++){
+    const a=document.createElement('a');
+    a.href=found[i].url;a.target='_blank';
+    a.download='favicon-'+(i+1)+'.'+found[i].type;
+    a.click();
+    await new Promise(r=>setTimeout(r,300));
+  }
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

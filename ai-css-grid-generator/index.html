@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered CSS Grid layout generator. Build responsive grid layouts visually with drag-and-drop, set gaps and sizing, then export production-ready CSS.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-grid-generator/">
+<title>AI CSS Grid Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f13;--bg2:#1a1a24;--bg3:#24243a;--bg4:#2e2e48;--text:#e4e4f0;--text2:#a0a0c0;--accent:#6c5ce7;--accent2:#a29bfe;--border:#333355;--success:#00cec9;--danger:#ff6b6b;--radius:10px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+.header{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.app{display:flex;height:calc(100vh - 52px)}
+.panel-left{width:340px;min-width:300px;border-right:1px solid var(--border);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg2)}
+.panel-right{flex:1;display:flex;flex-direction:column;padding:16px;gap:12px}
+.section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px}
+.stitle{font-size:.8rem;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px}
+.fr{display:flex;align-items:center;gap:8px}
+.fr label{font-size:.78rem;color:var(--text2);min-width:65px}
+.fr input[type="number"],.fr input[type="text"],.fr select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:.82rem;flex:1;min-width:0}
+.fr input:focus,.fr select:focus{outline:none;border-color:var(--accent)}
+.tlist{display:flex;flex-direction:column;gap:4px}
+.titem{display:flex;align-items:center;gap:5px;background:var(--bg);border-radius:6px;padding:5px 7px}
+.titem .ti{font-size:.7rem;color:var(--text2);min-width:16px;text-align:center}
+.titem input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:3px 6px;font-size:.78rem;width:70px;text-align:center}
+.titem input:focus{outline:none;border-color:var(--accent)}
+.titem select{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:3px 5px;font-size:.72rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 12px;border:none;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
+.btn-s{background:var(--bg4);color:var(--text)}.btn-s:hover{background:var(--border)}
+.btn-ok{background:var(--success);color:#000}.btn-ok:hover{opacity:.85}
+.btn-d{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:3px 7px;font-size:.7rem}.btn-d:hover{background:var(--danger);color:#fff}
+.citem{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:5px}
+.chdr{display:flex;align-items:center;justify-content:space-between}
+.cname{font-size:.78rem;font-weight:600;color:var(--accent2)}
+.cflds{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.cflds label{font-size:.68rem;color:var(--text2)}
+.cflds input{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:3px 6px;font-size:.76rem;width:100%}
+.cflds input:focus{outline:none;border-color:var(--accent)}
+.cclr{width:22px;height:22px;border:none;border-radius:4px;cursor:pointer;padding:0}
+.cclr::-webkit-color-swatch-wrapper{padding:0}
+.cclr::-webkit-color-swatch{border:2px solid var(--border);border-radius:4px}
+.preview-area{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow:auto;display:flex;align-items:center;justify-content:center}
+.grid-preview{width:100%;max-width:700px;aspect-ratio:4/3;border:2px dashed var(--border);border-radius:8px}
+.grid-cell{border:1px dashed rgba(108,92,231,.25);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--text2)}
+.grid-cell:hover{background:rgba(108,92,231,.08)}
+.grid-child{border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.code-area{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:260px;display:flex;flex-direction:column}
+.code-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.code-hdr span{font-size:.78rem;color:var(--accent2);font-weight:600}
+.code-body{padding:12px;overflow:auto;flex:1}
+.code-body pre{font-family:'Fira Code',Consolas,monospace;font-size:.78rem;line-height:1.5;color:var(--text);white-space:pre-wrap;word-break:break-all}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#000;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:768px){.app{flex-direction:column}.panel-left{width:100%;min-width:0;max-height:45vh;border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>⚡ AI CSS Grid Generator</h1>
+  <button class="btn btn-s" onclick="resetAll()">Reset</button>
+</div>
+<div class="app">
+  <div class="panel-left">
+    <div class="section">
+      <div class="stitle">📐 Grid Settings</div>
+      <div class="fr"><label>Columns</label><input type="number" id="cols" value="3" min="1" max="12" onchange="update()"></div>
+      <div class="fr"><label>Rows</label><input type="number" id="rows" value="3" min="1" max="12" onchange="update()"></div>
+      <div class="fr"><label>Gap</label><input type="text" id="gap" value="10px" onchange="update()"></div>
+      <div class="fr"><label>Justify</label><select id="justifyItems" onchange="update()"><option value="">default</option><option>start</option><option>center</option><option>end</option><option>stretch</option></select></div>
+      <div class="fr"><label>Align</label><select id="alignItems" onchange="update()"><option value="">default</option><option>start</option><option>center</option><option>end</option><option>stretch</option></select></div>
+    </div>
+    <div class="section">
+      <div class="stitle">↔️ Column Widths</div>
+      <div class="tlist" id="colTracks"></div>
+    </div>
+    <div class="section">
+      <div class="stitle">↕️ Row Heights</div>
+      <div class="tlist" id="rowTracks"></div>
+    </div>
+    <div class="section">
+      <div class="stitle">🧩 Child Elements</div>
+      <div id="childList" style="display:flex;flex-direction:column;gap:6px"></div>
+      <button class="btn btn-p" onclick="addChild()" style="margin-top:4px">+ Add Child</button>
+    </div>
+  </div>
+  <div class="panel-right">
+    <div class="preview-area">
+      <div class="grid-preview" id="gridPreview"></div>
+    </div>
+    <div class="code-area">
+      <div class="code-hdr"><span>Generated CSS</span><button class="btn btn-ok btn-sm" onclick="copyCSS()">📋 Copy</button></div>
+      <div class="code-body"><pre id="codeOutput"></pre></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied to clipboard!</div>
+<script>
+const COLORS=['#6c5ce7','#00cec9','#e17055','#fdcb6e','#a29bfe','#55efc4','#fab1a0','#74b9ff','#ff7675','#81ecec','#ffeaa7','#dfe6e9'];
+let state={cols:3,rows:3,gap:'10px',justifyItems:'',alignItems:'',colWidths:['1fr','1fr','1fr'],rowHeights:['1fr','1fr','1fr'],children:[]};
+let childCounter=0;
+
+function update(){
+  state.cols=parseInt(document.getElementById('cols').value)||3;
+  state.rows=parseInt(document.getElementById('rows').value)||3;
+  state.gap=document.getElementById('gap').value||'10px';
+  state.justifyItems=document.getElementById('justifyItems').value;
+  state.alignItems=document.getElementById('alignItems').value;
+  while(state.colWidths.length<state.cols)state.colWidths.push('1fr');
+  while(state.colWidths.length>state.cols)state.colWidths.pop();
+  while(state.rowHeights.length<state.rows)state.rowHeights.push('1fr');
+  while(state.rowHeights.length>state.rows)state.rowHeights.pop();
+  renderTracks();
+  renderPreview();
+  renderCode();
+}
+
+function renderTracks(){
+  let ch='';
+  for(let i=0;i<state.cols;i++){
+    ch+=`<div class="titem"><span class="ti">C${i+1}</span><input type="text" value="${state.colWidths[i]}" onchange="state.colWidths[${i}]=this.value;renderPreview();renderCode()"><select onchange="applyUnit(this,'col',${i})"><option>fr</option><option>px</option><option>%</option><option>auto</option><option>minmax</option></select></div>`;
+  }
+  document.getElementById('colTracks').innerHTML=ch;
+  let rh='';
+  for(let i=0;i<state.rows;i++){
+    rh+=`<div class="titem"><span class="ti">R${i+1}</span><input type="text" value="${state.rowHeights[i]}" onchange="state.rowHeights[${i}]=this.value;renderPreview();renderCode()"><select onchange="applyUnit(this,'row',${i})"><option>fr</option><option>px</option><option>%</option><option>auto</option><option>minmax</option></select></div>`;
+  }
+  document.getElementById('rowTracks').innerHTML=rh;
+}
+
+function applyUnit(sel,type,idx){
+  const v=sel.value;
+  const arr=type==='col'?state.colWidths:state.rowHeights;
+  const cur=arr[idx];
+  const num=parseFloat(cur)||1;
+  if(v==='auto')arr[idx]='auto';
+  else if(v==='minmax')arr[idx]=`minmax(0,1fr)`;
+  else arr[idx]=num+v;
+  renderTracks();renderPreview();renderCode();
+}
+
+function addChild(){
+  childCounter++;
+  const c={id:childCounter,name:`Item ${childCounter}`,colStart:'auto',colEnd:'auto',rowStart:'auto',rowEnd:'auto',color:COLORS[(childCounter-1)%COLORS.length]};
+  state.children.push(c);
+  renderChildren();renderPreview();renderCode();
+}
+
+function removeChild(id){
+  state.children=state.children.filter(c=>c.id!==id);
+  renderChildren();renderPreview();renderCode();
+}
+
+function updateChild(id,field,val){
+  const c=state.children.find(c=>c.id===id);
+  if(c){c[field]=val;renderPreview();renderCode();}
+}
+function renderChildren(){
+  const el=document.getElementById('childList');
+  let h='';
+  state.children.forEach(c=>{
+    h+=`<div class="citem">
+      <div class="chdr">
+        <span class="cname">${c.name}</span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="color" class="cclr" value="${c.color}" onchange="updateChild(${c.id},'color',this.value)">
+          <button class="btn-d" onclick="removeChild(${c.id})">✕</button>
+        </div>
+      </div>
+      <div class="cflds">
+        <div><label>Col Start</label><input value="${c.colStart}" onchange="updateChild(${c.id},'colStart',this.value)"></div>
+        <div><label>Col End</label><input value="${c.colEnd}" onchange="updateChild(${c.id},'colEnd',this.value)"></div>
+        <div><label>Row Start</label><input value="${c.rowStart}" onchange="updateChild(${c.id},'rowStart',this.value)"></div>
+        <div><label>Row End</label><input value="${c.rowEnd}" onchange="updateChild(${c.id},'rowEnd',this.value)"></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+function renderPreview(){
+  const g=document.getElementById('gridPreview');
+  g.style.display='grid';
+  g.style.gridTemplateColumns=state.colWidths.join(' ');
+  g.style.gridTemplateRows=state.rowHeights.join(' ');
+  g.style.gap=state.gap;
+  if(state.justifyItems)g.style.justifyItems=state.justifyItems;
+  else g.style.justifyItems='';
+  if(state.alignItems)g.style.alignItems=state.alignItems;
+  else g.style.alignItems='';
+  let h='';
+  for(let r=1;r<=state.rows;r++){
+    for(let c=1;c<=state.cols;c++){
+      h+=`<div class="grid-cell" style="grid-column:${c};grid-row:${r}"><span>${r},${c}</span></div>`;
+    }
+  }
+  state.children.forEach(c=>{
+    let style=`background:${c.color};opacity:0.85;`;
+    if(c.colStart&&c.colStart!=='auto')style+=`grid-column-start:${c.colStart};`;
+    if(c.colEnd&&c.colEnd!=='auto')style+=`grid-column-end:${c.colEnd};`;
+    if(c.rowStart&&c.rowStart!=='auto')style+=`grid-row-start:${c.rowStart};`;
+    if(c.rowEnd&&c.rowEnd!=='auto')style+=`grid-row-end:${c.rowEnd};`;
+    h+=`<div class="grid-child" style="${style}">${c.name}</div>`;
+  });
+  g.innerHTML=h;
+}
+
+function renderCode(){
+  let css=`.container {\n  display: grid;\n  grid-template-columns: ${state.colWidths.join(' ')};\n  grid-template-rows: ${state.rowHeights.join(' ')};\n  gap: ${state.gap};`;
+  if(state.justifyItems)css+=`\n  justify-items: ${state.justifyItems};`;
+  if(state.alignItems)css+=`\n  align-items: ${state.alignItems};`;
+  css+='\n}';
+  state.children.forEach((c,i)=>{
+    css+=`\n\n.item-${i+1} {`;
+    if(c.colStart&&c.colStart!=='auto')css+=`\n  grid-column-start: ${c.colStart};`;
+    if(c.colEnd&&c.colEnd!=='auto')css+=`\n  grid-column-end: ${c.colEnd};`;
+    if(c.rowStart&&c.rowStart!=='auto')css+=`\n  grid-row-start: ${c.rowStart};`;
+    if(c.rowEnd&&c.rowEnd!=='auto')css+=`\n  grid-row-end: ${c.rowEnd};`;
+    css+='\n}';
+  });
+  document.getElementById('codeOutput').textContent=css;
+}
+
+function copyCSS(){
+  const code=document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2000);
+  });
+}
+
+function resetAll(){
+  state={cols:3,rows:3,gap:'10px',justifyItems:'',alignItems:'',colWidths:['1fr','1fr','1fr'],rowHeights:['1fr','1fr','1fr'],children:[]};
+  childCounter=0;
+  document.getElementById('cols').value=3;
+  document.getElementById('rows').value=3;
+  document.getElementById('gap').value='10px';
+  document.getElementById('justifyItems').value='';
+  document.getElementById('alignItems').value='';
+  update();
+}
+
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Webhook Tester - Test Your Webhooks Instantly</title>
+<meta name="description" content="Free online webhook testing tool. Generate temporary webhook URLs, inspect requests, and customize responses in real-time.">
+<link rel="canonical" href="https://lifa-su.com/ai-webhook-tester/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--accent:#58a6ff;--accent2:#388bfd;--green:#3fb950;--red:#f85149;--orange:#d29922;--purple:#bc8cff;--radius:8px;--shadow:0 2px 8px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 16px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.25rem;font-weight:700}
+.logo svg{width:28px;height:28px;fill:var(--accent)}
+.badge{background:var(--accent);color:#000;font-size:.65rem;padding:2px 6px;border-radius:4px;font-weight:700;text-transform:uppercase}
+main{padding:24px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-header h2{font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:18px}
+.url-box{display:flex;gap:8px;margin-bottom:16px}
+.url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--accent);font-family:monospace;font-size:.85rem;outline:none;cursor:default}
+.url-input:focus{border-color:var(--accent)}
+.btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.8rem;cursor:pointer;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--border);border-color:var(--text2)}
+.btn-primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn-primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn-danger{border-color:var(--red);color:var(--red)}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sm{padding:5px 10px;font-size:.75rem}
+.method-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:700;font-family:monospace}
+.method-GET{background:#1f3a2a;color:var(--green)}
+.method-POST{background:#2a1f3a;color:var(--purple)}
+.method-PUT{background:#3a2f1f;color:var(--orange)}
+.method-DELETE{background:#3a1f1f;color:var(--red)}
+.method-PATCH{background:#1f2a3a;color:var(--accent)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.status-dot.active{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.inactive{background:var(--text2)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:5px;font-weight:500}
+.form-group input,.form-group textarea,.form-group select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text);font-size:.85rem;outline:none;font-family:inherit}
+.form-group textarea{font-family:monospace;resize:vertical;min-height:80px}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
+.request-list{max-height:500px;overflow-y:auto}
+.request-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.request-item:hover{background:var(--surface2)}
+.request-item.active{background:var(--surface2);border-left:3px solid var(--accent)}
+.request-item-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.request-item-time{font-size:.7rem;color:var(--text2);font-family:monospace}
+.request-item-path{font-size:.8rem;color:var(--text2);margin-top:3px;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-section{margin-bottom:16px}
+.detail-section h3{font-size:.8rem;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.detail-pre{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-family:monospace;font-size:.8rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;line-height:1.5}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty-state svg{width:48px;height:48px;fill:var(--border);margin-bottom:12px}
+.empty-state p{font-size:.9rem}
+.stats{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;flex:1;min-width:120px}
+.stat-value{font-size:1.4rem;font-weight:700;color:var(--accent)}
+.stat-label{font-size:.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;box-shadow:var(--shadow);transform:translateY(100px);opacity:0;transition:all .3s;z-index:200;font-size:.85rem}
+.toast.show{transform:translateY(0);opacity:1}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:.8rem;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.header-actions{display:flex;gap:8px;align-items:center}
+.send-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.send-row{display:flex;gap:8px;margin-bottom:10px}
+.send-row select{width:120px}
+.send-row input{flex:1}
+.counter{background:var(--accent2);color:#fff;font-size:.65rem;padding:1px 6px;border-radius:10px;margin-left:4px}
+footer{text-align:center;padding:32px 16px;color:var(--text2);font-size:.75rem;border-top:1px solid var(--border);margin-top:40px}
+.kv-row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
+.kv-row input{flex:1}
+.kv-row .btn{flex-shrink:0}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+.full-width{grid-column:1/-1}
+</style>
+</head>
+<body>
+
+<header>
+<div class="container">
+<div class="header-inner">
+<div class="logo">
+<svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+AI Webhook Tester
+<span class="badge">Free</span>
+</div>
+<div class="header-actions">
+<span class="status-dot active" id="statusDot"></span>
+<span style="font-size:.8rem;color:var(--text2)" id="statusText">Ready</span>
+</div>
+</div>
+</div>
+</header>
+
+<main class="container">
+<div class="stats">
+<div class="stat">
+<div class="stat-value" id="totalRequests">0</div>
+<div class="stat-label">Total Requests</div>
+</div>
+<div class="stat">
+<div class="stat-value" id="todayRequests">0</div>
+<div class="stat-label">Today</div>
+</div>
+<div class="stat">
+<div class="stat-value" id="lastMethod">-</div>
+<div class="stat-label">Last Method</div>
+</div>
+<div class="stat">
+<div class="stat-value" id="uniqueIPs">-</div>
+<div class="stat-label">Webhook ID</div>
+</div>
+</div>
+
+<div style="margin-bottom:20px">
+<div class="card">
+<div class="card-header">
+<h2>🔗 Your Webhook URL</h2>
+<div style="display:flex;gap:8px">
+<button class="btn btn-sm" onclick="copyUrl()">📋 Copy</button>
+<button class="btn btn-sm btn-primary" onclick="generateNewUrl()">🔄 New URL</button>
+</div>
+</div>
+<div class="card-body">
+<div class="url-box">
+<input type="text" class="url-input" id="webhookUrl" readonly>
+</div>
+<p style="font-size:.75rem;color:var(--text2)">⚡ This is a client-side simulated webhook. Use the "Send Test Request" section below to test, or send requests from your application to see them captured here.</p>
+</div>
+</div>
+</div>
+
+<div class="grid">
+<div class="card">
+<div class="card-header">
+<h2>📨 Request History <span class="counter" id="requestCount">0</span></h2>
+<button class="btn btn-sm btn-danger" onclick="clearHistory()">🗑 Clear</button>
+</div>
+<div class="request-list" id="requestList">
+<div class="empty-state" id="emptyState">
+<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z"/></svg>
+<p>No requests yet</p>
+<p style="font-size:.75rem;margin-top:4px">Send a test request to get started</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<h2>🔍 Request Details</h2>
+</div>
+<div class="card-body" id="detailPanel">
+<div class="tabs">
+<div class="tab active" data-tab="headers" onclick="switchTab(this)">Headers</div>
+<div class="tab" data-tab="body" onclick="switchTab(this)">Body</div>
+<div class="tab" data-tab="query" onclick="switchTab(this)">Query</div>
+<div class="tab" data-tab="raw" onclick="switchTab(this)">Raw</div>
+</div>
+<div class="tab-content active" id="tab-headers">
+<div class="detail-pre" id="detailHeaders">Select a request to view details</div>
+</div>
+<div class="tab-content" id="tab-body">
+<div class="detail-pre" id="detailBody">Select a request to view details</div>
+</div>
+<div class="tab-content" id="tab-query">
+<div class="detail-pre" id="detailQuery">Select a request to view details</div>
+</div>
+<div class="tab-content" id="tab-raw">
+<div class="detail-pre" id="detailRaw">Select a request to view details</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="grid" style="margin-top:20px">
+<div class="card">
+<div class="card-header">
+<h2>⚙️ Custom Response</h2>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>Status Code</label>
+<select id="responseStatus">
+<option value="200">200 OK</option>
+<option value="201">201 Created</option>
+<option value="204">204 No Content</option>
+<option value="301">301 Moved Permanently</option>
+<option value="400">400 Bad Request</option>
+<option value="401">401 Unauthorized</option>
+<option value="403">403 Forbidden</option>
+<option value="404">404 Not Found</option>
+<option value="500">500 Internal Server Error</option>
+</select>
+</div>
+<div class="form-group">
+<label>Response Headers</label>
+<div id="responseHeaders">
+<div class="kv-row">
+<input type="text" placeholder="Content-Type" value="Content-Type">
+<input type="text" placeholder="application/json" value="application/json">
+<button class="btn btn-sm btn-danger" onclick="removeKvRow(this)">✕</button>
+</div>
+</div>
+<button class="btn btn-sm" onclick="addResponseHeader()" style="margin-top:6px">+ Add Header</button>
+</div>
+<div class="form-group">
+<label>Response Body</label>
+<textarea id="responseBody" rows="4">{"status": "ok", "message": "Webhook received"}</textarea>
+</div>
+<button class="btn btn-primary" onclick="saveResponseConfig()">💾 Save Configuration</button>
+</div>
+</div>
+
+<div class="card">
+<div class="card-header">
+<h2>🚀 Send Test Request</h2>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>Method</label>
+<select id="testMethod">
+<option>GET</option>
+<option selected>POST</option>
+<option>PUT</option>
+<option>PATCH</option>
+<option>DELETE</option>
+</select>
+</div>
+<div class="form-group">
+<label>Request Headers</label>
+<div id="testHeaders">
+<div class="kv-row">
+<input type="text" placeholder="Key" value="Content-Type">
+<input type="text" placeholder="Value" value="application/json">
+<button class="btn btn-sm btn-danger" onclick="removeKvRow(this)">✕</button>
+</div>
+<div class="kv-row">
+<input type="text" placeholder="Key" value="X-Webhook-Secret">
+<input type="text" placeholder="Value" value="test-secret-123">
+<button class="btn btn-sm btn-danger" onclick="removeKvRow(this)">✕</button>
+</div>
+</div>
+<button class="btn btn-sm" onclick="addTestHeader()" style="margin-top:6px">+ Add Header</button>
+</div>
+<div class="form-group">
+<label>Request Body</label>
+<textarea id="testBody" rows="4">{
+  "event": "test.webhook",
+  "data": {
+    "id": 1,
+    "message": "Hello from AI Webhook Tester!"
+  },
+  "timestamp": ""
+}</textarea>
+</div>
+<button class="btn btn-primary" onclick="sendTestRequest()" style="width:100%">🚀 Send Request</button>
+<div id="testResponse" style="margin-top:12px;display:none">
+<div class="detail-section">
+<h3>Response</h3>
+<div class="detail-pre" id="testResponseContent"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<footer>
+<div class="container">
+<p>AI Webhook Tester — A free, client-side webhook testing tool. No data leaves your browser.</p>
+<p style="margin-top:4px">Built with ❤️ for developers | <a href="https://github.com/Lifa-su/ai-webhook-tester" target="_blank">GitHub</a></p>
+</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'ai-webhook-tester';
+const MAX_HISTORY = 100;
+
+let state = {
+  webhookId: '',
+  requests: [],
+  selectedIndex: -1,
+  responseConfig: {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+    body: '{"status": "ok", "message": "Webhook received"}'
+  }
+};
+
+function init() {
+  loadState();
+  if (!state.webhookId) generateNewUrl();
+  renderUrl();
+  renderRequests();
+  updateStats();
+  loadResponseConfig();
+  updateTimestamp();
+}
+
+function generateId() {
+  return 'wh_' + crypto.randomUUID().replace(/-/g, '').substring(0, 16);
+}
+
+function generateNewUrl() {
+  state.webhookId = generateId();
+  state.requests = [];
+  state.selectedIndex = -1;
+  saveState();
+  renderUrl();
+  renderRequests();
+  updateStats();
+  showToast('New webhook URL generated');
+}
+
+function renderUrl() {
+  const base = window.location.origin + window.location.pathname;
+  document.getElementById('webhookUrl').value = base + '?hook=' + state.webhookId;
+  document.getElementById('uniqueIPs').textContent = state.webhookId.substring(0, 10) + '…';
+}
+
+function copyUrl() {
+  const url = document.getElementById('webhookUrl').value;
+  navigator.clipboard.writeText(url).then(() => showToast('URL copied to clipboard'));
+}
+
+function simulateRequest(method, path, headers, body, query) {
+  const req = {
+    id: crypto.randomUUID(),
+    method: method || 'POST',
+    path: path || '/webhook/' + state.webhookId,
+    headers: headers || {},
+    body: body || '',
+    query: query || {},
+    timestamp: new Date().toISOString(),
+    size: new Blob([body || '']).size
+  };
+  state.requests.unshift(req);
+  if (state.requests.length > MAX_HISTORY) state.requests.pop();
+  saveState();
+  renderRequests();
+  updateStats();
+  return req;
+}
+
+function sendTestRequest() {
+  const method = document.getElementById('testMethod').value;
+  const body = document.getElementById('testBody').value;
+  const headerRows = document.querySelectorAll('#testHeaders .kv-row');
+  const headers = {};
+  headerRows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    if (inputs[0].value) headers[inputs[0].value] = inputs[1].value;
+  });
+
+  const req = simulateRequest(method, '/webhook/' + state.webhookId, headers, body, {});
+
+  const config = state.responseConfig;
+  const responseDiv = document.getElementById('testResponse');
+  const responseContent = document.getElementById('testResponseContent');
+  responseDiv.style.display = 'block';
+  responseContent.textContent = `HTTP/1.1 ${config.status}\n` +
+    Object.entries(config.headers || {}).map(([k, v]) => `${k}: ${v}`).join('\n') +
+    '\n\n' + (config.body || '');
+
+  state.selectedIndex = 0;
+  renderRequests();
+  showRequestDetail(req);
+  showToast('Test request sent and captured');
+}
+
+function renderRequests() {
+  const list = document.getElementById('requestList');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('requestCount').textContent = state.requests.length;
+
+  if (state.requests.length === 0) {
+    empty.style.display = 'block';
+    list.querySelectorAll('.request-item').forEach(el => el.remove());
+    return;
+  }
+  empty.style.display = 'none';
+
+  const fragment = document.createDocumentFragment();
+  state.requests.forEach((req, i) => {
+    const div = document.createElement('div');
+    div.className = 'request-item' + (i === state.selectedIndex ? ' active' : '');
+    div.onclick = () => selectRequest(i);
+    const time = new Date(req.timestamp);
+    const timeStr = time.toLocaleTimeString();
+    div.innerHTML = `
+      <div class="request-item-header">
+        <span class="method-badge method-${req.method}">${req.method}</span>
+        <span class="request-item-time">${timeStr}</span>
+      </div>
+      <div class="request-item-path">${escapeHtml(req.path)}</div>
+    `;
+    fragment.appendChild(div);
+  });
+
+  const items = list.querySelectorAll('.request-item');
+  items.forEach(el => el.remove());
+  list.insertBefore(fragment, empty);
+}
+
+function selectRequest(index) {
+  state.selectedIndex = index;
+  renderRequests();
+  showRequestDetail(state.requests[index]);
+}
+
+function showRequestDetail(req) {
+  if (!req) return;
+  document.getElementById('detailHeaders').textContent =
+    Object.entries(req.headers).map(([k, v]) => `${k}: ${v}`).join('\n') || 'No headers';
+  
+  let bodyDisplay = req.body || 'Empty body';
+  try {
+    const parsed = JSON.parse(req.body);
+    bodyDisplay = JSON.stringify(parsed, null, 2);
+  } catch (e) {}
+  document.getElementById('detailBody').textContent = bodyDisplay;
+  
+  document.getElementById('detailQuery').textContent =
+    Object.entries(req.query).map(([k, v]) => `${k}=${v}`).join('\n') || 'No query parameters';
+  
+  const raw = `${req.method} ${req.path} HTTP/1.1\n` +
+    Object.entries(req.headers).map(([k, v]) => `${k}: ${v}`).join('\n') +
+    '\n\n' + (req.body || '');
+  document.getElementById('detailRaw').textContent = raw;
+}
+
+function switchTab(el) {
+  const tabName = el.dataset.tab;
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  el.closest('.card-body').querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+function saveResponseConfig() {
+  const status = document.getElementById('responseStatus').value;
+  const body = document.getElementById('responseBody').value;
+  const headerRows = document.querySelectorAll('#responseHeaders .kv-row');
+  const headers = {};
+  headerRows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    if (inputs[0].value) headers[inputs[0].value] = inputs[1].value;
+  });
+  state.responseConfig = { status: parseInt(status), headers, body };
+  saveState();
+  showToast('Response configuration saved');
+}
+
+function loadResponseConfig() {
+  const config = state.responseConfig;
+  if (config.status) document.getElementById('responseStatus').value = config.status;
+  if (config.body) document.getElementById('responseBody').value = config.body;
+}
+
+function addResponseHeader() {
+  const container = document.getElementById('responseHeaders');
+  const row = document.createElement('div');
+  row.className = 'kv-row';
+  row.innerHTML = `<input type="text" placeholder="Header name"><input type="text" placeholder="Header value"><button class="btn btn-sm btn-danger" onclick="removeKvRow(this)">✕</button>`;
+  container.appendChild(row);
+}
+
+function addTestHeader() {
+  const container = document.getElementById('testHeaders');
+  const row = document.createElement('div');
+  row.className = 'kv-row';
+  row.innerHTML = `<input type="text" placeholder="Key"><input type="text" placeholder="Value"><button class="btn btn-sm btn-danger" onclick="removeKvRow(this)">✕</button>`;
+  container.appendChild(row);
+}
+
+function removeKvRow(btn) { btn.closest('.kv-row').remove(); }
+
+function clearHistory() {
+  if (!confirm('Clear all request history?')) return;
+  state.requests = [];
+  state.selectedIndex = -1;
+  saveState();
+  renderRequests();
+  updateStats();
+  document.getElementById('detailHeaders').textContent = 'Select a request to view details';
+  document.getElementById('detailBody').textContent = 'Select a request to view details';
+  document.getElementById('detailQuery').textContent = 'Select a request to view details';
+  document.getElementById('detailRaw').textContent = 'Select a request to view details';
+  showToast('History cleared');
+}
+
+function updateStats() {
+  document.getElementById('totalRequests').textContent = state.requests.length;
+  const today = new Date().toDateString();
+  const todayCount = state.requests.filter(r => new Date(r.timestamp).toDateString() === today).length;
+  document.getElementById('todayRequests').textContent = todayCount;
+  const last = state.requests[0];
+  document.getElementById('lastMethod').textContent = last ? last.method : '-';
+}
+
+function updateTimestamp() {
+  const body = document.getElementById('testBody');
+  if (body.value.includes('"timestamp": ""')) {
+    body.value = body.value.replace('"timestamp": ""', '"timestamp": "' + new Date().toISOString() + '"');
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    }
+  } catch (e) {}
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI CSS tooltip generator. Create pure CSS tooltips with custom styles, positions, animations, and arrow directions. Copy lightweight tooltip code instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-tooltip/">
+<title>AI CSS Tooltip Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#e94560;--text:#eee;--dim:#8892a4;--bdr:#2a3a5c;--ibg:#0f1a30;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.hd{text-align:center;padding:2.5rem 1rem 1.5rem;background:linear-gradient(135deg,#0f3460,#1a1a2e,#e94560)}
+.hd h1{font-size:2rem;font-weight:700}
+.hd h1 span{background:linear-gradient(135deg,#e94560,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hd p{color:var(--dim);margin-top:.4rem;font-size:.95rem}
+.ct{max-width:1200px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:860px){.ct{grid-template-columns:1fr;max-width:600px}}
+.pn{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.pt{font-size:1.05rem;font-weight:600;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem}
+.pt svg{width:18px;height:18px;fill:var(--accent)}
+.fd{margin-bottom:1rem}
+.fd label{display:block;font-size:.8rem;color:var(--dim);margin-bottom:.35rem;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.fd input[type=text],.fd input[type=number]{width:100%;padding:.55rem .75rem;background:var(--ibg);border:1px solid var(--bdr);border-radius:8px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s}
+.fd input:focus{border-color:var(--accent)}
+.cr{display:flex;gap:.75rem}
+.cr .fd{flex:1}
+.cw{display:flex;align-items:center;gap:.5rem}
+.cw input[type=color]{width:36px;height:36px;border:2px solid var(--bdr);border-radius:8px;cursor:pointer;background:none;padding:2px}
+.cw input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cw input[type=color]::-webkit-color-swatch{border:none;border-radius:5px}
+.cw input[type=text]{flex:1}
+.bg{display:grid;gap:.5rem}
+.c4{grid-template-columns:repeat(4,1fr)}
+.c3{grid-template-columns:repeat(3,1fr)}
+.gb{padding:.5rem;border:2px solid var(--bdr);border-radius:8px;background:var(--ibg);color:var(--text);cursor:pointer;font-size:.78rem;font-weight:500;transition:all .2s;text-align:center}
+.gb:hover{border-color:var(--accent);background:rgba(233,69,96,.08)}
+.gb.active{border-color:var(--accent);background:rgba(233,69,96,.15);color:var(--accent)}
+.rw{display:flex;align-items:center;gap:.75rem}
+.rw input[type=range]{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--bdr);outline:none}
+.rw input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+.rv{min-width:40px;text-align:right;font-size:.85rem;color:var(--dim)}
+.pa{min-height:280px;display:flex;align-items:center;justify-content:center;background:var(--ibg);border-radius:var(--r);border:1px dashed var(--bdr);margin-bottom:1.2rem;padding:4rem 2rem}
+.ptr{position:relative;display:inline-block;padding:.7rem 1.6rem;background:linear-gradient(135deg,var(--accent),#c0392b);color:#fff;border-radius:8px;font-weight:600;cursor:default}
+.tp{position:absolute;white-space:nowrap;pointer-events:none;z-index:10;line-height:1.4;font-weight:500}
+.tp::after{content:"";position:absolute;border:6px solid transparent}
+.tp-t{bottom:calc(100% + 10px);left:50%;transform:translateX(-50%)}
+.tp-t::after{top:100%;left:50%;transform:translateX(-50%);border-top-color:var(--tbg)}
+.tp-b{top:calc(100% + 10px);left:50%;transform:translateX(-50%)}
+.tp-b::after{bottom:100%;left:50%;transform:translateX(-50%);border-bottom-color:var(--tbg)}
+.tp-l{right:calc(100% + 10px);top:50%;transform:translateY(-50%)}
+.tp-l::after{left:100%;top:50%;transform:translateY(-50%);border-left-color:var(--tbg)}
+.tp-r{left:calc(100% + 10px);top:50%;transform:translateY(-50%)}
+.tp-r::after{right:100%;top:50%;transform:translateY(-50%);border-right-color:var(--tbg)}
+.tp-na::after{display:none!important}
+.cs{position:relative}
+.cbl{background:var(--ibg);border:1px solid var(--bdr);border-radius:8px;padding:1rem;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;color:#a8d8a8;overflow-x:auto;white-space:pre;max-height:400px;overflow-y:auto}
+.cpb{position:absolute;top:.5rem;right:.5rem;padding:.4rem .8rem;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:500;z-index:2;transition:all .2s}
+.cpb:hover{background:#c0392b}
+.ft{text-align:center;padding:2rem 1rem;color:var(--dim);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="hd">
+<h1>CSS <span>Tooltip</span> Generator</h1>
+<p>Design beautiful tooltips with live preview and instant CSS code</p>
+</div>
+<div class="ct">
+<div class="pn">
+<div class="pt"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>Settings</div>
+<div class="fd"><label>Tooltip Text</label><input type="text" id="ttText" value="Hello, I am a tooltip!"></div>
+<div class="fd"><label>Position</label><div class="bg c4" id="posG"><button class="gb active" data-v="top">Top</button><button class="gb" data-v="bottom">Bottom</button><button class="gb" data-v="left">Left</button><button class="gb" data-v="right">Right</button></div></div>
+<div class="cr">
+<div class="fd"><label>Background</label><div class="cw"><input type="color" id="bgC" value="#333333"><input type="text" id="bgT" value="#333333"></div></div>
+<div class="fd"><label>Text Color</label><div class="cw"><input type="color" id="txC" value="#ffffff"><input type="text" id="txT" value="#ffffff"></div></div>
+</div>
+<div class="fd"><label>Font Size (px)</label><div class="rw"><input type="range" id="fsR" min="10" max="20" value="13"><span class="rv" id="fsV">13px</span></div></div>
+<div class="fd"><label>Border Radius (px)</label><div class="rw"><input type="range" id="brR" min="0" max="20" value="6"><span class="rv" id="brV">6px</span></div></div>
+<div class="fd"><label>Arrow Style</label><div class="bg c3" id="arG"><button class="gb active" data-v="solid">Solid</button><button class="gb" data-v="hollow">Hollow</button><button class="gb" data-v="none">None</button></div></div>
+<div class="fd"><label>Animation</label><div class="bg c3" id="anG"><button class="gb active" data-v="fade">Fade</button><button class="gb" data-v="slide">Slide</button><button class="gb" data-v="scale">Scale</button></div></div>
+</div>
+<div>
+<div class="pn" style="margin-bottom:1.5rem">
+<div class="pt"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10m0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>Live Preview</div>
+<div class="pa"><div class="ptr" id="pvTrig">Hover me<div class="tp tp-t" id="pvTip">Hello, I am a tooltip!</div></div></div>
+</div>
+<div class="pn">
+<div class="pt"><svg viewBox="0 0 24 24"><path d="M9.4 16.6 4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4m5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4Z"/></svg>Generated CSS</div>
+<div class="cs"><button class="cpb" id="cpBtn">Copy</button><div class="cbl" id="codeOut"></div></div>
+</div>
+</div>
+</div>
+<div class="ft">AI CSS Tooltip Generator &mdash; Generate pure CSS tooltips</div>
+<script src="https://cdn.partytown.qwik.dev/v0.5.4/partytown.js"></script>
+<script src="https://lifa-su.com/monetize/monetize.js"></script>
+<script>
+(function(){
+var S={pos:"top",bgC:"#333333",txC:"#ffffff",fs:13,br:6,arrow:"solid",anim:"fade",text:"Hello, I am a tooltip!"};
+var tip=document.getElementById("pvTip"),trig=document.getElementById("pvTrig");
+var codeOut=document.getElementById("codeOut");
+
+function bind(gridId,key){
+  var el=document.getElementById(gridId);
+  el.addEventListener("click",function(e){
+    var b=e.target.closest(".gb");if(!b)return;
+    el.querySelectorAll(".gb").forEach(function(x){x.classList.remove("active")});
+    b.classList.add("active");S[key]=b.dataset.v;update();
+  });
+}
+bind("posG","pos");bind("arG","arrow");bind("anG","anim");
+
+function syncColor(cId,tId,key){
+  var c=document.getElementById(cId),t=document.getElementById(tId);
+  c.addEventListener("input",function(){t.value=c.value;S[key]=c.value;update()});
+  t.addEventListener("input",function(){if(/^#[0-9a-f]{6}$/i.test(t.value)){c.value=t.value;S[key]=t.value;update()}});
+}
+syncColor("bgC","bgT","bgC");syncColor("txC","txT","txC");
+
+function syncRange(rId,vId,key){
+  var r=document.getElementById(rId),v=document.getElementById(vId);
+  r.addEventListener("input",function(){v.textContent=r.value+"px";S[key]=parseInt(r.value);update()});
+}
+syncRange("fsR","fsV","fs");syncRange("brR","brV","br");
+
+document.getElementById("ttText").addEventListener("input",function(){S.text=this.value||"Tooltip";update()});
+
+function update(){
+  tip.textContent=S.text;
+  tip.className="tp tp-"+S.pos[0];
+  if(S.arrow==="none")tip.classList.add("tp-na");
+  tip.style.cssText="background:"+S.bgC+";color:"+S.txC+";font-size:"+S.fs+"px;border-radius:"+S.br+"px;padding:"+Math.max(4,S.fs*0.4)+"px "+Math.max(8,S.fs*0.65)+"px;--tbg:"+S.bgC;
+  genCode();
+}
+
+function genCode(){
+  var p=S.pos,bg=S.bgC,tx=S.txC,fs=S.fs,br=S.br,ar=S.arrow,an=S.anim;
+  var posMap={top:["bottom:calc(100% + 10px);left:50%;transform:translateX(-50%)","top:100%;left:50%;transform:translateX(-50%);border-top-color:"+bg],bottom:["top:calc(100% + 10px);left:50%;transform:translateX(-50%)","bottom:100%;left:50%;transform:translateX(-50%);border-bottom-color:"+bg],left:["right:calc(100% + 10px);top:50%;transform:translateY(-50%)","left:100%;top:50%;transform:translateY(-50%);border-left-color:"+bg],right:["left:calc(100% + 10px);top:50%;transform:translateY(-50%)","right:100%;top:50%;transform:translateY(-50%);border-right-color:"+bg]};
+  var animStart={fade:"opacity:0;",slide:"opacity:0;"+(p==="top"?"transform:translateX(-50%) translateY(6px);":p==="bottom"?"transform:translateX(-50%) translateY(-6px);":p==="left"?"transform:translateY(-50%) translateX(6px);":"transform:translateY(-50%) translateX(-6px);"),scale:"opacity:0;transform:"+(p==="top"||p==="bottom"?"translateX(-50%)":"translateY(-50%)")+" scale(0.8);"};
+  var animEnd={fade:"opacity:1;",slide:"opacity:1;"+(posMap[p][0].split(";").filter(function(s){return s.indexOf("transform")>-1}).join(";")+";"),scale:"opacity:1;"+(posMap[p][0].split(";").filter(function(s){return s.indexOf("transform")>-1}).join(";")+";")};
+  var pad=Math.max(4,Math.round(fs*0.4))+"px "+Math.max(8,Math.round(fs*0.65))+"px";
+  var css="/* Tooltip Container */\n.tooltip-wrapper {\n  position: relative;\n  display: inline-block;\n}\n\n/* Tooltip */\n.tooltip-wrapper .tooltip {\n  visibility: hidden;\n  position: absolute;\n  "+posMap[p][0].split(";").join(";\n  ")+"\n  background: "+bg+";\n  color: "+tx+";\n  font-size: "+fs+"px;\n  padding: "+pad+";\n  border-radius: "+br+"px;\n  white-space: nowrap;\n  z-index: 10;\n  "+animStart[an]+"\n  transition: all 0.3s ease;\n}\n";
+  if(ar!=="none"){css+="\n/* Arrow */\n.tooltip-wrapper .tooltip::after {\n  content: \"\";\n  position: absolute;\n  "+posMap[p][1].split(";").join(";\n  ")+"\n  border: 6px solid transparent;\n}\n";}
+  css+="\n/* Show on hover */\n.tooltip-wrapper:hover .tooltip {\n  visibility: visible;\n  "+animEnd[an].split(";").filter(function(s){return s.trim()}).join(";\n  ")+";\n}\n";
+  css+="\n/* Usage:\n<div class=\"tooltip-wrapper\">\n  Hover me\n  <span class=\"tooltip\">Tooltip text</span>\n</div> */";
+  codeOut.textContent=css;
+}
+
+document.getElementById("cpBtn").addEventListener("click",function(){
+  var t=codeOut.textContent;
+  navigator.clipboard.writeText(t).then(function(){
+    var b=document.getElementById("cpBtn");b.textContent="Copied!";
+    setTimeout(function(){b.textContent="Copy"},2000);
+  });
+});
+
+update();
+})();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

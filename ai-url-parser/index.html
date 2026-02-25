@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI URL Parser - Parse, Encode, Decode & Build URLs</title>
+<meta name="description" content="Free online URL parser tool. Parse URLs into components, encode/decode URLs, and build URLs from parts.">
+<link rel="canonical" href="https://lifa-su.com/ai-url-parser/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--primary:#6c63ff;--primary-hover:#5a52e0;--text:#e4e4e7;--text-dim:#9ca3af;--accent:#22d3ee;--success:#34d399;--warn:#fbbf24;--err:#f87171;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text-dim);margin-top:8px;font-size:.95rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h2 .icon{font-size:1.2rem}
+.input-group{display:flex;gap:10px;margin-bottom:12px}
+.input-group input,.input-group textarea{flex:1}
+input,textarea,select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);font-size:.95rem;width:100%;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary)}
+textarea{resize:vertical;min-height:60px;font-family:monospace}
+button{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:.95rem;cursor:pointer;transition:all .2s;font-weight:500}
+button:hover{background:var(--primary-hover);transform:translateY(-1px)}
+button.secondary{background:var(--surface2);border:1px solid var(--border)}
+button.secondary:hover{border-color:var(--primary);background:var(--surface2)}
+button.small{padding:6px 14px;font-size:.85rem}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface2);border-radius:10px;padding:4px;flex-wrap:wrap}
+.tab{padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--text-dim);transition:all .2s;border:none;background:transparent;flex:1;text-align:center;white-space:nowrap}
+.tab.active{background:var(--primary);color:#fff}
+.tab:hover:not(.active){color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:16px}
+.result-item{background:var(--surface2);border-radius:8px;padding:14px;border:1px solid var(--border)}
+.result-item .label{font-size:.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.result-item .value{font-family:monospace;font-size:.9rem;word-break:break-all;color:var(--accent);min-height:1.4em}
+.result-item .value.empty{color:var(--text-dim);font-style:italic}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:.9rem}
+th{color:var(--text-dim);font-weight:500;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+td{font-family:monospace;word-break:break-all}
+td.key{color:var(--warn)}
+td.val{color:var(--success)}
+.empty-state{text-align:center;padding:30px;color:var(--text-dim)}
+.builder-row{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.builder-row label{font-size:.85rem;color:var(--text-dim);text-align:right}
+.builder-output{margin-top:16px;padding:14px;background:var(--surface2);border-radius:8px;font-family:monospace;word-break:break-all;color:var(--accent);border:1px solid var(--border);min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.builder-output span{flex:1}
+.query-builder-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.query-builder-row input{flex:1}
+.btn-icon{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;border-radius:8px;flex-shrink:0}
+.encode-result{margin-top:12px;padding:14px;background:var(--surface2);border-radius:8px;font-family:monospace;word-break:break-all;border:1px solid var(--border);min-height:44px;position:relative}
+.encode-result .copy-btn{position:absolute;top:8px;right:8px}
+.copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--success);color:#000;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:500;transition:transform .3s ease;z-index:999}
+.copy-toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:30px 0;color:var(--text-dim);font-size:.8rem}
+footer a{color:var(--primary);text-decoration:none}
+@media(max-width:600px){
+  .container{padding:12px}
+  header{padding:24px 0 20px}
+  header h1{font-size:1.5rem}
+  .card{padding:16px}
+  .input-group{flex-direction:column}
+  .result-grid{grid-template-columns:1fr}
+  .builder-row{grid-template-columns:1fr;gap:4px}
+  .builder-row label{text-align:left}
+  .tabs{gap:2px}
+  .tab{padding:8px 12px;font-size:.8rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔗 AI URL Parser</h1>
+    <p>Parse, encode, decode, and build URLs instantly</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('parse')">🔍 Parse</button>
+    <button class="tab" onclick="switchTab('encode')">🔐 Encode / Decode</button>
+    <button class="tab" onclick="switchTab('build')">🛠️ Builder</button>
+  </div>
+
+  <!-- Parse Tab -->
+  <div id="tab-parse" class="tab-content active">
+    <div class="card">
+      <h2><span class="icon">🔍</span> URL Parser</h2>
+      <div class="input-group">
+        <input type="text" id="urlInput" placeholder="Enter URL, e.g. https://example.com:8080/path?key=value#section" autofocus>
+        <button onclick="parseURL()">Parse</button>
+      </div>
+      <div id="parseResult">
+        <div class="empty-state">Enter a URL above to see its components</div>
+      </div>
+    </div>
+    <div class="card" id="queryCard" style="display:none">
+      <h2><span class="icon">📋</span> Query Parameters</h2>
+      <div id="queryTable"></div>
+    </div>
+  </div>
+
+  <!-- Encode/Decode Tab -->
+  <div id="tab-encode" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">🔐</span> URL Encode</h2>
+      <div class="input-group">
+        <input type="text" id="encodeInput" placeholder="Text to encode...">
+        <button onclick="encodeURL()">Encode</button>
+      </div>
+      <div class="input-group" style="gap:6px">
+        <button class="secondary small" onclick="encodeComponent()">encodeURIComponent</button>
+        <button class="secondary small" onclick="encodeFullURI()">encodeURI</button>
+      </div>
+      <div id="encodeResult" class="encode-result" style="display:none"></div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">🔓</span> URL Decode</h2>
+      <div class="input-group">
+        <input type="text" id="decodeInput" placeholder="Encoded text to decode...">
+        <button onclick="decodeURL()">Decode</button>
+      </div>
+      <div class="input-group" style="gap:6px">
+        <button class="secondary small" onclick="decodeComponent()">decodeURIComponent</button>
+        <button class="secondary small" onclick="decodeFullURI()">decodeURI</button>
+      </div>
+      <div id="decodeResult" class="encode-result" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Builder Tab -->
+  <div id="tab-build" class="tab-content">
+    <div class="card">
+      <h2><span class="icon">🛠️</span> URL Builder</h2>
+      <div class="builder-row">
+        <label>Protocol</label>
+        <select id="bProtocol" onchange="buildURL()">
+          <option value="https">https</option>
+          <option value="http">http</option>
+          <option value="ftp">ftp</option>
+          <option value="ws">ws</option>
+          <option value="wss">wss</option>
+        </select>
+      </div>
+      <div class="builder-row">
+        <label>Host</label>
+        <input type="text" id="bHost" placeholder="example.com" oninput="buildURL()">
+      </div>
+      <div class="builder-row">
+        <label>Port</label>
+        <input type="text" id="bPort" placeholder="(default)" oninput="buildURL()">
+      </div>
+      <div class="builder-row">
+        <label>Path</label>
+        <input type="text" id="bPath" placeholder="/api/v1/users" oninput="buildURL()">
+      </div>
+      <div class="builder-row">
+        <label>Hash</label>
+        <input type="text" id="bHash" placeholder="section1" oninput="buildURL()">
+      </div>
+      <h2 style="margin-top:20px"><span class="icon">📋</span> Query Parameters</h2>
+      <div id="queryBuilder">
+        <div class="query-builder-row">
+          <input type="text" placeholder="Key" class="qKey" oninput="buildURL()">
+          <input type="text" placeholder="Value" class="qVal" oninput="buildURL()">
+          <button class="btn-icon secondary" onclick="removeQueryRow(this)" title="Remove">✕</button>
+        </div>
+      </div>
+      <button class="secondary small" onclick="addQueryRow()" style="margin-top:8px">+ Add Parameter</button>
+      <div class="builder-output">
+        <span id="builtURL">https://</span>
+        <button class="small" onclick="copyText(document.getElementById('builtURL').textContent)">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>AI URL Parser — Free online URL tool</p>
+  </footer>
+</div>
+
+<div class="copy-toast" id="toast">Copied!</div>
+
+<script>
+function switchTab(name){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelector(`.tab[onclick="switchTab('${name}')"]`).classList.add('active');
+}
+
+function parseURL(){
+  const raw=document.getElementById('urlInput').value.trim();
+  if(!raw){return}
+  let url;
+  try{
+    let input=raw;
+    if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(input)){input='https://'+input}
+    url=new URL(input);
+  }catch(e){
+    document.getElementById('parseResult').innerHTML='<div class="empty-state" style="color:var(--err)">Invalid URL. Please check the format.</div>';
+    document.getElementById('queryCard').style.display='none';
+    return;
+  }
+  const parts=[
+    {label:'Protocol',value:url.protocol.replace(':','')},
+    {label:'Host',value:url.hostname},
+    {label:'Port',value:url.port||'(default)'},
+    {label:'Path',value:url.pathname},
+    {label:'Query String',value:url.search||'(none)'},
+    {label:'Hash / Fragment',value:url.hash||'(none)'},
+    {label:'Origin',value:url.origin},
+    {label:'Full URL',value:url.href}
+  ];
+  let html='<div class="result-grid">';
+  parts.forEach(p=>{
+    const isEmpty=p.value==='(default)'||p.value==='(none)';
+    html+=`<div class="result-item"><div class="label">${p.label}</div><div class="value${isEmpty?' empty':''}">${escHTML(p.value)}</div></div>`;
+  });
+  html+='</div>';
+  document.getElementById('parseResult').innerHTML=html;
+
+  const params=[...url.searchParams.entries()];
+  const qCard=document.getElementById('queryCard');
+  if(params.length>0){
+    let thtml='<table><thead><tr><th>#</th><th>Key</th><th>Value</th></tr></thead><tbody>';
+    params.forEach((p,i)=>{
+      thtml+=`<tr><td>${i+1}</td><td class="key">${escHTML(p[0])}</td><td class="val">${escHTML(p[1])}</td></tr>`;
+    });
+    thtml+='</tbody></table>';
+    document.getElementById('queryTable').innerHTML=thtml;
+    qCard.style.display='block';
+  }else{
+    qCard.style.display='none';
+  }
+}
+
+function encodeURL(){encodeComponent()}
+function encodeComponent(){
+  const v=document.getElementById('encodeInput').value;
+  showResult('encodeResult',encodeURIComponent(v));
+}
+function encodeFullURI(){
+  const v=document.getElementById('encodeInput').value;
+  showResult('encodeResult',encodeURI(v));
+}
+function decodeURL(){decodeComponent()}
+function decodeComponent(){
+  const v=document.getElementById('decodeInput').value;
+  try{showResult('decodeResult',decodeURIComponent(v))}catch(e){showResult('decodeResult','Error: Invalid encoded string')}
+}
+function decodeFullURI(){
+  const v=document.getElementById('decodeInput').value;
+  try{showResult('decodeResult',decodeURI(v))}catch(e){showResult('decodeResult','Error: Invalid encoded string')}
+}
+function showResult(id,text){
+  const el=document.getElementById(id);
+  el.style.display='block';
+  el.innerHTML=`${escHTML(text)}<button class="small copy-btn" onclick="copyText('${escAttr(text)}')">Copy</button>`;
+}
+
+function buildURL(){
+  const proto=document.getElementById('bProtocol').value;
+  const host=document.getElementById('bHost').value.trim();
+  const port=document.getElementById('bPort').value.trim();
+  const path=document.getElementById('bPath').value.trim();
+  const hash=document.getElementById('bHash').value.trim();
+  let url=proto+'://';
+  url+=host||'example.com';
+  if(port)url+=':'+port;
+  if(path){url+=path.startsWith('/')?path:'/'+path}
+  const keys=document.querySelectorAll('.qKey');
+  const vals=document.querySelectorAll('.qVal');
+  const qParts=[];
+  keys.forEach((k,i)=>{
+    const kv=k.value.trim(),vv=vals[i].value.trim();
+    if(kv)qParts.push(encodeURIComponent(kv)+'='+encodeURIComponent(vv));
+  });
+  if(qParts.length)url+='?'+qParts.join('&');
+  if(hash)url+='#'+(hash.startsWith('#')?hash.slice(1):hash);
+  document.getElementById('builtURL').textContent=url;
+}
+
+function addQueryRow(){
+  const div=document.createElement('div');
+  div.className='query-builder-row';
+  div.innerHTML='<input type="text" placeholder="Key" class="qKey" oninput="buildURL()"><input type="text" placeholder="Value" class="qVal" oninput="buildURL()"><button class="btn-icon secondary" onclick="removeQueryRow(this)" title="Remove">✕</button>';
+  document.getElementById('queryBuilder').appendChild(div);
+}
+function removeQueryRow(btn){
+  const rows=document.querySelectorAll('.query-builder-row');
+  if(rows.length>1){btn.parentElement.remove();buildURL()}
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),1500);
+  });
+}
+
+function escHTML(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escAttr(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')parseURL()});
+document.getElementById('encodeInput').addEventListener('keydown',e=>{if(e.key==='Enter')encodeURL()});
+document.getElementById('decodeInput').addEventListener('keydown',e=>{if(e.key==='Enter')decodeURL()});
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

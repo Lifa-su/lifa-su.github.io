@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Hyphens Generator - Compare none / manual / auto Hyphenation Modes</title>
+<meta name="description" content="Interactive CSS hyphens property generator. Compare none, manual, and auto hyphenation modes across multiple languages with word-break combinations.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-hyphens/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f1a;--surface:#1a1a2e;--surface2:#16213e;--border:#2a2a4a;--text:#e0e0e0;--text2:#a0a0b8;--accent:#6c63ff;--accent2:#e94560;--success:#4ecca3;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+code{background:rgba(108,99,255,.15);padding:2px 6px;border-radius:4px;font-size:.85em;color:var(--accent)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:clamp(1.6rem,4vw,2.4rem);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:clamp(.9rem,2vw,1.05rem);max-width:620px;margin:0 auto}
+.controls{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.control-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+.control-group select{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s}
+.control-group select:focus{border-color:var(--accent)}
+.control-group input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--border);cursor:pointer;margin-top:8px}
+.control-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer}
+.range-val{font-size:.85rem;color:var(--accent);float:right}
+.section-title{font-size:1.15rem;font-weight:600;margin:32px 0 16px;padding-left:12px;border-left:3px solid var(--accent)}
+.comparison{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+@media(max-width:768px){.comparison{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-header h3{font-size:.95rem;font-weight:600}
+.badge{font-size:.7rem;padding:3px 8px;border-radius:12px;font-weight:600;text-transform:uppercase}
+.badge-none{background:rgba(224,224,224,.15);color:var(--text2)}
+.badge-manual{background:rgba(108,99,255,.2);color:var(--accent)}
+.badge-auto{background:rgba(78,204,163,.2);color:var(--success)}
+.card-body{padding:18px;font-size:.95rem;overflow-wrap:break-word}
+.wb-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;overflow:hidden}
+.code-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--surface2)}
+.code-header span{font-size:.85rem;color:var(--text2)}
+.copy-btn{background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:.8rem;cursor:pointer;transition:background .2s,transform .1s}
+.copy-btn:hover{background:#5a52e0}
+.copy-btn:active{transform:scale(.95)}
+.copy-btn.copied{background:var(--success)}
+.code-content{padding:18px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.7;color:var(--success);white-space:pre-wrap;overflow-x:auto}
+.lang-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.lang-tab{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:.85rem;transition:all .2s}
+.lang-tab:hover{border-color:var(--accent);color:var(--text)}
+.lang-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+footer{text-align:center;padding:40px 20px;color:var(--text2);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--accent);text-decoration:none}
+.shy-mark{color:var(--accent2);font-size:.7rem;vertical-align:super}
+</style>
+</head>
+<body>
+<header>
+  <h1>CSS Hyphens Generator</h1>
+  <p>Compare <code>none</code>, <code>manual</code>, and <code>auto</code> hyphenation modes across languages. Generate clean CSS with word-break combinations.</p>
+</header>
+<div class="container">
+  <div class="controls">
+    <div class="control-group">
+      <label for="langSelect">Language</label>
+      <select id="langSelect"></select>
+    </div>
+    <div class="control-group">
+      <label for="wbSelect">word-break</label>
+      <select id="wbSelect">
+        <option value="normal" selected>normal</option>
+        <option value="break-all">break-all</option>
+        <option value="keep-all">keep-all</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="widthRange">Container Width <span class="range-val" id="widthVal">300px</span></label>
+      <input type="range" id="widthRange" min="150" max="600" value="300">
+    </div>
+  </div>
+  <h2 class="section-title">Hyphens Mode Comparison</h2>
+  <div class="comparison" id="comparison"></div>
+  <h2 class="section-title">word-break + hyphens: auto Combinations</h2>
+  <div class="wb-grid" id="wbGrid"></div>
+  <h2 class="section-title">Generated CSS Code</h2>
+  <div class="code-block">
+    <div class="code-header">
+      <span>CSS</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy Code</button>
+    </div>
+    <pre class="code-content" id="codeOutput"></pre>
+  </div>
+  <h2 class="section-title">Browser Support</h2>
+  <div class="card" style="margin-bottom:24px">
+    <div class="card-body">
+      <p><code>hyphens: auto</code> requires the correct <code>lang</code> attribute on the HTML element. Support varies by language and browser.</p>
+      <p style="margin-top:10px;color:var(--text2)">Chrome 55+, Firefox 43+, Safari 5.1+, Edge 79+. Note: Chrome on Android and desktop may have limited dictionary support for some languages.</p>
+    </div>
+  </div>
+</div>
+<footer>
+  <p>CSS Hyphens Generator &mdash; A free tool by <a href="https://github.com/Lifa-su" target="_blank">Lifa-su</a></p>
+  <p style="margin-top:8px">Built with vanilla HTML, CSS &amp; JavaScript. No frameworks needed.</p>
+</footer>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script>
+const LANGS = {
+  en: { name: 'English', code: 'en',
+    text: 'Internationalization and accessibility are extraordinarily important considerations for contemporary web development. Hyphenation algorithms automatically determine appropriate breakpoints within polysyllabic words, significantly improving typographic quality and readability across different viewport dimensions.',
+    manual: 'Inter\u00ADnation\u00ADaliza\u00ADtion and acces\u00ADsibil\u00ADity are extra\u00ADordi\u00ADnarily impor\u00ADtant con\u00ADsidera\u00ADtions for con\u00ADtem\u00ADporary web develop\u00ADment. Hyphen\u00ADation algo\u00ADrithms auto\u00ADmati\u00ADcally deter\u00ADmine appro\u00ADpriate break\u00ADpoints within poly\u00ADsyl\u00ADlabic words.'
+  },
+  de: { name: 'Deutsch', code: 'de',
+    text: 'Donaudampfschifffahrtsgesellschaftskapit\u00E4n ist ein klassisches Beispiel f\u00FCr die Kompositionsf\u00E4higkeit der deutschen Sprache. Rindfleischetikettierungs\u00FCberwachungsaufgaben\u00FCbertragungsgesetz zeigt die bemerkenswerte Wortbildungskapazit\u00E4t.',
+    manual: 'Donau\u00ADdampf\u00ADschiff\u00ADfahrts\u00ADgesell\u00ADschafts\u00ADkapit\u00E4n ist ein klas\u00ADsisches Bei\u00ADspiel f\u00FCr die Kom\u00ADposi\u00ADtions\u00ADf\u00E4hig\u00ADkeit der deut\u00ADschen Sprache. Rind\u00ADfleisch\u00ADetiket\u00ADtierungs\u00AD\u00FCber\u00ADwachungs\u00ADauf\u00ADgaben\u00AD\u00FCber\u00ADtragungs\u00ADgesetz zeigt die bemer\u00ADkens\u00ADwerte Wort\u00ADbil\u00ADdungs\u00ADkapazi\u00ADt\u00E4t.'
+  },
+  zh: { name: '\u4E2D\u6587', code: 'zh',
+    text: '\u56FD\u9645\u5316\u548C\u65E0\u969C\u788D\u8BBF\u95EE\u662F\u5F53\u4EE3\u7F51\u7EDC\u5F00\u53D1\u4E2D\u975E\u5E38\u91CD\u8981\u7684\u8003\u8651\u56E0\u7D20\u3002CSS\u65AD\u5B57\u5C5E\u6027\u53EF\u4EE5\u5E2E\u52A9\u6211\u4EEC\u63A7\u5236\u6587\u672C\u5728\u5BB9\u5668\u4E2D\u7684\u6362\u884C\u65B9\u5F0F\uFF0C\u63D0\u9AD8\u6392\u7248\u8D28\u91CF\u548C\u53EF\u8BFB\u6027\u3002\u8FD9\u5BF9\u4E8E\u54CD\u5E94\u5F0F\u8BBE\u8BA1\u5C24\u5176\u91CD\u8981\u3002',
+    manual: '\u56FD\u9645\u5316\u548C\u65E0\u969C\u788D\u8BBF\u95EE\u662F\u5F53\u4EE3\u7F51\u7EDC\u5F00\u53D1\u4E2D\u975E\u5E38\u91CD\u8981\u7684\u8003\u8651\u56E0\u7D20\u3002CSS\u65AD\u5B57\u5C5E\u6027\u53EF\u4EE5\u5E2E\u52A9\u6211\u4EEC\u63A7\u5236\u6587\u672C\u5728\u5BB9\u5668\u4E2D\u7684\u6362\u884C\u65B9\u5F0F\u3002'
+  },
+  ja: { name: '\u65E5\u672C\u8A9E', code: 'ja',
+    text: '\u56FD\u969B\u5316\u3068\u30A2\u30AF\u30BB\u30B7\u30D3\u30EA\u30C6\u30A3\u306F\u3001\u73FE\u4EE3\u306EWeb\u958B\u767A\u306B\u304A\u3044\u3066\u975E\u5E38\u306B\u91CD\u8981\u306A\u8003\u616E\u4E8B\u9805\u3067\u3059\u3002CSS\u306E\u30CF\u30A4\u30D5\u30CD\u30FC\u30B7\u30E7\u30F3\u30D7\u30ED\u30D1\u30C6\u30A3\u306F\u3001\u30C6\u30AD\u30B9\u30C8\u306E\u6539\u884C\u4F4D\u7F6E\u3092\u5236\u5FA1\u3057\u3001\u7D44\u7248\u54C1\u8CEA\u3092\u5411\u4E0A\u3055\u305B\u307E\u3059\u3002',
+    manual: '\u56FD\u969B\u5316\u3068\u30A2\u30AF\u30BB\u30B7\u30D3\u30EA\u30C6\u30A3\u306F\u3001\u73FE\u4EE3\u306EWeb\u958B\u767A\u306B\u304A\u3044\u3066\u975E\u5E38\u306B\u91CD\u8981\u306A\u8003\u616E\u4E8B\u9805\u3067\u3059\u3002'
+  },
+  fr: { name: 'Fran\u00E7ais', code: 'fr',
+    text: "L'internationalisation et l'accessibilit\u00E9 sont des consid\u00E9rations extraordinairement importantes pour le d\u00E9veloppement web contemporain. Les algorithmes de c\u00E9sure d\u00E9terminent automatiquement les points de rupture appropri\u00E9s dans les mots polysyllabiques.",
+    manual: "L'inter\u00ADnatio\u00ADnali\u00ADsation et l'acces\u00ADsibi\u00ADlit\u00E9 sont des consi\u00ADd\u00E9ra\u00ADtions extra\u00ADordi\u00ADnaire\u00ADment impor\u00ADtantes pour le d\u00E9ve\u00ADloppe\u00ADment web contem\u00ADporain."
+  },
+  es: { name: 'Espa\u00F1ol', code: 'es',
+    text: 'La internacionalizaci\u00F3n y la accesibilidad son consideraciones extraordinariamente importantes para el desarrollo web contempor\u00E1neo. Los algoritmos de separaci\u00F3n sil\u00E1bica determinan autom\u00E1ticamente los puntos de ruptura apropiados en palabras polisil\u00E1bicas.',
+    manual: 'La inter\u00ADnacio\u00ADnali\u00ADza\u00ADci\u00F3n y la acce\u00ADsibi\u00ADlidad son consi\u00ADdera\u00ADciones extra\u00ADordi\u00ADnaria\u00ADmente impor\u00ADtantes para el desa\u00ADrrollo web contem\u00ADpor\u00E1neo.'
+  },
+  ru: { name: '\u0420\u0443\u0441\u0441\u043A\u0438\u0439', code: 'ru',
+    text: '\u0418\u043D\u0442\u0435\u0440\u043D\u0430\u0446\u0438\u043E\u043D\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044F \u0438 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C \u044F\u0432\u043B\u044F\u044E\u0442\u0441\u044F \u0447\u0440\u0435\u0437\u0432\u044B\u0447\u0430\u0439\u043D\u043E \u0432\u0430\u0436\u043D\u044B\u043C\u0438 \u0444\u0430\u043A\u0442\u043E\u0440\u0430\u043C\u0438 \u0441\u043E\u0432\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0439 \u0432\u0435\u0431-\u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0438. \u0410\u043B\u0433\u043E\u0440\u0438\u0442\u043C\u044B \u043F\u0435\u0440\u0435\u043D\u043E\u0441\u0430 \u0430\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u043E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u044E\u0442 \u043F\u043E\u0434\u0445\u043E\u0434\u044F\u0449\u0438\u0435 \u0442\u043E\u0447\u043A\u0438 \u0440\u0430\u0437\u0440\u044B\u0432\u0430 \u0432 \u043C\u043D\u043E\u0433\u043E\u0441\u043B\u043E\u0436\u043D\u044B\u0445 \u0441\u043B\u043E\u0432\u0430\u0445.',
+    manual: '\u0418\u043D\u0442\u0435\u0440\u00AD\u043D\u0430\u0446\u0438\u00AD\u043E\u043D\u0430\u00AD\u043B\u0438\u00AD\u0437\u0430\u00AD\u0446\u0438\u044F \u0438 \u0434\u043E\u00AD\u0441\u0442\u0443\u043F\u00AD\u043D\u043E\u0441\u0442\u044C \u044F\u0432\u00AD\u043B\u044F\u00AD\u044E\u0442\u0441\u044F \u0447\u0440\u0435\u0437\u00AD\u0432\u044B\u00AD\u0447\u0430\u0439\u043D\u043E \u0432\u0430\u0436\u00AD\u043D\u044B\u043C\u0438 \u0444\u0430\u043A\u00AD\u0442\u043E\u00AD\u0440\u0430\u043C\u0438.'
+  }
+};
+
+const langSelect = document.getElementById('langSelect');
+const wbSelect = document.getElementById('wbSelect');
+const widthRange = document.getElementById('widthRange');
+const widthVal = document.getElementById('widthVal');
+const comparison = document.getElementById('comparison');
+const wbGrid = document.getElementById('wbGrid');
+const codeOutput = document.getElementById('codeOutput');
+
+// Populate language select
+Object.keys(LANGS).forEach(k => {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = LANGS[k].name;
+  langSelect.appendChild(o);
+});
+
+function getManualHtml(text) {
+  return text.replace(/\u00AD/g, '\u00AD<span class="shy-mark">&shy;</span>');
+}
+
+function makeCard(title, badgeClass, hyphensVal, text, lang, wb, width, isManual) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const body = isManual ? getManualHtml(text) : text;
+  card.innerHTML = '<div class="card-header"><h3>hyphens: ' + title + '</h3><span class="badge ' + badgeClass + '">' + title + '</span></div>' +
+    '<div class="card-body"><div lang="' + lang + '" style="hyphens:' + hyphensVal + ';-webkit-hyphens:' + hyphensVal + ';word-break:' + wb + ';max-width:' + width + 'px;border:1px dashed var(--border);padding:12px;border-radius:6px;line-height:1.8">' + body + '</div></div>';
+  return card;
+}
+
+function update() {
+  const lang = langSelect.value;
+  const wb = wbSelect.value;
+  const width = widthRange.value;
+  const data = LANGS[lang];
+  widthVal.textContent = width + 'px';
+
+  comparison.innerHTML = '';
+  comparison.appendChild(makeCard('none', 'badge-none', 'none', data.text, data.code, wb, width, false));
+  comparison.appendChild(makeCard('manual', 'badge-manual', 'manual', data.manual, data.code, wb, width, true));
+  comparison.appendChild(makeCard('auto', 'badge-auto', 'auto', data.text, data.code, wb, width, false));
+
+  // word-break grid
+  const wbValues = ['normal', 'break-all', 'keep-all'];
+  wbGrid.innerHTML = '';
+  wbValues.forEach(wbv => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '<div class="card-header"><h3>word-break: ' + wbv + '</h3><span class="badge badge-auto">+ hyphens: auto</span></div>' +
+      '<div class="card-body"><div lang="' + data.code + '" style="hyphens:auto;-webkit-hyphens:auto;word-break:' + wbv + ';max-width:' + width + 'px;border:1px dashed var(--border);padding:12px;border-radius:6px;line-height:1.8">' + data.text + '</div></div>';
+    wbGrid.appendChild(card);
+  });
+
+  // Code output
+  const code = '.hyphenated {\n' +
+    '  hyphens: auto;\n' +
+    '  -webkit-hyphens: auto;\n' +
+    '  word-break: ' + wb + ';\n' +
+    '  overflow-wrap: break-word;\n' +
+    '}\n\n' +
+    '/* Set language in HTML */\n' +
+    '/* <html lang="' + data.code + '"> */';
+  codeOutput.textContent = code;
+}
+
+function copyCode() {
+  const btn = document.getElementById('copyBtn');
+  navigator.clipboard.writeText(codeOutput.textContent).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+langSelect.addEventListener('change', update);
+wbSelect.addEventListener('change', update);
+widthRange.addEventListener('input', update);
+update();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

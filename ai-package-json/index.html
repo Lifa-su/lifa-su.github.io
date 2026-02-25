@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate package.json files with AI assistance. Configure project name, dependencies, scripts, and metadata. Create properly structured Node.js project files.">
+<link rel="canonical" href="https://lifa-su.com/ai-package-json/">
+<title>AI Package.json Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--code-bg:#0d1117;--border:#2a2a4a;--success:#00c853;--radius:12px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px;background:linear-gradient(135deg,var(--surface) 0%,var(--accent2) 100%);border-bottom:2px solid var(--accent)}
+header h1{font-size:2.2rem;background:linear-gradient(90deg,#e94560,#533483,#e94560);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s linear infinite}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+header p{color:var(--text2);margin-top:8px;font-size:1.05rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}header h1{font-size:1.6rem}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:box-shadow .2s}
+.card:hover{box-shadow:0 4px 24px rgba(233,69,96,.1)}
+.card h2{font-size:1.15rem;margin-bottom:16px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.card h2 span{font-size:1.3rem}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px;margin-top:14px}
+label:first-of-type{margin-top:0}
+input[type="text"],input[type="number"],select{width:100%;padding:10px 14px;background:var(--code-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+.dep-category{margin-bottom:18px}
+.dep-category h3{font-size:.9rem;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.dep-grid{display:flex;flex-wrap:wrap;gap:8px}
+.dep-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--code-bg);color:var(--text2);cursor:pointer;font-size:.85rem;transition:all .2s;user-select:none}
+.dep-chip:hover{border-color:var(--accent);color:var(--text)}
+.dep-chip.selected{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.dep-chip .ver{font-size:.75rem;opacity:.7;margin-left:4px}
+.version-row{display:flex;gap:8px;align-items:center}
+.version-row select{width:auto;min-width:80px}
+.version-row input{flex:1}
+.preview-wrap{position:relative}
+.preview-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63851;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-success{background:var(--success);color:#fff}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;overflow-x:auto;font-family:'Fira Code','Cascadia Code','JetBrains Mono',monospace;font-size:.88rem;line-height:1.7;color:#c9d1d9;max-height:70vh;overflow-y:auto;tab-size:2}
+pre::-webkit-scrollbar{width:8px;height:8px}
+pre::-webkit-scrollbar-track{background:var(--code-bg)}
+pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.toast{position:fixed;bottom:30px;right:30px;padding:14px 24px;background:var(--success);color:#fff;border-radius:var(--radius);font-weight:600;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 4px 20px rgba(0,200,83,.3)}
+.toast.show{transform:translateY(0);opacity:1}
+.scripts-list{margin-top:10px}
+.script-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:.88rem;color:var(--text2)}
+.script-item code{background:var(--code-bg);padding:2px 8px;border-radius:4px;color:var(--accent);font-size:.82rem}
+.search-input{margin-bottom:12px}
+footer{text-align:center;padding:30px;color:var(--text2);font-size:.82rem;margin-top:40px;border-top:1px solid var(--border)}
+.json-key{color:#7ee787}.json-string{color:#a5d6ff}.json-number{color:#79c0ff}.json-bracket{color:#c9d1d9}.json-bool{color:#ff7b72}
+.stats{display:flex;gap:16px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.stat{background:var(--surface);padding:8px 16px;border-radius:20px;font-size:.82rem;color:var(--text2);border:1px solid var(--border)}
+.stat strong{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+<h1>📦 AI Package.json Generator</h1>
+<p>Generate perfect package.json files in seconds — select dependencies, auto-generate scripts, and export.</p>
+<div class="stats">
+<div class="stat"><strong>16+</strong> Popular Packages</div>
+<div class="stat"><strong>Smart</strong> Script Generation</div>
+<div class="stat"><strong>1-Click</strong> Export</div>
+</div>
+</header>
+<div class="container">
+<div class="grid">
+<div>
+<div class="card">
+<h2><span>📋</span> Project Info</h2>
+<label for="projName">Project Name</label>
+<input type="text" id="projName" placeholder="my-awesome-app" value="my-awesome-app">
+<label for="projDesc">Description</label>
+<input type="text" id="projDesc" placeholder="A modern web application">
+<label for="projAuthor">Author</label>
+<input type="text" id="projAuthor" placeholder="Your Name <you@example.com>">
+<label for="projLicense">License</label>
+<select id="projLicense">
+<option value="MIT">MIT</option>
+<option value="ISC">ISC</option>
+<option value="Apache-2.0">Apache-2.0</option>
+<option value="GPL-3.0">GPL-3.0</option>
+<option value="BSD-3-Clause">BSD-3-Clause</option>
+<option value="UNLICENSED">UNLICENSED</option>
+</select>
+<label>Version</label>
+<div class="version-row">
+<input type="number" id="verMajor" value="1" min="0" style="width:60px">
+<span style="color:var(--text2)">.</span>
+<input type="number" id="verMinor" value="0" min="0" style="width:60px">
+<span style="color:var(--text2)">.</span>
+<input type="number" id="verPatch" value="0" min="0" style="width:60px">
+<span style="color:var(--text2);font-size:.8rem;margin-left:4px">or</span>
+<input type="text" id="verCustom" placeholder="custom e.g. 2.0.0-beta.1" style="flex:1">
+</div>
+<label for="projKeywords">Keywords (comma separated)</label>
+<input type="text" id="projKeywords" placeholder="web, app, modern">
+<label for="projRepo">Repository URL</label>
+<input type="text" id="projRepo" placeholder="https://github.com/user/repo">
+</div>
+<div class="card" style="margin-top:24px">
+<h2><span>📦</span> Dependencies</h2>
+<input type="text" id="depSearch" class="search-input" placeholder="🔍 Search packages...">
+<div id="depContainer"></div>
+</div>
+</div>
+<div>
+<div class="card">
+<h2><span>⚡</span> Auto-Generated Scripts</h2>
+<p style="font-size:.85rem;color:var(--text2);margin-bottom:12px">Scripts are intelligently generated based on your selected dependencies.</p>
+<div id="scriptsPreview" class="scripts-list"></div>
+</div>
+<div class="card preview-wrap" style="margin-top:24px">
+<div class="preview-header">
+<h2 style="margin-bottom:0"><span>👁️</span> Live Preview</h2>
+<div class="btn-group">
+<button class="btn btn-primary" onclick="copyJSON()">📋 Copy</button>
+<button class="btn btn-secondary" onclick="downloadJSON()">⬇️ Download</button>
+</div>
+</div>
+<pre id="jsonPreview"></pre>
+</div>
+</div>
+</div>
+</div>
+<footer>
+<p>AI Package.json Generator — Built with ❤️ for developers</p>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+const DEPS = {
+  "Frontend Frameworks": [
+    {name:"react",ver:"^18.3.1",dev:false,peers:["react-dom"]},
+    {name:"react-dom",ver:"^18.3.1",dev:false},
+    {name:"vue",ver:"^3.5.13",dev:false},
+    {name:"next",ver:"^15.1.0",dev:false,peers:["react","react-dom"]},
+    {name:"svelte",ver:"^5.0.0",dev:false}
+  ],
+  "Backend": [
+    {name:"express",ver:"^4.21.1",dev:false},
+    {name:"fastify",ver:"^5.2.0",dev:false},
+    {name:"koa",ver:"^2.15.3",dev:false}
+  ],
+  "Database & ORM": [
+    {name:"mongoose",ver:"^8.9.5",dev:false},
+    {name:"prisma",ver:"^6.2.0",dev:true},
+    {name:"@prisma/client",ver:"^6.2.0",dev:false}
+  ],
+  "Build Tools": [
+    {name:"typescript",ver:"^5.7.3",dev:true},
+    {name:"webpack",ver:"^5.97.1",dev:true},
+    {name:"webpack-cli",ver:"^6.0.1",dev:true},
+    {name:"vite",ver:"^6.0.7",dev:true},
+    {name:"babel",display:"@babel/core",ver:"^7.26.0",dev:true},
+    {name:"esbuild",ver:"^0.24.2",dev:true}
+  ],
+  "Testing": [
+    {name:"jest",ver:"^29.7.0",dev:true},
+    {name:"mocha",ver:"^11.1.0",dev:true},
+    {name:"vitest",ver:"^3.0.4",dev:true}
+  ],
+  "Utilities": [
+    {name:"lodash",ver:"^4.17.21",dev:false},
+    {name:"axios",ver:"^1.7.9",dev:false},
+    {name:"dayjs",ver:"^1.11.13",dev:false},
+    {name:"dotenv",ver:"^16.4.7",dev:false}
+  ],
+  "CSS & Styling": [
+    {name:"tailwindcss",ver:"^3.4.17",dev:true},
+    {name:"sass",ver:"^1.83.4",dev:true},
+    {name:"postcss",ver:"^8.4.49",dev:true}
+  ],
+  "Code Quality": [
+    {name:"eslint",ver:"^9.18.0",dev:true},
+    {name:"prettier",ver:"^3.4.2",dev:true},
+    {name:"husky",ver:"^9.1.7",dev:true},
+    {name:"lint-staged",ver:"^15.4.3",dev:true}
+  ]
+};
+
+let selected = new Set();
+
+function renderDeps(filter = '') {
+  const container = document.getElementById('depContainer');
+  container.innerHTML = '';
+  const fl = filter.toLowerCase();
+  for (const [cat, pkgs] of Object.entries(DEPS)) {
+    const filtered = pkgs.filter(p => {
+      const n = p.display || p.name;
+      return n.toLowerCase().includes(fl) || cat.toLowerCase().includes(fl);
+    });
+    if (!filtered.length) continue;
+    const div = document.createElement('div');
+    div.className = 'dep-category';
+    div.innerHTML = `<h3>${cat}</h3><div class="dep-grid">${filtered.map(p => {
+      const n = p.display || p.name;
+      const sel = selected.has(p.name) ? ' selected' : '';
+      return `<div class="dep-chip${sel}" data-name="${p.name}" onclick="toggleDep('${p.name}')">${n}<span class="ver">${p.ver}</span></div>`;
+    }).join('')}</div>`;
+    container.appendChild(div);
+  }
+}
+
+function toggleDep(name) {
+  if (selected.has(name)) {
+    selected.delete(name);
+    // remove peers
+  } else {
+    selected.add(name);
+    // auto-add peers
+    for (const pkgs of Object.values(DEPS)) {
+      const pkg = pkgs.find(p => p.name === name);
+      if (pkg && pkg.peers) {
+        pkg.peers.forEach(peer => selected.add(peer));
+      }
+    }
+  }
+  renderDeps(document.getElementById('depSearch').value);
+  updatePreview();
+}
+
+function findPkg(name) {
+  for (const pkgs of Object.values(DEPS)) {
+    const p = pkgs.find(x => x.name === name);
+    if (p) return p;
+  }
+  return null;
+}
+
+function generateScripts() {
+  const s = {};
+  const has = n => selected.has(n);
+
+  // Dev server
+  if (has('next')) s.dev = 'next dev';
+  else if (has('vite')) s.dev = 'vite';
+  else if (has('webpack')) s.dev = 'webpack serve --mode development';
+  else if (has('express') || has('fastify') || has('koa')) {
+    s.dev = has('typescript') ? 'ts-node src/index.ts' : 'node src/index.js';
+    if (has('typescript')) s.dev = 'npx ts-node src/index.ts';
+  }
+
+  // Build
+  if (has('next')) s.build = 'next build';
+  else if (has('vite')) s.build = 'vite build';
+  else if (has('webpack')) s.build = 'webpack --mode production';
+  else if (has('esbuild')) s.build = 'esbuild src/index.ts --bundle --outdir=dist';
+  else if (has('typescript')) s.build = 'tsc';
+
+  // Start
+  if (has('next')) s.start = 'next start';
+  else if (has('express') || has('fastify') || has('koa')) {
+    s.start = has('typescript') ? 'node dist/index.js' : 'node src/index.js';
+  }
+
+  // Test
+  if (has('vitest')) s.test = 'vitest run';
+  else if (has('jest')) s.test = 'jest';
+  else if (has('mocha')) s.test = 'mocha';
+
+  // Lint & Format
+  if (has('eslint')) s.lint = 'eslint .';
+  if (has('prettier')) s.format = 'prettier --write .';
+  if (has('eslint') && has('prettier')) s['lint:fix'] = 'eslint . --fix';
+
+  // Type check
+  if (has('typescript')) s.typecheck = 'tsc --noEmit';
+
+  // Prisma
+  if (has('prisma')) {
+    s['db:generate'] = 'prisma generate';
+    s['db:push'] = 'prisma db push';
+    s['db:migrate'] = 'prisma migrate dev';
+  }
+
+  // Tailwind
+  if (has('tailwindcss') && !has('vite') && !has('next')) {
+    s['build:css'] = 'tailwindcss -i ./src/input.css -o ./dist/output.css';
+  }
+
+  // Husky
+  if (has('husky')) s.prepare = 'husky';
+
+  return s;
+}
+
+function getVersion() {
+  const custom = document.getElementById('verCustom').value.trim();
+  if (custom) return custom;
+  const M = document.getElementById('verMajor').value || '1';
+  const m = document.getElementById('verMinor').value || '0';
+  const p = document.getElementById('verPatch').value || '0';
+  return `${M}.${m}.${p}`;
+}
+
+function buildJSON() {
+  const name = document.getElementById('projName').value.trim() || 'my-app';
+  const desc = document.getElementById('projDesc').value.trim();
+  const author = document.getElementById('projAuthor').value.trim();
+  const license = document.getElementById('projLicense').value;
+  const keywords = document.getElementById('projKeywords').value.trim();
+  const repo = document.getElementById('projRepo').value.trim();
+  const version = getVersion();
+  const scripts = generateScripts();
+
+  const deps = {};
+  const devDeps = {};
+  const sorted = [...selected].sort();
+  for (const name of sorted) {
+    const pkg = findPkg(name);
+    if (!pkg) continue;
+    const key = pkg.display || pkg.name;
+    if (pkg.dev) devDeps[key] = pkg.ver;
+    else deps[key] = pkg.ver;
+  }
+
+  const obj = { name, version };
+  if (desc) obj.description = desc;
+  obj.main = selected.has('typescript') ? 'dist/index.js' : 'src/index.js';
+  if (Object.keys(scripts).length) obj.scripts = scripts;
+  if (keywords) obj.keywords = keywords.split(',').map(k => k.trim()).filter(Boolean);
+  if (author) obj.author = author;
+  obj.license = license;
+  if (repo) obj.repository = { type: 'git', url: repo };
+  if (Object.keys(deps).length) obj.dependencies = deps;
+  if (Object.keys(devDeps).length) obj.devDependencies = devDeps;
+
+  return obj;
+}
+
+function syntaxHighlight(json) {
+  return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*")/g, ': <span class="json-string">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+    .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
+    .replace(/[{}\[\]]/g, '<span class="json-bracket">$&</span>');
+}
+
+function updatePreview() {
+  const obj = buildJSON();
+  const json = JSON.stringify(obj, null, 2);
+  document.getElementById('jsonPreview').innerHTML = syntaxHighlight(json);
+
+  // Update scripts preview
+  const scripts = generateScripts();
+  const sp = document.getElementById('scriptsPreview');
+  if (!Object.keys(scripts).length) {
+    sp.innerHTML = '<p style="color:var(--text2);font-size:.85rem;font-style:italic">Select dependencies to auto-generate scripts...</p>';
+  } else {
+    sp.innerHTML = Object.entries(scripts).map(([k, v]) =>
+      `<div class="script-item"><code>npm run ${k}</code><span>→ ${v}</span></div>`
+    ).join('');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function copyJSON() {
+  const obj = buildJSON();
+  const json = JSON.stringify(obj, null, 2);
+  navigator.clipboard.writeText(json).then(() => showToast('✅ Copied to clipboard!')).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = json;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ Copied to clipboard!');
+  });
+}
+
+function downloadJSON() {
+  const obj = buildJSON();
+  const json = JSON.stringify(obj, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'package.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('⬇️ Downloaded package.json!');
+}
+
+// Init
+document.getElementById('depSearch').addEventListener('input', e => renderDeps(e.target.value));
+document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', updatePreview));
+renderDeps();
+updatePreview();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

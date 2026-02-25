@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Will-Change Optimizer | AI性能优化工具</title>
+<meta name="description" content="智能CSS will-change属性优化工具，帮助开发者正确使用will-change提升动画性能。">
+<link rel="canonical" href="https://lifa-su.com/ai-css-will-change/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--text:#e0e0e0;--text2:#a0a0b0;--card:#1e2a4a;--border:#2a3a5a;--success:#00c853;--warn:#ffd600;--danger:#ff5252;--info:#448aff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:40px 0 30px;text-align:center;border-bottom:2px solid var(--accent)}
+header h1{font-size:2rem;margin-bottom:8px;background:linear-gradient(90deg,var(--accent),#ff6b8a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:1rem}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:30px 0}
+@media(max-width:768px){.main{grid-template-columns:1fr}header h1{font-size:1.5rem}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.panel h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent)}
+.prop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.prop-grid{grid-template-columns:1fr}}
+.prop-item{background:var(--bg2);border:2px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .2s}
+.prop-item:hover{border-color:var(--accent);transform:translateY(-1px)}
+.prop-item.selected{border-color:var(--accent);background:rgba(233,69,96,.1)}
+.prop-item .name{font-weight:600;font-size:.95rem;margin-bottom:4px}
+.prop-item .impact{font-size:.75rem;display:inline-block;padding:2px 8px;border-radius:10px;margin-top:4px}
+.impact-high{background:rgba(255,82,82,.2);color:var(--danger)}
+.impact-medium{background:rgba(255,214,0,.2);color:var(--warn)}
+.impact-low{background:rgba(0,200,83,.2);color:var(--success)}
+.prop-item .desc{font-size:.8rem;color:var(--text2);margin-top:6px}
+.code-wrap{position:relative;margin-top:12px}
+.code-box{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;white-space:pre-wrap;word-break:break-all;color:#79c0ff;min-height:60px}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;transition:all .2s}
+.copy-btn:hover{background:#ff6b8a}
+.copy-btn.copied{background:var(--success)}
+.score-bar{margin-top:16px}
+.score-label{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px}
+.score-track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;transition:width .4s,background .4s}
+.tips{margin-top:20px}
+.tip-card{background:var(--bg2);border-left:3px solid var(--info);border-radius:0 8px 8px 0;padding:14px;margin-bottom:10px;font-size:.85rem}
+.tip-card.warn{border-left-color:var(--warn)}
+.tip-card.danger{border-left-color:var(--danger)}
+.scenario-section{grid-column:1/-1}
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:12px}
+.scenario-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.scenario-card:hover{border-color:var(--accent)}
+.scenario-card h3{font-size:.95rem;margin-bottom:8px;color:#ff6b8a}
+.scenario-card p{font-size:.83rem;color:var(--text2);margin-bottom:8px}
+.scenario-card code{background:#0d1117;padding:8px 12px;border-radius:6px;display:block;font-size:.8rem;color:#79c0ff;white-space:pre}
+footer{text-align:center;padding:30px 0;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
+.clear-btn{background:transparent;color:var(--text2);border:1px solid var(--border);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;margin-top:12px;transition:all .2s}
+.clear-btn:hover{border-color:var(--accent);color:var(--text)}
+.detail-box{margin-top:16px;padding:14px;background:var(--bg2);border-radius:8px;font-size:.85rem;display:none}
+.detail-box.show{display:block}
+.detail-box h3{color:var(--warn);margin-bottom:8px;font-size:.9rem}
+.detail-box ul{padding-left:18px;color:var(--text2)}
+.detail-box li{margin-bottom:4px}
+</style>
+</head>
+<body>
+<header><div class="container">
+<h1>⚡ CSS Will-Change Optimizer</h1>
+<p>智能分析 will-change 属性的性能影响，生成最优CSS代码</p>
+</div></header>
+<div class="container"><div class="main">
+<div class="panel">
+<h2>🎯 选择 Will-Change 属性</h2>
+<div class="prop-grid" id="propGrid"></div>
+<button class="clear-btn" onclick="clearAll()">清除所有选择</button>
+<div class="detail-box" id="detailBox">
+<h3 id="detailTitle"></h3>
+<p id="detailDesc" style="color:var(--text2);margin-bottom:8px"></p>
+<ul id="detailList"></ul>
+</div>
+</div>
+<div class="panel">
+<h2>📋 生成的CSS代码</h2>
+<div class="code-wrap">
+<div class="code-box" id="codeOutput">/* 请从左侧选择属性 */
+.element {
+  /* will-change: ... */
+}</div>
+<button class="copy-btn" id="copyBtn" onclick="copyCode()">复制代码</button>
+</div>
+<div class="score-bar">
+<div class="score-label"><span>性能影响评分</span><span id="scoreVal">0 / 100</span></div>
+<div class="score-track"><div class="score-fill" id="scoreFill" style="width:0;background:var(--success)"></div></div>
+</div>
+<div class="tips" id="tips"></div>
+</div>
+<div class="panel scenario-section">
+<h2>💡 使用场景示例</h2>
+<div class="scenario-grid" id="scenarios"></div>
+</div>
+</div></div>
+<footer><div class="container">
+<p>CSS Will-Change Optimizer &copy; 2026 | 帮助开发者写出高性能CSS</p>
+</div></footer>
+<script>
+var PROPS=[
+{id:'transform',name:'transform',impact:'high',score:25,desc:'触发GPU加速，创建独立合成层',details:['创建独立的GPU合成层','占用额外显存(VRAM)','适合频繁的位移/旋转/缩放动画','是最常用的will-change值'],tags:['GPU层','显存占用']},
+{id:'opacity',name:'opacity',impact:'medium',score:15,desc:'透明度变化，GPU可高效处理',details:['GPU可直接处理透明度合成','内存开销相对较小','适合淡入淡出动画','与transform组合是最佳实践'],tags:['GPU层']},
+{id:'scroll-position',name:'scroll-position',impact:'medium',score:20,desc:'优化滚动性能，预分配滚动缓冲区',details:['预分配滚动区域的渲染缓冲','提升滚动流畅度','增加内存占用','适合自定义滚动容器'],tags:['内存','缓冲区']},
+{id:'contents',name:'contents',impact:'high',score:30,desc:'提示元素内容会变化，影响范围大',details:['暗示元素子树会频繁变化','浏览器可能跳过部分缓存优化','影响范围大，谨慎使用','大多数场景不需要此值'],tags:['内存','重排']},
+{id:'left',name:'left',impact:'high',score:20,desc:'触发布局重排(reflow)，开销较大',details:['改变left会触发布局重排','浏览器会尝试优化但效果有限','建议用transform:translateX替代','仅在必须用left定位时使用'],tags:['重排','CPU']},
+{id:'top',name:'top',impact:'high',score:20,desc:'触发布局重排(reflow)，开销较大',details:['改变top会触发布局重排','与left类似，开销较大','建议用transform:translateY替代','仅在必须用top定位时使用'],tags:['重排','CPU']},
+{id:'right',name:'right',impact:'high',score:20,desc:'触发布局重排(reflow)，开销较大',details:['改变right触发布局计算','建议用transform替代','性能影响与left/top相同','避免在高频动画中使用'],tags:['重排','CPU']},
+{id:'bottom',name:'bottom',impact:'high',score:20,desc:'触发布局重排(reflow)，开销较大',details:['改变bottom触发布局计算','建议用transform替代','性能影响与left/top相同','避免在高频动画中使用'],tags:['重排','CPU']},
+{id:'width',name:'width',impact:'high',score:25,desc:'尺寸变化触发重排+重绘，开销大',details:['触发布局重排和重绘','影响周围元素的布局','内存和CPU开销都较大','考虑用transform:scaleX替代'],tags:['重排','重绘','CPU']},
+{id:'height',name:'height',impact:'high',score:25,desc:'尺寸变化触发重排+重绘，开销大',details:['触发布局重排和重绘','影响周围元素的布局','内存和CPU开销都较大','考虑用transform:scaleY替代'],tags:['重排','重绘','CPU']}
+];
+var SCENARIOS=[
+{title:'悬停动画',desc:'鼠标悬停时的缩放/阴影效果',code:'.card {\n  transition: transform 0.3s;\n}\n.card:hover {\n  will-change: transform;\n  transform: scale(1.05);\n}',props:['transform']},
+{title:'淡入淡出',desc:'元素的显示/隐藏过渡动画',code:'.modal {\n  will-change: opacity;\n  transition: opacity 0.3s;\n}\n.modal.hidden {\n  opacity: 0;\n}',props:['opacity']},
+{title:'滑动菜单',desc:'侧边栏滑入滑出效果',code:'.sidebar {\n  will-change: transform;\n  transform: translateX(-100%);\n  transition: transform 0.3s;\n}\n.sidebar.open {\n  transform: translateX(0);\n}',props:['transform']},
+{title:'视差滚动',desc:'滚动时的视差背景效果',code:'.parallax-container {\n  will-change: scroll-position;\n  overflow-y: scroll;\n  perspective: 1px;\n}',props:['scroll-position']},
+{title:'加载动画',desc:'旋转/脉冲等持续动画',code:'.spinner {\n  will-change: transform, opacity;\n  animation: spin 1s linear\n    infinite;\n}\n@keyframes spin {\n  to { transform: rotate(360deg); }\n}',props:['transform','opacity']},
+{title:'列表过渡',desc:'列表项的添加/删除动画',code:'.list-item {\n  will-change: transform, opacity;\n  transition: all 0.3s;\n}\n.list-item.removing {\n  transform: translateX(100%);\n  opacity: 0;\n}',props:['transform','opacity']}
+];
+var selected=new Set();
+function init(){
+var grid=document.getElementById('propGrid');
+PROPS.forEach(function(p){
+var el=document.createElement('div');
+el.className='prop-item';
+el.setAttribute('data-id',p.id);
+el.setAttribute('role','button');
+el.setAttribute('tabindex','0');
+el.setAttribute('aria-pressed','false');
+el.setAttribute('aria-label',p.name+' - '+p.desc);
+var tagHTML='';
+if(p.tags)p.tags.forEach(function(t){
+var cls=t==='GPU层'?'badge-gpu':t==='内存'||t==='显存占用'||t==='缓冲区'?'badge-mem':'badge-layer';
+tagHTML+='<span class="badge '+cls+'">'+t+'</span>';
+});
+el.innerHTML='<div class="name">'+p.name+tagHTML+'</div><span class="impact impact-'+p.impact+'">'+(p.impact==='high'?'⚠️ 高影响':p.impact==='medium'?'⚡ 中影响':'✅ 低影响')+'</span><div class="desc">'+p.desc+'</div>';
+el.onclick=function(){toggleProp(p.id)};
+el.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleProp(p.id)}};
+grid.appendChild(el);
+});
+var sg=document.getElementById('scenarios');
+SCENARIOS.forEach(function(s){
+var el=document.createElement('div');
+el.className='scenario-card';
+el.innerHTML='<h3>'+s.title+'</h3><p>'+s.desc+'</p><code>'+s.code+'</code>';
+sg.appendChild(el);
+});
+update();
+}
+function toggleProp(id){
+if(selected.has(id))selected.delete(id);else selected.add(id);
+showDetail(id);
+update();
+}
+function clearAll(){selected.clear();update();document.getElementById('detailBox').classList.remove('show')}
+function showDetail(id){
+var p=PROPS.find(function(x){return x.id===id});
+if(!p)return;
+var box=document.getElementById('detailBox');
+document.getElementById('detailTitle').textContent=p.name+' 详细说明';
+document.getElementById('detailDesc').textContent=p.desc;
+var ul=document.getElementById('detailList');
+ul.innerHTML='';
+p.details.forEach(function(d){var li=document.createElement('li');li.textContent=d;ul.appendChild(li)});
+box.classList.add('show');
+}
+function update(){
+var items=document.querySelectorAll('.prop-item');
+items.forEach(function(el){
+var id=el.getAttribute('data-id');
+var isSel=selected.has(id);
+el.classList.toggle('selected',isSel);
+el.setAttribute('aria-pressed',isSel?'true':'false');
+});
+var code=document.getElementById('codeOutput');
+var scoreEl=document.getElementById('scoreVal');
+var fill=document.getElementById('scoreFill');
+var tips=document.getElementById('tips');
+if(selected.size===0){
+code.textContent='/* 请从左侧选择属性 */\n.element {\n  /* will-change: ... */\n}';
+scoreEl.textContent='0 / 100';
+fill.style.width='0';
+fill.style.background='var(--success)';
+tips.innerHTML='<div class="tip-card">💡 点击左侧属性卡片开始选择，支持多选组合。</div>';
+return;
+}
+var vals=[];var totalScore=0;
+selected.forEach(function(id){
+var p=PROPS.find(function(x){return x.id===id});
+if(p){vals.push(p.name);totalScore+=p.score}
+});
+if(totalScore>100)totalScore=100;
+var cssText='.element {\n  will-change: '+vals.join(', ')+';\n}';
+var jsHint='\n\n/* 最佳实践：动态添加和移除 */\nel.addEventListener(\'mouseenter\', () => {\n  el.style.willChange = \''+vals.join(', ')+'\';\n});\nel.addEventListener(\'animationend\', () => {\n  el.style.willChange = \'auto\';\n});';
+code.textContent=cssText+jsHint;
+scoreEl.textContent=totalScore+' / 100';
+fill.style.width=totalScore+'%';
+fill.style.background=totalScore>60?'var(--danger)':totalScore>30?'var(--warn)':'var(--success)';
+var tipsHTML='';
+if(totalScore>60)tipsHTML+='<div class="tip-card danger">⚠️ <strong>性能风险较高</strong> — 选择了过多属性，可能导致大量GPU内存占用。建议只保留动画必需的属性。</div>';
+if(totalScore>30&&totalScore<=60)tipsHTML+='<div class="tip-card warn">⚡ <strong>注意内存开销</strong> — 当前组合会创建额外的合成层，确保这些属性确实需要动画。</div>';
+if(selected.has('left')||selected.has('top')||selected.has('right')||selected.has('bottom'))tipsHTML+='<div class="tip-card warn">💡 <strong>建议使用transform替代</strong> — left/top/right/bottom会触发重排，transform:translate()性能更好。</div>';
+if(selected.has('width')||selected.has('height'))tipsHTML+='<div class="tip-card warn">💡 <strong>建议使用transform:scale替代</strong> — width/height变化触发重排+重绘，scale()仅触发合成。</div>';
+if(selected.has('contents'))tipsHTML+='<div class="tip-card danger">⚠️ <strong>contents影响范围大</strong> — 大多数浏览器对此值的优化有限，请确认是否真的需要。</div>';
+if(selected.size>=3)tipsHTML+='<div class="tip-card warn">📌 <strong>属性过多</strong> — 每个will-change属性都会消耗资源，建议控制在1-2个。</div>';
+tipsHTML+='<div class="tip-card">✅ <strong>记得移除</strong> — 动画结束后将will-change设为auto，释放浏览器预留的资源。</div>';
+tips.innerHTML=tipsHTML;
+}
+function copyCode(){
+var text=document.getElementById('codeOutput').textContent;
+navigator.clipboard.writeText(text).then(function(){
+var btn=document.getElementById('copyBtn');
+btn.textContent='已复制!';btn.classList.add('copied');
+setTimeout(function(){btn.textContent='复制代码';btn.classList.remove('copied')},2000);
+});
+}
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert HTML to JSX instantly. Transform class to className, style strings to objects, and self-close tags automatically. Perfect for React developers.">
+<link rel="canonical" href="https://lifa-su.com/ai-html-to-jsx/">
+<title>AI HTML to JSX Converter</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,#16213e 0%,#0f3460 100%);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #0f3460}
+header h1{font-size:22px;font-weight:700;background:linear-gradient(90deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{font-size:13px;color:#8892b0}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#0f3460;border:1px solid #1a4a8a;border-radius:20px;padding:6px 14px;font-size:12px;color:#64ffda}
+.badge::before{content:'';width:8px;height:8px;background:#64ffda;border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+main{flex:1;display:flex;gap:0;padding:0;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;min-width:0}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#16213e;border-bottom:1px solid #0f3460}
+.panel-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#8892b0}
+.divider{width:1px;background:#0f3460;position:relative}
+textarea,.output-area{flex:1;background:#0d1117;border:none;padding:20px;font-family:'Fira Code','Cascadia Code',monospace;font-size:14px;line-height:1.7;color:#e0e0e0;resize:none;outline:none;overflow:auto;tab-size:2}
+textarea::placeholder{color:#4a5568}
+.output-area{white-space:pre-wrap;word-wrap:break-word}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;border:1px solid #1a4a8a;background:#0f3460;color:#e0e0e0;font-size:12px;cursor:pointer;transition:all .2s}
+.btn:hover{background:#1a4a8a;border-color:#533483}
+.btn-copy{background:linear-gradient(135deg,#e94560,#533483);border:none;color:#fff}
+.btn-copy:hover{opacity:.85}
+.btn-clear{border-color:#4a5568;color:#8892b0}
+.copied{background:#64ffda!important;color:#0d1117!important}
+footer{padding:10px 32px;background:#16213e;border-top:1px solid #0f3460;text-align:center;font-size:11px;color:#4a5568}
+.t{color:#e94560}.a{color:#64ffda}.s{color:#ffd700}.b{color:#c792ea}.x{color:#e0e0e0}.c{color:#546e7a;font-style:italic}
+@media(max-width:768px){main{flex-direction:column}.divider{width:100%;height:1px}}
+</style>
+</head>
+<body>
+<header>
+<div><h1>&#9883; HTML to JSX Converter</h1><p>Paste HTML, get clean JSX instantly</p></div>
+<div class="badge">Real-time</div>
+</header>
+<main>
+<div class="panel">
+<div class="panel-header">
+<span class="panel-title">HTML Input</span>
+<div style="display:flex;gap:8px">
+<button class="btn btn-clear" onclick="clearInput()">Clear</button>
+<button class="btn" onclick="loadExample()">Example</button>
+</div>
+</div>
+<textarea id="hi" placeholder="Paste your HTML here..." spellcheck="false"></textarea>
+</div>
+<div class="divider"></div>
+<div class="panel">
+<div class="panel-header">
+<span class="panel-title">JSX Output</span>
+<button class="btn btn-copy" id="cb" onclick="copyJsx()">Copy JSX</button>
+</div>
+<div class="output-area" id="jo"><span style="color:#4a5568">JSX output will appear here...</span></div>
+</div>
+</main>
+<footer>AI HTML to JSX Converter</footer>
+<script>
+var AM={'class':'className','for':'htmlFor','tabindex':'tabIndex','readonly':'readOnly',
+'maxlength':'maxLength','minlength':'minLength','cellpadding':'cellPadding',
+'cellspacing':'cellSpacing','rowspan':'rowSpan','colspan':'colSpan',
+'enctype':'encType','contenteditable':'contentEditable','crossorigin':'crossOrigin',
+'accesskey':'accessKey','autocomplete':'autoComplete','autofocus':'autoFocus',
+'autoplay':'autoPlay','formaction':'formAction','frameborder':'frameBorder',
+'hreflang':'hrefLang','inputmode':'inputMode','novalidate':'noValidate',
+'srcdoc':'srcDoc','srclang':'srcLang','srcset':'srcSet','charset':'charSet',
+'datetime':'dateTime','allowfullscreen':'allowFullScreen','httpequiv':'httpEquiv',
+'marginheight':'marginHeight','marginwidth':'marginWidth','usemap':'useMap'};
+var EV={};
+'click,change,submit,focus,blur,keydown,keyup,keypress,mousedown,mouseup,mouseover,mouseout,mousemove,mouseenter,mouseleave,touchstart,touchend,touchmove,scroll,wheel,drag,dragstart,dragend,dragover,dragenter,dragleave,drop,input,invalid,reset,select,contextmenu,dblclick,load,error,copy,cut,paste,pointerdown,pointerup,pointermove'.split(',').forEach(function(e){EV['on'+e]='on'+e[0].toUpperCase()+e.slice(1)});
+var SC='area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr'.split(',');
+
+function cssToJsx(s){
+if(!s||!s.trim())return null;
+var r=[];
+s.split(';').forEach(function(p){
+p=p.trim();if(!p)return;
+var i=p.indexOf(':');if(i<0)return;
+var k=p.slice(0,i).trim(),v=p.slice(i+1).trim();
+k=k.replace(/-([a-z])/g,function(_,c){return c.toUpperCase()});
+if(k.startsWith('-webkit'))k='Webkit'+k.slice(7);
+if(k.startsWith('-moz'))k='Moz'+k.slice(4);
+if(k.startsWith('-ms'))k='ms'+k.slice(3);
+var n=parseFloat(v);
+if(!isNaN(n)&&n+''===v.replace(/px$/,'')&&!/(opacity|flex|order|zIndex|zoom|fontWeight|lineHeight|orphans|widows|columns)/.test(k))
+v=v.replace(/px$/,'')===v?("'"+v+"'"):(isNaN(parseFloat(v))?("'"+v+"'"):parseFloat(v));
+else v="'"+v.replace(/'/g,"\\'")+"'";
+r.push(k+': '+v);
+});
+return r.length?'{{ '+r.join(', ')+' }}':null;
+}
+
+function mapAttr(name){
+var lo=name.toLowerCase();
+if(AM[lo])return AM[lo];
+if(EV[lo])return EV[lo];
+if(lo.startsWith('data-')||lo.startsWith('aria-'))return lo;
+return name;
+}
+
+function convertHtml(html){
+if(!html||!html.trim())return '';
+var result=html;
+// Comments: keep as {/* ... */}
+result=result.replace(/<!--([\s\S]*?)-->/g,'{/*$1*/}');
+// Style attributes
+result=result.replace(/style\s*=\s*"([^"]*)"/gi,function(_,v){
+var j=cssToJsx(v);return j?'style='+j:'style={{}}';
+});
+result=result.replace(/style\s*=\s*'([^']*)'/gi,function(_,v){
+var j=cssToJsx(v);return j?'style='+j:'style={{}}';
+});
+// class → className, for → htmlFor, etc
+result=result.replace(/<([a-zA-Z][a-zA-Z0-9]*)((?:\s+[^>]*?)?)(\s*\/?>)/g,function(m,tag,attrs,close){
+if(!attrs)return m;
+var newAttrs=attrs.replace(/\b([a-zA-Z][a-zA-Z0-9-]*)\s*=/g,function(am,an){
+if(an==='style')return am;
+return mapAttr(an)+'=';
+});
+// Boolean attributes without value
+newAttrs=newAttrs.replace(/\s([a-zA-Z][a-zA-Z0-9-]*)(?=\s|\/?>)(?!\s*=)/g,function(bm,bn){
+var mapped=mapAttr(bn);
+return ' '+mapped+'={true}';
+});
+return '<'+tag+newAttrs+close;
+});
+// Self-closing tags
+SC.forEach(function(tag){
+var re=new RegExp('<('+tag+')(\\b[^>]*)(?<!/)>','gi');
+result=result.replace(re,'<$1$2 />');
+});
+// Fix double self-close
+result=result.replace(/\s*\/\s*\/>/g,' />');
+return result;
+}
+
+function hl(code){
+var h=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Comments
+h=h.replace(/(\{\/\*[\s\S]*?\*\/\})/g,'<span class="c">$1</span>');
+// Tags
+h=h.replace(/(&lt;\/?[a-zA-Z][a-zA-Z0-9]*)/g,'<span class="t">$1</span>');
+h=h.replace(/(\/?\s*&gt;)/g,'<span class="t">$1</span>');
+// style={{ ... }}
+h=h.replace(/(style=)(\{\{[^}]*\}\})/g,'<span class="a">$1</span><span class="b">$2</span>');
+// Attributes
+h=h.replace(/\b([a-zA-Z][a-zA-Z0-9-]*)=/g,'<span class="a">$1</span>=');
+// Strings
+h=h.replace(/("(?:[^"\\]|\\.)*")/g,'<span class="s">$1</span>');
+h=h.replace(/('(?:[^'\\]|\\.)*')/g,'<span class="s">$1</span>');
+return h;
+}
+
+var input=document.getElementById('hi');
+var output=document.getElementById('jo');
+var rawJsx='';
+
+input.addEventListener('input',function(){convert()});
+
+function convert(){
+var v=input.value;
+if(!v.trim()){output.innerHTML='<span style="color:#4a5568">JSX output will appear here...</span>';rawJsx='';return;}
+rawJsx=convertHtml(v);
+output.innerHTML=hl(rawJsx);
+}
+
+window.clearInput=function(){input.value='';convert()};
+window.copyJsx=function(){
+if(!rawJsx)return;
+navigator.clipboard.writeText(rawJsx).then(function(){
+var b=document.getElementById('cb');
+b.textContent='Copied!';b.classList.add('copied');
+setTimeout(function(){b.textContent='Copy JSX';b.classList.remove('copied')},1500);
+});
+};
+window.loadExample=function(){
+input.value='<div class="container">\n  <h1 style="color: red; font-size: 24px">Hello World</h1>\n  <label for="name">Name:</label>\n  <input type="text" tabindex="1" readonly>\n  <img src="photo.jpg" alt="Photo">\n  <br>\n  <button onclick="handleClick()" class="btn">Click Me</button>\n  <!-- This is a comment -->\n  <div contenteditable>Edit me</div>\n</div>';
+convert();
+};
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

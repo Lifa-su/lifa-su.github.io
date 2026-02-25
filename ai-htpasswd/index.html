@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.htpasswd Generator - Create Apache Password Files Online</title>
+<meta name="description" content="Generate .htpasswd password files online with bcrypt, MD5 (apr1), and SHA1 encryption. Batch generation, one-click copy and download.">
+<link rel="canonical" href="https://lifa-su.com/ai-htpasswd/">
+<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--input:#0d1b2a;--border:#2a2a4a;--primary:#e94560;--primary-hover:#d63851;--secondary:#533483;--secondary-hover:#6b44a8;--text:#e0e0e0;--muted:#8892b0;--success:#4ecca3;--warning:#ffc107;--danger:#e94560;--radius:8px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;min-height:100vh;padding:20px}
+.container{max-width:720px;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin-bottom:6px;color:#fff}
+h1 span{color:var(--primary)}
+.subtitle{text-align:center;color:var(--muted);margin-bottom:24px;font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card-title{font-size:1rem;font-weight:600;margin-bottom:14px;color:#fff;display:flex;align-items:center;gap:8px}
+.form-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.form-group{flex:1;min-width:0}
+.form-group label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+input[type="text"],input[type="password"],input[type="number"],select,textarea{width:100%;padding:10px 12px;background:var(--input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--primary)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238892b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.password-wrap{position:relative;display:flex;gap:6px}
+.password-wrap input{flex:1}
+.btn{padding:10px 18px;border:none;border-radius:var(--radius);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:var(--secondary);color:#fff}
+.btn-secondary:hover{background:var(--secondary-hover)}
+.btn-outline{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn-icon{padding:10px;background:var(--secondary);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:1rem;transition:all .2s;display:flex;align-items:center;justify-content:center;min-width:40px}
+.btn-icon:hover{background:var(--secondary-hover)}
+.strength-bar{height:4px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden}
+.strength-bar-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+.strength-text{font-size:.75rem;margin-top:3px;color:var(--muted)}
+.batch-list{margin-top:12px}
+.batch-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--input);border-radius:var(--radius);margin-bottom:6px;font-size:.85rem;gap:8px}
+.batch-item .info{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.batch-item .algo{color:var(--primary);font-size:.75rem;font-weight:600;text-transform:uppercase;flex-shrink:0}
+.batch-item .remove{background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.1rem;padding:0 4px;opacity:.6;transition:opacity .2s}
+.batch-item .remove:hover{opacity:1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.result-area{width:100%;min-height:120px;resize:vertical;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.8;padding:12px}
+.result-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--success);color:#000;padding:10px 24px;border-radius:var(--radius);font-weight:600;font-size:.9rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.empty-state{text-align:center;color:var(--muted);padding:20px;font-size:.85rem}
+.badge{display:inline-block;background:var(--primary);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:10px;font-weight:600}
+footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:24px;padding-bottom:20px}
+footer a{color:var(--primary);text-decoration:none}
+@media(max-width:500px){
+  body{padding:12px}
+  h1{font-size:1.4rem}
+  .form-row{flex-direction:column;gap:8px}
+  .actions,.result-actions{flex-direction:column}
+  .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔐 <span>.htpasswd</span> Generator</h1>
+  <p class="subtitle">Generate Apache .htpasswd password entries with bcrypt, MD5, or SHA1</p>
+
+  <div class="card">
+    <div class="card-title">➕ Add Entry</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="admin" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label for="algorithm">Algorithm</label>
+        <select id="algorithm">
+          <option value="bcrypt">bcrypt (recommended)</option>
+          <option value="md5">MD5 (apr1)</option>
+          <option value="sha1">SHA1</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input type="password" id="password" placeholder="Enter password">
+          <button class="btn-icon" id="togglePass" title="Show/Hide password" aria-label="Toggle password visibility">👁</button>
+          <button class="btn-icon" id="randomPass" title="Generate random password" aria-label="Generate random password">🎲</button>
+        </div>
+        <div class="strength-bar"><div class="strength-bar-fill" id="strengthFill"></div></div>
+        <div class="strength-text" id="strengthText"></div>
+      </div>
+    </div>
+    <div class="form-row" style="align-items:flex-end">
+      <div class="form-group" style="flex:0 0 auto">
+        <label for="bcryptRounds">bcrypt rounds</label>
+        <input type="number" id="bcryptRounds" value="10" min="4" max="15" style="width:80px">
+      </div>
+      <div style="flex:1"></div>
+      <button class="btn btn-secondary" id="addBtn">➕ Add to Batch</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Batch Entries <span class="badge" id="batchCount">0</span></div>
+    <div id="batchList"><div class="empty-state">No entries yet. Add username/password pairs above.</div></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="generateBtn" disabled>⚡ Generate All</button>
+      <button class="btn btn-outline btn-sm" id="clearBatch" disabled>🗑 Clear All</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📄 Result</div>
+    <textarea class="result-area" id="resultArea" readonly placeholder="Generated .htpasswd entries will appear here..."></textarea>
+    <div class="result-actions">
+      <button class="btn btn-secondary" id="copyBtn" disabled>📋 Copy All</button>
+      <button class="btn btn-primary" id="downloadBtn" disabled>💾 Download .htpasswd</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>.htpasswd Generator &mdash; All processing happens in your browser. No data is sent to any server.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== MD5 Implementation (RFC 1321) =====
+const md5 = (function() {
+  const S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+             5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
+             4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+             6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+  const K = new Uint32Array(64);
+  for (let i = 0; i < 64; i++) K[i] = Math.floor(Math.abs(Math.sin(i+1)) * 0x100000000);
+
+  return function(input) {
+    const len = input.length;
+    const bitLen = len * 8;
+    const padLen = (len % 64 < 56) ? (56 - len % 64) : (120 - len % 64);
+    const padded = new Uint8Array(len + padLen + 8);
+    padded.set(input);
+    padded[len] = 0x80;
+    padded[padded.length - 8] = bitLen & 0xff;
+    padded[padded.length - 7] = (bitLen >>> 8) & 0xff;
+    padded[padded.length - 6] = (bitLen >>> 16) & 0xff;
+    padded[padded.length - 5] = (bitLen >>> 24) & 0xff;
+
+    let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+
+    for (let off = 0; off < padded.length; off += 64) {
+      const M = new Uint32Array(16);
+      for (let j = 0; j < 16; j++)
+        M[j] = padded[off+j*4] | (padded[off+j*4+1]<<8) | (padded[off+j*4+2]<<16) | (padded[off+j*4+3]<<24);
+
+      let A=a0, B=b0, C=c0, D=d0;
+      for (let i = 0; i < 64; i++) {
+        let F, g;
+        if (i < 16)      { F = (B & C) | (~B & D); g = i; }
+        else if (i < 32)  { F = (D & B) | (~D & C); g = (5*i+1) % 16; }
+        else if (i < 48)  { F = B ^ C ^ D;          g = (3*i+5) % 16; }
+        else               { F = C ^ (B | ~D);       g = (7*i) % 16; }
+        F = (F + A + K[i] + M[g]) >>> 0;
+        A = D; D = C; C = B;
+        B = (B + ((F << S[i]) | (F >>> (32-S[i])))) >>> 0;
+      }
+      a0 = (a0+A)>>>0; b0 = (b0+B)>>>0; c0 = (c0+C)>>>0; d0 = (d0+D)>>>0;
+    }
+
+    const r = new Uint8Array(16);
+    for (let i = 0; i < 4; i++) {
+      r[i]    = (a0 >>> (i*8)) & 0xff;
+      r[i+4]  = (b0 >>> (i*8)) & 0xff;
+      r[i+8]  = (c0 >>> (i*8)) & 0xff;
+      r[i+12] = (d0 >>> (i*8)) & 0xff;
+    }
+    return r;
+  };
+})();
+
+// ===== Apache APR1-MD5 =====
+function apr1md5(password, salt) {
+  const itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  const enc = new TextEncoder();
+
+  if (!salt) {
+    salt = '';
+    for (let i = 0; i < 8; i++) salt += itoa64[Math.floor(Math.random() * 64)];
+  }
+
+  const pass = enc.encode(password);
+  const sl = enc.encode(salt);
+  const magic = enc.encode('$apr1$');
+
+  function concat() {
+    let total = 0;
+    for (let a of arguments) total += a.length;
+    const r = new Uint8Array(total);
+    let off = 0;
+    for (let a of arguments) { r.set(a, off); off += a.length; }
+    return r;
+  }
+
+  // Digest B
+  let digestB = md5(concat(pass, sl, pass));
+
+  // Build context A
+  let ctxA = [];
+  for (let b of pass) ctxA.push(b);
+  for (let b of magic) ctxA.push(b);
+  for (let b of sl) ctxA.push(b);
+
+  // Add digestB bytes
+  for (let i = pass.length; i > 0; i -= 16) {
+    const chunk = digestB.slice(0, Math.min(i, 16));
+    for (let b of chunk) ctxA.push(b);
+  }
+
+  // Bit twiddling
+  for (let i = pass.length; i > 0; i >>= 1) {
+    ctxA.push(i & 1 ? 0 : pass[0]);
+  }
+
+  let digestA = md5(new Uint8Array(ctxA));
+
+  // 1000 rounds
+  for (let i = 0; i < 1000; i++) {
+    let ctx = [];
+    if (i & 1) for (let b of pass) ctx.push(b);
+    else       for (let b of digestA) ctx.push(b);
+    if (i % 3) for (let b of sl) ctx.push(b);
+    if (i % 7) for (let b of pass) ctx.push(b);
+    if (i & 1) for (let b of digestA) ctx.push(b);
+    else       for (let b of pass) ctx.push(b);
+    digestA = md5(new Uint8Array(ctx));
+  }
+
+  function to64(v, n) {
+    let s = '';
+    for (let i = 0; i < n; i++) { s += itoa64[v & 0x3f]; v >>= 6; }
+    return s;
+  }
+
+  const d = digestA;
+  let hash = '';
+  hash += to64((d[0]<<16)|(d[6]<<8)|d[12], 4);
+  hash += to64((d[1]<<16)|(d[7]<<8)|d[13], 4);
+  hash += to64((d[2]<<16)|(d[8]<<8)|d[14], 4);
+  hash += to64((d[3]<<16)|(d[9]<<8)|d[15], 4);
+  hash += to64((d[4]<<16)|(d[10]<<8)|d[5], 4);
+  hash += to64(d[11], 2);
+
+  return '$apr1$' + salt + '$' + hash;
+}
+
+// ===== SHA1 (using SubtleCrypto) =====
+async function sha1Hash(password) {
+  const data = new TextEncoder().encode(password);
+  const buf = await crypto.subtle.digest('SHA-1', data);
+  const bytes = new Uint8Array(buf);
+  const b64 = btoa(String.fromCharCode(...bytes));
+  return '{SHA}' + b64;
+}
+
+// ===== bcrypt (using bcryptjs from CDN) =====
+function bcryptHash(password, rounds) {
+  return new Promise((resolve, reject) => {
+    if (typeof dcodeIO === 'undefined' || !dcodeIO.bcrypt) {
+      reject(new Error('bcryptjs library not loaded'));
+      return;
+    }
+    dcodeIO.bcrypt.hash(password, rounds, (err, hash) => {
+      if (err) reject(err);
+      else resolve(hash);
+    });
+  });
+}
+
+// ===== Password Strength =====
+function getStrength(pw) {
+  if (!pw) return { score: 0, label: '', color: 'transparent' };
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (pw.length >= 16) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^a-zA-Z0-9]/.test(pw)) score++;
+
+  if (score <= 2) return { score: 1, label: 'Weak', color: '#e94560' };
+  if (score <= 4) return { score: 2, label: 'Fair', color: '#ffc107' };
+  if (score <= 5) return { score: 3, label: 'Good', color: '#4ecca3' };
+  return { score: 4, label: 'Strong', color: '#00d68f' };
+}
+
+// ===== Random Password =====
+function randomPassword(len = 16) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*_-+=';
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, v => chars[v % chars.length]).join('');
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== App State =====
+const batch = [];
+
+const $username = document.getElementById('username');
+const $password = document.getElementById('password');
+const $algorithm = document.getElementById('algorithm');
+const $rounds = document.getElementById('bcryptRounds');
+const $strengthFill = document.getElementById('strengthFill');
+const $strengthText = document.getElementById('strengthText');
+const $batchList = document.getElementById('batchList');
+const $batchCount = document.getElementById('batchCount');
+const $generateBtn = document.getElementById('generateBtn');
+const $clearBatch = document.getElementById('clearBatch');
+const $resultArea = document.getElementById('resultArea');
+const $copyBtn = document.getElementById('copyBtn');
+const $downloadBtn = document.getElementById('downloadBtn');
+
+// Toggle password visibility
+document.getElementById('togglePass').addEventListener('click', () => {
+  const type = $password.type === 'password' ? 'text' : 'password';
+  $password.type = type;
+  document.getElementById('togglePass').textContent = type === 'password' ? '👁' : '🙈';
+});
+
+// Random password
+document.getElementById('randomPass').addEventListener('click', () => {
+  const pw = randomPassword();
+  $password.value = pw;
+  $password.type = 'text';
+  document.getElementById('togglePass').textContent = '🙈';
+  updateStrength();
+  showToast('Random password generated!');
+});
+
+// Password strength
+function updateStrength() {
+  const s = getStrength($password.value);
+  $strengthFill.style.width = (s.score * 25) + '%';
+  $strengthFill.style.background = s.color;
+  $strengthText.textContent = s.label;
+  $strengthText.style.color = s.color;
+}
+$password.addEventListener('input', updateStrength);
+
+// Show/hide bcrypt rounds
+$algorithm.addEventListener('change', () => {
+  $rounds.parentElement.style.display = $algorithm.value === 'bcrypt' ? '' : 'none';
+});
+
+// Add to batch
+function renderBatch() {
+  if (batch.length === 0) {
+    $batchList.innerHTML = '<div class="empty-state">No entries yet. Add username/password pairs above.</div>';
+  } else {
+    $batchList.innerHTML = batch.map((e, i) => `
+      <div class="batch-item">
+        <span class="info">👤 ${escHtml(e.username)} : ${'•'.repeat(Math.min(e.password.length, 12))}</span>
+        <span class="algo">${e.algorithm}</span>
+        <button class="remove" onclick="removeBatch(${i})" title="Remove" aria-label="Remove entry">&times;</button>
+      </div>
+    `).join('');
+  }
+  $batchCount.textContent = batch.length;
+  $generateBtn.disabled = batch.length === 0;
+  $clearBatch.disabled = batch.length === 0;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+window.removeBatch = function(i) {
+  batch.splice(i, 1);
+  renderBatch();
+};
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  const user = $username.value.trim();
+  const pass = $password.value;
+  if (!user) { $username.focus(); showToast('Please enter a username'); return; }
+  if (!pass) { $password.focus(); showToast('Please enter a password'); return; }
+
+  batch.push({
+    username: user,
+    password: pass,
+    algorithm: $algorithm.value,
+    rounds: parseInt($rounds.value) || 10
+  });
+  renderBatch();
+  $username.value = '';
+  $password.value = '';
+  $password.type = 'password';
+  document.getElementById('togglePass').textContent = '👁';
+  updateStrength();
+  $username.focus();
+  showToast('Entry added to batch!');
+});
+
+// Enter key to add
+$password.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('addBtn').click();
+});
+$username.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $password.focus();
+});
+
+// Clear batch
+$clearBatch.addEventListener('click', () => {
+  batch.length = 0;
+  renderBatch();
+  $resultArea.value = '';
+  $copyBtn.disabled = true;
+  $downloadBtn.disabled = true;
+});
+
+// Generate
+$generateBtn.addEventListener('click', async () => {
+  $generateBtn.disabled = true;
+  $generateBtn.textContent = '⏳ Generating...';
+  const lines = [];
+
+  try {
+    for (const entry of batch) {
+      let hash;
+      switch (entry.algorithm) {
+        case 'bcrypt':
+          hash = await bcryptHash(entry.password, entry.rounds);
+          break;
+        case 'md5':
+          hash = apr1md5(entry.password);
+          break;
+        case 'sha1':
+          hash = await sha1Hash(entry.password);
+          break;
+      }
+      lines.push(entry.username + ':' + hash);
+    }
+    $resultArea.value = lines.join('\n');
+    $copyBtn.disabled = false;
+    $downloadBtn.disabled = false;
+    showToast('Generated ' + lines.length + ' entries!');
+  } catch (err) {
+    showToast('Error: ' + err.message);
+  } finally {
+    $generateBtn.disabled = batch.length === 0;
+    $generateBtn.textContent = '⚡ Generate All';
+  }
+});
+
+// Copy
+$copyBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($resultArea.value);
+    showToast('Copied to clipboard!');
+  } catch {
+    $resultArea.select();
+    document.execCommand('copy');
+    showToast('Copied!');
+  }
+});
+
+// Download
+$downloadBtn.addEventListener('click', () => {
+  const blob = new Blob([$resultArea.value], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '.htpasswd';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Downloaded .htpasswd');
+});
+
+// Init
+renderBatch();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

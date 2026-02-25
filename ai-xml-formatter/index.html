@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI XML Formatter - Format, Validate & Highlight XML Online</title>
+<meta name="description" content="Free online XML formatter with syntax highlighting, validation, minify and prettify. No dependencies, works entirely in your browser.">
+<link rel="canonical" href="https://lifa-su.com/ai-xml-formatter/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--surface:#1e2746;--surface2:#253256;--text:#e0e0e0;--text2:#a0a8c0;--accent:#e94560;--accent2:#ff6b6b;--green:#4ecca3;--yellow:#ffd369;--blue:#7ec8e3;--purple:#c77dff;--orange:#ff9e64;--border:#2a3a5c;--radius:8px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent2);text-decoration:none}
+
+/* Header */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem}
+.header h1{font-size:1.25rem;font-weight:700;display:flex;align-items:center;gap:0.5rem}
+.header h1 .icon{color:var(--accent);font-size:1.4rem}
+.header-actions{display:flex;gap:0.5rem;flex-wrap:wrap}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:0.85rem;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn:hover{background:var(--surface2);border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-green{background:var(--green);border-color:var(--green);color:#1a1a2e}
+.btn-green:hover{opacity:0.85}
+
+/* Status bar */
+.status-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0.5rem 1.5rem;display:flex;align-items:center;gap:1rem;font-size:0.8rem;color:var(--text2);flex-wrap:wrap}
+.status-item{display:flex;align-items:center;gap:0.3rem}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.status-dot.ok{background:var(--green)}
+.status-dot.err{background:var(--accent)}
+.status-dot.idle{background:var(--text2)}
+.error-msg{color:var(--accent2);font-weight:500;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Main layout */
+.main{flex:1;display:flex;flex-direction:column;padding:1rem 1.5rem;gap:1rem;overflow:hidden}
+.panels{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:1rem;min-height:0}
+.panel{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:300px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text2)}
+.panel-header span{font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+
+/* Editor */
+#input{width:100%;flex:1;resize:none;background:transparent;color:var(--text);border:none;padding:1rem;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;font-size:0.85rem;line-height:1.6;outline:none;tab-size:2}
+#input::placeholder{color:var(--text2);opacity:0.6}
+
+/* Output */
+.output-wrap{flex:1;overflow:auto;padding:1rem}
+.output-wrap pre{font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;font-size:0.85rem;line-height:1.6;white-space:pre;word-wrap:normal}
+
+/* Syntax highlighting */
+.xml-tag{color:var(--accent2)}
+.xml-attr{color:var(--yellow)}
+.xml-value{color:var(--green)}
+.xml-comment{color:var(--text2);font-style:italic}
+.xml-cdata{color:var(--purple)}
+.xml-prolog{color:var(--blue)}
+.xml-text{color:var(--text)}
+.xml-entity{color:var(--orange)}
+.xml-error{color:var(--accent);text-decoration:wavy underline}
+.line-num{color:var(--text2);opacity:0.4;user-select:none;display:inline-block;min-width:3ch;text-align:right;margin-right:1.5ch}
+
+/* Footer */
+.footer{text-align:center;padding:1rem;font-size:0.75rem;color:var(--text2);border-top:1px solid var(--border)}
+
+/* Responsive */
+@media(max-width:768px){
+  .panels{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .header{padding:0.75rem 1rem}
+  .main{padding:0.75rem}
+  .header-actions{width:100%;justify-content:flex-start}
+  .status-bar{padding:0.4rem 1rem}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface2);color:var(--text);padding:0.75rem 1.25rem;border-radius:var(--radius);border:1px solid var(--border);font-size:0.85rem;box-shadow:var(--shadow);transform:translateY(100px);opacity:0;transition:all 0.3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.pro-section{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;margin:0 1.5rem 1rem}
+.pro-mock{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.7}
+.pro-mock-title{font-size:12px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;font-weight:600}
+.pro-mock-item{background:rgba(255,255,255,.05);border-radius:4px;padding:6px 10px;margin-bottom:5px;font-size:12px;color:var(--text2)}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:var(--radius);z-index:10;transition:background .2s}
+.pro-section:hover .pro-lock-overlay{background:rgba(0,0,0,.55)}
+.pro-lock-icon{font-size:32px;margin-bottom:6px}
+.pro-lock-text{font-size:13px;color:#fff;font-weight:600}
+.pro-lock-sub{font-size:11px;color:#aaa;margin-top:2px}
+#proModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+#proModal.show{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.pro-modal h2{font-size:20px;margin-bottom:4px;color:var(--accent)}
+.pro-modal .pro-price{font-size:32px;font-weight:700;color:#fff;margin:12px 0}
+.pro-modal .pro-features{text-align:left;margin:16px 0;padding:0;list-style:none}
+.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal .pro-features li:last-child{border-bottom:none}
+.pro-modal .pro-features li::before{content:'✓';color:var(--green);font-weight:700;font-size:16px}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--purple));color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;text-align:center;transition:opacity .2s}
+.pro-btn-upgrade:hover{opacity:.9}
+.pro-btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;font-size:14px;cursor:pointer;margin-top:8px}
+.pro-btn-later:hover{color:#ccc}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1><span class="icon">&lt;/&gt;</span> AI XML Formatter</h1>
+  <div class="header-actions">
+    <button class="btn btn-primary" onclick="prettify()" title="Format XML with indentation">⬡ Prettify</button>
+    <button class="btn" onclick="minify()" title="Remove whitespace">⬢ Minify</button>
+    <button class="btn btn-green" onclick="validate()" title="Validate XML syntax">✓ Validate</button>
+    <button class="btn" onclick="copyOutput()" title="Copy formatted output">⎘ Copy</button>
+    <button class="btn" onclick="clearAll()" title="Clear input and output">✕ Clear</button>
+    <button class="btn" onclick="loadSample()" title="Load sample XML">☰ Sample</button>
+  </div>
+</header>
+
+<div class="status-bar">
+  <div class="status-item"><span class="status-dot idle" id="statusDot"></span><span id="statusText">Paste XML to begin</span></div>
+  <div class="status-item" id="sizeInfo">—</div>
+  <div class="status-item" id="lineInfo">—</div>
+  <span class="error-msg" id="errorMsg"></span>
+</div>
+
+<main class="main">
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-header"><span>Input</span><span id="inputLen">0 chars</span></div>
+      <textarea id="input" placeholder="Paste your XML here...&#10;&#10;It will be automatically formatted with syntax highlighting." spellcheck="false"></textarea>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span>Output</span><span id="outputLen">0 chars</span></div>
+      <div class="output-wrap"><pre id="output"></pre></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">AI XML Formatter — Free online XML formatting, validation &amp; syntax highlighting. No data leaves your browser.</footer>
+
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-mock">
+<div class="pro-mock-title">&#128269; XPath Query</div>
+<div class="pro-mock-item">&#9654; //book[@category='fiction']/title</div>
+<div class="pro-mock-item">&#9654; 2 results found</div>
+<div class="pro-mock-title" style="margin-top:10px">&#9989; Schema Validation</div>
+<div class="pro-mock-item">&#9654; Validate against XSD / DTD</div>
+<div class="pro-mock-item">&#9654; Auto-detect schema</div>
+<div class="pro-mock-title" style="margin-top:10px">&#128230; Batch Processing</div>
+<div class="pro-mock-item">&#9654; Format multiple XML files at once</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">&#128274;</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const input = document.getElementById('input');
+  const output = document.getElementById('output');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const errorMsg = document.getElementById('errorMsg');
+  const sizeInfo = document.getElementById('sizeInfo');
+  const lineInfo = document.getElementById('lineInfo');
+  const inputLen = document.getElementById('inputLen');
+  const outputLen = document.getElementById('outputLen');
+  const toastEl = document.getElementById('toast');
+
+  let debounceTimer;
+
+  // Auto-format on input
+  input.addEventListener('input', function(){
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(()=>{
+      const v = input.value.trim();
+      inputLen.textContent = input.value.length + ' chars';
+      if(!v){
+        output.innerHTML = '';
+        setStatus('idle','Paste XML to begin');
+        errorMsg.textContent = '';
+        sizeInfo.textContent = '—';
+        lineInfo.textContent = '—';
+        outputLen.textContent = '0 chars';
+        return;
+      }
+      prettify();
+    }, 300);
+  });
+
+  // Tab support in textarea
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      const s = this.selectionStart, end = this.selectionEnd;
+      this.value = this.value.substring(0,s) + '  ' + this.value.substring(end);
+      this.selectionStart = this.selectionEnd = s + 2;
+    }
+  });
+
+  function setStatus(type, text){
+    statusDot.className = 'status-dot ' + type;
+    statusText.textContent = text;
+  }
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(()=> toastEl.classList.remove('show'), 2000);
+  }
+
+  function formatSize(bytes){
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+  }
+
+  // Parse and validate XML
+  function parseXML(str){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(str, 'application/xml');
+    const err = doc.querySelector('parsererror');
+    if(err){
+      let msg = err.textContent || 'Invalid XML';
+      // Try to extract line/col
+      const m = msg.match(/line\s+(\d+)/i);
+      const lineNum = m ? m[1] : null;
+      return { valid: false, error: msg.split('\n')[0], line: lineNum, doc: null };
+    }
+    return { valid: true, error: null, line: null, doc };
+  }
+
+  // Prettify XML string (manual approach for preserving declaration etc.)
+  function prettifyXML(str){
+    // Normalize line endings
+    str = str.replace(/\r\n?/g, '\n').trim();
+
+    let formatted = '';
+    let indent = 0;
+    const tab = '  ';
+
+    // Tokenize: split into tags and text
+    const tokens = [];
+    let i = 0;
+    while(i < str.length){
+      if(str[i] === '<'){
+        let j = i + 1;
+        // Handle CDATA
+        if(str.substring(i, i+9) === '<![CDATA['){
+          const end = str.indexOf(']]>', i);
+          if(end === -1){ tokens.push(str.substring(i)); break; }
+          tokens.push(str.substring(i, end+3));
+          i = end + 3;
+          continue;
+        }
+        // Handle comments
+        if(str.substring(i, i+4) === '<!--'){
+          const end = str.indexOf('-->', i);
+          if(end === -1){ tokens.push(str.substring(i)); break; }
+          tokens.push(str.substring(i, end+3));
+          i = end + 3;
+          continue;
+        }
+        // Regular tag
+        let inQuote = false, quoteChar = '';
+        while(j < str.length){
+          if(inQuote){
+            if(str[j] === quoteChar) inQuote = false;
+          } else {
+            if(str[j] === '"' || str[j] === "'"){
+              inQuote = true; quoteChar = str[j];
+            } else if(str[j] === '>'){
+              break;
+            }
+          }
+          j++;
+        }
+        tokens.push(str.substring(i, j+1));
+        i = j + 1;
+      } else {
+        let j = str.indexOf('<', i);
+        if(j === -1){ tokens.push(str.substring(i)); break; }
+        const text = str.substring(i, j);
+        if(text.trim()) tokens.push(text.trim());
+        i = j;
+      }
+    }
+
+    const lines = [];
+    for(let t = 0; t < tokens.length; t++){
+      const token = tokens[t];
+      if(token.startsWith('<?')){
+        // Processing instruction / XML declaration
+        lines.push(tab.repeat(indent) + token);
+      } else if(token.startsWith('<!--')){
+        lines.push(tab.repeat(indent) + token);
+      } else if(token.startsWith('<![CDATA[')){
+        lines.push(tab.repeat(indent) + token);
+      } else if(token.startsWith('</')){
+        // Closing tag
+        indent = Math.max(0, indent - 1);
+        lines.push(tab.repeat(indent) + token);
+      } else if(token.startsWith('<')){
+        // Opening or self-closing tag
+        const selfClosing = token.endsWith('/>');
+        // Check if next token is text followed by closing tag (inline content)
+        if(!selfClosing && t+2 < tokens.length && !tokens[t+1].startsWith('<') && tokens[t+2].startsWith('</')){
+          lines.push(tab.repeat(indent) + token + tokens[t+1] + tokens[t+2]);
+          t += 2;
+        } else {
+          lines.push(tab.repeat(indent) + token);
+          if(!selfClosing) indent++;
+        }
+      } else {
+        // Text node
+        lines.push(tab.repeat(indent) + token);
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  // Minify XML
+  function minifyXML(str){
+    return str.replace(/\r\n?/g,'\n').replace(/>\s+</g,'><').replace(/\s*\n\s*/g,'').trim();
+  }
+
+  // Syntax highlight XML
+  function highlightXML(str){
+    // Escape HTML first
+    const esc = str
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+
+    let highlighted = esc
+      // CDATA
+      .replace(/(&lt;!\[CDATA\[)([\s\S]*?)(\]\]&gt;)/g,
+        '<span class="xml-cdata">$1$2$3</span>')
+      // Comments
+      .replace(/(&lt;!--)([\s\S]*?)(--&gt;)/g,
+        '<span class="xml-comment">$1$2$3</span>')
+      // Processing instructions / prolog
+      .replace(/(&lt;\?)([\s\S]*?)(\?&gt;)/g,
+        '<span class="xml-prolog">$1$2$3</span>')
+      // Self-closing tags
+      .replace(/(&lt;)(\/?)(\w[\w\-.:]*)((?:\s+[\s\S]*?)?)(\/?)(&gt;)/g, function(m, lt, slash, tag, attrs, selfSlash, gt){
+        let result = '<span class="xml-tag">' + lt + slash + tag + '</span>';
+        if(attrs){
+          result += attrs.replace(/([\w\-.:]+)(\s*=\s*)(&quot;)(.*?)(&quot;)/g,
+            '<span class="xml-attr">$1</span>$2<span class="xml-value">$3$4$5</span>');
+        }
+        result += '<span class="xml-tag">' + selfSlash + gt + '</span>';
+        return result;
+      })
+      // Entities
+      .replace(/(&amp;[\w#]+;)/g, '<span class="xml-entity">$1</span>');
+
+    // Add line numbers
+    const lines = highlighted.split('\n');
+    return lines.map((line, i) =>
+      '<span class="line-num">' + (i+1) + '</span>' + line
+    ).join('\n');
+  }
+
+  // Exposed functions
+  window.prettify = function(){
+    const v = input.value.trim();
+    if(!v){ showToast('No XML to format'); return; }
+    errorMsg.textContent = '';
+
+    const result = parseXML(v);
+    if(!result.valid){
+      setStatus('err', 'Invalid XML' + (result.line ? ' (line ' + result.line + ')' : ''));
+      errorMsg.textContent = result.error;
+    } else {
+      setStatus('ok', 'Valid XML');
+    }
+
+    const pretty = prettifyXML(v);
+    output.innerHTML = highlightXML(pretty);
+    updateStats(pretty);
+  };
+
+  window.minify = function(){
+    const v = input.value.trim();
+    if(!v){ showToast('No XML to minify'); return; }
+    errorMsg.textContent = '';
+
+    const result = parseXML(v);
+    if(!result.valid){
+      setStatus('err', 'Invalid XML' + (result.line ? ' (line ' + result.line + ')' : ''));
+      errorMsg.textContent = result.error;
+    } else {
+      setStatus('ok', 'Valid XML — minified');
+    }
+
+    const mini = minifyXML(v);
+    output.innerHTML = highlightXML(mini);
+    updateStats(mini);
+    showToast('XML minified');
+  };
+
+  window.validate = function(){
+    const v = input.value.trim();
+    if(!v){ showToast('No XML to validate'); return; }
+    errorMsg.textContent = '';
+
+    const result = parseXML(v);
+    if(result.valid){
+      setStatus('ok', 'XML is valid ✓');
+      showToast('XML is valid ✓');
+    } else {
+      setStatus('err', 'Invalid XML' + (result.line ? ' at line ' + result.line : ''));
+      errorMsg.textContent = result.error;
+      showToast('XML has errors');
+    }
+  };
+
+  window.copyOutput = function(){
+    const text = output.textContent;
+    if(!text){ showToast('Nothing to copy'); return; }
+    // Remove line numbers from copied text
+    const clean = text.replace(/^\s*\d+/gm, '').split('\n').map(l => {
+      // Each line starts with the line number then content
+      return l;
+    }).join('\n');
+
+    // Better approach: get raw formatted text
+    const v = input.value.trim();
+    if(!v) return;
+    const pretty = prettifyXML(v);
+    navigator.clipboard.writeText(pretty).then(()=>{
+      showToast('Copied to clipboard');
+    }).catch(()=>{
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = pretty;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied to clipboard');
+    });
+  };
+
+  window.clearAll = function(){
+    input.value = '';
+    output.innerHTML = '';
+    errorMsg.textContent = '';
+    setStatus('idle', 'Paste XML to begin');
+    sizeInfo.textContent = '—';
+    lineInfo.textContent = '—';
+    inputLen.textContent = '0 chars';
+    outputLen.textContent = '0 chars';
+  };
+
+  window.loadSample = function(){
+    input.value = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sample XML Document -->
+<bookstore xmlns:bk="urn:example:bookstore">
+  <bk:book id="1" category="fiction">
+    <title lang="en">The Great Gatsby</title>
+    <author>F. Scott Fitzgerald</author>
+    <year>1925</year>
+    <price currency="USD">12.99</price>
+    <description><![CDATA[A story about the <mysterious> Jay Gatsby]]></description>
+  </bk:book>
+  <bk:book id="2" category="science">
+    <title lang="en">A Brief History of Time</title>
+    <author>Stephen Hawking</author>
+    <year>1988</year>
+    <price currency="USD">15.50</price>
+    <available/>
+  </bk:book>
+</bookstore>`;
+    prettify();
+    showToast('Sample XML loaded');
+  };
+
+  function updateStats(str){
+    const bytes = new Blob([str]).size;
+    const lines = str.split('\n').length;
+    sizeInfo.textContent = formatSize(bytes);
+    lineInfo.textContent = lines + ' lines';
+    outputLen.textContent = str.length + ' chars';
+  }
+})();
+</script>
+<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>&#128640; XML Formatter Pro</h2>
+<div class="pro-price">$9</div>
+<ul class="pro-features">
+<li>XPath Query — search and extract XML nodes instantly</li>
+<li>Schema Validation — validate against XSD &amp; DTD</li>
+<li>Batch Processing — format multiple XML files at once</li>
+<li>Priority support &amp; all future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+<button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

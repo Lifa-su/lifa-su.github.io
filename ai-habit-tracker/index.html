@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="AI-powered habit tracking tool. Build daily routines, track streaks, visualize progress with charts, and get smart reminders to stay consistent every day.">
+<link rel="canonical" href="https://lifa-su.com/ai-habit-tracker/">
+<title>AI 习惯追踪器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;--text:#e4e4ef;--text2:#9494a8;--accent:#7c5cfc;--accent2:#5c8cfc;--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4em;font-weight:700}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border:none;border-radius:var(--radius);cursor:pointer;font-size:0.9em;font-weight:600;transition:all 0.3s;color:#fff}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.btn-primary:hover{opacity:0.85;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-danger{background:var(--danger)}.btn-danger:hover{opacity:0.85}
+.btn-success{background:var(--success);color:#000}
+.btn-sm{padding:5px 10px;font-size:0.8em}
+main{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);transition:all 0.3s}
+.card:hover{border-color:rgba(124,92,252,0.3)}
+.card-title{font-size:1.1em;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--surface);border-radius:var(--radius);padding:4px;border:1px solid var(--border);overflow-x:auto}
+.tab{padding:10px 20px;border:none;background:none;color:var(--text2);cursor:pointer;border-radius:8px;font-weight:600;transition:all 0.3s;white-space:nowrap}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.tab:hover:not(.active){color:var(--text);background:var(--surface2)}
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.stat-value{font-size:2em;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{color:var(--text2);font-size:0.85em;margin-top:4px}
+.habit-list{display:flex;flex-direction:column;gap:10px}
+.habit-item{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);transition:all 0.3s}
+.habit-item:hover{border-color:var(--accent);transform:translateX(4px)}
+.habit-item.completed{opacity:0.7}
+.habit-item.completed .habit-check{background:var(--success);border-color:var(--success)}
+.habit-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.3s;flex-shrink:0;cursor:pointer}
+.habit-check:hover{border-color:var(--success);background:rgba(76,218,138,0.1)}
+.habit-check svg{width:16px;height:16px;opacity:0;transition:all 0.3s}
+.habit-item.completed .habit-check svg{opacity:1}
+.habit-icon{font-size:1.5em;flex-shrink:0}
+.habit-info{flex:1;min-width:0}
+.habit-name{font-weight:600}
+.habit-meta{color:var(--text2);font-size:0.8em;display:flex;gap:12px;margin-top:2px;flex-wrap:wrap}
+.habit-streak{display:flex;align-items:center;gap:4px;color:var(--warn);font-weight:600;font-size:0.85em}
+.habit-actions{display:flex;gap:6px;flex-shrink:0}
+.habit-actions .btn-sm{opacity:0;transition:all 0.3s}
+.habit-item:hover .habit-actions .btn-sm{opacity:1}
+.heatmap-container{overflow-x:auto;padding:10px 0}
+.heatmap-body{display:flex;gap:2px}
+.heatmap-days{display:flex;flex-direction:column;gap:2px;font-size:0.7em;color:var(--text2);padding-right:6px;justify-content:space-between;min-width:24px}
+.heatmap-grid{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;gap:2px}
+.heatmap-cell{width:12px;height:12px;border-radius:2px;background:var(--surface2);transition:all 0.2s;cursor:pointer}
+.heatmap-cell:hover{transform:scale(1.5);z-index:10}
+.heatmap-cell[data-level="1"]{background:rgba(124,92,252,0.25)}
+.heatmap-cell[data-level="2"]{background:rgba(124,92,252,0.5)}
+.heatmap-cell[data-level="3"]{background:rgba(124,92,252,0.75)}
+.heatmap-cell[data-level="4"]{background:var(--accent)}
+.heatmap-legend{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:0.75em;color:var(--text2)}
+.heatmap-legend .heatmap-cell{cursor:default;pointer-events:none}
+.heatmap-months{display:flex;font-size:0.7em;color:var(--text2);margin-bottom:4px;padding-left:30px}
+.tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:0.8em;pointer-events:none;z-index:1000;box-shadow:var(--shadow);opacity:0;transition:opacity 0.15s}
+.tooltip.show{opacity:1}
+.ai-suggestion{background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(92,140,252,0.1));border:1px solid rgba(124,92,252,0.3);border-radius:var(--radius);padding:16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.ai-icon{font-size:1.3em;flex-shrink:0}
+.ai-text{flex:1;font-size:0.9em;line-height:1.5}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.progress-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.5s ease}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,0.5);animation:modalIn 0.3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{margin-bottom:16px;font-size:1.2em}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;margin-bottom:6px;font-size:0.9em;color:var(--text2)}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95em;outline:none;transition:border-color 0.3s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group select option{background:var(--surface2)}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.emoji-btn{padding:8px;background:var(--surface2);border:2px solid transparent;border-radius:8px;cursor:pointer;font-size:1.2em;text-align:center;transition:all 0.2s}
+.emoji-btn:hover{background:var(--surface);border-color:var(--accent)}
+.emoji-btn.selected{border-color:var(--accent);background:rgba(124,92,252,0.2)}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap}
+.color-opt{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.2s}
+.color-opt:hover{transform:scale(1.15)}
+.color-opt.selected{border-color:#fff;box-shadow:0 0 12px rgba(124,92,252,0.5)}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
+.template-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all 0.3s;text-align:center}
+.template-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.template-card .t-icon{font-size:2em;margin-bottom:6px}
+.template-card .t-name{font-weight:600;font-size:0.95em}
+.template-card .t-desc{color:var(--text2);font-size:0.8em;margin-top:4px}
+.empty-state{text-align:center;padding:40px;color:var(--text2)}
+.empty-state .empty-icon{font-size:3em;margin-bottom:12px}
+.section{display:none}.section.active{display:block}
+.fade-in{animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.archived-badge{background:var(--surface2);color:var(--text2);padding:2px 8px;border-radius:4px;font-size:0.75em}
+.select-habit{margin-bottom:12px}
+.select-habit select{width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95em}
+@media(max-width:768px){header{flex-direction:column;gap:8px;padding:10px 16px}.header-actions{width:100%;justify-content:center}.tabs{overflow-x:auto}.tab{padding:8px 14px;font-size:0.85em}main{padding:12px}.overview-grid{grid-template-columns:repeat(2,1fr)}.habit-actions .btn-sm{opacity:1}.heatmap-cell{width:10px;height:10px}}
+/* Pro Feature */
+.pro-section{position:relative;cursor:pointer;margin-top:20px}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;opacity:0.5}
+.pro-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;background:rgba(10,10,15,0.3);border-radius:var(--radius);border:2px dashed rgba(124,92,252,0.5);transition:all .3s}
+.pro-overlay:hover{background:rgba(124,92,252,0.08);border-color:var(--accent)}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:700;color:var(--accent)}
+.pro-hint{font-size:0.85rem;color:var(--text2);margin-top:4px}
+.pro-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:90%;max-width:420px;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(0.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;color:var(--accent);margin:12px 0}
+.pro-modal .pro-price span{font-size:1rem;color:var(--text2);font-weight:400}
+.pro-modal .pro-features{text-align:left;margin:20px 0;list-style:none;padding:0}
+.pro-modal .pro-features li{padding:10px 0;border-bottom:1px solid var(--border);font-size:0.9rem;display:flex;align-items:center;gap:10px}
+.pro-modal .pro-features li:last-child{border:none}
+.pro-upgrade-btn{display:inline-block;padding:14px 40px;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;margin-top:8px}
+.pro-upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,92,252,0.4)}
+.pro-modal .pro-close{margin-top:12px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:0.9rem;padding:8px}
+.pro-modal .pro-close:hover{color:var(--text)}
+.pro-insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pro-insight-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
+.pro-insight-item .icon{font-size:1.5rem;margin-bottom:6px}
+.pro-insight-item .name{font-weight:600;font-size:0.9rem}
+.pro-insight-item .desc{font-size:0.8rem;color:var(--text2);margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🎯 <span>AI 习惯追踪器</span></div>
+<div class="header-actions">
+<button class="btn btn-primary" onclick="openAddHabit()">➕ 添加习惯</button>
+<button class="btn btn-secondary" onclick="openModal('templateModal')">📋 模板</button>
+<button class="btn btn-secondary" onclick="openModal('importExportModal')">📦 导入/导出</button>
+</div>
+</header>
+<main>
+<div class="tabs">
+<button class="tab active" onclick="switchTab('today')">📅 今日</button>
+<button class="tab" onclick="switchTab('habits')">📝 习惯</button>
+<button class="tab" onclick="switchTab('heatmap')">🔥 热力图</button>
+<button class="tab" onclick="switchTab('stats')">📊 统计</button>
+<button class="tab" onclick="switchTab('ai')">🤖 AI建议</button>
+</div>
+<div id="today" class="section active">
+<div class="overview-grid" id="overviewGrid"></div>
+<div class="card">
+<div class="card-title">📅 今日待完成</div>
+<div class="habit-list" id="todayList"></div>
+</div>
+</div>
+<div id="habits" class="section">
+<div class="card">
+<div class="card-title" style="justify-content:space-between">📝 所有习惯 <button class="btn btn-sm btn-secondary" onclick="toggleArchived()">📁 已归档</button></div>
+<div class="habit-list" id="habitList"></div>
+</div>
+<div class="card" id="archivedCard" style="display:none">
+<div class="card-title">📁 已归档习惯</div>
+<div class="habit-list" id="archivedList"></div>
+</div>
+</div>
+<div id="heatmap" class="section">
+<div class="card">
+<div class="card-title">🔥 习惯热力图</div>
+<div class="select-habit">
+<select id="heatmapHabitSelect" onchange="renderHeatmap()">
+<option value="all">全部习惯</option>
+</select>
+</div>
+<div class="heatmap-months" id="heatmapMonths"></div>
+<div class="heatmap-container">
+<div class="heatmap-body">
+<div class="heatmap-days"><span>一</span><span>三</span><span>五</span><span>日</span></div>
+<div class="heatmap-grid" id="heatmapGrid"></div>
+</div>
+</div>
+<div class="heatmap-legend">少 <div class="heatmap-cell"></div><div class="heatmap-cell" data-level="1"></div><div class="heatmap-cell" data-level="2"></div><div class="heatmap-cell" data-level="3"></div><div class="heatmap-cell" data-level="4"></div> 多</div>
+</div>
+</div>
+<div id="stats" class="section">
+<div class="overview-grid" id="statsOverview"></div>
+<div class="stats-grid" id="statsGrid"></div>
+</div>
+<div id="ai" class="section">
+<div class="card">
+<div class="card-title">🤖 AI 习惯分析与建议</div>
+<div id="aiSuggestions"></div>
+</div>
+</div>
+<!-- Pro Analysis Section -->
+<div class="pro-section" onclick="showProModal()">
+  <div class="pro-overlay">
+    <div class="pro-lock-icon">🔒</div>
+    <div class="pro-label">Pro 习惯洞察</div>
+    <div class="pro-hint">点击解锁深度分析与趋势图</div>
+  </div>
+  <div class="pro-blur-content">
+    <div class="card">
+      <div class="card-title">🔬 深度习惯分析</div>
+      <div class="pro-insight-grid">
+        <div class="pro-insight-item"><div class="icon">📈</div><div class="name">趋势分析</div><div class="desc">每周/月完成率趋势</div></div>
+        <div class="pro-insight-item"><div class="icon">🧠</div><div class="name">AI 洞察</div><div class="desc">智能习惯建议</div></div>
+        <div class="pro-insight-item"><div class="icon">⏰</div><div class="name">最佳时段</div><div class="desc">你最高效的时间段</div></div>
+        <div class="pro-insight-item"><div class="icon">🔗</div><div class="name">习惯关联</div><div class="desc">发现习惯间的联系</div></div>
+      </div>
+      <div style="margin-top:16px;height:100px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:0.85rem">
+        📊 30天习惯完成趋势图
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+<div class="tooltip" id="tooltip"></div>
+<div class="modal-overlay" id="habitModal">
+<div class="modal">
+<h2 id="modalTitle">➕ 添加新习惯</h2>
+<div class="form-group"><label>习惯名称</label><input type="text" id="habitName" placeholder="例如：每天跑步30分钟"></div>
+<div class="form-group"><label>频率</label><select id="habitFreq"><option value="daily">每日</option><option value="weekly">每周</option></select></div>
+<div class="form-group"><label>选择图标</label><div class="emoji-grid" id="emojiGrid"></div></div>
+<div class="form-group"><label>颜色标签</label><div class="color-picker" id="colorPicker"></div></div>
+<div class="form-group"><label>目标描述（可选）</label><textarea id="habitDesc" placeholder="描述你的目标..."></textarea></div>
+<div class="modal-actions">
+<button class="btn btn-secondary" onclick="closeModal('habitModal')">取消</button>
+<button class="btn btn-primary" id="saveHabitBtn" onclick="saveHabit()">保存</button>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="templateModal">
+<div class="modal">
+<h2>📋 预设习惯模板</h2>
+<div class="template-grid" id="templateGrid"></div>
+<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('templateModal')">关闭</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="importExportModal">
+<div class="modal">
+<h2>📦 数据导入/导出</h2>
+<div style="display:flex;flex-direction:column;gap:12px">
+<button class="btn btn-primary" onclick="exportData()">📤 导出数据 (JSON)</button>
+<div class="form-group" style="margin:0"><label>📥 导入数据</label><input type="file" id="importFile" accept=".json" onchange="importData(event)" style="padding:8px"></div>
+</div>
+<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('importExportModal')">关闭</button></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModalOverlay" onclick="if(event.target===this)closeProModal()">
+  <div class="pro-modal">
+    <h2>🚀 升级到 Pro</h2>
+    <div class="pro-price">$9 <span>一次性付费</span></div>
+    <ul class="pro-features">
+      <li>📈 每周/月习惯完成率趋势图</li>
+      <li>🧠 AI 智能习惯洞察与建议</li>
+      <li>⏰ 最佳习惯执行时段分析</li>
+      <li>🔗 习惯间关联性分析</li>
+      <li>📊 精美可视化图表报告</li>
+      <li>📤 导出分析报告 PDF</li>
+      <li>♾️ 终身使用</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $9</a>
+    <br><button class="pro-close" onclick="closeProModal()">暂时不需要</button>
+  </div>
+</div>
+<script async src="https://cdn.siteanalyze.io/monetize.js"></script>
+<script>
+const EMOJIS=['🏃','💪','📖','🧘','💧','🌅','📚','✍️','🎵','🎨','🧹','🍎','😴','🚶','🧠','💊','🌿','🎯','💻','🏋️','🚴','🧗','⚽','🏊','🎸','📝','🍳','🧘‍♀️','🌙','☀️','🫁','❤️'];
+const COLORS=['#7c5cfc','#5c8cfc','#4cda8a','#fcb44c','#fc5c6c','#e44cfc','#4cd8da','#fc8c4c','#8cfc5c','#da4c8a','#5cfcb4','#b44cfc'];
+const TEMPLATES=[
+{name:'晨跑',icon:'🏃',color:'#4cda8a',freq:'daily',desc:'每天早起跑步30分钟，保持身体健康'},
+{name:'阅读',icon:'📖',color:'#5c8cfc',freq:'daily',desc:'每天阅读至少30分钟，拓展知识面'},
+{name:'冥想',icon:'🧘',color:'#e44cfc',freq:'daily',desc:'每天冥想10分钟，保持内心平静'},
+{name:'喝水',icon:'💧',color:'#4cd8da',freq:'daily',desc:'每天喝够8杯水，保持身体水分'},
+{name:'早起',icon:'🌅',color:'#fcb44c',freq:'daily',desc:'每天6:30前起床，养成早起习惯'},
+{name:'学习',icon:'📚',color:'#7c5cfc',freq:'daily',desc:'每天学习新知识1小时'},
+{name:'锻炼',icon:'💪',color:'#fc5c6c',freq:'daily',desc:'每天进行力量训练或有氧运动'},
+{name:'写日记',icon:'✍️',color:'#fcb44c',freq:'daily',desc:'每天记录生活感悟和心得'},
+{name:'练琴',icon:'🎸',color:'#da4c8a',freq:'daily',desc:'每天练习乐器30分钟'},
+{name:'健康饮食',icon:'🍎',color:'#4cda8a',freq:'daily',desc:'每天保持健康均衡的饮食'},
+{name:'编程',icon:'💻',color:'#5c8cfc',freq:'daily',desc:'每天写代码或学习编程技术'},
+{name:'画画',icon:'🎨',color:'#e44cfc',freq:'weekly',desc:'每周至少画一幅画'},
+{name:'游泳',icon:'🏊',color:'#4cd8da',freq:'weekly',desc:'每周游泳2-3次'},
+{name:'整理房间',icon:'🧹',color:'#8cfc5c',freq:'weekly',desc:'每周整理一次房间'},
+{name:'骑行',icon:'🚴',color:'#fc8c4c',freq:'weekly',desc:'每周骑行一次，享受户外'},
+{name:'做饭',icon:'🍳',color:'#fcb44c',freq:'weekly',desc:'每周尝试做一道新菜'}
+];
+let habits=JSON.parse(localStorage.getItem('habits')||'[]');
+let checkins=JSON.parse(localStorage.getItem('checkins')||'{}');
+let editingId=null;
+let selectedEmoji='🏃';
+let selectedColor=COLORS[0];
+function today(){return new Date().toISOString().slice(0,10)}
+function getDateStr(d){return d.toISOString().slice(0,10)}
+function getDayOfWeek(d){return(d.getDay()+6)%7}
+function showProModal(){document.getElementById('proModalOverlay').classList.add('show')}
+function closeProModal(){document.getElementById('proModalOverlay').classList.remove('show')}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS list-style generator with live preview. Customize bullet types, positions, images, and counters for ordered and unordered lists. Export ready CSS code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-list-style/">
+<title>CSS List Style Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+h1{text-align:center;padding:30px 0 10px;font-size:2rem;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.95rem}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.panel{background:#16213e;border-radius:12px;padding:24px;border:1px solid #0f3460}
+.panel h2{font-size:1.1rem;margin-bottom:18px;color:#e94560}
+.group{margin-bottom:18px}
+.group label{display:block;font-size:.85rem;color:#aaa;margin-bottom:6px;font-weight:500}
+select,input[type="text"],input[type="url"],input[type="color"]{width:100%;padding:10px 12px;background:#1a1a2e;border:1px solid #0f3460;border-radius:8px;color:#e0e0e0;font-size:.9rem;outline:none;transition:border-color .2s}
+select:focus,input[type="text"]:focus,input[type="url"]:focus{border-color:#e94560}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+input[type="color"]{height:42px;padding:4px;cursor:pointer}
+input[type="range"]{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:#0f3460;border:none;border-radius:3px;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#e94560;cursor:pointer}
+.rr{display:flex;align-items:center;gap:12px}
+.rr input[type="range"]{flex:1}
+.rv{min-width:45px;text-align:right;font-size:.85rem;color:#e94560;font-weight:600}
+.tg{display:flex;gap:0;margin-bottom:18px}
+.tb{flex:1;padding:10px;text-align:center;background:#1a1a2e;border:1px solid #0f3460;color:#888;cursor:pointer;font-size:.9rem;transition:all .2s;font-weight:500}
+.tb:first-child{border-radius:8px 0 0 8px}
+.tb:last-child{border-radius:0 8px 8px 0}
+.tb.active{background:#e94560;color:#fff;border-color:#e94560}
+.pbox{background:#1a1a2e;border:1px solid #0f3460;border-radius:8px;padding:24px;min-height:200px;margin-top:12px}
+.pbox ul,.pbox ol{padding-left:30px}
+.pbox li{padding:6px 0;font-size:1rem}
+.cbox{position:relative;margin-top:12px}
+.cbox pre{background:#1a1a2e;border:1px solid #0f3460;border-radius:8px;padding:16px;font-family:'Fira Code',monospace;font-size:.85rem;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:#7ec8e3;min-height:120px;max-height:300px;overflow-y:auto}
+.cbtn{position:absolute;top:8px;right:8px;background:#e94560;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s}
+.cbtn:hover{background:#c73650}
+.cbtn.copied{background:#27ae60}
+.dv{border:none;border-top:1px solid #0f3460;margin:18px 0}
+.sw{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sl{position:absolute;cursor:pointer;inset:0;background:#0f3460;border-radius:24px;transition:.3s}
+.sl:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#888;border-radius:50%;transition:.3s}
+.sw input:checked+.sl{background:#e94560}
+.sw input:checked+.sl:before{transform:translateX(20px);background:#fff}
+.mt{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.mt span{font-size:.9rem;color:#ccc}
+.dim{opacity:.4;pointer-events:none}
+.eh{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.ehi{background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:1rem;transition:border-color .2s}
+.ehi:hover{border-color:#e94560}
+@media(max-width:768px){.main{grid-template-columns:1fr}h1{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>CSS List Style Generator</h1>
+<p class="subtitle">Customize list styles with real-time preview &middot; Copy generated CSS</p>
+<div class="main">
+<div>
+<div class="panel">
+<h2>List Style Properties</h2>
+<div class="group"><label>list-style-type</label>
+<select id="sType"><option value="disc">disc</option><option value="circle">circle</option><option value="square">square</option><option value="decimal">decimal</option><option value="decimal-leading-zero">decimal-leading-zero</option><option value="lower-roman">lower-roman</option><option value="upper-roman">upper-roman</option><option value="lower-alpha">lower-alpha</option><option value="upper-alpha">upper-alpha</option><option value="lower-greek">lower-greek</option><option value="armenian">armenian</option><option value="georgian">georgian</option><option value="none">none</option></select></div>
+<div class="group"><label>list-style-position</label>
+<select id="sPos"><option value="outside">outside</option><option value="inside">inside</option></select></div>
+<div class="group"><label>list-style-image</label>
+<select id="sImgMode"><option value="none">none</option><option value="url">Custom URL</option></select></div>
+<div class="group" id="urlWrap" style="display:none"><label>Image URL</label>
+<input type="url" id="sImgUrl" placeholder="https://example.com/bullet.svg"></div>
+<hr class="dv">
+<h2>::marker Pseudo-element</h2>
+<div class="mt"><label class="sw"><input type="checkbox" id="markerOn"><span class="sl"></span></label><span>Enable ::marker customization</span></div>
+<div id="markerOpts" class="dim">
+<div class="group"><label>color</label><input type="color" id="mColor" value="#e94560"></div>
+<div class="group"><label>font-size</label><div class="rr"><input type="range" id="mSize" min="8" max="48" value="16"><span class="rv" id="mSizeVal">16px</span></div></div>
+<div class="group"><label>content (custom marker text)</label><input type="text" id="mContent" placeholder='e.g. "👉 " or "★ "'>
+<div class="eh"><span class="ehi" onclick="document.getElementById('mContent').value='&quot;👉 &quot;';update()">👉</span><span class="ehi" onclick="document.getElementById('mContent').value='&quot;★ &quot;';update()">★</span><span class="ehi" onclick="document.getElementById('mContent').value='&quot;🔥 &quot;';update()">🔥</span><span class="ehi" onclick="document.getElementById('mContent').value='&quot;✅ &quot;';update()">✅</span><span class="ehi" onclick="document.getElementById('mContent').value='&quot;➤ &quot;';update()">➤</span><span class="ehi" onclick="document.getElementById('mContent').value='&quot;💡 &quot;';update()">💡</span></div></div>
+</div>
+</div>
+</div>
+<div>
+<div class="panel">
+<h2>Preview</h2>
+<div class="tg"><div class="tb active" onclick="setTag('ul',this)">Unordered (ul)</div><div class="tb" onclick="setTag('ol',this)">Ordered (ol)</div></div>
+<div class="pbox" id="preview"></div>
+</div>
+<div class="panel" style="margin-top:24px">
+<h2>Generated CSS</h2>
+<div class="cbox"><button class="cbtn" onclick="copyCSS(this)">Copy CSS</button><pre id="codeOut"></pre></div>
+</div>
+</div>
+</div>
+</div>
+<script>
+let tag='ul';
+const $=id=>document.getElementById(id);
+const els={type:$('sType'),pos:$('sPos'),imgMode:$('sImgMode'),imgUrl:$('sImgUrl'),urlWrap:$('urlWrap'),markerOn:$('markerOn'),markerOpts:$('markerOpts'),mColor:$('mColor'),mSize:$('mSize'),mSizeVal:$('mSizeVal'),mContent:$('mContent'),preview:$('preview'),code:$('codeOut')};
+function setTag(t,btn){tag=t;document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');update()}
+function update(){
+  const t=els.type.value,p=els.pos.value,im=els.imgMode.value,iu=els.imgUrl.value.trim();
+  const mo=els.markerOn.checked,mc=els.mColor.value,ms=els.mSize.value,mct=els.mContent.value.trim();
+  els.urlWrap.style.display=im==='url'?'block':'none';
+  els.markerOpts.classList.toggle('dim',!mo);
+  els.mSizeVal.textContent=ms+'px';
+  // Build preview
+  const items=['First list item','Second list item','Third list item','Fourth list item','Fifth list item'];
+  let styleId='prev-style';
+  let old=document.getElementById(styleId);
+  if(old)old.remove();
+  let css=`#preview ${tag}{list-style-type:${t};list-style-position:${p};`;
+  if(im==='url'&&iu)css+=`list-style-image:url("${iu}");`;
+  css+='}';
+  if(mo){
+    css+=`#preview ${tag} li::marker{color:${mc};font-size:${ms}px;`;
+    if(mct)css+=`content:${mct};`;
+    css+='}';
+  }
+  const st=document.createElement('style');
+  st.id=styleId;st.textContent=css;document.head.appendChild(st);
+  let html=`<${tag}>`;
+  items.forEach(i=>html+=`<li>${i}</li>`);
+  html+=`</${tag}>`;
+  els.preview.innerHTML=html;
+  // Build output CSS
+  let out=`${tag} {\n  list-style-type: ${t};\n  list-style-position: ${p};`;
+  if(im==='url'&&iu)out+=`\n  list-style-image: url("${iu}");`;
+  out+='\n}';
+  if(mo){
+    out+=`\n\n${tag} li::marker {\n  color: ${mc};\n  font-size: ${ms}px;`;
+    if(mct)out+=`\n  content: ${mct};`;
+    out+='\n}';
+  }
+  els.code.textContent=out;
+}
+function copyCSS(btn){
+  navigator.clipboard.writeText(els.code.textContent).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy CSS';btn.classList.remove('copied')},2000);
+  });
+}
+// Event listeners
+[els.type,els.pos,els.imgMode,els.imgUrl,els.mColor,els.mContent].forEach(e=>e.addEventListener('input',update));
+els.mSize.addEventListener('input',update);
+els.markerOn.addEventListener('change',update);
+update();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:40px auto 0;padding:0 20px 40px;position:relative}
+.pro-hd{text-align:center;margin-bottom:20px}
+.pro-hd h2{font-size:1.5rem;color:#e94560;margin-bottom:4px}
+.pro-hd p{color:#888;font-size:.9rem}
+.pro-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden}
+.pro-blur{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;filter:blur(6px);opacity:.6;pointer-events:none;user-select:none}
+.pro-card{background:#16213e;border:1px solid #0f3460;border-radius:10px;padding:20px}
+.pro-card h3{font-size:1rem;color:#e94560;margin-bottom:8px}
+.pro-card p{color:#999;font-size:.85rem;line-height:1.5}
+.pro-card .mock-ui{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.pro-card .mock-chip{background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;padding:4px 10px;font-size:.8rem;color:#888}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);z-index:2}
+.pro-lock-icon{font-size:3rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.1rem;font-weight:600;color:#e0e0e0}
+.pro-lock-sub{font-size:.85rem;color:#888;margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:#e94560;margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.95rem;border-bottom:1px solid #0f3460}
+.pro-modal ul li::before{content:"✅ ";margin-right:6px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-btn-upgrade{display:inline-block;width:100%;padding:14px;background:#e94560;color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:8px}
+.pro-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-btn-later{background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-btn-later:hover{color:#ccc}
+@media(max-width:768px){.pro-blur{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-hd"><h2>🔒 Pro Features</h2><p>Take your list styling to the next level</p></div>
+<div class="pro-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-blur">
+<div class="pro-card"><h3>🎨 Custom Icon Library</h3><p>500+ curated SVG icons as list markers. Search, filter by category, and use any icon as your bullet.</p><div class="mock-ui"><span class="mock-chip">🏠 Home</span><span class="mock-chip">⚡ Energy</span><span class="mock-chip">🎯 Target</span><span class="mock-chip">+497</span></div></div>
+<div class="pro-card"><h3>✨ Animated Lists</h3><p>Entrance animations, hover effects, and staggered reveals. Make your lists come alive with CSS animations.</p><div class="mock-ui"><span class="mock-chip">fadeIn</span><span class="mock-chip">slideUp</span><span class="mock-chip">bounce</span><span class="mock-chip">stagger</span></div></div>
+<div class="pro-card"><h3>⚛️ React Component</h3><p>Export as a ready-to-use React component with TypeScript types. Copy & paste into your project.</p><div class="mock-ui"><span class="mock-chip">JSX</span><span class="mock-chip">TSX</span><span class="mock-chip">Styled</span></div></div>
+</div>
+<div class="pro-lock"><div class="pro-lock-icon">🔒</div><div class="pro-lock-text">Pro Features Locked</div><div class="pro-lock-sub">Click to unlock</div></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>Unlock Pro Features</h3>
+<div class="pro-price">$9</div>
+<ul>
+<li>Custom Icon Library — 500+ SVG markers</li>
+<li>Animated Lists — entrance & hover effects</li>
+<li>React Component Export — JSX/TSX ready</li>
+<li>Priority updates & support</li>
+</ul>
+<a class="pro-btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<br><button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

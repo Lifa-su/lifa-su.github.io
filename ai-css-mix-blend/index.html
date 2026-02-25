@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Preview all CSS mix-blend-mode values in real-time. Compare multiply, screen, overlay, and other blend modes on text and images with live examples.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-mix-blend/">
+<title>CSS Mix Blend Mode Preview Tool</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--r:12px;--sh:0 4px 24px rgba(0,0,0,.4)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.hd{text-align:center;padding:2.5rem 1rem 1.5rem;background:linear-gradient(135deg,var(--sf),var(--ac2));border-bottom:2px solid rgba(233,69,96,.3)}
+.hd h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,#fff,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hd p{color:var(--tx2);margin-top:.4rem;font-size:.95rem}
+.ctl{max-width:960px;margin:1.5rem auto;padding:0 1rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;align-items:flex-end}
+.cg{background:var(--sf);border-radius:var(--r);padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.5rem;box-shadow:var(--sh)}
+.cg label{font-size:.78rem;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.cr{display:flex;align-items:center;gap:.6rem}
+.cr input[type=color]{width:44px;height:44px;border:2px solid rgba(255,255,255,.1);border-radius:8px;cursor:pointer;background:transparent;padding:2px}
+.cr input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cr input[type=color]::-webkit-color-swatch{border:none;border-radius:6px}
+.chx{background:var(--bg);border:1px solid rgba(255,255,255,.1);color:var(--tx);padding:.4rem .6rem;border-radius:6px;width:90px;font-family:monospace;font-size:.9rem}
+.ub{display:inline-flex;align-items:center;gap:.4rem;background:var(--sf2);color:var(--tx);border:1px dashed rgba(255,255,255,.2);border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-size:.85rem;transition:all .2s}
+.ub:hover{border-color:var(--ac);color:var(--ac)}
+.ii{font-size:.72rem;color:var(--ac);min-height:1rem;display:flex;align-items:center;gap:.5rem}
+.clr{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.72rem;text-decoration:underline}
+.clr:hover{color:var(--ac)}
+.gw{max-width:1400px;margin:1.5rem auto;padding:0 1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.card{background:var(--sf);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;cursor:pointer}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(233,69,96,.15)}
+.pv{position:relative;height:180px;overflow:hidden}
+.lbg{position:absolute;inset:0}
+.lfg{position:absolute;inset:0}
+.ci{padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.05)}
+.bn{font-weight:700;font-size:.92rem}
+.cb{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:.32rem .75rem;font-size:.76rem;cursor:pointer;font-weight:600;transition:all .2s}
+.cb:hover{background:#c73650}
+.cb.ok{background:#2ecc71}
+.pnl{position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:2px solid var(--ac);transform:translateY(100%);transition:transform .3s;z-index:100;max-height:45vh;overflow:auto}
+.pnl.open{transform:translateY(0)}
+.pnlh{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1.2rem;background:rgba(0,0,0,.25);position:sticky;top:0;z-index:1}
+.pnlh h3{font-size:.9rem;color:var(--ac)}
+.xb{background:none;border:none;color:var(--tx2);font-size:1.5rem;cursor:pointer;line-height:1}
+.pnl pre{padding:1rem 1.2rem;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;color:#a8e6cf;white-space:pre-wrap;word-break:break-all}
+.pa{padding:.5rem 1.2rem 1rem;display:flex;gap:.5rem}
+.pa button{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:.4rem 1rem;font-size:.8rem;cursor:pointer;font-weight:600}
+.pa button:hover{background:#c73650}
+.pa button.ok{background:#2ecc71}
+.toast{position:fixed;top:1.5rem;right:1.5rem;background:#2ecc71;color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-size:.85rem;font-weight:600;opacity:0;transform:translateY(-10px);transition:all .3s;z-index:200;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.ft{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.78rem;margin-top:2rem}
+@media(max-width:600px){.ctl{flex-direction:column;align-items:stretch}.grid{grid-template-columns:1fr 1fr}.pv{height:140px}}
+@media(max-width:400px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hd"><h1>CSS Mix Blend Mode</h1><p>Preview &amp; compare all 16 blend modes interactively</p></header>
+<section class="ctl">
+<div class="cg">
+  <label for="bgC">Background Color</label>
+  <div class="cr"><input type="color" id="bgC" value="#3498db"><input type="text" class="chx" id="bgH" value="#3498db" maxlength="7"></div>
+  <label class="ub" for="bgI">&#128193; BG Image</label>
+  <input type="file" id="bgI" accept="image/*" hidden>
+  <div class="ii" id="bgN"></div>
+</div>
+<div class="cg">
+  <label for="fgC">Foreground Color</label>
+  <div class="cr"><input type="color" id="fgC" value="#e74c3c"><input type="text" class="chx" id="fgH" value="#e74c3c" maxlength="7"></div>
+  <label class="ub" for="fgI">&#128193; FG Image</label>
+  <input type="file" id="fgI" accept="image/*" hidden>
+  <div class="ii" id="fgN"></div>
+</div>
+</section>
+<div class="gw"><div class="grid" id="grid"></div></div>
+<div class="pnl" id="pnl">
+  <div class="pnlh"><h3 id="pnlT">CSS Code</h3><button class="xb" onclick="closePnl()">&times;</button></div>
+  <pre id="pnlC"></pre>
+  <div class="pa"><button onclick="copyCode()">Copy CSS</button></div>
+</div>
+<div class="toast" id="toast"></div>
+<footer class="ft">&copy; 2025 CSS Mix Blend Mode Tool</footer>
+<script>
+const modes=['normal','multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'];
+let bgImg=null,fgImg=null,curMode='';
+
+function init(){
+  const grid=document.getElementById('grid');
+  modes.forEach(m=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<div class="pv"><div class="lbg" data-bg="${m}"></div><div class="lfg" data-fg="${m}" style="mix-blend-mode:${m}"></div></div><div class="ci"><span class="bn">${m}</span><button class="cb" onclick="event.stopPropagation();copyOne('${m}')">Copy</button></div>`;
+    card.addEventListener('click',()=>showPnl(m));
+    grid.appendChild(card);
+  });
+  updateAll();
+}
+
+function updateAll(){
+  const bgc=document.getElementById('bgC').value;
+  const fgc=document.getElementById('fgC').value;
+  document.querySelectorAll('[data-bg]').forEach(el=>{
+    if(bgImg){el.style.background=`url(${bgImg}) center/cover no-repeat`;}
+    else{el.style.background=bgc;}
+  });
+  document.querySelectorAll('[data-fg]').forEach(el=>{
+    if(fgImg){el.style.background=`url(${fgImg}) center/cover no-repeat`;}
+    else{el.style.background=fgc;}
+  });
+}
+
+function syncColor(picker,hex,which){
+  document.getElementById(picker).addEventListener('input',e=>{
+    document.getElementById(hex).value=e.target.value;
+    updateAll();
+  });
+  document.getElementById(hex).addEventListener('input',e=>{
+    let v=e.target.value;
+    if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById(picker).value=v;updateAll();}
+  });
+}
+
+function handleImg(inputId,infoId,which){
+  document.getElementById(inputId).addEventListener('change',e=>{
+    const f=e.target.files[0];
+    if(!f)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      if(which==='bg')bgImg=ev.target.result;
+      else fgImg=ev.target.result;
+      document.getElementById(infoId).innerHTML=f.name.slice(0,20)+' <button class="clr" onclick="clearImg(\''+which+'\',\''+infoId+'\',\''+inputId+'\')">Clear</button>';
+      updateAll();
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function clearImg(which,infoId,inputId){
+  if(which==='bg')bgImg=null;else fgImg=null;
+  document.getElementById(infoId).innerHTML='';
+  document.getElementById(inputId).value='';
+  updateAll();
+}
+
+function genCSS(m){
+  const bgc=document.getElementById('bgC').value;
+  const fgc=document.getElementById('fgC').value;
+  let css=`.container {\n  position: relative;\n}\n\n.background {\n  background: ${bgImg?'url("your-bg-image.jpg") center/cover no-repeat':bgc};\n  width: 100%;\n  height: 300px;\n}\n\n.foreground {\n  background: ${fgImg?'url("your-fg-image.jpg") center/cover no-repeat':fgc};\n  mix-blend-mode: ${m};\n  width: 100%;\n  height: 300px;\n}`;
+  return css;
+}
+
+function showPnl(m){
+  curMode=m;
+  document.getElementById('pnlT').textContent='CSS — mix-blend-mode: '+m;
+  document.getElementById('pnlC').textContent=genCSS(m);
+  document.getElementById('pnl').classList.add('open');
+}
+
+function closePnl(){document.getElementById('pnl').classList.remove('open');}
+
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('pnlC').textContent).then(()=>{
+    showToast('CSS copied!');
+    const b=document.querySelector('.pa button');
+    b.classList.add('ok');b.textContent='Copied!';
+    setTimeout(()=>{b.classList.remove('ok');b.textContent='Copy CSS';},1500);
+  });
+}
+
+function copyOne(m){
+  const css=`mix-blend-mode: ${m};`;
+  navigator.clipboard.writeText(css).then(()=>{
+    showToast('Copied: '+css);
+    const btns=document.querySelectorAll('.cb');
+    btns.forEach(b=>{
+      if(b.closest('.card').querySelector('.bn').textContent===m){
+        b.classList.add('ok');b.textContent='OK!';
+        setTimeout(()=>{b.classList.remove('ok');b.textContent='Copy';},1200);
+      }
+    });
+  });
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+syncColor('bgC','bgH','bg');
+syncColor('fgC','fgH','fg');
+handleImg('bgI','bgN','bg');
+handleImg('fgI','fgN','fg');
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

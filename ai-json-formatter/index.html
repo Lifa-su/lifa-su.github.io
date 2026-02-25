@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI JSON Formatter - Format, Validate &amp; Beautify JSON Online</title>
+<meta name="description" content="Free online JSON formatter, validator, and beautifier. Format, minify, validate JSON with syntax highlighting, tree view, and error detection. Fast, private, no data sent to servers.">
+<meta name="keywords" content="JSON formatter, JSON validator, JSON beautifier, JSON minifier, JSON viewer, JSON tree view, online JSON tool, format JSON, validate JSON">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-json-formatter/">
+<meta property="og:title" content="AI JSON Formatter - Format, Validate &amp; Beautify JSON Online">
+<meta property="og:description" content="Free online JSON formatter with syntax highlighting, tree view, validation, and minification. Fast and private.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-json-formatter/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI JSON Formatter - Format, Validate &amp; Beautify JSON Online">
+<meta name="twitter:description" content="Free online JSON formatter with syntax highlighting, tree view, validation, and minification.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI JSON Formatter",
+  "url": "https://lifa-su.com/ai-json-formatter/",
+  "description": "Free online JSON formatter, validator, and beautifier with syntax highlighting and tree view.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "FeiDev", "url": "https://ko-fi.com/feidev" }
+}
+</script>
+<style>
+/* === Reset & Variables === */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--sf:#1e2746;--sf2:#253256;
+  --tx:#e0e0e0;--tx2:#a0a0b0;--ac:#e94560;--gn:#4ecca3;--bl:#4fc3f7;
+  --or:#ff9800;--pu:#ce93d8;--rd:#ef5350;--bd:#2a3a5c;--r:8px;
+  --shadow:0 2px 8px rgba(0,0,0,.3)
+}
+[data-theme="light"]{
+  --bg:#f5f7fa;--bg2:#ffffff;--bg3:#e8ecf1;--sf:#ffffff;--sf2:#f0f2f5;
+  --tx:#1a1a2e;--tx2:#6b7280;--ac:#e94560;--gn:#059669;--bl:#2563eb;
+  --or:#d97706;--pu:#9333ea;--rd:#dc2626;--bd:#d1d5db;
+  --shadow:0 2px 8px rgba(0,0,0,.08)
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+
+/* === Header === */
+.hd{background:var(--bg2);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.hd h1{font-size:1.3rem;color:var(--ac);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.hd h1 span{color:var(--gn)}
+.tb{display:flex;gap:8px;flex-wrap:wrap;flex:1;justify-content:flex-end;align-items:center}
+.btn{background:var(--sf2);color:var(--tx);border:1px solid var(--bd);padding:6px 14px;border-radius:var(--r);cursor:pointer;font-size:.85rem;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:var(--bg3);border-color:var(--ac)}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.p:hover{background:#d63050}
+.btn.g{background:var(--gn);border-color:var(--gn);color:#1a1a2e}.btn.g:hover{opacity:.85}
+.theme-btn{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:4px 8px;border-radius:var(--r);transition:all .2s}
+.theme-btn:hover{background:var(--sf2)}
+
+/* === Main Layout === */
+.mn{display:flex;flex:1;overflow:hidden}
+.pn{flex:1;display:flex;flex-direction:column;min-width:0}
+.ph{background:var(--bg2);padding:8px 14px;font-size:.85rem;color:var(--tx2);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.ew{flex:1;position:relative;overflow:hidden}
+.ln{position:absolute;left:0;top:0;bottom:0;width:44px;background:var(--bg2);border-right:1px solid var(--bd);padding:12px 4px;text-align:right;font:13px/1.5 'SF Mono',Monaco,Consolas,monospace;color:var(--tx2);overflow:hidden;user-select:none;z-index:1}
+#input{width:100%;height:100%;background:var(--sf);color:var(--tx);border:none;outline:none;resize:none;font:13px/1.5 'SF Mono',Monaco,Consolas,monospace;padding:12px 12px 12px 52px;tab-size:2}
+#input::placeholder{color:var(--tx2)}
+.dv{width:1px;background:var(--bd);cursor:col-resize;transition:all .15s}.dv:hover,.dv.act{background:var(--ac);width:3px}
+.ow{flex:1;overflow:auto;background:var(--sf)}
+.oc{padding:12px;font:13px/1.5 'SF Mono',Monaco,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+
+/* === Tabs === */
+.tabs{display:flex}.tab{padding:6px 14px;cursor:pointer;font-size:.8rem;color:var(--tx2);border-bottom:2px solid transparent;transition:all .2s}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}.tab:hover{color:var(--tx)}
+
+/* === Error Bar === */
+.err{background:rgba(239,83,80,.1);border:1px solid var(--rd);color:var(--rd);padding:8px 14px;font-size:.85rem;border-radius:var(--r);margin:8px;display:none;align-items:flex-start;gap:8px}
+.err.show{display:flex}.err .ic{font-size:1.1rem;flex-shrink:0}.err .ms{flex:1;word-break:break-word}
+.el{background:rgba(239,83,80,.15)!important}
+
+/* === Syntax Highlighting === */
+.hk{color:var(--bl)}.hs{color:var(--gn)}.hn{color:var(--or)}.hb{color:var(--pu)}.hu{color:var(--rd)}.hc{color:var(--tx2)}
+
+/* === Tree View === */
+.tree{padding:12px;font-size:13px;line-height:1.6}
+.tn{padding-left:20px}.tn>.tl{cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:1px 4px;border-radius:3px;transition:background .15s}
+.tn>.tl:hover{background:var(--sf2)}
+.tt{display:inline-block;width:16px;text-align:center;color:var(--tx2);font-size:11px;cursor:pointer;user-select:none;flex-shrink:0;transition:transform .15s}
+.tt.op{transform:rotate(90deg)}
+.tk{color:var(--bl)}.ts{color:var(--gn)}.tnu{color:var(--or)}.tbo{color:var(--pu)}.tnl{color:var(--rd)}
+.ty{color:var(--tx2);font-size:.8em;margin-left:4px}
+.tc{overflow:hidden}.tc.cl{display:none}
+.tp{opacity:0;font-size:10px;cursor:pointer;color:var(--ac);margin-left:6px;transition:opacity .15s}
+.tl:hover .tp{opacity:1}
+
+/* === Keyboard Shortcuts Hint === */
+.kbd-hint{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:10px 16px;font-size:.78rem;color:var(--tx2);margin:8px;line-height:1.8}
+.kbd-hint kbd{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:1px 6px;font-family:inherit;font-size:.75rem;color:var(--tx)}
+
+/* === Toast === */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gn);color:#fff;padding:8px 20px;border-radius:var(--r);font-size:.85rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:var(--shadow)}
+.toast.show{opacity:1}
+
+/* === Status Bar === */
+.sb{background:var(--bg2);border-top:1px solid var(--bd);padding:4px 14px;font-size:.75rem;color:var(--tx2);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+
+/* === Pro Section === */
+.pro-section{background:var(--bg2);border-top:1px solid var(--bd);padding:32px 20px}
+.pro-section h2{text-align:center;font-size:1.2rem;color:var(--tx);margin-bottom:20px}
+.pro-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto}
+.pro-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px 20px;width:260px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.pro-card:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pro-card h3{font-size:.95rem;margin-bottom:8px;color:var(--tx)}
+.pro-card p{font-size:.82rem;color:var(--tx2);line-height:1.5}
+.pro-card .lock-overlay{position:absolute;inset:0;background:rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+[data-theme="light"] .pro-card .lock-overlay{background:rgba(255,255,255,.25)}
+.pro-card:hover .lock-overlay{opacity:1}
+.lock-icon{font-size:2rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+
+/* === Modal === */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.modal h3{font-size:1.2rem;margin-bottom:12px;color:var(--tx)}
+.modal p{font-size:.9rem;color:var(--tx2);margin-bottom:20px;line-height:1.5}
+.modal .btn-pro{background:var(--ac);color:#fff;border:none;padding:12px 28px;border-radius:var(--r);font-size:1rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.modal .btn-pro:hover{background:#d63050;transform:scale(1.03)}
+.modal .btn-close{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.85rem;margin-top:12px;padding:6px}
+.modal .btn-close:hover{color:var(--tx)}
+
+/* === Footer === */
+.footer{background:var(--bg2);border-top:1px solid var(--bd);padding:16px 20px;text-align:center;font-size:.82rem;color:var(--tx2)}
+.footer a{color:var(--ac);text-decoration:none}.footer a:hover{text-decoration:underline}
+
+/* === Mobile === */
+@media(max-width:768px){
+  .mn{flex-direction:column}.dv{width:auto;height:1px;cursor:row-resize}.pn{min-height:35vh}
+  .hd{padding:8px 12px}.hd h1{font-size:1.1rem}
+  .tb{justify-content:flex-start}
+  .pro-card{width:100%}
+  .kbd-hint{display:none}
+}
+</style>
+</head>
+<body>
+<!-- Header -->
+<div class="hd">
+  <h1>{ } <span>JSON Formatter</span></h1>
+  <div class="tb">
+    <button class="btn p" onclick="doFormat()" title="Format JSON (Ctrl+Enter)">&#9654; Format</button>
+    <button class="btn" onclick="doCompress()" title="Minify (Ctrl+Shift+M)">&#128230; Minify</button>
+    <button class="btn" onclick="doCopy()" title="Copy result (Ctrl+Shift+C)">&#128203; Copy</button>
+    <button class="btn" onclick="doClear()" title="Clear (Ctrl+L)">&#128465; Clear</button>
+    <button class="btn g" onclick="doSample()">&#128196; Sample</button>
+    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">&#127769;</button>
+  </div>
+</div>
+
+<!-- Main Editor Area -->
+<div class="mn">
+  <div class="pn">
+    <div class="ph"><span>Input JSON</span><span id="iinfo"></span></div>
+    <div class="ew">
+      <div class="ln" id="lns">1</div>
+      <textarea id="input" placeholder="Paste your JSON here..." spellcheck="false"></textarea>
+    </div>
+  </div>
+  <div class="dv" id="dv"></div>
+  <div class="pn">
+    <div class="ph">
+      <div class="tabs">
+        <div class="tab on" data-t="fmt">Formatted</div>
+        <div class="tab" data-t="tree">Tree View</div>
+      </div>
+      <span id="oinfo"></span>
+    </div>
+    <div class="err" id="err"><span class="ic">&#9888;</span><span class="ms" id="errmsg"></span></div>
+    <div class="ow" id="ow">
+      <div class="oc" id="out"></div>
+      <div class="tree" id="treeout" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Bar -->
+<div class="sb">
+  <span id="sbl">Ready</span>
+  <span id="sbr">
+    <kbd>Ctrl+Enter</kbd> Format &nbsp;
+    <kbd>Ctrl+Shift+M</kbd> Minify &nbsp;
+    <kbd>Ctrl+Shift+C</kbd> Copy &nbsp;
+    <kbd>Ctrl+L</kbd> Clear
+  </span>
+</div>
+
+<!-- Pro Features Section -->
+<div class="pro-section">
+  <h2>&#128272; Pro Features</h2>
+  <div class="pro-cards">
+    <div class="pro-card" onclick="showProModal()">
+      <div class="pro-overlay"><span class="pro-lock">&#128274;</span></div>
+      <h3>&#128220; JSON Schema Validation</h3>
+      <p>Validate JSON against any JSON Schema draft. Get detailed error reports with line numbers and fix suggestions.</p>
+    </div>
+    <div class="pro-card" onclick="showProModal()">
+      <div class="pro-overlay"><span class="pro-lock">&#128274;</span></div>
+      <h3>&#128260; JSON Diff Compare</h3>
+      <p>Compare two JSON documents side by side. Highlight additions, deletions, and modifications instantly.</p>
+    </div>
+    <div class="pro-card" onclick="showProModal()">
+      <div class="pro-overlay"><span class="pro-lock">&#128274;</span></div>
+      <h3>&#9889; API Response Formatter</h3>
+      <p>Paste API responses with headers. Auto-detect content type, format body, and extract key information.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <span>Made with &#10084;&#65039; by <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">FeiDev</a></span>
+  <span>&middot;</span>
+  <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">&#9749; Support on Ko-fi</a>
+  <span>&middot;</span>
+  <span>&copy; 2025 FeiDev. All rights reserved.</span>
+</footer>
+
+<!-- Pro Modal -->
+<div class="modal-bg" id="proModal" onclick="hideProModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="hideProModal()">&times;</button>
+    <h2>&#128274; Unlock Pro Features</h2>
+    <p style="margin:12px 0;color:var(--tx2);line-height:1.6">Get access to advanced JSON tools including Schema Validation, Diff Compare, and API Response Formatter. Support the development and unlock all features.</p>
+    <ul style="margin:12px 0 20px;color:var(--tx2);line-height:1.8;padding-left:20px">
+      <li>JSON Schema Validation (all drafts)</li>
+      <li>Side-by-side JSON Diff Compare</li>
+      <li>API Response Formatter</li>
+      <li>Priority support &amp; future updates</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn p" style="display:inline-block;padding:10px 28px;font-size:1rem;text-decoration:none;text-align:center">&#9749; Unlock Pro Features</a>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+<script>
+/* === Utility === */
+const $ = s => document.querySelector(s);
+const inp = $('#input'), out = $('#out'), tree = $('#treeout'), lns = $('#lns');
+const errBar = $('#err'), errMsg = $('#errmsg'), toastEl = $('#toast');
+let curTab = 'fmt', lastParsed = null;
+
+/* === Theme Toggle === */
+function initTheme() {
+  const saved = localStorage.getItem('json-fmt-theme');
+  if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  updateThemeIcon();
+}
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if (isLight) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('json-fmt-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('json-fmt-theme', 'light');
+  }
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  $('#themeToggle').textContent = isLight ? '\u2600\uFE0F' : '\uD83C\uDF19';
+}
+initTheme();
+
+/* === Line Numbers === */
+function updLines() {
+  const lines = inp.value.split('\n');
+  const n = lines.length;
+  lns.innerHTML = Array.from({length: n}, (_, i) => i + 1).join('<br>');
+  const len = inp.value.length;
+  $('#iinfo').textContent = len ? len + ' chars \u00B7 ' + n + ' lines' : '';
+}
+inp.addEventListener('input', updLines);
+inp.addEventListener('scroll', () => { lns.style.transform = 'translateY(-' + inp.scrollTop + 'px)'; });
+inp.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = inp.selectionStart, en = inp.selectionEnd;
+    inp.value = inp.value.substring(0, s) + '  ' + inp.value.substring(en);
+    inp.selectionStart = inp.selectionEnd = s + 2;
+  }
+});
+
+/* === Auto-format on paste === */
+inp.addEventListener('paste', () => setTimeout(() => { updLines(); doFormat(); }, 50));
+
+/* === Tabs === */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+  t.classList.add('on');
+  curTab = t.dataset.t;
+  out.style.display = curTab === 'fmt' ? 'block' : 'none';
+  tree.style.display = curTab === 'tree' ? 'block' : 'none';
+  if (curTab === 'tree' && lastParsed !== null) buildTree(lastParsed);
+}));
+
+/* === HTML Escape === */
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+/* === Syntax Highlighter (tokenizer-based) === */
+function hlJSON(str) {
+  let r = '', i = 0;
+  while (i < str.length) {
+    const c = str[i];
+    if (c === '"') {
+      let j = i + 1;
+      while (j < str.length && !(str[j] === '"' && str[j - 1] !== '\\')) j++;
+      j++;
+      const s = esc(str.substring(i, j));
+      let k = j;
+      while (k < str.length && str[k] === ' ') k++;
+      if (str[k] === ':') r += '<span class="hk">' + s + '</span>';
+      else r += '<span class="hs">' + s + '</span>';
+      i = j;
+    } else if (c === '-' || (c >= '0' && c <= '9')) {
+      let j = i;
+      if (c === '-') j++;
+      while (j < str.length && ((str[j] >= '0' && str[j] <= '9') || str[j] === '.' || str[j] === 'e' || str[j] === 'E' || str[j] === '+' || str[j] === '-')) j++;
+      r += '<span class="hn">' + str.substring(i, j) + '</span>';
+      i = j;
+    } else if (str.substring(i, i + 4) === 'true') {
+      r += '<span class="hb">true</span>'; i += 4;
+    } else if (str.substring(i, i + 5) === 'false') {
+      r += '<span class="hb">false</span>'; i += 5;
+    } else if (str.substring(i, i + 4) === 'null') {
+      r += '<span class="hu">null</span>'; i += 4;
+    } else {
+      r += esc(c); i++;
+    }
+  }
+  return r;
+}
+
+/* === Toast Notification === */
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 2000);
+}
+
+/* === Error Display === */
+function showError(msg) {
+  errMsg.textContent = msg;
+  errBar.classList.add('show');
+}
+function hideError() { errBar.classList.remove('show'); }
+
+/* === Find Error Line === */
+function findErrorLine(msg, str) {
+  const m = msg.match(/position\s+(\d+)/i) || msg.match(/column\s+(\d+)/i);
+  if (m) {
+    const pos = parseInt(m[1]);
+    const before = str.substring(0, pos);
+    return before.split('\n').length;
+  }
+  const lm = msg.match(/line\s+(\d+)/i);
+  if (lm) return parseInt(lm[1]);
+  return -1;
+}
+
+/* === Highlight Error Line === */
+function highlightErrorLine(lineNum) {
+  const lineEls = lns.innerHTML.split('<br>');
+  if (lineNum > 0 && lineNum <= lineEls.length) {
+    lineEls[lineNum - 1] = '<span class="el" style="display:block;padding:0 4px;margin:0 -4px">' + lineEls[lineNum - 1] + '</span>';
+    lns.innerHTML = lineEls.join('<br>');
+  }
+}
+
+/* === Core Functions === */
+function doFormat() {
+  const raw = inp.value.trim();
+  if (!raw) { hideError(); out.innerHTML = ''; tree.innerHTML = ''; $('#oinfo').textContent = ''; $('#sbl').textContent = 'Ready'; return; }
+  try {
+    const obj = JSON.parse(raw);
+    lastParsed = obj;
+    hideError();
+    const formatted = JSON.stringify(obj, null, 2);
+    if (curTab === 'fmt') {
+      out.innerHTML = hlJSON(formatted);
+    } else {
+      buildTree(obj);
+    }
+    const lines = formatted.split('\n').length;
+    $('#oinfo').textContent = formatted.length + ' chars \u00B7 ' + lines + ' lines';
+    $('#sbl').textContent = '\u2705 Valid JSON \u00B7 Formatted';
+    showToast('Formatted successfully');
+  } catch (e) {
+    lastParsed = null;
+    const line = findErrorLine(e.message, raw);
+    showError('Syntax Error: ' + e.message);
+    highlightErrorLine(line);
+    out.innerHTML = '';
+    tree.innerHTML = '';
+    $('#oinfo').textContent = '';
+    $('#sbl').textContent = '\u274C Invalid JSON';
+  }
+}
+
+function doCompress() {
+  const raw = inp.value.trim();
+  if (!raw) return;
+  try {
+    const obj = JSON.parse(raw);
+    lastParsed = obj;
+    hideError();
+    const minified = JSON.stringify(obj);
+    out.innerHTML = hlJSON(minified);
+    curTab = 'fmt';
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.t === 'fmt'));
+    out.style.display = 'block';
+    tree.style.display = 'none';
+    $('#oinfo').textContent = minified.length + ' chars \u00B7 1 line';
+    $('#sbl').textContent = '\u2705 Minified \u00B7 ' + minified.length + ' chars';
+    showToast('Minified successfully');
+  } catch (e) {
+    showError('Syntax Error: ' + e.message);
+    $('#sbl').textContent = '\u274C Invalid JSON';
+  }
+}
+
+function doCopy() {
+  const text = out.textContent || tree.textContent;
+  if (!text) { showToast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+function doClear() {
+  inp.value = '';
+  out.innerHTML = '';
+  tree.innerHTML = '';
+  hideError();
+  updLines();
+  lastParsed = null;
+  $('#iinfo').textContent = '';
+  $('#oinfo').textContent = '';
+  $('#sbl').textContent = 'Ready';
+  inp.focus();
+  showToast('Cleared');
+}
+
+function doSample() {
+  inp.value = JSON.stringify({
+    "name": "AI JSON Formatter",
+    "version": "2.0.0",
+    "description": "A professional JSON formatting tool",
+    "features": ["Format", "Minify", "Validate", "Tree View", "Syntax Highlighting"],
+    "author": { "name": "FeiDev", "url": "https://ko-fi.com/feidev" },
+    "settings": { "theme": "dark", "indentSize": 2, "sortKeys": false },
+    "stats": { "users": 15000, "rating": 4.9, "isOpenSource": true },
+    "tags": null
+  }, null, 2);
+  updLines();
+  doFormat();
+}
+
+/* === Tree View Builder === */
+function buildTree(data) {
+  tree.innerHTML = '';
+  tree.appendChild(createTreeNode('root', data, '$'));
+}
+
+function createTreeNode(key, val, path) {
+  const div = document.createElement('div');
+  div.className = 'tn';
+
+  if (val !== null && typeof val === 'object') {
+    const isArr = Array.isArray(val);
+    const keys = Object.keys(val);
+    const label = document.createElement('div');
+    label.className = 'tl';
+
+    const toggle = document.createElement('span');
+    toggle.className = 'tt op';
+    toggle.textContent = '\u25B6';
+    label.appendChild(toggle);
+
+    if (key !== 'root') {
+      const k = document.createElement('span');
+      k.className = 'tk';
+      k.textContent = isNaN(key) ? '"' + key + '"' : key;
+      label.appendChild(k);
+      label.appendChild(document.createTextNode(': '));
+    }
+
+    const info = document.createElement('span');
+    info.className = 'ty';
+    info.textContent = isArr ? 'Array[' + keys.length + ']' : 'Object{' + keys.length + '}';
+    label.appendChild(info);
+
+    const cp = document.createElement('span');
+    cp.className = 'tp';
+    cp.textContent = '\uD83D\uDCCB ' + path;
+    cp.onclick = e => { e.stopPropagation(); navigator.clipboard.writeText(path).then(() => showToast('Copied: ' + path)); };
+    label.appendChild(cp);
+
+    const children = document.createElement('div');
+    children.className = 'tc';
+
+    toggle.addEventListener('click', e => {
+      e.stopPropagation();
+      toggle.classList.toggle('op');
+      children.classList.toggle('cl');
+    });
+    label.addEventListener('click', () => {
+      toggle.classList.toggle('op');
+      children.classList.toggle('cl');
+    });
+
+    div.appendChild(label);
+
+    keys.forEach(k => {
+      const childPath = isArr ? path + '[' + k + ']' : path + '.' + k;
+      children.appendChild(createTreeNode(k, val[k], childPath));
+    });
+    div.appendChild(children);
+  } else {
+    const label = document.createElement('div');
+    label.className = 'tl';
+
+    const spacer = document.createElement('span');
+    spacer.style.cssText = 'display:inline-block;width:16px';
+    label.appendChild(spacer);
+
+    if (key !== 'root') {
+      const k = document.createElement('span');
+      k.className = 'tk';
+      k.textContent = isNaN(key) ? '"' + key + '"' : key;
+      label.appendChild(k);
+      label.appendChild(document.createTextNode(': '));
+    }
+
+    const v = document.createElement('span');
+    if (val === null) { v.className = 'tnl'; v.textContent = 'null'; }
+    else if (typeof val === 'string') { v.className = 'ts'; v.textContent = '"' + val + '"'; }
+    else if (typeof val === 'number') { v.className = 'tnu'; v.textContent = val; }
+    else if (typeof val === 'boolean') { v.className = 'tbo'; v.textContent = val; }
+    label.appendChild(v);
+
+    const cp = document.createElement('span');
+    cp.className = 'tp';
+    cp.textContent = '\uD83D\uDCCB ' + path;
+    cp.onclick = e => { e.stopPropagation(); navigator.clipboard.writeText(path).then(() => showToast('Copied: ' + path)); };
+    label.appendChild(cp);
+
+    div.appendChild(label);
+  }
+  return div;
+}
+
+/* === Keyboard Shortcuts === */
+document.addEventListener('keydown', e => {
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key === 'Enter') { e.preventDefault(); doFormat(); }
+  else if (mod && e.shiftKey && (e.key === 'C' || e.key === 'c')) { e.preventDefault(); doCopy(); }
+  else if (mod && e.shiftKey && (e.key === 'M' || e.key === 'm')) { e.preventDefault(); doCompress(); }
+  else if (mod && (e.key === 'l' || e.key === 'L')) { e.preventDefault(); doClear(); }
+});
+
+/* === Divider Drag === */
+const dvEl = $('#dv');
+let dragging = false;
+dvEl.addEventListener('mousedown', e => { dragging = true; dvEl.classList.add('act'); e.preventDefault(); });
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const mn = $('.mn');
+  const rect = mn.getBoundingClientRect();
+  const pct = ((e.clientX - rect.left) / rect.width) * 100;
+  const panels = document.querySelectorAll('.pn');
+  panels[0].style.flex = 'none';
+  panels[0].style.width = Math.max(20, Math.min(80, pct)) + '%';
+  panels[1].style.flex = '1';
+});
+document.addEventListener('mouseup', () => { dragging = false; dvEl.classList.remove('act'); });
+
+/* === Touch support for divider on mobile === */
+dvEl.addEventListener('touchstart', e => { dragging = true; dvEl.classList.add('act'); });
+document.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  const mn = $('.mn');
+  const rect = mn.getBoundingClientRect();
+  const touch = e.touches[0];
+  const pct = ((touch.clientX - rect.left) / rect.width) * 100;
+  const panels = document.querySelectorAll('.pn');
+  panels[0].style.flex = 'none';
+  panels[0].style.width = Math.max(20, Math.min(80, pct)) + '%';
+  panels[1].style.flex = '1';
+});
+document.addEventListener('touchend', () => { dragging = false; dvEl.classList.remove('act'); });
+
+/* === Pro Modal === */
+function showProModal() {
+  $('#proModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function hideProModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  $('#proModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') hideProModal();
+});
+
+/* === Initialize === */
+updLines();
+inp.focus();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

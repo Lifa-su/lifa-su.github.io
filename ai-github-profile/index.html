@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate stunning GitHub profile READMEs with AI. Add stats, badges, tech stacks, and contribution graphs. Create a standout developer profile in minutes.">
+<link rel="canonical" href="https://lifa-su.com/ai-github-profile/">
+<title>AI GitHub Profile README Generator</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--accent:#58a6ff;--accent2:#bc8cff;--green:#3fb950;--input-bg:#0d1117;--hover:#1f2937}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+header{background:linear-gradient(135deg,#161b22 0%,#1a1e2e 100%);border-bottom:1px solid var(--border);padding:20px 24px;text-align:center}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text-muted);font-size:0.9rem;margin-top:4px}
+.container{display:flex;gap:20px;padding:20px;max-width:1600px;margin:0 auto}
+.panel{flex:1;min-width:0}
+.left-panel{max-width:520px;flex-shrink:0}
+.section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.section h2{font-size:1.1rem;margin-bottom:14px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.section h2 span{font-size:1.2rem}
+label{display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:4px;margin-top:10px}
+label:first-of-type{margin-top:0}
+input[type="text"],input[type="email"],input[type="url"],textarea,select{width:100%;padding:8px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:60px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.template-card{padding:14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;text-align:center;background:var(--input-bg)}
+.template-card:hover{border-color:var(--text-muted)}
+.template-card.active{border-color:var(--accent);background:rgba(88,166,255,0.08)}
+.template-card .icon{font-size:1.6rem;margin-bottom:4px}
+.template-card .name{font-size:0.85rem;font-weight:600}
+.template-card .desc{font-size:0.75rem;color:var(--text-muted);margin-top:2px}
+.skills-category{margin-bottom:12px}
+.skills-category h3{font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.skills-grid{display:flex;flex-wrap:wrap;gap:6px}
+.skill-tag{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;cursor:pointer;transition:all .2s;user-select:none;display:flex;align-items:center;gap:4px}
+.skill-tag:hover{border-color:var(--text-muted)}
+.skill-tag.active{border-color:var(--accent);background:rgba(88,166,255,0.12);color:var(--accent)}
+.skill-tag .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stats-options{display:flex;flex-direction:column;gap:8px}
+.stats-toggle{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s}
+.stats-toggle:hover{border-color:var(--text-muted)}
+.stats-toggle.active{border-color:var(--green);background:rgba(63,185,80,0.08)}
+.stats-toggle input{display:none}
+.stats-toggle .check{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.stats-toggle.active .check{background:var(--green);border-color:var(--green)}
+.stats-toggle.active .check::after{content:'✓';color:#fff;font-size:12px}
+.stats-toggle .label{font-size:0.85rem}
+.theme-select{margin-top:10px}
+.right-panel{position:sticky;top:20px;align-self:flex-start;max-height:calc(100vh - 40px);display:flex;flex-direction:column}
+.preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.preview-tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:3px}
+.preview-tab{padding:6px 16px;border-radius:6px;font-size:0.85rem;cursor:pointer;transition:all .2s;border:none;background:none;color:var(--text-muted)}
+.preview-tab.active{background:var(--accent);color:#fff}
+.copy-btn{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:0.85rem;cursor:pointer;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:6px}
+.copy-btn:hover{opacity:0.9}
+.copy-btn.copied{background:var(--accent2)}
+.preview-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;overflow-y:auto;flex:1;min-height:400px;max-height:calc(100vh - 140px)}
+.preview-box img{max-width:100%}
+.preview-box h1{font-size:1.8rem;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.preview-box h2{font-size:1.4rem;margin-top:20px;margin-bottom:10px}
+.preview-box h3{font-size:1.15rem;margin-top:16px;margin-bottom:8px}
+.preview-box p{margin-bottom:10px}
+.preview-box a{color:var(--accent);text-decoration:none}
+.preview-box a:hover{text-decoration:underline}
+.preview-box ul,.preview-box ol{margin-bottom:10px;padding-left:24px}
+.preview-box li{margin-bottom:4px}
+.preview-box code{background:rgba(110,118,129,0.2);padding:2px 6px;border-radius:4px;font-size:0.85em}
+.preview-box pre{background:rgba(110,118,129,0.15);padding:12px;border-radius:8px;overflow-x:auto;margin-bottom:12px}
+.preview-box pre code{background:none;padding:0}
+.preview-box hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+.preview-box blockquote{border-left:3px solid var(--accent);padding-left:12px;color:var(--text-muted);margin-bottom:10px}
+.raw-markdown{white-space:pre-wrap;word-break:break-all;font-family:'SFMono-Regular',Consolas,monospace;font-size:0.85rem;color:var(--text-muted);line-height:1.7}
+.badge-preview{display:inline-block;margin:2px}
+@media(max-width:900px){
+.container{flex-direction:column}
+.left-panel{max-width:100%}
+.right-panel{position:static;max-height:none}
+.preview-box{max-height:600px}
+.template-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:500px){
+.template-grid{grid-template-columns:1fr}
+.preview-header{flex-direction:column;gap:10px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🚀 AI GitHub Profile README Generator</h1>
+<p>Create a stunning GitHub profile README in seconds</p>
+</header>
+<div class="container">
+<div class="panel left-panel">
+
+<div class="section">
+<h2><span>👤</span> Basic Information</h2>
+<label>GitHub Username</label>
+<input type="text" id="username" placeholder="e.g. octocat" oninput="updatePreview()">
+<label>Display Name</label>
+<input type="text" id="displayName" placeholder="e.g. John Doe" oninput="updatePreview()">
+<label>Bio / Tagline</label>
+<input type="text" id="bio" placeholder="e.g. Full-stack developer & open source enthusiast" oninput="updatePreview()">
+<label>Current Work</label>
+<input type="text" id="currentWork" placeholder="e.g. Building awesome web apps at Company" oninput="updatePreview()">
+<label>Currently Learning</label>
+<input type="text" id="learning" placeholder="e.g. Rust, WebAssembly" oninput="updatePreview()">
+<label>Looking to Collaborate On</label>
+<input type="text" id="collaborate" placeholder="e.g. Open source projects" oninput="updatePreview()">
+<label>Ask Me About</label>
+<input type="text" id="askMe" placeholder="e.g. JavaScript, React, Node.js" oninput="updatePreview()">
+<label>Email</label>
+<input type="email" id="email" placeholder="e.g. you@example.com" oninput="updatePreview()">
+<label>Portfolio / Website</label>
+<input type="url" id="website" placeholder="e.g. https://yoursite.com" oninput="updatePreview()">
+<label>Twitter Username</label>
+<input type="text" id="twitter" placeholder="e.g. johndoe (without @)" oninput="updatePreview()">
+<label>LinkedIn Username</label>
+<input type="text" id="linkedin" placeholder="e.g. johndoe" oninput="updatePreview()">
+</div>
+
+<div class="section">
+<h2><span>🎨</span> Template Style</h2>
+<div class="template-grid" id="templateGrid">
+<div class="template-card active" data-template="minimal" onclick="selectTemplate('minimal')">
+<div class="icon">✨</div>
+<div class="name">Minimal</div>
+<div class="desc">Clean & simple</div>
+</div>
+<div class="template-card" data-template="developer" onclick="selectTemplate('developer')">
+<div class="icon">💻</div>
+<div class="name">Developer</div>
+<div class="desc">Code-focused</div>
+</div>
+<div class="template-card" data-template="creative" onclick="selectTemplate('creative')">
+<div class="icon">🎭</div>
+<div class="name">Creative</div>
+<div class="desc">Colorful & fun</div>
+</div>
+<div class="template-card" data-template="professional" onclick="selectTemplate('professional')">
+<div class="icon">💼</div>
+<div class="name">Professional</div>
+<div class="desc">Structured & formal</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2><span>🛠️</span> Skills & Technologies</h2>
+<div id="skillsContainer"></div>
+</div>
+
+<div class="section">
+<h2><span>📊</span> Stats Cards</h2>
+<div class="stats-options" id="statsOptions">
+<div class="stats-toggle active" onclick="toggleStat(this,'stats')">
+<div class="check"></div>
+<div class="label">GitHub Stats</div>
+</div>
+<div class="stats-toggle active" onclick="toggleStat(this,'langs')">
+<div class="check"></div>
+<div class="label">Top Languages</div>
+</div>
+<div class="stats-toggle active" onclick="toggleStat(this,'streak')">
+<div class="check"></div>
+<div class="label">Streak Stats</div>
+</div>
+</div>
+<label>Stats Theme</label>
+<select id="statsTheme" onchange="updatePreview()">
+<option value="radical">Radical</option>
+<option value="dark">Dark</option>
+<option value="tokyonight">Tokyo Night</option>
+<option value="dracula">Dracula</option>
+<option value="gruvbox">Gruvbox</option>
+<option value="onedark">One Dark</option>
+<option value="cobalt">Cobalt</option>
+<option value="synthwave">Synthwave</option>
+<option value="highcontrast">High Contrast</option>
+<option value="vue">Vue</option>
+</select>
+</div>
+
+</div>
+
+<div class="panel right-panel">
+<div class="preview-header">
+<div class="preview-tabs">
+<div class="preview-tab active" onclick="switchTab('rendered')">Preview</div>
+<div class="preview-tab" onclick="switchTab('raw')">Markdown</div>
+</div>
+<button class="copy-btn" onclick="copyMarkdown()">📋 Copy Markdown</button>
+</div>
+<div class="preview-box" id="previewBox"></div>
+</div>
+</div>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script>
+const skillsData = {
+  'Frontend': [
+    {name:'HTML5',logo:'html5',color:'E34F26'},
+    {name:'CSS3',logo:'css3',color:'1572B6'},
+    {name:'JavaScript',logo:'javascript',color:'F7DF1E'},
+    {name:'React',logo:'react',color:'20232a'},
+    {name:'Vue.js',logo:'vuedotjs',color:'4FC08D'},
+    {name:'Angular',logo:'angular',color:'DD0031'},
+    {name:'Svelte',logo:'svelte',color:'FF3E00'},
+    {name:'Next.js',logo:'nextdotjs',color:'000000'},
+    {name:'TypeScript',logo:'typescript',color:'007ACC'}
+  ],
+  'Backend': [
+    {name:'Node.js',logo:'nodedotjs',color:'6DA55F'},
+    {name:'Python',logo:'python',color:'3670A0'},
+    {name:'Java',logo:'openjdk',color:'ED8B00'},
+    {name:'Go',logo:'go',color:'00ADD8'},
+    {name:'Rust',logo:'rust',color:'000000'},
+    {name:'PHP',logo:'php',color:'777BB4'},
+    {name:'Ruby',logo:'ruby',color:'CC342D'}
+  ],
+  'Database': [
+    {name:'MySQL',logo:'mysql',color:'4479A1'},
+    {name:'PostgreSQL',logo:'postgresql',color:'316192'},
+    {name:'MongoDB',logo:'mongodb',color:'4ea94b'},
+    {name:'Redis',logo:'redis',color:'DD0031'}
+  ],
+  'Tools': [
+    {name:'Git',logo:'git',color:'F05033'},
+    {name:'Docker',logo:'docker',color:'0db7ed'},
+    {name:'AWS',logo:'amazonaws',color:'FF9900'},
+    {name:'Linux',logo:'linux',color:'FCC624'},
+    {name:'VS Code',logo:'visualstudiocode',color:'0078d7'},
+    {name:'Figma',logo:'figma',color:'F24E1E'}
+  ]
+};
+
+const categoryColors = {'Frontend':'#58a6ff','Backend':'#3fb950','Database':'#d29922','Tools':'#bc8cff'};
+
+let state = {
+  template: 'minimal',
+  skills: new Set(),
+  stats: {github:true, langs:true, streak:true},
+  tab: 'rendered'
+};
+
+// Init skill tags
+function initSkills() {
+  const container = document.getElementById('skillsContainer');
+  container.innerHTML = '';
+  for (const [cat, skills] of Object.entries(skillsData)) {
+    const div = document.createElement('div');
+    div.className = 'skills-category';
+    div.innerHTML = '<h3>' + cat + '</h3><div class="skills-grid">' +
+      skills.map(s => '<div class="skill-tag" data-skill="' + s.name + '" onclick="toggleSkill(this,\'' + s.name + '\')">' +
+        '<span class="dot" style="background:' + categoryColors[cat] + '"></span>' + s.name + '</div>').join('') +
+      '</div>';
+    container.appendChild(div);
+  }
+}
+
+function selectTemplate(el, tpl) {
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  state.template = tpl;
+  updatePreview();
+}
+
+function toggleSkill(el, name) {
+  el.classList.toggle('active');
+  if (state.skills.has(name)) state.skills.delete(name); else state.skills.add(name);
+  updatePreview();
+}
+
+function toggleStat(el, key) {
+  el.classList.toggle('active');
+  state.stats[key] = !state.stats[key];
+  updatePreview();
+}
+
+function switchTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.preview-tab').forEach(t => { if(t.textContent === (tab==='rendered'?'Preview':'Markdown')) t.classList.add('active'); });
+  updatePreview();
+}
+
+function copyMarkdown() {
+  const md = generateMarkdown();
+  navigator.clipboard.writeText(md).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = '✅ Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '📋 Copy Markdown'; }, 2000);
+  });
+}
+
+function getVal(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function getSkillBadge(name) {
+  for (const skills of Object.values(skillsData)) {
+    const s = skills.find(sk => sk.name === name);
+    if (s) return '![' + s.name + '](https://img.shields.io/badge/' + encodeURIComponent(s.name) + '-' + s.color + '?style=for-the-badge&logo=' + s.logo + '&logoColor=white)';
+  }
+  return '';
+}
+
+function getSkillBadges() {
+  return [...state.skills].map(getSkillBadge).filter(Boolean).join(' ');
+}
+
+function getStatsCards(username, theme) {
+  let cards = [];
+  if (state.stats.github) cards.push('![GitHub Stats](https://github-readme-stats.vercel.app/api?username=' + username + '&show_icons=true&theme=' + theme + '&hide_border=true)');
+  if (state.stats.langs) cards.push('![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=' + username + '&layout=compact&theme=' + theme + '&hide_border=true)');
+  if (state.stats.streak) cards.push('![Streak Stats](https://github-readme-streak-stats.herokuapp.com/?user=' + username + '&theme=' + theme + '&hide_border=true)');
+  return cards;
+}
+
+function generateMarkdown() {
+  const username = getVal('username') || 'username';
+  const name = getVal('name') || 'Your Name';
+  const bio = getVal('bio');
+  const work = getVal('work');
+  const learning = getVal('learning');
+  const collab = getVal('collab');
+  const contact = getVal('contact');
+  const website = getVal('website');
+  const theme = getVal('statsTheme') || 'radical';
+  const badges = getSkillBadges();
+  const stats = getStatsCards(username, theme);
+
+  switch(state.template) {
+    case 'minimal': return genMinimal(username,name,bio,work,learning,collab,contact,website,badges,stats);
+    case 'developer': return genDeveloper(username,name,bio,work,learning,collab,contact,website,badges,stats);
+    case 'creative': return genCreative(username,name,bio,work,learning,collab,contact,website,badges,stats);
+    case 'professional': return genProfessional(username,name,bio,work,learning,collab,contact,website,badges,stats);
+    default: return genMinimal(username,name,bio,work,learning,collab,contact,website,badges,stats);
+  }
+}
+
+function genMinimal(u,name,bio,work,learning,collab,contact,website,badges,stats) {
+  let md = '# Hi, I\'m ' + name + ' 👋\n\n';
+  if (bio) md += bio + '\n\n';
+  let about = [];
+  if (work) about.push('🔭 Currently working on **' + work + '**');
+  if (learning) about.push('🌱 Learning **' + learning + '**');
+  if (collab) about.push('👯 Looking to collaborate on **' + collab + '**');
+  if (contact) about.push('📫 Reach me at **' + contact + '**');
+  if (website) about.push('🌐 Website: [' + website + '](' + (website.startsWith('http')?website:'https://'+website) + ')');
+  if (about.length) md += about.join('\n\n') + '\n\n';
+  if (badges) md += '---\n\n### Tech Stack\n\n' + badges + '\n\n';
+  if (stats.length) md += '---\n\n### GitHub Stats\n\n' + stats.join('\n\n') + '\n\n';
+  return md;
+}
+
+function genDeveloper(u,name,bio,work,learning,collab,contact,website,badges,stats) {
+  let md = '```\n';
+  md += '> ' + name + '\n';
+  md += '> Full-Stack Developer\n';
+  md += '```\n\n';
+  md += '## $ whoami\n\n';
+  if (bio) md += '> ' + bio + '\n\n';
+  let info = [];
+  if (work) info.push('💻 **Working on:** `' + work + '`');
+  if (learning) info.push('📚 **Learning:** `' + learning + '`');
+  if (collab) info.push('🤝 **Collaborate:** `' + collab + '`');
+  if (contact) info.push('📧 **Contact:** `' + contact + '`');
+  if (website) info.push('🔗 **Website:** [`' + website + '`](' + (website.startsWith('http')?website:'https://'+website) + ')');
+  if (info.length) md += info.join('\n\n') + '\n\n';
+  if (badges) md += '---\n\n## $ ls skills/\n\n' + badges + '\n\n';
+  if (stats.length) md += '---\n\n## $ cat stats.md\n\n' + stats.join('\n\n') + '\n\n';
+  return md;
+}
+
+function genCreative(u,name,bio,work,learning,collab,contact,website,badges,stats) {
+  let md = '<div align="center">\n\n';
+  md += '# ✨ ' + name + ' ✨\n\n';
+  md += '![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=58A6FF&center=true&vCenter=true&width=435&lines=';
+  let lines = ['Welcome+to+my+profile!'];
+  if (work) lines.push('Working+on+' + encodeURIComponent(work));
+  if (learning) lines.push('Learning+' + encodeURIComponent(learning));
+  md += lines.join(';') + ')\n\n';
+  md += '</div>\n\n';
+  if (bio) md += '> 🎯 ' + bio + '\n\n';
+  let about = [];
+  if (work) about.push('🔭 Currently working on **' + work + '**');
+  if (learning) about.push('🌱 Currently learning **' + learning + '**');
+  if (collab) about.push('💞️ Looking to collaborate on **' + collab + '**');
+  if (contact) about.push('📫 How to reach me: **' + contact + '**');
+  if (website) about.push('🌐 Check out my website: [' + website + '](' + (website.startsWith('http')?website:'https://'+website) + ')');
+  if (about.length) md += about.join('\n\n') + '\n\n';
+  if (badges) md += '---\n\n<div align="center">\n\n### 🛠️ Languages & Tools\n\n' + badges + '\n\n</div>\n\n';
+  if (stats.length) md += '---\n\n<div align="center">\n\n### 📊 My GitHub Stats\n\n' + stats.join('\n\n') + '\n\n</div>\n\n';
+  md += '---\n\n<div align="center">\n\n![Profile Views](https://komarev.com/ghpvc/?username=' + u + '&color=58a6ff&style=flat-square)\n\n</div>\n';
+  return md;
+}
+
+function genProfessional(u,name,bio,work,learning,collab,contact,website,badges,stats) {
+  let md = '# ' + name + '\n\n';
+  if (bio) md += '**' + bio + '**\n\n';
+  md += '---\n\n';
+  md += '## About Me\n\n';
+  let about = [];
+  if (work) about.push('- 🔭 Currently working on **' + work + '**');
+  if (learning) about.push('- 🌱 Expanding knowledge in **' + learning + '**');
+  if (collab) about.push('- 👯 Open to collaborating on **' + collab + '**');
+  if (about.length) md += about.join('\n') + '\n\n';
+  if (badges) {
+    md += '## Technical Skills\n\n';
+    // Group badges by category
+    for (const [cat, skills] of Object.entries(skillsData)) {
+      const catBadges = skills.filter(s => state.skills.has(s.name)).map(s =>
+        '![' + s.name + '](https://img.shields.io/badge/' + encodeURIComponent(s.name) + '-' + s.color + '?style=for-the-badge&logo=' + s.logo + '&logoColor=white)'
+      );
+      if (catBadges.length) md += '**' + cat + ':**\n\n' + catBadges.join(' ') + '\n\n';
+    }
+  }
+  if (stats.length) md += '---\n\n## GitHub Analytics\n\n' + stats.join('\n\n') + '\n\n';
+  md += '---\n\n## Contact\n\n';
+  if (contact) md += '📧 **Email:** ' + contact + '\n\n';
+  if (website) md += '🌐 **Website:** [' + website + '](' + (website.startsWith('http')?website:'https://'+website) + ')\n\n';
+  md += '![Profile Views](https://komarev.com/ghpvc/?username=' + u + '&color=blue&style=flat-square&label=Profile+Views)\n';
+  return md;
+}
+
+function updatePreview() {
+  const md = generateMarkdown();
+  const box = document.getElementById('previewBox');
+  if (state.tab === 'rendered') {
+    box.innerHTML = marked.parse(md);
+  } else {
+    box.innerHTML = '<pre class="raw-markdown">' + md.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>';
+  }
+}
+
+// Init
+initSkills();
+// Set default template
+document.querySelector('.template-card').classList.add('active');
+// Add input listeners
+document.querySelectorAll('input,textarea,select').forEach(el => {
+  el.addEventListener('input', updatePreview);
+});
+// Initial preview
+updatePreview();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

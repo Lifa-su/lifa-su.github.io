@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Gradient Border Generator - CSS渐变边框生成器</title>
+<meta name="description" content="Free online CSS gradient border generator with border-image and background-clip methods.">
+<link rel="canonical" href="https://lifa-su.com/ai-gradient-border/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--text:#eee;--text2:#aaa;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,#e94560,#533483,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:20px}
+@media(max-width:800px){.main-grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.panel h2{font-size:1rem;margin-bottom:14px;color:var(--accent)}
+.control-group{margin-bottom:16px}
+.control-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:5px}
+.control-row{display:flex;align-items:center;gap:10px}
+.control-row input[type=range]{flex:1;accent-color:var(--accent)}
+.control-row .val{min-width:40px;text-align:right;font-size:.85rem;color:var(--accent);font-weight:600}
+select{width:100%;padding:8px 12px;background:var(--bg);color:var(--text);border:1px solid rgba(255,255,255,.12);border-radius:8px;cursor:pointer;outline:none;font-size:.9rem}
+.color-stops{display:flex;flex-direction:column;gap:8px}
+.color-stop{display:flex;align-items:center;gap:8px}
+.color-stop input[type=color]{width:40px;height:34px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.color-stop input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+.color-stop input[type=color]::-webkit-color-swatch{border-radius:4px;border:1px solid rgba(255,255,255,.15)}
+.color-stop input[type=number]{width:60px;padding:6px 8px;background:var(--bg);color:var(--text);border:1px solid rgba(255,255,255,.12);border-radius:6px;text-align:center;outline:none}
+.btn-remove{background:rgba(233,69,96,.15);color:var(--accent);border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.btn-remove:hover{background:rgba(233,69,96,.35)}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63a52}
+.btn-secondary{background:rgba(255,255,255,.08);color:var(--text)}
+.btn-secondary:hover{background:rgba(255,255,255,.14)}
+.btn-add{width:100%;justify-content:center;margin-top:6px}
+.method-toggle{display:flex;background:var(--bg);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.method-toggle button{flex:1;padding:10px 8px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:.82rem;font-weight:600;transition:.2s}
+.method-toggle button.active{background:var(--accent);color:#fff}
+.preview-area{display:flex;flex-direction:column;gap:20px}
+.preview-box{background:var(--surface);border-radius:var(--radius);padding:40px;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;min-height:320px}
+.preview-element{width:260px;height:200px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--text2);background:var(--bg);position:relative}
+.code-box{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.code-box h3{font-size:.95rem;color:var(--accent)}
+.btn-copy{padding:6px 14px;font-size:.82rem}
+.code-content{background:var(--bg);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;color:#c8d6e5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;padding:30px 0 20px;color:var(--text2);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>CSS Gradient Border Generator</h1>
+    <p>Create beautiful gradient borders with real-time preview</p>
+  </header>
+  <div class="main-grid">
+    <div class="controls-col">
+      <div class="panel">
+        <h2>⚙️ Settings</h2>
+        <div class="control-group">
+          <label for="gradientType">Gradient Type</label>
+          <select id="gradientType">
+            <option value="linear">Linear 线性渐变</option>
+            <option value="radial">Radial 径向渐变</option>
+            <option value="conic">Conic 锥形渐变</option>
+          </select>
+        </div>
+        <div class="control-group" id="angleGroup">
+          <label for="angle">Angle 角度</label>
+          <div class="control-row">
+            <input type="range" id="angle" min="0" max="360" value="135">
+            <span class="val" id="angleVal">135°</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label>Color Stops 颜色</label>
+          <div class="color-stops" id="colorStops"></div>
+          <button class="btn btn-secondary btn-add" id="addColor" type="button">+ Add Color</button>
+        </div>
+        <div class="control-group">
+          <label for="borderWidth">Border Width 边框宽度</label>
+          <div class="control-row">
+            <input type="range" id="borderWidth" min="1" max="20" value="4">
+            <span class="val" id="borderWidthVal">4px</span>
+          </div>
+        </div>
+        <div class="control-group">
+          <label for="borderRadius">Border Radius 圆角</label>
+          <div class="control-row">
+            <input type="range" id="borderRadius" min="0" max="100" value="12">
+            <span class="val" id="borderRadiusVal">12px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-area">
+      <div class="method-toggle">
+        <button class="active" data-method="border-image" type="button">border-image 方式</button>
+        <button data-method="background-clip" type="button">background-clip 方式</button>
+      </div>
+      <div class="preview-box">
+        <div class="preview-element" id="previewEl">
+          <span>Preview 预览</span>
+        </div>
+      </div>
+      <div class="code-box">
+        <div class="code-header">
+          <h3 id="codeTitle">CSS Code - border-image</h3>
+          <button class="btn btn-primary btn-copy" id="copyBtn" type="button">📋 Copy</button>
+        </div>
+        <pre class="code-content" id="codeOutput"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+<footer><p>CSS Gradient Border Generator &copy; 2025</p></footer>
+<script>
+const $ = s => document.querySelector(s);
+const state = {
+  type: 'linear', angle: 135, borderWidth: 4, borderRadius: 12,
+  method: 'border-image',
+  colors: [{color:'#e94560',pos:0},{color:'#533483',pos:50},{color:'#0f3460',pos:100}]
+};
+
+function renderColorStops() {
+  const container = $('#colorStops');
+  container.innerHTML = '';
+  state.colors.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'color-stop';
+    div.innerHTML = `<input type="color" value="${c.color}" data-i="${i}" aria-label="Color ${i+1}">` +
+      `<input type="number" value="${c.pos}" min="0" max="100" data-i="${i}" aria-label="Position ${i+1}">` +
+      `<span class="pct">%</span>` +
+      (state.colors.length > 2 ? `<button class="btn-remove" data-i="${i}" type="button" aria-label="Remove color ${i+1}">&times;</button>` : '');
+    div.querySelector('input[type=color]').addEventListener('input', e => {
+      state.colors[i].color = e.target.value; update();
+    });
+    div.querySelector('input[type=number]').addEventListener('input', e => {
+      state.colors[i].pos = Math.min(100, Math.max(0, parseInt(e.target.value)||0)); update();
+    });
+    const rm = div.querySelector('.btn-remove');
+    if (rm) rm.addEventListener('click', () => { state.colors.splice(i,1); renderColorStops(); update(); });
+    container.appendChild(div);
+  });
+}
+
+function getGradientStr() {
+  const stops = state.colors.map(c => `${c.color} ${c.pos}%`).join(', ');
+  if (state.type === 'linear') return `linear-gradient(${state.angle}deg, ${stops})`;
+  if (state.type === 'radial') return `radial-gradient(circle, ${stops})`;
+  return `conic-gradient(from ${state.angle}deg, ${stops})`;
+}
+
+function update() {
+  const el = $('#previewEl');
+  const grad = getGradientStr();
+  const bw = state.borderWidth;
+  const br = state.borderRadius;
+
+  // Clear previous styles
+  el.style.cssText = `width:260px;height:200px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--text2);background:var(--bg);position:relative;`;
+
+  if (state.method === 'border-image') {
+    el.style.border = `${bw}px solid`;
+    el.style.borderImage = `${grad} 1`;
+    el.style.borderRadius = `${br}px`;
+    // Note: border-image doesn't work well with border-radius
+  } else {
+    el.style.borderRadius = `${br}px`;
+    el.style.padding = `${bw}px`;
+    el.style.background = grad;
+    el.style.backgroundClip = 'border-box';
+    // Inner background
+    const inner = el.querySelector('span');
+    if (inner) {
+      inner.style.cssText = `display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#1a1a2e;border-radius:${Math.max(0,br-bw)}px;`;
+    }
+  }
+
+  generateCode();
+}
+
+function generateCode() {
+  const grad = getGradientStr();
+  const bw = state.borderWidth;
+  const br = state.borderRadius;
+  let code = '';
+
+  if (state.method === 'border-image') {
+    code = `.gradient-border {
+  border: ${bw}px solid;
+  border-image: ${grad} 1;
+  border-radius: ${br}px; /* Note: border-image overrides border-radius in most browsers */
+}`;
+    $('#codeTitle').textContent = 'CSS Code - border-image';
+  } else {
+    code = `.gradient-border {
+  position: relative;
+  border-radius: ${br}px;
+  padding: ${bw}px;
+  background: ${grad};
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Alternative: pseudo-element method */
+.gradient-border-alt {
+  position: relative;
+  border-radius: ${br}px;
+  background: transparent;
+}
+.gradient-border-alt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: ${br}px;
+  padding: ${bw}px;
+  background: ${grad};
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}`;
+    $('#codeTitle').textContent = 'CSS Code - background-clip / mask';
+  }
+
+  $('#codeOutput').textContent = code;
+}
+
+// Event listeners
+$('#gradientType').addEventListener('change', e => {
+  state.type = e.target.value;
+  $('#angleGroup').style.display = state.type === 'radial' ? 'none' : '';
+  update();
+});
+
+$('#angle').addEventListener('input', e => {
+  state.angle = parseInt(e.target.value);
+  $('#angleVal').textContent = state.angle + '°';
+  update();
+});
+
+$('#borderWidth').addEventListener('input', e => {
+  state.borderWidth = parseInt(e.target.value);
+  $('#borderWidthVal').textContent = state.borderWidth + 'px';
+  update();
+});
+
+$('#borderRadius').addEventListener('input', e => {
+  state.borderRadius = parseInt(e.target.value);
+  $('#borderRadiusVal').textContent = state.borderRadius + 'px';
+  update();
+});
+
+$('#addColor').addEventListener('click', () => {
+  const lastPos = state.colors[state.colors.length-1].pos;
+  state.colors.push({color:'#ffffff', pos: Math.min(100, lastPos+10)});
+  renderColorStops();
+  update();
+});
+
+document.querySelectorAll('.method-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.method-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.method = btn.dataset.method;
+    update();
+  });
+});
+
+$('#copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText($('#codeOutput').textContent).then(() => {
+    const toast = $('#toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1500);
+  });
+});
+
+// Init
+renderColorStops();
+update();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:30px auto 0;padding:0 20px}
+.pro-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#e94560,#533483);padding:6px 16px;border-radius:20px;font-size:.85rem;font-weight:600;margin-bottom:16px;color:#fff}
+.pro-mock{position:relative;background:var(--surface,#16213e);border-radius:12px;border:1px solid rgba(255,255,255,.06);padding:30px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-mock:hover{transform:translateY(-2px)}
+.pro-mock-content{filter:blur(3px);opacity:.5;pointer-events:none}
+.pro-mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pro-mock-card{background:rgba(255,255,255,.04);border-radius:10px;padding:20px;text-align:center}
+.pro-mock-card .pm-icon{font-size:1.8rem;margin-bottom:8px}
+.pro-mock-card h4{font-size:.9rem;color:#eee;margin-bottom:4px}
+.pro-mock-card p{font-size:.78rem;color:#888}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:10px}
+.pro-ov-text{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-ov-sub{font-size:.85rem;color:#aaa;margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.active{display:flex}
+.pro-modal{background:#16213e;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(233,69,96,.2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:#e94560;margin:12px 0}
+.pro-modal .pro-price span{font-size:.9rem;color:#aaa;font-weight:400}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal ul li::before{content:'✓';color:#e94560;font-weight:700;flex-shrink:0}
+.pro-modal .btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:opacity .2s;text-decoration:none;text-align:center}
+.pro-modal .btn-upgrade:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;cursor:pointer;font-size:.9rem;margin-top:8px;transition:color .2s}
+.pro-modal .btn-later:hover{color:#eee}
+@media(max-width:768px){.pro-mock-grid{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-badge">⚡ PRO Features</div>
+<div class="pro-mock" id="proMock">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-ov-text">Unlock Pro Features</div>
+<div class="pro-ov-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-grid">
+<div class="pro-mock-card"><div class="pm-icon">🎬</div><h4>Animated Gradients</h4><p>Smooth gradient animations with customizable speed and direction</p></div>
+<div class="pro-mock-card"><div class="pm-icon">📚</div><h4>Component Library</h4><p>50+ pre-built gradient border components ready to use</p></div>
+<div class="pro-mock-card"><div class="pm-icon">⚛️</div><h4>React Export</h4><p>Export as React/JSX components with props support</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModalBg">
+<div class="pro-modal">
+<h3>Upgrade to Pro</h3>
+<div class="pro-price">$9 <span>one-time</span></div>
+<ul>
+<li>Animated gradient border effects with CSS keyframes</li>
+<li>50+ pre-built gradient border components</li>
+<li>Export as React/JSX components</li>
+<li>Customizable animation speed & direction</li>
+<li>Priority support & future updates</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="btn-later" id="proLater">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var mock=document.getElementById('proMock');
+var bg=document.getElementById('proModalBg');
+var later=document.getElementById('proLater');
+mock.addEventListener('click',function(){bg.classList.add('active');});
+later.addEventListener('click',function(){bg.classList.remove('active');});
+bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('active');});
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

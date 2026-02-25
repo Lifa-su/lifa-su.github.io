@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Place Items Generator - Visual Alignment Tool</title>
+<meta name="description" content="Interactive CSS place-items generator with Grid and Flexbox preview. Visualize align-items and justify-items combinations instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-place-items/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+.container{max-width:1100px;margin:0 auto;padding:20px 16px}
+header{text-align:center;padding:32px 0 24px}
+header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.controls{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:28px}
+.control-group{background:var(--surface);border-radius:var(--radius);padding:16px 20px;min-width:220px;flex:1;max-width:340px}
+.control-group label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:8px;font-weight:600}
+.control-group select{width:100%;padding:10px 12px;background:var(--surface2);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:.95rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aab'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.control-group select:focus{outline:none;border-color:var(--accent)}
+.mode-toggle{display:flex;background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:28px;max-width:300px;margin-left:auto;margin-right:auto}
+.mode-btn{flex:1;padding:10px 20px;border:none;background:transparent;color:var(--text2);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.mode-btn.active{background:var(--accent);color:#fff}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.preview-section{background:var(--surface);border-radius:var(--radius);padding:20px}
+.section-title{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:14px;font-weight:600}
+.grid-preview{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:8px;width:100%;aspect-ratio:1;background:rgba(0,0,0,.3);border-radius:8px;padding:8px;border:1px dashed rgba(255,255,255,.1)}
+.grid-cell{background:rgba(255,255,255,.04);border-radius:4px;display:grid;position:relative;border:1px dashed rgba(255,255,255,.06);min-height:0;overflow:hidden}
+.grid-item{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;padding:4px;width:60%;height:60%;min-width:20px;min-height:20px;transition:all .3s ease}
+.code-section{background:var(--surface);border-radius:var(--radius);padding:20px}
+.code-block{background:rgba(0,0,0,.4);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;line-height:1.7;position:relative;margin-bottom:12px;border:1px solid rgba(255,255,255,.05);white-space:pre;overflow-x:auto}
+.cp{color:#e94560}.cv{color:#53d8fb}.cc{color:#666}
+.copy-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;margin-right:8px;margin-top:4px}
+.copy-btn:hover{opacity:.85;transform:translateY(-1px)}
+.copy-btn.copied{background:#2ecc71}
+.info-bar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:10px;background:var(--surface);border-radius:var(--radius);margin-bottom:20px;font-size:.85rem;color:var(--text2)}
+.badge{background:var(--accent);color:#fff;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+footer{text-align:center;padding:32px 0 20px;color:var(--text2);font-size:.8rem}
+@media(max-width:768px){.main-grid{grid-template-columns:1fr}.controls{flex-direction:column;align-items:stretch}.control-group{max-width:100%}header h1{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>CSS Place Items Generator</h1>
+<p>Visualize align-items &amp; justify-items combinations for Grid and Flexbox</p>
+</header>
+<div class="mode-toggle">
+<button class="mode-btn active" data-mode="grid" onclick="setMode('grid')">Grid</button>
+<button class="mode-btn" data-mode="flex" onclick="setMode('flex')">Flexbox</button>
+</div>
+<div class="controls">
+<div class="control-group">
+<label>align-items <span style="opacity:.5">(block axis)</span></label>
+<select id="alignItems" onchange="update()">
+<option value="stretch">stretch</option>
+<option value="start">start</option>
+<option value="end">end</option>
+<option value="center" selected>center</option>
+<option value="baseline">baseline</option>
+<option value="normal">normal</option>
+</select>
+</div>
+<div class="control-group">
+<label>justify-items <span style="opacity:.5">(inline axis)</span></label>
+<select id="justifyItems" onchange="update()">
+<option value="stretch">stretch</option>
+<option value="start">start</option>
+<option value="end">end</option>
+<option value="center" selected>center</option>
+<option value="baseline">baseline</option>
+<option value="normal">normal</option>
+<option value="legacy">legacy</option>
+</select>
+</div>
+</div>
+<div class="info-bar">
+<span class="badge" id="modeLabel">GRID</span>
+<span>place-items: <strong id="shorthandLabel">center center</strong></span>
+</div>
+<div class="main-grid">
+<div class="preview-section">
+<h2 class="section-title">Preview</h2>
+<div class="grid-preview" id="preview"></div>
+</div>
+<div class="code-section">
+<h2 class="section-title">Generated CSS</h2>
+<div class="code-block" id="codeShorthand"></div>
+<div class="code-block" id="codeLonghand"></div>
+<div>
+<button class="copy-btn" onclick="copyCode('shorthand')">&#128203; Copy Shorthand</button>
+<button class="copy-btn" onclick="copyCode('longhand')">&#128203; Copy Longhand</button>
+</div>
+</div>
+</div>
+<footer>&copy; 2025 CSS Place Items Generator. Built for developers.</footer>
+</div>
+<script>
+let mode='grid';
+const alignSel=document.getElementById('alignItems');
+const justifySel=document.getElementById('justifyItems');
+const preview=document.getElementById('preview');
+const codeShort=document.getElementById('codeShorthand');
+const codeLong=document.getElementById('codeLonghand');
+const modeLabel=document.getElementById('modeLabel');
+const shorthandLabel=document.getElementById('shorthandLabel');
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.mode===m);
+  });
+  modeLabel.textContent=m.toUpperCase();
+  // In flexbox, justify-items is not standard, show note
+  const jiLabel=justifySel.parentElement.querySelector('label');
+  if(m==='flex'){
+    jiLabel.innerHTML='justify-items <span style="opacity:.5">(⚠ limited in flex)</span>';
+  } else {
+    jiLabel.innerHTML='justify-items <span style="opacity:.5">(inline axis)</span>';
+  }
+  update();
+}
+
+function update(){
+  const ai=alignSel.value;
+  const ji=justifySel.value;
+  const shorthand=ai===ji?ai:ai+' '+ji;
+  shorthandLabel.textContent=shorthand;
+  renderPreview(ai,ji);
+  renderCode(ai,ji,shorthand);
+}
+
+function renderPreview(ai,ji){
+  preview.innerHTML='';
+  if(mode==='flex'){
+    preview.style.display='grid';
+    preview.style.gridTemplateColumns='repeat(3,1fr)';
+  } else {
+    preview.style.display='grid';
+    preview.style.gridTemplateColumns='repeat(3,1fr)';
+  }
+  for(let i=0;i<9;i++){
+    const cell=document.createElement('div');
+    cell.className='grid-cell';
+    if(mode==='grid'){
+      cell.style.display='grid';
+      cell.style.alignItems=ai;
+      cell.style.justifyItems=ji;
+    } else {
+      cell.style.display='flex';
+      cell.style.alignItems=ai;
+      cell.style.justifyContent=ji;
+    }
+    const item=document.createElement('div');
+    item.className='grid-item';
+    item.textContent=i+1;
+    // For grid, items need to not be full-size when stretch
+    if(mode==='grid'){
+      if(ai==='stretch') item.style.height='60%';
+      if(ji==='stretch') item.style.width='60%';
+    }
+    cell.appendChild(item);
+    preview.appendChild(cell);
+  }
+}
+
+function renderCode(ai,ji,shorthand){
+  const display=mode==='grid'?'grid':'flex';
+  const tpl=mode==='grid'?'grid-template-columns: repeat(3, 1fr);\n  grid-template-rows: repeat(3, 1fr);':'flex-wrap: wrap;';
+  codeShort.innerHTML='<span class="cc">/* Shorthand */</span>\n.container {\n  <span class="cp">display</span>: <span class="cv">'+display+'</span>;\n  <span class="cp">'+tpl.replace(/([a-z-]+):/g,'</span><span class="cp">$1</span>:').replace(/: ([^;]+)/g,': <span class="cv">$1</span>')+'</span>\n  <span class="cp">place-items</span>: <span class="cv">'+shorthand+'</span>;\n}';
+  // Clean up the template line rendering
+  let tplLines='';
+  if(mode==='grid'){
+    tplLines='\n  <span class="cp">grid-template-columns</span>: <span class="cv">repeat(3, 1fr)</span>;\n  <span class="cp">grid-template-rows</span>: <span class="cv">repeat(3, 1fr)</span>;';
+  } else {
+    tplLines='\n  <span class="cp">flex-wrap</span>: <span class="cv">wrap</span>;';
+  }
+  codeShort.innerHTML='<span class="cc">/* Shorthand */</span>\n.container {\n  <span class="cp">display</span>: <span class="cv">'+display+'</span>;'+tplLines+'\n  <span class="cp">place-items</span>: <span class="cv">'+shorthand+'</span>;\n}';
+
+  let longLines='';
+  if(mode==='grid'){
+    longLines='\n  <span class="cp">align-items</span>: <span class="cv">'+ai+'</span>;\n  <span class="cp">justify-items</span>: <span class="cv">'+ji+'</span>;';
+  } else {
+    longLines='\n  <span class="cp">align-items</span>: <span class="cv">'+ai+'</span>;\n  <span class="cp">justify-content</span>: <span class="cv">'+ji+'</span>;';
+  }
+  codeLong.innerHTML='<span class="cc">/* Longhand */</span>\n.container {\n  <span class="cp">display</span>: <span class="cv">'+display+'</span>;'+tplLines+longLines+'\n}';
+}
+
+function copyCode(type){
+  const ai=alignSel.value;
+  const ji=justifySel.value;
+  const shorthand=ai===ji?ai:ai+' '+ji;
+  const display=mode==='grid'?'grid':'flex';
+  let tpl=mode==='grid'?'grid-template-columns: repeat(3, 1fr);\n  grid-template-rows: repeat(3, 1fr);':'flex-wrap: wrap;';
+  let text='';
+  if(type==='shorthand'){
+    text='.container {\n  display: '+display+';\n  '+tpl+'\n  place-items: '+shorthand+';\n}';
+  } else {
+    const prop2=mode==='grid'?'justify-items':'justify-content';
+    text='.container {\n  display: '+display+';\n  '+tpl+'\n  align-items: '+ai+';\n  '+prop2+': '+ji+';\n}';
+  }
+  navigator.clipboard.writeText(text).then(()=>{
+    const btns=document.querySelectorAll('.copy-btn');
+    const btn=type==='shorthand'?btns[0]:btns[1];
+    btn.classList.add('copied');
+    btn.innerHTML='&#10003; Copied!';
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      btn.innerHTML='&#128203; Copy '+(type==='shorthand'?'Shorthand':'Longhand');
+    },1500);
+  });
+}
+
+update();
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Minifier - Compress, Beautify & Fix CSS Online</title>
+<meta name="description" content="Free online CSS minifier and beautifier. Compress CSS, auto-fix errors, syntax highlighting, and one-click copy.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-minifier/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e6f0;--text2:#8b8fa8;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00cec9;--red:#ff6b6b;--orange:#fdcb6e;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3)}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent2)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:.95rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;padding:14px 18px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:8px;font-size:.875rem;font-weight:600;cursor:pointer;transition:all .2s;color:#fff}
+.btn-primary{background:var(--accent)}
+.btn-primary:hover{background:var(--accent2)}
+.btn-green{background:#00b894}
+.btn-green:hover{background:var(--green)}
+.btn-orange{background:#e17055}
+.btn-orange:hover{background:var(--orange);color:#222}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent2)}
+.stats{display:flex;gap:20px;flex-wrap:wrap;margin-left:auto;font-size:.8rem;color:var(--text2)}
+.stats span{display:flex;align-items:center;gap:4px}
+.stats .val{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.ratio-good{color:var(--green)!important}
+.ratio-ok{color:var(--orange)!important}
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:768px){.editor-wrap{grid-template-columns:1fr}.toolbar{flex-direction:column;align-items:stretch}.stats{margin-left:0;justify-content:center}}
+.editor-panel{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--text2)}
+.panel-header .badge{padding:2px 8px;border-radius:4px;font-size:.7rem;background:var(--accent);color:#fff}
+.editor-area{position:relative;flex:1;min-height:400px}
+textarea{width:100%;height:100%;min-height:400px;padding:16px;background:transparent;border:none;color:var(--text);font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',monospace;font-size:.85rem;line-height:1.7;resize:vertical;outline:none;tab-size:2}
+textarea::placeholder{color:var(--text2)}
+.highlight-layer{position:absolute;top:0;left:0;right:0;bottom:0;padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',monospace;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-wrap:break-word;overflow:auto;pointer-events:none;tab-size:2;color:transparent}
+.highlight-layer .hl-sel{color:#c792ea}
+.highlight-layer .hl-prop{color:#82aaff}
+.highlight-layer .hl-val{color:#c3e88d}
+.highlight-layer .hl-num{color:#f78c6c}
+.highlight-layer .hl-unit{color:#ffcb6b}
+.highlight-layer .hl-comment{color:#546e7a;font-style:italic}
+.highlight-layer .hl-brace{color:#89ddff}
+.highlight-layer .hl-colon{color:#89ddff}
+.highlight-layer .hl-semi{color:#89ddff}
+.highlight-layer .hl-atrule{color:#c792ea}
+.highlight-layer .hl-str{color:#c3e88d}
+.copy-btn{position:absolute;top:50px;right:12px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:.75rem;cursor:pointer;transition:all .2s;z-index:2;opacity:0}
+.editor-panel:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.copy-btn.copied{background:var(--green);color:#fff;border-color:var(--green)}
+.fix-log{margin-bottom:20px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:none}
+.fix-log.show{display:block}
+.fix-log h3{font-size:.85rem;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fix-log ul{list-style:none;font-size:.8rem;color:var(--text2)}
+.fix-log li{padding:3px 0;padding-left:16px;position:relative}
+.fix-log li::before{content:'→';position:absolute;left:0;color:var(--accent2)}
+footer{text-align:center;padding:40px 0 20px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent2);text-decoration:none}
+.toast{position:fixed;bottom:30px;right:30px;padding:12px 24px;background:var(--green);color:#fff;border-radius:8px;font-size:.85rem;font-weight:600;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ AI CSS Minifier</h1>
+    <p>Compress, beautify, and auto-fix your CSS code instantly</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="minifyCSS()" id="btnMinify">⚡ Minify</button>
+    <button class="btn btn-green" onclick="beautifyCSS()">✨ Beautify</button>
+    <button class="btn btn-orange" onclick="autoFixCSS()">🔧 Auto Fix</button>
+    <button class="btn btn-outline" onclick="clearAll()">✕ Clear</button>
+    <div class="stats" id="stats">
+      <span>Original: <b class="val" id="origSize">0 B</b></span>
+      <span>Output: <b class="val" id="outSize">0 B</b></span>
+      <span>Saved: <b class="val" id="savedPct">0%</b></span>
+    </div>
+  </div>
+
+  <div class="editor-wrap">
+    <div class="editor-panel">
+      <div class="panel-header"><span>📝 Input CSS</span><span class="badge">EDIT</span></div>
+      <div class="editor-area">
+        <div class="highlight-layer" id="hlInput"></div>
+        <textarea id="input" placeholder="Paste your CSS here..." spellcheck="false" oninput="onInputChange()" onscroll="syncScroll('input','hlInput')"></textarea>
+      </div>
+    </div>
+    <div class="editor-panel">
+      <div class="panel-header"><span>📦 Output</span><span class="badge" id="modeBadge">MINIFIED</span></div>
+      <div class="editor-area">
+        <div class="highlight-layer" id="hlOutput"></div>
+        <textarea id="output" readonly spellcheck="false" onscroll="syncScroll('output','hlOutput')"></textarea>
+        <button class="copy-btn" id="copyBtn" onclick="copyOutput()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fix-log" id="fixLog">
+    <h3>🔧 Auto-Fix Report</h3>
+    <ul id="fixList"></ul>
+  </div>
+
+  <footer>
+    <p>AI CSS Minifier — Free online tool to optimize your stylesheets</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function formatSize(b){if(b<1024)return b+' B';return (b/1024).toFixed(1)+' KB'}
+
+function updateStats(){
+  const inp=document.getElementById('input').value;
+  const out=document.getElementById('output').value;
+  const ob=new Blob([inp]).size;
+  const nb=new Blob([out]).size;
+  document.getElementById('origSize').textContent=formatSize(ob);
+  document.getElementById('outSize').textContent=formatSize(nb);
+  const pct=ob?Math.round((1-nb/ob)*100):0;
+  const el=document.getElementById('savedPct');
+  el.textContent=pct+'%';
+  el.className='val '+(pct>30?'ratio-good':pct>10?'ratio-ok':'');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+/* ---- Syntax Highlighting ---- */
+function highlightCSS(code){
+  let h=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // comments
+  h=h.replace(/(\/\*[\s\S]*?\*\/)/g,'<span class="hl-comment">$1</span>');
+  // strings
+  h=h.replace(/(["'])(?:(?!\1|\\).|\\.)*\1/g,'<span class="hl-str">$&</span>');
+  // @rules
+  h=h.replace(/@[\w-]+/g,'<span class="hl-atrule">$&</span>');
+  // selectors (simplified: lines before {)
+  h=h.replace(/^([^{}@\/\n][^{}\n]*?)(\{)/gm,'<span class="hl-sel">$1</span><span class="hl-brace">$2</span>');
+  // properties
+  h=h.replace(/([\w-]+)\s*(:)/g,'<span class="hl-prop">$1</span><span class="hl-colon">$2</span>');
+  // numbers with units
+  h=h.replace(/\b(\d+\.?\d*)(px|em|rem|%|vh|vw|vmin|vmax|deg|s|ms|fr|ch|ex)\b/g,'<span class="hl-num">$1</span><span class="hl-unit">$2</span>');
+  // plain numbers
+  h=h.replace(/\b(\d+\.?\d*)\b/g,'<span class="hl-num">$1</span>');
+  // braces & semicolons
+  h=h.replace(/([{}])/g,'<span class="hl-brace">$1</span>');
+  h=h.replace(/(;)/g,'<span class="hl-semi">$1</span>');
+  return h;
+}
+
+function syncScroll(srcId,hlId){
+  const src=document.getElementById(srcId);
+  const hl=document.getElementById(hlId);
+  hl.scrollTop=src.scrollTop;
+  hl.scrollLeft=src.scrollLeft;
+}
+
+function updateHighlight(id,hlId){
+  const code=document.getElementById(id).value;
+  document.getElementById(hlId).innerHTML=highlightCSS(code);
+}
+
+function onInputChange(){
+  updateHighlight('input','hlInput');
+}
+
+/* ---- CSS Minifier ---- */
+function minifyCSS(){
+  const css=document.getElementById('input').value.trim();
+  if(!css){showToast('Please enter some CSS first');return}
+  let m=css;
+  // remove comments
+  m=m.replace(/\/\*[\s\S]*?\*\//g,'');
+  // remove newlines and extra whitespace
+  m=m.replace(/\s+/g,' ');
+  // remove spaces around special chars
+  m=m.replace(/\s*([{}:;,>~+])\s*/g,'$1');
+  // remove trailing semicolons before }
+  m=m.replace(/;}/g,'}');
+  // remove leading/trailing space
+  m=m.trim();
+  document.getElementById('output').value=m;
+  document.getElementById('modeBadge').textContent='MINIFIED';
+  updateHighlight('output','hlOutput');
+  updateStats();
+  showToast('CSS minified!');
+}
+
+/* ---- CSS Beautifier ---- */
+function beautifyCSS(){
+  const css=document.getElementById('input').value.trim();
+  if(!css){showToast('Please enter some CSS first');return}
+  let b=css;
+  // normalize whitespace
+  b=b.replace(/\s+/g,' ');
+  // add newline after { and ;
+  b=b.replace(/\{/g,' {\n  ');
+  b=b.replace(/;/g,';\n  ');
+  b=b.replace(/\}/g,'\n}\n');
+  // clean up extra spaces
+  b=b.replace(/\n\s*\n/g,'\n');
+  b=b.replace(/\{\s*\n\s*\n/g,'{\n  ');
+  b=b.replace(/\n\s*\}/g,'\n}');
+  // indent nested rules
+  let lines=b.split('\n');
+  let indent=0;let result=[];
+  for(let line of lines){
+    let trimmed=line.trim();
+    if(!trimmed)continue;
+    if(trimmed.startsWith('}')){indent=Math.max(0,indent-1)}
+    result.push('  '.repeat(indent)+trimmed);
+    if(trimmed.endsWith('{')){indent++}
+  }
+  b=result.join('\n');
+  document.getElementById('output').value=b;
+  document.getElementById('modeBadge').textContent='BEAUTIFIED';
+  updateHighlight('output','hlOutput');
+  updateStats();
+  showToast('CSS beautified!');
+}
+
+/* ---- Auto Fix ---- */
+function autoFixCSS(){
+  const css=document.getElementById('input').value;
+  if(!css.trim()){showToast('Please enter some CSS first');return}
+  let fixed=css;
+  const fixes=[];
+
+  // Fix missing semicolons before }
+  const r1=fixed.replace(/([a-zA-Z0-9%"'\)#])(\s*\})/g,(m,p1,p2)=>{
+    if(p1!==';'&&p1!=='{'&&p1!=='}'){
+      fixes.push('Added missing semicolon before "}"');
+      return p1+';'+p2;
+    }
+    return m;
+  });
+  fixed=r1;
+
+  // Fix double semicolons
+  const before2=fixed;
+  fixed=fixed.replace(/;;+/g,';');
+  if(fixed!==before2)fixes.push('Removed duplicate semicolons');
+
+  // Fix missing space after colon in properties
+  const before3=fixed;
+  fixed=fixed.replace(/([a-zA-Z-]+):([^\s:\/\/])/g,(m,p,v)=>{
+    if(v!=='/' && !m.includes('://')){
+      return p+': '+v;
+    }
+    return m;
+  });
+  if(fixed!==before3)fixes.push('Added space after property colons');
+
+  // Remove empty rules
+  const before4=fixed;
+  fixed=fixed.replace(/[^{}]+\{\s*\}/g,'');
+  if(fixed!==before4)fixes.push('Removed empty rule blocks');
+
+  // Fix extra whitespace in selectors
+  const before5=fixed;
+  fixed=fixed.replace(/\s{2,}/g,' ');
+  if(fixed!==before5)fixes.push('Normalized extra whitespace');
+
+  // Trim trailing whitespace on lines
+  const before6=fixed;
+  fixed=fixed.replace(/[ \t]+$/gm,'');
+  if(fixed!==before6)fixes.push('Trimmed trailing whitespace');
+
+  // Remove trailing whitespace at end
+  fixed=fixed.trim()+'\n';
+
+  document.getElementById('input').value=fixed;
+  updateHighlight('input','hlInput');
+
+  // Show fix log
+  const logEl=document.getElementById('fixLog');
+  const listEl=document.getElementById('fixList');
+  if(fixes.length>0){
+    listEl.innerHTML=fixes.map(f=>'<li>'+f+'</li>').join('');
+    logEl.classList.add('show');
+    showToast(fixes.length+' fix(es) applied!');
+  }else{
+    logEl.classList.remove('show');
+    showToast('No issues found — CSS looks clean!');
+  }
+}
+
+/* ---- Copy ---- */
+function copyOutput(){
+  const out=document.getElementById('output').value;
+  if(!out){showToast('Nothing to copy');return}
+  navigator.clipboard.writeText(out).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied')},1500);
+    showToast('Copied to clipboard!');
+  });
+}
+
+/* ---- Clear ---- */
+function clearAll(){
+  document.getElementById('input').value='';
+  document.getElementById('output').value='';
+  document.getElementById('hlInput').innerHTML='';
+  document.getElementById('hlOutput').innerHTML='';
+  document.getElementById('fixLog').classList.remove('show');
+  document.getElementById('origSize').textContent='0 B';
+  document.getElementById('outSize').textContent='0 B';
+  document.getElementById('savedPct').textContent='0%';
+  document.getElementById('savedPct').className='val';
+}
+
+// Sample CSS on load
+document.getElementById('input').value=`/* Sample CSS - Try minifying or beautifying! */
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: #1a1a2e;
+  color: #eaeaea;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 12px;
+  }
+}`;
+onInputChange();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

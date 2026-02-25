@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="All-in-one JSON toolkit. Format, validate, minify, compare, and transform JSON data. Includes tree viewer, path finder, and schema generator in one tool.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-toolkit/">
+<title>AI JSON 工具箱</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--border:#475569;--text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--accent2:#2563eb;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--purple:#a855f7;--font-mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.api-key-wrap{display:flex;align-items:center;gap:8px}
+.api-key-wrap label{font-size:13px;color:var(--text2)}
+.api-key-wrap input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:13px;width:260px}
+.tabs{display:flex;gap:4px;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-wrap:nowrap}
+.tab{padding:10px 18px;cursor:pointer;font-size:14px;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+main{flex:1;display:flex;flex-direction:column;padding:20px 24px;gap:16px;max-width:1400px;width:100%;margin:0 auto}
+.panel{display:none;flex:1;flex-direction:column;gap:16px}
+.panel.active{display:flex}
+.editor-row{display:flex;gap:16px;flex:1;min-height:350px}
+.editor-col{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.editor-col label{font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:space-between}
+textarea{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;color:var(--text);font-family:var(--font-mono);font-size:13px;line-height:1.6;resize:none;outline:none;transition:border-color .2s;min-height:200px}
+textarea:focus{border-color:var(--accent)}
+textarea::placeholder{color:var(--text2)}
+.output-pre{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--font-mono);font-size:13px;line-height:1.6;overflow:auto;min-height:200px;white-space:pre-wrap;word-break:break-all}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+button{padding:8px 18px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+button:hover{background:var(--border)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{background:var(--accent2)}
+button.danger{background:var(--red);border-color:var(--red);color:#fff}
+button.danger:hover{opacity:.85}
+.status{font-size:12px;color:var(--text2);padding:4px 0}
+.error{color:var(--red)}
+.success{color:var(--green)}
+/* Syntax highlight classes */
+.hl-key{color:#7dd3fc}
+.hl-str{color:#86efac}
+.hl-num{color:#fbbf24}
+.hl-bool{color:#c084fc}
+.hl-null{color:#94a3b8}
+.hl-brace{color:#e2e8f0}
+/* Diff styles */
+.diff-add{background:rgba(34,197,94,.15);color:var(--green)}
+.diff-del{background:rgba(239,68,68,.15);color:var(--red)}
+.diff-line{padding:1px 8px;font-family:var(--font-mono);font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all}
+.diff-sep{color:var(--orange);padding:4px 8px;font-weight:600;font-size:12px}
+/* AI explain */
+.ai-output{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;min-height:200px;line-height:1.7;font-size:14px;white-space:pre-wrap}
+.ai-output code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:13px}
+.loading{display:inline-block;width:16px;height:16px;border:2px solid var(--text2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:768px){
+  header{padding:12px 16px}
+  .tabs{padding:0 16px}
+  main{padding:16px}
+  .editor-row{flex-direction:column;min-height:auto}
+  textarea,.output-pre{min-height:160px}
+  .api-key-wrap input{width:180px}
+  .tab{padding:8px 12px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🔧 <span>AI JSON 工具箱</span></div>
+  <div class="api-key-wrap">
+    <label>DeepSeek API Key:</label>
+    <input type="password" id="apiKey" placeholder="sk-..." />
+  </div>
+</header>
+<nav class="tabs" id="tabs">
+  <div class="tab active" data-tab="format">格式化 / 压缩</div>
+  <div class="tab" data-tab="ts">→ TypeScript</div>
+  <div class="tab" data-tab="go">→ Go Struct</div>
+  <div class="tab" data-tab="py">→ Python</div>
+  <div class="tab" data-tab="diff">Diff 对比</div>
+  <div class="tab" data-tab="ai">AI 解释</div>
+</nav>
+<main>
+  <!-- Format / Minify -->
+  <div class="panel active" id="p-format">
+    <div class="btn-row">
+      <button class="primary" onclick="doFormat()">格式化</button>
+      <button onclick="doMinify()">压缩</button>
+      <button onclick="copyOutput('formatOut')">📋 复制</button>
+      <button onclick="clearAll('formatIn','formatOut')">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>输入 JSON</label>
+        <textarea id="formatIn" placeholder='粘贴 JSON...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>输出 <span id="formatStatus" class="status"></span></label>
+        <div class="output-pre" id="formatOut"></div>
+      </div>
+    </div>
+  </div>
+  <!-- TypeScript -->
+  <div class="panel" id="p-ts">
+    <div class="btn-row">
+      <button class="primary" onclick="doConvert('ts')">转换为 TypeScript</button>
+      <button onclick="copyOutput('tsOut')">📋 复制</button>
+      <button onclick="clearAll('tsIn','tsOut')">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>输入 JSON</label>
+        <textarea id="tsIn" placeholder='粘贴 JSON...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>TypeScript 类型 <span id="tsStatus" class="status"></span></label>
+        <div class="output-pre" id="tsOut"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Go -->
+  <div class="panel" id="p-go">
+    <div class="btn-row">
+      <button class="primary" onclick="doConvert('go')">转换为 Go Struct</button>
+      <button onclick="copyOutput('goOut')">📋 复制</button>
+      <button onclick="clearAll('goIn','goOut')">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>输入 JSON</label>
+        <textarea id="goIn" placeholder='粘贴 JSON...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>Go Struct <span id="goStatus" class="status"></span></label>
+        <div class="output-pre" id="goOut"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Python -->
+  <div class="panel" id="p-py">
+    <div class="btn-row">
+      <button class="primary" onclick="doConvert('py')">转换为 Python Dataclass</button>
+      <button onclick="copyOutput('pyOut')">📋 复制</button>
+      <button onclick="clearAll('pyIn','pyOut')">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>输入 JSON</label>
+        <textarea id="pyIn" placeholder='粘贴 JSON...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>Python Dataclass <span id="pyStatus" class="status"></span></label>
+        <div class="output-pre" id="pyOut"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Diff -->
+  <div class="panel" id="p-diff">
+    <div class="btn-row">
+      <button class="primary" onclick="doDiff()">对比</button>
+      <button onclick="clearAll('diffA','diffB');document.getElementById('diffOut').innerHTML=''">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>JSON A</label>
+        <textarea id="diffA" placeholder='第一个 JSON...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>JSON B</label>
+        <textarea id="diffB" placeholder='第二个 JSON...'></textarea>
+      </div>
+    </div>
+    <label style="font-size:13px;font-weight:600;color:var(--text2)">对比结果</label>
+    <div class="output-pre" id="diffOut" style="max-height:400px"></div>
+  </div>
+  <!-- AI Explain -->
+  <div class="panel" id="p-ai">
+    <div class="btn-row">
+      <button class="primary" onclick="doAIExplain()">🤖 AI 解释结构</button>
+      <button onclick="copyOutput('aiOut')">📋 复制</button>
+      <button onclick="clearAll('aiIn');document.getElementById('aiOut').textContent=''">清空</button>
+    </div>
+    <div class="editor-row">
+      <div class="editor-col">
+        <label>输入 JSON</label>
+        <textarea id="aiIn" placeholder='粘贴 JSON，AI 将解释其结构...'></textarea>
+      </div>
+      <div class="editor-col">
+        <label>AI 解释 <span id="aiStatus" class="status"></span></label>
+        <div class="ai-output" id="aiOut"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ===== Tab switching =====
+document.getElementById('tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('p-' + tab.dataset.tab).classList.add('active');
+});
+
+// ===== Persist API key =====
+const apiKeyEl = document.getElementById('apiKey');
+apiKeyEl.value = localStorage.getItem('deepseek_key') || '';
+apiKeyEl.addEventListener('change', () => localStorage.setItem('deepseek_key', apiKeyEl.value.trim()));
+
+// ===== Helpers =====
+function parseJSON(str) {
+  try { return { ok: true, data: JSON.parse(str) }; }
+  catch (e) { return { ok: false, error: e.message }; }
+}
+
+function setStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.className = 'status ' + (type || ''); }
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.style.borderColor;
+    el.style.borderColor = 'var(--green)';
+    setTimeout(() => el.style.borderColor = orig, 600);
+  });
+}
+
+function clearAll(...ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'TEXTAREA') el.value = '';
+    else el.innerHTML = '';
+  });
+}
+
+// ===== Syntax Highlight =====
+function highlight(json) {
+  if (typeof json !== 'string') json = JSON.stringify(json, null, 2);
+  return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, '<span class="hl-key">"$1"</span>:')
+    .replace(/"([^"\\]*(\\.[^"\\]*)*)"/g, '<span class="hl-str">"$1"</span>')
+    .replace(/\b(-?\d+\.?\d*([eE][+-]?\d+)?)\b/g, '<span class="hl-num">$1</span>')
+    .replace(/\b(true|false)\b/g, '<span class="hl-bool">$1</span>')
+    .replace(/\bnull\b/g, '<span class="hl-null">null</span>');
+}
+
+// ===== Format / Minify =====
+function doFormat() {
+  const input = document.getElementById('formatIn').value.trim();
+  if (!input) return;
+  const r = parseJSON(input);
+  if (!r.ok) {
+    document.getElementById('formatOut').innerHTML = '<span class="error">❌ ' + r.error + '</span>';
+    setStatus('formatStatus', '解析失败', 'error');
+    return;
+  }
+  document.getElementById('formatOut').innerHTML = highlight(JSON.stringify(r.data, null, 2));
+  setStatus('formatStatus', '✓ 已格式化', 'success');
+}
+
+function doMinify() {
+  const input = document.getElementById('formatIn').value.trim();
+  if (!input) return;
+  const r = parseJSON(input);
+  if (!r.ok) {
+    document.getElementById('formatOut').innerHTML = '<span class="error">❌ ' + r.error + '</span>';
+    return;
+  }
+  const minified = JSON.stringify(r.data);
+  document.getElementById('formatOut').textContent = minified;
+  setStatus('formatStatus', '✓ 已压缩 (' + minified.length + ' bytes)', 'success');
+}
+
+// ===== Type Converters =====
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function camelToTitle(s) { return s.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, c => c.toUpperCase()); }
+function snakeToCamel(s) { return s.replace(/_([a-z])/g, (_, c) => c.toUpperCase()); }
+
+function inferTSType(val, name, indent, interfaces) {
+  if (val === null) return 'null';
+  if (Array.isArray(val)) {
+    if (val.length === 0) return 'any[]';
+    const itemType = inferTSType(val[0], name + 'Item', indent, interfaces);
+    return itemType + '[]';
+  }
+  if (typeof val === 'object') {
+    const iName = capitalize(snakeToCamel(name));
+    const lines = [];
+    for (const [k, v] of Object.entries(val)) {
+      const t = inferTSType(v, k, indent + '  ', interfaces);
+      lines.push(indent + '  ' + k + ': ' + t + ';');
+    }
+    interfaces.push('interface ' + iName + ' {\n' + lines.join('\n') + '\n' + indent + '}');
+    return iName;
+  }
+  return typeof val;
+}
+
+function jsonToTS(data) {
+  const interfaces = [];
+  inferTSType(data, 'Root', '', interfaces);
+  return interfaces.reverse().join('\n\n');
+}
+
+function inferGoType(val, name, indent, structs) {
+  if (val === null) return 'interface{}';
+  if (Array.isArray(val)) {
+    if (val.length === 0) return '[]interface{}';
+    return '[]' + inferGoType(val[0], name + 'Item', indent, structs);
+  }
+  if (typeof val === 'object') {
+    const sName = capitalize(snakeToCamel(name));
+    const lines = [];
+    for (const [k, v] of Object.entries(val)) {
+      const goName = capitalize(snakeToCamel(k));
+      const t = inferGoType(v, k, indent + '\t', structs);
+      lines.push(indent + '\t' + goName + ' ' + t + ' `json:"' + k + '"`');
+    }
+    structs.push('type ' + sName + ' struct {\n' + lines.join('\n') + '\n' + indent + '}');
+    return sName;
+  }
+  if (typeof val === 'string') return 'string';
+  if (typeof val === 'number') return Number.isInteger(val) ? 'int' : 'float64';
+  if (typeof val === 'boolean') return 'bool';
+  return 'interface{}';
+}
+
+function jsonToGo(data) {
+  const structs = [];
+  inferGoType(data, 'Root', '', structs);
+  return structs.reverse().join('\n\n');
+}
+
+function inferPyType(val, name, indent, classes) {
+  if (val === null) return 'Optional[Any]';
+  if (Array.isArray(val)) {
+    if (val.length === 0) return 'List[Any]';
+    return 'List[' + inferPyType(val[0], name + '_item', indent, classes) + ']';
+  }
+  if (typeof val === 'object') {
+    const cName = capitalize(snakeToCamel(name));
+    const lines = [];
+    for (const [k, v] of Object.entries(val)) {
+      const t = inferPyType(v, k, indent + '    ', classes);
+      lines.push(indent + '    ' + k + ': ' + t);
+    }
+    classes.push('@dataclass\nclass ' + cName + ':\n' + lines.join('\n'));
+    return cName;
+  }
+  if (typeof val === 'string') return 'str';
+  if (typeof val === 'number') return Number.isInteger(val) ? 'int' : 'float';
+  if (typeof val === 'boolean') return 'bool';
+  return 'Any';
+}
+
+function jsonToPy(data) {
+  const classes = [];
+  inferPyType(data, 'Root', '', classes);
+  const header = 'from dataclasses import dataclass\nfrom typing import Any, List, Optional\n\n';
+  return header + classes.reverse().join('\n\n');
+}
+
+function doConvert(lang) {
+  const input = document.getElementById(lang + 'In').value.trim();
+  if (!input) return;
+  const r = parseJSON(input);
+  if (!r.ok) {
+    document.getElementById(lang + 'Out').innerHTML = '<span class="error">❌ ' + r.error + '</span>';
+    setStatus(lang + 'Status', '解析失败', 'error');
+    return;
+  }
+  let result;
+  if (lang === 'ts') result = jsonToTS(r.data);
+  else if (lang === 'go') result = jsonToGo(r.data);
+  else if (lang === 'py') result = jsonToPy(r.data);
+  document.getElementById(lang + 'Out').textContent = result;
+  setStatus(lang + 'Status', '✓ 转换完成', 'success');
+}
+
+// ===== JSON Diff =====
+function flattenJSON(obj, prefix, result) {
+  result = result || {};
+  prefix = prefix || '';
+  if (obj === null || typeof obj !== 'object') {
+    result[prefix] = JSON.stringify(obj);
+    return result;
+  }
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) { result[prefix] = '[]'; return result; }
+    obj.forEach((v, i) => flattenJSON(v, prefix + '[' + i + ']', result));
+    return result;
+  }
+  const keys = Object.keys(obj);
+  if (keys.length === 0) { result[prefix] = '{}'; return result; }
+  keys.forEach(k => {
+    const newKey = prefix ? prefix + '.' + k : k;
+    flattenJSON(obj[k], newKey, result);
+  });
+  return result;
+}
+
+function doDiff() {
+  const a = parseJSON(document.getElementById('diffA').value.trim());
+  const b = parseJSON(document.getElementById('diffB').value.trim());
+  const out = document.getElementById('diffOut');
+  if (!a.ok || !b.ok) {
+    out.innerHTML = '<span class="error">❌ 请确保两个输入都是有效 JSON</span>';
+    return;
+  }
+  const fa = flattenJSON(a.data);
+  const fb = flattenJSON(b.data);
+  const allKeys = new Set([...Object.keys(fa), ...Object.keys(fb)]);
+  const lines = [];
+  let diffs = 0;
+  const sorted = [...allKeys].sort();
+  for (const key of sorted) {
+    const inA = key in fa, inB = key in fb;
+    if (inA && inB) {
+      if (fa[key] === fb[key]) continue;
+      lines.push('<div class="diff-line diff-del">- ' + esc(key) + ': ' + esc(fa[key]) + '</div>');
+      lines.push('<div class="diff-line diff-add">+ ' + esc(key) + ': ' + esc(fb[key]) + '</div>');
+      diffs++;
+    } else if (inA) {
+      lines.push('<div class="diff-line diff-del">- ' + esc(key) + ': ' + esc(fa[key]) + '</div>');
+      diffs++;
+    } else {
+      lines.push('<div class="diff-line diff-add">+ ' + esc(key) + ': ' + esc(fb[key]) + '</div>');
+      diffs++;
+    }
+  }
+  if (diffs === 0) {
+    out.innerHTML = '<span class="success">✓ 两个 JSON 完全相同</span>';
+  } else {
+    out.innerHTML = '<div class="diff-sep">共 ' + diffs + ' 处差异</div>' + lines.join('');
+  }
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== AI Explain =====
+async function doAIExplain() {
+  const key = apiKeyEl.value.trim();
+  if (!key) { alert('请先输入 DeepSeek API Key'); apiKeyEl.focus(); return; }
+  const input = document.getElementById('aiIn').value.trim();
+  if (!input) return;
+  const r = parseJSON(input);
+  if (!r.ok) {
+    document.getElementById('aiOut').innerHTML = '<span class="error">❌ ' + r.error + '</span>';
+    return;
+  }
+  const out = document.getElementById('aiOut');
+  out.innerHTML = '<span class="loading"></span> AI 正在分析...';
+  setStatus('aiStatus', '请求中...', '');
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: '你是一个 JSON 结构分析专家。请用中文详细解释给定 JSON 的结构，包括：1) 整体结构概述 2) 每个字段的含义和类型 3) 数据之间的关系 4) 可能的用途场景。使用清晰的格式，适当使用 emoji 让解释更易读。' },
+          { role: 'user', content: '请解释这个 JSON 的结构：\n\n```json\n' + JSON.stringify(r.data, null, 2) + '\n```' }
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+        stream: true
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error('API 错误 (' + resp.status + '): ' + err);
+    }
+
+    out.textContent = '';
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) out.textContent += content;
+        } catch {}
+      }
+    }
+    setStatus('aiStatus', '✓ 分析完成', 'success');
+  } catch (e) {
+    out.innerHTML = '<span class="error">❌ ' + esc(e.message) + '</span>';
+    setStatus('aiStatus', '请求失败', 'error');
+  }
+}
+
+// ===== Keyboard shortcut =====
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    const active = document.querySelector('.panel.active');
+    if (!active) return;
+    const id = active.id.replace('p-', '');
+    if (id === 'format') doFormat();
+    else if (id === 'diff') doDiff();
+    else if (id === 'ai') doAIExplain();
+    else doConvert(id);
+  }
+});
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

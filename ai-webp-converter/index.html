@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert images to WebP format for faster web loading. Batch convert PNG, JPEG, and GIF files to WebP with adjustable quality. Reduce image file sizes easily.">
+<link rel="canonical" href="https://lifa-su.com/ai-webp-converter/">
+<title>AI WebP Converter - 图片格式转换工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;padding:20px}
+.container{max-width:960px;margin:0 auto}
+h1{text-align:center;font-size:2rem;margin:20px 0 8px;background:linear-gradient(135deg,#00d2ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.95rem}
+.card{background:#16213e;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.drop-zone{border:2px dashed #7b2ff7;border-radius:12px;padding:60px 20px;text-align:center;cursor:pointer;transition:all .3s}
+.drop-zone:hover,.drop-zone.dragover{border-color:#00d2ff;background:rgba(0,210,255,.05)}
+.drop-zone-icon{font-size:3rem;margin-bottom:12px}
+.drop-zone p{color:#aaa;margin:4px 0}
+.drop-zone .hint{font-size:.85rem;color:#666}
+input[type=file]{display:none}
+.controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.controls label{font-size:.9rem;color:#aaa}
+.slider-wrap{flex:1;min-width:200px;display:flex;align-items:center;gap:10px}
+.slider-wrap input[type=range]{flex:1;accent-color:#7b2ff7;height:6px}
+.quality-val{font-weight:700;color:#00d2ff;min-width:40px}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,#7b2ff7,#00d2ff);color:#fff}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(123,47,247,.4)}
+.btn-success{background:linear-gradient(135deg,#00b894,#00cec9);color:#fff}
+.btn-success:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,184,148,.4)}
+.btn-danger{background:#e74c3c;color:#fff;padding:6px 12px;font-size:.8rem}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.file-item{background:#0f3460;border-radius:12px;padding:16px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.thumb-wrap{display:flex;gap:12px;flex-shrink:0;align-items:flex-end}
+.thumb-box{text-align:center}
+.thumb{width:80px;height:80px;border-radius:8px;object-fit:cover;background:#1a1a2e;display:block}
+.thumb-label{font-size:.7rem;color:#888;margin-top:2px}
+.arrow{color:#7b2ff7;font-size:1.4rem;align-self:center}
+.file-info{flex:1;min-width:180px}
+.file-name{font-weight:600;margin-bottom:6px;word-break:break-all}
+.size-row{display:flex;gap:16px;font-size:.85rem;color:#aaa;flex-wrap:wrap;margin-bottom:6px}
+.ratio{font-weight:700}
+.ratio.good{color:#00b894}
+.ratio.bad{color:#e74c3c}
+.ratio.neutral{color:#00d2ff}
+.file-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.status{font-size:.8rem;padding:3px 8px;border-radius:4px;font-weight:600}
+.status.pending{background:rgba(255,255,255,.1);color:#aaa}
+.status.done{background:rgba(0,184,148,.2);color:#00b894}
+.status.error{background:rgba(231,76,60,.2);color:#e74c3c}
+.empty{text-align:center;color:#555;padding:40px;font-size:.95rem}
+@media(max-width:600px){.file-item{flex-direction:column}.controls{flex-direction:column;align-items:stretch}h1{font-size:1.5rem}.thumb{width:60px;height:60px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🖼️ AI WebP Converter</h1>
+  <p class="subtitle">PNG / JPG / GIF → WebP · 批量转换 · 一键打包下载</p>
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-zone-icon">📁</div>
+      <p>拖拽图片到这里，或点击选择文件</p>
+      <p class="hint">支持 PNG、JPG、GIF，可多选</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/gif" multiple>
+  </div>
+  <div class="card">
+    <div class="controls">
+      <label>WebP 质量：</label>
+      <div class="slider-wrap">
+        <input type="range" id="quality" min="0" max="100" value="80">
+        <span class="quality-val" id="qualityVal">80</span>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="convertAll" disabled>⚡ 全部转换</button>
+      <button class="btn btn-success" id="downloadZip" disabled>📦 ZIP 下载</button>
+      <button class="btn btn-danger" id="clearAll" disabled>🗑️ 清空</button>
+    </div>
+  </div>
+  <div id="fileList">
+    <div class="empty" id="emptyHint">还没有添加图片，快来试试吧 ✨</div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function(){
+var items=[],uid=0;
+var dropZone=document.getElementById('dropZone');
+var fileInput=document.getElementById('fileInput');
+var qualitySlider=document.getElementById('quality');
+var qualityVal=document.getElementById('qualityVal');
+var convertAllBtn=document.getElementById('convertAll');
+var downloadZipBtn=document.getElementById('downloadZip');
+var clearAllBtn=document.getElementById('clearAll');
+var fileListEl=document.getElementById('fileList');
+var emptyHint=document.getElementById('emptyHint');
+
+function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB';}
+function baseName(n){return n.replace(/\.[^.]+$/,'');}
+
+dropZone.onclick=function(){fileInput.click();};
+dropZone.ondragover=function(e){e.preventDefault();dropZone.classList.add('dragover');};
+dropZone.ondragleave=function(){dropZone.classList.remove('dragover');};
+dropZone.ondrop=function(e){e.preventDefault();dropZone.classList.remove('dragover');addFiles(e.dataTransfer.files);};
+fileInput.onchange=function(){addFiles(fileInput.files);fileInput.value='';};
+
+function addFiles(fl){
+  for(var i=0;i<fl.length;i++){
+    var f=fl[i];
+    if(!f.type.match(/^image\/(png|jpeg|gif)$/))continue;
+    items.push({id:++uid,file:f,origUrl:URL.createObjectURL(f),webpBlob:null,webpUrl:null,status:'pending'});
+  }
+  updateUI();
+}
+
+function updateUI(){
+  var hasPending=false,hasDone=false;
+  items.forEach(function(it){if(it.status==='pending')hasPending=true;if(it.status==='done')hasDone=true;});
+  convertAllBtn.disabled=!hasPending;
+  downloadZipBtn.disabled=!hasDone;
+  clearAllBtn.disabled=items.length===0;
+  emptyHint.style.display=items.length?'none':'block';
+  // remove old items
+  var old=fileListEl.querySelectorAll('.file-item');
+  old.forEach(function(el){el.remove();});
+  items.forEach(function(it){fileListEl.appendChild(renderItem(it));});
+}
+
+function renderItem(it){
+  var div=document.createElement('div');
+  div.className='file-item';
+  div.setAttribute('data-id',it.id);
+  var thumbHtml='<div class="thumb-wrap"><div class="thumb-box"><img class="thumb" src="'+it.origUrl+'" alt="原图"><div class="thumb-label">原图</div></div>';
+  if(it.webpUrl){
+    thumbHtml+='<span class="arrow">→</span><div class="thumb-box"><img class="thumb" src="'+it.webpUrl+'" alt="WebP"><div class="thumb-label">WebP</div></div>';
+  }
+  thumbHtml+='</div>';
+
+  var sizeHtml='<div class="size-row"><span>原始: '+fmt(it.file.size)+'</span>';
+  if(it.webpBlob){
+    var ratio=((1-it.webpBlob.size/it.file.size)*100).toFixed(1);
+    var cls=ratio>0?'good':'bad';
+    sizeHtml+='<span>WebP: '+fmt(it.webpBlob.size)+'</span><span class="ratio '+cls+'">'+
+      (ratio>0?'↓':'↑')+Math.abs(ratio)+'%</span>';
+  }
+  sizeHtml+='</div>';
+
+  var statusCls=it.status;
+  var statusText={pending:'待转换',done:'已完成',error:'失败'}[it.status]||it.status;
+
+  var actionsHtml='<div class="file-actions"><span class="status '+statusCls+'">'+statusText+'</span>';
+  if(it.status==='done'){
+    actionsHtml+='<button class="btn btn-success btn-sm" onclick="window._dl('+it.id+')">⬇ 下载</button>';
+  }
+  actionsHtml+='<button class="btn btn-danger btn-sm" onclick="window._rm('+it.id+')">✕</button></div>';
+
+  div.innerHTML=thumbHtml+'<div class="file-info"><div class="file-name">'+it.file.name+'</div>'+sizeHtml+'</div>'+actionsHtml;
+  return div;
+}
+
+function convertOne(it){
+  return new Promise(function(resolve){
+    var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');
+      c.width=img.naturalWidth;c.height=img.naturalHeight;
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0);
+      c.toBlob(function(blob){
+        if(blob){
+          it.webpBlob=blob;
+          it.webpUrl=URL.createObjectURL(blob);
+          it.status='done';
+        }else{
+          it.status='error';
+        }
+        resolve();
+      },'image/webp',qualitySlider.value/100);
+    };
+    img.onerror=function(){it.status='error';resolve();};
+    img.src=it.origUrl;
+  });
+}
+
+convertAllBtn.onclick=function(){
+  var pending=items.filter(function(it){return it.status==='pending';});
+  if(!pending.length)return;
+  convertAllBtn.disabled=true;
+  var chain=Promise.resolve();
+  pending.forEach(function(it){
+    chain=chain.then(function(){return convertOne(it);}).then(function(){updateUI();});
+  });
+  chain.then(function(){updateUI();});
+};
+
+downloadZipBtn.onclick=function(){
+  var done=items.filter(function(it){return it.status==='done';});
+  if(!done.length)return;
+  if(done.length===1){window._dl(done[0].id);return;}
+  var zip=new JSZip();
+  done.forEach(function(it){zip.file(baseName(it.file.name)+'.webp',it.webpBlob);});
+  zip.generateAsync({type:'blob'}).then(function(b){
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);
+    a.download='webp-images.zip';a.click();
+  });
+};
+
+clearAllBtn.onclick=function(){
+  items.forEach(function(it){URL.revokeObjectURL(it.origUrl);if(it.webpUrl)URL.revokeObjectURL(it.webpUrl);});
+  items=[];updateUI();
+};
+
+window._dl=function(id){
+  var it=items.find(function(x){return x.id===id;});
+  if(!it||!it.webpBlob)return;
+  var a=document.createElement('a');a.href=it.webpUrl;
+  a.download=baseName(it.file.name)+'.webp';a.click();
+};
+
+window._rm=function(id){
+  var it=items.find(function(x){return x.id===id;});
+  if(it){URL.revokeObjectURL(it.origUrl);if(it.webpUrl)URL.revokeObjectURL(it.webpUrl);}
+  items=items.filter(function(x){return x.id!==id;});
+  updateUI();
+};
+
+qualitySlider.oninput=function(){
+  qualityVal.textContent=qualitySlider.value;
+  // re-convert done items to preview new quality
+  items.forEach(function(it){if(it.status==='done'){it.status='pending';it.webpBlob=null;if(it.webpUrl){URL.revokeObjectURL(it.webpUrl);it.webpUrl=null;}}});
+  updateUI();
+};
+})();
+</script>
+<script src="https://cdn.buysellads.com/pub/lifa.js" async></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Data Faker - Generate Realistic Fake Data</title>
+<meta name="description" content="Generate realistic fake data for testing: names, emails, addresses, phones, companies. Multi-language support with batch generation and export.">
+<link rel="canonical" href="https://lifa-su.com/ai-data-faker/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f13;--surface:#1a1a24;--surface2:#242436;--border:#2e2e45;--primary:#6c5ce7;--primary-hover:#7c6ef7;--accent:#00cec9;--text:#e8e8f0;--text2:#9090a8;--danger:#ff6b6b;--success:#51cf66;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:1.05rem}
+.badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px;font-size:0.8rem;color:var(--accent);margin-top:10px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.panel-title{font-size:1.1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:350px 1fr;gap:20px;align-items:start}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:0.85rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+select,input[type="number"],input[type="text"],textarea{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95rem;outline:none;transition:border-color .2s}
+select:focus,input:focus,textarea:focus{border-color:var(--primary)}
+textarea{resize:vertical;min-height:80px;font-family:monospace;font-size:0.85rem}
+.field-group{margin-bottom:16px}
+.checkbox-grid{display:flex;flex-wrap:wrap;gap:10px}
+.checkbox-item{display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;transition:all .2s;font-size:0.9rem;user-select:none}
+.checkbox-item:hover{border-color:var(--primary)}
+.checkbox-item.active{border-color:var(--primary);background:rgba(108,92,231,0.15)}
+.checkbox-item input{display:none}
+.btn{padding:12px 24px;border:none;border-radius:8px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:0 4px 16px rgba(108,92,231,0.4)}
+.btn-sm{padding:8px 16px;font-size:0.85rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.output-stats{font-size:0.85rem;color:var(--text2)}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{background:var(--surface2);padding:10px 14px;text-align:left;font-weight:600;color:var(--text2);position:sticky;top:0;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;max-width:250px;overflow:hidden;text-overflow:ellipsis}
+tr:hover td{background:rgba(108,92,231,0.05)}
+.table-wrap{max-height:500px;overflow:auto;border-radius:8px;border:1px solid var(--border)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.template-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:0.78rem;cursor:pointer;color:var(--accent);font-family:monospace;transition:all .2s}
+.chip:hover{border-color:var(--accent);background:rgba(0,206,201,0.1)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:12px 20px;border-radius:8px;font-size:0.9rem;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+footer{text-align:center;padding:30px 20px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--primary);text-decoration:none}
+.preview-toggle{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.preview-toggle button{padding:8px 16px;background:var(--surface2);border:none;color:var(--text2);cursor:pointer;font-size:0.85rem;transition:all .2s}
+.preview-toggle button.active{background:var(--primary);color:#fff}
+#json-output{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:monospace;font-size:0.8rem;max-height:500px;overflow:auto;white-space:pre-wrap;display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>🎲 AI Data Faker</h1>
+<p>Generate realistic fake data for testing and development</p>
+<span class="badge">✨ Multi-language · Batch · Export · Templates</span>
+</header>
+<div class="container">
+<div class="grid">
+<div>
+<div class="panel">
+<div class="panel-title">⚙️ Configuration</div>
+<div class="field-group">
+<label for="lang">Language</label>
+<select id="lang">
+<option value="en">🇺🇸 English</option>
+<option value="zh">🇨🇳 中文</option>
+<option value="ja">🇯🇵 日本語</option>
+<option value="mixed">🌍 Mixed (Random)</option>
+</select>
+</div>
+<div class="field-group">
+<label>Fields to Generate</label>
+<div class="checkbox-grid" id="fields-grid"></div>
+</div>
+<div class="field-group">
+<label for="count">Number of Records</label>
+<div style="display:flex;align-items:center;gap:12px">
+<input type="range" id="count-range" min="1" max="1000" value="10" style="flex:1;accent-color:var(--primary)">
+<input type="number" id="count" min="1" max="1000" value="10" style="width:80px">
+</div>
+</div>
+<div class="field-group">
+<label for="template">Custom Template (optional)</label>
+<textarea id="template" placeholder="e.g. {{name}} works at {{company}} - {{email}}"></textarea>
+<div class="template-chips">
+<span class="chip" onclick="insertTemplate('{{name}}')">{{name}}</span>
+<span class="chip" onclick="insertTemplate('{{email}}')">{{email}}</span>
+<span class="chip" onclick="insertTemplate('{{phone}}')">{{phone}}</span>
+<span class="chip" onclick="insertTemplate('{{address}}')">{{address}}</span>
+<span class="chip" onclick="insertTemplate('{{company}}')">{{company}}</span>
+</div>
+</div>
+<button class="btn btn-primary" onclick="generate()">🚀 Generate Data</button>
+</div>
+</div>
+<div>
+<div class="panel">
+<div class="output-header">
+<div class="panel-title" style="margin-bottom:0">📊 Output</div>
+<div style="display:flex;align-items:center;gap:12px">
+<span class="output-stats" id="stats"></span>
+<div class="preview-toggle">
+<button class="active" onclick="setView('table',this)" aria-label="Table view">Table</button>
+<button onclick="setView('json',this)" aria-label="JSON view">JSON</button>
+</div>
+</div>
+</div>
+<div id="table-view">
+<div class="table-wrap" id="table-wrap">
+<div class="empty-state" id="empty">
+<div class="icon">🎲</div>
+<p>Configure fields and click Generate</p>
+</div>
+</div>
+</div>
+<div id="json-output"></div>
+<div class="btn-group" id="export-btns" style="margin-top:16px;display:none">
+<button class="btn btn-sm btn-outline" onclick="exportJSON()">📥 Export JSON</button>
+<button class="btn btn-sm btn-outline" onclick="exportCSV()">📥 Export CSV</button>
+<button class="btn btn-sm btn-outline" onclick="copyJSON()">📋 Copy JSON</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer>
+<p>AI Data Faker — All data is randomly generated and not real. Built for developers. <a href="https://github.com/Lifa-su/ai-data-faker" target="_blank">GitHub</a></p>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA={
+en:{
+first:['James','Mary','John','Patricia','Robert','Jennifer','Michael','Linda','David','Elizabeth','William','Barbara','Richard','Susan','Joseph','Jessica','Thomas','Sarah','Christopher','Karen','Charles','Lisa','Daniel','Nancy','Matthew','Betty','Anthony','Margaret','Mark','Sandra','Emma','Olivia','Ava','Sophia','Isabella','Mia','Charlotte','Amelia','Harper','Evelyn','Liam','Noah','Oliver','Elijah','Lucas','Mason','Logan','Alexander','Ethan','Jacob'],
+last:['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Gonzalez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Lee','Perez','Thompson','White','Harris','Sanchez','Clark','Ramirez','Lewis','Robinson','Walker','Young','Allen','King','Wright','Scott','Torres','Nguyen','Hill','Flores'],
+street:['Main St','Oak Ave','Maple Dr','Cedar Ln','Pine Rd','Elm St','Washington Blvd','Park Ave','Lake Dr','Hill Rd','River Rd','Sunset Blvd','Broadway','Highland Ave','Forest Dr','Valley Rd','Spring St','Church St','Mill Rd','Academy St'],
+city:['New York','Los Angeles','Chicago','Houston','Phoenix','Philadelphia','San Antonio','San Diego','Dallas','San Jose','Austin','Jacksonville','Fort Worth','Columbus','Charlotte','Indianapolis','San Francisco','Seattle','Denver','Nashville'],
+company:['Tech','Solutions','Global','Systems','Digital','Cloud','Data','Net','Soft','Core','Labs','Works','Hub','Logic','Byte','Wave','Link','Mind','Spark','Flow'],
+companyType:['Inc','LLC','Corp','Ltd','Group','Co','Technologies','Industries','Enterprises','Partners'],
+domain:['gmail.com','yahoo.com','outlook.com','hotmail.com','proton.me','icloud.com','mail.com','fastmail.com']
+},
+zh:{
+first:['伟','芳','娜','秀英','敏','静','丽','强','磊','洋','勇','艳','杰','娟','涛','明','超','秀兰','霞','平','刚','桂英','华','飞','玉兰','萍','红','玉','军','凤','春','建华','桂兰','英','梅','建国','建军','淑珍','志强','文'],
+last:['王','李','张','刘','陈','杨','赵','黄','周','吴','徐','孙','胡','朱','高','林','何','郭','马','罗','梁','宋','郑','谢','韩','唐','冯','于','董','萧','程','曹','袁','邓','许','傅','沈','曾','彭','吕'],
+street:['中山路','人民路','解放路','建设路','和平路','长安街','南京路','北京路','上海路','天津路','文化路','科技路','学院路','花园路','湖滨路','江南路','东风路','朝阳路','光明路','幸福路'],
+city:['北京','上海','广州','深圳','杭州','成都','武汉','南京','重庆','西安','苏州','天津','长沙','郑州','东莞','青岛','昆明','宁波','合肥','厦门'],
+company:['科技','信息','网络','数据','智能','云','创新','未来','天下','华','盛','达','通','联','新','中','国','东方','世纪','万'],
+companyType:['有限公司','科技有限公司','集团','股份有限公司','网络科技','信息技术'],
+domain:['qq.com','163.com','126.com','sina.com','foxmail.com','yeah.net']
+},
+ja:{
+first:['太郎','花子','一郎','美咲','健太','さくら','大輔','愛','翔太','陽子','拓也','真由美','直樹','恵','和也','裕子','誠','明美','哲也','由美子','隆','京子','浩','幸子','修','節子','豊','洋子','進','和子'],
+last:['佐藤','鈴木','高橋','田中','伊藤','渡辺','山本','中村','小林','加藤','吉田','山田','佐々木','松本','井上','木村','林','斎藤','清水','山口','森','池田','橋本','阿部','石川','山崎','中島','藤田','小川','後藤'],
+street:['桜通り','富士見通り','中央通り','本町通り','駅前通り','緑町','青葉通り','花見通り','松原通り','梅田通り'],
+city:['東京','大阪','名古屋','札幌','福岡','横浜','京都','神戸','仙台','広島','千葉','さいたま','新潟','浜松','熊本','岡山','静岡','金沢','長崎','那覇'],
+company:['テック','ソリューション','デジタル','システム','クラウド','ラボ','ワークス','ネット','ソフト','リンク'],
+companyType:['株式会社','合同会社','有限会社'],
+domain:['yahoo.co.jp','gmail.com','docomo.ne.jp','ezweb.ne.jp','softbank.ne.jp','icloud.com']
+}
+};
+
+const FIELDS=[
+{id:'name',label:'👤 Name',icon:'👤'},
+{id:'email',label:'📧 Email',icon:'📧'},
+{id:'phone',label:'📱 Phone',icon:'📱'},
+{id:'address',label:'🏠 Address',icon:'🏠'},
+{id:'company',label:'🏢 Company',icon:'🏢'}
+];
+
+let generatedData=[];
+let currentView='table';
+let activeFields=new Set(['name','email','phone','address','company']);
+
+function init(){
+const grid=document.getElementById('fields-grid');
+FIELDS.forEach(f=>{
+const item=document.createElement('label');
+item.className='checkbox-item active';
+item.innerHTML=`<input type="checkbox" checked value="${f.id}">${f.label}`;
+item.onclick=function(e){
+if(e.target.tagName==='INPUT')return;
+const cb=this.querySelector('input');
+cb.checked=!cb.checked;
+this.classList.toggle('active',cb.checked);
+if(cb.checked)activeFields.add(cb.value);else activeFields.delete(cb.value);
+};
+item.querySelector('input').onchange=function(){
+item.classList.toggle('active',this.checked);
+if(this.checked)activeFields.add(this.value);else activeFields.delete(this.value);
+};
+grid.appendChild(item);
+});
+const range=document.getElementById('count-range');
+const num=document.getElementById('count');
+range.oninput=()=>num.value=range.value;
+num.oninput=()=>{let v=Math.min(1000,Math.max(1,parseInt(num.value)||1));num.value=v;range.value=v;};
+}
+
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+
+function getLangData(){
+const lang=document.getElementById('lang').value;
+if(lang==='mixed')return DATA[pick(['en','zh','ja'])];
+return DATA[lang];
+}
+
+function genName(d){return d===DATA.zh||d===DATA.ja?pick(d.last)+pick(d.first):pick(d.first)+' '+pick(d.last)}
+
+function genEmail(d,name){
+const clean=name.replace(/\s+/g,'.').toLowerCase().replace(/[^a-z0-9.]/g,'');
+const user=clean||('user'+rand(100,9999));
+const num=rand(1,999);
+return user+num+'@'+pick(d.domain);
+}
+
+function genPhone(d){
+if(d===DATA.zh)return'1'+pick(['3','5','7','8','9'])+rand(0,9)+''+String(rand(10000000,99999999));
+if(d===DATA.ja)return'0'+pick(['70','80','90'])+'-'+rand(1000,9999)+'-'+rand(1000,9999);
+return'+1-'+rand(200,999)+'-'+rand(200,999)+'-'+rand(1000,9999);
+}
+
+function genAddress(d){
+const num=rand(1,9999);
+const street=pick(d.street);
+const city=pick(d.city);
+if(d===DATA.zh)return city+street+num+'号';
+if(d===DATA.ja)return city+'市'+street+num+'番地';
+return num+' '+street+', '+city;
+}
+
+function genCompany(d){
+if(d===DATA.zh)return pick(d.company)+pick(d.company)+pick(d.companyType);
+if(d===DATA.ja)return pick(d.companyType)+pick(d.company)+pick(d.company);
+return pick(d.company)+pick(d.company)+' '+pick(d.companyType);
+}
+
+function generate(){
+const count=Math.min(1000,Math.max(1,parseInt(document.getElementById('count').value)||10));
+const tmpl=document.getElementById('template').value.trim();
+generatedData=[];
+for(let i=0;i<count;i++){
+const d=getLangData();
+const row={};
+const name=genName(d);
+if(activeFields.has('name'))row.name=name;
+if(activeFields.has('email'))row.email=genEmail(d,name);
+if(activeFields.has('phone'))row.phone=genPhone(d);
+if(activeFields.has('address'))row.address=genAddress(d);
+if(activeFields.has('company'))row.company=genCompany(d);
+if(tmpl){
+row._template=tmpl.replace(/\{\{name\}\}/g,name)
+.replace(/\{\{email\}\}/g,row.email||genEmail(d,name))
+.replace(/\{\{phone\}\}/g,row.phone||genPhone(d))
+.replace(/\{\{address\}\}/g,row.address||genAddress(d))
+.replace(/\{\{company\}\}/g,row.company||genCompany(d));
+}
+generatedData.push(row);
+}
+renderOutput();
+document.getElementById('export-btns').style.display='flex';
+document.getElementById('stats').textContent=count+' records generated';
+showToast('Generated '+count+' records ✨');
+}
+
+function renderOutput(){
+if(currentView==='table')renderTable();
+else renderJSON();
+}
+
+function renderTable(){
+document.getElementById('table-view').style.display='block';
+document.getElementById('json-output').style.display='none';
+if(!generatedData.length){document.getElementById('table-wrap').innerHTML='<div class="empty-state"><div class="icon">🎲</div><p>Configure fields and click Generate</p></div>';return;}
+const keys=Object.keys(generatedData[0]);
+let html='<table><thead><tr><th>#</th>';
+keys.forEach(k=>html+='<th>'+k+'</th>');
+html+='</tr></thead><tbody>';
+generatedData.forEach((row,i)=>{
+html+='<tr><td>'+(i+1)+'</td>';
+keys.forEach(k=>html+='<td title="'+escHtml(row[k]||'')+'">'+escHtml(row[k]||'')+'</td>');
+html+='</tr>';
+});
+html+='</tbody></table>';
+document.getElementById('table-wrap').innerHTML=html;
+}
+
+function renderJSON(){
+document.getElementById('table-view').style.display='none';
+document.getElementById('json-output').style.display='block';
+document.getElementById('json-output').textContent=JSON.stringify(generatedData,null,2);
+}
+
+function setView(view,btn){
+currentView=view;
+document.querySelectorAll('.preview-toggle button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+renderOutput();
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function exportJSON(){
+const blob=new Blob([JSON.stringify(generatedData,null,2)],{type:'application/json'});
+dl(blob,'fake-data.json');
+}
+
+function exportCSV(){
+if(!generatedData.length)return;
+const keys=Object.keys(generatedData[0]);
+let csv=keys.join(',')+'\n';
+generatedData.forEach(row=>{
+csv+=keys.map(k=>'"'+(row[k]||'').replace(/"/g,'""')+'"').join(',')+'\n';
+});
+const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+dl(blob,'fake-data.csv');
+}
+
+function dl(blob,name){
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download=name;
+a.click();
+URL.revokeObjectURL(a.href);
+showToast('Downloaded '+name+' 📥');
+}
+
+function copyJSON(){
+navigator.clipboard.writeText(JSON.stringify(generatedData,null,2)).then(()=>showToast('Copied to clipboard 📋'));
+}
+
+function insertTemplate(tag){
+const ta=document.getElementById('template');
+const start=ta.selectionStart;
+ta.value=ta.value.substring(0,start)+tag+ta.value.substring(ta.selectionEnd);
+ta.focus();
+ta.selectionStart=ta.selectionEnd=start+tag.length;
+}
+
+function showToast(msg){
+const t=document.getElementById('toast');
+t.textContent=msg;
+t.classList.add('show');
+setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS object-fit preview tool. Compare cover, contain, fill, scale-down, and none values on images. Visualize how images resize within their containers.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-object-fit/">
+<title>CSS Object-Fit Preview Tool</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#0f3460;--hl:#e94560;--text:#eee;--text2:#aaa;--border:#2a2a4a;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+h1{text-align:center;font-size:1.6rem;margin-bottom:6px;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;color:var(--text2);font-size:.85rem;margin-bottom:20px}
+.up{border:2px dashed var(--border);border-radius:var(--r);padding:30px;text-align:center;cursor:pointer;transition:.3s;background:var(--card);margin:0 auto 20px;max-width:600px}
+.up:hover,.up.over{border-color:var(--hl);background:#1e2a4a}
+.up svg{width:40px;height:40px;fill:var(--text2);margin-bottom:8px}
+.up p{color:var(--text2);font-size:.9rem}
+.up input{display:none}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border-radius:var(--r);padding:12px;border:2px solid transparent;cursor:pointer;transition:.2s}
+.card:hover{border-color:var(--accent)}
+.card.on{border-color:var(--hl);box-shadow:0 0 16px rgba(233,69,96,.25)}
+.ct{font-size:.8rem;font-weight:600;margin-bottom:8px;text-align:center;color:var(--hl);text-transform:uppercase;letter-spacing:.5px}
+.ic{width:100%;overflow:hidden;border-radius:6px;background:#0d1117;margin:0 auto}
+.ic img{display:block;width:100%;height:100%}
+.ci{margin-top:8px;font-size:.7rem;color:var(--text2);text-align:center}
+.ctrl{background:var(--card);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.ctrl-t{font-size:.95rem;font-weight:600;margin-bottom:14px;color:var(--hl)}
+.cr{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:12px}
+.cg{flex:1;min-width:200px}
+.cg label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:4px}
+.cg input[type=range]{width:100%;accent-color:var(--hl);cursor:pointer}
+.cg .v{font-size:.75rem;color:var(--hl);float:right}
+.pre{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pre button{padding:5px 12px;border:1px solid var(--border);background:var(--accent);color:var(--text);border-radius:6px;cursor:pointer;font-size:.75rem;transition:.2s}
+.pre button:hover,.pre button.on{background:var(--hl);border-color:var(--hl)}
+.co{background:var(--card);border-radius:var(--r);padding:16px;position:relative}
+.co .cot{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--hl)}
+.cb{background:#0d1117;border-radius:8px;padding:14px;font-family:'SF Mono',Consolas,monospace;font-size:.82rem;line-height:1.6;color:#c9d1d9;overflow-x:auto;white-space:pre}
+.cpb{position:absolute;top:16px;right:16px;padding:6px 14px;background:var(--hl);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;transition:.2s}
+.cpb:hover{opacity:.85}.cpb.ok{background:#2ea043}
+footer{text-align:center;color:var(--text2);font-size:.7rem;margin-top:30px;padding:10px}
+</style>
+</head>
+<body>
+<h1>CSS Object-Fit Preview Tool</h1>
+<p class="sub">Compare all 5 object-fit modes side by side</p>
+<div class="up" id="ua" role="button" tabindex="0" aria-label="Upload image">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+<p>Drop an image here or click to upload</p>
+<input type="file" id="fi" accept="image/*">
+</div>
+<div class="grid" id="grid"></div>
+<div class="ctrl">
+<div class="ctrl-t">Settings</div>
+<div class="cr">
+<div class="cg"><label>object-position X <span class="v" id="pxv">50%</span></label><input type="range" id="px" min="0" max="100" value="50"></div>
+<div class="cg"><label>object-position Y <span class="v" id="pyv">50%</span></label><input type="range" id="py" min="0" max="100" value="50"></div>
+</div>
+<div class="cr">
+<div class="cg"><label>Container Height (px) <span class="v" id="hv">180</span></label><input type="range" id="ch" min="60" max="500" value="180"></div>
+</div>
+<label style="font-size:.78rem;color:var(--text2);display:block;margin-bottom:6px">Position Presets</label>
+<div class="pre" id="pre"></div>
+</div>
+<div class="co">
+<div class="cot">Generated CSS</div>
+<button class="cpb" id="cpb">Copy</button>
+<div class="cb" id="cbl"></div>
+</div>
+<footer>CSS Object-Fit Preview Tool</footer>
+<script>
+!function(){
+var M=['fill','contain','cover','none','scale-down'];
+var P=[['center',50,50],['top',50,0],['bottom',50,100],['left',0,50],['right',100,50],['top left',0,0],['top right',100,0],['bottom left',0,100],['bottom right',100,100]];
+var sel='cover';
+var svg='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#2d3748"/><rect x="200" y="100" width="400" height="400" rx="20" fill="#4a5568"/><circle cx="350" cy="250" r="60" fill="#e94560"/><circle cx="500" cy="300" r="40" fill="#0f3460"/><polygon points="250,450 400,200 550,450" fill="#38b2ac" opacity=".7"/><text x="400" y="550" text-anchor="middle" fill="#a0aec0" font-size="24" font-family="sans-serif">Sample Image 800x600</text></svg>');
+var src=svg;
+var g=document.getElementById('grid');
+var px=document.getElementById('px'),py=document.getElementById('py'),ch=document.getElementById('ch');
+var pxv=document.getElementById('pxv'),pyv=document.getElementById('pyv'),hv=document.getElementById('hv');
+var cbl=document.getElementById('cbl'),cpb=document.getElementById('cpb');
+var pre=document.getElementById('pre'),ua=document.getElementById('ua'),fi=document.getElementById('fi');
+
+function build(){
+  g.innerHTML='';
+  M.forEach(function(m){
+    var d=document.createElement('div');d.className='card'+(m===sel?' on':'');
+    d.innerHTML='<div class="ct">'+m+'</div><div class="ic"><img alt="preview '+m+'"></div><div class="ci">object-fit: '+m+'</div>';
+    d.onclick=function(){sel=m;update()};
+    g.appendChild(d);
+  });
+  update();
+}
+
+function update(){
+  var x=px.value,y=py.value,h=ch.value;
+  pxv.textContent=x+'%';pyv.textContent=y+'%';hv.textContent=h;
+  var cards=g.querySelectorAll('.card');
+  cards.forEach(function(c,i){
+    c.className='card'+(M[i]===sel?' on':'');
+    var ic=c.querySelector('.ic');ic.style.height=h+'px';
+    var img=c.querySelector('img');
+    img.src=src;img.style.objectFit=M[i];img.style.objectPosition=x+'% '+y+'%';
+  });
+  cbl.textContent='.element {\n  object-fit: '+sel+';\n  object-position: '+x+'% '+y+'%;\n  width: 100%;\n  height: '+h+'px;\n}';
+}
+
+P.forEach(function(p){
+  var b=document.createElement('button');b.textContent=p[0];
+  b.onclick=function(){px.value=p[1];py.value=p[2];update();
+    pre.querySelectorAll('button').forEach(function(bb){bb.className=''});b.className='on';};
+  pre.appendChild(b);
+});
+
+px.oninput=py.oninput=ch.oninput=function(){
+  pre.querySelectorAll('button').forEach(function(b){b.className=''});update();};
+
+cpb.onclick=function(){
+  navigator.clipboard.writeText(cbl.textContent).then(function(){
+    cpb.textContent='Copied!';cpb.className='cpb ok';
+    setTimeout(function(){cpb.textContent='Copy';cpb.className='cpb'},1500);
+  });
+};
+
+ua.onclick=function(){fi.click()};
+ua.onkeydown=function(e){if(e.key==='Enter')fi.click()};
+fi.onchange=function(){if(fi.files[0]){var r=new FileReader();r.onload=function(e){src=e.target.result;update()};r.readAsDataURL(fi.files[0])}};
+ua.ondragover=function(e){e.preventDefault();ua.classList.add('over')};
+ua.ondragleave=function(){ua.classList.remove('over')};
+ua.ondrop=function(e){e.preventDefault();ua.classList.remove('over');
+  var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){var r=new FileReader();r.onload=function(ev){src=ev.target.result;update()};r.readAsDataURL(f)}};
+
+build();
+}();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

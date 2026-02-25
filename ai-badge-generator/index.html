@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate GitHub README badges instantly. Create shields.io badges for build status, version, license, downloads, and custom labels for your projects.">
+<link rel="canonical" href="https://lifa-su.com/ai-badge-generator/">
+<title>AI Badge Generator - GitHub README 徽章生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+--text:#e6edf3;--text2:#8b949e;--accent:#58a6ff;--accent2:#3fb950;
+--danger:#f85149;--warn:#d29922;--radius:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit;font-size:14px}
+
+/* Header */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:20px;display:flex;align-items:center;gap:8px}
+.header h1 span{font-size:24px}
+.header-actions{display:flex;gap:8px}
+
+/* Layout */
+.container{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 57px);overflow:hidden}
+@media(max-width:900px){.container{grid-template-columns:1fr;height:auto}}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:0}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:13px;font-weight:500;color:var(--text2);border:none;background:none;border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:var(--text);background:var(--surface2)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:16px}
+.tab-content.active{display:block}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.color-input-wrap{display:flex;gap:6px;align-items:center}
+.color-input-wrap input[type=color]{width:36px;height:36px;border:1px solid var(--border);border-radius:var(--radius);padding:2px;background:var(--bg);cursor:pointer}
+.color-input-wrap input[type=text]{flex:1}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--border)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#4c9aed;border-color:#4c9aed}
+.btn-success{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.btn-success:hover{background:#36a148}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-danger:hover{background:#e04740}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-block{width:100%;justify-content:center}
+
+/* Badge Preview in editor */
+.badge-preview-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:14px;min-height:50px;display:flex;align-items:center;justify-content:center}
+
+/* Preset grid */
+.preset-category{margin-bottom:16px}
+.preset-category h3{font-size:13px;color:var(--text2);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.preset-grid{display:flex;flex-wrap:wrap;gap:6px}
+.preset-badge{cursor:pointer;transition:transform .15s,box-shadow .15s;border-radius:4px;overflow:hidden}
+.preset-badge:hover{transform:scale(1.05);box-shadow:0 0 0 2px var(--accent)}
+.preset-badge img{display:block;height:20px}
+
+/* AI Section */
+.ai-section textarea{min-height:80px;resize:vertical}
+.ai-result{margin-top:12px}
+.ai-loading{text-align:center;padding:20px;color:var(--text2)}
+.ai-loading .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Main area */
+.main{overflow-y:auto;padding:24px}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar .sep{width:1px;height:24px;background:var(--border)}
+.layout-btn{padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);font-size:18px;transition:all .2s}
+.layout-btn:hover,.layout-btn.active{color:var(--accent);border-color:var(--accent);background:var(--surface2)}
+
+/* Preview area */
+.preview-area{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-height:200px;margin-bottom:16px}
+.preview-area.horizontal .badge-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.preview-area.vertical .badge-items{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.preview-area.grouped .badge-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.preview-area .group-label{width:100%;font-size:12px;color:var(--text2);font-weight:600;margin-top:8px;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px}
+.preview-area .group-label:first-child{margin-top:0}
+.badge-item{position:relative;display:inline-flex;cursor:grab}
+.badge-item:hover .badge-remove{opacity:1}
+.badge-item img{display:block;height:20px}
+.badge-remove{position:absolute;top:-6px;right:-6px;width:16px;height:16px;background:var(--danger);color:#fff;border:none;border-radius:50%;font-size:10px;line-height:16px;text-align:center;opacity:0;transition:opacity .2s;padding:0}
+.empty-state{text-align:center;padding:40px;color:var(--text2)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* Output */
+.output-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.output-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.output-header h3{font-size:13px;color:var(--text2)}
+.output-body{padding:0}
+.output-body pre{padding:16px;font-size:13px;line-height:1.5;overflow-x:auto;color:var(--text);white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;margin:0}
+.output-body pre::-webkit-scrollbar{height:6px;width:6px}
+.output-body pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent2);color:#fff;padding:10px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:1000}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:18px;margin-bottom:16px}
+.modal .form-group{margin-bottom:12px}
+
+/* Responsive */
+@media(max-width:900px){
+.sidebar{border-right:none;border-bottom:1px solid var(--border)}
+.container{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+.badge-item{position:relative;display:inline-flex;align-items:center;border-radius:4px;transition:all .15s}
+.badge-item:hover{box-shadow:0 0 0 2px var(--accent)}
+.badge-item img{display:block;height:20px}
+.badge-item .badge-remove{position:absolute;top:-8px;right:-8px;width:18px;height:18px;background:var(--danger);color:#fff;border:none;border-radius:50%;font-size:11px;display:none;align-items:center;justify-content:center;line-height:1}
+.badge-item:hover .badge-remove{display:flex}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* Output */
+.output-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.output-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.output-header h3{font-size:13px;color:var(--text2)}
+.output-body{padding:0}
+.output-body pre{padding:16px;font-size:13px;line-height:1.5;overflow-x:auto;color:var(--text);white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;margin:0}
+.output-body pre::-webkit-scrollbar{height:6px;width:6px}
+.output-body pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.output-tabs{display:flex;gap:0}
+.output-tab{padding:6px 14px;font-size:12px;background:none;border:none;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--accent2);color:#fff;padding:10px 20px;border-radius:var(--radius);font-size:14px;transform:translateY(100px);opacity:0;transition:all .3s;z-index:1000}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:18px;margin-bottom:16px}
+.modal .form-group{margin-bottom:12px}
+
+/* Responsive */
+@media(max-width:900px){
+.sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:50vh;overflow-y:auto}
+.main{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>🛡️</span> AI Badge Generator</h1>
+  <div class="header-actions">
+    <button class="btn btn-sm" onclick="showApiKeyModal()">🔑 API Key</button>
+    <button class="btn btn-sm" onclick="clearAll()">🗑️ 清空</button>
+    <button class="btn btn-sm btn-primary" onclick="exportMarkdown()">📋 复制 Markdown</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="tabs">
+      <button class="tab active" data-tab="editor">✏️ 编辑器</button>
+      <button class="tab" data-tab="presets">📦 预设</button>
+      <button class="tab" data-tab="ai">🤖 AI推荐</button>
+    </div>
+
+    <!-- Editor Tab -->
+    <div class="tab-content active" id="tab-editor">
+      <div class="badge-preview-box" id="editorPreview">
+        <img id="editorPreviewImg" src="https://img.shields.io/badge/hello-world-blue" alt="preview">
+      </div>
+      <div class="form-group">
+        <label>标签 (Label)</label>
+        <input type="text" id="badgeLabel" value="hello" placeholder="左侧文字">
+      </div>
+      <div class="form-group">
+        <label>消息 (Message)</label>
+        <input type="text" id="badgeMessage" value="world" placeholder="右侧文字">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>标签颜色</label>
+          <div class="color-input-wrap">
+            <input type="color" id="labelColorPicker" value="#555555">
+            <input type="text" id="labelColor" value="555" placeholder="颜色值">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>消息颜色</label>
+          <div class="color-input-wrap">
+            <input type="color" id="msgColorPicker" value="#007ec6">
+            <input type="text" id="msgColor" value="blue" placeholder="颜色值">
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>样式 (Style)</label>
+          <select id="badgeStyle">
+            <option value="flat">Flat</option>
+            <option value="flat-square">Flat Square</option>
+            <option value="plastic">Plastic</option>
+            <option value="for-the-badge">For the Badge</option>
+            <option value="social">Social</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Logo</label>
+          <input type="text" id="badgeLogo" placeholder="如: github, npm, python">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Logo 颜色</label>
+          <input type="text" id="logoColor" placeholder="white">
+        </div>
+        <div class="form-group">
+          <label>链接 URL</label>
+          <input type="text" id="badgeLink" placeholder="https://...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>自定义 Logo (Base64/URL)</label>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="customLogo" placeholder="data:image/svg+xml;base64,..." style="flex:1">
+          <button class="btn btn-sm" onclick="document.getElementById('logoUpload').click()">📁</button>
+          <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="addBadgeFromEditor()">➕ 添加到预览</button>
+    </div>
+
+    <!-- Presets Tab -->
+    <div class="tab-content" id="tab-presets">
+      <div class="form-group">
+        <input type="text" id="presetSearch" placeholder="🔍 搜索预设徽章..." oninput="filterPresets()">
+      </div>
+      <div id="presetList"></div>
+    </div>
+
+    <!-- AI Tab -->
+    <div class="tab-content" id="tab-ai">
+      <div class="ai-section">
+        <div class="form-group">
+          <label>项目描述</label>
+          <textarea id="projectDesc" placeholder="描述你的项目，例如：一个基于React和TypeScript的开源天气应用，使用OpenWeather API，支持PWA，MIT许可证..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>项目仓库 (可选)</label>
+          <input type="text" id="projectRepo" placeholder="owner/repo">
+        </div>
+        <button class="btn btn-primary btn-block" onclick="aiRecommend()">🤖 AI 推荐徽章</button>
+        <div id="aiResult" class="ai-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Preview -->
+  <div class="main">
+    <div class="toolbar">
+      <span style="font-size:14px;color:var(--text2)">排列方式：</span>
+      <button class="layout-btn active" data-layout="horizontal" onclick="setLayout('horizontal')" title="横排">⬌</button>
+      <button class="layout-btn" data-layout="vertical" onclick="setLayout('vertical')" title="竖排">⬍</button>
+      <button class="layout-btn" data-layout="grouped" onclick="setLayout('grouped')" title="分组">▦</button>
+      <div class="sep"></div>
+      <span style="font-size:13px;color:var(--text2)" id="badgeCount">0 个徽章</span>
+    </div>
+
+    <div class="preview-area horizontal" id="previewArea">
+      <div class="badge-items" id="badgeItems">
+        <div class="empty-state" id="emptyState">
+          <div class="icon">🛡️</div>
+          <p>从左侧编辑器添加徽章，或选择预设</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-section">
+      <div class="output-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h3>生成代码</h3>
+          <div class="output-tabs">
+            <button class="output-tab active" data-output="markdown" onclick="setOutputTab('markdown')">Markdown</button>
+            <button class="output-tab" data-output="html" onclick="setOutputTab('html')">HTML</button>
+            <button class="output-tab" data-output="rst" onclick="setOutputTab('rst')">reStructuredText</button>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-success" onclick="exportMarkdown()">📋 复制</button>
+      </div>
+      <div class="output-body">
+        <pre id="outputCode"><!-- 添加徽章后这里会显示代码 --></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="apiKeyModal">
+  <div class="modal">
+    <h2>🔑 设置 DeepSeek API Key</h2>
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-...">
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:16px">API Key 仅保存在浏览器本地，不会上传到任何服务器。用于 AI 推荐功能。</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeApiKeyModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+      <div style="margin-bottom:12px">
+        <input type="text" id="presetSearch" placeholder="🔍 搜索预设徽章..." style="width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);outline:none">
+      </div>
+      <div id="presetList"></div>
+    </div>
+
+    <!-- AI Tab -->
+    <div class="tab-content" id="tab-ai">
+      <div class="form-group">
+        <label>项目描述</label>
+        <textarea id="projectDesc" placeholder="描述你的项目，例如：一个基于React和TypeScript的开源天气应用，使用MIT许可证，已发布到npm..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>项目类型</label>
+        <select id="projectType">
+          <option value="auto">自动检测</option>
+          <option value="frontend">前端项目</option>
+          <option value="backend">后端项目</option>
+          <option value="fullstack">全栈项目</option>
+          <option value="library">库/框架</option>
+          <option value="cli">CLI工具</option>
+          <option value="mobile">移动应用</option>
+          <option value="devops">DevOps/基础设施</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="aiRecommend()" id="aiBtn">🤖 AI 推荐徽章</button>
+      <div id="aiResult" class="ai-result"></div>
+    </div>
+  </div>
+
+  <!-- Main Preview -->
+  <div class="main">
+    <div class="toolbar">
+      <span style="font-size:14px;font-weight:600">预览</span>
+      <span style="font-size:12px;color:var(--text2)" id="badgeCount">0 个徽章</span>
+      <div class="sep"></div>
+      <button class="layout-btn active" data-layout="horizontal" title="横排">⬌</button>
+      <button class="layout-btn" data-layout="vertical" title="竖排">⬍</button>
+      <button class="layout-btn" data-layout="grouped" title="分组">▦</button>
+      <div class="sep"></div>
+      <select id="bgSelect" style="padding:4px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px">
+        <option value="#0d1117">深色背景</option>
+        <option value="#ffffff">浅色背景</option>
+        <option value="#f6f8fa">GitHub 浅色</option>
+        <option value="#161b22">GitHub 深色</option>
+        <option value="transparent">透明</option>
+      </select>
+    </div>
+
+    <div class="preview-area horizontal" id="previewArea">
+      <div class="badge-items" id="badgeItems">
+        <div class="empty-state" id="emptyState">
+          <div class="icon">🛡️</div>
+          <p>从左侧编辑器添加徽章，或选择预设</p>
+          <p style="font-size:12px;margin-top:8px">支持拖拽排序</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <h3>输出代码</h3>
+          <div class="output-tabs">
+            <button class="output-tab active" data-output="markdown">Markdown</button>
+            <button class="output-tab" data-output="html">HTML</button>
+            <button class="output-tab" data-output="rst">reStructuredText</button>
+            <button class="output-tab" data-output="url">URL</button>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-success" onclick="copyOutput()">📋 复制</button>
+      </div>
+      <div class="output-body">
+        <pre id="outputCode"><!-- 添加徽章后这里会显示代码 --></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="apiKeyModal">
+  <div class="modal">
+    <h2>🔑 设置 DeepSeek API Key</h2>
+    <div class="form-group">
+      <label>API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="sk-...">
+    </div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:16px">API Key 仅保存在本地浏览器中，不会上传到任何服务器。用于 AI 推荐功能。</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeApiKeyModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== State ====================
+const state = {
+  badges: [],
+  layout: 'horizontal',
+  outputFormat: 'markdown',
+  apiKey: localStorage.getItem('deepseek_api_key') || ''
+};
+
+// ==================== Preset Badges (50+) ====================
+const PRESETS = {
+  '构建状态': [
+    { label: 'build', message: 'passing', color: 'brightgreen', logo: 'github-actions' },
+    { label: 'tests', message: 'passing', color: 'brightgreen', logo: 'jest' },
+    { label: 'CI', message: 'passing', color: 'brightgreen', logo: 'github-actions' },
+    { label: 'coverage', message: '95%25', color: 'brightgreen', logo: 'codecov' },
+    { label: 'build', message: 'failing', color: 'red', logo: 'github-actions' },
+    { label: 'deploy', message: 'success', color: 'brightgreen', logo: 'vercel' },
+    { label: 'docker build', message: 'automated', color: 'blue', logo: 'docker' },
+    { label: 'pipeline', message: 'passed', color: 'brightgreen', logo: 'gitlab' },
+  ],
+  '版本': [
+    { label: 'version', message: 'v1.0.0', color: 'blue' },
+    { label: 'npm', message: 'v1.0.0', color: 'cb3837', logo: 'npm' },
+    { label: 'pypi', message: 'v1.0.0', color: '3775A9', logo: 'pypi' },
+    { label: 'gem', message: 'v1.0.0', color: 'CC342D', logo: 'rubygems' },
+    { label: 'nuget', message: 'v1.0.0', color: '004880', logo: 'nuget' },
+    { label: 'maven', message: 'v1.0.0', color: 'C71A36', logo: 'apachemaven' },
+    { label: 'crates.io', message: 'v1.0.0', color: 'dea584', logo: 'rust' },
+    { label: 'pub', message: 'v1.0.0', color: '0175C2', logo: 'dart' },
+  ],
+  '许可证': [
+    { label: 'license', message: 'MIT', color: 'green' },
+    { label: 'license', message: 'Apache 2.0', color: 'blue' },
+    { label: 'license', message: 'GPL v3', color: 'blue' },
+    { label: 'license', message: 'BSD 3--Clause', color: 'orange' },
+    { label: 'license', message: 'ISC', color: 'green' },
+    { label: 'license', message: 'MPL 2.0', color: 'brightgreen' },
+    { label: 'license', message: 'Unlicense', color: 'blue' },
+  ],
+  '社交': [
+    { label: 'GitHub stars', message: '1k', color: 'yellow', logo: 'github', style: 'social' },
+    { label: 'GitHub forks', message: '200', color: 'blue', logo: 'github', style: 'social' },
+    { label: 'GitHub watchers', message: '50', color: 'blue', logo: 'github', style: 'social' },
+    { label: 'Twitter Follow', message: '@user', color: '1DA1F2', logo: 'twitter' },
+    { label: 'Discord', message: 'chat', color: '5865F2', logo: 'discord' },
+    { label: 'Slack', message: 'join', color: '4A154B', logo: 'slack' },
+    { label: 'Reddit', message: 'r/project', color: 'FF4500', logo: 'reddit' },
+  ],
+  '下载量': [
+    { label: 'downloads', message: '10k/month', color: 'brightgreen' },
+    { label: 'npm downloads', message: '10k/week', color: 'cb3837', logo: 'npm' },
+    { label: 'PyPI downloads', message: '5k/month', color: '3775A9', logo: 'pypi' },
+    { label: 'GitHub Downloads', message: '1k', color: 'blue', logo: 'github' },
+    { label: 'Docker Pulls', message: '10k', color: '2496ED', logo: 'docker' },
+    { label: 'Homebrew', message: 'available', color: 'FBB040', logo: 'homebrew' },
+  ],
+  '代码质量': [
+    { label: 'code style', message: 'prettier', color: 'F7B93E', logo: 'prettier' },
+    { label: 'code style', message: 'eslint', color: '4B32C3', logo: 'eslint' },
+    { label: 'maintainability', message: 'A', color: 'brightgreen' },
+    { label: 'technical debt', message: '0', color: 'brightgreen' },
+    { label: 'Codacy', message: 'A', color: 'brightgreen', logo: 'codacy' },
+    { label: 'CodeFactor', message: 'A+', color: 'brightgreen', logo: 'codefactor' },
+    { label: 'SonarQube', message: 'passed', color: '4E9BCD', logo: 'sonarqube' },
+  ],
+  '技术栈': [
+    { label: 'React', message: '18', color: '61DAFB', logo: 'react' },
+    { label: 'Vue.js', message: '3', color: '4FC08D', logo: 'vuedotjs' },
+    { label: 'TypeScript', message: '5.0', color: '3178C6', logo: 'typescript' },
+    { label: 'Node.js', message: '20', color: '339933', logo: 'nodedotjs' },
+    { label: 'Python', message: '3.12', color: '3776AB', logo: 'python' },
+    { label: 'Go', message: '1.21', color: '00ADD8', logo: 'go' },
+    { label: 'Rust', message: '1.75', color: '000000', logo: 'rust' },
+    { label: 'Java', message: '21', color: 'ED8B00', logo: 'openjdk' },
+    { label: 'Swift', message: '5.9', color: 'F05138', logo: 'swift' },
+    { label: 'Kotlin', message: '1.9', color: '7F52FF', logo: 'kotlin' },
+  ],
+  '平台': [
+    { label: 'platform', message: 'macOS | Linux | Windows', color: 'blue' },
+    { label: 'iOS', message: '16+', color: '000000', logo: 'apple' },
+    { label: 'Android', message: '13+', color: '3DDC84', logo: 'android' },
+    { label: 'Docker', message: 'ready', color: '2496ED', logo: 'docker' },
+    { label: 'Kubernetes', message: 'ready', color: '326CE5', logo: 'kubernetes' },
+    { label: 'AWS', message: 'deployed', color: '232F3E', logo: 'amazonaws' },
+  ],
+  '文档与贡献': [
+    { label: 'docs', message: 'latest', color: 'brightgreen', logo: 'readthedocs' },
+    { label: 'PRs', message: 'welcome', color: 'brightgreen' },
+    { label: 'contributions', message: 'welcome', color: 'brightgreen' },
+    { label: 'Conventional Commits', message: '1.0.0', color: 'FE5196', logo: 'conventionalcommits' },
+    { label: 'semantic--release', message: 'angular', color: 'e10079', logo: 'semanticrelease' },
+    { label: 'Storybook', message: 'docs', color: 'FF4785', logo: 'storybook' },
+  ],
+  '状态': [
+    { label: 'status', message: 'active', color: 'brightgreen' },
+    { label: 'status', message: 'beta', color: 'yellow' },
+    { label: 'status', message: 'deprecated', color: 'red' },
+    { label: 'maintenance', message: 'yes', color: 'brightgreen' },
+    { label: 'stability', message: 'stable', color: 'brightgreen' },
+    { label: 'made with', message: '❤️', color: 'red' },
+  ],
+};
+
+// ==================== Utility Functions ====================
+function encodeBadgePart(str) {
+  return encodeURIComponent(str).replace(/-/g, '--').replace(/_/g, '__').replace(/ /g, '_');
+}
+
+function buildBadgeUrl(badge) {
+  const label = encodeBadgePart(badge.label || '');
+  const message = encodeBadgePart(badge.message || '');
+  const color = (badge.color || 'blue').replace('#', '');
+  let url = `https://img.shields.io/badge/${label}-${message}-${color}`;
+  const params = [];
+  if (badge.style && badge.style !== 'flat') params.push(`style=${badge.style}`);
+  if (badge.logo) params.push(`logo=${encodeURIComponent(badge.logo)}`);
+  if (badge.logoColor) params.push(`logoColor=${encodeURIComponent(badge.logoColor)}`);
+  if (badge.labelColor && badge.labelColor !== '555') params.push(`labelColor=${badge.labelColor.replace('#','')}`);
+  if (badge.customLogo) params.push(`logo=${encodeURIComponent(badge.customLogo)}`);
+  if (params.length) url += '?' + params.join('&');
+  return url;
+}
+
+function showToast(msg, duration = 2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function generateId() {
+  return 'b_' + Math.random().toString(36).substr(2, 9);
+}
+
+// ==================== Tab Switching ====================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ==================== Layout Switching ====================
+document.querySelectorAll('.layout-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.layout = btn.dataset.layout;
+    const area = document.getElementById('previewArea');
+    area.className = 'preview-area ' + state.layout;
+    updateOutput();
+  });
+});
+
+// ==================== Background Color ====================
+document.getElementById('bgSelect').addEventListener('change', (e) => {
+  const area = document.getElementById('previewArea');
+  area.style.background = e.target.value === 'transparent' ? 'repeating-conic-gradient(#30363d 0% 25%, var(--surface) 0% 50%) 0 0/20px 20px' : e.target.value;
+});
+
+// ==================== Output Format Switching ====================
+document.querySelectorAll('.output-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.outputFormat = tab.dataset.output;
+    updateOutput();
+  });
+});
+
+// ==================== Editor Preview ====================
+function updateEditorPreview() {
+  const badge = getEditorBadge();
+  const url = buildBadgeUrl(badge);
+  const img = document.getElementById('editorPreviewImg');
+  img.src = url;
+  img.alt = `${badge.label}: ${badge.message}`;
+}
+
+function getEditorBadge() {
+  return {
+    label: document.getElementById('badgeLabel').value || 'badge',
+    message: document.getElementById('badgeMessage').value || '',
+    color: document.getElementById('msgColor').value || 'blue',
+    labelColor: document.getElementById('labelColor').value || '555',
+    style: document.getElementById('badgeStyle').value,
+    logo: document.getElementById('badgeLogo').value,
+    logoColor: document.getElementById('logoColor').value,
+    link: document.getElementById('badgeLink').value,
+    customLogo: document.getElementById('customLogo').value,
+  };
+}
+
+// Debounced editor preview update
+let editorTimer;
+['badgeLabel','badgeMessage','msgColor','labelColor','badgeStyle','badgeLogo','logoColor','customLogo'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => {
+    clearTimeout(editorTimer);
+    editorTimer = setTimeout(updateEditorPreview, 300);
+  });
+});
+document.getElementById('badgeStyle').addEventListener('change', updateEditorPreview);
+
+// Color picker sync
+document.getElementById('labelColorPicker').addEventListener('input', (e) => {
+  document.getElementById('labelColor').value = e.target.value.replace('#','');
+  updateEditorPreview();
+});
+document.getElementById('msgColorPicker').addEventListener('input', (e) => {
+  document.getElementById('msgColor').value = e.target.value.replace('#','');
+  updateEditorPreview();
+});
+
+// ==================== Logo Upload ====================
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('customLogo').value = e.target.result;
+    updateEditorPreview();
+    showToast('Logo 已上传');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==================== Add Badge ====================
+function addBadgeFromEditor() {
+  const badge = getEditorBadge();
+  badge.id = generateId();
+  badge.category = '自定义';
+  state.badges.push(badge);
+  renderPreview();
+  updateOutput();
+  showToast('✅ 徽章已添加');
+}
+
+function addPresetBadge(category, index) {
+  const preset = PRESETS[category][index];
+  const badge = { ...preset, id: generateId(), category };
+  state.badges.push(badge);
+  renderPreview();
+  updateOutput();
+  showToast('✅ 已添加: ' + preset.label);
+}
+
+function removeBadge(id) {
+  state.badges = state.badges.filter(b => b.id !== id);
+  renderPreview();
+  updateOutput();
+}
+
+function clearAll() {
+  if (state.badges.length === 0) return;
+  if (!confirm('确定清空所有徽章？')) return;
+  state.badges = [];
+  renderPreview();
+  updateOutput();
+  showToast('已清空');
+}
+
+
+// ==================== Render Preview ====================
+function renderPreview() {
+  const container = document.getElementById('badgeItems');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('badgeCount').textContent = state.badges.length + ' 个徽章';
+
+  if (state.badges.length === 0) {
+    container.innerHTML = '';
+    container.appendChild(createEmptyState());
+    return;
+  }
+
+  container.innerHTML = '';
+
+  if (state.layout === 'grouped') {
+    const groups = {};
+    state.badges.forEach(b => {
+      const cat = b.category || '自定义';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(b);
+    });
+    Object.keys(groups).forEach(cat => {
+      const label = document.createElement('div');
+      label.className = 'group-label';
+      label.textContent = cat;
+      container.appendChild(label);
+      groups[cat].forEach(b => container.appendChild(createBadgeElement(b)));
+    });
+  } else {
+    state.badges.forEach(b => container.appendChild(createBadgeElement(b)));
+  }
+}
+
+function createEmptyState() {
+  const div = document.createElement('div');
+  div.className = 'empty-state';
+  div.id = 'emptyState';
+  div.innerHTML = '<div class="icon">🛡️</div><p>从左侧编辑器添加徽章，或选择预设</p><p style="font-size:12px;margin-top:8px">支持拖拽排序</p>';
+  return div;
+}
+
+function createBadgeElement(badge) {
+  const div = document.createElement('div');
+  div.className = 'badge-item';
+  div.draggable = true;
+  div.dataset.id = badge.id;
+
+  const img = document.createElement('img');
+  img.src = buildBadgeUrl(badge);
+  img.alt = badge.label + ': ' + badge.message;
+  img.loading = 'lazy';
+  img.onerror = () => { img.style.opacity = '0.3'; };
+  div.appendChild(img);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'badge-remove';
+  removeBtn.innerHTML = '×';
+  removeBtn.onclick = (e) => { e.stopPropagation(); removeBadge(badge.id); };
+  div.appendChild(removeBtn);
+
+  // Click to edit
+  div.addEventListener('dblclick', () => {
+    document.getElementById('badgeLabel').value = badge.label || '';
+    document.getElementById('badgeMessage').value = badge.message || '';
+    document.getElementById('msgColor').value = badge.color || 'blue';
+    document.getElementById('labelColor').value = badge.labelColor || '555';
+    document.getElementById('badgeStyle').value = badge.style || 'flat';
+    document.getElementById('badgeLogo').value = badge.logo || '';
+    document.getElementById('logoColor').value = badge.logoColor || '';
+    document.getElementById('badgeLink').value = badge.link || '';
+    document.getElementById('customLogo').value = badge.customLogo || '';
+    updateEditorPreview();
+    // Switch to editor tab
+    document.querySelectorAll('.tab')[0].click();
+    showToast('双击编辑模式 - 修改后点击添加');
+  });
+
+  // Drag events
+  div.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', badge.id);
+    div.style.opacity = '0.4';
+  });
+  div.addEventListener('dragend', () => { div.style.opacity = '1'; });
+  div.addEventListener('dragover', (e) => { e.preventDefault(); div.style.boxShadow = '0 0 0 2px var(--accent)'; });
+  div.addEventListener('dragleave', () => { div.style.boxShadow = ''; });
+  div.addEventListener('drop', (e) => {
+    e.preventDefault();
+    div.style.boxShadow = '';
+    const dragId = e.dataTransfer.getData('text/plain');
+    const dropId = badge.id;
+    if (dragId === dropId) return;
+    const dragIdx = state.badges.findIndex(b => b.id === dragId);
+    const dropIdx = state.badges.findIndex(b => b.id === dropId);
+    if (dragIdx < 0 || dropIdx < 0) return;
+    const [item] = state.badges.splice(dragIdx, 1);
+    state.badges.splice(dropIdx, 0, item);
+    renderPreview();
+    updateOutput();
+  });
+
+  return div;
+}
+
+// ==================== Output Generation ====================
+function updateOutput() {
+  const code = document.getElementById('outputCode');
+  if (state.badges.length === 0) {
+    code.textContent = '<!-- 添加徽章后这里会显示代码 -->';
+    return;
+  }
+
+  let output = '';
+  const fmt = state.outputFormat;
+
+  if (state.layout === 'grouped') {
+    const groups = {};
+    state.badges.forEach(b => {
+      const cat = b.category || '自定义';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(b);
+    });
+    Object.keys(groups).forEach(cat => {
+      if (fmt === 'markdown') {
+        output += `### ${cat}\n\n`;
+        groups[cat].forEach(b => { output += formatBadge(b, fmt) + '\n'; });
+        output += '\n';
+      } else if (fmt === 'html') {
+        output += `<h3>${cat}</h3>\n<p>\n`;
+        groups[cat].forEach(b => { output += '  ' + formatBadge(b, fmt) + '\n'; });
+        output += '</p>\n\n';
+      } else {
+        groups[cat].forEach(b => { output += formatBadge(b, fmt) + '\n'; });
+        output += '\n';
+      }
+    });
+  } else if (state.layout === 'vertical') {
+    state.badges.forEach(b => {
+      output += formatBadge(b, fmt) + '\n\n';
+    });
+  } else {
+    state.badges.forEach(b => {
+      output += formatBadge(b, fmt) + '\n';
+    });
+  }
+
+  code.textContent = output.trim();
+}
+
+function formatBadge(badge, fmt) {
+  const url = buildBadgeUrl(badge);
+  const alt = `${badge.label}: ${badge.message}`;
+  const link = badge.link || '';
+
+  switch (fmt) {
+    case 'markdown':
+      if (link) return `[![${alt}](${url})](${link})`;
+      return `![${alt}](${url})`;
+    case 'html':
+      if (link) return `<a href="${link}"><img src="${url}" alt="${alt}"></a>`;
+      return `<img src="${url}" alt="${alt}">`;
+    case 'rst':
+      if (link) return `.. image:: ${url}\n   :target: ${link}\n   :alt: ${alt}`;
+      return `.. image:: ${url}\n   :alt: ${alt}`;
+    case 'url':
+      return url;
+    default:
+      return url;
+  }
+}
+
+function copyOutput() {
+  const code = document.getElementById('outputCode').textContent;
+  if (!code || code.startsWith('<!--')) {
+    showToast('没有可复制的内容');
+    return;
+  }
+  navigator.clipboard.writeText(code).then(() => showToast('✅ 已复制到剪贴板'));
+}
+
+function exportMarkdown() {
+  state.outputFormat = 'markdown';
+  document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.output-tab[data-output="markdown"]').classList.add('active');
+  updateOutput();
+  copyOutput();
+}
+
+// ==================== Render Presets ====================
+function renderPresets(filter = '') {
+  const container = document.getElementById('presetList');
+  container.innerHTML = '';
+  const lowerFilter = filter.toLowerCase();
+
+  Object.keys(PRESETS).forEach(category => {
+    const badges = PRESETS[category].filter(b => {
+      if (!lowerFilter) return true;
+      return (b.label + ' ' + b.message + ' ' + category + ' ' + (b.logo || '')).toLowerCase().includes(lowerFilter);
+    });
+    if (badges.length === 0) return;
+
+    const catDiv = document.createElement('div');
+    catDiv.className = 'preset-category';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = category + ' (' + badges.length + ')';
+    catDiv.appendChild(h3);
+
+    const grid = document.createElement('div');
+    grid.className = 'preset-grid';
+
+    badges.forEach((badge, idx) => {
+      const origIdx = PRESETS[category].indexOf(badge);
+      const span = document.createElement('span');
+      span.className = 'preset-badge';
+      span.title = `${badge.label}: ${badge.message} — 点击添加`;
+      span.onclick = () => addPresetBadge(category, origIdx);
+
+      const img = document.createElement('img');
+      img.src = buildBadgeUrl(badge);
+      img.alt = badge.label;
+      img.loading = 'lazy';
+      span.appendChild(img);
+      grid.appendChild(span);
+    });
+
+    catDiv.appendChild(grid);
+    container.appendChild(catDiv);
+  });
+
+  if (container.children.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text2);padding:20px">没有匹配的徽章</p>';
+  }
+}
+
+// Preset search
+document.getElementById('presetSearch').addEventListener('input', (e) => {
+  renderPresets(e.target.value);
+});
+
+// ==================== API Key Modal ====================
+function showApiKeyModal() {
+  document.getElementById('apiKeyInput').value = state.apiKey;
+  document.getElementById('apiKeyModal').classList.add('show');
+}
+function closeApiKeyModal() {
+  document.getElementById('apiKeyModal').classList.remove('show');
+}
+function saveApiKey() {
+  state.apiKey = document.getElementById('apiKeyInput').value.trim();
+  localStorage.setItem('deepseek_api_key', state.apiKey);
+  closeApiKeyModal();
+  showToast('API Key 已保存');
+}
+
+// ==================== AI Recommendation ====================
+async function aiRecommend() {
+  const desc = document.getElementById('projectDesc').value.trim();
+  if (!desc) {
+    showToast('请输入项目描述');
+    return;
+  }
+  if (!state.apiKey) {
+    showApiKeyModal();
+    showToast('请先设置 DeepSeek API Key');
+    return;
+  }
+
+  const btn = document.getElementById('aiBtn');
+  const resultDiv = document.getElementById('aiResult');
+  btn.disabled = true;
+  btn.textContent = '⏳ AI 分析中...';
+  resultDiv.innerHTML = '<div class="ai-loading"><div class="spinner"></div><p style="margin-top:8px">正在分析项目并推荐徽章...</p></div>';
+
+  const projectType = document.getElementById('projectType').value;
+  const typeHint = projectType !== 'auto' ? `\n项目类型: ${projectType}` : '';
+
+  const prompt = `你是一个GitHub README徽章专家。根据以下项目描述，推荐最合适的shields.io徽章组合。${typeHint}
+
+项目描述: ${desc}
+
+请返回一个JSON数组，每个元素包含:
+- label: 徽章左侧文字
+- message: 徽章右侧文字
+- color: 颜色(如 brightgreen, blue, red, orange, yellow, 或十六进制如 FF6F00)
+- logo: shields.io支持的logo名称(可选，如 github, npm, python, react, typescript 等)
+- style: 样式(可选，flat/flat-square/for-the-badge)
+- category: 分类(如 构建状态/版本/许可证/技术栈/社交/文档 等)
+- reason: 推荐理由(简短中文)
+
+推荐8-15个最相关的徽章，覆盖不同分类。只返回JSON数组，不要其他文字。`;
+
+  try {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: '你是一个GitHub README徽章推荐专家。只返回有效的JSON数组。' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API 错误: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content.trim();
+
+    // Extract JSON from response (handle markdown code blocks)
+    let jsonStr = content;
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) jsonStr = jsonMatch[1].trim();
+    // Also try to find array directly
+    if (!jsonStr.startsWith('[')) {
+      const arrMatch = jsonStr.match(/\[[\s\S]*\]/);
+      if (arrMatch) jsonStr = arrMatch[0];
+    }
+
+    const badges = JSON.parse(jsonStr);
+    if (!Array.isArray(badges) || badges.length === 0) throw new Error('AI 返回了无效的数据');
+
+    // Render AI results
+    resultDiv.innerHTML = `<p style="font-size:13px;color:var(--accent2);margin-bottom:10px">✅ 推荐了 ${badges.length} 个徽章</p>`;
+
+    const addAllBtn = document.createElement('button');
+    addAllBtn.className = 'btn btn-success btn-block btn-sm';
+    addAllBtn.textContent = '📥 全部添加到预览';
+    addAllBtn.style.marginBottom = '12px';
+    addAllBtn.onclick = () => {
+      badges.forEach(b => {
+        state.badges.push({ ...b, id: generateId() });
+      });
+      renderPreview();
+      updateOutput();
+      showToast(`✅ 已添加 ${badges.length} 个徽章`);
+    };
+    resultDiv.appendChild(addAllBtn);
+
+    badges.forEach((badge, i) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border)';
+
+      const img = document.createElement('img');
+      img.src = buildBadgeUrl(badge);
+      img.style.height = '20px';
+      img.loading = 'lazy';
+
+      const info = document.createElement('div');
+      info.style.cssText = 'flex:1;min-width:0';
+      info.innerHTML = `<div style="font-size:11px;color:var(--text2)">${badge.reason || badge.category || ''}</div>`;
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn btn-sm btn-primary';
+      addBtn.textContent = '+';
+      addBtn.onclick = () => {
+        state.badges.push({ ...badge, id: generateId() });
+        renderPreview();
+        updateOutput();
+        showToast('✅ 已添加: ' + badge.label);
+      };
+
+      item.appendChild(img);
+      item.appendChild(info);
+      item.appendChild(addBtn);
+      resultDiv.appendChild(item);
+    });
+
+  } catch (err) {
+    resultDiv.innerHTML = `<div style="padding:12px;background:rgba(248,81,73,0.1);border:1px solid var(--danger);border-radius:var(--radius);color:var(--danger);font-size:13px">
+      <strong>❌ 错误:</strong> ${err.message}
+      <p style="margin-top:6px;color:var(--text2);font-size:12px">请检查 API Key 是否正确，或稍后重试。</p>
+    </div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 AI 推荐徽章';
+  }
+}
+
+// ==================== Init ====================
+renderPresets();
+updateEditorPreview();
+
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

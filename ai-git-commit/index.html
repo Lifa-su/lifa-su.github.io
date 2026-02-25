@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Git Commit Message Generator - Create Conventional Commits</title>
+<meta name="description" content="Generate conventional commit messages from your code diffs and change descriptions. Supports multiple styles and formats.">
+<meta name="keywords" content="git commit message, conventional commits, commit generator, git workflow, developer tools, code diff, commit format">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-git-commit/">
+<meta property="og:title" content="AI Git Commit Message Generator">
+<meta property="og:description" content="Generate conventional commit messages from your code diffs and change descriptions. Multiple styles and formats supported.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-git-commit/">
+<meta property="og:image" content="https://lifa-su.com/ai-git-commit/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Git Commit Message Generator">
+<meta name="twitter:description" content="Generate conventional commit messages from code diffs. Free online tool for developers.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Git Commit Message Generator","description":"Generate conventional commit messages from code diffs and change descriptions. Supports multiple styles and formats.","url":"https://lifa-su.com/ai-git-commit/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Conventional Commits format","Multiple commit types","Scope and breaking change support","Alternative suggestions","One-click copy"]}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--border:#2a2a42;
+  --text:#e8e8f4;--text2:#9898b4;--accent:#7c5cfc;--accent2:#5c8cfc;
+  --success:#4cda8a;--danger:#fc5c6c;--warn:#fcb44c;
+  --purple:#bc8cff;
+  --radius:10px;--shadow:0 2px 12px rgba(0,0,0,.4);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+.sticky-header{position:sticky;top:0;z-index:100;background:rgba(11,11,18,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.sticky-header h1{font-size:1.15rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.free-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:var(--success);color:#0b0b12;letter-spacing:0.5px}
+.container{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+header{text-align:center;padding:30px 0 24px}
+header h2{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);transition:border-color .2s}
+.card:hover{border-color:color-mix(in srgb,var(--border) 50%,var(--accent) 50%)}
+.card h2{font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:12px;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:.85rem;resize:vertical;line-height:1.5;transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,0.15)}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px;margin-bottom:16px}
+.type-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .25s ease;font-size:.8rem;color:var(--text2);user-select:none}
+.type-btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-2px);box-shadow:0 4px 12px rgba(124,92,252,0.2)}
+.type-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:var(--accent);color:#fff;font-weight:600;transform:translateY(-1px);box-shadow:0 4px 16px rgba(124,92,252,0.3)}
+.type-btn .emoji{font-size:1.1rem;display:block;margin-bottom:2px}
+.style-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.style-btn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;cursor:pointer;font-size:.85rem;color:var(--text2);transition:all .25s ease}
+.style-btn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.style-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:var(--accent);color:#fff}
+.scope-row{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.scope-row input{flex:1;min-width:150px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:.85rem;transition:border-color .2s}
+.scope-row input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,92,252,0.15)}
+.scope-row .breaking{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--text2);cursor:pointer;white-space:nowrap}
+.scope-row .breaking input[type=checkbox]{accent-color:var(--danger);width:16px;height:16px;cursor:pointer}
+.generate-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--purple));border:none;border-radius:8px;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:all .25s ease}
+.generate-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,92,252,0.35)}
+.generate-btn:active{transform:scale(.98)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.output-area{position:relative;margin-top:14px;display:none}
+.output-area.show{display:block;animation:fadeInUp .4s ease}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.output-header h3{font-size:.9rem;color:var(--success);display:flex;align-items:center;gap:6px}
+.copy-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);padding:5px 12px;font-size:.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}
+.copy-btn:hover{border-color:var(--accent);color:var(--text)}
+.copy-btn.copied{border-color:var(--success);color:var(--success)}
+.output-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-word;line-height:1.6;color:var(--text)}
+.output-box .cm-type{color:var(--accent)}
+.output-box .cm-scope{color:var(--warn)}
+.output-box .cm-breaking{color:var(--danger)}
+.output-box .cm-subject{color:var(--text)}
+.output-box .cm-body{color:var(--text2)}
+.tips{margin-top:10px}
+.tips summary{font-size:.85rem;color:var(--text2);cursor:pointer;user-select:none;transition:color .2s}
+.tips summary:hover{color:var(--text)}
+.tips .tip-content{margin-top:8px;font-size:.82rem;color:var(--text2);line-height:1.7}
+.tip-content code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:.8rem}
+.alternatives{margin-top:16px;display:none}
+.alternatives.show{display:block;animation:fadeInUp .4s ease .1s both}
+.alternatives h3{font-size:.9rem;color:var(--text2);margin-bottom:10px}
+.alt-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;transition:all .2s}
+.alt-item:hover{border-color:var(--accent);background:var(--surface2)}
+.alt-item code{font-size:.82rem;color:var(--text2);word-break:break-all;flex:1}
+.alt-copy{font-size:.75rem;color:var(--text2);white-space:nowrap;padding:3px 8px;border-radius:4px;background:var(--surface2);transition:color .2s}
+.pro-section{max-width:900px;margin:40px auto;padding:0 16px}
+.pro-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;position:relative;overflow:hidden}
+.pro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--success))}
+.pro-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;margin-bottom:12px}
+.pro-card h3{font-size:1.4rem;margin-bottom:8px}
+.pro-card p{color:var(--text2);margin-bottom:24px}
+.pro-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin-bottom:24px}
+.pro-feat{display:flex;gap:12px;padding:12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);transition:border-color .2s}
+.pro-feat:hover{border-color:var(--accent)}
+.pf-icon{font-size:1.5rem;flex-shrink:0}
+.pf-text{font-size:0.85rem;font-weight:600}
+.pf-text span{display:block;font-size:0.75rem;font-weight:400;color:var(--text2);margin-top:2px}
+.pro-btn{display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;border-radius:10px;font-weight:700;font-size:0.95rem;transition:all .2s;text-decoration:none}
+.pro-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(245,166,35,0.4)}
+@media(max-width:768px){
+  .type-grid{grid-template-columns:repeat(auto-fill,minmax(85px,1fr))}
+  .scope-row{flex-direction:column;align-items:stretch}
+  .scope-row input{min-width:100%}
+  header h2{font-size:1.4rem}
+  .pro-features{grid-template-columns:1fr}
+  .container{padding:16px 12px 30px}
+}
+</style>
+</head>
+<body>
+
+<div class="sticky-header">
+  <h1>📝 Git Commit Generator</h1>
+  <span class="free-badge">FREE</span>
+</div>
+
+<div class="container">
+  <header>
+    <h2>Craft Perfect Commit Messages</h2>
+    <p>Generate conventional commit messages instantly — no AI key needed</p>
+  </header>
+
+  <!-- Commit Type -->
+  <div class="card">
+    <h2><span>🏷️</span> Commit Type</h2>
+    <div class="type-grid" id="typeGrid">
+      <div class="type-btn active" data-type="feat"><span class="emoji">✨</span>feat</div>
+      <div class="type-btn" data-type="fix"><span class="emoji">🐛</span>fix</div>
+      <div class="type-btn" data-type="docs"><span class="emoji">📚</span>docs</div>
+      <div class="type-btn" data-type="style"><span class="emoji">💎</span>style</div>
+      <div class="type-btn" data-type="refactor"><span class="emoji">♻️</span>refactor</div>
+      <div class="type-btn" data-type="perf"><span class="emoji">⚡</span>perf</div>
+      <div class="type-btn" data-type="test"><span class="emoji">🧪</span>test</div>
+      <div class="type-btn" data-type="build"><span class="emoji">📦</span>build</div>
+      <div class="type-btn" data-type="ci"><span class="emoji">🔧</span>ci</div>
+      <div class="type-btn" data-type="chore"><span class="emoji">🔨</span>chore</div>
+      <div class="type-btn" data-type="revert"><span class="emoji">⏪</span>revert</div>
+    </div>
+  </div>
+
+  <!-- Commit Style -->
+  <div class="card">
+    <h2><span>🎨</span> Commit Style</h2>
+    <div class="style-row" id="styleRow">
+      <div class="style-btn active" data-style="conventional">Conventional</div>
+      <div class="style-btn" data-style="angular">Angular</div>
+      <div class="style-btn" data-style="emoji">Emoji</div>
+      <div class="style-btn" data-style="simple">Simple</div>
+    </div>
+  </div>
+
+  <!-- Scope & Details -->
+  <div class="card">
+    <h2><span>📋</span> Details</h2>
+    <div class="scope-row">
+      <input type="text" id="scopeInput" placeholder="Scope (e.g. auth, api, ui)">
+      <label class="breaking">
+        <input type="checkbox" id="breakingCheck"> Breaking change
+      </label>
+    </div>
+    <label>Short description *</label>
+    <textarea id="subjectInput" rows="2" placeholder="e.g. add user authentication flow" style="min-height:60px;resize:none;font-family:inherit"></textarea>
+    <label style="margin-top:14px">Body (optional)</label>
+    <textarea id="bodyInput" rows="4" placeholder="Detailed explanation of the change...&#10;&#10;- What changed and why&#10;- Any side effects or caveats" style="min-height:100px"></textarea>
+    <label style="margin-top:14px">Footer (optional)</label>
+    <textarea id="footerInput" rows="2" placeholder="e.g. BREAKING CHANGE: API endpoint renamed&#10;Closes #123, #456" style="min-height:60px"></textarea>
+  </div>
+
+  <!-- Generate -->
+  <button class="generate-btn" id="generateBtn" onclick="generate()">🚀 Generate Commit Message</button>
+
+  <!-- Output -->
+  <div class="output-area" id="outputArea">
+    <div class="output-header">
+      <h3>✅ Generated Commit</h3>
+      <button class="copy-btn" id="copyBtn" onclick="copyCommit()">
+        <span id="copyIcon">📋</span> <span id="copyText">Copy</span>
+      </button>
+    </div>
+    <div class="output-box" id="outputBox"></div>
+    <details class="tips">
+      <summary>💡 Conventional Commits Tips</summary>
+      <div class="tip-content">
+        Format: <code>type(scope): description</code><br><br>
+        <code>feat</code> — A new feature (correlates with MINOR in SemVer)<br>
+        <code>fix</code> — A bug fix (correlates with PATCH in SemVer)<br>
+        <code>BREAKING CHANGE</code> — in footer or <code>!</code> after type (correlates with MAJOR)<br><br>
+        Keep the subject line under 72 characters. Use imperative mood ("add" not "added").
+      </div>
+    </details>
+  </div>
+
+  <!-- Alternatives -->
+  <div class="alternatives" id="altSection">
+    <h3>🔄 Alternative Suggestions</h3>
+    <div id="altList"></div>
+  </div>
+</div>
+
+<!-- Pro Section -->
+<div class="pro-section">
+  <div class="pro-card">
+    <div class="pro-badge">PRO</div>
+    <h3>Level Up Your Git Workflow</h3>
+    <p>Unlock AI-powered commit analysis and advanced formatting</p>
+    <div class="pro-features">
+      <div class="pro-feat">
+        <div class="pf-icon">🤖</div>
+        <div class="pf-text">AI Diff Analysis<span>Paste a diff and get smart commit messages</span></div>
+      </div>
+      <div class="pro-feat">
+        <div class="pf-icon">📊</div>
+        <div class="pf-text">Commit Analytics<span>Track your commit patterns over time</span></div>
+      </div>
+      <div class="pro-feat">
+        <div class="pf-icon">🔗</div>
+        <div class="pf-text">Issue Linking<span>Auto-link Jira, GitHub, GitLab issues</span></div>
+      </div>
+      <div class="pro-feat">
+        <div class="pf-icon">📝</div>
+        <div class="pf-text">Changelog Generation<span>Auto-generate changelogs from commits</span></div>
+      </div>
+    </div>
+    <a class="pro-btn" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">⚡ Unlock Pro — $9</a>
+  </div>
+</div>
+
+<footer style="text-align:center;padding:24px 16px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);">
+  <a href="https://lifa-su.com/" style="color:var(--accent);">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" style="color:var(--accent);">☕ Support on Ko-fi</a>
+</footer>
+
+<script>
+const TYPES = {
+  feat:     { emoji:'✨', desc:'A new feature' },
+  fix:      { emoji:'🐛', desc:'A bug fix' },
+  docs:     { emoji:'📚', desc:'Documentation changes' },
+  style:    { emoji:'💎', desc:'Code style (formatting, semicolons)' },
+  refactor: { emoji:'♻️', desc:'Code refactoring' },
+  perf:     { emoji:'⚡', desc:'Performance improvement' },
+  test:     { emoji:'🧪', desc:'Adding or fixing tests' },
+  build:    { emoji:'📦', desc:'Build system or dependencies' },
+  ci:       { emoji:'🔧', desc:'CI configuration' },
+  chore:    { emoji:'🔨', desc:'Other changes (no src/test)' },
+  revert:   { emoji:'⏪', desc:'Revert a previous commit' }
+};
+
+let state = { type:'feat', style:'conventional' };
+
+// Type selection
+document.getElementById('typeGrid').addEventListener('click', e => {
+  const btn = e.target.closest('.type-btn');
+  if (!btn) return;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.type = btn.dataset.type;
+});
+
+// Style selection
+document.getElementById('styleRow').addEventListener('click', e => {
+  const btn = e.target.closest('.style-btn');
+  if (!btn) return;
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.style = btn.dataset.style;
+});
+
+function generate() {
+  const scope = document.getElementById('scopeInput').value.trim();
+  const subject = document.getElementById('subjectInput').value.trim();
+  const body = document.getElementById('bodyInput').value.trim();
+  const footer = document.getElementById('footerInput').value.trim();
+  const breaking = document.getElementById('breakingCheck').checked;
+
+  if (!subject) {
+    document.getElementById('subjectInput').focus();
+    document.getElementById('subjectInput').style.borderColor = 'var(--danger)';
+    setTimeout(() => document.getElementById('subjectInput').style.borderColor = '', 2000);
+    return;
+  }
+
+  const type = state.type;
+  const style = state.style;
+  let main = '';
+  let full = '';
+
+  // Build main commit line based on style
+  if (style === 'conventional' || style === 'angular') {
+    const bang = breaking ? '!' : '';
+    const scopePart = scope ? `(${scope})` : '';
+    main = `${type}${scopePart}${bang}: ${subject}`;
+  } else if (style === 'emoji') {
+    const emoji = TYPES[type].emoji;
+    const scopePart = scope ? `(${scope}) ` : '';
+    main = `${emoji} ${scopePart}${subject}`;
+  } else {
+    // simple
+    main = subject.charAt(0).toUpperCase() + subject.slice(1);
+  }
+
+  full = main;
+  if (body) full += '\n\n' + body;
+  if (breaking && footer && !footer.includes('BREAKING CHANGE')) {
+    full += '\n\nBREAKING CHANGE: ' + subject;
+    full += '\n' + footer;
+  } else if (breaking && !footer) {
+    full += '\n\nBREAKING CHANGE: ' + subject;
+  } else if (footer) {
+    full += '\n\n' + footer;
+  }
+
+  // Render with syntax highlighting
+  renderOutput(full, type, scope, breaking);
+  generateAlternatives(type, scope, subject, breaking);
+
+  document.getElementById('outputArea').classList.add('show');
+  document.getElementById('outputArea').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function renderOutput(text, type, scope, breaking) {
+  const box = document.getElementById('outputBox');
+  // Highlight the first line
+  const lines = text.split('\n');
+  const firstLine = lines[0];
+  let highlighted = highlightCommit(firstLine, type, scope, breaking);
+  if (lines.length > 1) {
+    const rest = lines.slice(1).join('\n');
+    highlighted += '\n<span class="cm-body">' + escHtml(rest) + '</span>';
+  }
+  box.innerHTML = highlighted;
+}
+
+function highlightCommit(line, type, scope, breaking) {
+  // Try to parse conventional format
+  const match = line.match(/^([a-z]+)(\([^)]*\))?(!)?(:\s*)(.*)$/);
+  if (match) {
+    let html = '<span class="cm-type">' + escHtml(match[1]) + '</span>';
+    if (match[2]) html += '<span class="cm-scope">' + escHtml(match[2]) + '</span>';
+    if (match[3]) html += '<span class="cm-breaking">!</span>';
+    if (match[4]) html += escHtml(match[4]);
+    html += '<span class="cm-subject">' + escHtml(match[5]) + '</span>';
+    return html;
+  }
+  // Emoji style or simple
+  return '<span class="cm-subject">' + escHtml(line) + '</span>';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function generateAlternatives(type, scope, subject, breaking) {
+  const alts = [];
+  const scopePart = scope ? `(${scope})` : '';
+  const bang = breaking ? '!' : '';
+
+  // Different styles as alternatives
+  if (state.style !== 'conventional') {
+    alts.push(`${type}${scopePart}${bang}: ${subject}`);
+  }
+  if (state.style !== 'emoji') {
+    alts.push(`${TYPES[type].emoji} ${scope ? scopePart + ' ' : ''}${subject}`);
+  }
+  if (state.style !== 'simple') {
+    alts.push(subject.charAt(0).toUpperCase() + subject.slice(1));
+  }
+  // Imperative variations
+  const words = subject.split(' ');
+  if (words[0] && !words[0].endsWith('e')) {
+    const past = words[0] + 'ed';
+    const altSubject = [past, ...words.slice(1)].join(' ');
+    alts.push(`${type}${scopePart}${bang}: ${altSubject}`);
+  }
+
+  const section = document.getElementById('altSection');
+  const list = document.getElementById('altList');
+  if (alts.length === 0) { section.classList.remove('show'); return; }
+
+  list.innerHTML = alts.map(a =>
+    `<div class="alt-item" onclick="copyText(this, '${escAttr(a)}')">
+      <code>${escHtml(a)}</code>
+      <span class="alt-copy">Copy</span>
+    </div>`
+  ).join('');
+  section.classList.add('show');
+}
+
+function escAttr(s) {
+  return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+async function copyCommit() {
+  const box = document.getElementById('outputBox');
+  const text = box.textContent || box.innerText;
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById('copyIcon').textContent = '✅';
+    document.getElementById('copyText').textContent = 'Copied!';
+    document.getElementById('copyBtn').classList.add('copied');
+    setTimeout(() => {
+      document.getElementById('copyIcon').textContent = '📋';
+      document.getElementById('copyText').textContent = 'Copy';
+      document.getElementById('copyBtn').classList.remove('copied');
+    }, 2000);
+  } catch(e) {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('copyText').textContent = 'Copied!';
+    setTimeout(() => { document.getElementById('copyText').textContent = 'Copy'; }, 2000);
+  }
+}
+
+async function copyText(el, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const span = el.querySelector('.alt-copy');
+  span.textContent = 'Copied!';
+  span.style.color = 'var(--success)';
+  setTimeout(() => { span.textContent = 'Copy'; span.style.color = ''; }, 2000);
+}
+
+// Keyboard shortcut: Ctrl/Cmd+Enter to generate
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    generate();
+  }
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

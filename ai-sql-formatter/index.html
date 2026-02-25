@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Formatter — Format & Beautify SQL Online</title>
+<meta name="description" content="Free online SQL formatter and beautifier with syntax highlighting.">
+<link rel="canonical" href="https://lifa-su.com/ai-sql-formatter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--grn:#0eca6e;--ylw:#f5c542;--blu:#5dade2;--org:#e67e22;--gry:#7f8c8d;--r:8px;--fn:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx)}
+.ct{max-width:1200px;margin:0 auto;padding:16px;min-height:100vh;display:flex;flex-direction:column}
+header{text-align:center;padding:20px 0 16px}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);font-size:.85rem;margin-top:4px}
+.tb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0}
+.tb label{font-size:.8rem;color:var(--tx2);display:flex;align-items:center;gap:4px}
+.tb select,.tb button{background:var(--sf);color:var(--tx);border:1px solid var(--sf2);border-radius:var(--r);padding:6px 12px;font-size:.8rem;cursor:pointer;transition:border-color .2s}
+.tb select:hover,.tb button:hover{border-color:var(--ac)}
+.tb .sp{flex:1}
+.bp{background:var(--ac)!important;border-color:var(--ac)!important;font-weight:600}
+.bp:hover{opacity:.85}
+.bc{position:relative}
+.bc.ok::after{content:'Copied!';position:absolute;top:-28px;left:50%;transform:translateX(-50%);background:var(--grn);color:#fff;padding:2px 8px;border-radius:4px;font-size:.7rem;white-space:nowrap}
+.eds{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0}
+.ew{display:flex;flex-direction:column;min-height:300px}
+.el{font-size:.75rem;color:var(--tx2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.ew textarea{flex:1;background:var(--sf);color:var(--tx);border:1px solid var(--sf2);border-radius:var(--r);padding:12px;font-family:var(--fn);font-size:.85rem;line-height:1.6;resize:none;outline:none;tab-size:4;transition:border-color .2s}
+.ew textarea:focus{border-color:var(--ac)}
+.oc{flex:1;position:relative;background:var(--sf);border:1px solid var(--sf2);border-radius:var(--r);overflow:auto}
+.oc pre{padding:12px;font-family:var(--fn);font-size:.85rem;line-height:1.6;white-space:pre;margin:0}
+.oc .ph{color:var(--tx2);padding:12px;font-family:var(--fn);font-size:.85rem}
+.hk{color:var(--blu);font-weight:700}
+.hs{color:var(--grn)}
+.hn{color:var(--org)}
+.hc{color:var(--gry);font-style:italic}
+.hf{color:var(--ylw)}
+.ho{color:var(--ac)}
+footer{text-align:center;padding:16px 0 8px;color:var(--tx2);font-size:.75rem}
+@media(max-width:768px){.eds{grid-template-columns:1fr;grid-template-rows:1fr 1fr}header h1{font-size:1.3rem}.tb{gap:6px}}
+</style>
+</head>
+<body>
+<div class="ct">
+  <header><h1>&#9997; SQL Formatter</h1><p>Paste your SQL and get it beautifully formatted with syntax highlighting</p></header>
+  <div class="tb" role="toolbar" aria-label="Formatting options">
+    <label>Keywords:<select id="kwCase" aria-label="Keyword case"><option value="upper">UPPERCASE</option><option value="lower">lowercase</option><option value="preserve">Preserve</option></select></label>
+    <label>Indent:<select id="indentStyle" aria-label="Indent style"><option value="2">2 Spaces</option><option value="4" selected>4 Spaces</option><option value="tab">Tab</option></select></label>
+    <label><input type="checkbox" id="splitComma" checked> Split columns</label>
+    <div class="sp"></div>
+    <button class="bp" id="fmtBtn">Format</button>
+    <button class="bc" id="copyBtn">Copy</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+  <div class="eds">
+    <div class="ew"><div class="el">Input SQL</div><textarea id="input" placeholder="Paste your SQL here..." spellcheck="false" aria-label="SQL input"></textarea></div>
+    <div class="ew"><div class="el">Formatted Output</div><div class="oc" id="out" role="region" aria-label="Formatted output" tabindex="0"><div class="ph">Formatted SQL will appear here...</div></div></div>
+  </div>
+  <footer>&copy; 2026 SQL Formatter</footer>
+</div>
+<script>
+(function(){
+"use strict";
+var KW='SELECT FROM WHERE JOIN INNER LEFT RIGHT FULL OUTER CROSS ON AND OR NOT IN EXISTS BETWEEN LIKE ILIKE IS NULL AS CASE WHEN THEN ELSE END INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE INDEX VIEW ALTER DROP ADD COLUMN PRIMARY KEY FOREIGN REFERENCES UNIQUE CHECK DEFAULT CONSTRAINT IF REPLACE TEMPORARY TEMP DATABASE SCHEMA GRANT REVOKE UNION ALL INTERSECT EXCEPT ORDER BY GROUP HAVING LIMIT OFFSET FETCH NEXT ROWS ONLY FIRST ASC DESC DISTINCT TOP WITH RECURSIVE OVER PARTITION WINDOW RANGE PRECEDING FOLLOWING UNBOUNDED CURRENT ROW CAST CONVERT TRUE FALSE NATURAL USING RETURNING TRUNCATE BEGIN COMMIT ROLLBACK SAVEPOINT TRANSACTION EXPLAIN ANALYZE LATERAL MATERIALIZED ENUM TYPE TRIGGER FUNCTION PROCEDURE DECLARE EXECUTE PREPARE DEALLOCATE COALESCE NULLIF GREATEST LEAST';
+var KWS=new Set(KW.split(' '));
+var FNS=new Set('COUNT SUM AVG MIN MAX COALESCE NULLIF GREATEST LEAST CONCAT LENGTH SUBSTR SUBSTRING TRIM UPPER LOWER REPLACE ROUND FLOOR CEIL CEILING ABS MOD POWER SQRT NOW CURRENT_TIMESTAMP CURRENT_DATE CURRENT_TIME DATE YEAR MONTH DAY HOUR MINUTE SECOND EXTRACT DATE_TRUNC DATE_PART TO_CHAR TO_DATE TO_NUMBER CAST CONVERT IFNULL NVL NVL2 DECODE IIF ROW_NUMBER RANK DENSE_RANK NTILE LAG LEAD FIRST_VALUE LAST_VALUE STRING_AGG GROUP_CONCAT ARRAY_AGG JSON_AGG JSONB_AGG EXISTS ANY SOME'.split(' '));
+
+function tokenize(sql){
+  var r=[],i=0,n=sql.length,c,s;
+  while(i<n){
+    c=sql[i];
+    if(/\s/.test(c)){s=i;while(i<n&&/\s/.test(sql[i]))i++;r.push({t:'w',v:sql.slice(s,i)});continue;}
+    if(c==='-'&&sql[i+1]==='-'){s=i;i+=2;while(i<n&&sql[i]!=='\n')i++;r.push({t:'c',v:sql.slice(s,i)});continue;}
+    if(c==='/'&&sql[i+1]==='*'){s=i;i+=2;while(i<n-1&&!(sql[i]==='*'&&sql[i+1]==='/'))i++;i+=2;r.push({t:'c',v:sql.slice(s,i)});continue;}
+    if(c==="'"){s=i;i++;while(i<n){if(sql[i]==="'"&&sql[i+1]==="'")i+=2;else if(sql[i]==="'"){i++;break;}else i++;}r.push({t:'s',v:sql.slice(s,i)});continue;}
+    if(c==='"'){s=i;i++;while(i<n&&sql[i]!=='"')i++;i++;r.push({t:'i',v:sql.slice(s,i)});continue;}
+    if(c==='`'){s=i;i++;while(i<n&&sql[i]!=='`')i++;i++;r.push({t:'i',v:sql.slice(s,i)});continue;}
+    if(/[0-9]/.test(c)||(c==='.'&&i+1<n&&/[0-9]/.test(sql[i+1]))){s=i;while(i<n&&/[0-9.]/.test(sql[i]))i++;if(i<n&&/[eE]/.test(sql[i])){i++;if(i<n&&/[+-]/.test(sql[i]))i++;while(i<n&&/[0-9]/.test(sql[i]))i++;}r.push({t:'n',v:sql.slice(s,i)});continue;}
+    if(c==='('||c===')'){r.push({t:'p',v:c});i++;continue;}
+    if(c===','){r.push({t:',',v:','});i++;continue;}
+    if(c===';'){r.push({t:';',v:';'});i++;continue;}
+    if(c==='.'){r.push({t:'.',v:'.'});i++;continue;}
+    if(c==='*'){r.push({t:'*',v:'*'});i++;continue;}
+    if('<>=!'.indexOf(c)>=0){s=i;i++;if(i<n&&'=><'.indexOf(sql[i])>=0)i++;r.push({t:'o',v:sql.slice(s,i)});continue;}
+    if(c==='|'&&sql[i+1]==='|'){r.push({t:'o',v:'||'});i+=2;continue;}
+    if('+-/%&|^~'.indexOf(c)>=0){r.push({t:'o',v:c});i++;continue;}
+    if('$:@'.indexOf(c)>=0&&i+1<n&&/[a-zA-Z0-9_]/.test(sql[i+1])){s=i;i++;while(i<n&&/[a-zA-Z0-9_]/.test(sql[i]))i++;r.push({t:'i',v:sql.slice(s,i)});continue;}
+    if(/[a-zA-Z_]/.test(c)){s=i;while(i<n&&/[a-zA-Z0-9_]/.test(sql[i]))i++;var w=sql.slice(s,i);r.push({t:KWS.has(w.toUpperCase())?'k':'i',v:w});continue;}
+    r.push({t:'o',v:c});i++;
+  }
+  return r;
+}
+
+function formatSQL(sql,opts){
+  var tks=tokenize(sql),ind=opts.indent,kc=opts.kwCase,sc=opts.splitComma;
+  var o='',d=0,nl=true,ns=false;
+  var LK=new Set(['SELECT','FROM','WHERE','HAVING','LIMIT','OFFSET','RETURNING','SET','VALUES']);
+  var JK=new Set(['JOIN','INNER','LEFT','RIGHT','FULL','OUTER','CROSS','NATURAL']);
+  function gi(){return ind.repeat(d);}
+  function newl(){if(!nl){o+='\n';nl=true;ns=false;}}
+  function nli(){newl();o+=gi();nl=false;ns=false;}
+  function sp(){if(!nl&&ns)o+=' ';ns=false;}
+  function ac(w){if(kc==='upper')return w.toUpperCase();if(kc==='lower')return w.toLowerCase();return w;}
+  function pk(j){while(j<tks.length&&tks[j].t==='w')j++;return j<tks.length?tks[j]:null;}
+  var i=0,len=tks.length,asel=false,pdepth=0;
+  while(i<len){
+    var t=tks[i];
+    if(t.t==='w'){ns=true;i++;continue;}
+    if(t.t==='c'){sp();o+=t.v;ns=true;i++;continue;}
+    if(t.t===';'){o+=';';newl();o+='\n';nl=true;ns=false;asel=false;d=0;i++;continue;}
+    if(t.t==='p'&&t.v==='('){sp();o+='(';pdepth++;d++;nl=false;ns=false;
+      var nx=pk(i+1);
+      if(nx&&nx.t==='k'&&nx.v.toUpperCase()==='SELECT'){nli();}
+      i++;continue;}
+    if(t.t==='p'&&t.v===')'){d=Math.max(0,d-1);pdepth=Math.max(0,pdepth-1);nli();o+=')';nl=false;ns=true;i++;continue;}
+    if(t.t==='k'){
+      var u=t.v.toUpperCase();
+      // GROUP BY, ORDER BY compound
+      if((u==='GROUP'||u==='ORDER')&&pk(i+1)&&pk(i+1).t==='k'&&pk(i+1).v.toUpperCase()==='BY'){
+        nli();o+=ac(t.v);ns=false;
+        i++;while(i<len&&tks[i].t==='w')i++;
+        o+=' '+ac(tks[i].v);ns=true;i++;asel=false;continue;
+      }
+      // INSERT INTO compound
+      if(u==='INSERT'&&pk(i+1)&&pk(i+1).t==='k'&&pk(i+1).v.toUpperCase()==='INTO'){
+        nli();o+=ac(t.v);ns=false;
+        i++;while(i<len&&tks[i].t==='w')i++;
+        o+=' '+ac(tks[i].v);ns=true;i++;asel=false;continue;
+      }
+      // JOIN keywords
+      if(JK.has(u)){
+        if(u==='INNER'||u==='LEFT'||u==='RIGHT'||u==='FULL'||u==='CROSS'||u==='NATURAL'){
+          nli();o+=ac(t.v);ns=true;i++;continue;
+        }
+        if(u==='JOIN'){nli();o+=ac(t.v);ns=true;i++;continue;}
+        nli();o+=ac(t.v);ns=true;i++;continue;
+      }
+      if(u==='ON'){nli();d++;o+=gi().slice(ind.length)+ac(t.v);ns=true;i++;continue;}
+      if(u==='AND'||u==='OR'){nli();o+=ac(t.v);ns=true;i++;continue;}
+      if(u==='SELECT'){nli();o+=ac(t.v);ns=true;asel=true;d++;i++;continue;}
+      if(LK.has(u)){
+        if(asel&&(u==='FROM'||u==='WHERE'||u==='HAVING'||u==='LIMIT'||u==='OFFSET'||u==='RETURNING')){d=Math.max(0,d-1);asel=false;}
+        nli();o+=ac(t.v);ns=true;
+        if(u==='FROM'||u==='WHERE'||u==='HAVING')d++;
+        i++;continue;
+      }
+      if(u==='CASE'){sp();o+=ac(t.v);d++;ns=true;i++;continue;}
+      if(u==='WHEN'||u==='ELSE'){nli();o+=ac(t.v);ns=true;i++;continue;}
+      if(u==='THEN'){sp();o+=ac(t.v);ns=true;i++;continue;}
+      if(u==='END'){d=Math.max(0,d-1);nli();o+=ac(t.v);ns=true;i++;continue;}
+      if(u==='UNION'||u==='INTERSECT'||u==='EXCEPT'){d=0;asel=false;newl();o+='\n'+ac(t.v);
+        var nx2=pk(i+1);if(nx2&&nx2.t==='k'&&nx2.v.toUpperCase()==='ALL'){i++;while(i<len&&tks[i].t==='w')i++;o+=' '+ac(tks[i].v);}
+        ns=true;i++;continue;
+      }
+      // Other keywords
+      sp();o+=ac(t.v);ns=true;i++;continue;
+    }
+    if(t.t===','&&sc&&asel){o+=',';nli();i++;continue;}
+    if(t.t===','){o+=',';ns=true;i++;continue;}
+    // Function detection: identifier followed by (
+    if(t.t==='i'){
+      var nx3=pk(i+1);
+      sp();o+=t.v;ns=true;i++;continue;
+    }
+    // Everything else
+    if(t.t==='.'||t.t==='*'){o+=t.v;ns=false;i++;continue;}
+    sp();o+=t.v;ns=true;i++;
+  }
+  return o.replace(/^\n+/,'').replace(/\n{3,}/g,'\n\n').trimEnd();
+}
+
+function highlight(sql){
+  var tks=tokenize(sql);
+  var h='';
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  for(var i=0;i<tks.length;i++){
+    var t=tks[i];
+    if(t.t==='k')h+='<span class="hk">'+esc(t.v)+'</span>';
+    else if(t.t==='s')h+='<span class="hs">'+esc(t.v)+'</span>';
+    else if(t.t==='n')h+='<span class="hn">'+esc(t.v)+'</span>';
+    else if(t.t==='c')h+='<span class="hc">'+esc(t.v)+'</span>';
+    else if(t.t==='o')h+='<span class="ho">'+esc(t.v)+'</span>';
+    else if(t.t==='i'&&FNS.has(t.v.toUpperCase())&&i+1<tks.length){
+      var j=i+1;while(j<tks.length&&tks[j].t==='w')j++;
+      if(j<tks.length&&tks[j].t==='p'&&tks[j].v==='(')h+='<span class="hf">'+esc(t.v)+'</span>';
+      else h+=esc(t.v);
+    }
+    else h+=esc(t.v);
+  }
+  return h;
+}
+
+var plainText='';
+function doFormat(){
+  var sql=document.getElementById('input').value.trim();
+  if(!sql){document.getElementById('out').innerHTML='<div class="ph">Formatted SQL will appear here...</div>';plainText='';return;}
+  var is=document.getElementById('indentStyle').value;
+  var indent=is==='tab'?'\t':' '.repeat(parseInt(is));
+  var opts={indent:indent,kwCase:document.getElementById('kwCase').value,splitComma:document.getElementById('splitComma').checked};
+  var formatted=formatSQL(sql,opts);
+  plainText=formatted;
+  var highlighted=highlight(formatted);
+  document.getElementById('out').innerHTML='<pre>'+highlighted+'</pre>';
+}
+function doCopy(){
+  if(!plainText)return;
+  navigator.clipboard.writeText(plainText).then(function(){
+    var b=document.getElementById('copyBtn');b.classList.add('ok');
+    setTimeout(function(){b.classList.remove('ok');},1500);
+  });
+}
+function doClear(){
+  document.getElementById('input').value='';
+  document.getElementById('out').innerHTML='<div class="ph">Formatted SQL will appear here...</div>';
+  plainText='';
+}
+document.getElementById('fmtBtn').addEventListener('click',doFormat);
+document.getElementById('copyBtn').addEventListener('click',doCopy);
+document.getElementById('clearBtn').addEventListener('click',doClear);
+document.getElementById('input').addEventListener('input',function(){
+  clearTimeout(this._t);this._t=setTimeout(doFormat,400);
+});
+// Demo
+document.getElementById('input').value="SELECT u.id, u.name, u.email, COUNT(o.id) AS order_count, SUM(o.total) AS total_spent FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.active = TRUE AND u.created_at >= '2024-01-01' GROUP BY u.id, u.name, u.email HAVING COUNT(o.id) > 5 ORDER BY total_spent DESC LIMIT 20;";
+doFormat();
+})();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

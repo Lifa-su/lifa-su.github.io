@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base64 Encode and Decode - Free Online Tool</title>
+<meta name="description" content="Free online Base64 encoder decoder.">
+<link rel="canonical" href="https://lifa-su.com/ai-base64-encode/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--bd:#2a2a4e;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+header{text-align:center;padding:2rem 1rem 1rem}
+h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);margin-top:.4rem;font-size:.95rem}
+.w{width:100%;max-width:960px;padding:0 1rem 2rem}
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:1.2rem 0}
+.tabs button{padding:.5rem 1rem;border:1px solid var(--bd);background:var(--sf);color:var(--tx2);border-radius:var(--r);cursor:pointer;font-size:.85rem;transition:.2s}
+.tabs button.on,.tabs button:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.opts{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.opts label{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--tx2);cursor:pointer}
+.opts input[type=checkbox]{accent-color:var(--ac)}
+.bg{padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600;display:inline-block}
+.bg.y{background:#0f5132;color:#75b798}.bg.n{background:#58151c;color:#ea868f}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.g{grid-template-columns:1fr}}
+.p{display:flex;flex-direction:column;gap:.5rem}
+.pt{font-size:.85rem;color:var(--tx2);display:flex;align-items:center;justify-content:space-between}
+textarea{width:100%;height:220px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);color:var(--tx);padding:.8rem;font-family:SF Mono,Consolas,monospace;font-size:.9rem;resize:vertical;outline:none;transition:.2s}
+textarea:focus{border-color:var(--ac)}
+textarea::placeholder{color:var(--tx2);opacity:.6}
+.acts{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin:1rem 0}
+.b{padding:.6rem 1.4rem;border:none;border-radius:var(--r);cursor:pointer;font-size:.9rem;font-weight:600;transition:.2s}
+.bp{background:var(--ac);color:#fff}.bp:hover{opacity:.85;transform:translateY(-1px)}
+.bs{background:var(--sf2);color:var(--tx)}.bs:hover{opacity:.85}
+.bc{background:var(--ac2);color:#fff}.bc:hover{opacity:.85}
+.sm{padding:.35rem .8rem;font-size:.8rem}
+.dz{border:2px dashed var(--bd);border-radius:var(--r);padding:2rem;text-align:center;color:var(--tx2);cursor:pointer;transition:.2s;margin:1rem 0;position:relative}
+.dz.over{border-color:var(--ac);background:rgba(233,69,96,.08)}
+.dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ac);color:#fff;padding:.7rem 1.5rem;border-radius:var(--r);font-size:.9rem;opacity:0;transition:.3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.st{text-align:center;font-size:.8rem;color:var(--tx2);margin-top:.5rem}
+footer{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.8rem;margin-top:auto}
+footer a{color:var(--ac);text-decoration:none}
+</style>
+</head>
+<body>
+<header><h1>Base64 Encode &amp; Decode</h1><p>Fast, private, runs entirely in your browser</p></header>
+<div class="w">
+<div class="tabs" id="tabs"><button class="on" onclick="mode('text')">Text</button><button onclick="mode('file')">File</button><button onclick="mode('batch')">Batch</button></div>
+<div class="opts"><label><input type="checkbox" id="urlSafe" onchange="proc()"> URL-safe</label><label><input type="checkbox" id="autoDet" checked onchange="proc()"> Auto-detect</label><span id="det"></span></div>
+<div id="sec_text"><div class="g"><div class="p"><div class="pt"><span>Input</span><button class="b sm bs" onclick="Q('inp').value='';proc()">Clear</button></div><textarea id="inp" placeholder="Enter text or Base64..." oninput="proc()" aria-label="Input"></textarea></div><div class="p"><div class="pt"><span>Output</span><button class="b sm bc" onclick="cc(Q('out').value)">Copy</button></div><textarea id="out" placeholder="Result..." readonly aria-label="Output"></textarea></div></div><div class="acts"><button class="b bp" onclick="enc()">Encode</button><button class="b bp" onclick="dec()">Decode</button><button class="b bs" onclick="sw()">Swap</button></div><div class="st" id="stats"></div></div>
+<div id="sec_file" style="display:none"><div class="dz" id="dz"><div style="font-size:2rem">&#128194;</div><p>Drag and drop file or click to browse</p><input type="file" id="fi" onchange="doFile(this.files[0])" aria-label="Upload"></div><div id="finfo" style="font-size:.8rem;color:var(--tx2);margin:.5rem 0;word-break:break-all"></div><div class="p"><div class="pt"><span>Base64 Output</span><button class="b sm bc" onclick="cc(Q('fout').value)">Copy</button></div><textarea id="fout" readonly placeholder="File Base64..." aria-label="File output"></textarea></div></div>
+<div id="sec_batch" style="display:none"><div class="g"><div class="p"><div class="pt"><span>Input (one per line)</span><button class="b sm bs" onclick="Q('binp').value=''">Clear</button></div><textarea id="binp" placeholder="Line 1
+Line 2
+Line 3" aria-label="Batch input"></textarea></div><div class="p"><div class="pt"><span>Output</span><button class="b sm bc" onclick="cc(Q('bout').value)">Copy</button></div><textarea id="bout" readonly placeholder="Results..." aria-label="Batch output"></textarea></div></div><div class="acts"><button class="b bp" onclick="benc()">Encode All</button><button class="b bp" onclick="bdec()">Decode All</button></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<footer><p>Base64 Tool &mdash; All processing happens locally in your browser. No data sent to servers.</p></footer>
+<script>
+function Q(id){return document.getElementById(id)}
+function toast(m){var t=Q('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+function cc(txt){if(!txt){toast('Nothing to copy');return}navigator.clipboard.writeText(txt).then(function(){toast('Copied!')}).catch(function(){toast('Copy failed')})}
+
+var curMode='text';
+function mode(m){
+  curMode=m;
+  ['text','file','batch'].forEach(function(s){Q('sec_'+s).style.display=s===m?'':'none'});
+  var btns=Q('tabs').querySelectorAll('button');
+  btns.forEach(function(b,i){b.className=(['text','file','batch'][i]===m)?'on':''});
+}
+
+function isB64(s){
+  s=s.trim();
+  if(s.length<2)return false;
+  if(/^[A-Za-z0-9+/]+={0,2}$/.test(s)&&s.length%4===0)return true;
+  if(/^[A-Za-z0-9\-_]+$/.test(s))return true;
+  return false;
+}
+
+function toUrlSafe(s){return s.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function fromUrlSafe(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return s}
+
+function doEnc(txt){
+  var r=btoa(unescape(encodeURIComponent(txt)));
+  if(Q('urlSafe').checked)r=toUrlSafe(r);
+  return r;
+}
+
+function doDec(txt){
+  txt=txt.trim();
+  if(Q('urlSafe').checked||/[-_]/.test(txt))txt=fromUrlSafe(txt);
+  try{return decodeURIComponent(escape(atob(txt)))}
+  catch(e){return '[Error: Invalid Base64]'}
+}
+
+function enc(){
+  var v=Q('inp').value;
+  if(!v){toast('Enter some text first');return}
+  Q('out').value=doEnc(v);
+  updStats();
+}
+
+function dec(){
+  var v=Q('inp').value;
+  if(!v){toast('Enter Base64 first');return}
+  Q('out').value=doDec(v);
+  updStats();
+}
+
+function sw(){var a=Q('inp'),b=Q('out'),t=a.value;a.value=b.value;b.value=t;proc()}
+
+function proc(){
+  var v=Q('inp').value,d=Q('det');
+  if(!v){d.innerHTML='';Q('out').value='';Q('stats').textContent='';return}
+  if(Q('autoDet').checked){
+    var is=isB64(v);
+    d.innerHTML=is?'<span class="bg y">Base64 detected</span>':'<span class="bg n">Plain text</span>';
+    Q('out').value=is?doDec(v):doEnc(v);
+  }
+  updStats();
+}
+
+function updStats(){
+  var i=Q('inp').value,o=Q('out').value;
+  if(!i&&!o){Q('stats').textContent='';return}
+  Q('stats').textContent='Input: '+i.length+' chars | Output: '+o.length+' chars';
+}
+
+// File handling
+var dz=Q('dz');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over')});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files.length)doFile(e.dataTransfer.files[0])});
+
+function doFile(f){
+  if(!f)return;
+  Q('finfo').textContent='File: '+f.name+' ('+fmtSize(f.size)+')';
+  var r=new FileReader();
+  r.onload=function(){
+    var b=r.result.split(',')[1]||'';
+    if(Q('urlSafe').checked)b=toUrlSafe(b);
+    Q('fout').value=b;
+    toast('File converted!');
+  };
+  r.readAsDataURL(f);
+}
+
+function fmtSize(b){
+  if(b<1024)return b+' B';
+  if(b<1048576)return(b/1024).toFixed(1)+' KB';
+  return(b/1048576).toFixed(1)+' MB';
+}
+
+// Batch
+function batchEnc(){
+  var lines=Q('binp').value.split('\n');
+  Q('bout').value=lines.map(function(l){return l?doEnc(l):''}).join('\n');
+  toast('Batch encoded!');
+}
+
+function batchDec(){
+  var lines=Q('binp').value.split('\n');
+  Q('bout').value=lines.map(function(l){return l?doDec(l):''}).join('\n');
+  toast('Batch decoded!');
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

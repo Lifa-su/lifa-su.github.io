@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Link Checker - Batch URL Status Validator</title>
+<meta name="description" content="Paste HTML or Markdown content to extract and validate all links instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-link-checker/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--green:#00c853;--yellow:#ffd600;--red:#ff1744;--orange:#ff9100;--gray:#78909c;--text:#e0e0e0;--text2:#90a4ae;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;color:#fff;margin-bottom:6px}
+header p{color:var(--text2);font-size:0.95rem}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+textarea{width:100%;height:180px;background:var(--bg);color:var(--text);border:1px solid var(--surface2);border-radius:var(--radius);padding:12px;font-family:monospace;font-size:0.9rem;resize:vertical}
+textarea:focus{outline:none;border-color:var(--accent)}
+textarea::placeholder{color:var(--text2)}
+.btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+button{padding:10px 20px;border:none;border-radius:var(--radius);font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+button:hover{opacity:0.85}
+button:disabled{opacity:0.4;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:var(--surface2);color:var(--text)}
+.progress-wrap{background:var(--bg);border-radius:20px;height:24px;overflow:hidden;margin-bottom:8px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#e94560cc);border-radius:20px;transition:width .3s;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:600;min-width:40px}
+.progress-text{color:var(--text2);font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--bg);border-radius:var(--radius);padding:12px;text-align:center}
+.stat .num{font-size:1.5rem;font-weight:700}
+.stat .label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.stat.ok .num{color:var(--green)}.stat.warn .num{color:var(--yellow)}.stat.err .num{color:var(--red)}.stat.timeout .num{color:var(--gray)}.stat.cors .num{color:var(--orange)}.stat.total .num{color:var(--accent)}
+#results-section{display:none}
+.result-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--bg);flex-wrap:wrap}
+.result-item:last-child{border-bottom:none}
+.badge{padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:700;white-space:nowrap;min-width:70px;text-align:center}
+.badge-ok{background:var(--green);color:#000}.badge-redirect{background:var(--yellow);color:#000}.badge-error{background:var(--red);color:#fff}.badge-timeout{background:var(--gray);color:#fff}.badge-cors{background:var(--orange);color:#000}
+.result-url{flex:1;min-width:0;word-break:break-all;font-size:.88rem}
+.result-url a{color:var(--text);text-decoration:none}
+.result-url a:hover{text-decoration:underline;color:#fff}
+.result-status{color:var(--text2);font-size:.8rem;white-space:nowrap}
+.export-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+footer{text-align:center;padding:30px 0 10px;color:var(--text2);font-size:.8rem}
+@media(max-width:600px){.container{padding:12px}header h1{font-size:1.4rem}textarea{height:140px}.stats{grid-template-columns:repeat(3,1fr)}.result-item{font-size:.85rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>&#128279; AI Link Checker</h1><p>Paste HTML or Markdown to extract and validate all links instantly</p></header>
+<div class="card">
+<textarea id="input" placeholder="Paste your HTML, Markdown, or plain text with URLs here..."></textarea>
+<div class="btn-row">
+<button class="btn-primary" id="checkBtn" onclick="startCheck()">Check Links</button>
+<button class="btn-secondary" onclick="clearAll()">Clear</button>
+<label style="display:flex;align-items:center;gap:6px;color:var(--text2);font-size:.85rem;margin-left:auto">
+<span>Concurrency:</span>
+<select id="concurrency" style="background:var(--bg);color:var(--text);border:1px solid var(--surface2);border-radius:4px;padding:4px 8px">
+<option value="3">3</option><option value="5" selected>5</option><option value="10">10</option><option value="20">20</option>
+</select></label>
+</div></div>
+<div class="card" id="progress-card" style="display:none">
+<div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%">0%</div></div>
+<div class="progress-text" id="progressText"></div>
+</div>
+<div id="results-section">
+<div class="card"><div class="stats" id="stats"></div></div>
+<div class="card">
+<h3 style="margin-bottom:12px;font-size:1rem">Results</h3>
+<div id="resultsList"></div>
+<div class="export-row">
+<button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
+<button class="btn-secondary" onclick="exportText()">Export Text Report</button>
+</div></div></div>
+<footer><p>AI Link Checker &mdash; Browser-based link validator. No data sent to servers.</p></footer>
+</div>
+<script>
+let results=[];
+function extractLinks(text){
+const urls=new Set();
+let m;
+const r1=/href\s*=\s*["']([^"']+)["']/gi;
+while((m=r1.exec(text))!==null){try{new URL(m[1]);urls.add(m[1])}catch{}}
+const r2=/\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
+while((m=r2.exec(text))!==null) urls.add(m[2]);
+const r3=/(?:^|[\s<(])((https?:\/\/)[^\s>"')]+)/gm;
+while((m=r3.exec(text))!==null){
+const u=m[1].replace(/[.,;:!?)]+$/,'');
+if(!urls.has(u)){try{new URL(u);urls.add(u)}catch{}}
+}
+return[...urls];
+}
+async function checkOne(url){
+const ctrl=new AbortController();
+const tid=setTimeout(()=>ctrl.abort(),10000);
+try{
+const r=await fetch(url,{method:'HEAD',mode:'no-cors',signal:ctrl.signal,redirect:'manual'});
+clearTimeout(tid);
+if(r.type==='opaque'||r.type==='opaqueredirect'){
+return{url,status:0,label:'CORS Blocked',cat:'cors'};
+}
+const s=r.status;
+if(s>=200&&s<300) return{url,status:s,label:s+' OK',cat:'ok'};
+if(s===301||s===302||s===303||s===307||s===308) return{url,status:s,label:s+' Redirect',cat:'redirect'};
+if(s===404) return{url,status:s,label:'404 Not Found',cat:'error'};
+if(s>=400) return{url,status:s,label:s+' Error',cat:'error'};
+return{url,status:s,label:s+'',cat:'ok'};
+}catch(e){
+clearTimeout(tid);
+if(e.name==='AbortError') return{url,status:0,label:'Timeout',cat:'timeout'};
+if(e.name==='TypeError') return{url,status:0,label:'CORS Blocked',cat:'cors'};
+return{url,status:0,label:'Error: '+e.message.slice(0,30),cat:'error'};
+}
+}
+function updateProgress(done,total){
+const pct=Math.round(done/total*100);
+const bar=document.getElementById('progressBar');
+bar.style.width=pct+'%';bar.textContent=pct+'%';
+document.getElementById('progressText').textContent='Checked '+done+' of '+total+' links...';
+}
+function renderStats(){
+const s={total:results.length,ok:0,redirect:0,error:0,timeout:0,cors:0};
+results.forEach(r=>{if(r.cat==='ok')s.ok++;else if(r.cat==='redirect')s.redirect++;else if(r.cat==='error')s.error++;else if(r.cat==='timeout')s.timeout++;else if(r.cat==='cors')s.cors++;});
+document.getElementById('stats').innerHTML=
+'<div class="stat total"><div class="num">'+s.total+'</div><div class="label">Total</div></div>'+
+'<div class="stat ok"><div class="num">'+s.ok+'</div><div class="label">OK</div></div>'+
+'<div class="stat warn"><div class="num">'+s.redirect+'</div><div class="label">Redirect</div></div>'+
+'<div class="stat err"><div class="num">'+s.error+'</div><div class="label">Error</div></div>'+
+'<div class="stat timeout"><div class="num">'+s.timeout+'</div><div class="label">Timeout</div></div>'+
+'<div class="stat cors"><div class="num">'+s.cors+'</div><div class="label">CORS</div></div>';
+}
+function renderResults(){
+const el=document.getElementById('resultsList');
+el.innerHTML=results.map(r=>{
+const bc={ok:'badge-ok',redirect:'badge-redirect',error:'badge-error',timeout:'badge-timeout',cors:'badge-cors'}[r.cat]||'badge-error';
+return'<div class="result-item"><span class="badge '+bc+'">'+r.label+'</span><span class="result-url"><a href="'+r.url+'" target="_blank" rel="noopener">'+r.url+'</a></span></div>';
+}).join('');
+}
+async function startCheck(){
+const text=document.getElementById('input').value.trim();
+if(!text){alert('Please paste some content first.');return;}
+const urls=extractLinks(text);
+if(!urls.length){alert('No links found in the input.');return;}
+results=[];
+const btn=document.getElementById('checkBtn');
+btn.disabled=true;btn.textContent='Checking...';
+const pc=document.getElementById('progress-card');
+pc.style.display='block';
+document.getElementById('results-section').style.display='none';
+updateProgress(0,urls.length);
+const conc=parseInt(document.getElementById('concurrency').value)||5;
+let done=0;
+const queue=[...urls];
+async function worker(){
+while(queue.length){
+const u=queue.shift();
+const r=await checkOne(u);
+results.push(r);
+done++;
+updateProgress(done,urls.length);
+}
+}
+const workers=[];
+for(let i=0;i<Math.min(conc,urls.length);i++) workers.push(worker());
+await Promise.all(workers);
+btn.disabled=false;btn.textContent='Check Links';
+document.getElementById('progressText').textContent='Done! Checked '+results.length+' links.';
+document.getElementById('results-section').style.display='block';
+renderStats();renderResults();
+}
+function clearAll(){
+document.getElementById('input').value='';
+document.getElementById('progress-card').style.display='none';
+document.getElementById('results-section').style.display='none';
+results=[];
+}
+function dl(name,content,type){
+const b=new Blob([content],{type});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(b);a.download=name;a.click();
+URL.revokeObjectURL(a.href);
+}
+function exportCSV(){
+if(!results.length)return;
+let csv='URL,Status,Category\n';
+results.forEach(r=>{csv+='"'+r.url.replace(/"/g,'""')+'",'+r.label+','+r.cat+'\n';});
+dl('link-check-report.csv',csv,'text/csv');
+}
+function exportText(){
+if(!results.length)return;
+const s={total:results.length,ok:0,redirect:0,error:0,timeout:0,cors:0};
+results.forEach(r=>{if(s[r.cat]!==undefined)s[r.cat]++;else if(r.cat==='error')s.error++;});
+let t='=== AI Link Checker Report ===\n';
+t+='Date: '+new Date().toISOString()+'\n\n';
+t+='Summary:\n  Total: '+s.total+'\n  OK: '+s.ok+'\n  Redirect: '+s.redirect+'\n  Error: '+s.error+'\n  Timeout: '+s.timeout+'\n  CORS Blocked: '+s.cors+'\n\nDetails:\n';
+results.forEach(r=>{t+='['+r.label+'] '+r.url+'\n';});
+dl('link-check-report.txt',t,'text/plain');
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

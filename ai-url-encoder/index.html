@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI URL Encoder - URL 编解码工具</title>
+<meta name="description" content="在线 URL 编解码工具，支持 encodeURI/encodeURIComponent 对比、批量处理、特殊字符参考表">
+<link rel="canonical" href="https://lifa-su.com/ai-url-encoder/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4e;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:16px}
+header{text-align:center;padding:32px 0 24px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card h2{font-size:1.1rem;margin-bottom:14px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-size:.9rem;transition:.2s}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+textarea{width:100%;min-height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;resize:vertical;transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--accent)}
+.btn-row{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+.btn{padding:10px 22px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63050;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text)}
+.btn-secondary:hover{background:#1a4a80}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.output-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;min-height:60px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;word-break:break-all;white-space:pre-wrap;position:relative;color:var(--text)}
+.output-box:empty::before{content:'结果将显示在这里...';color:#555}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;font-size:.75rem;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:.2s}
+.copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.output-wrapper{position:relative;margin-top:10px}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media(max-width:600px){.compare-grid{grid-template-columns:1fr}}
+.compare-box h3{font-size:.85rem;color:var(--accent2);margin-bottom:6px;font-weight:600}
+.compare-box .output-box{min-height:50px;font-size:.85rem}
+.diff-highlight{color:#4ade80;background:rgba(74,222,128,.12);padding:0 2px;border-radius:3px}
+.ref-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.ref-table th{text-align:left;padding:10px 12px;background:var(--surface2);color:var(--accent);font-weight:600;border-bottom:2px solid var(--border)}
+.ref-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-family:'SF Mono',Monaco,Consolas,monospace}
+.ref-table tr:hover td{background:rgba(233,69,96,.05)}
+.ref-table td:first-child{color:var(--accent);font-weight:600;font-size:1rem}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:600}
+.badge-yes{background:rgba(74,222,128,.15);color:#4ade80}
+.badge-no{background:rgba(233,69,96,.15);color:var(--accent)}
+.status-bar{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--text2);margin-top:8px;flex-wrap:wrap;gap:4px}
+footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent);text-decoration:none}
+.swap-icon{font-size:1.2rem;cursor:pointer;transition:transform .3s}
+.swap-icon:hover{transform:rotate(180deg)}
+@media(max-width:600px){
+  .container{padding:12px}
+  header h1{font-size:1.4rem}
+  .btn{padding:8px 16px;font-size:.85rem}
+  textarea{min-height:100px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🔗 AI URL Encoder</h1>
+    <p>URL 编解码工具 — 编码 · 解码 · 对比 · 批量处理</p>
+  </header>
+
+  <!-- 主功能区 -->
+  <div class="card">
+    <h2>⚡ 编码 / 解码</h2>
+    <div class="tabs">
+      <button class="tab active" onclick="switchMode('encode')" id="tab-encode">编码 Encode</button>
+      <button class="tab" onclick="switchMode('decode')" id="tab-decode">解码 Decode</button>
+      <button class="tab" onclick="switchMode('batch')" id="tab-batch">批量处理 Batch</button>
+    </div>
+    <label id="input-label">输入要编码的文本：</label>
+    <textarea id="input" placeholder="输入文本或 URL 编码字符串..." oninput="autoProcess()"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="process()">
+        <span id="process-btn-text">▶ 编码</span>
+      </button>
+      <button class="btn btn-secondary" onclick="swapIO()" title="交换输入输出">🔄 交换</button>
+      <button class="btn btn-secondary" onclick="clearAll()">✕ 清空</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--text2);margin-left:auto;cursor:pointer">
+        <input type="checkbox" id="auto-mode" checked onchange="autoProcess()"> 实时转换
+      </label>
+    </div>
+    <div class="output-wrapper">
+      <label>输出结果：</label>
+      <div class="output-box" id="output"></div>
+      <button class="copy-btn" onclick="copyResult('output')">复制</button>
+    </div>
+    <div class="status-bar">
+      <span id="status-info"></span>
+      <span id="char-count"></span>
+    </div>
+  </div>
+
+  <!-- encodeURI vs encodeURIComponent 对比 -->
+  <div class="card">
+    <h2>🔍 encodeURI vs encodeURIComponent 对比</h2>
+    <label>输入文本进行对比：</label>
+    <textarea id="compare-input" placeholder="例如：https://example.com/path?name=你好&key=value#section" oninput="autoCompare()" rows="3"></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm" onclick="doCompare()">对比</button>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-box">
+        <h3>encodeURI()</h3>
+        <p style="font-size:.75rem;color:var(--text2);margin-bottom:6px">保留 URL 结构字符（:/?#[]@!$&'()*+,;=）</p>
+        <div class="output-wrapper">
+          <div class="output-box" id="compare-uri" style="min-height:60px"></div>
+          <button class="copy-btn" onclick="copyResult('compare-uri')">复制</button>
+        </div>
+      </div>
+      <div class="compare-box">
+        <h3>encodeURIComponent()</h3>
+        <p style="font-size:.75rem;color:var(--text2);margin-bottom:6px">编码所有特殊字符（更严格）</p>
+        <div class="output-wrapper">
+          <div class="output-box" id="compare-comp" style="min-height:60px"></div>
+          <button class="copy-btn" onclick="copyResult('compare-comp')">复制</button>
+        </div>
+      </div>
+    </div>
+    <div class="output-wrapper" style="margin-top:12px">
+      <label>差异高亮：</label>
+      <div class="output-box" id="compare-diff" style="font-size:.85rem"></div>
+    </div>
+  </div>
+
+  <!-- 特殊字符参考表 -->
+  <div class="card">
+    <h2>📋 常用特殊字符编码参考</h2>
+    <div style="overflow-x:auto">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th>字符</th>
+            <th>名称</th>
+            <th>编码</th>
+            <th>encodeURI</th>
+            <th>encodeURIComponent</th>
+          </tr>
+        </thead>
+        <tbody id="ref-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <p>AI URL Encoder &copy; 2025 · Built with ❤️ · <a href="https://github.com/Lifa-su/ai-url-encoder" target="_blank">GitHub</a></p>
+  </footer>
+</div>
+
+<script>
+let currentMode = 'encode';
+
+const refChars = [
+  [' ', '空格 Space', '%20', '✗ 编码', '✗ 编码'],
+  ['&', '和号 Ampersand', '%26', '✓ 保留', '✗ 编码'],
+  ['=', '等号 Equals', '%3D', '✓ 保留', '✗ 编码'],
+  ['?', '问号 Question', '%3F', '✓ 保留', '✗ 编码'],
+  ['#', '井号 Hash', '%23', '✓ 保留', '✗ 编码'],
+  ['/', '斜杠 Slash', '%2F', '✓ 保留', '✗ 编码'],
+  ['+', '加号 Plus', '%2B', '✗ 编码', '✗ 编码'],
+  ['@', 'At 符号', '%40', '✓ 保留', '✗ 编码'],
+  [':', '冒号 Colon', '%3A', '✓ 保留', '✗ 编码'],
+  ['%', '百分号 Percent', '%25', '✗ 编码', '✗ 编码'],
+  ['!', '感叹号 Exclamation', '%21', '✓ 保留', '✗ 编码'],
+  ["'", '单引号 Quote', '%27', '✓ 保留', '✗ 编码'],
+  ['(', '左括号', '%28', '✓ 保留', '✗ 编码'],
+  [')', '右括号', '%29', '✓ 保留', '✗ 编码'],
+  ['*', '星号 Asterisk', '%2A', '✓ 保留', '✗ 编码'],
+  [',', '逗号 Comma', '%2C', '✓ 保留', '✗ 编码'],
+  [';', '分号 Semicolon', '%3B', '✓ 保留', '✗ 编码'],
+];
+
+function initRefTable() {
+  const tbody = document.getElementById('ref-tbody');
+  tbody.innerHTML = refChars.map(([ch, name, code, uri, comp]) => {
+    const uriBadge = uri.startsWith('✓')
+      ? `<span class="badge badge-yes">${uri}</span>`
+      : `<span class="badge badge-no">${uri}</span>`;
+    const compBadge = comp.startsWith('✓')
+      ? `<span class="badge badge-yes">${comp}</span>`
+      : `<span class="badge badge-no">${comp}</span>`;
+    return `<tr><td>${ch === ' ' ? '␣' : ch}</td><td>${name}</td><td>${code}</td><td>${uriBadge}</td><td>${compBadge}</td></tr>`;
+  }).join('');
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + mode).classList.add('active');
+  const label = document.getElementById('input-label');
+  const btnText = document.getElementById('process-btn-text');
+  const input = document.getElementById('input');
+  if (mode === 'encode') {
+    label.textContent = '输入要编码的文本：';
+    btnText.textContent = '▶ 编码';
+    input.placeholder = '输入文本，如：你好世界 hello&world';
+  } else if (mode === 'decode') {
+    label.textContent = '输入要解码的 URL 编码字符串：';
+    btnText.textContent = '▶ 解码';
+    input.placeholder = '输入编码字符串，如：%E4%BD%A0%E5%A5%BD%E4%B8%96%E7%95%8C';
+  } else {
+    label.textContent = '输入多行文本（每行独立处理）：';
+    btnText.textContent = '▶ 批量处理';
+    input.placeholder = '每行一个，如：\n你好世界\nhello world\nfoo=bar&baz=qux';
+  }
+  autoProcess();
+}
+
+function process() {
+  const input = document.getElementById('input').value;
+  const output = document.getElementById('output');
+  const status = document.getElementById('status-info');
+  const charCount = document.getElementById('char-count');
+  if (!input.trim()) { output.textContent = ''; status.textContent = ''; charCount.textContent = ''; return; }
+  let result = '';
+  try {
+    if (currentMode === 'encode') {
+      result = encodeURIComponent(input);
+      status.textContent = '✅ 编码完成 (encodeURIComponent)';
+    } else if (currentMode === 'decode') {
+      result = decodeURIComponent(input);
+      status.textContent = '✅ 解码完成';
+    } else {
+      const lines = input.split('\n');
+      const isEncoded = lines.some(l => /%[0-9A-Fa-f]{2}/.test(l));
+      result = lines.map(line => {
+        if (!line.trim()) return '';
+        try {
+          return isEncoded ? decodeURIComponent(line) : encodeURIComponent(line);
+        } catch { return `[错误] ${line}`; }
+      }).join('\n');
+      status.textContent = `✅ 批量${isEncoded ? '解码' : '编码'}完成，共 ${lines.length} 行`;
+    }
+  } catch (e) {
+    result = `❌ 错误: ${e.message}`;
+    status.textContent = '处理出错';
+  }
+  output.textContent = result;
+  charCount.textContent = `输入 ${input.length} 字符 → 输出 ${result.length} 字符`;
+}
+
+function autoProcess() {
+  if (document.getElementById('auto-mode').checked) process();
+}
+
+function swapIO() {
+  const input = document.getElementById('input');
+  const output = document.getElementById('output');
+  const temp = output.textContent;
+  if (!temp) return;
+  input.value = temp;
+  if (currentMode === 'encode') switchMode('decode');
+  else if (currentMode === 'decode') switchMode('encode');
+  autoProcess();
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').textContent = '';
+  document.getElementById('status-info').textContent = '';
+  document.getElementById('char-count').textContent = '';
+}
+
+function copyResult(id) {
+  const text = document.getElementById(id).textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(id).parentElement.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '已复制 ✓';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 1500);
+  });
+}
+
+function doCompare() {
+  const input = document.getElementById('compare-input').value;
+  const uriBox = document.getElementById('compare-uri');
+  const compBox = document.getElementById('compare-comp');
+  const diffBox = document.getElementById('compare-diff');
+  if (!input.trim()) { uriBox.textContent = ''; compBox.textContent = ''; diffBox.innerHTML = ''; return; }
+  let uriResult, compResult;
+  try { uriResult = encodeURI(input); } catch (e) { uriResult = `错误: ${e.message}`; }
+  try { compResult = encodeURIComponent(input); } catch (e) { compResult = `错误: ${e.message}`; }
+  uriBox.textContent = uriResult;
+  compBox.textContent = compResult;
+  // Build diff
+  let diffHtml = '';
+  let i = 0, j = 0;
+  while (i < uriResult.length && j < compResult.length) {
+    if (uriResult[i] === compResult[j]) {
+      diffHtml += escHtml(uriResult[i]);
+      i++; j++;
+    } else {
+      // Find the differing segment in compResult (it's the encoded version)
+      let uriSeg = '', compSeg = '';
+      // encodeURIComponent encodes more, so comp will have %XX where uri has the raw char
+      if (compResult[j] === '%' && j + 2 < compResult.length) {
+        compSeg = compResult.substring(j, j + 3);
+        uriSeg = uriResult[i];
+        diffHtml += `<span class="diff-highlight" title="encodeURI 保留 '${escHtml(uriSeg)}'，encodeURIComponent 编码为 '${compSeg}'">${escHtml(uriSeg)} → ${compSeg}</span>`;
+        i++; j += 3;
+      } else {
+        diffHtml += escHtml(uriResult[i]);
+        i++; j++;
+      }
+    }
+  }
+  diffBox.innerHTML = diffHtml || '<span style="color:var(--text2)">两种编码结果相同，无差异</span>';
+}
+
+function autoCompare() {
+  if (document.getElementById('auto-mode').checked) doCompare();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+initRefTable();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

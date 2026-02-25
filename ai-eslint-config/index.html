@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate ESLint configuration files with AI. Select rules, plugins, and presets for JavaScript and TypeScript projects. Export .eslintrc in any format.">
+<link rel="canonical" href="https://lifa-su.com/ai-eslint-config/">
+<title>AI ESLint Config Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--card:#1e2746;--code:#0d1117;--accent:#e94560;--accent2:#533483;--text:#e0e0e0;--text2:#a0a0b0;--border:#2a2a4a;--success:#00d68f;--warn:#ffaa00;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1280px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px;background:linear-gradient(135deg,var(--bg2),var(--accent2) 50%,var(--bg3));border-bottom:1px solid var(--border)}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,#fff,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:1.05rem}
+.logo{font-size:2.8rem;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 4px 24px rgba(0,0,0,0.3)}
+.panel h2{font-size:1.15rem;margin-bottom:16px;color:#fff;display:flex;align-items:center;gap:8px}
+.sec{margin-bottom:20px}
+.stitle{font-size:0.85rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.ob{background:var(--bg);border:2px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);cursor:pointer;transition:all .2s;font-size:0.88rem;text-align:center;user-select:none}
+.ob:hover{border-color:var(--accent);background:rgba(233,69,96,0.08)}
+.ob.on{border-color:var(--accent);background:rgba(233,69,96,0.15);color:#fff;box-shadow:0 0 12px rgba(233,69,96,0.2)}
+.ob i{display:block;font-size:1.3rem;margin-bottom:4px;font-style:normal}
+.tr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
+.tr label{font-size:0.9rem}
+.sw{position:relative;width:44px;height:24px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw .sl{position:absolute;inset:0;background:var(--border);border-radius:12px;cursor:pointer;transition:.3s}
+.sw .sl::before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.sw input:checked+.sl{background:var(--accent)}
+.sw input:checked+.sl::before{transform:translateX(20px)}
+.rr{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;border:1px solid var(--border);flex-wrap:wrap}
+.rr .rn{flex:1;font-size:0.85rem;font-family:'SF Mono',Monaco,monospace;min-width:120px}
+.rs{background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:0.82rem;cursor:pointer;outline:none}
+.rs:focus{border-color:var(--accent)}
+.rs option{background:var(--bg2)}
+.cb{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:20px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:0.84rem;line-height:1.7;color:#c9d1d9;overflow-x:auto;white-space:pre;max-height:70vh;overflow-y:auto;tab-size:2}
+.cb::-webkit-scrollbar{width:8px;height:8px}
+.cb::-webkit-scrollbar-track{background:var(--code)}
+.cb::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+.bgrp{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:6px}
+.bp{background:var(--accent);color:#fff}.bp:hover{background:#d63a52;transform:translateY(-1px)}
+.bs{background:var(--bg3);color:#fff;border:1px solid var(--border)}.bs:hover{background:#1a4a7a}
+.ftabs{display:flex;background:var(--bg);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px}
+.ftb{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:0.82rem;color:var(--text2);transition:all .2s;border:none;background:transparent}
+.ftb.on{background:var(--accent);color:#fff}
+.ftb:hover:not(.on){background:rgba(233,69,96,0.1)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--success);color:#111;padding:12px 28px;border-radius:8px;font-weight:600;font-size:0.9rem;transition:transform .3s ease;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.dep{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:14px;margin-top:12px;font-family:'SF Mono',Monaco,monospace;font-size:0.82rem;color:var(--success);word-break:break-all;line-height:1.8}
+.dtit{font-size:0.85rem;color:var(--text2);margin-top:16px;margin-bottom:6px}
+footer{text-align:center;padding:30px;color:var(--text2);font-size:0.82rem;border-top:1px solid var(--border);margin-top:40px}
+.sticky{position:sticky;top:20px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">&#9889;</div>
+<h1>AI ESLint Config Generator</h1>
+<p>Generate perfect ESLint configurations in seconds</p>
+</header>
+<div class="container">
+<div class="grid">
+<div class="panel" style="overflow-y:auto;max-height:90vh">
+<h2>&#9881;&#65039; Configuration</h2>
+
+<div class="sec">
+<div class="stitle">&#128218; Preset / Style Guide</div>
+<div class="og" id="presets"></div>
+</div>
+
+<div class="sec">
+<div class="stitle">&#128640; Frameworks</div>
+<div class="og" id="frameworks"></div>
+</div>
+
+<div class="sec">
+<div class="stitle">&#128295; TypeScript</div>
+<div class="tr">
+<label>Enable TypeScript Support</label>
+<div class="sw"><input type="checkbox" id="tsToggle" onchange="update()"><span class="sl"></span></div>
+</div>
+</div>
+
+<div class="sec">
+<div class="stitle">&#127760; Environments</div>
+<div class="eg" id="envs"></div>
+</div>
+
+<div class="sec">
+<div class="stitle">&#128221; Custom Rules</div>
+<div id="rules"></div>
+</div>
+</div>
+
+<div class="panel">
+<div class="sticky">
+<h2>&#128196; Generated Config</h2>
+
+<div class="ftabs" id="formatTabs"></div>
+
+<div style="position:relative">
+<div class="cb" id="preview">// Select options to generate config...</div>
+</div>
+
+<div class="bgrp">
+<button class="btn bp" onclick="copyConfig()">&#128203; Copy</button>
+<button class="btn bs" onclick="downloadConfig()">&#11015;&#65039; Download</button>
+</div>
+
+<div class="dtit">&#128230; Required Dependencies:</div>
+<div class="dep" id="deps">eslint</div>
+</div>
+</div>
+</div>
+</div>
+
+<footer>
+<p>AI ESLint Config Generator &mdash; Built with &#10084;&#65039; for developers</p>
+</footer>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+<script>
+
+const S = {
+  preset: 'recommended',
+  frameworks: [],
+  ts: false,
+  envs: ['browser','es2024'],
+  format: 'json',
+  rules: {}
+};
+
+const PRESETS = [
+  {id:'recommended',name:'ESLint Recommended',icon:'&#9989;'},
+  {id:'airbnb',name:'Airbnb',icon:'&#9992;&#65039;'},
+  {id:'standard',name:'Standard',icon:'&#128220;'},
+  {id:'google',name:'Google',icon:'&#127468;'},
+  {id:'xo',name:'XO',icon:'&#9898;'}
+];
+
+const FRAMEWORKS = [
+  {id:'react',name:'React',icon:'&#9883;&#65039;'},
+  {id:'vue',name:'Vue',icon:'&#128154;'},
+  {id:'node',name:'Node.js',icon:'&#128421;&#65039;'},
+  {id:'next',name:'Next.js',icon:'&#9654;&#65039;'}
+];
+
+const ENVS = [
+  {id:'browser',name:'Browser'},{id:'node',name:'Node'},
+  {id:'es2024',name:'ES2024'},{id:'jest',name:'Jest'},{id:'mocha',name:'Mocha'}
+];
+
+const RULES = [
+  {name:'no-console',def:'off',desc:'Disallow console'},
+  {name:'no-unused-vars',def:'warn',desc:'No unused variables'},
+  {name:'semi',def:'off',desc:'Require semicolons',opts:['off','warn','error','warn-always','error-always','warn-never','error-never']},
+  {name:'quotes',def:'off',desc:'Quote style',opts:['off','warn-single','error-single','warn-double','error-double']},
+  {name:'indent',def:'off',desc:'Indentation',opts:['off','warn-2','error-2','warn-4','error-4','warn-tab','error-tab']},
+  {name:'no-debugger',def:'warn',desc:'Disallow debugger'},
+  {name:'eqeqeq',def:'off',desc:'Require === and !=='},
+  {name:'curly',def:'off',desc:'Require curly braces'},
+  {name:'no-var',def:'off',desc:'Disallow var'},
+  {name:'prefer-const',def:'off',desc:'Prefer const'},
+  {name:'no-multiple-empty-lines',def:'off',desc:'No multiple empty lines'},
+  {name:'comma-dangle',def:'off',desc:'Trailing commas',opts:['off','warn-always','error-always','warn-never','error-never']},
+  {name:'arrow-body-style',def:'off',desc:'Arrow function body'},
+  {name:'no-shadow',def:'off',desc:'Disallow variable shadowing'}
+];
+
+const FORMATS = [
+  {id:'json',name:'.eslintrc.json',ext:'.eslintrc.json'},
+  {id:'js',name:'.eslintrc.js',ext:'.eslintrc.js'},
+  {id:'flat',name:'eslint.config.js',ext:'eslint.config.js'}
+];
+
+function init() {
+  // Presets
+  const pe = document.getElementById('presets');
+  PRESETS.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'ob' + (S.preset===p.id?' on':'');
+    d.innerHTML = '<i>'+p.icon+'</i>'+p.name;
+    d.onclick = () => { S.preset=p.id; renderPresets(); update(); };
+    pe.appendChild(d);
+  });
+
+  // Frameworks
+  const fe = document.getElementById('frameworks');
+  FRAMEWORKS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'ob';
+    d.innerHTML = '<i>'+f.icon+'</i>'+f.name;
+    d.onclick = () => {
+      const i = S.frameworks.indexOf(f.id);
+      if(i>=0) S.frameworks.splice(i,1); else S.frameworks.push(f.id);
+      renderFrameworks(); update();
+    };
+    fe.appendChild(d);
+  });
+
+  // Envs
+  const ee = document.getElementById('envs');
+  ENVS.forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'ob' + (S.envs.includes(e.id)?' on':'');
+    d.innerHTML = e.name;
+    d.onclick = () => {
+      const i = S.envs.indexOf(e.id);
+      if(i>=0) S.envs.splice(i,1); else S.envs.push(e.id);
+      renderEnvs(); update();
+    };
+    ee.appendChild(d);
+  });
+
+  // Rules
+  const re = document.getElementById('rules');
+  RULES.forEach(r => {
+    S.rules[r.name] = r.def;
+    const d = document.createElement('div');
+    d.className = 'rr';
+    let opts;
+    if(r.opts) {
+      opts = r.opts.map(o => '<option value="'+o+'"'+(r.def===o?' selected':'')+'>'+o.replace(/-/g,' ')+'</option>').join('');
+    } else {
+      opts = ['off','warn','error'].map(o => '<option value="'+o+'"'+(r.def===o?' selected':'')+'>'+o+'</option>').join('');
+    }
+    d.innerHTML = '<span class="rn" title="'+r.desc+'">'+r.name+'</span><select class="rs" onchange="setRule(\''+r.name+'\',this.value)">'+opts+'</select>';
+    re.appendChild(d);
+  });
+
+  // Format tabs
+  const ft = document.getElementById('formatTabs');
+  FORMATS.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftb'+(S.format===f.id?' on':'');
+    b.textContent = f.name;
+    b.onclick = () => { S.format=f.id; renderFormats(); update(); };
+    ft.appendChild(b);
+  });
+
+  update();
+}
+
+function renderPresets() {
+  document.querySelectorAll('#presets .ob').forEach((d,i) => {
+    d.className = 'ob'+(S.preset===PRESETS[i].id?' on':'');
+  });
+}
+function renderFrameworks() {
+  document.querySelectorAll('#frameworks .ob').forEach((d,i) => {
+    d.className = 'ob'+(S.frameworks.includes(FRAMEWORKS[i].id)?' on':'');
+  });
+}
+function renderEnvs() {
+  document.querySelectorAll('#envs .ob').forEach((d,i) => {
+    d.className = 'ob'+(S.envs.includes(ENVS[i].id)?' on':'');
+  });
+}
+function renderFormats() {
+  document.querySelectorAll('#formatTabs .ftb').forEach((b,i) => {
+    b.className = 'ftb'+(S.format===FORMATS[i].id?' on':'');
+  });
+}
+function setRule(name, val) { S.rules[name]=val; update(); }
+
+function parseRule(name, val) {
+  if(val==='off') return null;
+  if(val==='warn'||val==='error') return val==='warn'?1:2;
+  // compound values like warn-single, error-2, warn-always
+  const parts = val.split('-');
+  const level = parts[0]==='warn'?1:2;
+  const v = parts.slice(1).join('-');
+  if(v==='2'||v==='4') return [level, parseInt(v)];
+  if(v==='tab') return [level, 'tab'];
+  if(v==='single'||v==='double') return [level, v];
+  if(v==='always'||v==='never') return [level, v];
+  return level;
+}
+
+function getDeps() {
+  const deps = ['eslint'];
+  const p = S.preset;
+  if(p==='airbnb') { deps.push('eslint-config-airbnb'); if(!S.frameworks.includes('react')) deps.push('eslint-config-airbnb-base'); }
+  if(p==='standard') deps.push('eslint-config-standard');
+  if(p==='google') deps.push('eslint-config-google');
+  if(p==='xo') deps.push('eslint-config-xo');
+  if(S.frameworks.includes('react')) { deps.push('eslint-plugin-react','eslint-plugin-react-hooks'); }
+  if(S.frameworks.includes('vue')) deps.push('eslint-plugin-vue');
+  if(S.frameworks.includes('node')) deps.push('eslint-plugin-n');
+  if(S.frameworks.includes('next')) deps.push('@next/eslint-plugin-next','eslint-config-next');
+  if(S.ts) { deps.push('@typescript-eslint/parser','@typescript-eslint/eslint-plugin'); }
+  return [...new Set(deps)];
+}
+
+function getExtends() {
+  const ext = [];
+  const p = S.preset;
+  if(p==='recommended') ext.push('eslint:recommended');
+  if(p==='airbnb') ext.push(S.frameworks.includes('react')?'airbnb':'airbnb-base');
+  if(p==='standard') ext.push('standard');
+  if(p==='google') ext.push('google');
+  if(p==='xo') ext.push('xo');
+  if(S.ts) ext.push('plugin:@typescript-eslint/recommended');
+  if(S.frameworks.includes('react')) { ext.push('plugin:react/recommended','plugin:react-hooks/recommended'); }
+  if(S.frameworks.includes('vue')) ext.push('plugin:vue/vue3-recommended');
+  if(S.frameworks.includes('next')) ext.push('next/core-web-vitals');
+  return ext;
+}
+
+function getPlugins() {
+  const pl = [];
+  if(S.ts) pl.push('@typescript-eslint');
+  if(S.frameworks.includes('react')) { pl.push('react','react-hooks'); }
+  if(S.frameworks.includes('vue')) pl.push('vue');
+  if(S.frameworks.includes('node')) pl.push('n');
+  return pl;
+}
+
+function getRulesObj() {
+  const r = {};
+  for(const [name, val] of Object.entries(S.rules)) {
+    const parsed = parseRule(name, val);
+    if(parsed !== null) r[name] = parsed;
+  }
+  return r;
+}
+
+function getEnvObj() {
+  const e = {};
+  S.envs.forEach(v => {
+    if(v==='es2024') e['es2024']=true;
+    else e[v]=true;
+  });
+  return e;
+}
+
+function genJSON() {
+  const cfg = {};
+  const env = getEnvObj();
+  if(Object.keys(env).length) cfg.env = env;
+  const ext = getExtends();
+  if(ext.length) cfg.extends = ext;
+  const pl = getPlugins();
+  if(pl.length) cfg.plugins = pl;
+  if(S.ts) cfg.parser = '@typescript-eslint/parser';
+  cfg.parserOptions = { ecmaVersion: 'latest', sourceType: 'module' };
+  if(S.frameworks.includes('react')) cfg.parserOptions.ecmaFeatures = { jsx: true };
+  const rules = getRulesObj();
+  if(Object.keys(rules).length) cfg.rules = rules;
+  return JSON.stringify(cfg, null, 2);
+}
+
+function genJS() {
+  return 'module.exports = ' + genJSON().replace(/"([^"]+)":/g, (m, k) => {
+    return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(k) ? k+':' : '"'+k+'":';
+  }).replace(/: "([^"]+)"/g, ": '$1'") + ';\n';
+}
+
+function genFlat() {
+  let out = '';
+  const imports = ['import globals from "globals";'];
+  if(S.ts) imports.push('import tseslint from "typescript-eslint";');
+  if(S.frameworks.includes('react')) imports.push('import react from "eslint-plugin-react";');
+  if(S.frameworks.includes('vue')) imports.push('import vue from "eslint-plugin-vue";');
+  if(S.frameworks.includes('node')) imports.push('import n from "eslint-plugin-n";');
+  out += imports.join('\n') + '\n\nexport default [\n';
+  // base configs
+  const configs = [];
+  if(S.preset==='recommended') configs.push('  { rules: { .../* eslint:recommended */ } }');
+  // language options
+  let lo = '  {\n    languageOptions: {\n';
+  lo += '      ecmaVersion: "latest",\n      sourceType: "module",\n';
+  const globs = [];
+  if(S.envs.includes('browser')) globs.push('...globals.browser');
+  if(S.envs.includes('node')) globs.push('...globals.node');
+  if(S.envs.includes('jest')) globs.push('...globals.jest');
+  if(S.envs.includes('mocha')) globs.push('...globals.mocha');
+  if(globs.length) lo += '      globals: {\n        ' + globs.join(',\n        ') + '\n      },\n';
+  if(S.ts) lo += '      parser: tseslint.parser,\n';
+  if(S.frameworks.includes('react')) lo += '      parserOptions: { ecmaFeatures: { jsx: true } },\n';
+  lo += '    },\n';
+  // plugins
+  const pls = [];
+  if(S.ts) pls.push('"@typescript-eslint": tseslint.plugin');
+  if(S.frameworks.includes('react')) pls.push('react');
+  if(S.frameworks.includes('vue')) pls.push('vue');
+  if(S.frameworks.includes('node')) pls.push('n');
+  if(pls.length) lo += '    plugins: { ' + pls.join(', ') + ' },\n';
+  // rules
+  const rules = getRulesObj();
+  if(Object.keys(rules).length) {
+    lo += '    rules: ' + JSON.stringify(rules, null, 6).replace(/\n/g, '\n    ') + ',\n';
+  }
+  lo += '  }';
+  out += lo + '\n];\n';
+  return out;
+}
+
+function update() {
+  S.ts = document.getElementById('tsToggle').checked;
+  let code;
+  if(S.format==='json') code = genJSON();
+  else if(S.format==='js') code = genJS();
+  else code = genFlat();
+  document.getElementById('preview').textContent = code;
+  document.getElementById('deps').textContent = 'npm install -D ' + getDeps().join(' ');
+}
+
+function copyConfig() {
+  const code = document.getElementById('preview').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('Copied to clipboard!'));
+}
+
+function downloadConfig() {
+  const code = document.getElementById('preview').textContent;
+  const fmt = FORMATS.find(f=>f.id===S.format);
+  const blob = new Blob([code], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fmt.ext;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded ' + fmt.ext);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

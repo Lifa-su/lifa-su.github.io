@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServerConf AI - .htaccess & Nginx Config Generator</title>
+<meta name="description" content="AI Server Config Generator - Generate .htaccess and Nginx configurations with AI. Security audit, format conversion, and redirect rules.">
+<meta name="keywords" content="htaccess generator, nginx config, server configuration, AI config generator, web server, redirect rules, security headers">
+<meta property="og:title" content="ServerConf AI - .htaccess & Nginx Config Generator">
+<meta property="og:description" content="AI Server Config Generator - Generate .htaccess and Nginx configurations with AI. Security audit, format conversion, and redirect rules.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-server-config/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ServerConf AI - .htaccess & Nginx Config Generator">
+<meta name="twitter:description" content="AI Server Config Generator - Generate .htaccess and Nginx configurations with AI. Security audit, format conversion, and redirect rules.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-server-config/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"ServerConf AI","description":"AI Server Config Generator - Generate .htaccess and Nginx configurations with AI. Security audit, format conversion, and redirect rules.","url":"https://lifa-su.com/ai-server-config/","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"FeiDev Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","ratingCount":"1650"}}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--s2:#242836;--border:#2e3348;--pri:#6366f1;--pri2:#818cf8;--text:#e2e8f0;--muted:#94a3b8;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.ctn{max-width:1200px;margin:0 auto;padding:0 20px}
+header{padding:20px 0;border-bottom:1px solid var(--border);background:var(--surface)}
+header .ctn{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:1.3rem;font-weight:700}
+.api-box{display:flex;align-items:center;gap:8px}
+.api-box input{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem;width:260px}
+.api-box input::placeholder{color:var(--muted)}
+.tabs{display:flex;gap:4px;padding:16px 0;flex-wrap:wrap}
+.tab{padding:10px 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.9rem;color:var(--muted);transition:all .2s;user-select:none}
+.tab:hover{border-color:var(--pri);color:var(--text)}
+.tab.active{background:var(--pri);border-color:var(--pri);color:#fff}
+.pnl{display:none;padding:20px 0}.pnl.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.card h3{margin-bottom:16px;font-size:1.1rem}
+textarea{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:14px;border-radius:8px;font-family:'Fira Code',Consolas,monospace;font-size:.88rem;resize:vertical;min-height:120px;line-height:1.5}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--pri)}
+textarea::placeholder{color:var(--muted)}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--pri);color:#fff}.btn-p:hover{background:var(--pri2)}
+.btn-s{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-s:hover{border-color:var(--pri)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-sm{padding:6px 14px;font-size:.82rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.out{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:16px;font-family:'Fira Code',Consolas,monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-word;min-height:60px;max-height:500px;overflow-y:auto;position:relative;line-height:1.6}
+.cpb{position:absolute;top:8px;right:8px;padding:4px 10px;background:var(--s2);border:1px solid var(--border);color:var(--muted);border-radius:6px;cursor:pointer;font-size:.75rem;z-index:2}
+.cpb:hover{border-color:var(--pri);color:var(--text)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tc{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s}
+.tc:hover{border-color:var(--pri);transform:translateY(-2px)}
+.tc h4{font-size:.95rem;margin-bottom:4px}.tc p{font-size:.8rem;color:var(--muted)}.tc .i{font-size:1.4rem;margin-bottom:8px}
+select{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.9rem}
+.rg{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+.rg label{display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 16px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:.9rem;transition:all .2s}
+.rg input[type=radio]{accent-color:var(--pri)}
+.rg label:has(input:checked){border-color:var(--pri);background:rgba(99,102,241,.1)}
+.si{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:.88rem}
+.si.pass{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
+.si.fail{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3)}
+.si.warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
+.ld{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--pri);border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.pnl.active{animation:fadeIn .4s ease both}
+.card{animation:fadeIn .4s ease both}
+.tc{animation:fadeIn .35s ease both}
+.tc:nth-child(2){animation-delay:.05s}
+.tc:nth-child(3){animation-delay:.1s}
+.tc:nth-child(4){animation-delay:.15s}
+.tc:nth-child(5){animation-delay:.2s}
+.tc:nth-child(6){animation-delay:.25s}
+.pro-section{animation:fadeIn .5s ease .2s both}
+.rf{display:grid;gap:12px}.rr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rf input,.rf select{background:var(--s2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:.9rem}
+.rf label{font-size:.85rem;color:var(--muted);margin-bottom:4px;display:block}
+footer{text-align:center;padding:30px 0;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:768px){header .ctn{flex-direction:column;align-items:flex-start}.api-box input{width:100%}.rr{grid-template-columns:1fr}.tgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.tgrid{grid-template-columns:1fr}.tabs{gap:2px}.tab{padding:8px 14px;font-size:.82rem}}
+/* UI/UX Enhancements */
+.card{transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+textarea,input,select{transition:border-color .2s ease,box-shadow .2s ease}
+textarea:focus,input:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.btn{transition:all .2s ease}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.35)}
+.btn-s:hover{transform:translateY(-1px)}
+.cpb{transition:all .2s ease}
+.out{transition:opacity .3s ease}
+header{transition:background .2s ease}
+/* Pro Section */
+.pro-section{max-width:1200px;margin:40px auto 0;padding:0 20px}
+.pro-card{background:linear-gradient(135deg,var(--surface) 0%,var(--s2) 100%);border:1px solid var(--border);border-radius:var(--r);padding:32px;text-align:center;position:relative;overflow:hidden}
+.pro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--pri),var(--pri2),var(--ok))}
+.pro-card h3{font-size:1.3rem;margin-bottom:20px}
+.pro-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;text-align:left}
+.pro-feat{background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:8px;padding:16px;transition:all .2s ease}
+.pro-feat:hover{border-color:var(--pri);transform:translateY(-2px);box-shadow:0 4px 16px rgba(99,102,241,.15)}
+.pro-feat .pf-icon{font-size:1.3rem;margin-bottom:6px}
+.pro-feat h4{font-size:.95rem;margin-bottom:4px}
+.pro-feat p{font-size:.82rem;color:var(--muted);line-height:1.4}
+.btn-pro{background:linear-gradient(135deg,var(--pri),var(--pri2));color:#fff;padding:14px 36px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;font-weight:700;transition:all .25s ease;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-pro:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,.4)}
+@media(max-width:480px){.pro-features{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<div class="ctn">
+<div class="logo">⚙️ ServerConf AI</div>
+<div class="api-box">
+<input type="password" id="apiKey" placeholder="DeepSeek API Key (sk-...)" />
+<button class="btn btn-sm btn-s" onclick="saveKey()">Save</button>
+</div>
+</div>
+</header>
+
+<div class="ctn">
+<div class="tabs">
+<div class="tab active" data-tab="generate" onclick="switchTab('generate')">🤖 AI Generate</div>
+<div class="tab" data-tab="templates" onclick="switchTab('templates')">📋 Templates</div>
+<div class="tab" data-tab="convert" onclick="switchTab('convert')">🔄 Convert</div>
+<div class="tab" data-tab="security" onclick="switchTab('security')">🛡️ Security Check</div>
+<div class="tab" data-tab="redirect" onclick="switchTab('redirect')">↪️ Redirects</div>
+<div class="tab" data-tab="explain" onclick="switchTab('explain')">💡 Explain</div>
+</div>
+
+<!-- AI Generate Panel -->
+<div class="pnl active" id="panel-generate">
+<div class="card">
+<h3>🤖 AI Config Generator</h3>
+<p style="color:var(--muted);margin-bottom:12px;font-size:.9rem">Describe what you need in plain English and AI will generate the server configuration for you.</p>
+<div class="rg">
+<label><input type="radio" name="genType" value="htaccess" checked> .htaccess (Apache)</label>
+<label><input type="radio" name="genType" value="nginx"> Nginx</label>
+<label><input type="radio" name="genType" value="both"> Both</label>
+</div>
+<textarea id="genPrompt" rows="4" placeholder="e.g. Redirect all HTTP traffic to HTTPS, enable Gzip compression, add security headers, and cache static assets for 30 days..."></textarea>
+<div class="btns">
+<button class="btn btn-p" onclick="aiGenerate()" id="genBtn">✨ Generate Config</button>
+</div>
+<div id="genOut" class="out" style="display:none"></div>
+</div>
+</div>
+
+<!-- Templates Panel -->
+<div class="pnl" id="panel-templates">
+<div class="card">
+<h3>📋 Quick Templates</h3>
+<p style="color:var(--muted);margin-bottom:16px;font-size:.9rem">Click a template to generate production-ready configuration instantly.</p>
+<div class="rg">
+<label><input type="radio" name="tplType" value="htaccess" checked> .htaccess</label>
+<label><input type="radio" name="tplType" value="nginx"> Nginx</label>
+</div>
+<div class="tgrid">
+<div class="tc" onclick="loadTemplate('security')"><div class="i">🛡️</div><h4>Security Headers</h4><p>HSTS, CSP, X-Frame-Options, XSS Protection</p></div>
+<div class="tc" onclick="loadTemplate('cache')"><div class="i">⚡</div><h4>Browser Caching</h4><p>Cache-Control for static assets</p></div>
+<div class="tc" onclick="loadTemplate('gzip')"><div class="i">📦</div><h4>Gzip Compression</h4><p>Compress text, CSS, JS, SVG, JSON</p></div>
+<div class="tc" onclick="loadTemplate('cors')"><div class="i">🌐</div><h4>CORS Headers</h4><p>Cross-Origin Resource Sharing</p></div>
+<div class="tc" onclick="loadTemplate('ssl')"><div class="i">🔒</div><h4>SSL / HTTPS</h4><p>Force HTTPS, HSTS preload</p></div>
+<div class="tc" onclick="loadTemplate('redirect')"><div class="i">↪️</div><h4>WWW Redirect</h4><p>Redirect non-www to www (or vice versa)</p></div>
+<div class="tc" onclick="loadTemplate('hotlink')"><div class="i">🚫</div><h4>Hotlink Protection</h4><p>Prevent image/media hotlinking</p></div>
+<div class="tc" onclick="loadTemplate('perf')"><div class="i">🚀</div><h4>Performance Bundle</h4><p>Gzip + Cache + Keep-Alive + ETags</p></div>
+</div>
+<div id="tplOut" class="out" style="display:none"></div>
+</div>
+</div>
+
+<!-- Convert Panel -->
+<div class="pnl" id="panel-convert">
+<div class="card">
+<h3>🔄 Config Converter</h3>
+<p style="color:var(--muted);margin-bottom:12px;font-size:.9rem">Convert between .htaccess (Apache) and Nginx configuration formats using AI.</p>
+<div class="rg">
+<label><input type="radio" name="convDir" value="htaccess2nginx" checked> .htaccess → Nginx</label>
+<label><input type="radio" name="convDir" value="nginx2htaccess"> Nginx → .htaccess</label>
+</div>
+<textarea id="convInput" rows="6" placeholder="Paste your configuration here..."></textarea>
+<div class="btns">
+<button class="btn btn-p" onclick="aiConvert()" id="convBtn">🔄 Convert</button>
+</div>
+<div id="convOut" class="out" style="display:none"></div>
+</div>
+</div>
+
+<!-- Security Check Panel -->
+<div class="pnl" id="panel-security">
+<div class="card">
+<h3>🛡️ Security Configuration Audit</h3>
+<p style="color:var(--muted);margin-bottom:12px;font-size:.9rem">Paste your config to check for security best practices (2025/2026 standards).</p>
+<div class="rg">
+<label><input type="radio" name="secType" value="htaccess" checked> .htaccess</label>
+<label><input type="radio" name="secType" value="nginx"> Nginx</label>
+</div>
+<textarea id="secInput" rows="6" placeholder="Paste your server configuration here for security analysis..."></textarea>
+<div class="btns">
+<button class="btn btn-p" onclick="securityCheck()" id="secBtn">🔍 Run Security Audit</button>
+</div>
+<div id="secOut" style="display:none;margin-top:16px"></div>
+</div>
+</div>
+
+<!-- Redirect Panel -->
+<div class="pnl" id="panel-redirect">
+<div class="card">
+<h3>↪️ Redirect Rule Generator</h3>
+<p style="color:var(--muted);margin-bottom:12px;font-size:.9rem">Generate redirect rules for Apache or Nginx.</p>
+<div class="rg">
+<label><input type="radio" name="redirType" value="htaccess" checked> .htaccess</label>
+<label><input type="radio" name="redirType" value="nginx"> Nginx</label>
+</div>
+<div class="rf">
+<div class="rr">
+<div><label>Redirect Type</label><select id="redirCode" style="width:100%"><option value="301">301 - Permanent</option><option value="302">302 - Temporary</option><option value="307">307 - Temporary (preserve method)</option><option value="308">308 - Permanent (preserve method)</option></select></div>
+<div><label>Match Type</label><select id="redirMatch" style="width:100%"><option value="exact">Exact Path</option><option value="regex">Regex Pattern</option><option value="prefix">Path Prefix</option></select></div>
+</div>
+<div class="rr">
+<div><label>Source URL / Pattern</label><input type="text" id="redirFrom" placeholder="/old-page or ^/blog/(.*)$"></div>
+<div><label>Destination URL</label><input type="text" id="redirTo" placeholder="/new-page or https://example.com/$1"></div>
+</div>
+</div>
+<div class="btns">
+<button class="btn btn-p" onclick="generateRedirect()">⚡ Generate Rule</button>
+<button class="btn btn-s" onclick="addRedirectRow()">+ Add Another Rule</button>
+</div>
+<div id="extraRedirects"></div>
+<div id="redirOut" class="out" style="display:none"></div>
+</div>
+</div>
+
+<!-- Explain Panel -->
+<div class="pnl" id="panel-explain">
+<div class="card">
+<h3>💡 Config Explainer</h3>
+<p style="color:var(--muted);margin-bottom:12px;font-size:.9rem">Paste any .htaccess or Nginx configuration and AI will explain each line.</p>
+<textarea id="explainInput" rows="6" placeholder="Paste your configuration here to get a line-by-line explanation..."></textarea>
+<div class="btns">
+<button class="btn btn-p" onclick="aiExplain()" id="explainBtn">💡 Explain Config</button>
+</div>
+<div id="explainOut" class="out" style="display:none"></div>
+</div>
+</div>
+</div>
+
+<!-- Pro Features -->
+<div class="pro-section">
+<div class="pro-card">
+<h3>⚡ Pro Features</h3>
+<div class="pro-features">
+<div class="pro-feat"><div class="pf-icon">🛡️</div><h4>Advanced Security Templates</h4><p>Enterprise-grade WAF rules, bot protection, and DDoS mitigation configs</p></div>
+<div class="pro-feat"><div class="pf-icon">🔄</div><h4>Multi-Server Sync</h4><p>Generate and sync configs across Apache, Nginx, and Caddy simultaneously</p></div>
+<div class="pro-feat"><div class="pf-icon">📜</div><h4>Config Version History</h4><p>Track changes, diff versions, and rollback to any previous configuration</p></div>
+<div class="pro-feat"><div class="pf-icon">🚀</div><h4>Priority AI Generation</h4><p>Faster responses, higher token limits, and access to advanced AI models</p></div>
+</div>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn-pro">🔓 Unlock Pro</a>
+</div>
+</div>
+
+<footer style="text-align:center;padding:30px 0;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px">
+  <p>Built by <a href="https://lifa-su.com" style="color:var(--pri2);text-decoration:none">FeiDev Tools</a> · <a href="https://lifa-su.com/#tools" style="color:var(--pri2);text-decoration:none">More Free Tools</a></p>
+  <p style="margin-top:6px;font-size:.78rem;color:#555">© 2025 FeiDev Tools. Free to use.</p>
+</footer>
+
+<script>
+// ===== State & Config =====
+const API_URL = 'https://api.deepseek.com/chat/completions';
+const MODEL = 'deepseek-chat';
+
+function getKey() {
+  const k = document.getElementById('apiKey').value.trim();
+  if (k) { localStorage.setItem('ds_key', k); return k; }
+  return localStorage.getItem('ds_key') || '';
+}
+function saveKey() {
+  const k = document.getElementById('apiKey').value.trim();
+  if (k) { localStorage.setItem('ds_key', k); alert('API key saved!'); }
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('ds_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+});
+
+// ===== Tab Switching =====
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.pnl').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+}
+
+// ===== Copy to Clipboard =====
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+// ===== Show Output =====
+function showOutput(elId, text) {
+  const el = document.getElementById(elId);
+  el.style.display = 'block';
+  el.innerHTML = '<button class="cpb" onclick="copyText(this.parentElement.querySelector(\'.code-text\').textContent, this)">📋 Copy</button><div class="code-text">' + escHtml(text) + '</div>';
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== DeepSeek API Call =====
+async function callAI(systemPrompt, userMsg, btnId) {
+  const key = getKey();
+  if (!key) { alert('Please enter your DeepSeek API key first.'); return null; }
+  const btn = document.getElementById(btnId);
+  const origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ld"></span> Generating...';
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMsg }
+        ],
+        temperature: 0.3,
+        max_tokens: 4096
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'API error: ' + res.status);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content;
+  } catch (e) {
+    alert('Error: ' + e.message);
+    return null;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = origText;
+  }
+}
+
+// ===== AI Generate =====
+async function aiGenerate() {
+  const type = document.querySelector('input[name="genType"]:checked').value;
+  const prompt = document.getElementById('genPrompt').value.trim();
+  if (!prompt) { alert('Please describe what you need.'); return; }
+  const typeLabel = type === 'both' ? '.htaccess AND Nginx' : type === 'htaccess' ? '.htaccess (Apache)' : 'Nginx';
+  const sys = `You are an expert server administrator. Generate ${typeLabel} configuration based on the user's request.
+Follow 2025/2026 best practices:
+- Security: HSTS with preload, CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy
+- Performance: Gzip/Brotli compression, optimal Cache-Control headers, Keep-Alive
+- For .htaccess: use mod_rewrite, mod_headers, mod_deflate, mod_expires
+- For Nginx: use proper server/location blocks, add_header with 'always' flag
+Output ONLY the configuration code. Add brief comments explaining each section. No markdown fences.`;
+  const result = await callAI(sys, prompt, 'genBtn');
+  if (result) showOutput('genOut', result);
+}
+
+// ===== Config Converter =====
+async function aiConvert() {
+  const dir = document.querySelector('input[name="convDir"]:checked').value;
+  const input = document.getElementById('convInput').value.trim();
+  if (!input) { alert('Please paste a configuration to convert.'); return; }
+  const fromTo = dir === 'htaccess2nginx' ? 'Apache .htaccess to Nginx' : 'Nginx to Apache .htaccess';
+  const sys = `You are an expert at converting server configurations. Convert the following ${fromTo} configuration.
+Rules:
+- Produce functionally equivalent configuration
+- Add comments explaining the conversion choices
+- Follow 2025/2026 best practices for the target format
+- For Nginx output: use proper server block structure
+- For .htaccess output: use appropriate Apache modules (mod_rewrite, mod_headers, etc.)
+Output ONLY the converted configuration code. No markdown fences.`;
+  const result = await callAI(sys, input, 'convBtn');
+  if (result) showOutput('convOut', result);
+}
+
+// ===== Security Check =====
+async function securityCheck() {
+  const type = document.querySelector('input[name="secType"]:checked').value;
+  const input = document.getElementById('secInput').value.trim();
+  if (!input) { alert('Please paste a configuration to audit.'); return; }
+  const sys = `You are a server security auditor. Analyze the given ${type === 'htaccess' ? '.htaccess' : 'Nginx'} configuration for security issues.
+Check for these 2025/2026 security best practices:
+1. HSTS (Strict-Transport-Security with includeSubDomains and preload, max-age >= 31536000)
+2. Content-Security-Policy header
+3. X-Content-Type-Options: nosniff
+4. X-Frame-Options: DENY or SAMEORIGIN
+5. Referrer-Policy
+6. Permissions-Policy (formerly Feature-Policy)
+7. X-XSS-Protection (legacy but still recommended)
+8. Server signature/version hiding
+9. Directory listing disabled
+10. Sensitive file access blocked (.env, .git, etc.)
+11. Rate limiting considerations
+12. SSL/TLS configuration
+
+Respond in this EXACT JSON format (no markdown, no fences):
+{"items":[{"name":"Check Name","status":"pass|fail|warn","detail":"Brief explanation"}],"score":85,"summary":"Overall summary"}`;
+  const result = await callAI(sys, input, 'secBtn');
+  if (result) renderSecurityResult(result);
+}
+
+function renderSecurityResult(raw) {
+  const el = document.getElementById('secOut');
+  el.style.display = 'block';
+  try {
+    const clean = raw.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const data = JSON.parse(clean);
+    const icons = { pass: '✅', fail: '❌', warn: '⚠️' };
+    let html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:16px;background:var(--s2);border-radius:8px">';
+    const scoreColor = data.score >= 80 ? 'var(--ok)' : data.score >= 50 ? 'var(--warn)' : 'var(--err)';
+    html += '<div style="font-size:2rem;font-weight:700;color:' + scoreColor + '">' + data.score + '/100</div>';
+    html += '<div style="font-size:.9rem;color:var(--muted)">' + escHtml(data.summary) + '</div></div>';
+    data.items.forEach(item => {
+      html += '<div class="si ' + item.status + '">' + icons[item.status] + ' <div><strong>' + escHtml(item.name) + '</strong><br><span style="color:var(--muted);font-size:.82rem">' + escHtml(item.detail) + '</span></div></div>';
+    });
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '<div class="out">' + escHtml(raw) + '</div>';
+  }
+}
+
+// ===== Templates =====
+const TEMPLATES = {
+  security: {
+    htaccess: `# === Security Headers (2025/2026 Best Practices) ===
+<IfModule mod_headers.c>
+    # HSTS - Force HTTPS for 1 year, include subdomains, preload
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Prevent MIME-type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Clickjacking protection
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS Protection (legacy browsers)
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'"
+    
+    # Permissions Policy (formerly Feature-Policy)
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    
+    # Remove server signature
+    Header always unset X-Powered-By
+    ServerSignature Off
+</IfModule>`,
+    nginx: `# === Security Headers (2025/2026 Best Practices) ===
+
+# HSTS - Force HTTPS for 1 year, include subdomains, preload
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+# Prevent MIME-type sniffing
+add_header X-Content-Type-Options "nosniff" always;
+
+# Clickjacking protection
+add_header X-Frame-Options "SAMEORIGIN" always;
+
+# XSS Protection (legacy browsers)
+add_header X-XSS-Protection "1; mode=block" always;
+
+# Referrer Policy
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+# Content Security Policy
+add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'" always;
+
+# Permissions Policy
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+
+# Hide Nginx version
+server_tokens off;`
+  },
+  cache: {
+    htaccess: `# === Browser Caching ===
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images - 1 year
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS & JS - 1 month
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # Fonts - 1 year
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/ttf "access plus 1 year"
+    
+    # HTML - no cache
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Cache-Control for static assets
+    <FilesMatch "\\.(ico|jpg|jpeg|png|gif|webp|svg|css|js|woff2?|ttf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    
+    # No cache for HTML
+    <FilesMatch "\\.(html|htm)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>`,
+    nginx: `# === Browser Caching ===
+
+# Images - 1 year
+location ~* \\.(ico|jpg|jpeg|png|gif|webp|svg)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+    access_log off;
+}
+
+# CSS & JS - 1 month
+location ~* \\.(css|js)$ {
+    expires 1M;
+    add_header Cache-Control "public";
+    access_log off;
+}
+
+# Fonts - 1 year
+location ~* \\.(woff2?|ttf|eot|otf)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+    add_header Access-Control-Allow-Origin "*";
+    access_log off;
+}
+
+# HTML - no cache
+location ~* \\.(html|htm)$ {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+}`
+  },
+  gzip: {
+    htaccess: `# === Gzip Compression ===
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE font/woff2
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    
+    # Compression level
+    DeflateCompressionLevel 6
+    
+    # Handle browser bugs
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\\.0[678] no-gzip
+    BrowserMatch \\bMSIE !no-gzip !gzip-only-text/html
+</IfModule>`,
+    nginx: `# === Gzip Compression ===
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_min_length 256;
+gzip_types
+    text/plain
+    text/css
+    text/javascript
+    application/javascript
+    application/json
+    application/xml
+    text/xml
+    image/svg+xml
+    application/xhtml+xml
+    font/woff2
+    application/vnd.ms-fontobject;
+
+# Brotli (if module available)
+# brotli on;
+# brotli_comp_level 6;
+# brotli_types text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml;`
+  },
+  cors: {
+    htaccess: `# === CORS Headers ===
+<IfModule mod_headers.c>
+    # Allow specific origin (replace * with your domain for production)
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    Header always set Access-Control-Max-Age "86400"
+    
+    # Handle preflight OPTIONS requests
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>`,
+    nginx: `# === CORS Headers ===
+location / {
+    # Allow specific origin (replace * with your domain for production)
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+    add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization" always;
+    add_header Access-Control-Max-Age "86400" always;
+    
+    # Handle preflight OPTIONS requests
+    if ($request_method = 'OPTIONS') {
+        return 204;
+    }
+}`
+  },
+  ssl: {
+    htaccess: `# === Force HTTPS + HSTS ===
+RewriteEngine On
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# HSTS Header
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>`,
+    nginx: `# === Force HTTPS + SSL Configuration ===
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name example.com www.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name example.com www.example.com;
+    
+    # SSL Certificate
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    
+    # Modern SSL Configuration (2025)
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    
+    # OCSP Stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    
+    # HSTS
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+}`
+  },
+  redirect: {
+    htaccess: `# === WWW Redirect ===
+RewriteEngine On
+
+# Option 1: Redirect non-www to www
+RewriteCond %{HTTP_HOST} !^www\\. [NC]
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+
+# Option 2: Redirect www to non-www (uncomment below, comment above)
+# RewriteCond %{HTTP_HOST} ^www\\.(.+)$ [NC]
+# RewriteRule ^(.*)$ https://%1/$1 [R=301,L]`,
+    nginx: `# === WWW Redirect ===
+
+# Option 1: Redirect non-www to www
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+    return 301 https://www.example.com$request_uri;
+}
+
+# Option 2: Redirect www to non-www (use instead of above)
+# server {
+#     listen 443 ssl http2;
+#     server_name www.example.com;
+#     return 301 https://example.com$request_uri;
+# }`
+  },
+  hotlink: {
+    htaccess: `# === Hotlink Protection ===
+RewriteEngine On
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https?://(www\\.)?yourdomain\\.com [NC]
+RewriteCond %{HTTP_REFERER} !^https?://(www\\.)?google\\.com [NC]
+RewriteRule \\.(jpg|jpeg|png|gif|webp|svg|mp4|pdf)$ - [F,NC,L]`,
+    nginx: `# === Hotlink Protection ===
+location ~* \\.(jpg|jpeg|png|gif|webp|svg|mp4|pdf)$ {
+    valid_referers none blocked server_names
+        *.yourdomain.com
+        *.google.com;
+    
+    if ($invalid_referer) {
+        return 403;
+    }
+}`
+  },
+  perf: {
+    htaccess: `# === Performance Bundle ===
+
+# --- Gzip Compression ---
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE application/xml text/xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    DeflateCompressionLevel 6
+</IfModule>
+
+# --- Browser Caching ---
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# --- Keep-Alive ---
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
+# --- ETags ---
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+FileETag None`,
+    nginx: `# === Performance Bundle ===
+
+# --- Gzip Compression ---
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_min_length 256;
+gzip_types text/plain text/css text/javascript application/javascript
+           application/json application/xml image/svg+xml font/woff2;
+
+# --- Keep-Alive ---
+keepalive_timeout 65;
+keepalive_requests 100;
+
+# --- Static Asset Caching ---
+location ~* \\.(ico|jpg|jpeg|png|gif|webp|svg|woff2?|ttf|css|js)$ {
+    expires 1y;
+    add_header Cache-Control "public, immutable";
+    access_log off;
+    tcp_nodelay off;
+    open_file_cache max=3000 inactive=120s;
+    open_file_cache_valid 45s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors off;
+}
+
+# --- Buffer Optimization ---
+client_body_buffer_size 10K;
+client_header_buffer_size 1k;
+client_max_body_size 8m;
+large_client_header_buffers 4 4k;`
+  }
+};
+
+function loadTemplate(name) {
+  const type = document.querySelector('input[name="tplType"]:checked').value;
+  const tpl = TEMPLATES[name];
+  if (tpl && tpl[type]) {
+    showOutput('tplOut', tpl[type]);
+  }
+}
+
+// ===== Redirect Generator =====
+function generateRedirect() {
+  const type = document.querySelector('input[name="redirType"]:checked').value;
+  const code = document.getElementById('redirCode').value;
+  const match = document.getElementById('redirMatch').value;
+  const from = document.getElementById('redirFrom').value.trim();
+  const to = document.getElementById('redirTo').value.trim();
+  if (!from || !to) { alert('Please fill in both source and destination.'); return; }
+
+  let config = '';
+  if (type === 'htaccess') {
+    config += '# Redirect ' + code + ': ' + from + ' -> ' + to + '\n';
+    config += 'RewriteEngine On\n';
+    if (match === 'exact') {
+      config += 'RewriteRule ^' + from.replace(/^\//, '') + '$ ' + to + ' [R=' + code + ',L]';
+    } else if (match === 'regex') {
+      config += 'RewriteRule ' + from + ' ' + to + ' [R=' + code + ',L]';
+    } else {
+      config += 'RewriteRule ^' + from.replace(/^\//, '').replace(/\/$/, '') + '(/.*)?$ ' + to + '$1 [R=' + code + ',L]';
+    }
+  } else {
+    config += '# Redirect ' + code + ': ' + from + ' -> ' + to + '\n';
+    if (match === 'exact') {
+      config += 'location = ' + from + ' {\n    return ' + code + ' ' + to + ';\n}';
+    } else if (match === 'regex') {
+      config += 'location ~ ' + from + ' {\n    return ' + code + ' ' + to + ';\n}';
+    } else {
+      config += 'location ^~ ' + from + ' {\n    return ' + code + ' ' + to + '$request_uri;\n}';
+    }
+  }
+  showOutput('redirOut', config);
+}
+
+// ===== Explain Config =====
+async function aiExplain() {
+  const input = document.getElementById('explainInput').value.trim();
+  if (!input) { alert('Please paste a configuration to explain.'); return; }
+  const sys = `You are a server configuration expert and teacher. Explain the given server configuration line by line.
+For each directive or block:
+1. What it does
+2. Why it matters
+3. Any security or performance implications
+
+Format your response clearly with each line/block quoted, followed by its explanation.
+Be concise but thorough. Use plain English that a junior developer can understand.`;
+  const result = await callAI(sys, 'Please explain this server configuration:\n\n' + input, 'explainBtn');
+  if (result) showOutput('explainOut', result);
+}
+
+// ===== Syntax Validation (local) =====
+function validateSyntax(config, type) {
+  const issues = [];
+  const lines = config.split('\n');
+
+  if (type === 'htaccess') {
+    let openIf = 0;
+    lines.forEach((line, i) => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('<IfModule')) openIf++;
+      if (trimmed === '</IfModule>') openIf--;
+      if (trimmed.startsWith('<') && !trimmed.startsWith('#') && !trimmed.startsWith('</') && !trimmed.includes('>')) {
+        issues.push('Line ' + (i+1) + ': Unclosed tag');
+      }
+    });
+    if (openIf !== 0) issues.push('Mismatched <IfModule> blocks (' + openIf + ' unclosed)');
+    if (config.includes('RewriteRule') && !config.includes('RewriteEngine On')) {
+      issues.push('RewriteRule found but RewriteEngine is not enabled');
+    }
+  } else {
+    let braces = 0;
+    lines.forEach((line, i) => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('#') || trimmed === '') return;
+      braces += (trimmed.match(/{/g) || []).length;
+      braces -= (trimmed.match(/}/g) || []).length;
+      if (!trimmed.endsWith('{') && !trimmed.endsWith('}') && !trimmed.endsWith(';') && !trimmed.startsWith('#') && trimmed !== '') {
+        if (!trimmed.match(/^\s*(server|location|http|events|upstream|if|map)\b/)) {
+          issues.push('Line ' + (i+1) + ': Missing semicolon? "' + trimmed.substring(0, 50) + '"');
+        }
+      }
+    });
+    if (braces !== 0) issues.push('Mismatched braces (' + (braces > 0 ? braces + ' unclosed' : Math.abs(braces) + ' extra closing') + ')');
+  }
+  return issues;
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

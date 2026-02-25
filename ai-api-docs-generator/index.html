@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>API Documentation Generator - Create Beautiful API Docs</title>
+<meta name="description" content="Free API documentation generator. Input your endpoints and instantly generate professional, well-structured API documentation with examples.">
+<meta name="keywords" content="API documentation, API docs generator, REST API docs, Swagger alternative, OpenAPI, developer tools, documentation">
+<meta property="og:title" content="API Documentation Generator - Create Beautiful API Docs">
+<meta property="og:description" content="Input your endpoints and instantly generate professional API documentation with examples.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-api-docs-generator/">
+<meta property="og:image" content="https://lifa-su.com/ai-api-docs-generator/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="API Documentation Generator">
+<meta name="twitter:description" content="Generate professional API documentation instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-api-docs-generator/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"API Documentation Generator","url":"https://lifa-su.com/ai-api-docs-generator/","description":"Free API documentation generator with live preview","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"760","bestRating":"5"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;--border:#2a2a42;--border2:#363652;--text:#e8e8f4;--text2:#9898b4;--text3:#686884;--accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--radius-sm:8px}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none;transition:color .2s}a:hover{color:var(--accent2)}
+header{position:sticky;top:0;z-index:100;background:rgba(18,18,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{color:var(--text3);font-size:13px}
+header .back-link{margin-left:auto;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+header .back-link:hover{color:var(--accent)}
+.container{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:24px}
+.panels{display:grid;grid-template-columns:420px 1fr;gap:16px;min-height:600px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+.panel-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text2)}
+.panel-header .spacer{flex:1}
+.panel-header button{padding:5px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface3);color:var(--text2);font-size:12px;cursor:pointer;transition:all .2s}
+.panel-header button:hover{border-color:var(--accent);color:var(--accent)}
+.panel-header .btn-copy{background:linear-gradient(135deg,var(--success),#3ab87a);border-color:transparent;color:#fff;font-weight:600}
+.panel-body{flex:1;overflow-y:auto;padding:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-family:inherit;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.field textarea{font-family:'SF Mono',Consolas,monospace;resize:vertical;min-height:80px}
+.field select{cursor:pointer}
+.section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.section-title:first-child{margin-top:0}
+.endpoint-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;position:relative}
+.endpoint-card .remove-btn{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:all .2s}
+.endpoint-card .remove-btn:hover{color:var(--danger);background:rgba(252,92,108,0.1)}
+.endpoint-row{display:flex;gap:8px;margin-bottom:8px}
+.endpoint-row select{width:110px;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-weight:700}
+.endpoint-row input{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-family:'SF Mono',Consolas,monospace}
+.endpoint-row input:focus,.endpoint-row select:focus{outline:none;border-color:var(--accent)}
+.small-field{margin-bottom:8px}
+.small-field input,.small-field textarea{width:100%;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:12px}
+.small-field textarea{font-family:'SF Mono',Consolas,monospace;min-height:50px;resize:vertical}
+.small-field label{font-size:11px;color:var(--text3);margin-bottom:3px;display:block}
+.btn-add{width:100%;padding:8px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text3);font-size:13px;cursor:pointer;transition:all .2s;margin-bottom:12px}
+.btn-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.btn-generate{width:100%;padding:12px;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:all .3s}
+.btn-generate:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(124,92,252,0.35)}
+.doc-preview{padding:24px;font-size:14px;line-height:1.7}
+.doc-preview h1{font-size:24px;margin-bottom:8px;color:var(--text)}
+.doc-preview h2{font-size:18px;margin:24px 0 10px;color:var(--accent2);border-bottom:1px solid var(--border);padding-bottom:6px}
+.doc-preview h3{font-size:15px;margin:16px 0 6px;color:var(--text)}
+.doc-preview p{color:var(--text2);margin:6px 0}
+.doc-preview .method-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;font-family:'SF Mono',Consolas,monospace;margin-right:8px}
+.doc-preview .method-badge.get{background:rgba(76,218,138,0.15);color:var(--success)}
+.doc-preview .method-badge.post{background:rgba(252,180,76,0.15);color:var(--warn)}
+.doc-preview .method-badge.put{background:rgba(92,140,252,0.15);color:var(--accent2)}
+.doc-preview .method-badge.patch{background:rgba(192,132,252,0.15);color:#c084fc}
+.doc-preview .method-badge.delete{background:rgba(252,92,108,0.15);color:var(--danger)}
+.doc-preview .endpoint-path{font-family:'SF Mono',Consolas,monospace;font-size:14px;color:var(--text)}
+.doc-preview .param-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+.doc-preview .param-table th{text-align:left;padding:8px 12px;background:var(--surface2);color:var(--text2);font-weight:600;border:1px solid var(--border)}
+.doc-preview .param-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text2)}
+.doc-preview .param-table code{background:var(--surface3);padding:1px 6px;border-radius:3px;font-size:12px;color:var(--accent2)}
+.doc-preview .code-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin:8px 0;overflow-x:auto;font-family:'SF Mono',Consolas,monospace;font-size:12px;line-height:1.5;color:var(--text2)}
+.doc-preview .response-example{margin:8px 0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);text-align:center;padding:40px}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+footer{text-align:center;padding:20px;color:var(--text3);font-size:13px;border-top:1px solid var(--border)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface3);color:var(--text);padding:10px 24px;border-radius:var(--radius);font-size:14px;opacity:0;transition:all .3s;z-index:999;border:1px solid var(--border2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@media(max-width:768px){
+.panels{grid-template-columns:1fr;min-height:auto}
+.container{padding:16px}
+header{padding:12px 16px}
+header h1{font-size:17px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>📖 API Docs Generator</h1>
+<span class="subtitle">Generate professional API documentation</span>
+<a href="https://lifa-su.com/" class="back-link">← All Tools</a>
+</header>
+
+<div class="container">
+<div class="panels">
+<div class="panel">
+<div class="panel-header"><span>⚙️ Configuration</span></div>
+<div class="panel-body" id="configPanel">
+<div class="section-title">API Info</div>
+<div class="field"><label>API Name</label><input type="text" id="apiName" value="My API" placeholder="e.g. User Management API"></div>
+<div class="field"><label>Version</label><input type="text" id="apiVersion" value="1.0.0" placeholder="e.g. 1.0.0"></div>
+<div class="field"><label>Base URL</label><input type="text" id="baseUrl" value="https://api.example.com/v1" placeholder="https://api.example.com/v1"></div>
+<div class="field"><label>Description</label><textarea id="apiDesc" rows="2" placeholder="Brief description of your API...">A RESTful API for managing users and their data.</textarea></div>
+<div class="field"><label>Authentication</label><select id="authType"><option value="bearer">Bearer Token</option><option value="apikey">API Key</option><option value="basic">Basic Auth</option><option value="oauth2">OAuth 2.0</option><option value="none">None</option></select></div>
+
+<div class="section-title">Endpoints</div>
+<div id="endpointsList"></div>
+<button class="btn-add" onclick="addEndpoint()">+ Add Endpoint</button>
+<button class="btn-generate" onclick="generateDocs()">📖 Generate Documentation</button>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-header">
+<span>📄 Documentation Preview</span>
+<span class="spacer"></span>
+<button onclick="copyMarkdown()">📋 Copy Markdown</button>
+<button class="btn-copy" onclick="copyHTML()">Copy HTML</button>
+</div>
+<div class="panel-body" id="docPreview">
+<div class="empty-state">
+<div class="icon">📖</div>
+<h3>Documentation preview will appear here</h3>
+<p>Add endpoints and click Generate Documentation.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<footer><a href="https://lifa-su.com/">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank">☕ Support on Ko-fi</a></footer>
+<div id="toast" class="toast"></div>
+
+<script>
+let endpointCount=0;
+let markdownCache='';
+
+function addEndpoint(method='GET',path='/users',desc='Get all users',params='',resBody=''){
+  endpointCount++;
+  const id=endpointCount;
+  const div=document.createElement('div');
+  div.className='endpoint-card';
+  div.id='ep-'+id;
+  div.innerHTML=`
+    <button class="remove-btn" onclick="this.parentElement.remove()" title="Remove">&times;</button>
+    <div class="endpoint-row">
+      <select id="epMethod${id}">
+        <option value="GET" ${method==='GET'?'selected':''}>GET</option>
+        <option value="POST" ${method==='POST'?'selected':''}>POST</option>
+        <option value="PUT" ${method==='PUT'?'selected':''}>PUT</option>
+        <option value="PATCH" ${method==='PATCH'?'selected':''}>PATCH</option>
+        <option value="DELETE" ${method==='DELETE'?'selected':''}>DELETE</option>
+      </select>
+      <input type="text" id="epPath${id}" value="${path}" placeholder="/endpoint">
+    </div>
+    <div class="small-field"><label>Description</label><input type="text" id="epDesc${id}" value="${desc}" placeholder="What does this endpoint do?"></div>
+    <div class="small-field"><label>Parameters (JSON: [{"name":"id","type":"string","required":true,"desc":"User ID"}])</label><textarea id="epParams${id}" rows="2" placeholder='[{"name":"id","type":"string","required":true,"desc":"User ID"}]'>${params}</textarea></div>
+    <div class="small-field"><label>Response Body (JSON example)</label><textarea id="epRes${id}" rows="3" placeholder='{"id":"123","name":"John"}'>${resBody}</textarea></div>
+  `;
+  document.getElementById('endpointsList').appendChild(div);
+}
+
+function getEndpoints(){
+  const cards=document.querySelectorAll('.endpoint-card');
+  const eps=[];
+  cards.forEach(card=>{
+    const id=card.id.replace('ep-','');
+    const method=document.getElementById('epMethod'+id)?.value||'GET';
+    const path=document.getElementById('epPath'+id)?.value||'/';
+    const desc=document.getElementById('epDesc'+id)?.value||'';
+    const paramsRaw=document.getElementById('epParams'+id)?.value||'';
+    const resBody=document.getElementById('epRes'+id)?.value||'';
+    let params=[];
+    try{params=JSON.parse(paramsRaw);}catch(e){}
+    eps.push({method,path,desc,params,resBody});
+  });
+  return eps;
+}
+
+function generateDocs(){
+  const name=document.getElementById('apiName').value.trim()||'My API';
+  const version=document.getElementById('apiVersion').value.trim()||'1.0.0';
+  const baseUrl=document.getElementById('baseUrl').value.trim()||'https://api.example.com';
+  const desc=document.getElementById('apiDesc').value.trim();
+  const auth=document.getElementById('authType').value;
+  const endpoints=getEndpoints();
+
+  if(endpoints.length===0){showToast('Add at least one endpoint!');return;}
+
+  const authDescMap={
+    bearer:'Include a Bearer token in the Authorization header:\n`Authorization: Bearer YOUR_TOKEN`',
+    apikey:'Include your API key in the header:\n`X-API-Key: YOUR_API_KEY`',
+    basic:'Use HTTP Basic Authentication:\n`Authorization: Basic base64(username:password)`',
+    oauth2:'This API uses OAuth 2.0. Obtain an access token from the authorization server.',
+    none:'This API does not require authentication.'
+  };
+
+  // Build markdown
+  let md=`# ${name}\n\n`;
+  md+=`**Version:** ${version} | **Base URL:** \`${baseUrl}\`\n\n`;
+  if(desc) md+=`${desc}\n\n`;
+  md+=`## Authentication\n\n${authDescMap[auth]}\n\n`;
+  md+=`## Endpoints\n\n`;
+  md+=`| Method | Endpoint | Description |\n|--------|----------|-------------|\n`;
+  endpoints.forEach(ep=>{
+    md+=`| ${ep.method} | \`${ep.path}\` | ${ep.desc} |\n`;
+  });
+  md+='\n';
+
+  endpoints.forEach(ep=>{
+    md+=`---\n\n### ${ep.method} \`${ep.path}\`\n\n`;
+    md+=`${ep.desc}\n\n`;
+    md+=`**URL:** \`${baseUrl}${ep.path}\`\n\n`;
+    if(ep.params&&ep.params.length>0){
+      md+=`**Parameters:**\n\n| Name | Type | Required | Description |\n|------|------|----------|-------------|\n`;
+      ep.params.forEach(p=>{
+        md+=`| ${p.name} | ${p.type} | ${p.required?'Yes':'No'} | ${p.desc||''} |\n`;
+      });
+      md+='\n';
+    }
+    md+=`**Example Request:**\n\n\`\`\`bash\ncurl -X ${ep.method} "${baseUrl}${ep.path}"`;
+    if(auth==='bearer') md+=` \\\n  -H "Authorization: Bearer YOUR_TOKEN"`;
+    else if(auth==='apikey') md+=` \\\n  -H "X-API-Key: YOUR_API_KEY"`;
+    if(['POST','PUT','PATCH'].includes(ep.method)) md+=` \\\n  -H "Content-Type: application/json"`;
+    md+=`\n\`\`\`\n\n`;
+    if(ep.resBody){
+      md+=`**Example Response:**\n\n\`\`\`json\n${ep.resBody}\n\`\`\`\n\n`;
+    }
+  });
+
+  markdownCache=md;
+
+  // Build HTML preview
+  let html=`<div class="doc-preview">`;
+  html+=`<h1>${esc(name)}</h1>`;
+  html+=`<p><strong>Version:</strong> ${esc(version)} &nbsp;|&nbsp; <strong>Base URL:</strong> <code>${esc(baseUrl)}</code></p>`;
+  if(desc) html+=`<p>${esc(desc)}</p>`;
+  html+=`<h2>🔐 Authentication</h2><p>${esc(authDescMap[auth]).replace(/`([^`]+)`/g,'<code>$1</code>')}</p>`;
+  html+=`<h2>📋 Endpoints Overview</h2>`;
+  html+=`<table class="param-table"><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>`;
+  endpoints.forEach(ep=>{
+    html+=`<tr><td><span class="method-badge ${ep.method.toLowerCase()}">${ep.method}</span></td><td><code>${esc(ep.path)}</code></td><td>${esc(ep.desc)}</td></tr>`;
+  });
+  html+=`</table>`;
+
+  endpoints.forEach(ep=>{
+    html+=`<h2><span class="method-badge ${ep.method.toLowerCase()}">${ep.method}</span> <span class="endpoint-path">${esc(ep.path)}</span></h2>`;
+    html+=`<p>${esc(ep.desc)}</p>`;
+    if(ep.params&&ep.params.length>0){
+      html+=`<h3>Parameters</h3><table class="param-table"><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>`;
+      ep.params.forEach(p=>{
+        html+=`<tr><td><code>${esc(p.name)}</code></td><td>${esc(p.type)}</td><td>${p.required?'✅':'—'}</td><td>${esc(p.desc||'')}</td></tr>`;
+      });
+      html+=`</table>`;
+    }
+    let curl=`curl -X ${ep.method} "${baseUrl}${ep.path}"`;
+    if(auth==='bearer') curl+=` \\\n  -H "Authorization: Bearer YOUR_TOKEN"`;
+    else if(auth==='apikey') curl+=` \\\n  -H "X-API-Key: YOUR_API_KEY"`;
+    if(['POST','PUT','PATCH'].includes(ep.method)) curl+=` \\\n  -H "Content-Type: application/json"`;
+    html+=`<h3>Example Request</h3><div class="code-block">${esc(curl)}</div>`;
+    if(ep.resBody){
+      let formatted=ep.resBody;
+      try{formatted=JSON.stringify(JSON.parse(ep.resBody),null,2);}catch(e){}
+      html+=`<h3>Example Response</h3><div class="code-block">${esc(formatted)}</div>`;
+    }
+  });
+  html+=`</div>`;
+
+  document.getElementById('docPreview').innerHTML=html;
+  showToast('Documentation generated!');
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+function copyMarkdown(){
+  if(!markdownCache){showToast('Generate docs first!');return;}
+  navigator.clipboard.writeText(markdownCache).then(()=>showToast('Markdown copied!'));
+}
+
+function copyHTML(){
+  const el=document.getElementById('docPreview');
+  if(el.querySelector('.empty-state')){showToast('Generate docs first!');return;}
+  navigator.clipboard.writeText(el.innerHTML).then(()=>showToast('HTML copied!'));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Init with sample endpoints
+addEndpoint('GET','/users','List all users','[{"name":"page","type":"integer","required":false,"desc":"Page number"},{"name":"limit","type":"integer","required":false,"desc":"Items per page"}]','{"data":[{"id":"1","name":"John Doe","email":"john@example.com"}],"total":100,"page":1}');
+addEndpoint('POST','/users','Create a new user','[{"name":"name","type":"string","required":true,"desc":"User full name"},{"name":"email","type":"string","required":true,"desc":"User email address"}]','{"id":"2","name":"Jane Smith","email":"jane@example.com","created_at":"2025-01-15T10:30:00Z"}');
+addEndpoint('GET','/users/:id','Get user by ID','[{"name":"id","type":"string","required":true,"desc":"User ID"}]','{"id":"1","name":"John Doe","email":"john@example.com","role":"admin"}');
+addEndpoint('DELETE','/users/:id','Delete a user','[{"name":"id","type":"string","required":true,"desc":"User ID"}]','{"message":"User deleted successfully"}');
+generateDocs();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

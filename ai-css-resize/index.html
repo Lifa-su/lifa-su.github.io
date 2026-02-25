@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Resize Property Demo - Interactive Playground</title>
+<meta name="description" content="Interactive CSS resize property demo. Compare none, both, horizontal, vertical resize modes with live code generation.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-resize/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--tx:#eee;--td:#999;--bd:#2a2a4a;--ok:#00d2ff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.hd{text-align:center;padding:2rem 1rem 1rem}
+.hd h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ok),var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hd p{color:var(--td);margin-top:.4rem;font-size:.95rem}
+.ctl{max-width:900px;margin:1.5rem auto;padding:0 1rem}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.2rem}
+.ci label{display:block;font-size:.75rem;color:var(--td);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem}
+.ci input[type=number]{width:100%;padding:.5rem;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:.9rem;outline:none}
+.ci input:focus{border-color:var(--ok)}
+.ds{max-width:900px;margin:1.5rem auto;padding:0 1rem}
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:1.2rem}
+@media(max-width:500px){.dg{grid-template-columns:1fr}}
+.dc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.2rem}
+.dc:hover{border-color:var(--ac)}
+.dc h3{font-size:.95rem;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.badge{font-size:.7rem;padding:.15rem .5rem;border-radius:20px;background:var(--ac);color:#fff;font-weight:400}
+.rb{background:var(--cd);border:2px dashed var(--bd);border-radius:8px;padding:1rem;overflow:auto;position:relative;width:250px;height:120px}
+.rb:active{border-color:var(--ok)}
+.rb .it{color:var(--td);font-size:.8rem;user-select:none}
+.rb .dh{position:absolute;bottom:4px;right:8px;font-size:.65rem;color:var(--td);opacity:.6}
+.r-n{resize:none}.r-b{resize:both}.r-h{resize:horizontal}.r-v{resize:vertical}
+.cs{max-width:900px;margin:1.5rem auto;padding:0 1rem}
+.cb{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.2rem;position:relative}
+.cb h3{font-size:.95rem;margin-bottom:.8rem}
+.cb pre{background:var(--bg);border-radius:8px;padding:1rem;overflow-x:auto;font-size:.85rem;line-height:1.7;color:var(--ok);font-family:'SF Mono',Monaco,Consolas,monospace}
+.cp{position:absolute;top:1rem;right:1rem;padding:.4rem .8rem;background:var(--ac);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.8rem}
+.cp:hover{background:#ff6b81}.cp.ok{background:#27ae60}
+.ft{text-align:center;padding:2rem 1rem;color:var(--td);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="hd"><h1>CSS Resize Property</h1><p>Interactive demo — drag the corners to see each resize mode in action</p></div>
+<div class="ctl"><div class="cg">
+<div class="ci"><label>Min Width (px)</label><input type="number" id="minW" value="120" min="0" max="800" step="10"></div>
+<div class="ci"><label>Max Width (px)</label><input type="number" id="maxW" value="500" min="0" max="1200" step="10"></div>
+<div class="ci"><label>Min Height (px)</label><input type="number" id="minH" value="80" min="0" max="600" step="10"></div>
+<div class="ci"><label>Max Height (px)</label><input type="number" id="maxH" value="400" min="0" max="800" step="10"></div>
+</div></div>
+<div class="ds"><div class="dg">
+<div class="dc"><h3>resize: none <span class="badge">Default</span></h3><div class="rb r-n" id="box-none"><div class="it">This element cannot be resized. Default behavior for most elements.</div></div></div>
+<div class="dc"><h3>resize: both <span class="badge" style="background:var(--ok);color:#000">Popular</span></h3><div class="rb r-b" id="box-both"><div class="it">Drag bottom-right corner to resize freely.</div><div class="dh">&#8600; drag</div></div></div>
+<div class="dc"><h3>resize: horizontal</h3><div class="rb r-h" id="box-horiz"><div class="it">Only horizontal resizing allowed.</div><div class="dh">&#8594; drag</div></div></div>
+<div class="dc"><h3>resize: vertical</h3><div class="rb r-v" id="box-vert"><div class="it">Only vertical resizing allowed.</div><div class="dh">&#8595; drag</div></div></div>
+</div></div>
+<div class="cs"><div class="cb"><h3>Generated CSS</h3><button class="cp" onclick="copyCSS()">Copy</button><pre id="codeOut"></pre></div></div>
+<div class="ft">CSS Resize Property Demo &mdash; No dependencies, pure HTML/CSS/JS</div>
+<script>
+const ids={minW:'minW',maxW:'maxW',minH:'minH',maxH:'maxH'};
+const boxes=document.querySelectorAll('.rb');
+function val(id){return parseInt(document.getElementById(id).value)||0}
+function update(){
+  const mw=val('minW'),xw=val('maxW'),mh=val('minH'),xh=val('maxH');
+  boxes.forEach(b=>{b.style.minWidth=mw+'px';b.style.maxWidth=xw+'px';b.style.minHeight=mh+'px';b.style.maxHeight=xh+'px'});
+  const modes=['none','both','horizontal','vertical'];
+  let css='';
+  modes.forEach(m=>{css+=`.resizable-${m} {\n  resize: ${m};\n  overflow: auto;\n  min-width: ${mw}px;\n  max-width: ${xw}px;\n  min-height: ${mh}px;\n  max-height: ${xh}px;\n}\n\n`});
+  document.getElementById('codeOut').textContent=css.trim();
+}
+Object.values(ids).forEach(id=>{document.getElementById(id).addEventListener('input',update)});
+update();
+function copyCSS(){
+  const btn=document.querySelector('.cp');
+  navigator.clipboard.writeText(document.getElementById('codeOut').textContent).then(()=>{btn.textContent='Copied!';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},2000)});
+}
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

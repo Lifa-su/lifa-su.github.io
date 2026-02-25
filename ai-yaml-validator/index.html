@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI YAML Validator - Online YAML Validation & Conversion Tool</title>
+<meta name="description" content="Free online YAML validator, formatter, and converter. Validate YAML syntax, convert between YAML and JSON, format and minify YAML instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-yaml-validator/">
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--success:#00d2a0;--error:#ff6b6b;--border:#2a2a4a;--line-bg:#111;--mono:'Menlo','Consolas','Courier New',monospace}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+header h1{font-size:1.4rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header h1 span{font-size:.8rem;color:var(--text2);-webkit-text-fill-color:var(--text2)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.toolbar button{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .2s;white-space:nowrap}
+.toolbar button:hover{background:var(--accent2);border-color:var(--accent2)}
+.toolbar button.primary{background:var(--accent);border-color:var(--accent)}
+.toolbar button.primary:hover{opacity:.85}
+main{flex:1;display:flex;gap:0;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;min-width:0}
+.panel-header{background:var(--surface);padding:10px 16px;font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:.75rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.badge.valid{background:rgba(0,210,160,.15);color:var(--success)}
+.badge.invalid{background:rgba(255,107,107,.15);color:var(--error)}
+.badge.idle{background:rgba(170,170,170,.1);color:var(--text2)}
+.editor-wrap{flex:1;display:flex;overflow:auto;background:var(--line-bg);position:relative}
+.line-numbers{padding:12px 0;text-align:right;color:#555;font:13px/1.6 var(--mono);user-select:none;min-width:44px;padding-right:10px;background:rgba(0,0,0,.2);border-right:1px solid var(--border);flex-shrink:0}
+.editor-container{flex:1;position:relative}
+textarea{width:100%;height:100%;background:transparent;color:var(--text);border:none;outline:none;resize:none;font:13px/1.6 var(--mono);padding:12px;tab-size:2;position:absolute;top:0;left:0}
+.highlight-layer{position:absolute;top:0;left:0;right:0;padding:12px;font:13px/1.6 var(--mono);pointer-events:none;white-space:pre-wrap;word-wrap:break-word;color:transparent}
+.highlight-layer .err-line{background:rgba(255,107,107,.12);display:inline-block;width:100%;border-left:3px solid var(--error);padding-left:9px;margin-left:-12px}
+.divider{width:1px;background:var(--border);flex-shrink:0}
+.output-content{flex:1;overflow:auto;padding:12px;font:13px/1.6 var(--mono);white-space:pre-wrap;word-wrap:break-word;background:var(--line-bg);color:var(--text)}
+.error-panel{background:rgba(255,107,107,.08);border-top:1px solid var(--border);padding:12px 16px;font-size:.85rem;color:var(--error);max-height:120px;overflow:auto;display:none}
+.error-panel.show{display:block}
+footer{background:var(--surface);padding:10px 24px;text-align:center;font-size:.75rem;color:var(--text2);border-top:1px solid var(--border)}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:768px){main{flex-direction:column}.divider{width:auto;height:1px}.editor-wrap,.output-content{min-height:35vh}header{padding:12px 16px}header h1{font-size:1.1rem}.toolbar button{padding:6px 10px;font-size:.8rem}}
+</style>
+</head>
+<body>
+<header>
+<h1>&#9889; YAML Validator <span>| Online Tool</span></h1>
+<div class="toolbar">
+<button class="primary" onclick="validateYAML()">&#10003; Validate</button>
+<button onclick="toJSON()">YAML&#8594;JSON</button>
+<button onclick="toYAML()">JSON&#8594;YAML</button>
+<button onclick="formatYAML()">Format</button>
+<button onclick="minifyYAML()">Minify</button>
+<button onclick="clearAll()">Clear</button>
+<button onclick="copyOutput()">Copy</button>
+</div>
+</header>
+<main>
+<div class="panel">
+<div class="panel-header"><span>&#128221; Input (YAML/JSON)</span><span id="status" class="badge idle">Ready</span></div>
+<div class="editor-wrap"><div class="line-numbers" id="lineNums">1</div><div class="editor-container"><div class="highlight-layer" id="hl"></div><textarea id="inp" spellcheck="false" placeholder="Paste your YAML here..."></textarea></div></div>
+<div class="error-panel" id="ep"></div>
+</div>
+<div class="divider"></div>
+<div class="panel">
+<div class="panel-header"><span>&#128196; Output</span><span id="oi" class="badge idle">&mdash;</span></div>
+<div class="output-content" id="out">Output will appear here...</div>
+</div>
+</main>
+<footer>Built with &#10084;&#65039; &mdash; <a href="https://github.com/Lifa-su/ai-yaml-validator" target="_blank">GitHub</a></footer>
+<script>
+(function(){
+var inp=document.getElementById('inp'),out=document.getElementById('out'),
+ln=document.getElementById('lineNums'),st=document.getElementById('status'),
+oi=document.getElementById('oi'),ep=document.getElementById('ep'),
+hl=document.getElementById('hl'),timer;
+
+function updateLines(){
+  var n=inp.value.split('\n').length,s='';
+  for(var i=1;i<=n;i++)s+=i+'\n';
+  ln.textContent=s;
+}
+
+function setStatus(type,text){
+  st.className='badge '+type;
+  st.textContent=text;
+}
+
+function setOutput(type,text,info){
+  oi.className='badge '+(type||'idle');
+  oi.textContent=info||'\u2014';
+  out.textContent=text;
+}
+
+function showError(msg,line){
+  ep.innerHTML='<strong>Error'+(line?' (line '+line+')':'')+':</strong> '+msg;
+  ep.classList.add('show');
+  if(line){
+    var lines=inp.value.split('\n');
+    var h='';
+    for(var i=0;i<lines.length;i++){
+      if(i===line-1)h+='<span class="err-line">'+escHtml(lines[i])+'</span>\n';
+      else h+=escHtml(lines[i])+'\n';
+    }
+    hl.innerHTML=h;
+  }
+}
+
+function clearError(){
+  ep.classList.remove('show');
+  ep.innerHTML='';
+  hl.innerHTML='';
+}
+
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function parse(val){
+  if(!val.trim()){setStatus('idle','Ready');clearError();return null;}
+  try{
+    var d=jsyaml.load(val);
+    setStatus('valid','Valid YAML');
+    clearError();
+    return d;
+  }catch(e){
+    setStatus('invalid','Invalid');
+    showError(e.message,e.mark?e.mark.line+1:null);
+    return undefined;
+  }
+}
+
+window.validateYAML=function(){
+  var v=inp.value;
+  if(!v.trim()){setOutput('idle','Enter YAML to validate');return;}
+  var d=parse(v);
+  if(d===undefined)setOutput('invalid','Validation failed - see errors above','Error');
+  else if(d===null)setOutput('idle','Empty input');
+  else setOutput('valid','YAML is valid!\n\nParsed structure:\n'+JSON.stringify(d,null,2),'Valid');
+};
+
+window.toJSON=function(){
+  var d=parse(inp.value);
+  if(d===undefined)setOutput('invalid','Fix YAML errors first','Error');
+  else if(d===null)setOutput('idle','Empty input');
+  else setOutput('valid',JSON.stringify(d,null,2),'JSON');
+};
+
+window.toYAML=function(){
+  var v=inp.value.trim();
+  if(!v){setOutput('idle','Empty input');return;}
+  try{
+    var d=JSON.parse(v);
+    var y=jsyaml.dump(d,{indent:2,lineWidth:120});
+    setOutput('valid',y,'YAML');
+    setStatus('valid','Valid JSON input');
+    clearError();
+  }catch(e){
+    try{
+      var d2=jsyaml.load(v);
+      var y2=jsyaml.dump(d2,{indent:2,lineWidth:120});
+      setOutput('valid',y2,'YAML');
+    }catch(e2){
+      setOutput('invalid','Cannot parse input as JSON or YAML','Error');
+      setStatus('invalid','Invalid');
+      showError(e.message,null);
+    }
+  }
+};
+
+window.formatYAML=function(){
+  var d=parse(inp.value);
+  if(d===undefined)setOutput('invalid','Fix YAML errors first','Error');
+  else if(d===null)setOutput('idle','Empty input');
+  else{
+    var y=jsyaml.dump(d,{indent:2,lineWidth:120,sortKeys:false});
+    setOutput('valid',y,'Formatted');
+  }
+};
+
+window.minifyYAML=function(){
+  var d=parse(inp.value);
+  if(d===undefined)setOutput('invalid','Fix YAML errors first','Error');
+  else if(d===null)setOutput('idle','Empty input');
+  else{
+    var y=jsyaml.dump(d,{flowLevel:0,lineWidth:-1});
+    setOutput('valid',y.trim(),'Minified');
+  }
+};
+
+window.clearAll=function(){
+  inp.value='';out.textContent='Output will appear here...';
+  setStatus('idle','Ready');setOutput('idle','');
+  clearError();updateLines();
+};
+
+window.copyOutput=function(){
+  var t=out.textContent;
+  if(!t||t==='Output will appear here...')return;
+  navigator.clipboard.writeText(t).then(function(){
+    var prev=oi.textContent;
+    oi.textContent='Copied!';
+    setTimeout(function(){oi.textContent=prev;},1500);
+  });
+};
+
+inp.addEventListener('input',function(){
+  updateLines();
+  clearTimeout(timer);
+  timer=setTimeout(function(){parse(inp.value);},300);
+});
+
+inp.addEventListener('scroll',function(){
+  hl.style.transform='translateY(-'+inp.scrollTop+'px)';
+});
+
+inp.addEventListener('keydown',function(e){
+  if(e.key==='Tab'){
+    e.preventDefault();
+    var s=this.selectionStart,end=this.selectionEnd;
+    this.value=this.value.substring(0,s)+'  '+this.value.substring(end);
+    this.selectionStart=this.selectionEnd=s+2;
+    updateLines();
+  }
+});
+
+updateLines();
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

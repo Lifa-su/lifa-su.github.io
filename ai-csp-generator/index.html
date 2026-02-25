@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSP Generator - Content Security Policy Builder &amp; Tester</title>
+<meta name="description" content="Free online Content Security Policy (CSP) generator. Visually configure CSP directives, test URLs, load presets, and export as HTTP headers or meta tags.">
+<meta name="keywords" content="CSP, Content Security Policy, generator, builder, security, HTTP headers, web security">
+<meta property="og:title" content="AI CSP Generator - Content Security Policy Builder">
+<meta property="og:description" content="Visually build and test Content Security Policies with presets, URL validation, and one-click copy.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-csp-generator/">
+<link rel="canonical" href="https://lifa-su.com/ai-csp-generator/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f6e1;&#xfe0f;</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--card:#1e2746;--card2:#243054;--accent:#e94560;--accent2:#ff6b6b;--green:#00d2d3;--blue:#54a0ff;--yellow:#feca57;--text:#e8e8e8;--text2:#a0a0b8;--border:#2a2a4a;--radius:12px;--shadow:0 4px 20px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(135deg,var(--bg2),var(--bg3));padding:30px 0;text-align:center;border-bottom:2px solid var(--accent)}
+header h1{font-size:2rem;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:1rem}
+.shield-icon{font-size:2.5rem;margin-bottom:10px}
+main{padding:30px 0 60px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card h2{font-size:1.15rem;margin-bottom:16px;color:var(--green);display:flex;align-items:center;gap:8px}
+.card h3{font-size:1rem;margin:12px 0 8px;color:var(--blue)}
+.presets{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.875rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-green{background:var(--green);color:#111}
+.btn-green:hover{opacity:.85;transform:translateY(-1px)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{opacity:.85;transform:translateY(-1px)}
+.btn-yellow{background:var(--yellow);color:#111}
+.btn-yellow:hover{opacity:.85;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:5px 12px;font-size:.8rem}
+.btn-copy{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn-copy:hover{border-color:var(--green);color:var(--green)}
+.btn-copy.copied{background:var(--green);color:#111;border-color:var(--green)}
+.directive-block{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.directive-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.directive-name{font-weight:700;color:var(--yellow);font-family:'Courier New',monospace;font-size:.95rem}
+.directive-desc{font-size:.78rem;color:var(--text2);margin-bottom:10px}
+.source-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tag{display:inline-flex;align-items:center;gap:4px;background:var(--bg3);color:var(--text);padding:4px 10px;border-radius:6px;font-size:.82rem;font-family:'Courier New',monospace}
+.tag .remove{cursor:pointer;color:var(--accent);font-weight:700;margin-left:4px;font-size:1rem;line-height:1}
+.tag .remove:hover{color:var(--accent2)}
+.add-source{display:flex;gap:6px}
+.add-source input{flex:1;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem;font-family:'Courier New',monospace}
+.add-source input:focus{outline:none;border-color:var(--accent)}
+.quick-sources{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.quick-src{padding:3px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-size:.75rem;cursor:pointer;color:var(--text2);font-family:'Courier New',monospace;transition:all .15s}
+.quick-src:hover{border-color:var(--green);color:var(--green)}
+.output-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:.85rem;word-break:break-all;white-space:pre-wrap;position:relative;min-height:60px;color:var(--green);line-height:1.5}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.test-section{margin-top:16px}
+.test-input{display:flex;gap:8px;margin-bottom:12px}
+.test-input input{flex:1;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9rem}
+.test-input input:focus{outline:none;border-color:var(--accent)}
+.test-result{padding:12px;border-radius:8px;font-size:.9rem;display:none}
+.test-result.allowed{display:block;background:rgba(0,210,211,.1);border:1px solid var(--green);color:var(--green)}
+.test-result.blocked{display:block;background:rgba(233,69,96,.1);border:1px solid var(--accent);color:var(--accent)}
+.directives-scroll{max-height:600px;overflow-y:auto;padding-right:4px}
+.directives-scroll::-webkit-scrollbar{width:6px}
+.directives-scroll::-webkit-scrollbar-track{background:var(--bg)}
+.directives-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.doc-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px}
+.doc-item h4{color:var(--yellow);font-family:'Courier New',monospace;font-size:.9rem;margin-bottom:6px}
+.doc-item p{color:var(--text2);font-size:.8rem}
+.select-dir{display:flex;gap:6px;align-items:center}
+.select-dir select{padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}
+footer{text-align:center;padding:30px 0;color:var(--text2);font-size:.85rem;border-top:1px solid var(--border)}
+.clear-all{margin-left:auto}
+.full-width{grid-column:1/-1}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+.tab-btn{padding:8px 16px;background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:.875rem;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green)}
+.tab-btn:hover{color:var(--text)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.toast{position:fixed;bottom:30px;right:30px;background:var(--green);color:#111;padding:12px 24px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<div class="shield-icon">&#x1f6e1;&#xfe0f;</div>
+<h1>AI CSP Generator</h1>
+<p>Content Security Policy Builder &amp; Tester &mdash; Visually configure, test, and export CSP policies</p>
+</div>
+</header>
+<main class="container">
+<div class="card" style="margin-bottom:24px">
+<h2>&#x26a1; Quick Presets</h2>
+<div class="presets">
+<button class="btn btn-accent" onclick="loadPreset('strict')">&#x1f512; Strict</button>
+<button class="btn btn-blue" onclick="loadPreset('moderate')">&#x1f6e1;&#xfe0f; Moderate</button>
+<button class="btn btn-yellow" onclick="loadPreset('relaxed')">&#x1f513; Relaxed</button>
+<button class="btn btn-outline clear-all" onclick="clearAll()">&#x1f5d1;&#xfe0f; Clear All</button>
+</div>
+</div>
+<div class="grid">
+<div class="card">
+<h2>&#x1f527; CSP Directives</h2>
+<div class="directives-scroll" id="directives-container"></div>
+</div>
+<div class="card">
+<div class="tab-bar">
+<button class="tab-btn active" onclick="switchTab('output',this)">&#x1f4cb; Output</button>
+<button class="tab-btn" onclick="switchTab('test',this)">&#x1f9ea; URL Test</button>
+<button class="tab-btn" onclick="switchTab('docs',this)">&#x1f4d6; Docs</button>
+</div>
+<div id="tab-output" class="tab-content active">
+<h3>HTTP Header Format</h3>
+<div class="output-header">
+<span style="color:var(--text2);font-size:.8rem">Content-Security-Policy header</span>
+<button class="btn btn-sm btn-copy" onclick="copyOutput('header')">&#x1f4cb; Copy</button>
+</div>
+<div class="output-box" id="output-header">Configure directives to generate CSP...</div>
+<h3 style="margin-top:16px">HTML Meta Tag Format</h3>
+<div class="output-header">
+<span style="color:var(--text2);font-size:.8rem">&lt;meta&gt; tag for HTML</span>
+<button class="btn btn-sm btn-copy" onclick="copyOutput('meta')">&#x1f4cb; Copy</button>
+</div>
+<div class="output-box" id="output-meta">Configure directives to generate CSP...</div>
+</div>
+<div id="tab-test" class="tab-content">
+<h3>URL Validation Test</h3>
+<p style="color:var(--text2);font-size:.85rem;margin-bottom:12px">Enter a URL to check if it would be allowed by your current CSP policy.</p>
+<div class="select-dir">
+<label style="font-size:.85rem;color:var(--text2)">Directive:</label>
+<select id="test-directive"></select>
+</div>
+<div class="test-input" style="margin-top:10px">
+<input type="text" id="test-url" placeholder="https://example.com/script.js" onkeydown="if(event.key==='Enter')testUrl()">
+<button class="btn btn-green" onclick="testUrl()">Test</button>
+</div>
+<div id="test-result" class="test-result"></div>
+</div>
+<div id="tab-docs" class="tab-content">
+<h3>CSP Directive Reference</h3>
+<div class="doc-grid" id="docs-container"></div>
+</div>
+</div>
+</div>
+</main>
+<footer>
+<div class="container">
+<p>AI CSP Generator &mdash; Open source tool for building Content Security Policies</p>
+<p style="margin-top:6px"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" target="_blank" rel="noopener">MDN CSP Documentation</a> &middot; <a href="https://github.com/Lifa-su/ai-csp-generator" target="_blank" rel="noopener">GitHub</a></p>
+</div>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+const DIRECTIVES=[
+{name:'default-src',desc:'Fallback for other fetch directives. If a specific directive is not set, the browser uses this value.',sources:[]},
+{name:'script-src',desc:'Controls which scripts can be executed. Critical for preventing XSS attacks.',sources:[]},
+{name:'style-src',desc:'Controls which stylesheets can be applied. Prevents CSS injection attacks.',sources:[]},
+{name:'img-src',desc:'Controls which images can be loaded. Includes favicons and image data URIs.',sources:[]},
+{name:'font-src',desc:'Controls which fonts can be loaded. Applies to @font-face declarations.',sources:[]},
+{name:'connect-src',desc:'Controls which URLs can be loaded via scripts (fetch, XHR, WebSocket, EventSource).',sources:[]},
+{name:'frame-src',desc:'Controls which URLs can be embedded in frames and iframes.',sources:[]},
+{name:'media-src',desc:'Controls which media (audio/video) can be loaded via <audio> and <video> elements.',sources:[]},
+{name:'object-src',desc:'Controls which plugins can be loaded (<object>, <embed>, <applet>). Set to none for security.',sources:[]},
+{name:'base-uri',desc:'Restricts URLs that can appear in the <base> element. Prevents base tag hijacking.',sources:[]},
+{name:'form-action',desc:'Restricts URLs that can be used as form submission targets.',sources:[]},
+{name:'frame-ancestors',desc:'Controls which pages can embed this page in frames. Replaces X-Frame-Options. Not supported in meta tags.',sources:[]},
+{name:'worker-src',desc:'Controls which URLs can be loaded as Worker, SharedWorker, or ServiceWorker.',sources:[]},
+{name:'child-src',desc:'Controls which URLs can be loaded for workers and embedded frame contents.',sources:[]},
+{name:'manifest-src',desc:'Controls which manifest files can be loaded.',sources:[]},
+{name:'prefetch-src',desc:'Controls which URLs can be prefetched or prerendered.',sources:[]}
+];
+const COMMON_SOURCES=["'self'","'none'","'unsafe-inline'","'unsafe-eval'","'strict-dynamic'","'unsafe-hashes'","data:","blob:","https:","http:","*"];
+const PRESETS={
+strict:{
+'default-src':["'none'"],
+'script-src':["'self'"],
+'style-src':["'self'"],
+'img-src':["'self'"],
+'font-src':["'self'"],
+'connect-src':["'self'"],
+'frame-src':["'none'"],
+'object-src':["'none'"],
+'base-uri':["'self'"],
+'form-action':["'self'"],
+'frame-ancestors':["'none'"]
+},
+moderate:{
+'default-src':["'self'"],
+'script-src':["'self'","'unsafe-inline'","https:"],
+'style-src':["'self'","'unsafe-inline'","https:"],
+'img-src':["'self'","data:","https:"],
+'font-src':["'self'","https:","data:"],
+'connect-src':["'self'","https:"],
+'frame-src':["'self'","https:"],
+'object-src':["'none'"],
+'base-uri':["'self'"],
+'form-action':["'self'","https:"]
+},
+relaxed:{
+'default-src':["*"],
+'script-src':["*","'unsafe-inline'","'unsafe-eval'"],
+'style-src':["*","'unsafe-inline'"],
+'img-src':["*","data:","blob:"],
+'font-src':["*","data:"],
+'connect-src':["*"],
+'frame-src':["*"],
+'object-src':["*"]
+}
+};
+function init(){
+const container=document.getElementById('directives-container');
+DIRECTIVES.forEach((d,i)=>{
+const block=document.createElement('div');
+block.className='directive-block';
+block.id='dir-'+d.name;
+block.innerHTML=`
+<div class="directive-header">
+<span class="directive-name">${d.name}</span>
+<button class="btn btn-sm btn-outline" onclick="clearDirective(${i})">Clear</button>
+</div>
+<div class="directive-desc">${d.desc}</div>
+<div class="source-tags" id="tags-${i}"></div>
+<div class="add-source">
+<input type="text" id="input-${i}" placeholder="Add source..." onkeydown="if(event.key==='Enter')addSource(${i})">
+<button class="btn btn-sm btn-green" onclick="addSource(${i})">+</button>
+</div>
+<div class="quick-sources">${COMMON_SOURCES.map(s=>`<span class="quick-src" onclick="addQuickSource(${i},'${s.replace(/'/g,"\'")}')">${s}</span>`).join('')}</div>`;
+container.appendChild(block);
+});
+const sel=document.getElementById('test-directive');
+DIRECTIVES.forEach(d=>{
+const opt=document.createElement('option');
+opt.value=d.name;opt.textContent=d.name;
+sel.appendChild(opt);
+});
+renderDocs();
+updateOutput();
+}
+function addSource(idx){
+const input=document.getElementById('input-'+idx);
+const val=input.value.trim();
+if(!val)return;
+if(!DIRECTIVES[idx].sources.includes(val)){
+DIRECTIVES[idx].sources.push(val);
+renderTags(idx);
+updateOutput();
+}
+input.value='';input.focus();
+}
+function addQuickSource(idx,src){
+if(!DIRECTIVES[idx].sources.includes(src)){
+DIRECTIVES[idx].sources.push(src);
+renderTags(idx);
+updateOutput();
+}
+}
+function removeSource(idx,src){
+DIRECTIVES[idx].sources=DIRECTIVES[idx].sources.filter(s=>s!==src);
+renderTags(idx);
+updateOutput();
+}
+function clearDirective(idx){
+DIRECTIVES[idx].sources=[];
+renderTags(idx);
+updateOutput();
+}
+function renderTags(idx){
+const container=document.getElementById('tags-'+idx);
+container.innerHTML=DIRECTIVES[idx].sources.map(s=>`<span class="tag">${s}<span class="remove" onclick="removeSource(${idx},'${s.replace(/'/g,"\'")}')">&times;</span></span>`).join('');
+}
+function clearAll(){
+DIRECTIVES.forEach((d,i)=>{d.sources=[];renderTags(i);});
+updateOutput();
+showToast('All directives cleared');
+}
+function loadPreset(name){
+const preset=PRESETS[name];
+DIRECTIVES.forEach((d,i)=>{
+d.sources=preset[d.name]?[...preset[d.name]]:[];
+renderTags(i);
+});
+updateOutput();
+const labels={strict:'Strict',moderate:'Moderate',relaxed:'Relaxed'};
+showToast(labels[name]+' preset loaded');
+}
+function generateCSP(){
+const parts=[];
+DIRECTIVES.forEach(d=>{
+if(d.sources.length>0){
+parts.push(d.name+' '+d.sources.join(' '));
+}
+});
+return parts.join('; ');
+}
+function updateOutput(){
+const csp=generateCSP();
+const headerEl=document.getElementById('output-header');
+const metaEl=document.getElementById('output-meta');
+if(!csp){
+headerEl.textContent='Configure directives to generate CSP...';
+metaEl.textContent='Configure directives to generate CSP...';
+headerEl.style.color='var(--text2)';
+metaEl.style.color='var(--text2)';
+return;
+}
+headerEl.style.color='var(--green)';
+metaEl.style.color='var(--green)';
+headerEl.textContent='Content-Security-Policy: '+csp;
+const metaCSP=generateCSPForMeta();
+metaEl.textContent='<meta http-equiv="Content-Security-Policy" content="'+metaCSP+'">';
+}
+function generateCSPForMeta(){
+const parts=[];
+DIRECTIVES.forEach(d=>{
+if(d.sources.length>0&&d.name!=='frame-ancestors'){
+parts.push(d.name+' '+d.sources.join(' '));
+}
+});
+return parts.join('; ');
+}
+function copyOutput(type){
+let text='';
+if(type==='header'){
+const csp=generateCSP();
+text=csp?'Content-Security-Policy: '+csp:'';
+}else{
+const csp=generateCSPForMeta();
+text=csp?'<meta http-equiv="Content-Security-Policy" content="'+csp+'">':'';
+}
+if(!text){showToast('Nothing to copy');return;}
+navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!')).catch(()=>showToast('Copy failed'));
+}
+function testUrl(){
+const url=document.getElementById('test-url').value.trim();
+const directive=document.getElementById('test-directive').value;
+const resultEl=document.getElementById('test-result');
+if(!url){resultEl.className='test-result';resultEl.style.display='none';return;}
+const dir=DIRECTIVES.find(d=>d.name===directive);
+let sources=dir.sources;
+if(sources.length===0){
+const def=DIRECTIVES.find(d=>d.name==='default-src');
+sources=def.sources;
+}
+if(sources.length===0){
+resultEl.className='test-result blocked';
+resultEl.innerHTML='<strong>&#x274c; BLOCKED</strong> &mdash; No sources configured for <code>'+directive+'</code> or <code>default-src</code>';
+return;
+}
+const allowed=checkUrlAgainstSources(url,sources);
+if(allowed){
+resultEl.className='test-result allowed';
+resultEl.innerHTML='<strong>&#x2705; ALLOWED</strong> &mdash; <code>'+escHtml(url)+'</code> matches <code>'+directive+'</code> policy';
+}else{
+resultEl.className='test-result blocked';
+resultEl.innerHTML='<strong>&#x274c; BLOCKED</strong> &mdash; <code>'+escHtml(url)+'</code> does not match <code>'+directive+'</code> policy';
+}
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function checkUrlAgainstSources(url,sources){
+for(const src of sources){
+if(src==="*")return true;
+if(src==="'none'")return false;
+if(src==="'self'"){try{const u=new URL(url);if(u.origin===location.origin)return true;}catch(e){}}
+if(src==="data:"&&url.startsWith("data:"))return true;
+if(src==="blob:"&&url.startsWith("blob:"))return true;
+if(src==="https:"&&url.startsWith("https://"))return true;
+if(src==="http:"&&url.startsWith("http://"))return true;
+if(src==="'unsafe-inline'"||src==="'unsafe-eval'"||src==="'strict-dynamic'"||src==="'unsafe-hashes'")continue;
+try{
+const u=new URL(url);
+if(src.startsWith("*.")){
+const domain=src.slice(2);
+if(u.hostname===domain||u.hostname.endsWith("."+domain))return true;
+}else if(src.includes("://")){
+try{const s=new URL(src);if(u.origin===s.origin&&u.pathname.startsWith(s.pathname))return true;}catch(e){}
+}else{
+if(u.hostname===src)return true;
+}
+}catch(e){}
+}
+return false;
+}
+function switchTab(name,btn){
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+document.getElementById('tab-'+name).classList.add('active');
+btn.classList.add('active');
+}
+function renderDocs(){
+const docs=[
+{name:'default-src',text:'Serves as a fallback for the other fetch directives. If a fetch directive is absent, the user agent will look for this directive.'},
+{name:'script-src',text:'Restricts the sources for JavaScript. Includes inline script handlers and XSLT stylesheets. Use nonce or hash for inline scripts.'},
+{name:'style-src',text:'Restricts the sources for stylesheets. Includes inline styles applied via the style attribute.'},
+{name:'img-src',text:'Restricts the sources from which images and favicons can be loaded.'},
+{name:'font-src',text:'Restricts the sources from which fonts can be loaded. Applies to CSS @font-face rules.'},
+{name:'connect-src',text:'Restricts the URLs which can be loaded using script interfaces: fetch, XHR, WebSocket, EventSource, Navigator.sendBeacon().'},
+{name:'frame-src',text:'Restricts the URLs which can be loaded into nested browsing contexts (<frame>, <iframe>).'},
+{name:'media-src',text:'Restricts the URLs from which audio and video resources can be loaded.'},
+{name:'object-src',text:'Restricts the sources for <object>, <embed>, and <applet>. Recommended to set to none.'},
+{name:'base-uri',text:'Restricts the URLs which can be used in the document base URL (<base> element). Prevents base tag hijacking.'},
+{name:'form-action',text:'Restricts the URLs which can be used as the target of form submissions.'},
+{name:'frame-ancestors',text:'Specifies valid parents that may embed a page. Setting to none is similar to X-Frame-Options: DENY. Not valid in <meta> tags.'},
+{name:'worker-src',text:'Restricts the URLs which may be loaded as a Worker, SharedWorker, or ServiceWorker.'},
+{name:'child-src',text:'Defines valid sources for web workers and nested browsing contexts loaded using <frame> and <iframe>.'},
+{name:'manifest-src',text:'Restricts the URLs from which application manifests can be loaded.'},
+{name:'prefetch-src',text:'Restricts the URLs from which resources can be prefetched or prerendered.'}
+];
+const container=document.getElementById('docs-container');
+container.innerHTML=docs.map(d=>`<div class="doc-item"><h4>${d.name}</h4><p>${d.text}</p></div>`).join('');
+}
+function showToast(msg){
+const t=document.getElementById('toast');
+t.textContent=msg;t.classList.add('show');
+setTimeout(()=>t.classList.remove('show'),2000);
+}
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

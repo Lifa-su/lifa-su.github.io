@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Aspect Ratio Calculator</title>
+<meta name="description" content="Calculate aspect ratios, convert units, and scale dimensions with locked proportions.">
+<link rel="canonical" href="https://lifa-su.com/ai-aspect-ratio/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#533483;--tx:#eee;--t2:#aab;--bd:#2a2a4e;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 6px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--t2);margin-bottom:24px;font-size:.95rem}
+.wrap{width:100%;max-width:520px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px}
+.ct{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--t2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ct em{font-style:normal;font-size:1.1rem}
+.row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.row:last-child{margin-bottom:0}
+.f{flex:1;display:flex;flex-direction:column;gap:4px}
+.f label{font-size:.78rem;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.f input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;color:var(--tx);font-size:1rem;outline:none;transition:border .2s;width:100%}
+.f input:focus{border-color:var(--ac)}
+.rd{text-align:center;padding:12px;background:var(--bg);border-radius:8px;font-size:1.4rem;font-weight:700;color:var(--ac);letter-spacing:2px}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pb{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;color:var(--tx);font-size:.85rem;cursor:pointer;transition:all .2s;text-align:center}
+.pb:hover{border-color:var(--ac);color:var(--ac);transform:translateY(-1px)}
+.pb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.lr{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.lb{background:none;border:2px solid var(--bd);border-radius:8px;width:44px;height:44px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .2s;flex-shrink:0;color:var(--t2)}
+.lb.on{border-color:var(--ac);background:rgba(233,69,96,.15);color:var(--ac)}
+.lb:hover{border-color:var(--ac)}
+.x{color:var(--t2);font-size:1.2rem;padding-top:18px}
+.ur{background:var(--bg);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ur b{font-size:1.1rem;font-weight:600}
+.ur small{font-size:.8rem;color:var(--t2)}
+.vis{margin-top:12px;display:flex;justify-content:center;align-items:center;height:100px}
+.vb{border:2px solid var(--ac);border-radius:4px;transition:all .3s;max-width:100%;max-height:100px;background:rgba(233,69,96,.08)}
+footer{margin-top:32px;padding:16px;text-align:center;color:var(--t2);font-size:.78rem}
+footer a{color:var(--ac);text-decoration:none}
+@media(max-width:480px){body{padding:12px}h1{font-size:1.4rem}.card{padding:14px}}
+</style>
+</head>
+<body>
+<h1>&#x2B21; Aspect Ratio Calculator</h1>
+<p class="sub">Calculate, convert &amp; scale dimensions</p>
+<div class="wrap">
+
+<div class="card">
+<div class="ct"><em>&#x1F4D0;</em> Dimensions</div>
+<div class="row">
+<div class="f"><label for="w">Width (px)</label><input type="number" id="w" value="1920" min="1"></div>
+<span class="x">&times;</span>
+<div class="f"><label for="h">Height (px)</label><input type="number" id="h" value="1080" min="1"></div>
+</div>
+<div class="rd" id="rd">16 : 9</div>
+<div class="vis"><div class="vb" id="vb"></div></div>
+</div>
+
+<div class="card">
+<div class="ct"><em>&#x26A1;</em> Quick Presets</div>
+<div class="presets" id="ps"></div>
+</div>
+
+<div class="card">
+<div class="ct"><em>&#x1F517;</em> Lock &amp; Scale</div>
+<div class="lr">
+<button class="lb" id="lb" title="Lock aspect ratio" aria-label="Lock aspect ratio">&#x1F513;</button>
+<div style="flex:1;font-size:.88rem;color:var(--t2)" id="ls">Unlocked — edit freely</div>
+</div>
+<div class="row">
+<div class="f"><label for="sw">Scale Width</label><input type="number" id="sw" value="1920" min="1"></div>
+<span class="x">&times;</span>
+<div class="f"><label for="sh">Scale Height</label><input type="number" id="sh" value="1080" min="1"></div>
+</div>
+</div>
+
+<div class="card">
+<div class="ct"><em>&#x1F4CF;</em> Unit Converter</div>
+<div class="row">
+<div class="f"><label for="dpi">DPI / PPI</label><input type="number" id="dpi" value="96" min="1"></div>
+</div>
+<div id="uc"></div>
+</div>
+
+</div>
+<footer>AI Aspect Ratio Calculator &mdash; Free online tool<br><a href="https://github.com/Lifa-su/ai-aspect-ratio">GitHub</a></footer>
+<script>
+(function(){
+var P=[[16,9],[4,3],[1,1],[21,9],[3,2],[2,1],[9,16],[3,4]];
+var lk=false,rW=16,rH=9;
+var $w=document.getElementById('w'),$h=document.getElementById('h'),
+$rd=document.getElementById('rd'),$vb=document.getElementById('vb'),
+$ps=document.getElementById('ps'),$lb=document.getElementById('lb'),
+$ls=document.getElementById('ls'),$sw=document.getElementById('sw'),
+$sh=document.getElementById('sh'),$dpi=document.getElementById('dpi'),
+$uc=document.getElementById('uc');
+
+function gcd(a,b){a=Math.abs(Math.round(a));b=Math.abs(Math.round(b));while(b){var t=b;b=a%b;a=t;}return a||1;}
+
+function calc(){
+var w=parseInt($w.value)||0,h=parseInt($h.value)||0;
+if(w>0&&h>0){var g=gcd(w,h);rW=w/g;rH=h/g;$rd.textContent=rW+' : '+rH;
+var mw=200,mh=100,s=Math.min(mw/w,mh/h);
+$vb.style.width=Math.max(20,Math.round(w*s))+'px';
+$vb.style.height=Math.max(20,Math.round(h*s))+'px';
+}else{$rd.textContent='—';}
+$sw.value=w;$sh.value=h;
+hilite();units();
+}
+
+function hilite(){
+var bs=$ps.querySelectorAll('.pb');
+var w=parseInt($w.value)||0,h=parseInt($h.value)||0;
+var g=gcd(w,h),cw=w/g,ch=h/g;
+bs.forEach(function(b){
+var pw=parseInt(b.dataset.w),ph=parseInt(b.dataset.h);
+b.classList.toggle('on',pw===cw&&ph===ch);
+});
+}
+
+function units(){
+var w=parseInt($w.value)||0,h=parseInt($h.value)||0,d=parseInt($dpi.value)||96;
+if(w<=0||h<=0){$uc.innerHTML='';return;}
+var wi=(w/d).toFixed(2),hi=(h/d).toFixed(2);
+var wc=(w/d*2.54).toFixed(2),hc=(h/d*2.54).toFixed(2);
+$uc.innerHTML='<div class="ur"><div><b>'+wi+' × '+hi+'</b></div><small>inches</small></div>'
++'<div class="ur"><div><b>'+wc+' × '+hc+'</b></div><small>centimeters</small></div>'
++'<div class="ur"><div><b>'+(w*h).toLocaleString()+'</b></div><small>total pixels</small></div>';
+}
+
+P.forEach(function(p){
+var b=document.createElement('button');
+b.className='pb';b.dataset.w=p[0];b.dataset.h=p[1];
+b.textContent=p[0]+':'+p[1];
+b.addEventListener('click',function(){
+var base=Math.max(parseInt($w.value)||1920,480);
+$w.value=base;$h.value=Math.round(base*p[1]/p[0]);
+calc();
+});
+$ps.appendChild(b);
+});
+
+$w.addEventListener('input',calc);
+$h.addEventListener('input',calc);
+$dpi.addEventListener('input',units);
+
+$lb.addEventListener('click',function(){
+lk=!lk;
+$lb.classList.toggle('on',lk);
+$lb.innerHTML=lk?'&#x1F512;':'&#x1F513;';
+$ls.textContent=lk?'Locked at '+rW+':'+rH:'Unlocked — edit freely';
+});
+
+$sw.addEventListener('input',function(){
+if(lk){var v=parseInt($sw.value)||0;if(v>0){$sh.value=Math.round(v*rH/rW);}}
+});
+$sh.addEventListener('input',function(){
+if(lk){var v=parseInt($sh.value)||0;if(v>0){$sw.value=Math.round(v*rW/rH);}}
+});
+
+calc();
+})();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{width:100%;max-width:520px;margin:0 auto 20px}
+.pro-blur-wrap{position:relative;cursor:pointer;border-radius:var(--r);overflow:hidden;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;opacity:.6;padding:20px;background:var(--sf);border-radius:var(--r);border:1px solid var(--bd)}
+.pro-blur-content .mock-title{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--t2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pro-blur-content .mock-title em{font-style:normal;font-size:1.1rem}
+.pro-blur-content .mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.pro-blur-content .mock-preset{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;text-align:center;color:var(--t2);font-size:.82rem}
+.pro-blur-content .mock-row{display:flex;gap:10px;margin-bottom:10px}
+.pro-blur-content .mock-input{flex:1;height:36px;background:var(--bg);border:1px solid var(--bd);border-radius:8px}
+.pro-blur-content .mock-btn{width:130px;height:36px;background:var(--ac);border-radius:8px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:var(--r);z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-label{font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:1px}
+.pro-sublabel{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal-box{background:var(--sf);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid var(--ac);box-shadow:0 20px 60px rgba(0,0,0,.5);animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.pro-modal-box h3{font-size:1.4rem;margin-bottom:4px;color:#fff}
+.pro-modal-box .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc}
+.pro-modal-box ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal-box .pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-modal-box .pro-upgrade-btn:hover{opacity:.88}
+.pro-modal-box .pro-later-btn{display:block;width:100%;padding:12px;background:transparent;color:#888;font-size:.9rem;border:none;cursor:pointer;margin-top:8px;transition:color .2s}
+.pro-modal-box .pro-later-btn:hover{color:#fff}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur-content">
+<div class="mock-title"><em>📱</em> Social Media Presets</div>
+<div class="mock-grid">
+<div class="mock-preset">Instagram<br>1080×1080</div>
+<div class="mock-preset">YouTube<br>1920×1080</div>
+<div class="mock-preset">TikTok<br>1080×1920</div>
+<div class="mock-preset">Twitter<br>1600×900</div>
+<div class="mock-preset">Facebook<br>1200×630</div>
+<div class="mock-preset">LinkedIn<br>1200×627</div>
+</div>
+<div class="mock-title"><em>📦</em> Batch Calculator</div>
+<div class="mock-row"><div class="mock-input"></div><div class="mock-btn"></div></div>
+<div class="mock-title"><em>💾</em> Export Template</div>
+<div class="mock-row"><div class="mock-btn" style="background:#28a745"></div><div class="mock-btn" style="background:var(--ac2)"></div></div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal-box">
+<h3>📐 Aspect Ratio Pro</h3>
+<div class="pro-price">$9</div>
+<p style="color:#aab;font-size:.9rem;margin-bottom:8px">One-time payment · Lifetime access</p>
+<ul>
+<li>Batch Ratio Calculator</li>
+<li>Social Media Presets (20+ platforms)</li>
+<li>Export Templates (JSON/CSV)</li>
+<li>Custom Preset Manager</li>
+<li>Priority Support</li>
+</ul>
+<a class="pro-upgrade-btn" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

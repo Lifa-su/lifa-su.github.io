@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Loading Spinner Generator - 30+ Pure CSS Loading Animations</title>
+<meta name="description" content="Generate beautiful pure CSS loading animations. 30+ presets with customizable colors and sizes. Copy code with one click.">
+<link rel="canonical" href="https://lifa-su.com/ai-loading-spinner/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#6c5ce7;--secondary:#00cec9;--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--text:#e0e0e0;--text2:#888;--border:#2a2a3a;--size:40px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--primary)}
+
+/* Top Controls */
+.controls{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.controls h1{font-size:1.2rem;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:auto;white-space:nowrap}
+.control-group{display:flex;align-items:center;gap:8px}
+.control-group label{font-size:0.8rem;color:var(--text2);white-space:nowrap}
+.control-group input[type="color"]{width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;background:none}
+.control-group select,.control-group input[type="number"]{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:0.85rem}
+.control-group input[type="number"]{width:70px}
+.category-filters{display:flex;gap:6px;flex-wrap:wrap;padding:8px 24px;background:var(--surface)}
+.cat-btn{background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:0.78rem;cursor:pointer;transition:all .2s}
+.cat-btn:hover,.cat-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* Preview Panel */
+.preview-panel{display:none;background:var(--surface);border-bottom:1px solid var(--border);padding:30px;text-align:center;position:relative}
+.preview-panel.active{display:block}
+.preview-panel .preview-box{width:120px;height:120px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center}
+.preview-panel .spinner-name{font-size:1rem;color:var(--text);margin-bottom:8px}
+.preview-panel .copy-btn{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.9rem;cursor:pointer;transition:transform .15s}
+.preview-panel .copy-btn:hover{transform:scale(1.05)}
+.preview-panel .close-btn{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:1.4rem;cursor:pointer}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin:12px auto;max-width:600px;text-align:left;font-family:'Fira Code',monospace;font-size:0.78rem;color:#a0e0a0;max-height:250px;overflow:auto;white-space:pre;display:none}
+.code-block.show{display:block}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px;padding:24px}
+.grid-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;min-height:140px}
+.grid-item:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 20px rgba(108,92,231,.15)}
+.grid-item.selected{border-color:var(--primary);box-shadow:0 0 0 2px rgba(108,92,231,.3)}
+.grid-item .spinner-wrap{width:var(--size);height:var(--size);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.grid-item .name{font-size:0.72rem;color:var(--text2);text-align:center}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--primary);color:#fff;padding:10px 24px;border-radius:8px;font-size:0.85rem;transition:transform .3s;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Responsive */
+@media(max-width:768px){.controls{padding:12px 16px;gap:10px}.grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:16px}}
+@media(max-width:480px){.controls{flex-direction:column;align-items:stretch}.controls h1{text-align:center}}
+
+/* ============ SPINNER ANIMATIONS ============ */
+
+/* 1. Classic Spinner */
+.sp-classic{width:var(--size);height:var(--size);border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 2. Dual Ring */
+.sp-dual{width:var(--size);height:var(--size);position:relative}
+.sp-dual::after,.sp-dual::before{content:'';position:absolute;inset:0;border:3px solid transparent;border-radius:50%}
+.sp-dual::before{border-top-color:var(--primary);animation:spin 1s linear infinite}
+.sp-dual::after{border-bottom-color:var(--secondary);animation:spin 1s linear infinite reverse}
+
+/* 3. Thick Spinner */
+.sp-thick{width:var(--size);height:var(--size);border:5px solid var(--surface2);border-top-color:var(--primary);border-right-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite}
+
+/* 4. Dotted Spinner */
+.sp-dotted{width:var(--size);height:var(--size);border:3px dotted var(--primary);border-radius:50%;animation:spin 1.5s linear infinite}
+
+/* 5. Split Spinner */
+.sp-split{width:var(--size);height:var(--size);border:3px solid var(--primary);border-radius:50%;border-right-color:transparent;border-bottom-color:transparent;animation:spin 0.75s linear infinite}
+
+/* 6. Orbit Spinner */
+.sp-orbit{width:var(--size);height:var(--size);position:relative;animation:spin 1.2s linear infinite}
+.sp-orbit::before{content:'';position:absolute;width:25%;height:25%;background:var(--primary);border-radius:50%;top:0;left:50%;transform:translateX(-50%)}
+
+/* 7. Pulse Circle */
+.sp-pulse{width:var(--size);height:var(--size);background:var(--primary);border-radius:50%;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(0.85);opacity:0.5}50%{transform:scale(1);opacity:1}}
+
+/* 8. Pulse Ring */
+.sp-pulse-ring{width:var(--size);height:var(--size);border:3px solid var(--primary);border-radius:50%;animation:pulse-ring 1.2s ease-out infinite}
+@keyframes pulse-ring{0%{transform:scale(0.5);opacity:1}100%{transform:scale(1.3);opacity:0}}
+
+/* 9. Double Pulse */
+.sp-double-pulse{width:var(--size);height:var(--size);position:relative}
+.sp-double-pulse::before,.sp-double-pulse::after{content:'';position:absolute;inset:0;border:2px solid var(--primary);border-radius:50%;animation:pulse-ring 1.5s ease-out infinite}
+.sp-double-pulse::after{animation-delay:0.5s}
+
+/* 10. Heartbeat */
+.sp-heartbeat{width:var(--size);height:var(--size);background:var(--primary);border-radius:50%;animation:heartbeat 1s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}15%{transform:scale(1.25)}30%{transform:scale(1)}45%{transform:scale(1.15)}}
+
+/* 11. Bounce Ball */
+.sp-bounce{width:calc(var(--size)*0.4);height:calc(var(--size)*0.4);background:var(--primary);border-radius:50%;animation:bounce 0.6s ease-in-out infinite alternate}
+@keyframes bounce{to{transform:translateY(calc(var(--size)*-0.6))}}
+
+/* 12. Three Bounce */
+.sp-3bounce{display:flex;gap:calc(var(--size)*0.15);align-items:center;height:var(--size)}
+.sp-3bounce i{display:block;width:calc(var(--size)*0.25);height:calc(var(--size)*0.25);background:var(--primary);border-radius:50%;animation:bounce3 0.6s ease-in-out infinite alternate}
+.sp-3bounce i:nth-child(2){animation-delay:0.2s;background:var(--secondary)}
+.sp-3bounce i:nth-child(3){animation-delay:0.4s}
+@keyframes bounce3{to{transform:translateY(calc(var(--size)*-0.35))}}
+
+/* 13. Bounce Scale */
+.sp-bounce-scale{display:flex;gap:calc(var(--size)*0.1);align-items:center;justify-content:center;height:var(--size)}
+.sp-bounce-scale i{display:block;width:calc(var(--size)*0.2);height:calc(var(--size)*0.2);background:var(--primary);border-radius:50%;animation:bscale 0.8s ease-in-out infinite}
+.sp-bounce-scale i:nth-child(2){animation-delay:0.15s}
+.sp-bounce-scale i:nth-child(3){animation-delay:0.3s}
+@keyframes bscale{0%,100%{transform:scale(1)}50%{transform:scale(1.6)}}
+
+/* 14. Bounce Rotate */
+.sp-bounce-rot{width:var(--size);height:var(--size);position:relative;animation:spin 2s linear infinite}
+.sp-bounce-rot::before,.sp-bounce-rot::after{content:'';position:absolute;width:45%;height:45%;background:var(--primary);border-radius:50%;animation:brot 2s ease-in-out infinite}
+.sp-bounce-rot::before{top:0;left:0}
+.sp-bounce-rot::after{bottom:0;right:0;animation-delay:1s;background:var(--secondary)}
+@keyframes brot{0%,100%{transform:scale(0)}50%{transform:scale(1)}}
+
+/* 15. Wave Bars */
+.sp-wave{display:flex;gap:calc(var(--size)*0.08);align-items:center;justify-content:center;height:var(--size)}
+.sp-wave i{display:block;width:calc(var(--size)*0.1);height:calc(var(--size)*0.5);background:var(--primary);border-radius:3px;animation:wave 1.2s ease-in-out infinite}
+.sp-wave i:nth-child(2){animation-delay:0.1s}
+.sp-wave i:nth-child(3){animation-delay:0.2s}
+.sp-wave i:nth-child(4){animation-delay:0.3s}
+.sp-wave i:nth-child(5){animation-delay:0.4s}
+@keyframes wave{0%,100%{transform:scaleY(0.5)}50%{transform:scaleY(1.2)}}
+
+/* 16. Wave Dots */
+.sp-wave-dots{display:flex;gap:calc(var(--size)*0.12);align-items:center;justify-content:center;height:var(--size)}
+.sp-wave-dots i{display:block;width:calc(var(--size)*0.18);height:calc(var(--size)*0.18);background:var(--primary);border-radius:50%;animation:wdots 1.4s ease-in-out infinite}
+.sp-wave-dots i:nth-child(2){animation-delay:0.15s}
+.sp-wave-dots i:nth-child(3){animation-delay:0.3s}
+.sp-wave-dots i:nth-child(4){animation-delay:0.45s}
+@keyframes wdots{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--size)*-0.3))}}
+
+/* 17. Wave Fade */
+.sp-wave-fade{display:flex;gap:calc(var(--size)*0.08);align-items:center;justify-content:center;height:var(--size)}
+.sp-wave-fade i{display:block;width:calc(var(--size)*0.1);height:calc(var(--size)*0.6);background:var(--primary);border-radius:3px;animation:wfade 1s ease-in-out infinite}
+.sp-wave-fade i:nth-child(2){animation-delay:0.12s}
+.sp-wave-fade i:nth-child(3){animation-delay:0.24s}
+.sp-wave-fade i:nth-child(4){animation-delay:0.36s}
+.sp-wave-fade i:nth-child(5){animation-delay:0.48s}
+@keyframes wfade{0%,100%{opacity:0.3;transform:scaleY(0.6)}50%{opacity:1;transform:scaleY(1)}}
+
+/* 18. Sine Wave */
+.sp-sine{display:flex;gap:calc(var(--size)*0.06);align-items:flex-end;justify-content:center;height:var(--size)}
+.sp-sine i{display:block;width:calc(var(--size)*0.08);height:calc(var(--size)*0.08);background:var(--primary);border-radius:50%;animation:sine 1.6s ease-in-out infinite}
+.sp-sine i:nth-child(2){animation-delay:0.1s}
+.sp-sine i:nth-child(3){animation-delay:0.2s}
+.sp-sine i:nth-child(4){animation-delay:0.3s}
+.sp-sine i:nth-child(5){animation-delay:0.4s}
+.sp-sine i:nth-child(6){animation-delay:0.5s}
+.sp-sine i:nth-child(7){animation-delay:0.6s}
+@keyframes sine{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--size)*-0.7))}}
+
+/* 19. Dot Spinner */
+.sp-dot-spin{width:var(--size);height:var(--size);position:relative}
+.sp-dot-spin i{position:absolute;width:20%;height:20%;background:var(--primary);border-radius:50%;animation:dot-fade 1.2s ease-in-out infinite}
+.sp-dot-spin i:nth-child(1){top:0;left:40%;animation-delay:0s}
+.sp-dot-spin i:nth-child(2){top:10%;right:10%;animation-delay:0.15s}
+.sp-dot-spin i:nth-child(3){right:0;top:40%;animation-delay:0.3s}
+.sp-dot-spin i:nth-child(4){bottom:10%;right:10%;animation-delay:0.45s}
+.sp-dot-spin i:nth-child(5){bottom:0;left:40%;animation-delay:0.6s}
+.sp-dot-spin i:nth-child(6){bottom:10%;left:10%;animation-delay:0.75s}
+.sp-dot-spin i:nth-child(7){left:0;top:40%;animation-delay:0.9s}
+.sp-dot-spin i:nth-child(8){top:10%;left:10%;animation-delay:1.05s}
+@keyframes dot-fade{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+
+/* 20. Dot Grid */
+.sp-dot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--size)*0.1);width:var(--size);height:var(--size)}
+.sp-dot-grid i{background:var(--primary);border-radius:50%;animation:dot-grid 1.3s ease-in-out infinite}
+.sp-dot-grid i:nth-child(1){animation-delay:0s}
+.sp-dot-grid i:nth-child(2){animation-delay:0.1s}
+.sp-dot-grid i:nth-child(3){animation-delay:0.2s}
+.sp-dot-grid i:nth-child(4){animation-delay:0.3s}
+.sp-dot-grid i:nth-child(5){animation-delay:0.4s}
+.sp-dot-grid i:nth-child(6){animation-delay:0.5s}
+.sp-dot-grid i:nth-child(7){animation-delay:0.6s}
+.sp-dot-grid i:nth-child(8){animation-delay:0.7s}
+.sp-dot-grid i:nth-child(9){animation-delay:0.8s}
+@keyframes dot-grid{0%,100%{opacity:0.2}50%{opacity:1}}
+
+/* 21. Dot Flashing */
+.sp-dot-flash{display:flex;gap:calc(var(--size)*0.15);align-items:center;justify-content:center;height:var(--size)}
+.sp-dot-flash i{width:calc(var(--size)*0.22);height:calc(var(--size)*0.22);background:var(--primary);border-radius:50%;animation:dot-flash 1s ease-in-out infinite alternate}
+.sp-dot-flash i:nth-child(2){animation-delay:0.3s}
+.sp-dot-flash i:nth-child(3){animation-delay:0.6s}
+@keyframes dot-flash{to{opacity:0.2;transform:scale(0.6)}}
+
+/* 22. Dot Typing */
+.sp-typing{display:flex;gap:calc(var(--size)*0.12);align-items:center;justify-content:center;height:var(--size)}
+.sp-typing i{width:calc(var(--size)*0.2);height:calc(var(--size)*0.2);background:var(--primary);border-radius:50%;animation:typing 1.4s ease-in-out infinite}
+.sp-typing i:nth-child(2){animation-delay:0.2s}
+.sp-typing i:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(calc(var(--size)*-0.25))}}
+
+/* 23. Bar Progress */
+.sp-bar{width:var(--size);height:calc(var(--size)*0.12);background:var(--surface2);border-radius:6px;overflow:hidden;position:relative}
+.sp-bar::after{content:'';position:absolute;left:0;top:0;height:100%;width:40%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:6px;animation:bar-slide 1.5s ease-in-out infinite}
+@keyframes bar-slide{0%{left:-40%;width:40%}50%{left:30%;width:60%}100%{left:100%;width:40%}}
+
+/* 24. Bar Segments */
+.sp-bar-seg{display:flex;gap:3px;align-items:center;height:var(--size)}
+.sp-bar-seg i{display:block;width:calc(var(--size)*0.12);height:calc(var(--size)*0.6);background:var(--primary);border-radius:2px;animation:bar-seg 1s ease-in-out infinite}
+.sp-bar-seg i:nth-child(2){animation-delay:0.1s}
+.sp-bar-seg i:nth-child(3){animation-delay:0.2s}
+.sp-bar-seg i:nth-child(4){animation-delay:0.3s}
+.sp-bar-seg i:nth-child(5){animation-delay:0.4s}
+.sp-bar-seg i:nth-child(6){animation-delay:0.5s}
+@keyframes bar-seg{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* 25. Bar Grow */
+.sp-bar-grow{width:var(--size);height:calc(var(--size)*0.12);background:var(--surface2);border-radius:6px;overflow:hidden;position:relative}
+.sp-bar-grow::after{content:'';position:absolute;left:0;top:0;height:100%;width:0;background:var(--primary);border-radius:6px;animation:bar-grow 2s ease-in-out infinite}
+@keyframes bar-grow{0%{width:0}50%{width:100%}100%{width:0}}
+
+/* 26. Bar Bounce */
+.sp-bar-bounce{width:var(--size);height:calc(var(--size)*0.12);background:var(--surface2);border-radius:6px;overflow:hidden;position:relative}
+.sp-bar-bounce::after{content:'';position:absolute;top:0;height:100%;width:30%;background:var(--primary);border-radius:6px;animation:bar-bounce 1s ease-in-out infinite alternate}
+@keyframes bar-bounce{0%{left:0}100%{left:70%}}
+
+/* 27. Gradient Ring */
+.sp-grad-ring{width:var(--size);height:var(--size);border-radius:50%;background:conic-gradient(from 0deg,transparent,var(--primary));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:spin 1s linear infinite}
+
+/* 28. Rainbow Ring */
+.sp-rainbow{width:var(--size);height:var(--size);border-radius:50%;background:conic-gradient(#f06,#f90,#ff0,#3c0,#09f,#c0f,#f06);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:spin 1.5s linear infinite}
+
+/* 29. Gradient Pulse */
+.sp-grad-pulse{width:var(--size);height:var(--size);border-radius:50%;background:radial-gradient(circle,var(--primary),var(--secondary));animation:pulse 1.2s ease-in-out infinite}
+
+/* 30. Dual Gradient Ring */
+.sp-dual-grad{width:var(--size);height:var(--size);position:relative;animation:spin 1.5s linear infinite}
+.sp-dual-grad::before{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 30%,var(--primary));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+
+/* 31. Morphing */
+.sp-morph{width:var(--size);height:var(--size);background:linear-gradient(135deg,var(--primary),var(--secondary));animation:morph 2s ease-in-out infinite}
+@keyframes morph{0%,100%{border-radius:50%}25%{border-radius:30% 70% 70% 30%/30% 30% 70% 70%}50%{border-radius:50% 20% 50% 20%/20% 50% 20% 50%}75%{border-radius:70% 30% 30% 70%/70% 70% 30% 30%}}
+
+/* 32. Flip */
+.sp-flip{width:var(--size);height:var(--size);background:var(--primary);animation:flip 1.2s ease-in-out infinite}
+@keyframes flip{0%{transform:perspective(200px) rotateX(0) rotateY(0)}50%{transform:perspective(200px) rotateX(180deg) rotateY(0)}100%{transform:perspective(200px) rotateX(180deg) rotateY(180deg)}}
+
+/* 33. Clock */
+.sp-clock{width:var(--size);height:var(--size);border:3px solid var(--primary);border-radius:50%;position:relative}
+.sp-clock::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:35%;background:var(--primary);transform-origin:bottom center;transform:translateX(-50%);animation:clock 1.5s steps(12) infinite}
+@keyframes clock{to{transform:translateX(-50%) rotate(360deg)}}
+
+/* 34. Ripple */
+.sp-ripple{width:var(--size);height:var(--size);position:relative}
+.sp-ripple i{position:absolute;inset:0;border:3px solid var(--primary);border-radius:50%;animation:ripple 1.5s ease-out infinite}
+.sp-ripple i:nth-child(2){animation-delay:0.5s}
+@keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(1);opacity:0}}
+
+/* 35. Hourglass */
+.sp-hourglass{width:var(--size);height:var(--size);border:3px solid var(--primary);border-radius:50%;animation:hourglass 1.2s ease-in-out infinite}
+@keyframes hourglass{0%{transform:rotate(0);border-radius:50%}25%{border-radius:50% 50% 20% 20%}50%{transform:rotate(180deg);border-radius:50%}75%{border-radius:20% 20% 50% 50%}100%{transform:rotate(360deg);border-radius:50%}}
+
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <h1>🌀 AI Loading Spinner Generator</h1>
+  <div class="control-group">
+    <label>Primary</label>
+    <input type="color" id="colorPrimary" value="#6c5ce7">
+  </div>
+  <div class="control-group">
+    <label>Secondary</label>
+    <input type="color" id="colorSecondary" value="#00cec9">
+  </div>
+  <div class="control-group">
+    <label>Size</label>
+    <select id="sizeSelect">
+      <option value="24">Small (24px)</option>
+      <option value="40" selected>Medium (40px)</option>
+      <option value="64">Large (64px)</option>
+      <option value="custom">Custom</option>
+    </select>
+    <input type="number" id="customSize" value="40" min="10" max="200" style="display:none">
+  </div>
+</div>
+
+<div class="category-filters" id="catFilters">
+  <button class="cat-btn active" data-cat="all">All</button>
+  <button class="cat-btn" data-cat="spinner">Spinners</button>
+  <button class="cat-btn" data-cat="pulse">Pulse</button>
+  <button class="cat-btn" data-cat="bounce">Bounce</button>
+  <button class="cat-btn" data-cat="wave">Wave</button>
+  <button class="cat-btn" data-cat="dots">Dots</button>
+  <button class="cat-btn" data-cat="bars">Bars</button>
+  <button class="cat-btn" data-cat="gradient">Gradient Ring</button>
+  <button class="cat-btn" data-cat="misc">Misc</button>
+</div>
+
+<div class="preview-panel" id="previewPanel">
+  <button class="close-btn" onclick="closePreview()">&times;</button>
+  <div class="preview-box" id="previewBox"></div>
+  <div class="spinner-name" id="previewName"></div>
+  <button class="copy-btn" onclick="toggleCode()">📋 Show & Copy Code</button>
+  <div class="code-block" id="codeBlock"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+const spinners = [
+  {id:'sp-classic',name:'Classic Spinner',cat:'spinner',html:'<div class="sp-classic"></div>'},
+  {id:'sp-dual',name:'Dual Ring',cat:'spinner',html:'<div class="sp-dual"></div>'},
+  {id:'sp-thick',name:'Thick Spinner',cat:'spinner',html:'<div class="sp-thick"></div>'},
+  {id:'sp-dotted',name:'Dotted Spinner',cat:'spinner',html:'<div class="sp-dotted"></div>'},
+  {id:'sp-split',name:'Split Spinner',cat:'spinner',html:'<div class="sp-split"></div>'},
+  {id:'sp-orbit',name:'Orbit',cat:'spinner',html:'<div class="sp-orbit"></div>'},
+  {id:'sp-pulse',name:'Pulse Circle',cat:'pulse',html:'<div class="sp-pulse"></div>'},
+  {id:'sp-pulse-ring',name:'Pulse Ring',cat:'pulse',html:'<div class="sp-pulse-ring"></div>'},
+  {id:'sp-double-pulse',name:'Double Pulse',cat:'pulse',html:'<div class="sp-double-pulse"></div>'},
+  {id:'sp-heartbeat',name:'Heartbeat',cat:'pulse',html:'<div class="sp-heartbeat"></div>'},
+  {id:'sp-bounce',name:'Bounce Ball',cat:'bounce',html:'<div class="sp-bounce"></div>'},
+  {id:'sp-3bounce',name:'Three Bounce',cat:'bounce',html:'<div class="sp-3bounce"><i></i><i></i><i></i></div>'},
+  {id:'sp-bounce-scale',name:'Bounce Scale',cat:'bounce',html:'<div class="sp-bounce-scale"><i></i><i></i><i></i></div>'},
+  {id:'sp-bounce-rot',name:'Bounce Rotate',cat:'bounce',html:'<div class="sp-bounce-rot"></div>'},
+  {id:'sp-wave',name:'Wave Bars',cat:'wave',html:'<div class="sp-wave"><i></i><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-wave-dots',name:'Wave Dots',cat:'wave',html:'<div class="sp-wave-dots"><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-wave-fade',name:'Wave Fade',cat:'wave',html:'<div class="sp-wave-fade"><i></i><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-wave-grow',name:'Wave Grow',cat:'wave',html:'<div class="sp-wave-grow"><i></i><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-dots-fade',name:'Fading Dots',cat:'dots',html:'<div class="sp-dots-fade"><i></i><i></i><i></i></div>'},
+  {id:'sp-dots-circle',name:'Circle Dots',cat:'dots',html:'<div class="sp-dots-circle"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-dots-pulse',name:'Pulse Dots',cat:'dots',html:'<div class="sp-dots-pulse"><i></i><i></i><i></i></div>'},
+  {id:'sp-dots-typing',name:'Typing Dots',cat:'dots',html:'<div class="sp-dots-typing"><i></i><i></i><i></i></div>'},
+  {id:'sp-dots-flashing',name:'Flashing Dots',cat:'dots',html:'<div class="sp-dots-flashing"><i></i><i></i><i></i></div>'},
+  {id:'sp-bar-progress',name:'Progress Bar',cat:'bars',html:'<div class="sp-bar-progress"><i></i></div>'},
+  {id:'sp-bar-swing',name:'Swing Bar',cat:'bars',html:'<div class="sp-bar-swing"><i></i></div>'},
+  {id:'sp-bar-elastic',name:'Elastic Bar',cat:'bars',html:'<div class="sp-bar-elastic"></div>'},
+  {id:'sp-bar-blocks',name:'Loading Blocks',cat:'bars',html:'<div class="sp-bar-blocks"><i></i><i></i><i></i><i></i><i></i></div>'},
+  {id:'sp-grad-ring',name:'Gradient Ring',cat:'gradient',html:'<div class="sp-grad-ring"></div>'},
+  {id:'sp-grad-dual',name:'Gradient Dual',cat:'gradient',html:'<div class="sp-grad-dual"></div>'},
+  {id:'sp-grad-arc',name:'Gradient Arc',cat:'gradient',html:'<div class="sp-grad-arc"></div>'},
+  {id:'sp-grad-pulse',name:'Gradient Pulse',cat:'gradient',html:'<div class="sp-grad-pulse"></div>'},
+  {id:'sp-square-spin',name:'Square Spin',cat:'misc',html:'<div class="sp-square-spin"></div>'},
+  {id:'sp-hourglass',name:'Hourglass',cat:'misc',html:'<div class="sp-hourglass"></div>'},
+  {id:'sp-ripple',name:'Ripple',cat:'misc',html:'<div class="sp-ripple"><i></i><i></i></div>'},
+  {id:'sp-clock',name:'Clock',cat:'misc',html:'<div class="sp-clock"></div>'},
+];
+
+let selected = null;
+const grid = document.getElementById('grid');
+const previewPanel = document.getElementById('previewPanel');
+const previewBox = document.getElementById('previewBox');
+const previewName = document.getElementById('previewName');
+const codeBlock = document.getElementById('codeBlock');
+
+function renderGrid(cat) {
+  grid.innerHTML = '';
+  const filtered = cat === 'all' ? spinners : spinners.filter(s => s.cat === cat);
+  filtered.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.dataset.id = s.id;
+    div.innerHTML = '<div class="spinner-wrap">' + s.html + '</div><div class="name">' + s.name + '</div>';
+    div.onclick = () => selectSpinner(s);
+    grid.appendChild(div);
+  });
+}
+
+function selectSpinner(s) {
+  selected = s;
+  document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('selected'));
+  const el = document.querySelector('[data-id="'+s.id+'"]');
+  if(el) el.classList.add('selected');
+  previewPanel.classList.add('active');
+  previewBox.innerHTML = s.html;
+  previewBox.style.width = '120px';
+  previewBox.style.height = '120px';
+  const inner = previewBox.firstElementChild;
+  if(inner) {
+    inner.style.setProperty('--size','80px');
+  }
+  previewName.textContent = s.name;
+  codeBlock.classList.remove('show');
+}
+
+function closePreview() {
+  previewPanel.classList.remove('active');
+  selected = null;
+  document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('selected'));
+}
+
+function getSpinnerCSS(id) {
+  const sheets = document.styleSheets;
+  let css = '';
+  const rootVars = `  --primary: ${getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()};\n  --secondary: ${getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim()};\n  --size: ${getComputedStyle(document.documentElement).getPropertyValue('--size').trim()};`;
+  for(let sheet of sheets) {
+    try {
+      for(let rule of sheet.cssRules) {
+        const t = rule.cssText;
+        if(t.includes('.'+id) || (rule.type === 7 && isAnimUsedBy(rule.name, id))) {
+          css += t + '\n';
+        }
+      }
+    } catch(e){}
+  }
+  return `:root {\n${rootVars}\n}\n${css}`;
+}
+
+function isAnimUsedBy(animName, id) {
+  const el = document.querySelector('.'+id);
+  if(!el) return false;
+  const check = (e) => {
+    const a = getComputedStyle(e).animationName;
+    if(a && a.includes(animName)) return true;
+    for(let c of e.children) { if(check(c)) return true; }
+    const ps = ['::before','::after'];
+    return false;
+  };
+  return check(el);
+}
+
+function toggleCode() {
+  if(!selected) return;
+  if(codeBlock.classList.contains('show')) {
+    navigator.clipboard.writeText(codeBlock.textContent).then(() => showToast());
+    return;
+  }
+  const s = selected;
+  const css = getSpinnerCSS(s.id);
+  const code = `<!-- HTML -->\n${s.html}\n\n/* CSS */\n${css}`;
+  codeBlock.textContent = code;
+  codeBlock.classList.add('show');
+  navigator.clipboard.writeText(code).then(() => showToast());
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Color controls
+document.getElementById('colorPrimary').addEventListener('input', e => {
+  document.documentElement.style.setProperty('--primary', e.target.value);
+});
+document.getElementById('colorSecondary').addEventListener('input', e => {
+  document.documentElement.style.setProperty('--secondary', e.target.value);
+});
+
+// Size controls
+const sizeSelect = document.getElementById('sizeSelect');
+const customSize = document.getElementById('customSize');
+sizeSelect.addEventListener('change', e => {
+  if(e.target.value === 'custom') {
+    customSize.style.display = 'inline-block';
+    document.documentElement.style.setProperty('--size', customSize.value + 'px');
+  } else {
+    customSize.style.display = 'none';
+    document.documentElement.style.setProperty('--size', e.target.value + 'px');
+  }
+});
+customSize.addEventListener('input', e => {
+  document.documentElement.style.setProperty('--size', e.target.value + 'px');
+});
+
+// Category filters
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(btn.dataset.cat);
+  });
+});
+
+// Init
+renderGrid('all');
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Entity Lookup - HTML实体编码查询工具</title>
+<meta name="description" content="快速查询HTML实体编码，支持符号、箭头、数学、货币、希腊字母等200+常用实体，点击即复制。">
+<link rel="canonical" href="https://lifa-su.com/ai-html-entity/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--success:#00c853;--hover:#1a2a5e}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:0.95rem}
+.search-box{position:relative;max-width:600px;margin:0 auto 30px}
+.search-box input{width:100%;padding:14px 20px 14px 48px;border:2px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:1rem;outline:none;transition:border-color .3s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box input::placeholder{color:var(--text2)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:1.2rem}
+.search-box .clear-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);font-size:1.3rem;cursor:pointer;display:none;padding:4px}
+.search-box .clear-btn:hover{color:var(--text)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:30px}
+.tab{padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-size:0.85rem;transition:all .3s;white-space:nowrap}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.count{text-align:center;color:var(--text2);font-size:0.85rem;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .3s;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(233,69,96,.15)}
+.card-char{font-size:2.2rem;margin-bottom:8px;min-height:48px;display:flex;align-items:center}
+.card-name{font-size:0.82rem;color:var(--accent);font-family:'SF Mono',Monaco,Consolas,monospace;margin-bottom:4px;word-break:break-all}
+.card-code{font-size:0.78rem;color:var(--text2);font-family:'SF Mono',Monaco,Consolas,monospace}
+.card-desc{font-size:0.78rem;color:var(--text2);margin-top:6px}
+.copy-menu{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(15,52,96,.97);border-radius:10px;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2}
+.card:hover .copy-menu{display:flex}
+.copy-btn{padding:6px 16px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:0.8rem;cursor:pointer;font-family:'SF Mono',Monaco,Consolas,monospace;transition:all .2s;min-width:160px;text-align:center}
+.copy-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--success);color:#fff;padding:10px 24px;border-radius:8px;font-size:0.9rem;transition:transform .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty span{font-size:3rem;display:block;margin-bottom:16px}
+footer{text-align:center;padding:40px 0 20px;color:var(--text2);font-size:0.8rem}
+footer a{color:var(--accent);text-decoration:none}
+@media(max-width:640px){
+  header h1{font-size:1.5rem}
+  .grid{grid-template-columns:1fr 1fr}
+  .card-char{font-size:1.8rem}
+  .tabs{gap:6px}
+  .tab{padding:6px 12px;font-size:0.8rem}
+}
+@media(max-width:400px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ HTML Entity Lookup</h1>
+    <p>200+ 常用 HTML 实体编码 · 搜索 · 分类 · 点击复制</p>
+  </header>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="搜索实体名、编号、字符或描述..." autocomplete="off">
+    <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none"><span>🔎</span>没有找到匹配的实体</div>
+</div>
+<div class="toast" id="toast"></div>
+<footer>
+  <p>Made with ❤️ for developers · <a href="https://github.com/Lifa-su/ai-html-entity" target="_blank">GitHub</a></p>
+</footer>
+<script>
+const entities=[
+// 符号 Symbols
+{char:'&',name:'&amp;',code:'&#38;',desc:'And 符号',cat:'符号'},
+{char:'<',name:'&lt;',code:'&#60;',desc:'小于号',cat:'符号'},
+{char:'>',name:'&gt;',code:'&#62;',desc:'大于号',cat:'符号'},
+{char:'"',name:'&quot;',code:'&#34;',desc:'双引号',cat:'符号'},
+{char:"'",name:'&apos;',code:'&#39;',desc:'单引号',cat:'符号'},
+{char:' ',name:'&nbsp;',code:'&#160;',desc:'不换行空格',cat:'符号'},
+{char:'©',name:'&copy;',code:'&#169;',desc:'版权符号',cat:'符号'},
+{char:'®',name:'&reg;',code:'&#174;',desc:'注册商标',cat:'符号'},
+{char:'™',name:'&trade;',code:'&#8482;',desc:'商标符号',cat:'符号'},
+{char:'§',name:'&sect;',code:'&#167;',desc:'章节符号',cat:'符号'},
+{char:'¶',name:'&para;',code:'&#182;',desc:'段落符号',cat:'符号'},
+{char:'†',name:'&dagger;',code:'&#8224;',desc:'剑标',cat:'符号'},
+{char:'‡',name:'&Dagger;',code:'&#8225;',desc:'双剑标',cat:'符号'},
+{char:'•',name:'&bull;',code:'&#8226;',desc:'项目符号',cat:'符号'},
+{char:'…',name:'&hellip;',code:'&#8230;',desc:'省略号',cat:'符号'},
+{char:'′',name:'&prime;',code:'&#8242;',desc:'角分符号',cat:'符号'},
+{char:'″',name:'&Prime;',code:'&#8243;',desc:'角秒符号',cat:'符号'},
+{char:'‾',name:'&oline;',code:'&#8254;',desc:'上划线',cat:'符号'},
+{char:'⁄',name:'&frasl;',code:'&#8260;',desc:'分数斜线',cat:'符号'},
+{char:'‰',name:'&permil;',code:'&#8240;',desc:'千分号',cat:'符号'},
+{char:'¡',name:'&iexcl;',code:'&#161;',desc:'倒感叹号',cat:'符号'},
+{char:'¿',name:'&iquest;',code:'&#191;',desc:'倒问号',cat:'符号'},
+{char:'ˆ',name:'&circ;',code:'&#710;',desc:'抑扬符',cat:'符号'},
+{char:'˜',name:'&tilde;',code:'&#732;',desc:'波浪号',cat:'符号'},
+{char:'–',name:'&ndash;',code:'&#8211;',desc:'短破折号',cat:'符号'},
+{char:'—',name:'&mdash;',code:'&#8212;',desc:'长破折号',cat:'符号'},
+{char:''',name:'&lsquo;',code:'&#8216;',desc:'左单引号',cat:'符号'},
+{char:''',name:'&rsquo;',code:'&#8217;',desc:'右单引号',cat:'符号'},
+{char:'"',name:'&ldquo;',code:'&#8220;',desc:'左双引号',cat:'符号'},
+{char:'"',name:'&rdquo;',code:'&#8221;',desc:'右双引号',cat:'符号'},
+{char:'‹',name:'&lsaquo;',code:'&#8249;',desc:'左单角引号',cat:'符号'},
+{char:'›',name:'&rsaquo;',code:'&#8250;',desc:'右单角引号',cat:'符号'},
+{char:'«',name:'&laquo;',code:'&#171;',desc:'左双角引号',cat:'符号'},
+{char:'»',name:'&raquo;',code:'&#187;',desc:'右双角引号',cat:'符号'},
+// 箭头 Arrows
+{char:'←',name:'&larr;',code:'&#8592;',desc:'左箭头',cat:'箭头'},
+{char:'↑',name:'&uarr;',code:'&#8593;',desc:'上箭头',cat:'箭头'},
+{char:'→',name:'&rarr;',code:'&#8594;',desc:'右箭头',cat:'箭头'},
+{char:'↓',name:'&darr;',code:'&#8595;',desc:'下箭头',cat:'箭头'},
+{char:'↔',name:'&harr;',code:'&#8596;',desc:'左右箭头',cat:'箭头'},
+{char:'↵',name:'&crarr;',code:'&#8629;',desc:'回车箭头',cat:'箭头'},
+{char:'⇐',name:'&lArr;',code:'&#8656;',desc:'左双箭头',cat:'箭头'},
+{char:'⇑',name:'&uArr;',code:'&#8657;',desc:'上双箭头',cat:'箭头'},
+{char:'⇒',name:'&rArr;',code:'&#8658;',desc:'右双箭头',cat:'箭头'},
+{char:'⇓',name:'&dArr;',code:'&#8659;',desc:'下双箭头',cat:'箭头'},
+{char:'⇔',name:'&hArr;',code:'&#8660;',desc:'左右双箭头',cat:'箭头'},
+{char:'↩',name:'&hookleftarrow;',code:'&#8617;',desc:'左钩箭头',cat:'箭头'},
+{char:'↪',name:'&hookrightarrow;',code:'&#8618;',desc:'右钩箭头',cat:'箭头'},
+{char:'↰',name:'&Lsh;',code:'&#8624;',desc:'左上转箭头',cat:'箭头'},
+{char:'↱',name:'&Rsh;',code:'&#8625;',desc:'右上转箭头',cat:'箭头'},
+{char:'↺',name:'&olarr;',code:'&#8634;',desc:'逆时针箭头',cat:'箭头'},
+{char:'↻',name:'&orarr;',code:'&#8635;',desc:'顺时针箭头',cat:'箭头'},
+{char:'⇠',name:'&dashleftarrow;',code:'&#8672;',desc:'左虚线箭头',cat:'箭头'},
+{char:'⇢',name:'&dashrightarrow;',code:'&#8674;',desc:'右虚线箭头',cat:'箭头'},
+{char:'↗',name:'&nearr;',code:'&#8599;',desc:'右上箭头',cat:'箭头'},
+{char:'↘',name:'&searr;',code:'&#8600;',desc:'右下箭头',cat:'箭头'},
+{char:'↙',name:'&swarr;',code:'&#8601;',desc:'左下箭头',cat:'箭头'},
+{char:'↖',name:'&nwarr;',code:'&#8598;',desc:'左上箭头',cat:'箭头'},
+// 数学 Math
+{char:'∀',name:'&forall;',code:'&#8704;',desc:'全称量词',cat:'数学'},
+{char:'∂',name:'&part;',code:'&#8706;',desc:'偏导数',cat:'数学'},
+{char:'∃',name:'&exist;',code:'&#8707;',desc:'存在量词',cat:'数学'},
+{char:'∅',name:'&empty;',code:'&#8709;',desc:'空集',cat:'数学'},
+{char:'∇',name:'&nabla;',code:'&#8711;',desc:'梯度算子',cat:'数学'},
+{char:'∈',name:'&isin;',code:'&#8712;',desc:'属于',cat:'数学'},
+{char:'∉',name:'&notin;',code:'&#8713;',desc:'不属于',cat:'数学'},
+{char:'∋',name:'&ni;',code:'&#8715;',desc:'包含',cat:'数学'},
+{char:'∏',name:'&prod;',code:'&#8719;',desc:'连乘积',cat:'数学'},
+{char:'∑',name:'&sum;',code:'&#8721;',desc:'求和',cat:'数学'},
+{char:'−',name:'&minus;',code:'&#8722;',desc:'减号',cat:'数学'},
+{char:'∗',name:'&lowast;',code:'&#8727;',desc:'星号运算符',cat:'数学'},
+{char:'√',name:'&radic;',code:'&#8730;',desc:'平方根',cat:'数学'},
+{char:'∝',name:'&prop;',code:'&#8733;',desc:'正比于',cat:'数学'},
+{char:'∞',name:'&infin;',code:'&#8734;',desc:'无穷大',cat:'数学'},
+{char:'∠',name:'&ang;',code:'&#8736;',desc:'角',cat:'数学'},
+{char:'∧',name:'&and;',code:'&#8743;',desc:'逻辑与',cat:'数学'},
+{char:'∨',name:'&or;',code:'&#8744;',desc:'逻辑或',cat:'数学'},
+{char:'∩',name:'&cap;',code:'&#8745;',desc:'交集',cat:'数学'},
+{char:'∪',name:'&cup;',code:'&#8746;',desc:'并集',cat:'数学'},
+{char:'∫',name:'&int;',code:'&#8747;',desc:'积分',cat:'数学'},
+{char:'∴',name:'&there4;',code:'&#8756;',desc:'所以',cat:'数学'},
+{char:'∵',name:'&because;',code:'&#8757;',desc:'因为',cat:'数学'},
+{char:'∼',name:'&sim;',code:'&#8764;',desc:'相似',cat:'数学'},
+{char:'≅',name:'&cong;',code:'&#8773;',desc:'全等',cat:'数学'},
+{char:'≈',name:'&asymp;',code:'&#8776;',desc:'约等于',cat:'数学'},
+{char:'≠',name:'&ne;',code:'&#8800;',desc:'不等于',cat:'数学'},
+{char:'≡',name:'&equiv;',code:'&#8801;',desc:'恒等于',cat:'数学'},
+{char:'≤',name:'&le;',code:'&#8804;',desc:'小于等于',cat:'数学'},
+{char:'≥',name:'&ge;',code:'&#8805;',desc:'大于等于',cat:'数学'},
+{char:'⊂',name:'&sub;',code:'&#8834;',desc:'子集',cat:'数学'},
+{char:'⊃',name:'&sup;',code:'&#8835;',desc:'超集',cat:'数学'},
+{char:'⊄',name:'&nsub;',code:'&#8836;',desc:'非子集',cat:'数学'},
+{char:'⊆',name:'&sube;',code:'&#8838;',desc:'子集或等于',cat:'数学'},
+{char:'⊇',name:'&supe;',code:'&#8839;',desc:'超集或等于',cat:'数学'},
+{char:'⊕',name:'&oplus;',code:'&#8853;',desc:'异或',cat:'数学'},
+{char:'⊗',name:'&otimes;',code:'&#8855;',desc:'张量积',cat:'数学'},
+{char:'⊥',name:'&perp;',code:'&#8869;',desc:'垂直',cat:'数学'},
+{char:'⋅',name:'&sdot;',code:'&#8901;',desc:'点乘',cat:'数学'},
+{char:'±',name:'&plusmn;',code:'&#177;',desc:'正负号',cat:'数学'},
+{char:'×',name:'&times;',code:'&#215;',desc:'乘号',cat:'数学'},
+{char:'÷',name:'&divide;',code:'&#247;',desc:'除号',cat:'数学'},
+{char:'¬',name:'&not;',code:'&#172;',desc:'逻辑非',cat:'数学'},
+{char:'¹',name:'&sup1;',code:'&#185;',desc:'上标1',cat:'数学'},
+{char:'²',name:'&sup2;',code:'&#178;',desc:'上标2',cat:'数学'},
+{char:'³',name:'&sup3;',code:'&#179;',desc:'上标3',cat:'数学'},
+{char:'¼',name:'&frac14;',code:'&#188;',desc:'四分之一',cat:'数学'},
+{char:'½',name:'&frac12;',code:'&#189;',desc:'二分之一',cat:'数学'},
+{char:'¾',name:'&frac34;',code:'&#190;',desc:'四分之三',cat:'数学'},
+{char:'°',name:'&deg;',code:'&#176;',desc:'度',cat:'数学'},
+{char:'µ',name:'&micro;',code:'&#181;',desc:'微',cat:'数学'},
+// 货币 Currency
+{char:'$',name:'&dollar;',code:'&#36;',desc:'美元',cat:'货币'},
+{char:'€',name:'&euro;',code:'&#8364;',desc:'欧元',cat:'货币'},
+{char:'£',name:'&pound;',code:'&#163;',desc:'英镑',cat:'货币'},
+{char:'¥',name:'&yen;',code:'&#165;',desc:'日元/人民币',cat:'货币'},
+{char:'¢',name:'&cent;',code:'&#162;',desc:'美分',cat:'货币'},
+{char:'₹',name:'&rupee;',code:'&#8377;',desc:'印度卢比',cat:'货币'},
+{char:'₩',name:'&won;',code:'&#8361;',desc:'韩元',cat:'货币'},
+{char:'₪',name:'&shekel;',code:'&#8362;',desc:'以色列谢克尔',cat:'货币'},
+{char:'₫',name:'&dong;',code:'&#8363;',desc:'越南盾',cat:'货币'},
+{char:'₭',name:'&kip;',code:'&#8365;',desc:'老挝基普',cat:'货币'},
+{char:'₮',name:'&tugrik;',code:'&#8366;',desc:'蒙古图格里克',cat:'货币'},
+{char:'₱',name:'&peso;',code:'&#8369;',desc:'菲律宾比索',cat:'货币'},
+{char:'₴',name:'&hryvnia;',code:'&#8372;',desc:'乌克兰格里夫纳',cat:'货币'},
+{char:'₵',name:'&cedi;',code:'&#8373;',desc:'加纳塞地',cat:'货币'},
+{char:'₸',name:'&tenge;',code:'&#8376;',desc:'哈萨克坚戈',cat:'货币'},
+{char:'₺',name:'&lira;',code:'&#8378;',desc:'土耳其里拉',cat:'货币'},
+{char:'₼',name:'&manat;',code:'&#8380;',desc:'阿塞拜疆马纳特',cat:'货币'},
+{char:'₽',name:'&ruble;',code:'&#8381;',desc:'俄罗斯卢布',cat:'货币'},
+{char:'¤',name:'&curren;',code:'&#164;',desc:'通用货币符号',cat:'货币'},
+{char:'ƒ',name:'&fnof;',code:'&#402;',desc:'荷兰盾/函数',cat:'货币'},
+// 希腊字母 Greek
+{char:'Α',name:'&Alpha;',code:'&#913;',desc:'Alpha 大写',cat:'希腊字母'},
+{char:'Β',name:'&Beta;',code:'&#914;',desc:'Beta 大写',cat:'希腊字母'},
+{char:'Γ',name:'&Gamma;',code:'&#915;',desc:'Gamma 大写',cat:'希腊字母'},
+{char:'Δ',name:'&Delta;',code:'&#916;',desc:'Delta 大写',cat:'希腊字母'},
+{char:'Ε',name:'&Epsilon;',code:'&#917;',desc:'Epsilon 大写',cat:'希腊字母'},
+{char:'Ζ',name:'&Zeta;',code:'&#918;',desc:'Zeta 大写',cat:'希腊字母'},
+{char:'Η',name:'&Eta;',code:'&#919;',desc:'Eta 大写',cat:'希腊字母'},
+{char:'Θ',name:'&Theta;',code:'&#920;',desc:'Theta 大写',cat:'希腊字母'},
+{char:'Ι',name:'&Iota;',code:'&#921;',desc:'Iota 大写',cat:'希腊字母'},
+{char:'Κ',name:'&Kappa;',code:'&#922;',desc:'Kappa 大写',cat:'希腊字母'},
+{char:'Λ',name:'&Lambda;',code:'&#923;',desc:'Lambda 大写',cat:'希腊字母'},
+{char:'Μ',name:'&Mu;',code:'&#924;',desc:'Mu 大写',cat:'希腊字母'},
+{char:'Ν',name:'&Nu;',code:'&#925;',desc:'Nu 大写',cat:'希腊字母'},
+{char:'Ξ',name:'&Xi;',code:'&#926;',desc:'Xi 大写',cat:'希腊字母'},
+{char:'Ο',name:'&Omicron;',code:'&#927;',desc:'Omicron 大写',cat:'希腊字母'},
+{char:'Π',name:'&Pi;',code:'&#928;',desc:'Pi 大写',cat:'希腊字母'},
+{char:'Ρ',name:'&Rho;',code:'&#929;',desc:'Rho 大写',cat:'希腊字母'},
+{char:'Σ',name:'&Sigma;',code:'&#931;',desc:'Sigma 大写',cat:'希腊字母'},
+{char:'Τ',name:'&Tau;',code:'&#932;',desc:'Tau 大写',cat:'希腊字母'},
+{char:'Υ',name:'&Upsilon;',code:'&#933;',desc:'Upsilon 大写',cat:'希腊字母'},
+{char:'Φ',name:'&Phi;',code:'&#934;',desc:'Phi 大写',cat:'希腊字母'},
+{char:'Χ',name:'&Chi;',code:'&#935;',desc:'Chi 大写',cat:'希腊字母'},
+{char:'Ψ',name:'&Psi;',code:'&#936;',desc:'Psi 大写',cat:'希腊字母'},
+{char:'Ω',name:'&Omega;',code:'&#937;',desc:'Omega 大写',cat:'希腊字母'},
+{char:'α',name:'&alpha;',code:'&#945;',desc:'alpha 小写',cat:'希腊字母'},
+{char:'β',name:'&beta;',code:'&#946;',desc:'beta 小写',cat:'希腊字母'},
+{char:'γ',name:'&gamma;',code:'&#947;',desc:'gamma 小写',cat:'希腊字母'},
+{char:'δ',name:'&delta;',code:'&#948;',desc:'delta 小写',cat:'希腊字母'},
+{char:'ε',name:'&epsilon;',code:'&#949;',desc:'epsilon 小写',cat:'希腊字母'},
+{char:'ζ',name:'&zeta;',code:'&#950;',desc:'zeta 小写',cat:'希腊字母'},
+{char:'η',name:'&eta;',code:'&#951;',desc:'eta 小写',cat:'希腊字母'},
+{char:'θ',name:'&theta;',code:'&#952;',desc:'theta 小写',cat:'希腊字母'},
+{char:'ι',name:'&iota;',code:'&#953;',desc:'iota 小写',cat:'希腊字母'},
+{char:'κ',name:'&kappa;',code:'&#954;',desc:'kappa 小写',cat:'希腊字母'},
+{char:'λ',name:'&lambda;',code:'&#955;',desc:'lambda 小写',cat:'希腊字母'},
+{char:'μ',name:'&mu;',code:'&#956;',desc:'mu 小写',cat:'希腊字母'},
+{char:'ν',name:'&nu;',code:'&#957;',desc:'nu 小写',cat:'希腊字母'},
+{char:'ξ',name:'&xi;',code:'&#958;',desc:'xi 小写',cat:'希腊字母'},
+{char:'ο',name:'&omicron;',code:'&#959;',desc:'omicron 小写',cat:'希腊字母'},
+{char:'π',name:'&pi;',code:'&#960;',desc:'pi 小写',cat:'希腊字母'},
+{char:'ρ',name:'&rho;',code:'&#961;',desc:'rho 小写',cat:'希腊字母'},
+{char:'ς',name:'&sigmaf;',code:'&#962;',desc:'sigma 词尾',cat:'希腊字母'},
+{char:'σ',name:'&sigma;',code:'&#963;',desc:'sigma 小写',cat:'希腊字母'},
+{char:'τ',name:'&tau;',code:'&#964;',desc:'tau 小写',cat:'希腊字母'},
+{char:'υ',name:'&upsilon;',code:'&#965;',desc:'upsilon 小写',cat:'希腊字母'},
+{char:'φ',name:'&phi;',code:'&#966;',desc:'phi 小写',cat:'希腊字母'},
+{char:'χ',name:'&chi;',code:'&#967;',desc:'chi 小写',cat:'希腊字母'},
+{char:'ψ',name:'&psi;',code:'&#968;',desc:'psi 小写',cat:'希腊字母'},
+{char:'ω',name:'&omega;',code:'&#969;',desc:'omega 小写',cat:'希腊字母'},
+// 扑克/杂项 Cards & Misc
+{char:'♠',name:'&spades;',code:'&#9824;',desc:'黑桃',cat:'杂项'},
+{char:'♣',name:'&clubs;',code:'&#9827;',desc:'梅花',cat:'杂项'},
+{char:'♥',name:'&hearts;',code:'&#9829;',desc:'红心',cat:'杂项'},
+{char:'♦',name:'&diams;',code:'&#9830;',desc:'方块',cat:'杂项'},
+{char:'♩',name:'&mnote;',code:'&#9833;',desc:'四分音符',cat:'杂项'},
+{char:'♪',name:'&mnote2;',code:'&#9834;',desc:'八分音符',cat:'杂项'},
+{char:'♫',name:'&mnotes;',code:'&#9835;',desc:'连音符',cat:'杂项'},
+{char:'♬',name:'&mnotes2;',code:'&#9836;',desc:'十六分音符',cat:'杂项'},
+{char:'✓',name:'&check;',code:'&#10003;',desc:'对勾',cat:'杂项'},
+{char:'✗',name:'&cross;',code:'&#10007;',desc:'叉号',cat:'杂项'},
+{char:'✦',name:'&star4;',code:'&#10022;',desc:'四角星',cat:'杂项'},
+{char:'✧',name:'&star4o;',code:'&#10023;',desc:'空心四角星',cat:'杂项'},
+{char:'★',name:'&starf;',code:'&#9733;',desc:'实心五角星',cat:'杂项'},
+{char:'☆',name:'&star;',code:'&#9734;',desc:'空心五角星',cat:'杂项'},
+{char:'☀',name:'&sun;',code:'&#9728;',desc:'太阳',cat:'杂项'},
+{char:'☁',name:'&cloud;',code:'&#9729;',desc:'云',cat:'杂项'},
+{char:'☂',name:'&umbrella;',code:'&#9730;',desc:'雨伞',cat:'杂项'},
+{char:'☎',name:'&phone;',code:'&#9742;',desc:'电话',cat:'杂项'},
+{char:'☑',name:'&checkbox;',code:'&#9745;',desc:'勾选框',cat:'杂项'},
+{char:'☒',name:'&crossbox;',code:'&#9746;',desc:'叉选框',cat:'杂项'},
+{char:'☮',name:'&peace;',code:'&#9774;',desc:'和平符号',cat:'杂项'},
+{char:'☯',name:'&yinyang;',code:'&#9775;',desc:'阴阳',cat:'杂项'},
+{char:'☺',name:'&smiley;',code:'&#9786;',desc:'笑脸',cat:'杂项'},
+{char:'☻',name:'&smileyb;',code:'&#9787;',desc:'实心笑脸',cat:'杂项'},
+{char:'☼',name:'&sunface;',code:'&#9788;',desc:'太阳脸',cat:'杂项'},
+{char:'♀',name:'&female;',code:'&#9792;',desc:'女性符号',cat:'杂项'},
+{char:'♂',name:'&male;',code:'&#9794;',desc:'男性符号',cat:'杂项'},
+{char:'⚡',name:'&zap;',code:'&#9889;',desc:'闪电',cat:'杂项'},
+{char:'⚠',name:'&warning;',code:'&#9888;',desc:'警告',cat:'杂项'},
+{char:'⚙',name:'&gear;',code:'&#9881;',desc:'齿轮',cat:'杂项'},
+{char:'⌘',name:'&cmd;',code:'&#8984;',desc:'Command键',cat:'杂项'},
+{char:'⌥',name:'&opt;',code:'&#8997;',desc:'Option键',cat:'杂项'},
+{char:'⇧',name:'&shift;',code:'&#8679;',desc:'Shift键',cat:'杂项'},
+{char:'⌫',name:'&delete;',code:'&#9003;',desc:'Delete键',cat:'杂项'},
+{char:'⏎',name:'&return;',code:'&#9166;',desc:'Return键',cat:'杂项'},
+{char:'⎋',name:'&esc;',code:'&#9099;',desc:'Escape键',cat:'杂项'},
+{char:'⌨',name:'&keyboard;',code:'&#9000;',desc:'键盘',cat:'杂项'},
+{char:'✂',name:'&scissors;',code:'&#9986;',desc:'剪刀',cat:'杂项'},
+{char:'✉',name:'&envelope;',code:'&#9993;',desc:'信封',cat:'杂项'},
+{char:'✎',name:'&pencil;',code:'&#9998;',desc:'铅笔',cat:'杂项'},
+{char:'✏',name:'&pencil2;',code:'&#9999;',desc:'铅笔2',cat:'杂项'},
+{char:'✐',name:'&nib;',code:'&#10000;',desc:'笔尖',cat:'杂项'},
+{char:'❄',name:'&snowflake;',code:'&#10052;',desc:'雪花',cat:'杂项'},
+{char:'❤',name:'&heart;',code:'&#10084;',desc:'红心',cat:'杂项'},
+{char:'⚽',name:'&soccer;',code:'&#9917;',desc:'足球',cat:'杂项'},
+{char:'♻',name:'&recycle;',code:'&#9851;',desc:'回收符号',cat:'杂项'},
+{char:'⚓',name:'&anchor;',code:'&#9875;',desc:'锚',cat:'杂项'},
+{char:'◉',name:'&circledot;',code:'&#9673;',desc:'圆点',cat:'杂项'},
+{char:'◎',name:'&bullseye;',code:'&#9678;',desc:'靶心',cat:'杂项'},
+{char:'●',name:'&circle;',code:'&#9679;',desc:'实心圆',cat:'杂项'},
+{char:'○',name:'&circleo;',code:'&#9675;',desc:'空心圆',cat:'杂项'},
+{char:'■',name:'&square;',code:'&#9632;',desc:'实心方块',cat:'杂项'},
+{char:'□',name:'&squareo;',code:'&#9633;',desc:'空心方块',cat:'杂项'},
+{char:'▲',name:'&triangleu;',code:'&#9650;',desc:'上三角',cat:'杂项'},
+{char:'△',name:'&triangleuo;',code:'&#9651;',desc:'空心上三角',cat:'杂项'},
+{char:'▼',name:'&triangled;',code:'&#9660;',desc:'下三角',cat:'杂项'},
+{char:'▽',name:'&triangledo;',code:'&#9661;',desc:'空心下三角',cat:'杂项'},
+{char:'◆',name:'&diamondf;',code:'&#9670;',desc:'实心菱形',cat:'杂项'},
+{char:'◇',name:'&diamondo;',code:'&#9671;',desc:'空心菱形',cat:'杂项'},
+];
+
+const cats=['全部',...[...new Set(entities.map(e=>e.cat))]];
+let activeCat='全部',query='';
+const $=id=>document.getElementById(id);
+const grid=$('grid'),tabsEl=$('tabs'),countEl=$('count'),emptyEl=$('empty'),searchEl=$('search'),clearBtn=$('clearBtn'),toastEl=$('toast');
+
+function initTabs(){
+  tabsEl.innerHTML=cats.map(c=>`<button class="tab${c===activeCat?' active':''}" data-cat="${c}">${c}</button>`).join('');
+  tabsEl.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{activeCat=t.dataset.cat;tabsEl.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));t.classList.add('active');render()});
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function render(){
+  const q=query.toLowerCase();
+  const filtered=entities.filter(e=>{
+    if(activeCat!=='全部'&&e.cat!==activeCat)return false;
+    if(!q)return true;
+    return e.char.toLowerCase().includes(q)||e.name.toLowerCase().includes(q)||e.code.toLowerCase().includes(q)||e.desc.toLowerCase().includes(q);
+  });
+  countEl.textContent=`显示 ${filtered.length} / ${entities.length} 个实体`;
+  if(!filtered.length){grid.innerHTML='';emptyEl.style.display='block';return}
+  emptyEl.style.display='none';
+  grid.innerHTML=filtered.map(e=>`<div class="card">
+    <div class="card-char">${e.char==='&'?'&amp;':e.char==='<'?'&lt;':e.char==='>'?'&gt;':e.char===' '?'<span style="opacity:.3">[space]</span>':e.char}</div>
+    <div class="card-name">${escHtml(e.name)}</div>
+    <div class="card-code">${escHtml(e.code)}</div>
+    <div class="card-desc">${e.desc} · ${e.cat}</div>
+    <div class="copy-menu">
+      <button class="copy-btn" onclick="copyText('${escHtml(e.name)}',event)">复制 ${escHtml(e.name)}</button>
+      <button class="copy-btn" onclick="copyText('${escHtml(e.code)}',event)">复制 ${escHtml(e.code)}</button>
+      <button class="copy-btn" onclick="copyText('${e.char.replace(/'/g,"\\'")}',event)">复制字符 ${e.char==='&'?'&amp;':e.char==='<'?'&lt;':e.char==='>'?'&gt;':e.char===' '?'⎵':e.char}</button>
+    </div>
+  </div>`).join('');
+}
+
+function copyText(text,e){
+  e&&e.stopPropagation();
+  navigator.clipboard.writeText(text).then(()=>showToast('已复制: '+text)).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('已复制: '+text);
+  });
+}
+
+let toastTimer;
+function showToast(msg){
+  toastEl.textContent=msg;toastEl.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),1800);
+}
+
+function clearSearch(){searchEl.value='';query='';clearBtn.style.display='none';render();searchEl.focus()}
+
+searchEl.addEventListener('input',e=>{query=e.target.value.trim();clearBtn.style.display=query?'block':'none';render()});
+
+initTabs();render();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1200px;margin:40px auto 0;padding:0 20px;position:relative;cursor:pointer}
+.pro-section .pro-title{font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:16px;text-align:center}
+.pro-mock{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px;background:var(--surface);border-radius:16px;filter:blur(4px);pointer-events:none;user-select:none}
+.pro-mock-card{background:var(--card);border-radius:12px;padding:20px;text-align:center}
+.pro-mock-card .icon{font-size:2rem;margin-bottom:8px}
+.pro-mock-card h3{font-size:.9rem;color:var(--text);margin-bottom:6px}
+.pro-mock-card p{font-size:.75rem;color:var(--text2)}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.pro-lock .lock-icon{font-size:3rem;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(233,69,96,.4))}
+.pro-lock .lock-text{font-size:1.1rem;font-weight:600;color:#fff;background:rgba(233,69,96,.85);padding:8px 24px;border-radius:20px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:20px;padding:36px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:2rem;font-weight:800;color:var(--accent);margin:12px 0}
+.pro-modal .price span{font-size:.9rem;font-weight:400;color:var(--text2)}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#c23152);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-bottom:12px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:8px}
+.pro-modal .btn-later:hover{color:#ccc}
+@media(max-width:640px){.pro-mock{grid-template-columns:1fr}}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+  <div class="pro-title">⚡ Pro Features</div>
+  <div class="pro-mock">
+    <div class="pro-mock-card"><div class="icon">⭐</div><h3>Custom Favorites</h3><p>Save & organize your most-used entities</p></div>
+    <div class="pro-mock-card"><div class="icon">🔄</div><h3>Batch Convert</h3><p>Convert entire text blocks to HTML entities</p></div>
+    <div class="pro-mock-card"><div class="icon">🔌</div><h3>Entity API</h3><p>REST API for programmatic entity lookup</p></div>
+  </div>
+  <div class="pro-lock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-text">Unlock Pro Features</div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="pro-modal">
+    <h2>HTML Entity Pro</h2>
+    <div class="price">$9 <span>one-time</span></div>
+    <ul>
+      <li>Custom favorites — save & organize entities</li>
+      <li>Batch convert entire text blocks</li>
+      <li>REST API for programmatic lookup</li>
+      <li>Extended library (1000+ entities)</li>
+      <li>Lifetime updates</li>
+    </ul>
+    <a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+    <button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/gh/nicegoodthings/monetize.js@latest/monetize.min.js" defer></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

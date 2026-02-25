@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Scanner & Reader</title>
+<meta name="description" content="Scan QR codes by uploading an image or using your camera.">
+<link rel="canonical" href="https://lifa-su.com/ai-qrcode-reader/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--card2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--radius:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+a{color:var(--accent)}
+.container{max-width:600px;width:100%;padding:16px}
+header{text-align:center;padding:32px 0 16px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{flex:1;padding:12px;border:none;border-radius:12px;background:var(--card2);color:var(--text);font-size:.95rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab.active{background:var(--accent);font-weight:600}
+.tab:hover:not(.active){opacity:.8}
+.upload-area{border:2px dashed #444;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .2s}
+.upload-area:hover,.upload-area.dragover{border-color:var(--accent)}
+.upload-area p{color:var(--text2);margin-top:8px}
+.upload-area .icon{font-size:2.5rem}
+#fileInput{display:none}
+#cameraSection{display:none}
+#cameraVideo{width:100%;border-radius:12px;background:#000;display:block}
+.btn{padding:10px 20px;border:none;border-radius:10px;font-size:.9rem;cursor:pointer;transition:all .2s;font-weight:500}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{background:var(--card2);color:var(--text)}
+.btn-secondary:hover{opacity:.8}
+.btn-danger{background:#c0392b;color:#fff}
+.btn-danger:hover{opacity:.85}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+#result{display:none}
+.result-box{background:var(--card2);border-radius:12px;padding:16px;word-break:break-all}
+.result-text{font-size:1rem;line-height:1.5;margin-bottom:10px;user-select:all}
+.result-label{font-size:.8rem;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:20px;font-size:.9rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+#historySection{display:none}
+.history-item{background:var(--card2);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.history-item .text{flex:1;word-break:break-all;font-size:.9rem;cursor:pointer}
+.history-item .time{color:var(--text2);font-size:.75rem;white-space:nowrap}
+.history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.history-header h3{font-size:1rem}
+.empty{text-align:center;color:var(--text2);padding:20px}
+.scanning-overlay{position:relative}
+.scan-line{position:absolute;top:0;left:5%;width:90%;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:scanAnim 2s linear infinite;border-radius:1px;display:none;pointer-events:none}
+@keyframes scanAnim{0%{top:5%}50%{top:90%}100%{top:5%}}
+canvas{display:none}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem}
+@media(max-width:480px){header h1{font-size:1.4rem}.card{padding:14px}.tab{padding:10px;font-size:.85rem}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>📷 QR Code Scanner</h1>
+    <p>Upload an image or use your camera to scan QR codes</p>
+  </header>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('upload')" id="tabUpload">📁 Upload</button>
+      <button class="tab" onclick="switchTab('camera')" id="tabCamera">📸 Camera</button>
+      <button class="tab" onclick="switchTab('history')" id="tabHistory">📋 History</button>
+    </div>
+    <div id="uploadSection">
+      <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="icon">📁</div>
+        <p>Click or drag & drop an image here</p>
+        <p style="font-size:.8rem;margin-top:4px">PNG, JPG, GIF, BMP, WebP</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+    <div id="cameraSection">
+      <div class="scanning-overlay">
+        <video id="cameraVideo" autoplay playsinline muted></video>
+        <div class="scan-line" id="scanLine"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnCam" onclick="toggleCamera()">Start Camera</button>
+        <button class="btn btn-secondary" id="btnFlip" onclick="flipCamera()" style="display:none">🔄 Flip</button>
+      </div>
+    </div>
+    <div id="historySection">
+      <div class="history-header">
+        <h3>Scan History</h3>
+        <button class="btn btn-danger" onclick="clearHistory()" style="font-size:.8rem;padding:6px 12px">Clear All</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+  <div class="card" id="result">
+    <div class="result-label">Decoded Result</div>
+    <div class="result-box">
+      <div class="result-text" id="resultText"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="copyResult()">📋 Copy</button>
+        <button class="btn btn-secondary" id="btnOpen" onclick="openResult()" style="display:none">🔗 Open Link</button>
+      </div>
+    </div>
+  </div>
+  <footer>Built with jsQR · Free & Open Source</footer>
+</div>
+<div class="toast" id="toast"></div>
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById('cameraVideo');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let scanning = false;
+let stream = null;
+let facingMode = 'environment';
+let animFrame = null;
+let currentResult = '';
+
+// Tab switching
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('uploadSection').style.display = tab === 'upload' ? '' : 'none';
+  document.getElementById('cameraSection').style.display = tab === 'camera' ? '' : 'none';
+  document.getElementById('historySection').style.display = tab === 'history' ? '' : 'none';
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  if (tab === 'history') renderHistory();
+  if (tab !== 'camera' && scanning) stopCamera();
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// File upload
+document.getElementById('fileInput').addEventListener('change', e => {
+  if (e.target.files[0]) decodeFile(e.target.files[0]);
+});
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) decodeFile(e.dataTransfer.files[0]);
+});
+
+function decodeFile(file) {
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    if (code) {
+      showResult(code.data);
+    } else {
+      showToast('No QR code found in image');
+    }
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+// Camera
+async function toggleCamera() {
+  if (scanning) { stopCamera(); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+    video.srcObject = stream;
+    await video.play();
+    scanning = true;
+    document.getElementById('btnCam').textContent = 'Stop Camera';
+    document.getElementById('btnFlip').style.display = '';
+    document.getElementById('scanLine').style.display = '';
+    scanFrame();
+  } catch (err) {
+    showToast('Camera access denied');
+  }
+}
+
+function stopCamera() {
+  scanning = false;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null;
+  video.srcObject = null;
+  document.getElementById('btnCam').textContent = 'Start Camera';
+  document.getElementById('btnFlip').style.display = 'none';
+  document.getElementById('scanLine').style.display = 'none';
+}
+
+function flipCamera() {
+  facingMode = facingMode === 'environment' ? 'user' : 'environment';
+  stopCamera();
+  toggleCamera();
+}
+
+function scanFrame() {
+  if (!scanning) return;
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+    if (code) {
+      showResult(code.data);
+      stopCamera();
+      return;
+    }
+  }
+  animFrame = requestAnimationFrame(scanFrame);
+}
+
+// Result
+function showResult(data) {
+  currentResult = data;
+  document.getElementById('resultText').textContent = data;
+  document.getElementById('result').style.display = '';
+  const isUrl = /^https?:\/\//i.test(data);
+  document.getElementById('btnOpen').style.display = isUrl ? '' : 'none';
+  saveHistory(data);
+  showToast('QR code decoded!');
+}
+
+function copyResult() {
+  navigator.clipboard.writeText(currentResult).then(() => showToast('Copied to clipboard!'));
+}
+
+function openResult() {
+  window.open(currentResult, '_blank', 'noopener');
+}
+
+// History
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('qr_history') || '[]'); } catch { return []; }
+}
+
+function saveHistory(data) {
+  const h = getHistory();
+  h.unshift({ text: data, time: new Date().toISOString() });
+  if (h.length > 50) h.length = 50;
+  localStorage.setItem('qr_history', JSON.stringify(h));
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const h = getHistory();
+  if (!h.length) { list.innerHTML = '<div class="empty">No scan history yet</div>'; return; }
+  list.innerHTML = h.map(item => {
+    const d = new Date(item.time);
+    const ts = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    return '<div class="history-item"><div class="text" onclick="copyText(this)">' +
+      escHtml(item.text) + '</div><div class="time">' + ts + '</div></div>';
+  }).join('');
+}
+
+function clearHistory() {
+  localStorage.removeItem('qr_history');
+  renderHistory();
+  showToast('History cleared');
+}
+
+function copyText(el) {
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('Copied!'));
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Tab IDs for switchTab
+document.getElementById('tabUpload').id = 'tabUpload';
+document.getElementById('tabCamera').id = 'tabCamera';
+document.getElementById('tabHistory').id = 'tabHistory';
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:600px;width:100%;margin-top:24px;padding:0 16px}
+.pro-section h2{text-align:center;font-size:1.3rem;margin-bottom:16px;color:var(--accent)}
+.pro-mock{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer}
+.pro-mock-inner{filter:blur(3px);opacity:.7;pointer-events:none;padding:16px;background:var(--card);border-radius:var(--radius)}
+.pro-mock-card{background:var(--card2);border-radius:10px;padding:14px;margin-bottom:10px}
+.pro-mock-card .pm-title{font-size:.8rem;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.pro-mock-card .pm-desc{font-size:.85rem;color:var(--text2)}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);border-radius:var(--radius);z-index:2}
+.pro-lock-icon{font-size:2.8rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.05rem;font-weight:600;color:#fff}
+.pro-lock-sub{font-size:.85rem;color:var(--text2);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--card);border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;position:relative;border:1px solid rgba(233,69,96,.3);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .price{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:10px 0 18px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:24px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.92rem;color:var(--text)}
+.pro-modal ul li::before{content:'✓ ';color:#00c853;font-weight:700}
+.pro-modal .btn-upgrade{display:block;width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .2s;margin-bottom:10px}
+.pro-modal .btn-upgrade:hover{opacity:.9}
+.pro-modal .btn-later{background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:8px;transition:color .2s}
+.pro-modal .btn-later:hover{color:var(--text)}
+</style>
+<div class="pro-section">
+  <h2>⚡ Pro Features</h2>
+  <div class="pro-mock" id="proMock">
+    <div class="pro-mock-inner">
+      <div class="pro-mock-card">
+        <div class="pm-title">Batch QR Scanning</div>
+        <div class="pm-desc">Upload multiple images at once — scan 100+ QR codes in seconds with bulk results</div>
+      </div>
+      <div class="pro-mock-card">
+        <div class="pm-title">History Export</div>
+        <div class="pm-desc">Export full scan history as CSV/JSON with timestamps, source files, and metadata</div>
+      </div>
+      <div class="pro-mock-card">
+        <div class="pm-title">Custom QR Code Generator</div>
+        <div class="pm-desc">Generate styled QR codes with custom colors, logos, rounded corners, and gradient fills</div>
+      </div>
+    </div>
+    <div class="pro-lock-overlay">
+      <div class="pro-lock-icon">🔒</div>
+      <div class="pro-lock-text">Unlock Pro Features</div>
+      <div class="pro-lock-sub">Batch Scan · Export · Custom QR Generator</div>
+    </div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal">
+  <div class="pro-modal">
+    <h3>🔒 QR Code Reader Pro</h3>
+    <div class="price">$14</div>
+    <ul>
+      <li>Batch scanning — process 100+ images at once</li>
+      <li>Full history export (CSV / JSON)</li>
+      <li>Custom styled QR code generator</li>
+      <li>Logo embedding & gradient QR codes</li>
+      <li>Priority support & lifetime updates</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn-upgrade">Upgrade to Pro — $14</a>
+    <button class="btn-later" id="proModalClose">Maybe later</button>
+  </div>
+</div>
+<script>
+document.getElementById('proMock').addEventListener('click',function(){document.getElementById('proModal').classList.add('active');});
+document.getElementById('proModalClose').addEventListener('click',function(e){e.stopPropagation();document.getElementById('proModal').classList.remove('active');});
+document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
+</script>
+<script src="https://lifa-su.com/monetize/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

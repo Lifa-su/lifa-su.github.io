@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS/JS Minifier - Compress & Beautify Code</title>
+<meta name="description" content="Free online AI-powered CSS, JavaScript and HTML minifier and beautifier. Compress your code instantly with advanced optimization.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-minifier-v2/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:linear-gradient(135deg,#00b09b,#96c93d);--accent-color:#00b09b;--accent2:#96c93d;--text:#e0e0e0;--text-dim:#8892a4;--border:#2a3a5c;--input-bg:#0f1a30;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent-color);text-decoration:none}
+
+.container{max-width:1400px;margin:0 auto;padding:20px}
+
+/* Header */
+.header{text-align:center;padding:30px 0 20px}
+.header h1{font-size:1.8rem;background:var(--accent);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.header p{color:var(--text-dim);font-size:0.95rem}
+
+/* Tabs */
+.tabs{display:flex;justify-content:center;gap:4px;margin-bottom:20px;background:var(--card);border-radius:var(--radius);padding:4px;max-width:400px;margin-left:auto;margin-right:auto}
+.tab{flex:1;padding:10px 20px;border:none;background:transparent;color:var(--text-dim);font-size:0.95rem;cursor:pointer;border-radius:8px;transition:all .2s;font-weight:500}
+.tab.active{background:var(--accent);color:#fff;-webkit-text-fill-color:#fff}
+.tab:hover:not(.active){color:var(--text)}
+
+/* Actions */
+.actions{display:flex;justify-content:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.btn{padding:10px 24px;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.btn:active{transform:translateY(0)}
+.btn-minify{background:var(--accent);color:#fff}
+.btn-beautify{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.btn-copy{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-clear{background:var(--card);color:var(--text);border:1px solid var(--border)}
+
+/* Stats */
+.stats{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;text-align:center;min-width:140px}
+.stat-label{font-size:0.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.stat-value{font-size:1.2rem;font-weight:700;background:var(--accent);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Editor Layout */
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.editor-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.panel-title{font-size:0.85rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.panel-size{font-size:0.8rem;color:var(--text-dim)}
+.editor-panel textarea{width:100%;min-height:400px;padding:16px;background:var(--input-bg);border:none;color:var(--text);font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;font-size:0.88rem;resize:vertical;line-height:1.6;outline:none;flex:1}
+.editor-panel textarea::placeholder{color:#4a5568}
+.editor-panel textarea:focus{box-shadow:inset 0 0 0 1px var(--accent-color)}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--accent);color:#fff;padding:12px 24px;border-radius:8px;font-size:0.9rem;font-weight:500;transition:transform .3s ease;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Footer */
+.footer{text-align:center;padding:30px 0;color:var(--text-dim);font-size:0.8rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .editor-wrap{grid-template-columns:1fr}
+  .editor-panel textarea{min-height:250px}
+  .header h1{font-size:1.4rem}
+  .stats{gap:10px}
+  .stat{min-width:100px;padding:10px 14px}
+  .stat-value{font-size:1rem}
+  .actions{gap:6px}
+  .btn{padding:8px 16px;font-size:0.85rem}
+  .container{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>⚡ AI CSS/JS Minifier</h1>
+    <p>Compress & Beautify CSS, JavaScript, and HTML instantly</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-type="css">CSS</button>
+    <button class="tab" data-type="js">JavaScript</button>
+    <button class="tab" data-type="html">HTML</button>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-minify" onclick="doMinify()">🗜️ Minify</button>
+    <button class="btn btn-beautify" onclick="doBeautify()">✨ Beautify</button>
+    <button class="btn btn-copy" onclick="doCopy()">📋 Copy Output</button>
+    <button class="btn btn-clear" onclick="doClear()">🗑️ Clear</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Original</div><div class="stat-value" id="stat-original">0 B</div></div>
+    <div class="stat"><div class="stat-label">Output</div><div class="stat-value" id="stat-output">0 B</div></div>
+    <div class="stat"><div class="stat-label">Saved</div><div class="stat-value" id="stat-saved">0 B</div></div>
+    <div class="stat"><div class="stat-label">Ratio</div><div class="stat-value" id="stat-ratio">0%</div></div>
+  </div>
+
+  <div class="editor-wrap">
+    <div class="editor-panel">
+      <div class="panel-header">
+        <span class="panel-title">Input</span>
+        <span class="panel-size" id="input-size">0 B</span>
+      </div>
+      <textarea id="input" placeholder="Paste your CSS, JavaScript, or HTML here..." spellcheck="false"></textarea>
+    </div>
+    <div class="editor-panel">
+      <div class="panel-header">
+        <span class="panel-title">Output</span>
+        <span class="panel-size" id="output-size">0 B</span>
+      </div>
+      <textarea id="output" placeholder="Minified or beautified output will appear here..." spellcheck="false" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>AI CSS/JS Minifier v2 — Free online code compression tool</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  let currentType = 'css';
+  const $input = document.getElementById('input');
+  const $output = document.getElementById('output');
+  const tabs = document.querySelectorAll('.tab');
+
+  // Tab switching
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentType = t.dataset.type;
+    const placeholders = {css:'Paste your CSS here...',js:'Paste your JavaScript here...',html:'Paste your HTML here...'};
+    $input.placeholder = placeholders[currentType] || 'Paste code here...';
+  }));
+
+  // Update input size on typing
+  $input.addEventListener('input', () => {
+    document.getElementById('input-size').textContent = formatBytes($input.value.length);
+  });
+
+  // Format bytes
+  function formatBytes(b) {
+    if (b === 0) return '0 B';
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(2) + ' MB';
+  }
+
+  // Update stats
+  function updateStats(orig, out) {
+    document.getElementById('stat-original').textContent = formatBytes(orig);
+    document.getElementById('stat-output').textContent = formatBytes(out);
+    document.getElementById('stat-saved').textContent = formatBytes(Math.max(0, orig - out));
+    const ratio = orig > 0 ? ((1 - out / orig) * 100) : 0;
+    document.getElementById('stat-ratio').textContent = ratio.toFixed(1) + '%';
+    document.getElementById('input-size').textContent = formatBytes(orig);
+    document.getElementById('output-size').textContent = formatBytes(out);
+  }
+
+  // Toast
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  // ===== CSS Minifier =====
+  function minifyCSS(code) {
+    let s = code;
+    s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+    s = s.replace(/\/\/.*/g, '');
+    s = s.replace(/\s+/g, ' ');
+    s = s.replace(/\s*([{}:;,>~+])\s*/g, '$1');
+    s = s.replace(/;}/g, '}');
+    s = s.replace(/\s*!important/g, '!important');
+    // Shorten colors
+    s = s.replace(/#([0-9a-fA-F])\1([0-9a-fA-F])\2([0-9a-fA-F])\3/g, '#$1$2$3');
+    // Remove leading zeros
+    s = s.replace(/:(\s*)0\./g, ':$1.');
+    s = s.replace(/(\s)0\./g, '$1.');
+    // Remove units from zero values
+    s = s.replace(/([:,\s])0(px|em|rem|%|vh|vw|pt|cm|mm|in|ex|ch|vmin|vmax)/g, '$10');
+    s = s.trim();
+    return s;
+  }
+
+  // ===== CSS Beautifier =====
+  function beautifyCSS(code) {
+    let s = code.trim();
+    let result = '';
+    let indent = 0;
+    const tab = '  ';
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (c === '{') {
+        result += ' {\n';
+        indent++;
+        result += tab.repeat(indent);
+      } else if (c === '}') {
+        result = result.trimEnd();
+        result += '\n';
+        indent = Math.max(0, indent - 1);
+        result += tab.repeat(indent) + '}\n';
+        if (indent === 0) result += '\n';
+        result += tab.repeat(indent);
+      } else if (c === ';') {
+        result += ';\n' + tab.repeat(indent);
+      } else if (c === ':' && s[i+1] !== ':' && (i === 0 || s[i-1] !== ':')) {
+        result += ': ';
+        while (s[i+1] === ' ') i++;
+      } else {
+        result += c;
+      }
+    }
+    return result.replace(/\n\s*\n\s*\n/g, '\n\n').trim() + '\n';
+  }
+
+  // ===== JS Minifier =====
+  function minifyJS(code) {
+    let s = code;
+    // Remove single-line comments (careful with URLs)
+    s = s.replace(/(["'`])(?:(?!\1|\\).|\\.)*\1|\/\/.*$/gm, function(m) {
+      return m[0] === '/' ? '' : m;
+    });
+    // Remove multi-line comments
+    s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+    // Collapse whitespace
+    s = s.replace(/\s+/g, ' ');
+    // Remove spaces around operators
+    s = s.replace(/\s*([{}();,=+\-*/<>!&|?:~^%])\s*/g, '$1');
+    // Restore needed spaces
+    s = s.replace(/\b(var|let|const|return|typeof|instanceof|new|delete|throw|case|in|of|void|yield|await|async|function|class|extends|import|export|from|default|if|else|for|while|do|switch|break|continue|try|catch|finally)\b/g, ' $1 ');
+    s = s.replace(/\s+/g, ' ');
+    s = s.trim();
+    return s;
+  }
+
+  // ===== JS Beautifier =====
+  function beautifyJS(code) {
+    let s = code.trim();
+    let result = '';
+    let indent = 0;
+    const tab = '  ';
+    let inString = false;
+    let strChar = '';
+
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      const next = s[i+1] || '';
+
+      // Handle strings
+      if (!inString && (c === '"' || c === "'" || c === '`')) {
+        inString = true;
+        strChar = c;
+        result += c;
+        continue;
+      }
+      if (inString) {
+        result += c;
+        if (c === strChar && s[i-1] !== '\\') inString = false;
+        continue;
+      }
+
+      if (c === '{') {
+        result += ' {\n';
+        indent++;
+        result += tab.repeat(indent);
+      } else if (c === '}') {
+        result = result.trimEnd();
+        result += '\n';
+        indent = Math.max(0, indent - 1);
+        result += tab.repeat(indent) + '}';
+        if (next && next !== ';' && next !== ',' && next !== ')' && next !== '}' && next !== 'e') {
+          result += '\n' + tab.repeat(indent);
+        }
+      } else if (c === ';') {
+        result += ';\n' + tab.repeat(indent);
+      } else if (c === ',') {
+        result += ',\n' + tab.repeat(indent);
+      } else {
+        result += c;
+      }
+    }
+    return result.replace(/\n\s*\n\s*\n/g, '\n\n').trim() + '\n';
+  }
+
+  // ===== HTML Minifier =====
+  function minifyHTML(code) {
+    let s = code;
+    // Remove HTML comments (keep conditional)
+    s = s.replace(/<!--(?!\[if)[\s\S]*?-->/g, '');
+    // Collapse whitespace between tags
+    s = s.replace(/>\s+</g, '><');
+    // Collapse internal whitespace
+    s = s.replace(/\s+/g, ' ');
+    // Remove optional quotes from attributes (simple cases)
+    s = s.replace(/=\s*"([a-zA-Z0-9_\-]+)"/g, '=$1');
+    s = s.replace(/=\s*'([a-zA-Z0-9_\-]+)'/g, '=$1');
+    // Remove optional closing tags
+    // Remove type attributes from script/style
+    s = s.replace(/<script\s+type\s*=\s*["']?text\/javascript["']?/gi, '<script');
+    s = s.replace(/<style\s+type\s*=\s*["']?text\/css["']?/gi, '<style');
+    s = s.trim();
+    return s;
+  }
+
+  // ===== HTML Beautifier =====
+  function beautifyHTML(code) {
+    let s = code.trim();
+    // Simple approach: add newlines after closing tags and indent
+    s = s.replace(/></g, '>\n<');
+    const lines = s.split('\n');
+    let indent = 0;
+    const tab = '  ';
+    const selfClosing = /^<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i;
+    const closing = /^<\//;
+    const opening = /^<[a-zA-Z]/;
+    let result = [];
+
+    for (let line of lines) {
+      line = line.trim();
+      if (!line) continue;
+      if (closing.test(line)) {
+        indent = Math.max(0, indent - 1);
+        result.push(tab.repeat(indent) + line);
+      } else if (selfClosing.test(line) || line.startsWith('<!')) {
+        result.push(tab.repeat(indent) + line);
+      } else if (opening.test(line)) {
+        result.push(tab.repeat(indent) + line);
+        if (!line.includes('</') && !line.endsWith('/>')) indent++;
+      } else {
+        result.push(tab.repeat(indent) + line);
+      }
+    }
+    return result.join('\n') + '\n';
+  }
+
+  // ===== Public API =====
+  window.doMinify = function() {
+    const code = $input.value;
+    if (!code.trim()) { toast('Please paste some code first'); return; }
+    let result;
+    switch(currentType) {
+      case 'css': result = minifyCSS(code); break;
+      case 'js': result = minifyJS(code); break;
+      case 'html': result = minifyHTML(code); break;
+    }
+    $output.value = result;
+    updateStats(code.length, result.length);
+    toast('✅ Code minified!');
+  };
+
+  window.doBeautify = function() {
+    const code = $input.value;
+    if (!code.trim()) { toast('Please paste some code first'); return; }
+    let result;
+    switch(currentType) {
+      case 'css': result = beautifyCSS(code); break;
+      case 'js': result = beautifyJS(code); break;
+      case 'html': result = beautifyHTML(code); break;
+    }
+    $output.value = result;
+    updateStats(code.length, result.length);
+    toast('✨ Code beautified!');
+  };
+
+  window.doCopy = function() {
+    const text = $output.value;
+    if (!text) { toast('Nothing to copy'); return; }
+    navigator.clipboard.writeText(text).then(() => toast('📋 Copied to clipboard!'));
+  };
+
+  window.doClear = function() {
+    $input.value = '';
+    $output.value = '';
+    updateStats(0, 0);
+    toast('🗑️ Cleared');
+  };
+})();
+</script>
+<script async src="https://cdn.sitemoney.co/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

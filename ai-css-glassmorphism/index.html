@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS glassmorphism effect generator. Create frosted glass UI components with customizable blur, transparency, and border settings. Copy clean CSS code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-glassmorphism/">
+<title>CSS Glassmorphism Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#0f3460;--highlight:#e94560;--text:#eee;--text-dim:#999;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+h1{font-size:1.6rem;font-weight:700;text-align:center;padding:1.2rem 0 .3rem;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem}
+.app{max-width:1100px;margin:0 auto;padding:0 1rem 2rem;display:grid;grid-template-columns:320px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:768px){.app{grid-template-columns:1fr;max-width:500px}}
+.panel{background:var(--surface);border-radius:var(--radius);padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.panel h2{font-size:.95rem;color:var(--highlight);border-bottom:1px solid #ffffff15;padding-bottom:.5rem;margin-bottom:.2rem}
+.control{display:flex;flex-direction:column;gap:.3rem}
+.control label{font-size:.8rem;color:var(--text-dim);display:flex;justify-content:space-between;align-items:center}
+.control label span{color:var(--highlight);font-weight:600;font-size:.85rem}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#ffffff20;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--highlight);cursor:pointer}
+input[type=color]{width:40px;height:28px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.bg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.3rem}
+.bg-opt{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid transparent;cursor:pointer;background-size:cover;background-position:center;transition:border-color .2s}
+.bg-opt.active{border-color:var(--highlight)}
+.bg-upload{display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text-dim);border:2px dashed #ffffff30;cursor:pointer;text-align:center;padding:4px}
+.bg-upload:hover{border-color:var(--highlight);color:var(--highlight)}
+.preview-area{display:flex;flex-direction:column;gap:1rem}
+.preview-wrap{position:relative;width:100%;min-height:420px;border-radius:var(--radius);overflow:hidden;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center}
+.glass-card{width:280px;padding:2rem;text-align:center;transition:all .15s ease}
+.glass-card h3{font-size:1.2rem;margin-bottom:.5rem}
+.glass-card p{font-size:.85rem;color:#ffffffcc}
+.code-wrap{position:relative}
+.code-box{background:#0d1117;border-radius:var(--radius);padding:1rem;font-family:'SF Mono',Consolas,monospace;font-size:.78rem;line-height:1.7;color:#c9d1d9;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto}
+.copy-btn{position:absolute;top:.6rem;right:.6rem;background:var(--highlight);color:#fff;border:none;border-radius:6px;padding:.35rem .8rem;font-size:.75rem;cursor:pointer;transition:opacity .2s}
+.copy-btn:hover{opacity:.8}
+.footer{text-align:center;padding:1.5rem 0;color:var(--text-dim);font-size:.75rem}
+</style>
+</head>
+<body>
+
+<h1>CSS Glassmorphism Generator</h1>
+<p class="subtitle">Design beautiful frosted glass effects. Tweak, preview, copy.</p>
+
+<div class="app">
+  <div class="panel">
+    <h2>Controls</h2>
+    <div class="control">
+      <label>Blur <span id="blurVal">10px</span></label>
+      <input type="range" id="blur" min="0" max="30" value="10">
+    </div>
+    <div class="control">
+      <label>Opacity <span id="opacityVal">0.25</span></label>
+      <input type="range" id="opacity" min="0" max="100" value="25">
+    </div>
+    <div class="control">
+      <label>Border Width <span id="borderWVal">1px</span></label>
+      <input type="range" id="borderW" min="0" max="10" value="1">
+    </div>
+    <div class="control">
+      <label>Border Color</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="color" id="borderC" value="#ffffff">
+        <input type="range" id="borderCAlpha" min="0" max="100" value="25" style="flex:1" title="Border opacity">
+        <span id="borderCVal" style="font-size:.75rem;color:var(--highlight);min-width:70px;text-align:right">#ffffff40</span>
+      </div>
+    </div>
+    <div class="control">
+      <label>Border Radius <span id="radiusVal">16px</span></label>
+      <input type="range" id="radius" min="0" max="50" value="16">
+    </div>
+
+    <h2>Background</h2>
+    <div class="bg-grid" id="bgGrid"></div>
+  </div>
+
+  <div class="preview-area">
+    <div class="preview-wrap" id="previewWrap">
+      <div class="glass-card" id="glassCard">
+        <h3>Glass Card</h3>
+        <p>This is a glassmorphism effect. Adjust the controls on the left to customize it.</p>
+      </div>
+    </div>
+    <div class="code-wrap">
+      <div class="code-box" id="codeBox"></div>
+      <button class="copy-btn" id="copyBtn">Copy CSS</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">CSS Glassmorphism Generator &copy; 2026</div>
+
+<script>
+(function(){
+var presets=[
+{name:'Gradient 1',css:'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'},
+{name:'Gradient 2',css:'linear-gradient(135deg,#f093fb 0%,#f5576c 100%)'},
+{name:'Gradient 3',css:'linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)'},
+{name:'Gradient 4',css:'linear-gradient(135deg,#43e97b 0%,#38f9d7 100%)'},
+{name:'Gradient 5',css:'linear-gradient(135deg,#fa709a 0%,#fee140 100%)'},
+{name:'Gradient 6',css:'linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)'},
+{name:'Mountains',css:'url(https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80)'},
+{name:'Ocean',css:'url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80)'}
+];
+var activeBg=0;
+var grid=document.getElementById('bgGrid');
+var wrap=document.getElementById('previewWrap');
+var card=document.getElementById('glassCard');
+var codeBox=document.getElementById('codeBox');
+var copyBtn=document.getElementById('copyBtn');
+
+function buildGrid(){
+  grid.innerHTML='';
+  presets.forEach(function(p,i){
+    var d=document.createElement('div');
+    d.className='bg-opt'+(i===activeBg?' active':'');
+    d.style.background=p.css;
+    d.style.backgroundSize='cover';
+    d.style.backgroundPosition='center';
+    d.title=p.name;
+    d.onclick=function(){activeBg=i;buildGrid();update()};
+    grid.appendChild(d);
+  });
+  var up=document.createElement('div');
+  up.className='bg-opt bg-upload';
+  up.innerHTML='+ Upload<br>Image';
+  up.onclick=function(){
+    var inp=document.createElement('input');
+    inp.type='file';inp.accept='image/*';
+    inp.onchange=function(e){
+      var f=e.target.files[0];if(!f)return;
+      var r=new FileReader();
+      r.onload=function(ev){
+        presets.push({name:'Custom',css:'url('+ev.target.result+')'});
+        activeBg=presets.length-1;
+        buildGrid();update();
+      };
+      r.readAsDataURL(f);
+    };
+    inp.click();
+  };
+  grid.appendChild(up);
+}
+
+function hexToRgba(hex,a){
+  var r=parseInt(hex.slice(1,3),16);
+  var g=parseInt(hex.slice(3,5),16);
+  var b=parseInt(hex.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+a+')';
+}
+
+function update(){
+  var blur=document.getElementById('blur').value;
+  var opacity=(document.getElementById('opacity').value/100).toFixed(2);
+  var borderW=document.getElementById('borderW').value;
+  var borderC=document.getElementById('borderC').value;
+  var borderA=(document.getElementById('borderCAlpha').value/100).toFixed(2);
+  var radius=document.getElementById('radius').value;
+
+  document.getElementById('blurVal').textContent=blur+'px';
+  document.getElementById('opacityVal').textContent=opacity;
+  document.getElementById('borderWVal').textContent=borderW+'px';
+  document.getElementById('radiusVal').textContent=radius+'px';
+
+  var borderRgba=hexToRgba(borderC,borderA);
+  var alphaHex=Math.round(borderA*255).toString(16).padStart(2,'0');
+  document.getElementById('borderCVal').textContent=borderC+alphaHex;
+
+  var bg=presets[activeBg].css;
+  wrap.style.background=bg;
+  wrap.style.backgroundSize='cover';
+  wrap.style.backgroundPosition='center';
+
+  var bgRgba='rgba(255,255,255,'+opacity+')';
+  card.style.background=bgRgba;
+  card.style.backdropFilter='blur('+blur+'px)';
+  card.style.webkitBackdropFilter='blur('+blur+'px)';
+  card.style.border=borderW+'px solid '+borderRgba;
+  card.style.borderRadius=radius+'px';
+  card.style.boxShadow='0 8px 32px rgba(0,0,0,0.37)';
+
+  var code='/* Glassmorphism CSS */\n';
+  code+='background: '+bgRgba+';\n';
+  code+='backdrop-filter: blur('+blur+'px);\n';
+  code+='-webkit-backdrop-filter: blur('+blur+'px);\n';
+  code+='border-radius: '+radius+'px;\n';
+  code+='border: '+borderW+'px solid '+borderRgba+';\n';
+  code+='box-shadow: 0 8px 32px rgba(0,0,0,0.37);';
+  codeBox.textContent=code;
+}
+
+document.querySelectorAll('input[type=range],input[type=color]').forEach(function(el){
+  el.addEventListener('input',update);
+});
+
+copyBtn.addEventListener('click',function(){
+  navigator.clipboard.writeText(codeBox.textContent).then(function(){
+    copyBtn.textContent='Copied!';
+    setTimeout(function(){copyBtn.textContent='Copy CSS'},1500);
+  });
+});
+
+buildGrid();
+update();
+})();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1100px;margin:30px auto 0;padding:0 1rem 2rem}
+.pro-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#e94560,#533483);padding:6px 16px;border-radius:20px;font-size:.85rem;font-weight:600;margin-bottom:16px;color:#fff}
+.pro-mock{position:relative;background:var(--surface,#16213e);border-radius:12px;border:1px solid rgba(255,255,255,.06);padding:30px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-mock:hover{transform:translateY(-2px)}
+.pro-mock-content{filter:blur(3px);opacity:.5;pointer-events:none}
+.pro-mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pro-mock-card{background:rgba(255,255,255,.04);border-radius:10px;padding:20px;text-align:center}
+.pro-mock-card .pm-icon{font-size:1.8rem;margin-bottom:8px}
+.pro-mock-card h4{font-size:.9rem;color:#eee;margin-bottom:4px}
+.pro-mock-card p{font-size:.78rem;color:#888}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:10px}
+.pro-ov-text{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-ov-sub{font-size:.85rem;color:#aaa;margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.active{display:flex}
+.pro-modal{background:#16213e;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(233,69,96,.2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:#e94560;margin:12px 0}
+.pro-modal .pro-price span{font-size:.9rem;color:#aaa;font-weight:400}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal ul li::before{content:'✓';color:#e94560;font-weight:700;flex-shrink:0}
+.pro-modal .btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:opacity .2s;text-decoration:none;text-align:center}
+.pro-modal .btn-upgrade:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;cursor:pointer;font-size:.9rem;margin-top:8px;transition:color .2s}
+.pro-modal .btn-later:hover{color:#eee}
+@media(max-width:768px){.pro-mock-grid{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-badge">⚡ PRO Features</div>
+<div class="pro-mock" id="proMock">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-ov-text">Unlock Pro Features</div>
+<div class="pro-ov-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-grid">
+<div class="pro-mock-card"><div class="pm-icon">🎬</div><h4>Animation Effects</h4><p>Glassmorphism with smooth entrance, hover, and transition animations</p></div>
+<div class="pro-mock-card"><div class="pm-icon">🧩</div><h4>Component Templates</h4><p>40+ ready-made glass UI components: cards, navbars, modals</p></div>
+<div class="pro-mock-card"><div class="pm-icon">🎨</div><h4>Figma Plugin</h4><p>Apply glassmorphism effects directly in Figma designs</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModalBg">
+<div class="pro-modal">
+<h3>Upgrade to Pro</h3>
+<div class="pro-price">$14 <span>one-time</span></div>
+<ul>
+<li>Animated glassmorphism effects (entrance, hover, transitions)</li>
+<li>40+ pre-built glass UI component templates</li>
+<li>Figma plugin for direct glass effect application</li>
+<li>CSS animation keyframes & timing functions</li>
+<li>Priority support & future updates</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $14</a>
+<button class="btn-later" id="proLater">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var mock=document.getElementById('proMock');
+var bg=document.getElementById('proModalBg');
+var later=document.getElementById('proLater');
+mock.addEventListener('click',function(){bg.classList.add('active');});
+later.addEventListener('click',function(){bg.classList.remove('active');});
+bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('active');});
+})();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

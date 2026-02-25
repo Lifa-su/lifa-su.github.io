@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tailwind CSS Converter - CSS to Tailwind & Tailwind to CSS</title>
+<meta name="description" content="Convert CSS to Tailwind CSS classes and vice versa. Free online tool with reference panel.">
+<link rel="canonical" href="https://lifa-su.com/ai-tailwind-converter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--border:#475569;--text:#f1f5f9;--text2:#94a3b8;--accent:#3b82f6;--accent2:#60a5fa;--green:#10b981;--red:#ef4444;--purple:#a78bfa;--yellow:#fbbf24}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700}
+.logo svg{width:32px;height:32px}
+.mode-toggle{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:8px;padding:4px}
+.mode-btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text2);background:transparent;transition:all .2s}
+.mode-btn.active{background:var(--accent);color:#fff}
+.main-container{display:flex;flex:1;gap:0;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.panel:last-child{border-right:none}
+.panel-header{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:14px;font-weight:600;color:var(--text2)}
+.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-copy{background:var(--accent);color:#fff}
+.btn-copy:hover{background:var(--accent2)}
+.btn-clear{background:var(--surface2);color:var(--text2)}
+.btn-clear:hover{background:var(--border);color:var(--text)}
+.btn-copied{background:var(--green) !important}
+textarea{flex:1;width:100%;padding:16px;background:var(--bg);color:var(--text);border:none;resize:none;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',monospace;font-size:14px;line-height:1.6;outline:none}
+textarea::placeholder{color:var(--surface2)}
+.output-area{flex:1;padding:16px;background:var(--bg);overflow-y:auto;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',monospace;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-all}
+.ref-panel{width:320px;min-width:280px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.ref-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text2)}
+.ref-search{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none;margin:8px 12px;width:calc(100% - 24px)}
+.ref-search:focus{border-color:var(--accent)}
+.ref-body{flex:1;overflow-y:auto;padding:8px 12px}
+.ref-category{margin-bottom:12px}
+.ref-cat-title{font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;padding:4px 0;cursor:pointer;display:flex;align-items:center;gap:6px}
+.ref-cat-title::before{content:'▸';transition:transform .2s}
+.ref-cat-title.open::before{transform:rotate(90deg)}
+.ref-items{display:none;padding:4px 0}
+.ref-items.open{display:block}
+.ref-item{display:flex;justify-content:space-between;padding:3px 6px;border-radius:4px;font-size:12px;cursor:pointer;transition:background .15s}
+.ref-item:hover{background:var(--surface2)}
+.ref-item .cls{color:var(--green);font-family:monospace}
+.ref-item .css{color:var(--text2);font-family:monospace;font-size:11px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#fff;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:500;transition:transform .3s ease;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:12px;color:var(--text2);font-size:12px;border-top:1px solid var(--border);background:var(--surface)}
+@media(max-width:900px){
+.main-container{flex-direction:column}
+.panel{border-right:none;border-bottom:1px solid var(--border);min-height:200px}
+.ref-panel{width:100%;min-width:auto;max-height:300px;border-left:none;border-top:1px solid var(--border)}
+}
+@media(max-width:600px){
+header{padding:12px 16px}
+.logo{font-size:16px}
+.mode-btn{padding:6px 10px;font-size:12px}
+}
+.highlight-prop{color:var(--purple)}
+.highlight-val{color:var(--yellow)}
+.highlight-class{color:var(--green)}
+.highlight-comment{color:var(--text2)}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">
+<svg viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#3b82f6"/><path d="M8 12h16M8 16h12M8 20h8" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+AI Tailwind Converter
+</div>
+<div class="mode-toggle">
+<button class="mode-btn active" id="btnCssToTw" onclick="setMode('css2tw')">CSS → Tailwind</button>
+<button class="mode-btn" id="btnTwToCss" onclick="setMode('tw2css')">Tailwind → CSS</button>
+</div>
+</header>
+<div class="main-container">
+<div class="panel">
+<div class="panel-header">
+<span class="panel-title" id="inputTitle">CSS Input</span>
+<div style="display:flex;gap:6px">
+<button class="btn btn-clear" onclick="clearInput()">Clear</button>
+<button class="btn btn-copy" onclick="pasteInput()">Paste</button>
+</div>
+</div>
+<textarea id="inputArea" placeholder="Paste your CSS here...
+Example:
+display: flex;
+padding: 16px;
+margin: 8px;
+background-color: #3b82f6;
+font-size: 14px;
+border-radius: 8px;" oninput="convert()"></textarea>
+</div>
+<div class="panel">
+<div class="panel-header">
+<span class="panel-title" id="outputTitle">Tailwind Classes</span>
+<button class="btn btn-copy" id="copyBtn" onclick="copyOutput()">📋 Copy</button>
+</div>
+<div class="output-area" id="outputArea">Converted result will appear here...</div>
+</div>
+<div class="ref-panel" id="refPanel">
+<div class="ref-header">📖 Tailwind Reference</div>
+<input type="text" class="ref-search" id="refSearch" placeholder="Search classes..." oninput="filterRef()">
+<div class="ref-body" id="refBody"></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<footer>AI Tailwind CSS Converter — Free online tool to convert between CSS and Tailwind CSS classes</footer>
+<script>
+// ===== CSS <-> Tailwind Mapping =====
+const cssToTwMap = {
+  // Display
+  'display:flex': 'flex', 'display:inline-flex': 'inline-flex', 'display:block': 'block',
+  'display:inline-block': 'inline-block', 'display:inline': 'inline', 'display:grid': 'grid',
+  'display:inline-grid': 'inline-grid', 'display:none': 'hidden', 'display:table': 'table',
+  'display:contents': 'contents', 'display:flow-root': 'flow-root',
+  // Position
+  'position:static': 'static', 'position:fixed': 'fixed', 'position:absolute': 'absolute',
+  'position:relative': 'relative', 'position:sticky': 'sticky',
+  // Flex
+  'flex-direction:row': 'flex-row', 'flex-direction:column': 'flex-col',
+  'flex-direction:row-reverse': 'flex-row-reverse', 'flex-direction:column-reverse': 'flex-col-reverse',
+  'flex-wrap:wrap': 'flex-wrap', 'flex-wrap:nowrap': 'flex-nowrap', 'flex-wrap:wrap-reverse': 'flex-wrap-reverse',
+  'flex:1 1 0%': 'flex-1', 'flex:1 1 auto': 'flex-auto', 'flex:0 1 auto': 'flex-initial', 'flex:none': 'flex-none',
+  'flex-grow:1': 'grow', 'flex-grow:0': 'grow-0', 'flex-shrink:1': 'shrink', 'flex-shrink:0': 'shrink-0',
+  // Align & Justify
+  'justify-content:flex-start': 'justify-start', 'justify-content:flex-end': 'justify-end',
+  'justify-content:center': 'justify-center', 'justify-content:space-between': 'justify-between',
+  'justify-content:space-around': 'justify-around', 'justify-content:space-evenly': 'justify-evenly',
+  'align-items:flex-start': 'items-start', 'align-items:flex-end': 'items-end',
+  'align-items:center': 'items-center', 'align-items:baseline': 'items-baseline',
+  'align-items:stretch': 'items-stretch',
+  'align-self:auto': 'self-auto', 'align-self:flex-start': 'self-start',
+  'align-self:flex-end': 'self-end', 'align-self:center': 'self-center', 'align-self:stretch': 'self-stretch',
+  'align-content:flex-start': 'content-start', 'align-content:flex-end': 'content-end',
+  'align-content:center': 'content-center', 'align-content:space-between': 'content-between',
+  // Grid
+  'grid-template-columns:repeat(1,minmax(0,1fr))': 'grid-cols-1',
+  'grid-template-columns:repeat(2,minmax(0,1fr))': 'grid-cols-2',
+  'grid-template-columns:repeat(3,minmax(0,1fr))': 'grid-cols-3',
+  'grid-template-columns:repeat(4,minmax(0,1fr))': 'grid-cols-4',
+  'grid-template-columns:repeat(6,minmax(0,1fr))': 'grid-cols-6',
+  'grid-template-columns:repeat(12,minmax(0,1fr))': 'grid-cols-12',
+  'grid-column:span 1/span 1': 'col-span-1', 'grid-column:span 2/span 2': 'col-span-2',
+  'grid-column:span 3/span 3': 'col-span-3', 'grid-column:span 4/span 4': 'col-span-4',
+  'grid-column:span 6/span 6': 'col-span-6', 'grid-column:span 12/span 12': 'col-span-full',
+  'gap:0px': 'gap-0', 'gap:4px': 'gap-1', 'gap:8px': 'gap-2', 'gap:12px': 'gap-3',
+  'gap:16px': 'gap-4', 'gap:20px': 'gap-5', 'gap:24px': 'gap-6', 'gap:32px': 'gap-8',
+  // Text Align
+  'text-align:left': 'text-left', 'text-align:center': 'text-center',
+  'text-align:right': 'text-right', 'text-align:justify': 'text-justify',
+  // Font Weight
+  'font-weight:100': 'font-thin', 'font-weight:200': 'font-extralight', 'font-weight:300': 'font-light',
+  'font-weight:400': 'font-normal', 'font-weight:500': 'font-medium', 'font-weight:600': 'font-semibold',
+  'font-weight:700': 'font-bold', 'font-weight:800': 'font-extrabold', 'font-weight:900': 'font-black',
+  // Font Size
+  'font-size:12px': 'text-xs', 'font-size:14px': 'text-sm', 'font-size:16px': 'text-base',
+  'font-size:18px': 'text-lg', 'font-size:20px': 'text-xl', 'font-size:24px': 'text-2xl',
+  'font-size:30px': 'text-3xl', 'font-size:36px': 'text-4xl', 'font-size:48px': 'text-5xl',
+  'font-size:60px': 'text-6xl', 'font-size:72px': 'text-7xl', 'font-size:96px': 'text-8xl',
+  'font-size:128px': 'text-9xl',
+  'font-size:0.75rem': 'text-xs', 'font-size:0.875rem': 'text-sm', 'font-size:1rem': 'text-base',
+  'font-size:1.125rem': 'text-lg', 'font-size:1.25rem': 'text-xl', 'font-size:1.5rem': 'text-2xl',
+  'font-size:1.875rem': 'text-3xl', 'font-size:2.25rem': 'text-4xl', 'font-size:3rem': 'text-5xl',
+  // Font Style
+  'font-style:italic': 'italic', 'font-style:normal': 'not-italic',
+  // Text Decoration
+  'text-decoration:underline': 'underline', 'text-decoration:line-through': 'line-through',
+  'text-decoration:none': 'no-underline',
+  'text-decoration-line:underline': 'underline', 'text-decoration-line:line-through': 'line-through',
+  'text-decoration-line:none': 'no-underline',
+  // Text Transform
+  'text-transform:uppercase': 'uppercase', 'text-transform:lowercase': 'lowercase',
+  'text-transform:capitalize': 'capitalize', 'text-transform:none': 'normal-case',
+  // Overflow
+  'overflow:auto': 'overflow-auto', 'overflow:hidden': 'overflow-hidden',
+  'overflow:visible': 'overflow-visible', 'overflow:scroll': 'overflow-scroll',
+  'overflow-x:auto': 'overflow-x-auto', 'overflow-x:hidden': 'overflow-x-hidden',
+  'overflow-y:auto': 'overflow-y-auto', 'overflow-y:hidden': 'overflow-y-hidden',
+  // Visibility
+  'visibility:visible': 'visible', 'visibility:hidden': 'invisible',
+  // Cursor
+  'cursor:pointer': 'cursor-pointer', 'cursor:default': 'cursor-default',
+  'cursor:not-allowed': 'cursor-not-allowed', 'cursor:wait': 'cursor-wait',
+  'cursor:move': 'cursor-move', 'cursor:grab': 'cursor-grab',
+  // Pointer Events
+  'pointer-events:none': 'pointer-events-none', 'pointer-events:auto': 'pointer-events-auto',
+  // User Select
+  'user-select:none': 'select-none', 'user-select:text': 'select-text', 'user-select:all': 'select-all',
+  // List Style
+  'list-style-type:none': 'list-none', 'list-style-type:disc': 'list-disc', 'list-style-type:decimal': 'list-decimal',
+  // White Space
+  'white-space:nowrap': 'whitespace-nowrap', 'white-space:pre': 'whitespace-pre',
+  'white-space:pre-wrap': 'whitespace-pre-wrap', 'white-space:normal': 'whitespace-normal',
+  // Word Break
+  'word-break:break-all': 'break-all', 'overflow-wrap:break-word': 'break-words',
+  // Object Fit
+  'object-fit:contain': 'object-contain', 'object-fit:cover': 'object-cover',
+  'object-fit:fill': 'object-fill', 'object-fit:none': 'object-none',
+  // Box Sizing
+  'box-sizing:border-box': 'box-border', 'box-sizing:content-box': 'box-content',
+  // Float
+  'float:right': 'float-right', 'float:left': 'float-left', 'float:none': 'float-none',
+  // Clear
+  'clear:both': 'clear-both', 'clear:left': 'clear-left', 'clear:right': 'clear-right',
+  // Table Layout
+  'table-layout:auto': 'table-auto', 'table-layout:fixed': 'table-fixed',
+  // Border Collapse
+  'border-collapse:collapse': 'border-collapse', 'border-collapse:separate': 'border-separate',
+  // Resize
+  'resize:both': 'resize', 'resize:vertical': 'resize-y', 'resize:horizontal': 'resize-x', 'resize:none': 'resize-none',
+  // Appearance
+  'appearance:none': 'appearance-none',
+  // Outline
+  'outline:none': 'outline-none', 'outline:0': 'outline-none',
+};
+
+// Spacing map (px -> tailwind)
+const spacingMap = {
+  '0px':'0','1px':'px','2px':'0.5','4px':'1','6px':'1.5','8px':'2','10px':'2.5',
+  '12px':'3','14px':'3.5','16px':'4','20px':'5','24px':'6','28px':'7','32px':'8',
+  '36px':'9','40px':'10','44px':'11','48px':'12','56px':'14','64px':'16','80px':'20',
+  '96px':'24','112px':'28','128px':'32','144px':'36','160px':'40','176px':'44',
+  '192px':'48','208px':'52','224px':'56','240px':'60','256px':'64','288px':'72',
+  '320px':'80','384px':'96',
+  '0':'0','auto':'auto',
+  '0rem':'0','0.125rem':'0.5','0.25rem':'1','0.375rem':'1.5','0.5rem':'2',
+  '0.625rem':'2.5','0.75rem':'3','0.875rem':'3.5','1rem':'4','1.25rem':'5',
+  '1.5rem':'6','1.75rem':'7','2rem':'8','2.25rem':'9','2.5rem':'10',
+  '2.75rem':'11','3rem':'12','3.5rem':'14','4rem':'16','5rem':'20','6rem':'24',
+  '7rem':'28','8rem':'32','9rem':'36','10rem':'40','11rem':'44','12rem':'48',
+  '13rem':'52','14rem':'56','15rem':'60','16rem':'64','18rem':'72','20rem':'80','24rem':'96',
+  '50%':'1/2','33.333%':'1/3','66.667%':'2/3','25%':'1/4','75%':'3/4','100%':'full',
+};
+
+const sizeMap = {
+  ...spacingMap,
+  '100%':'full','100vw':'screen','100vh':'screen',
+  'min-content':'min','max-content':'max','fit-content':'fit',
+};
+
+const borderRadiusMap = {
+  '0px':'rounded-none','2px':'rounded-sm','4px':'rounded','6px':'rounded-md',
+  '8px':'rounded-lg','12px':'rounded-xl','16px':'rounded-2xl','24px':'rounded-3xl',
+  '9999px':'rounded-full','50%':'rounded-full',
+  '0.125rem':'rounded-sm','0.25rem':'rounded','0.375rem':'rounded-md',
+  '0.5rem':'rounded-lg','0.75rem':'rounded-xl','1rem':'rounded-2xl','1.5rem':'rounded-3xl',
+};
+
+const opacityMap = {
+  '0':'opacity-0','0.05':'opacity-5','0.1':'opacity-10','0.2':'opacity-20',
+  '0.25':'opacity-25','0.3':'opacity-30','0.4':'opacity-40','0.5':'opacity-50',
+  '0.6':'opacity-60','0.7':'opacity-70','0.75':'opacity-75','0.8':'opacity-80',
+  '0.9':'opacity-90','0.95':'opacity-95','1':'opacity-100',
+};
+
+const colorMap = {
+  '#000':'black','#000000':'black','#fff':'white','#ffffff':'white',
+  '#f8fafc':'slate-50','#f1f5f9':'slate-100','#e2e8f0':'slate-200','#cbd5e1':'slate-300',
+  '#94a3b8':'slate-400','#64748b':'slate-500','#475569':'slate-600','#334155':'slate-700',
+  '#1e293b':'slate-800','#0f172a':'slate-900',
+  '#f9fafb':'gray-50','#f3f4f6':'gray-100','#e5e7eb':'gray-200','#d1d5db':'gray-300',
+  '#9ca3af':'gray-400','#6b7280':'gray-500','#4b5563':'gray-600','#374151':'gray-700',
+  '#1f2937':'gray-800','#111827':'gray-900',
+  '#fef2f2':'red-50','#fee2e2':'red-100','#fecaca':'red-200','#fca5a5':'red-300',
+  '#f87171':'red-400','#ef4444':'red-500','#dc2626':'red-600','#b91c1c':'red-700',
+  '#991b1b':'red-800','#7f1d1d':'red-900',
+  '#fff7ed':'orange-50','#ffedd5':'orange-100','#fed7aa':'orange-200','#fdba74':'orange-300',
+  '#fb923c':'orange-400','#f97316':'orange-500','#ea580c':'orange-600','#c2410c':'orange-700',
+  '#fffbeb':'amber-50','#fef3c7':'amber-100','#fde68a':'amber-200','#fcd34d':'amber-300',
+  '#fbbf24':'amber-400','#f59e0b':'amber-500','#d97706':'amber-600','#b45309':'amber-700',
+  '#fefce8':'yellow-50','#fef9c3':'yellow-100','#fef08a':'yellow-200','#fde047':'yellow-300',
+  '#facc15':'yellow-400','#eab308':'yellow-500','#ca8a04':'yellow-600',
+  '#f0fdf4':'green-50','#dcfce7':'green-100','#bbf7d0':'green-200','#86efac':'green-300',
+  '#4ade80':'green-400','#22c55e':'green-500','#16a34a':'green-600','#15803d':'green-700',
+  '#166534':'green-800','#14532d':'green-900',
+  '#ecfdf5':'emerald-50','#d1fae5':'emerald-100','#a7f3d0':'emerald-200','#6ee7b7':'emerald-300',
+  '#34d399':'emerald-400','#10b981':'emerald-500','#059669':'emerald-600','#047857':'emerald-700',
+  '#eff6ff':'blue-50','#dbeafe':'blue-100','#bfdbfe':'blue-200','#93c5fd':'blue-300',
+  '#60a5fa':'blue-400','#3b82f6':'blue-500','#2563eb':'blue-600','#1d4ed8':'blue-700',
+  '#1e40af':'blue-800','#1e3a8a':'blue-900',
+  '#eef2ff':'indigo-50','#e0e7ff':'indigo-100','#c7d2fe':'indigo-200','#a5b4fc':'indigo-300',
+  '#818cf8':'indigo-400','#6366f1':'indigo-500','#4f46e5':'indigo-600','#4338ca':'indigo-700',
+  '#f5f3ff':'violet-50','#ede9fe':'violet-100','#ddd6fe':'violet-200','#c4b5fd':'violet-300',
+  '#a78bfa':'violet-400','#8b5cf6':'violet-500','#7c3aed':'violet-600','#6d28d9':'violet-700',
+  '#fdf2f8':'pink-50','#fce7f3':'pink-100','#fbcfe8':'pink-200','#f9a8d4':'pink-300',
+  '#f472b6':'pink-400','#ec4899':'pink-500','#db2777':'pink-600','#be185d':'pink-700',
+  'transparent':'transparent','currentColor':'current','inherit':'inherit',
+};
+
+const shadowMap = {
+  'none':'shadow-none',
+  '0 1px 2px 0 rgb(0 0 0 / 0.05)':'shadow-sm',
+  '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)':'shadow',
+  '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)':'shadow-md',
+  '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)':'shadow-lg',
+  '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)':'shadow-xl',
+  '0 25px 50px -12px rgb(0 0 0 / 0.25)':'shadow-2xl',
+  'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)':'shadow-inner',
+};
+
+// ===== Conversion Functions =====
+let currentMode = 'css2tw';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btnCssToTw').classList.toggle('active', mode === 'css2tw');
+  document.getElementById('btnTwToCss').classList.toggle('active', mode === 'tw2css');
+  document.getElementById('inputTitle').textContent = mode === 'css2tw' ? 'CSS Input' : 'Tailwind Input';
+  document.getElementById('outputTitle').textContent = mode === 'css2tw' ? 'Tailwind Classes' : 'CSS Output';
+  const ta = document.getElementById('inputArea');
+  ta.placeholder = mode === 'css2tw'
+    ? 'Paste your CSS here...\nExample:\ndisplay: flex;\npadding: 16px;\nmargin: 8px;\nbackground-color: #3b82f6;\nfont-size: 14px;\nborder-radius: 8px;'
+    : 'Paste Tailwind classes here...\nExample:\nflex p-4 m-2 bg-blue-500 text-sm rounded-lg';
+  ta.value = '';
+  document.getElementById('outputArea').textContent = 'Converted result will appear here...';
+}
+
+function normalizeValue(v) {
+  return v.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function lookupColor(val, prefix) {
+  const v = val.toLowerCase().trim();
+  if (colorMap[v]) return prefix + '-' + colorMap[v];
+  // Try rgb/rgba
+  if (v.startsWith('rgb')) {
+    const nums = v.match(/[\d.]+/g);
+    if (nums && nums.length >= 3) {
+      const hex = '#' + [nums[0],nums[1],nums[2]].map(n => {
+        const h = parseInt(n).toString(16);
+        return h.length === 1 ? '0'+h : h;
+      }).join('');
+      if (colorMap[hex]) return prefix + '-' + colorMap[hex];
+    }
+  }
+  return null;
+}
+
+function convertSpacing(prop, val) {
+  const prefixMap = {
+    'padding': 'p', 'padding-top': 'pt', 'padding-right': 'pr',
+    'padding-bottom': 'pb', 'padding-left': 'pl',
+    'padding-inline': 'px', 'padding-block': 'py',
+    'margin': 'm', 'margin-top': 'mt', 'margin-right': 'mr',
+    'margin-bottom': 'mb', 'margin-left': 'ml',
+    'margin-inline': 'mx', 'margin-block': 'my',
+    'top': 'top', 'right': 'right', 'bottom': 'bottom', 'left': 'left',
+    'inset': 'inset',
+  };
+  const prefix = prefixMap[prop];
+  if (!prefix) return null;
+  const v = val.trim();
+  // Handle negative values
+  const isNeg = v.startsWith('-');
+  const absVal = isNeg ? v.slice(1) : v;
+  if (spacingMap[absVal]) {
+    const tw = spacingMap[absVal];
+    return (isNeg ? '-' : '') + prefix + '-' + tw;
+  }
+  // Handle shorthand (e.g., padding: 8px 16px)
+  if ((prop === 'padding' || prop === 'margin') && v.includes(' ')) {
+    const parts = v.split(/\s+/);
+    const p = prop === 'padding' ? 'p' : 'm';
+    if (parts.length === 2) {
+      const y = spacingMap[parts[0]], x = spacingMap[parts[1]];
+      if (y && x) return p + 'y-' + y + ' ' + p + 'x-' + x;
+    }
+    if (parts.length === 4) {
+      const t = spacingMap[parts[0]], r = spacingMap[parts[1]],
+            b = spacingMap[parts[2]], l = spacingMap[parts[3]];
+      const results = [];
+      if (t) results.push(p + 't-' + t);
+      if (r) results.push(p + 'r-' + r);
+      if (b) results.push(p + 'b-' + b);
+      if (l) results.push(p + 'l-' + l);
+      if (results.length) return results.join(' ');
+    }
+  }
+  return null;
+}
+
+function convertSize(prop, val) {
+  const prefixMap = {
+    'width': 'w', 'height': 'h', 'min-width': 'min-w', 'min-height': 'min-h',
+    'max-width': 'max-w', 'max-height': 'max-h',
+  };
+  const prefix = prefixMap[prop];
+  if (!prefix) return null;
+  const v = val.trim();
+  if (sizeMap[v]) return prefix + '-' + sizeMap[v];
+  // Common max-width values
+  if (prop === 'max-width') {
+    const mwMap = {'640px':'max-w-sm','768px':'max-w-md','1024px':'max-w-lg',
+      '1280px':'max-w-xl','1536px':'max-w-2xl','none':'max-w-none'};
+    if (mwMap[v]) return mwMap[v];
+  }
+  return null;
+}
+
+function cssPropToTailwind(prop, val) {
+  prop = prop.trim().toLowerCase();
+  val = normalizeValue(val);
+  // Direct lookup
+  const key = prop + ':' + val;
+  if (cssToTwMap[key]) return cssToTwMap[key];
+  // Spacing
+  const spacing = convertSpacing(prop, val);
+  if (spacing) return spacing;
+  // Size
+  const size = convertSize(prop, val);
+  if (size) return size;
+  // Border radius
+  if (prop === 'border-radius') {
+    if (borderRadiusMap[val]) return borderRadiusMap[val];
+  }
+  // Opacity
+  if (prop === 'opacity') {
+    if (opacityMap[val]) return opacityMap[val];
+  }
+  // Colors
+  if (prop === 'color') {
+    const c = lookupColor(val, 'text');
+    if (c) return c;
+  }
+  if (prop === 'background-color' || prop === 'background') {
+    const c = lookupColor(val, 'bg');
+    if (c) return c;
+  }
+  if (prop === 'border-color') {
+    const c = lookupColor(val, 'border');
+    if (c) return c;
+  }
+  // Border width
+  if (prop === 'border-width' || prop === 'border') {
+    const bwMap = {'0px':'border-0','1px':'border','2px':'border-2','4px':'border-4','8px':'border-8'};
+    if (bwMap[val]) return bwMap[val];
+  }
+  // Box shadow
+  if (prop === 'box-shadow') {
+    if (shadowMap[val]) return shadowMap[val];
+    if (val === 'none') return 'shadow-none';
+  }
+  // Z-index
+  if (prop === 'z-index') {
+    const zMap = {'0':'z-0','10':'z-10','20':'z-20','30':'z-30','40':'z-40','50':'z-50','auto':'z-auto'};
+    if (zMap[val]) return zMap[val];
+  }
+  // Line height
+  if (prop === 'line-height') {
+    const lhMap = {'1':'leading-none','1.25':'leading-tight','1.375':'leading-snug',
+      '1.5':'leading-normal','1.625':'leading-relaxed','2':'leading-loose'};
+    if (lhMap[val]) return lhMap[val];
+  }
+  // Letter spacing
+  if (prop === 'letter-spacing') {
+    const lsMap = {'-0.05em':'tracking-tighter','-0.025em':'tracking-tight','0em':'tracking-normal',
+      '0.025em':'tracking-wide','0.05em':'tracking-wider','0.1em':'tracking-widest'};
+    if (lsMap[val]) return lsMap[val];
+  }
+  // Transition
+  if (prop === 'transition-property') {
+    if (val.includes('all')) return 'transition-all';
+    if (val.includes('color') || val.includes('background')) return 'transition-colors';
+    if (val.includes('opacity')) return 'transition-opacity';
+    if (val.includes('shadow')) return 'transition-shadow';
+    if (val.includes('transform')) return 'transition-transform';
+    return 'transition';
+  }
+  if (prop === 'transition-duration') {
+    const durMap = {'75ms':'duration-75','100ms':'duration-100','150ms':'duration-150',
+      '200ms':'duration-200','300ms':'duration-300','500ms':'duration-500',
+      '700ms':'duration-700','1000ms':'duration-1000'};
+    if (durMap[val]) return durMap[val];
+  }
+  if (prop === 'transition-timing-function') {
+    const easeMap = {'linear':'ease-linear','ease':'ease-in-out',
+      'cubic-bezier(0.4, 0, 1, 1)':'ease-in','cubic-bezier(0, 0, 0.2, 1)':'ease-out',
+      'cubic-bezier(0.4, 0, 0.2, 1)':'ease-in-out'};
+    if (easeMap[val]) return easeMap[val];
+  }
+  // Object fit
+  if (prop === 'object-fit') {
+    return 'object-' + val;
+  }
+  // Object position
+  if (prop === 'object-position') {
+    return 'object-' + val.replace(' ', '-');
+  }
+  // Background size
+  if (prop === 'background-size') {
+    const bsMap = {'cover':'bg-cover','contain':'bg-contain','auto':'bg-auto'};
+    if (bsMap[val]) return bsMap[val];
+  }
+  // Background position
+  if (prop === 'background-position') {
+    return 'bg-' + val.replace(' ', '-');
+  }
+  // Background repeat
+  if (prop === 'background-repeat') {
+    const brMap = {'repeat':'bg-repeat','no-repeat':'bg-no-repeat',
+      'repeat-x':'bg-repeat-x','repeat-y':'bg-repeat-y','round':'bg-repeat-round'};
+    if (brMap[val]) return brMap[val];
+  }
+  return null;
+}
+
+function cssToTailwind(input) {
+  const lines = input.split('\n');
+  const results = [];
+  let currentSelector = '';
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed === '}') continue;
+    if (trimmed.endsWith('{')) {
+      currentSelector = trimmed.replace('{','').trim();
+      continue;
+    }
+    const match = trimmed.match(/^([a-z-]+)\s*:\s*(.+?)\s*;?$/i);
+    if (match) {
+      const [, prop, val] = match;
+      const tw = cssPropToTailwind(prop, val);
+      if (tw) {
+        results.push(tw);
+      } else {
+        results.push('/* ' + prop + ': ' + val + ' (no match) */');
+      }
+    }
+  }
+  return results.join(' ');
+}
+
+// Build reverse map: Tailwind class -> CSS
+const twToCssMap = {};
+for (const [css, tw] of Object.entries(cssToTwMap)) {
+  const [prop, val] = css.split(':');
+  twToCssMap[tw] = prop + ': ' + val + ';';
+}
+// Add spacing classes
+for (const [px, tw] of Object.entries(spacingMap)) {
+  if (tw === 'auto' || tw === '0') continue;
+  ['p','pt','pr','pb','pl','px','py','m','mt','mr','mb','ml','mx','my'].forEach(pre => {
+    const propMap = {p:'padding',pt:'padding-top',pr:'padding-right',pb:'padding-bottom',
+      pl:'padding-left',px:'padding-inline',py:'padding-block',
+      m:'margin',mt:'margin-top',mr:'margin-right',mb:'margin-bottom',
+      ml:'margin-left',mx:'margin-inline',my:'margin-block'};
+    twToCssMap[pre+'-'+tw] = propMap[pre] + ': ' + px + ';';
+  });
+}
+// Add size classes
+for (const [px, tw] of Object.entries(sizeMap)) {
+  ['w','h','min-w','min-h','max-w','max-h'].forEach(pre => {
+    const propMap = {w:'width',h:'height','min-w':'min-width','min-h':'min-height','max-w':'max-width','max-h':'max-height'};
+    twToCssMap[pre+'-'+tw] = propMap[pre] + ': ' + px + ';';
+  });
+}
+// Add border-radius
+for (const [px, tw] of Object.entries(borderRadiusMap)) {
+  twToCssMap[tw] = 'border-radius: ' + px + ';';
+}
+// Add opacity
+for (const [val, tw] of Object.entries(opacityMap)) {
+  twToCssMap[tw] = 'opacity: ' + val + ';';
+}
+// Add color classes
+for (const [hex, name] of Object.entries(colorMap)) {
+  twToCssMap['text-'+name] = 'color: ' + hex + ';';
+  twToCssMap['bg-'+name] = 'background-color: ' + hex + ';';
+  twToCssMap['border-'+name] = 'border-color: ' + hex + ';';
+}
+// Add shadow
+for (const [val, tw] of Object.entries(shadowMap)) {
+  twToCssMap[tw] = 'box-shadow: ' + val + ';';
+}
+
+function tailwindToCss(input) {
+  const classes = input.trim().split(/\s+/);
+  const results = [];
+  for (const cls of classes) {
+    if (!cls) continue;
+    if (twToCssMap[cls]) {
+      results.push(twToCssMap[cls]);
+    } else {
+      results.push('/* ' + cls + ' (no match) */');
+    }
+  }
+  return results.join('\n');
+}
+
+function convert() {
+  const input = document.getElementById('inputArea').value;
+  const output = document.getElementById('outputArea');
+  if (!input.trim()) {
+    output.textContent = 'Converted result will appear here...';
+    return;
+  }
+  if (currentMode === 'css2tw') {
+    output.textContent = cssToTailwind(input);
+  } else {
+    output.textContent = tailwindToCss(input);
+  }
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputArea').textContent;
+  if (!text || text === 'Converted result will appear here...') return;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard!');
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '\u2705 Copied!';
+    btn.classList.add('btn-copied');
+    setTimeout(() => { btn.textContent = '\ud83d\udccb Copy'; btn.classList.remove('btn-copied'); }, 2000);
+  });
+}
+
+function clearInput() {
+  document.getElementById('inputArea').value = '';
+  document.getElementById('outputArea').textContent = 'Converted result will appear here...';
+}
+
+async function pasteInput() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('inputArea').value = text;
+    convert();
+  } catch(e) {
+    showToast('Paste not available - type or drag text instead');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== Reference Panel =====
+const refData = {
+  'Layout': {
+    'block':'display: block','inline-block':'display: inline-block','inline':'display: inline',
+    'flex':'display: flex','inline-flex':'display: inline-flex','grid':'display: grid',
+    'hidden':'display: none','contents':'display: contents','flow-root':'display: flow-root',
+    'static':'position: static','fixed':'position: fixed','absolute':'position: absolute',
+    'relative':'position: relative','sticky':'position: sticky',
+  },
+  'Flexbox': {
+    'flex-row':'flex-direction: row','flex-col':'flex-direction: column',
+    'flex-row-reverse':'flex-direction: row-reverse','flex-col-reverse':'flex-direction: column-reverse',
+    'flex-wrap':'flex-wrap: wrap','flex-nowrap':'flex-wrap: nowrap',
+    'flex-1':'flex: 1 1 0%','flex-auto':'flex: 1 1 auto','flex-none':'flex: none',
+    'grow':'flex-grow: 1','grow-0':'flex-grow: 0','shrink':'flex-shrink: 1','shrink-0':'flex-shrink: 0',
+    'justify-start':'justify-content: flex-start','justify-center':'justify-content: center',
+    'justify-end':'justify-content: flex-end','justify-between':'justify-content: space-between',
+    'justify-around':'justify-content: space-around','justify-evenly':'justify-content: space-evenly',
+    'items-start':'align-items: flex-start','items-center':'align-items: center',
+    'items-end':'align-items: flex-end','items-stretch':'align-items: stretch',
+    'items-baseline':'align-items: baseline',
+  },
+  'Grid': {
+    'grid-cols-1':'grid-template-columns: repeat(1, 1fr)',
+    'grid-cols-2':'grid-template-columns: repeat(2, 1fr)',
+    'grid-cols-3':'grid-template-columns: repeat(3, 1fr)',
+    'grid-cols-4':'grid-template-columns: repeat(4, 1fr)',
+    'grid-cols-6':'grid-template-columns: repeat(6, 1fr)',
+    'grid-cols-12':'grid-template-columns: repeat(12, 1fr)',
+    'col-span-1':'grid-column: span 1','col-span-2':'grid-column: span 2',
+    'col-span-3':'grid-column: span 3','col-span-full':'grid-column: 1 / -1',
+    'gap-0':'gap: 0','gap-1':'gap: 4px','gap-2':'gap: 8px','gap-4':'gap: 16px',
+    'gap-6':'gap: 24px','gap-8':'gap: 32px',
+  },
+  'Spacing': {
+    'p-0':'padding: 0','p-1':'padding: 4px','p-2':'padding: 8px','p-3':'padding: 12px',
+    'p-4':'padding: 16px','p-5':'padding: 20px','p-6':'padding: 24px','p-8':'padding: 32px',
+    'px-4':'padding-inline: 16px','py-4':'padding-block: 16px',
+    'm-0':'margin: 0','m-1':'margin: 4px','m-2':'margin: 8px','m-4':'margin: 16px',
+    'm-auto':'margin: auto','mx-auto':'margin-inline: auto',
+  },
+  'Sizing': {
+    'w-full':'width: 100%','w-screen':'width: 100vw','w-auto':'width: auto',
+    'w-1/2':'width: 50%','w-1/3':'width: 33.333%','w-1/4':'width: 25%',
+    'h-full':'height: 100%','h-screen':'height: 100vh','h-auto':'height: auto',
+    'min-w-0':'min-width: 0','min-h-0':'min-height: 0',
+    'max-w-sm':'max-width: 640px','max-w-md':'max-width: 768px',
+    'max-w-lg':'max-width: 1024px','max-w-xl':'max-width: 1280px',
+    'max-w-none':'max-width: none',
+  },
+  'Typography': {
+    'text-xs':'font-size: 12px','text-sm':'font-size: 14px','text-base':'font-size: 16px',
+    'text-lg':'font-size: 18px','text-xl':'font-size: 20px','text-2xl':'font-size: 24px',
+    'text-3xl':'font-size: 30px','text-4xl':'font-size: 36px',
+    'font-thin':'font-weight: 100','font-light':'font-weight: 300',
+    'font-normal':'font-weight: 400','font-medium':'font-weight: 500',
+    'font-semibold':'font-weight: 600','font-bold':'font-weight: 700',
+    'font-extrabold':'font-weight: 800','font-black':'font-weight: 900',
+    'italic':'font-style: italic','not-italic':'font-style: normal',
+    'text-left':'text-align: left','text-center':'text-align: center',
+    'text-right':'text-align: right','text-justify':'text-align: justify',
+    'uppercase':'text-transform: uppercase','lowercase':'text-transform: lowercase',
+    'capitalize':'text-transform: capitalize','underline':'text-decoration: underline',
+    'line-through':'text-decoration: line-through','no-underline':'text-decoration: none',
+    'leading-none':'line-height: 1','leading-tight':'line-height: 1.25',
+    'leading-normal':'line-height: 1.5','leading-relaxed':'line-height: 1.625',
+    'leading-loose':'line-height: 2',
+  },
+  'Colors': {
+    'text-black':'color: #000','text-white':'color: #fff',
+    'text-gray-500':'color: #6b7280','text-red-500':'color: #ef4444',
+    'text-blue-500':'color: #3b82f6','text-green-500':'color: #22c55e',
+    'bg-white':'background: #fff','bg-black':'background: #000',
+    'bg-gray-100':'background: #f3f4f6','bg-gray-900':'background: #111827',
+    'bg-blue-500':'background: #3b82f6','bg-red-500':'background: #ef4444',
+    'bg-green-500':'background: #22c55e','bg-transparent':'background: transparent',
+    'border-gray-300':'border-color: #d1d5db','border-blue-500':'border-color: #3b82f6',
+  },
+  'Borders': {
+    'rounded-none':'border-radius: 0','rounded-sm':'border-radius: 2px',
+    'rounded':'border-radius: 4px','rounded-md':'border-radius: 6px',
+    'rounded-lg':'border-radius: 8px','rounded-xl':'border-radius: 12px',
+    'rounded-2xl':'border-radius: 16px','rounded-full':'border-radius: 9999px',
+    'border':'border-width: 1px','border-0':'border-width: 0',
+    'border-2':'border-width: 2px','border-4':'border-width: 4px',
+  },
+  'Effects': {
+    'shadow-sm':'box-shadow: 0 1px 2px rgba(0,0,0,.05)',
+    'shadow':'box-shadow: 0 1px 3px rgba(0,0,0,.1)',
+    'shadow-md':'box-shadow: 0 4px 6px rgba(0,0,0,.1)',
+    'shadow-lg':'box-shadow: 0 10px 15px rgba(0,0,0,.1)',
+    'shadow-xl':'box-shadow: 0 20px 25px rgba(0,0,0,.1)',
+    'shadow-none':'box-shadow: none',
+    'opacity-0':'opacity: 0','opacity-25':'opacity: 0.25',
+    'opacity-50':'opacity: 0.5','opacity-75':'opacity: 0.75','opacity-100':'opacity: 1',
+  },
+  'Misc': {
+    'overflow-auto':'overflow: auto','overflow-hidden':'overflow: hidden',
+    'overflow-scroll':'overflow: scroll','overflow-visible':'overflow: visible',
+    'cursor-pointer':'cursor: pointer','cursor-default':'cursor: default',
+    'cursor-not-allowed':'cursor: not-allowed',
+    'select-none':'user-select: none','select-text':'user-select: text',
+    'whitespace-nowrap':'white-space: nowrap','whitespace-pre':'white-space: pre',
+    'transition-all':'transition: all','transition-colors':'transition: colors',
+    'transition-opacity':'transition: opacity',
+    'z-0':'z-index: 0','z-10':'z-index: 10','z-50':'z-index: 50',
+    'visible':'visibility: visible','invisible':'visibility: hidden',
+  },
+};
+
+function renderRefPanel() {
+  const body = document.getElementById('refBody');
+  body.innerHTML = '';
+  for (const [cat, items] of Object.entries(refData)) {
+    const div = document.createElement('div');
+    div.className = 'ref-category';
+    const title = document.createElement('div');
+    title.className = 'ref-cat-title';
+    title.textContent = cat;
+    title.onclick = function() {
+      this.classList.toggle('open');
+      this.nextElementSibling.classList.toggle('open');
+    };
+    div.appendChild(title);
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'ref-items';
+    for (const [cls, css] of Object.entries(items)) {
+      const item = document.createElement('div');
+      item.className = 'ref-item';
+      item.innerHTML = '<span class="cls">' + cls + '</span><span class="css">' + css + '</span>';
+      item.onclick = function() {
+        navigator.clipboard.writeText(cls);
+        showToast('Copied: ' + cls);
+      };
+      itemsDiv.appendChild(item);
+    }
+    div.appendChild(itemsDiv);
+    body.appendChild(div);
+  }
+}
+
+function filterRef() {
+  const q = document.getElementById('refSearch').value.toLowerCase();
+  const cats = document.querySelectorAll('.ref-category');
+  cats.forEach(cat => {
+    const items = cat.querySelectorAll('.ref-item');
+    let hasVisible = false;
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      const show = !q || text.includes(q);
+      item.style.display = show ? '' : 'none';
+      if (show) hasVisible = true;
+    });
+    cat.style.display = hasVisible ? '' : 'none';
+    if (q && hasVisible) {
+      cat.querySelector('.ref-cat-title').classList.add('open');
+      cat.querySelector('.ref-items').classList.add('open');
+    }
+  });
+}
+
+// Init
+renderRefPanel();
+
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

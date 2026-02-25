@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>AI Markdown Editor - Live Preview & Export</title>
+<meta name="description" content="Free online Markdown editor with real-time preview. Write, edit, and export Markdown documents with syntax highlighting and instant rendering.">
+<meta name="keywords" content="markdown editor, online markdown, live preview, markdown to html, markdown export, writing tool, developer tools">
+<meta property="og:title" content="AI Markdown Editor - Live Preview & Export">
+<meta property="og:description" content="Free online Markdown editor with real-time preview, syntax highlighting, and export to HTML.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-markdown-editor/">
+<meta property="og:image" content="https://lifa-su.com/ai-markdown-editor/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Markdown Editor">
+<meta name="twitter:description" content="Write and preview Markdown in real-time. Free online editor with export.">
+<link rel="canonical" href="https://lifa-su.com/ai-markdown-editor/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Markdown Editor","url":"https://lifa-su.com/ai-markdown-editor/","description":"Free online Markdown editor with live preview and export","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools","url":"https://lifa-su.com"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;--border:#2a2a42;--border2:#363652;--text:#e8e8f4;--text2:#9898b4;--text3:#686884;--accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--radius-sm:8px}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+header{position:sticky;top:0;z-index:100;background:rgba(18,18,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{color:var(--text3);font-size:13px;margin-left:4px}
+header .back-link{margin-left:auto;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+header .back-link:hover{color:var(--accent)}
+.toolbar{display:flex;align-items:center;gap:4px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.toolbar button{padding:6px 10px;border:1px solid transparent;border-radius:var(--radius-sm);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;transition:all .2s;line-height:1}
+.toolbar button:hover{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.toolbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.toolbar .spacer{flex:1}
+.toolbar .btn-export{padding:6px 14px;background:linear-gradient(135deg,var(--success),#3ab87a);border:none;color:#fff;font-weight:600;font-size:12px;border-radius:var(--radius-sm);cursor:pointer}
+.toolbar .btn-export:hover{box-shadow:0 4px 16px rgba(76,218,138,0.3)}
+.toolbar .btn-copy{padding:6px 14px;background:var(--surface3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:500;border-radius:var(--radius-sm);cursor:pointer}
+.toolbar .btn-copy:hover{border-color:var(--accent);color:var(--accent)}
+.editor-wrap{display:flex;flex:1;overflow:hidden}
+.editor-pane,.preview-pane{flex:1;display:flex;flex-direction:column;min-width:0}
+.editor-pane{border-right:1px solid var(--border)}
+.pane-header{padding:8px 16px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.pane-header .dot{width:8px;height:8px;border-radius:50%}
+.editor-pane .dot{background:var(--accent)}
+.preview-pane .dot{background:var(--success)}
+#editor{flex:1;width:100%;border:none;background:var(--bg);color:var(--text);font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace;font-size:14px;line-height:1.7;padding:20px;resize:none;outline:none;tab-size:2}
+#editor::placeholder{color:var(--text3)}
+.preview-content{flex:1;overflow-y:auto;padding:24px;line-height:1.75;background:var(--bg)}
+.preview-content h1{font-size:28px;border-bottom:2px solid var(--border);padding-bottom:10px;margin:24px 0 14px}
+.preview-content h1:first-child{margin-top:0}
+.preview-content h2{font-size:22px;border-bottom:1px solid var(--border);padding-bottom:6px;margin:22px 0 12px}
+.preview-content h3{font-size:18px;margin:18px 0 8px;color:var(--accent2)}
+.preview-content h4{font-size:15px;margin:14px 0 6px;color:var(--text2)}
+.preview-content p{margin:8px 0;color:var(--text)}
+.preview-content ul,.preview-content ol{padding-left:24px;margin:8px 0}
+.preview-content li{margin:4px 0}
+.preview-content code{background:var(--surface3);padding:2px 7px;border-radius:4px;font-size:13px;font-family:'SF Mono',Consolas,monospace;color:var(--accent2)}
+.preview-content pre{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;overflow-x:auto;margin:12px 0}
+.preview-content pre code{background:none;padding:0;color:var(--text2)}
+.preview-content blockquote{border-left:3px solid var(--accent);padding:8px 16px;margin:12px 0;color:var(--text2);background:var(--accent-glow);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.preview-content a{color:var(--accent)}
+.preview-content hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+.preview-content table{width:100%;border-collapse:collapse;margin:12px 0}
+.preview-content th,.preview-content td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+.preview-content th{background:var(--surface2);font-weight:600}
+.preview-content img{max-width:100%;border-radius:var(--radius-sm)}
+.preview-content .task-list-item{list-style:none;margin-left:-20px}
+.preview-content .task-list-item input{margin-right:6px}
+.status-bar{display:flex;align-items:center;gap:16px;padding:6px 16px;background:var(--surface);border-top:1px solid var(--border);font-size:11px;color:var(--text3)}
+.status-bar .spacer{flex:1}
+footer{text-align:center;padding:20px;border-top:1px solid var(--border);color:var(--text3);font-size:13px}
+footer a{color:var(--accent)}
+.toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 8px 32px rgba(124,92,252,0.3)}
+.toast.show{transform:translateY(0);opacity:1}
+@media(max-width:768px){.editor-wrap{flex-direction:column}.editor-pane{border-right:none;border-bottom:1px solid var(--border);max-height:45vh}.preview-pane{min-height:40vh}.toolbar{gap:2px;padding:6px 10px}}
+@media(max-width:480px){header{padding:12px 16px}header h1{font-size:17px}#editor{padding:12px;font-size:13px}.preview-content{padding:14px}}
+</style>
+</head>
+<body>
+<header>
+<h1>✏️ AI Markdown Editor</h1>
+<span class="subtitle">Write & preview Markdown in real-time</span>
+<a href="https://lifa-su.com" class="back-link">← All Tools</a>
+</header>
+
+<div class="toolbar">
+<button onclick="insertMd('**','**')" title="Bold (Ctrl+B)"><b>B</b></button>
+<button onclick="insertMd('*','*')" title="Italic (Ctrl+I)"><i>I</i></button>
+<button onclick="insertMd('~~','~~')" title="Strikethrough"><s>S</s></button>
+<button onclick="insertMd('`','`')" title="Inline Code">⌨</button>
+<div class="sep"></div>
+<button onclick="insertLine('# ')" title="Heading 1">H1</button>
+<button onclick="insertLine('## ')" title="Heading 2">H2</button>
+<button onclick="insertLine('### ')" title="Heading 3">H3</button>
+<div class="sep"></div>
+<button onclick="insertLine('- ')" title="Unordered List">• List</button>
+<button onclick="insertLine('1. ')" title="Ordered List">1. List</button>
+<button onclick="insertLine('- [ ] ')" title="Task List">☑ Task</button>
+<div class="sep"></div>
+<button onclick="insertLine('> ')" title="Blockquote">❝ Quote</button>
+<button onclick="insertMd('\n```\n','\n```\n')" title="Code Block">{ } Code</button>
+<button onclick="insertLine('---')" title="Horizontal Rule">― Line</button>
+<button onclick="insertMd('[','](url)')" title="Link">🔗 Link</button>
+<button onclick="insertMd('![alt](',')')" title="Image">🖼 Image</button>
+<button onclick="insertTable()" title="Table">⊞ Table</button>
+<div class="spacer"></div>
+<button class="btn-copy" onclick="copyMd()">📋 Copy MD</button>
+<button class="btn-copy" onclick="copyHtml()">📋 Copy HTML</button>
+<button class="btn-export" onclick="exportHtml()">⬇ Export HTML</button>
+<button class="btn-export" onclick="exportMd()">⬇ Export .md</button>
+</div>
+
+<div class="editor-wrap">
+<div class="editor-pane">
+<div class="pane-header"><span class="dot"></span> Markdown</div>
+<textarea id="editor" placeholder="Start writing Markdown here...
+
+# Hello World
+
+This is a **Markdown** editor with *live preview*.
+
+- Feature 1
+- Feature 2
+- Feature 3
+
+> Tip: Use the toolbar above for quick formatting!
+" spellcheck="false"></textarea>
+</div>
+<div class="preview-pane">
+<div class="pane-header"><span class="dot"></span> Preview</div>
+<div class="preview-content" id="preview"></div>
+</div>
+</div>
+
+<div class="status-bar">
+<span id="charCount">0 characters</span>
+<span id="wordCount">0 words</span>
+<span id="lineCount">0 lines</span>
+<div class="spacer"></div>
+<span>Markdown</span>
+</div>
+
+<footer>
+<a href="https://lifa-su.com">Lifa AI Tools</a> · Free online Markdown editor with live preview
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const editor=document.getElementById('editor');
+const preview=document.getElementById('preview');
+
+// Simple Markdown parser
+function parseMd(md){
+  let h=md;
+  // Escape HTML
+  h=h.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Code blocks
+  h=h.replace(/```(\w*)\n([\s\S]*?)```/g,function(m,lang,code){
+    return '<pre><code class="lang-'+lang+'">'+code+'</code></pre>';
+  });
+  // Inline code
+  h=h.replace(/`([^`]+)`/g,'<code>$1</code>');
+  // Images
+  h=h.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1">');
+  // Links
+  h=h.replace(/\[([^\]]*)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
+  // Headings
+  h=h.replace(/^#### (.+)$/gm,'<h4>$1</h4>');
+  h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  // Horizontal rule
+  h=h.replace(/^---$/gm,'<hr>');
+  // Bold
+  h=h.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  // Italic
+  h=h.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  // Strikethrough
+  h=h.replace(/~~(.+?)~~/g,'<del>$1</del>');
+  // Blockquote
+  h=h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  // Task list
+  h=h.replace(/^- \[x\] (.+)$/gm,'<li class="task-list-item"><input type="checkbox" checked disabled> $1</li>');
+  h=h.replace(/^- \[ \] (.+)$/gm,'<li class="task-list-item"><input type="checkbox" disabled> $1</li>');
+  // Unordered list
+  h=h.replace(/^- (.+)$/gm,'<li>$1</li>');
+  // Ordered list
+  h=h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  // Wrap consecutive li in ul
+  h=h.replace(/(<li.*<\/li>\n?)+/g,function(m){return '<ul>'+m+'</ul>';});
+  // Tables
+  h=h.replace(/^\|(.+)\|$/gm,function(m,content){
+    const cells=content.split('|').map(c=>c.trim());
+    if(cells.every(c=>/^-+$/.test(c)))return '<!--sep-->';
+    return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
+  });
+  h=h.replace(/((<tr>.*<\/tr>\n?)+)/g,function(m){
+    let t=m.replace('<!--sep-->\n','').replace('<!--sep-->','');
+    t=t.replace(/<tr>(.*?)<\/tr>/,function(m2,inner){
+      return '<tr>'+inner.replace(/<td>/g,'<th>').replace(/<\/td>/g,'</th>')+'</tr>';
+    });
+    return '<table>'+t+'</table>';
+  });
+  // Paragraphs
+  h=h.replace(/^(?!<[hulotbhp]|<\/|<!)(.*\S.*)$/gm,'<p>$1</p>');
+  // Clean up
+  h=h.replace(/<\/blockquote>\n<blockquote>/g,'\n');
+  return h;
+}
+
+function render(){
+  const md=editor.value;
+  preview.innerHTML=parseMd(md);
+  updateStats(md);
+}
+
+function updateStats(md){
+  document.getElementById('charCount').textContent=md.length+' characters';
+  document.getElementById('wordCount').textContent=(md.match(/\S+/g)||[]).length+' words';
+  document.getElementById('lineCount').textContent=md.split('\n').length+' lines';
+}
+
+function insertMd(before,after){
+  const s=editor.selectionStart,e=editor.selectionEnd;
+  const sel=editor.value.substring(s,e)||'text';
+  editor.value=editor.value.substring(0,s)+before+sel+after+editor.value.substring(e);
+  editor.focus();
+  editor.selectionStart=s+before.length;
+  editor.selectionEnd=s+before.length+sel.length;
+  render();
+}
+
+function insertLine(prefix){
+  const s=editor.selectionStart;
+  const before=editor.value.substring(0,s);
+  const lineStart=before.lastIndexOf('\n')+1;
+  const needNewline=s>0&&editor.value[s-1]!=='\n'?'\n':'';
+  editor.value=editor.value.substring(0,s)+needNewline+prefix+editor.value.substring(s);
+  editor.focus();
+  const newPos=s+needNewline.length+prefix.length;
+  editor.selectionStart=editor.selectionEnd=newPos;
+  render();
+}
+
+function insertTable(){
+  const tpl='\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n';
+  const s=editor.selectionStart;
+  editor.value=editor.value.substring(0,s)+tpl+editor.value.substring(s);
+  editor.focus();
+  render();
+}
+
+function copyMd(){
+  navigator.clipboard.writeText(editor.value).then(()=>showToast('Markdown copied!'));
+}
+
+function copyHtml(){
+  navigator.clipboard.writeText(preview.innerHTML).then(()=>showToast('HTML copied!'));
+}
+
+function exportHtml(){
+  const html='<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Document</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}code{background:#f4f4f4;padding:2px 6px;border-radius:3px}pre{background:#f4f4f4;padding:16px;border-radius:8px;overflow-x:auto}pre code{background:none}blockquote{border-left:3px solid #7c5cfc;padding:8px 16px;margin:12px 0;color:#666}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px 12px}th{background:#f4f4f4}</style></head><body>'+preview.innerHTML+'<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>';
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='document.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('HTML exported!');
+}
+
+function exportMd(){
+  const blob=new Blob([editor.value],{type:'text/markdown'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='document.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Markdown exported!');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// Keyboard shortcuts
+editor.addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.metaKey){
+    if(e.key==='b'){e.preventDefault();insertMd('**','**');}
+    if(e.key==='i'){e.preventDefault();insertMd('*','*');}
+  }
+  // Tab support
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const s=this.selectionStart;
+    this.value=this.value.substring(0,s)+'  '+this.value.substring(this.selectionEnd);
+    this.selectionStart=this.selectionEnd=s+2;
+    render();
+  }
+});
+
+editor.addEventListener('input',render);
+
+// Load sample content
+editor.value=`# Welcome to Markdown Editor
+
+A powerful **online Markdown editor** with real-time preview.
+
+## Features
+
+- ✏️ Live preview as you type
+- 🎨 Syntax highlighting
+- 📋 Copy as Markdown or HTML
+- ⬇️ Export to .html or .md
+- ⌨️ Keyboard shortcuts (Ctrl+B, Ctrl+I)
+- 📊 Word & character count
+
+## Quick Guide
+
+### Text Formatting
+
+**Bold text**, *italic text*, ~~strikethrough~~, and \`inline code\`.
+
+### Code Block
+
+\\`\\`\\`javascript
+function hello() {
+  console.log("Hello, Markdown!");
+}
+\\`\\`\\`
+
+### Blockquote
+
+> Markdown is a lightweight markup language that you can use to add formatting elements to plaintext documents.
+
+### Task List
+
+- [x] Write Markdown
+- [x] Preview in real-time
+- [ ] Export document
+
+### Table
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Bold | ✅ | Ctrl+B |
+| Italic | ✅ | Ctrl+I |
+| Tables | ✅ | Auto-formatted |
+
+---
+
+*Start editing to see the magic!* 🚀`;
+render();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

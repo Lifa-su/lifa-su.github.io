@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Media Query Generator</title>
+<meta name="description" content="Generate CSS media queries with preset breakpoints, device preview, and multi-condition support.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-media-query/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+header{text-align:center;padding:24px 0 16px}
+header h1{font-size:1.6rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.card h2{font-size:1rem;margin-bottom:12px;color:var(--accent)}
+label{display:block;font-size:.85rem;color:var(--text2);margin:10px 0 4px}
+select,input[type="number"]{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.9rem;outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+.preset-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.preset-btn{padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.78rem;cursor:pointer;transition:all .2s}
+.preset-btn:hover{border-color:var(--accent)}
+.preset-btn.active{background:var(--accent);border-color:var(--accent)}
+.code-box{position:relative;background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-all;color:#c9d1d9;min-height:80px;max-height:300px;overflow-y:auto;line-height:1.5}
+.copy-btn{position:absolute;top:8px;right:8px;padding:5px 12px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:.78rem;cursor:pointer;opacity:.85}
+.copy-btn:hover{opacity:1}
+.copy-btn.copied{background:#2ea043}
+.preview-area{display:flex;gap:16px;justify-content:center;align-items:flex-end;flex-wrap:wrap;padding:10px 0}
+.device{border:2px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;transition:all .3s;background:var(--bg)}
+.device.on{border-color:var(--accent);box-shadow:0 0 12px rgba(233,69,96,.3)}
+.device-lbl{font-size:.7rem;color:var(--text2);padding:4px}
+.device-scr{background:var(--surface2);border-radius:3px;margin:4px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--text2)}
+.cond-list{display:flex;flex-direction:column;gap:6px}
+.cond-row{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:var(--radius);flex-wrap:wrap}
+.cond-row select,.cond-row input{width:auto;flex:1;min-width:80px}
+.rm-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:1.1rem;padding:2px 6px}
+.add-btn{padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.82rem;cursor:pointer;margin-top:8px}
+.add-btn:hover{background:var(--accent);border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:.8rem;cursor:pointer;user-select:none}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+footer{text-align:center;padding:24px 0 12px;color:var(--text2);font-size:.75rem}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>CSS Media Query Generator</h1>
+<p>Build responsive media queries with presets, preview, and multi-condition support</p>
+</header>
+<div class="grid">
+<div>
+<div class="card">
+<h2>📐 Breakpoint Presets</h2>
+<label>Framework</label>
+<select id="fw" onchange="applyFw()">
+<option value="">Custom</option>
+<option value="bs">Bootstrap 5</option>
+<option value="tw">Tailwind CSS</option>
+</select>
+<div class="preset-grid" id="presets"></div>
+</div>
+<div class="card">
+<h2>🔧 Query Conditions</h2>
+<div class="cond-list" id="conds"></div>
+<button class="add-btn" onclick="addCond()">+ Add Condition</button>
+</div>
+<div class="card">
+<h2>⚙️ Options</h2>
+<label>Combine with</label>
+<div class="chips" id="opChips">
+<div class="chip on" onclick="setOp('and')">and</div>
+<div class="chip" onclick="setOp(',')">or (comma)</div>
+</div>
+<label>Media Type</label>
+<select id="mtype" onchange="gen()">
+<option value="">all (default)</option>
+<option value="screen">screen</option>
+<option value="print">print</option>
+</select>
+</div>
+</div>
+<div>
+<div class="card">
+<h2>👁️ Device Preview</h2>
+<div class="preview-area" id="preview"></div>
+</div>
+<div class="card">
+<h2>📋 Generated CSS</h2>
+<div class="code-box" id="output">@media (min-width: 768px) {
+  /* Your styles here */
+}</div>
+<button class="copy-btn" onclick="copyCode()">Copy</button>
+</div>
+</div>
+</div>
+</div>
+<footer>CSS Media Query Generator &mdash; No dependencies, no tracking.</footer>
+<script>
+const PRESETS={bs:[{n:'sm',v:576},{n:'md',v:768},{n:'lg',v:992},{n:'xl',v:1200},{n:'xxl',v:1400}],tw:[{n:'sm',v:640},{n:'md',v:768},{n:'lg',v:1024},{n:'xl',v:1280},{n:'2xl',v:1536}]};
+const DEVICES=[{n:'Phone',w:320,h:180,sw:60,sh:100},{n:'Tablet',w:768,h:140,sw:90,sh:70},{n:'Desktop',w:1200,h:100,sw:130,sh:55}];
+const FEATURES=['min-width','max-width','orientation','prefers-color-scheme','prefers-reduced-motion','hover','pointer','aspect-ratio'];
+let op='and',conditions=[{feat:'min-width',val:'768'}];
+
+function applyFw(){
+  var f=document.getElementById('fw').value;
+  var g=document.getElementById('presets');
+  g.innerHTML='';
+  if(!f)return;
+  PRESETS[f].forEach(function(p){
+    var b=document.createElement('button');
+    b.className='preset-btn';
+    b.textContent=p.n+' ('+p.v+'px)';
+    b.onclick=function(){
+      document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active')});
+      b.classList.add('active');
+      conditions=[{feat:'min-width',val:String(p.v)}];
+      renderConds();gen();
+    };
+    g.appendChild(b);
+  });
+}
+
+function renderConds(){
+  var el=document.getElementById('conds');
+  el.innerHTML='';
+  conditions.forEach(function(c,i){
+    var row=document.createElement('div');
+    row.className='cond-row';
+    var sel=document.createElement('select');
+    FEATURES.forEach(function(f){
+      var o=document.createElement('option');
+      o.value=f;o.textContent=f;
+      if(f===c.feat)o.selected=true;
+      sel.appendChild(o);
+    });
+    sel.onchange=function(){c.feat=sel.value;renderConds();gen()};
+    row.appendChild(sel);
+    var inp=makeInput(c);
+    row.appendChild(inp);
+    var rm=document.createElement('button');
+    rm.className='rm-btn';rm.innerHTML='&times;';
+    rm.onclick=function(){conditions.splice(i,1);renderConds();gen()};
+    row.appendChild(rm);
+    el.appendChild(row);
+  });
+}
+
+function makeInput(c){
+  var f=c.feat;
+  if(f==='orientation'){
+    var s=document.createElement('select');
+    ['portrait','landscape'].forEach(function(v){
+      var o=document.createElement('option');o.value=v;o.textContent=v;
+      if(v===c.val)o.selected=true;s.appendChild(o);
+    });
+    s.onchange=function(){c.val=s.value;gen()};
+    if(!c.val)c.val='portrait';
+    return s;
+  }
+  if(f==='prefers-color-scheme'){
+    var s=document.createElement('select');
+    ['light','dark'].forEach(function(v){
+      var o=document.createElement('option');o.value=v;o.textContent=v;
+      if(v===c.val)o.selected=true;s.appendChild(o);
+    });
+    s.onchange=function(){c.val=s.value;gen()};
+    if(!c.val)c.val='light';
+    return s;
+  }
+  if(f==='prefers-reduced-motion'){
+    var s=document.createElement('select');
+    ['no-preference','reduce'].forEach(function(v){
+      var o=document.createElement('option');o.value=v;o.textContent=v;
+      if(v===c.val)o.selected=true;s.appendChild(o);
+    });
+    s.onchange=function(){c.val=s.value;gen()};
+    if(!c.val)c.val='no-preference';
+    return s;
+  }
+  if(f==='hover'){
+    var s=document.createElement('select');
+    ['hover','none'].forEach(function(v){
+      var o=document.createElement('option');o.value=v;o.textContent=v;
+      if(v===c.val)o.selected=true;s.appendChild(o);
+    });
+    s.onchange=function(){c.val=s.value;gen()};
+    if(!c.val)c.val='hover';
+    return s;
+  }
+  if(f==='pointer'){
+    var s=document.createElement('select');
+    ['fine','coarse','none'].forEach(function(v){
+      var o=document.createElement('option');o.value=v;o.textContent=v;
+      if(v===c.val)o.selected=true;s.appendChild(o);
+    });
+    s.onchange=function(){c.val=s.value;gen()};
+    if(!c.val)c.val='fine';
+    return s;
+  }
+  var inp=document.createElement('input');
+  inp.type=f==='aspect-ratio'?'text':'number';
+  inp.placeholder=f==='aspect-ratio'?'16/9':'px';
+  inp.value=c.val||'';
+  inp.oninput=function(){c.val=inp.value;gen()};
+  return inp;
+}
+
+function addCond(){
+  conditions.push({feat:'min-width',val:''});
+  renderConds();gen();
+}
+
+function setOp(v){
+  op=v;
+  document.querySelectorAll('#opChips .chip').forEach(function(c){
+    c.classList.toggle('on',c.textContent.indexOf(v===','?'or':'and')>=0);
+  });
+  gen();
+}
+
+function gen(){
+  var parts=[];
+  conditions.forEach(function(c){
+    if(!c.val&&c.feat!=='orientation')return;
+    var f=c.feat,v=c.val;
+    if(f==='min-width'||f==='max-width'){
+      parts.push('('+f+': '+v+'px)');
+    }else if(f==='aspect-ratio'){
+      parts.push('('+f+': '+v+')');
+    }else{
+      parts.push('('+f+': '+v+')');
+    }
+  });
+  if(!parts.length){parts.push('(min-width: 768px)');}
+  var mt=document.getElementById('mtype').value;
+  var prefix=mt?mt+' and ':'';
+  var joiner=op===','?' , ':' and ';
+  var query='@media '+prefix+parts.join(joiner)+' {\n  /* Your styles here */\n}';
+  document.getElementById('output').textContent=query;
+  updatePreview();
+}
+
+function updatePreview(){
+  var el=document.getElementById('preview');
+  el.innerHTML='';
+  var minW=0,maxW=Infinity;
+  conditions.forEach(function(c){
+    var v=parseInt(c.val);
+    if(c.feat==='min-width'&&v)minW=v;
+    if(c.feat==='max-width'&&v)maxW=v;
+  });
+  DEVICES.forEach(function(d){
+    var frame=document.createElement('div');
+    frame.className='device';
+    var match=d.w>=minW&&d.w<=maxW;
+    if(match)frame.classList.add('on');
+    var scr=document.createElement('div');
+    scr.className='device-scr';
+    scr.style.width=d.sw+'px';
+    scr.style.height=d.sh+'px';
+    scr.textContent=d.w+'px';
+    var lbl=document.createElement('div');
+    lbl.className='device-lbl';
+    lbl.textContent=d.n+(match?' ✓':'');
+    frame.appendChild(scr);
+    frame.appendChild(lbl);
+    el.appendChild(frame);
+  });
+}
+
+function copyCode(){
+  var text=document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn=document.querySelector('.copy-btn');
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied')},1500);
+  });
+}
+
+renderConds();gen();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

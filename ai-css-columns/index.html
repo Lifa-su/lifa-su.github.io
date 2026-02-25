@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Columns - Multi-Column Layout Generator</title>
+<meta name="description" content="Generate CSS multi-column layouts visually. Adjust column count, width, gap, rules and more with real-time preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-columns/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
+a{color:#6c63ff}
+header{text-align:center;padding:2rem 1rem 1rem}
+header h1{font-size:1.8rem;color:#fff;margin-bottom:.3rem}
+header h1 span{color:#6c63ff}
+header p{color:#888;font-size:.95rem}
+.container{max-width:1200px;margin:0 auto;padding:1rem;display:grid;grid-template-columns:320px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:800px){.container{grid-template-columns:1fr}}
+.panel{background:#16213e;border-radius:12px;padding:1.5rem;border:1px solid #0f3460}
+.panel h2{font-size:1.1rem;color:#6c63ff;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid #0f3460}
+.control{margin-bottom:1.2rem}
+.control label{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:#aaa;margin-bottom:.4rem}
+.control label .val{color:#6c63ff;font-weight:600;font-size:.9rem}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#0f3460;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#6c63ff;cursor:pointer;border:2px solid #1a1a2e}
+input[type=number]{width:80px;background:#0f3460;border:1px solid #1a1a2e;color:#e0e0e0;padding:4px 8px;border-radius:6px;font-size:.9rem;text-align:center}
+input[type=color]{width:40px;height:30px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+select{background:#0f3460;color:#e0e0e0;border:1px solid #1a1a2e;padding:6px 10px;border-radius:6px;font-size:.9rem;width:100%}
+.row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.row>*{flex:1;min-width:0}
+.row label{flex:none;width:100%}
+.preview-area{min-height:300px}
+.preview-area h2{display:flex;justify-content:space-between;align-items:center}
+#preview{background:#0f3460;border-radius:8px;padding:1.5rem;margin-bottom:1rem;min-height:200px;color:#ccc;font-size:.95rem;line-height:1.8;transition:all .3s}
+.code-block{position:relative;background:#0d1b36;border-radius:8px;padding:1rem;margin-top:.5rem}
+.code-block pre{color:#8be9fd;font-family:'Fira Code',monospace;font-size:.82rem;white-space:pre-wrap;word-break:break-all;line-height:1.7}
+.btn-copy{position:absolute;top:.6rem;right:.6rem;background:#6c63ff;color:#fff;border:none;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;transition:background .2s}
+.btn-copy:hover{background:#5a52d5}
+.btn-copy.copied{background:#27ae60}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;margin-left:.5rem}
+.tag-none{background:#e74c3c33;color:#e74c3c}
+.tag-all{background:#27ae6033;color:#27ae60}
+footer{text-align:center;padding:2rem 1rem;color:#555;font-size:.8rem}
+</style>
+</head>
+<body>
+<header>
+<h1>🏛️ AI <span>CSS Columns</span> Generator</h1>
+<p>Design multi-column layouts visually with real-time preview</p>
+</header>
+<div class="container">
+<div class="panel controls">
+<h2>⚙️ Column Settings</h2>
+<div class="control">
+<label>Column Count <span class="val" id="countVal">3</span></label>
+<input type="range" id="colCount" min="1" max="6" value="3">
+</div>
+<div class="control">
+<label>Column Width (px) <span class="val" id="widthVal">auto</span></label>
+<div class="row">
+<input type="range" id="colWidth" min="0" max="500" value="0" step="10">
+<input type="number" id="colWidthNum" min="0" max="500" value="0" step="10" placeholder="auto">
+</div>
+</div>
+<div class="control">
+<label>Column Gap (px) <span class="val" id="gapVal">20</span></label>
+<div class="row">
+<input type="range" id="colGap" min="0" max="100" value="20">
+<input type="number" id="colGapNum" min="0" max="100" value="20">
+</div>
+</div>
+<h2 style="margin-top:1.2rem">📏 Column Rule</h2>
+<div class="control">
+<label>Rule Width (px) <span class="val" id="ruleWVal">1</span></label>
+<input type="range" id="ruleWidth" min="0" max="10" value="1">
+</div>
+<div class="control">
+<label>Rule Style</label>
+<select id="ruleStyle">
+<option value="solid">solid</option>
+<option value="dashed">dashed</option>
+<option value="dotted">dotted</option>
+<option value="double">double</option>
+</select>
+</div>
+<div class="control">
+<label>Rule Color</label>
+<input type="color" id="ruleColor" value="#6c63ff">
+</div>
+<h2 style="margin-top:1.2rem">🔀 Column Span</h2>
+<div class="control">
+<label>Span Mode <span id="spanTag" class="tag tag-none">none</span></label>
+<select id="colSpan">
+<option value="none">none</option>
+<option value="all">all</option>
+</select>
+</div>
+</div>
+<div>
+<div class="panel preview-area">
+<h2>👁️ Live Preview</h2>
+<div id="preview">
+<h3 id="spanHeading" style="display:none;text-align:center;margin-bottom:1rem;color:#6c63ff;font-size:1.1rem;">— Spanning Heading —</h3>
+<p>CSS Multi-Column Layout is a powerful module that allows content to flow into multiple columns, similar to how text is laid out in newspapers and magazines. This feature enables designers to create sophisticated layouts without complex markup or JavaScript.</p>
+<p style="margin-top:1rem">The multi-column layout specification provides properties to control the number of columns, the width of each column, the gap between columns, and decorative rules between them. Content automatically flows from one column to the next, making it ideal for text-heavy pages.</p>
+<p style="margin-top:1rem">With properties like column-count, column-width, column-gap, and column-rule, you have fine-grained control over how your content is distributed across columns. The column-span property even allows certain elements to span across all columns, perfect for headings or featured content.</p>
+<p style="margin-top:1rem">Browser support for CSS columns is excellent, with all modern browsers supporting the core properties. This makes it a reliable choice for production websites without the need for vendor prefixes in most cases.</p>
+</div>
+</div>
+<div class="panel">
+<h2>📋 Generated CSS</h2>
+<div class="code-block">
+<button class="btn-copy" id="copyBtn" onclick="copyCSS()">Copy</button>
+<pre id="codeOutput"></pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1200px;margin:30px auto;cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid #0f3460}
+.pro-blur{filter:blur(4px);opacity:.7;padding:24px;background:#16213e;pointer-events:none;user-select:none}
+.pro-blur h3{color:#6c63ff;font-size:1rem;margin-bottom:14px}
+.pro-blur .mock-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.pro-blur .mock-tab{padding:8px 16px;background:#0f3460;border-radius:6px;font-size:.8rem;color:#888}
+.pro-blur .mock-tab.active{background:#6c63ff;color:#fff}
+.pro-blur .mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.pro-blur .mock-tpl{background:#0f3460;border-radius:8px;padding:16px;text-align:center;font-size:.75rem;color:#666}
+.pro-blur .mock-tpl .tpl-icon{font-size:1.5rem;margin-bottom:4px}
+.pro-blur .mock-code{background:#0d1b36;border-radius:6px;padding:12px;font-family:monospace;font-size:.78rem;color:#8be9fd;line-height:1.6}
+.pro-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(0,0,0,.55)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{color:#fff;font-size:1.15rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-sublabel{color:rgba(255,255,255,.7);font-size:.85rem;margin-top:4px}
+.pro-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-box{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pro-modal-box h3{font-size:1.3rem;color:#fff;margin-bottom:4px}
+.pro-modal-box .pro-price{font-size:2rem;font-weight:800;color:#6c63ff;margin:12px 0}
+.pro-modal-box .pro-desc{color:#888;font-size:.85rem;margin-bottom:8px}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid #0f3460;font-size:.9rem;color:#ccc}
+.pro-modal-box ul li:last-child{border-bottom:none}
+.pro-modal-box ul li::before{content:'✓ ';color:#6c63ff;font-weight:700}
+.pro-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#6c63ff,#5a52d5);color:#fff;text-decoration:none;border-radius:10px;font-size:1.05rem;font-weight:700;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-btn:hover{opacity:.9}
+.pro-close{background:none;border:none;color:#888;font-size:.9rem;margin-top:12px;cursor:pointer;padding:8px}
+.pro-close:hover{color:#fff}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').style.display='flex'">
+<div class="pro-blur">
+<h3>📐 Responsive Breakpoints</h3>
+<div class="mock-row">
+<span class="mock-tab">📱 Mobile ≤576px</span>
+<span class="mock-tab active">📱 Tablet ≤768px</span>
+<span class="mock-tab">🖥️ Desktop ≤1200px</span>
+<span class="mock-tab">🖥️ Wide ≥1400px</span>
+</div>
+<h3>🎨 Template Library</h3>
+<div class="mock-grid">
+<div class="mock-tpl"><div class="tpl-icon">📰</div>Newspaper</div>
+<div class="mock-tpl"><div class="tpl-icon">📋</div>Magazine</div>
+<div class="mock-tpl"><div class="tpl-icon">🃏</div>Card Grid</div>
+<div class="mock-tpl"><div class="tpl-icon">📖</div>Blog Post</div>
+<div class="mock-tpl"><div class="tpl-icon">📊</div>Dashboard</div>
+<div class="mock-tpl"><div class="tpl-icon">🖼️</div>Gallery</div>
+</div>
+<h3>⚛️ React Component Export</h3>
+<div class="mock-code">import { MultiColumn } from './columns';<br><br>export default function Layout() {<br>&nbsp;&nbsp;return &lt;MultiColumn cols={3} gap={20} /&gt;;<br>}</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock responsive breakpoints, templates & React export</div>
+</div>
+</div>
+<div id="proModal" class="pro-modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="pro-modal-box">
+<h3>⚡ CSS Columns Pro</h3>
+<div class="pro-desc">Take your multi-column layouts to the next level</div>
+<div class="pro-price">$9</div>
+<ul>
+<li>Responsive Breakpoints — auto-adapt columns for mobile, tablet & desktop</li>
+<li>Template Library — 20+ ready-to-use column layout templates</li>
+<li>React Component Export — copy-paste React/JSX components directly</li>
+<li>Priority support & lifetime updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn">Upgrade to Pro — $9</a>
+<button class="pro-close" onclick="event.stopPropagation();document.getElementById('proModal').style.display='none'">Maybe later</button>
+</div>
+</div>
+<footer>
+<p>AI CSS Columns Generator — Build beautiful multi-column layouts effortlessly</p>
+</footer>
+<script>
+const $ = id => document.getElementById(id);
+const preview = $('preview');
+const codeOutput = $('codeOutput');
+const spanHeading = $('spanHeading');
+
+const inputs = {
+  colCount: $('colCount'),
+  colWidth: $('colWidth'),
+  colWidthNum: $('colWidthNum'),
+  colGap: $('colGap'),
+  colGapNum: $('colGapNum'),
+  ruleWidth: $('ruleWidth'),
+  ruleStyle: $('ruleStyle'),
+  ruleColor: $('ruleColor'),
+  colSpan: $('colSpan')
+};
+
+function sync(slider, num) {
+  slider.addEventListener('input', () => { num.value = slider.value; update(); });
+  num.addEventListener('input', () => { slider.value = num.value; update(); });
+}
+sync(inputs.colWidth, inputs.colWidthNum);
+sync(inputs.colGap, inputs.colGapNum);
+
+Object.values(inputs).forEach(el => el.addEventListener('input', update));
+
+function update() {
+  const count = inputs.colCount.value;
+  const width = inputs.colWidth.value;
+  const gap = inputs.colGap.value;
+  const rw = inputs.ruleWidth.value;
+  const rs = inputs.ruleStyle.value;
+  const rc = inputs.ruleColor.value;
+  const span = inputs.colSpan.value;
+
+  $('countVal').textContent = count;
+  $('widthVal').textContent = width == 0 ? 'auto' : width + 'px';
+  $('gapVal').textContent = gap + 'px';
+  $('ruleWVal').textContent = rw + 'px';
+
+  const tag = $('spanTag');
+  tag.textContent = span;
+  tag.className = 'tag ' + (span === 'all' ? 'tag-all' : 'tag-none');
+
+  // Apply to preview
+  preview.style.columnCount = count;
+  preview.style.columnWidth = width == 0 ? 'auto' : width + 'px';
+  preview.style.columnGap = gap + 'px';
+  preview.style.columnRule = `${rw}px ${rs} ${rc}`;
+
+  spanHeading.style.display = span === 'all' ? 'block' : 'none';
+  spanHeading.style.columnSpan = span;
+
+  // Generate CSS
+  let css = `.multi-column {\n`;
+  css += `  column-count: ${count};\n`;
+  if (width != 0) css += `  column-width: ${width}px;\n`;
+  css += `  column-gap: ${gap}px;\n`;
+  if (rw > 0) css += `  column-rule: ${rw}px ${rs} ${rc};\n`;
+  css += `}`;
+  if (span === 'all') {
+    css += `\n\n.multi-column .spanning {\n  column-span: all;\n}`;
+  }
+  codeOutput.textContent = css;
+}
+
+function copyCSS() {
+  const btn = $('copyBtn');
+  navigator.clipboard.writeText(codeOutput.textContent).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

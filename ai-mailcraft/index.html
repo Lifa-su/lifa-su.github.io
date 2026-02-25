@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI email writing assistant. Compose professional emails with smart templates, tone adjustment, and grammar suggestions. Write better emails in less time.">
+<link rel="canonical" href="https://lifa-su.com/ai-mailcraft/">
+<title>MailCraft - AI\u90ae\u4ef6\u5199\u4f5c\u52a9\u624b</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#6366f1;--primary-light:#818cf8;--primary-dark:#4f46e5;--bg:#f8fafc;--card:#fff;--text:#1e293b;--text-secondary:#64748b;--border:#e2e8f0;--success:#10b981;--radius:16px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+header{text-align:center;padding:32px 0 24px}
+header h1{font-size:28px;background:linear-gradient(135deg,var(--primary),#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+header p{color:var(--text-secondary);font-size:15px}
+.section-title{font-size:18px;font-weight:600;margin:24px 0 14px;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:20px}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:8px}
+.type-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+.type-card:hover{border-color:var(--primary-light);transform:translateY(-2px);box-shadow:var(--shadow)}
+.type-card.active{border-color:var(--primary);background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(236,72,153,.04))}
+.type-card .emoji{font-size:32px;margin-bottom:8px;display:block}
+.type-card .name{font-size:14px;font-weight:600;color:var(--text)}
+.type-card .desc{font-size:11px;color:var(--text-secondary);margin-top:4px}
+.form-panel{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-top:16px;display:none}
+.form-panel.show{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:var(--text)}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;transition:border-color .2s;background:#fff}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--primary)}
+.form-group textarea{resize:vertical;min-height:80px}
+.tone-group{display:flex;gap:8px;flex-wrap:wrap}
+.tone-btn{padding:8px 18px;border:1.5px solid var(--border);border-radius:20px;background:var(--card);cursor:pointer;font-size:13px;transition:all .2s;font-family:inherit}
+.tone-btn:hover{border-color:var(--primary-light)}
+.tone-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.lang-group{display:flex;gap:8px;flex-wrap:wrap}
+.lang-btn{padding:8px 18px;border:1.5px solid var(--border);border-radius:20px;background:var(--card);cursor:pointer;font-size:13px;transition:all .2s;font-family:inherit}
+.lang-btn:hover{border-color:var(--primary-light)}
+.lang-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.gen-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;margin-top:8px}
+.gen-btn:hover{opacity:.9;transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.gen-btn .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.results{margin-top:24px}
+.result-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:14px;position:relative;animation:fadeIn .4s}
+.result-card .label-tag{display:inline-block;background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:8px;margin-bottom:10px}
+.result-card .email-content{font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)}
+.result-card .actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.result-card .actions button{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;font-size:12px;transition:all .2s;font-family:inherit;display:flex;align-items:center;gap:4px}
+.result-card .actions button:hover{border-color:var(--primary);color:var(--primary)}
+.result-card .actions button.copied{background:var(--success);color:#fff;border-color:var(--success)}
+.api-key-bar{background:var(--card);border-radius:12px;padding:14px 18px;box-shadow:var(--shadow);margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.api-key-bar label{font-size:13px;font-weight:500;white-space:nowrap}
+.api-key-bar input{flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:monospace}
+.api-key-bar input:focus{outline:none;border-color:var(--primary)}
+.api-key-bar .save-btn{padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.history-panel{margin-top:32px}
+.history-item{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow);margin-bottom:10px;cursor:pointer;transition:all .2s}
+.history-item:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.history-item .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.history-item .meta .tag{font-size:12px;background:rgba(99,102,241,.1);color:var(--primary);padding:2px 8px;border-radius:6px;font-weight:500}
+.history-item .meta .time{font-size:12px;color:var(--text-secondary)}
+.history-item .preview{font-size:13px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item .del-btn{float:right;background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:4px;opacity:0;transition:opacity .2s}
+.history-item:hover .del-btn{opacity:1}
+.clear-history{background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;margin-left:auto}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-secondary)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.streaming-cursor{display:inline-block;width:2px;height:16px;background:var(--primary);animation:blink 1s infinite;vertical-align:text-bottom;margin-left:2px}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+@media(max-width:600px){
+  .container{padding:12px 10px 32px}
+  header h1{font-size:24px}
+  .type-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+  .type-card{padding:14px 8px}
+  .type-card .emoji{font-size:26px}
+  .form-panel{padding:16px}
+  .api-key-bar{flex-direction:column;align-items:stretch}
+  .api-key-bar input{min-width:auto}
+  .pro-grid{grid-template-columns:1fr}
+}
+
+/* ========== Pro Section ========== */
+.pro-section{margin-top:36px;padding-top:28px;border-top:1.5px dashed var(--border)}
+.pro-title{font-size:18px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.pro-badge{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pro-card{position:relative;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:24px 18px;text-align:center;cursor:pointer;transition:all .2s;overflow:hidden;min-height:160px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.pro-card:hover{border-color:var(--primary-light);transform:translateY(-2px);box-shadow:var(--shadow)}
+.pro-card .pro-emoji{font-size:36px;margin-bottom:10px;display:block}
+.pro-card .pro-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.pro-card .pro-desc{font-size:12px;color:var(--text-secondary);line-height:1.5}
+.pro-card-overlay{position:absolute;inset:0;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);background:rgba(255,255,255,.55);display:flex;justify-content:center;align-items:center;z-index:2;transition:background .2s}
+.pro-card:hover .pro-card-overlay{background:rgba(255,255,255,.45)}
+.pro-card-overlay .lock{font-size:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
+
+/* Pro Upgrade Modal */
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center;padding:20px}
+.pro-modal-backdrop.show{display:flex;animation:fadeIn .25s}
+.pro-modal{background:var(--card);border-radius:var(--radius);padding:32px 28px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:fadeIn .3s}
+.pro-modal h2{font-size:22px;margin-bottom:6px;background:linear-gradient(135deg,var(--primary),#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pro-modal .modal-subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:20px}
+.pro-modal .feature-list{text-align:left;margin:0 auto 24px;max-width:300px}
+.pro-modal .feature-list li{font-size:14px;color:var(--text);padding:6px 0;list-style:none;display:flex;align-items:center;gap:8px}
+.pro-modal .feature-list li::before{content:'✅';font-size:14px}
+.pro-modal .upgrade-btn{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;font-family:inherit}
+.pro-modal .upgrade-btn:hover{opacity:.9;transform:translateY(-1px)}
+.pro-modal .maybe-later{display:block;margin-top:14px;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:13px;font-family:inherit;padding:6px}
+.pro-modal .maybe-later:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>\u2709\ufe0f MailCraft - AI\u90ae\u4ef6\u5199\u4f5c\u52a9\u624b</h1>
+    <p>30\u79d2\u5199\u51fa\u4e13\u4e1a\u90ae\u4ef6\uff0c\u652f\u6301\u591a\u573a\u666f\u3001\u591a\u8bed\u8a00\u3001\u591a\u8bed\u6c14</p>
+  </header>
+
+  <div class="api-key-bar">
+    <label>\ud83d\udd11 DeepSeek API Key\uff1a</label>
+    <input type="password" id="apiKey" placeholder="sk-..." />
+    <button class="save-btn" onclick="saveApiKey()">\u4fdd\u5b58</button>
+  </div>
+
+  <div class="section-title"><span class="icon">\u2709\ufe0f</span> \u9009\u62e9\u90ae\u4ef6\u7c7b\u578b</div>
+  <div class="type-grid" id="typeGrid"></div>
+
+  <div class="form-panel" id="formPanel">
+    <div class="section-title"><span class="icon">\ud83d\udcdd</span> <span id="formTitle">\u586b\u5199\u90ae\u4ef6\u4fe1\u606f</span></div>
+    <div id="formFields"></div>
+    <div class="form-group">
+      <label>\ud83c\udfad \u8bed\u6c14\u98ce\u683c</label>
+      <div class="tone-group" id="toneGroup"></div>
+    </div>
+    <div class="form-group">
+      <label>\ud83c\udf10 \u8f93\u51fa\u8bed\u8a00</label>
+      <div class="lang-group" id="langGroup"></div>
+    </div>
+    <button class="gen-btn" id="genBtn" onclick="generate()">\ud83d\ude80 \u751f\u6210\u90ae\u4ef6</button>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <div class="history-panel" id="historyPanel">
+    <div class="section-title">
+      <span class="icon">\ud83d\udcda</span> \u751f\u6210\u5386\u53f2
+      <button class="clear-history" onclick="clearHistory()">\u6e05\u7a7a</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- Pro Features Section -->
+  <div class="pro-section">
+    <div class="pro-title">
+      <span>🚀 高级功能</span>
+      <span class="pro-badge">PRO</span>
+    </div>
+    <div class="pro-grid">
+      <div class="pro-card" onclick="showProModal()">
+        <span class="pro-emoji">🌍</span>
+        <div class="pro-name">多语言翻译</div>
+        <div class="pro-desc">支持英/日/韩/法/德/西等10+语言互译</div>
+        <div class="pro-card-overlay"><span class="lock">🔒</span></div>
+      </div>
+      <div class="pro-card" onclick="showProModal()">
+        <span class="pro-emoji">🎭</span>
+        <div class="pro-name">语气调整</div>
+        <div class="pro-desc">正式/友好/专业/幽默等多种语气风格切换</div>
+        <div class="pro-card-overlay"><span class="lock">🔒</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pro Upgrade Modal -->
+<div class="pro-modal-backdrop" id="proModal">
+  <div class="pro-modal">
+    <h2>✨ Upgrade to Pro</h2>
+    <p class="modal-subtitle">解锁全部高级功能，让邮件更专业</p>
+    <ul class="feature-list">
+      <li>10+ 语言互译（英/日/韩/法/德/西...）</li>
+      <li>多种语气风格一键切换</li>
+      <li>持续更新更多 Pro 功能</li>
+    </ul>
+    <a class="upgrade-btn" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+    <button class="maybe-later" onclick="hideProModal()">Maybe later</button>
+  </div>
+</div>
+
+<script>
+
+<script>
+// ========== Email Scenes ==========
+const SCENES = [
+  { id:'business', name:'商务合作', emoji:'🤝', desc:'合作邀请/洽谈', fields:[
+    {key:'recipient',label:'收件人/公司',type:'input',placeholder:'如：张总 / ABC公司'},
+    {key:'purpose',label:'合作目的',type:'textarea',placeholder:'如：希望在XX领域展开合作'},
+    {key:'background',label:'自我/公司介绍',type:'textarea',placeholder:'如：我们是一家专注于...的公司'}
+  ]},
+  { id:'job', name:'求职申请', emoji:'💼', desc:'求职/Cover Letter', fields:[
+    {key:'position',label:'目标职位',type:'input',placeholder:'如：高级前端工程师'},
+    {key:'company',label:'目标公司',type:'input',placeholder:'如：Google'},
+    {key:'highlights',label:'个人亮点',type:'textarea',placeholder:'如：5年React经验，主导过千万级用户产品'},
+    {key:'education',label:'教育背景（可选）',type:'input',placeholder:'如：北京大学计算机硕士'}
+  ]},
+  { id:'followup', name:'客户跟进', emoji:'📧', desc:'跟进/催促回复', fields:[
+    {key:'context',label:'上次沟通内容',type:'textarea',placeholder:'如：上周讨论了合作方案'},
+    {key:'action',label:'期望对方做什么',type:'input',placeholder:'如：确认报价 / 签署合同'}
+  ]},
+  { id:'complaint', name:'投诉回复', emoji:'🛡️', desc:'专业回复投诉', fields:[
+    {key:'complaint',label:'客户投诉内容',type:'textarea',placeholder:'粘贴客户投诉邮件内容...'},
+    {key:'solution',label:'解决方案',type:'textarea',placeholder:'如：我们计划退款并赠送优惠券'}
+  ]},
+  { id:'cold', name:'冷启动开发信', emoji:'🚀', desc:'陌生客户开发', fields:[
+    {key:'target',label:'目标客户/行业',type:'input',placeholder:'如：跨境电商卖家'},
+    {key:'product',label:'你的产品/服务',type:'textarea',placeholder:'如：AI驱动的客服自动化平台'},
+    {key:'value',label:'核心价值主张',type:'input',placeholder:'如：降低80%客服成本'}
+  ]},
+  { id:'marketing', name:'营销推广', emoji:'📣', desc:'产品推广/活动', fields:[
+    {key:'product',label:'产品/活动名称',type:'input',placeholder:'如：春季大促 / 新品发布'},
+    {key:'highlights',label:'核心卖点',type:'textarea',placeholder:'如：限时5折、买一送一'},
+    {key:'audience',label:'目标受众',type:'input',placeholder:'如：25-35岁女性用户'},
+    {key:'cta',label:'行动号召',type:'input',placeholder:'如：立即抢购 / 预约体验'}
+  ]},
+  { id:'thanks', name:'感谢信', emoji:'💐', desc:'表达感谢之情', fields:[
+    {key:'recipient',label:'感谢对象',type:'input',placeholder:'如：导师、同事、客户'},
+    {key:'reason',label:'感谢原因',type:'textarea',placeholder:'如：项目中给予的帮助和指导'},
+    {key:'details',label:'具体事例',type:'textarea',placeholder:'如：在关键节点提供了技术支持'}
+  ]},
+  { id:'apology', name:'道歉信', emoji:'🙏', desc:'真诚道歉', fields:[
+    {key:'recipient',label:'道歉对象',type:'input',placeholder:'如：客户、合作方'},
+    {key:'incident',label:'事件描述',type:'textarea',placeholder:'如：项目延期交付'},
+    {key:'cause',label:'原因说明',type:'input',placeholder:'如：需求变更导致工期不足'},
+    {key:'remedy',label:'补救措施',type:'textarea',placeholder:'如：加班赶工、提供补偿方案'}
+  ]},
+  { id:'invitation', name:'会议邀请', emoji:'📅', desc:'会议/活动邀请', fields:[
+    {key:'event',label:'会议/活动名称',type:'input',placeholder:'如：Q1季度复盘会'},
+    {key:'datetime',label:'时间地点',type:'input',placeholder:'如：3月15日 14:00 会议室A'},
+    {key:'agenda',label:'议程/内容',type:'textarea',placeholder:'如：1.业绩回顾 2.问题讨论 3.下季度规划'},
+    {key:'attendees',label:'参会人员',type:'input',placeholder:'如：全体产品团队'}
+  ]},
+  { id:'resign', name:'离职邮件', emoji:'👋', desc:'正式离职通知', fields:[
+    {key:'manager',label:'上级姓名',type:'input',placeholder:'如：王总'},
+    {key:'lastday',label:'最后工作日',type:'input',placeholder:'如：2026年3月31日'},
+    {key:'reason',label:'离职原因（可选）',type:'input',placeholder:'如：个人发展规划'},
+    {key:'handover',label:'交接安排',type:'textarea',placeholder:'如：已整理文档，可在两周内完成交接'}
+  ]},
+  { id:'reply', name:'邮件回复', emoji:'💬', desc:'AI生成回复建议', fields:[
+    {key:'original',label:'收到的邮件内容',type:'textarea',placeholder:'粘贴收到的邮件...'},
+    {key:'intent',label:'你想表达的意思',type:'textarea',placeholder:'如：同意合作但希望调整价格'}
+  ]},
+  { id:'optimize', name:'邮件优化', emoji:'✨', desc:'优化已有邮件', fields:[
+    {key:'draft',label:'你的邮件草稿',type:'textarea',placeholder:'粘贴你写的邮件草稿...'},
+    {key:'goal',label:'优化目标（可选）',type:'input',placeholder:'如：更正式 / 更简洁 / 语法纠错'}
+  ]}
+];
+
+const TONES = [
+  {id:'formal', label:'🎩 正式', name:'正式'},
+  {id:'friendly', label:'😊 友好', name:'友好'},
+  {id:'urgent', label:'⚡ 紧急', name:'紧急'},
+  {id:'polite', label:'🌸 委婉', name:'委婉'},
+  {id:'casual', label:'😎 轻松', name:'轻松'}
+];
+
+const LANGS = [
+  {id:'zh', label:'🇨🇳 中文'},
+  {id:'en', label:'🇺🇸 English'},
+  {id:'both', label:'🌐 中英双语'}
+];
+
+// ========== State ==========
+let currentScene = null;
+let currentTone = 'formal';
+let currentLang = 'zh';
+let history = JSON.parse(localStorage.getItem('mailcraft_history') || '[]');
+let generating = false;
+
+// ========== Init ==========
+function init() {
+  const apiKey = localStorage.getItem('mailcraft_api_key') || '';
+  document.getElementById('apiKey').value = apiKey;
+  renderScenes();
+  renderHistory();
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  localStorage.setItem('mailcraft_api_key', key);
+  const btn = document.querySelector('.api-key-bar .save-btn');
+  btn.textContent = '✅ 已保存';
+  setTimeout(() => btn.textContent = '保存', 1500);
+}
+
+// ========== Render Scenes ==========
+function renderScenes() {
+  const grid = document.getElementById('typeGrid');
+  grid.innerHTML = SCENES.map(s => `
+    <div class="type-card" data-id="${s.id}" onclick="selectScene('${s.id}')">
+      <span class="emoji">${s.emoji}</span>
+      <div class="name">${s.name}</div>
+      <div class="desc">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
+function selectScene(id) {
+  currentScene = SCENES.find(s => s.id === id);
+  if (!currentScene) return;
+
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.type-card[data-id="${id}"]`).classList.add('active');
+
+  const panel = document.getElementById('formPanel');
+  panel.classList.add('show');
+  document.getElementById('formTitle').textContent = currentScene.emoji + ' ' + currentScene.name;
+
+  // Render fields
+  const fieldsDiv = document.getElementById('formFields');
+  fieldsDiv.innerHTML = currentScene.fields.map(f => `
+    <div class="form-group">
+      <label>${f.label}</label>
+      ${f.type === 'textarea'
+        ? `<textarea id="field_${f.key}" placeholder="${f.placeholder}"></textarea>`
+        : `<input type="text" id="field_${f.key}" placeholder="${f.placeholder}" />`
+      }
+    </div>
+  `).join('');
+
+  // Render tones
+  document.getElementById('toneGroup').innerHTML = TONES.map(t => `
+    <button class="tone-btn ${t.id === currentTone ? 'active' : ''}" data-tone="${t.id}" onclick="selectTone('${t.id}')">${t.label}</button>
+  `).join('');
+
+  // Render langs
+  document.getElementById('langGroup').innerHTML = LANGS.map(l => `
+    <button class="lang-btn ${l.id === currentLang ? 'active' : ''}" data-lang="${l.id}" onclick="selectLang('${l.id}')">${l.label}</button>
+  `).join('');
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectTone(id) {
+  currentTone = id;
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.tone-btn[data-tone="${id}"]`).classList.add('active');
+}
+
+function selectLang(id) {
+  currentLang = id;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[data-lang="${id}"]`).classList.add('active');
+}
+
+// ========== Generate ==========
+async function generate() {
+  if (generating || !currentScene) return;
+
+  const apiKey = localStorage.getItem('mailcraft_api_key');
+  if (!apiKey) {
+    alert('请先输入并保存 DeepSeek API Key');
+    document.getElementById('apiKey').focus();
+    return;
+  }
+
+  // Collect field values
+  const fields = {};
+  let hasEmpty = false;
+  currentScene.fields.forEach(f => {
+    const val = document.getElementById('field_' + f.key)?.value?.trim() || '';
+    fields[f.key] = val;
+    if (!val && !f.label.includes('可选')) hasEmpty = true;
+  });
+  if (hasEmpty) {
+    alert('请填写必填信息');
+    return;
+  }
+
+  const toneName = TONES.find(t => t.id === currentTone)?.name || '正式';
+  const langMap = { zh: '中文', en: '英文(English)', both: '先中文再英文（两个版本）' };
+  const langName = langMap[currentLang];
+
+  // Build prompt
+  let prompt = '';
+  if (currentScene.id === 'optimize') {
+    prompt = `你是一位专业的邮件写作专家。请优化以下邮件草稿。
+
+邮件草稿：
+${fields.draft}
+
+${fields.goal ? '优化目标：' + fields.goal : ''}
+
+语气风格：${toneName}
+输出语言：${langName}
+
+请直接输出优化后的完整邮件（包含主题行），不要解释。`;
+  } else if (currentScene.id === 'reply') {
+    prompt = `你是一位专业的邮件写作专家。请根据收到的邮件生成回复。
+
+收到的邮件：
+${fields.original}
+
+我想表达的意思：${fields.intent}
+
+语气风格：${toneName}
+输出语言：${langName}
+
+请直接输出回复邮件（包含主题行），不要解释。`;
+  } else {
+    const fieldDesc = currentScene.fields.map(f => `${f.label}：${fields[f.key]}`).filter(x => !x.endsWith('：')).join('\n');
+    prompt = `你是一位专业的邮件写作专家。请根据以下信息生成一封${currentScene.name}邮件。
+
+邮件类型：${currentScene.name}
+${fieldDesc}
+
+语气风格：${toneName}
+输出语言：${langName}
+
+要求：
+1. 包含邮件主题行（Subject:）
+2. 邮件正文结构清晰、措辞专业
+3. 符合商务邮件礼仪
+4. 语气${toneName}
+${currentLang === 'both' ? '5. 先输出中文版本，然后输出英文版本，用"---"分隔' : ''}
+
+请直接输出邮件内容，不要额外解释。`;
+  }
+
+  // Start generating
+  generating = true;
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>AI 正在撰写邮件...';
+
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = `<div class="result-card"><div class="label-tag">${currentScene.emoji} ${currentScene.name}</div><div class="email-content" id="streamOutput">正在生成...</div></div>`;
+
+  try {
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: '你是MailCraft，一位专业的邮件写作AI助手。你擅长撰写各类商务邮件，措辞精准、结构清晰、语气得体。' },
+          { role: 'user', content: prompt }
+        ],
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error('API请求失败: ' + response.status + ' ' + err);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    const outputEl = document.getElementById('streamOutput');
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n').filter(l => l.trim().startsWith('data:'));
+
+      for (const line of lines) {
+        const data = line.replace('data: ', '').trim();
+        if (data === '[DONE]') continue;
+        try {
+          const json = JSON.parse(data);
+          const delta = json.choices?.[0]?.delta?.content || '';
+          fullText += delta;
+          outputEl.textContent = fullText;
+        } catch(e) {}
+      }
+    }
+
+    // Render final result with actions
+    resultsDiv.innerHTML = `
+      <div class="result-card">
+        <div class="label-tag">${currentScene.emoji} ${currentScene.name} · ${toneName} · ${langMap[currentLang]}</div>
+        <div class="email-content">${escapeHtml(fullText)}</div>
+        <div class="actions">
+          <button onclick="copyText(this, '${escapeForAttr(fullText)}')">📋 复制全文</button>
+          <button onclick="copySubject('${escapeForAttr(fullText)}')">📌 复制主题</button>
+          <button onclick="regenerate()">🔄 重新生成</button>
+        </div>
+      </div>
+    `;
+
+    // Save to history
+    history.unshift({
+      scene: currentScene.name,
+      emoji: currentScene.emoji,
+      tone: toneName,
+      lang: langMap[currentLang],
+      content: fullText,
+      time: new Date().toLocaleString('zh-CN')
+    });
+    if (history.length > 50) history = history.slice(0, 50);
+    localStorage.setItem('mailcraft_history', JSON.stringify(history));
+    renderHistory();
+
+  } catch(e) {
+    resultsDiv.innerHTML = `<div class="result-card"><div class="email-content" style="color:#ef4444">❌ 生成失败：${escapeHtml(e.message)}</div></div>`;
+  } finally {
+    generating = false;
+    btn.disabled = false;
+    btn.innerHTML = '✉️ 生成邮件';
+  }
+}
+
+function regenerate() {
+  generate();
+}
+
+// ========== Copy ==========
+function copyText(btn, text) {
+  // Use the displayed text instead of attr for reliability
+  const card = btn.closest('.result-card');
+  const content = card.querySelector('.email-content').textContent;
+  navigator.clipboard.writeText(content).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '✅ 已复制';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '📋 复制全文';
+    }, 2000);
+  });
+}
+
+function copySubject(text) {
+  const card = document.querySelector('.result-card .email-content');
+  const content = card.textContent;
+  const match = content.match(/(?:Subject|主题|邮件主题)[：:]\s*(.+)/i);
+  if (match) {
+    navigator.clipboard.writeText(match[1].trim());
+    alert('主题已复制：' + match[1].trim());
+  } else {
+    const firstLine = content.split('\n')[0];
+    navigator.clipboard.writeText(firstLine);
+    alert('已复制第一行：' + firstLine);
+  }
+}
+
+// ========== History ==========
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const panel = document.getElementById('historyPanel');
+  if (!history.length) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <button class="del-btn" onclick="event.stopPropagation();deleteHistory(${i})">删除</button>
+      <div class="meta">
+        <span class="tag">${h.emoji} ${h.scene} · ${h.tone}</span>
+        <span class="time">${h.time}</span>
+      </div>
+      <div class="preview">${escapeHtml((h.content || '').substring(0, 80))}...</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(index) {
+  const h = history[index];
+  if (!h) return;
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = `
+    <div class="result-card">
+      <div class="label-tag">${h.emoji} ${h.scene} · ${h.tone} · ${h.lang}</div>
+      <div class="email-content">${escapeHtml(h.content)}</div>
+      <div class="actions">
+        <button onclick="copyText(this, '')">📋 复制全文</button>
+        <button onclick="copySubject('')">📌 复制主题</button>
+      </div>
+    </div>
+  `;
+  resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function deleteHistory(index) {
+  history.splice(index, 1);
+  localStorage.setItem('mailcraft_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('确定清空所有历史记录？')) return;
+  history = [];
+  localStorage.setItem('mailcraft_history', '[]');
+  renderHistory();
+}
+
+// ========== Utils ==========
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function escapeForAttr(str) {
+  return (str || '').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+}
+
+// ========== Pro Modal ==========
+function showProModal() {
+  document.getElementById('proModal').classList.add('show');
+}
+function hideProModal() {
+  document.getElementById('proModal').classList.remove('show');
+}
+document.getElementById('proModal').addEventListener('click', function(e) {
+  if (e.target === this) hideProModal();
+});
+
+// ========== Start ==========
+init();
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

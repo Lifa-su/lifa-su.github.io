@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Font Pair — Smart Typography Pairing Tool</title>
+<meta name="description" content="Discover perfect font pairings for your next project. Preview, customize, and export CSS code instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-font-pair/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;
+  --accent2:#533483;--text:#eee;--text2:#a0a0b8;--radius:12px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.header{text-align:center;padding:3rem 1.5rem 2rem;background:linear-gradient(135deg,var(--surface) 0%,var(--bg) 100%)}
+.header h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,var(--accent),#ff6b8a,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem;letter-spacing:-.02em}
+.header p{color:var(--text2);font-size:1.05rem;max-width:520px;margin:0 auto}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;vertical-align:middle;margin-left:6px;letter-spacing:.04em}
+
+/* Layout */
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem 3rem}
+.controls{display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;align-items:end}
+.control-group{flex:1;min-width:220px}
+.control-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.control-group select,.control-group input[type="text"],.control-group textarea{
+  width:100%;padding:10px 14px;background:var(--surface);border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius);color:var(--text);font-size:.95rem;outline:none;transition:border .2s
+}
+.control-group select:focus,.control-group input:focus,.control-group textarea:focus{border-color:var(--accent)}
+.control-group textarea{resize:vertical;min-height:60px;font-family:inherit}
+
+/* Filter tabs */
+.filter-bar{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter-btn{padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--text2);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Pair grid */
+.pair-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:2rem}
+.pair-card{
+  background:var(--surface);border-radius:var(--radius);padding:1.5rem;cursor:pointer;
+  border:2px solid transparent;transition:all .25s;position:relative;overflow:hidden
+}
+.pair-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .25s}
+.pair-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:rgba(233,69,96,.2)}
+.pair-card:hover::before{opacity:1}
+.pair-card.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.pair-card.selected::before{opacity:1}
+.pair-card .pair-tag{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.pair-card .pair-tag span{background:rgba(233,69,96,.12);padding:2px 8px;border-radius:10px}
+.pair-heading{font-size:1.6rem;line-height:1.25;margin-bottom:.5rem;color:#fff}
+.pair-body{font-size:1rem;line-height:1.65;color:var(--text2);margin-bottom:.75rem}
+.pair-meta{font-size:.75rem;color:rgba(255,255,255,.35);display:flex;justify-content:space-between;align-items:center}
+.pair-names{font-weight:600;color:var(--text2)}
+
+/* Preview section */
+.preview-section{background:var(--surface);border-radius:var(--radius);padding:2rem;margin-bottom:2rem;box-shadow:var(--shadow)}
+.preview-section h2{font-size:1rem;color:var(--text2);margin-bottom:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.preview-section h2::before{content:'';width:3px;height:16px;background:var(--accent);border-radius:2px}
+.preview-heading{font-size:2.8rem;line-height:1.2;margin-bottom:1rem;color:#fff;font-weight:700}
+.preview-body{font-size:1.15rem;line-height:1.8;color:var(--text2);max-width:680px}
+
+/* Code section */
+.code-section{background:var(--surface);border-radius:var(--radius);padding:1.5rem;position:relative;box-shadow:var(--shadow)}
+.code-section h2{font-size:1rem;color:var(--text2);margin-bottom:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.code-section h2::before{content:'';width:3px;height:16px;background:var(--accent2);border-radius:2px}
+.code-block{background:#0d1117;border-radius:8px;padding:1.25rem;font-family:'Fira Code','SF Mono',monospace;font-size:.85rem;line-height:1.7;color:#c9d1d9;overflow-x:auto;white-space:pre;tab-size:2}
+.copy-btn{
+  position:absolute;top:1.25rem;right:1.25rem;padding:8px 16px;background:var(--accent);
+  border:none;border-radius:8px;color:#fff;font-size:.8rem;font-weight:700;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;gap:6px
+}
+.copy-btn:hover{background:#d63851;transform:scale(1.03)}
+.copy-btn.copied{background:#2ea043}
+.copy-btn svg{width:14px;height:14px}
+
+/* Footer */
+.footer{text-align:center;padding:2rem;color:rgba(255,255,255,.25);font-size:.8rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .header h1{font-size:1.8rem}
+  .pair-grid{grid-template-columns:1fr}
+  .preview-heading{font-size:2rem}
+  .controls{flex-direction:column}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.pair-card{animation:fadeUp .4s ease both}
+.pair-card:nth-child(2){animation-delay:.05s}
+.pair-card:nth-child(3){animation-delay:.1s}
+.pair-card:nth-child(4){animation-delay:.15s}
+.pair-card:nth-child(5){animation-delay:.2s}
+.pair-card:nth-child(6){animation-delay:.25s}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Font Pair <span class="badge">v2.0</span></h1>
+  <p>Curated typography pairings backed by design principles. Preview, customize, and grab the CSS.</p>
+</div>
+
+<div class="container">
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-group" style="flex:2;min-width:300px">
+      <label>Preview Text — Heading</label>
+      <input type="text" id="headingText" value="The quick brown fox jumps over the lazy dog" placeholder="Type heading text...">
+    </div>
+    <div class="control-group" style="flex:3;min-width:300px">
+      <label>Preview Text — Body</label>
+      <textarea id="bodyText" rows="2" placeholder="Type body text...">Typography is the art and technique of arranging type to make written language legible, readable, and appealing when displayed. Good font pairing creates visual hierarchy and harmony.</textarea>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All Pairs</button>
+    <button class="filter-btn" data-filter="serif-sans">Serif + Sans</button>
+    <button class="filter-btn" data-filter="sans-sans">Sans + Sans</button>
+    <button class="filter-btn" data-filter="display-sans">Display + Sans</button>
+    <button class="filter-btn" data-filter="serif-serif">Serif + Serif</button>
+  </div>
+
+  <!-- Pair Grid -->
+  <div class="pair-grid" id="pairGrid"></div>
+
+  <!-- Preview -->
+  <div class="preview-section">
+    <h2>Live Preview</h2>
+    <div class="preview-heading" id="previewHeading">Select a font pair above</div>
+    <div class="preview-body" id="previewBody">Click any card to see the pairing in action with your custom text.</div>
+  </div>
+
+  <!-- CSS Code -->
+  <div class="code-section">
+    <h2>Generated CSS</h2>
+    <button class="copy-btn" id="copyBtn" onclick="copyCSS()">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25z"/></svg>
+      Copy
+    </button>
+    <div class="code-block" id="codeBlock">/* Select a font pair to generate CSS */</div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>AI Font Pair — Built with ❤️ for designers & developers</p>
+</div>
+
+<script>
+const PAIRS = [
+  {
+    heading: { family: "Playfair Display", weight: 700 },
+    body: { family: "Source Sans 3", weight: 400 },
+    category: "serif-sans",
+    tag: "Classic Editorial",
+    rationale: "High-contrast serif meets clean geometric sans — ideal for editorial and luxury brands"
+  },
+  {
+    heading: { family: "Montserrat", weight: 800 },
+    body: { family: "Merriweather", weight: 400 },
+    category: "sans-sans",
+    tag: "Modern Warmth",
+    rationale: "Bold geometric heading with a highly readable serif body — great for blogs"
+  },
+  {
+    heading: { family: "Oswald", weight: 600 },
+    body: { family: "Lato", weight: 400 },
+    category: "sans-sans",
+    tag: "Bold & Clean",
+    rationale: "Condensed impact heading with friendly humanist body — perfect for marketing"
+  },
+  {
+    heading: { family: "Raleway", weight: 700 },
+    body: { family: "Roboto", weight: 400 },
+    category: "sans-sans",
+    tag: "Elegant Tech",
+    rationale: "Elegant thin-stroke heading with neutral body — versatile for tech and SaaS"
+  },
+  {
+    heading: { family: "Lora", weight: 700 },
+    body: { family: "Open Sans", weight: 400 },
+    category: "serif-sans",
+    tag: "Scholarly",
+    rationale: "Calligraphic serif heading with neutral sans body — academic and trustworthy"
+  },
+  {
+    heading: { family: "Poppins", weight: 700 },
+    body: { family: "Nunito", weight: 400 },
+    category: "sans-sans",
+    tag: "Friendly Modern",
+    rationale: "Geometric rounded pair — approachable and modern for apps and startups"
+  },
+  {
+    heading: { family: "DM Serif Display", weight: 400 },
+    body: { family: "DM Sans", weight: 400 },
+    category: "serif-sans",
+    tag: "DM Superfamily",
+    rationale: "Same design DNA in serif and sans — guaranteed harmony from the DM family"
+  },
+  {
+    heading: { family: "Bebas Neue", weight: 400 },
+    body: { family: "Inter", weight: 400 },
+    category: "display-sans",
+    tag: "Impact Hero",
+    rationale: "All-caps display heading with the web's most readable UI font — bold statements"
+  },
+  {
+    heading: { family: "Cormorant Garamond", weight: 600 },
+    body: { family: "Fira Sans", weight: 400 },
+    category: "serif-sans",
+    tag: "Refined Contrast",
+    rationale: "Elegant high-contrast Garamond with technical sans — fashion meets function"
+  },
+  {
+    heading: { family: "Space Grotesk", weight: 700 },
+    body: { family: "Space Mono", weight: 400 },
+    category: "sans-sans",
+    tag: "Developer",
+    rationale: "Proportional + monospace from the same family — perfect for dev tools and docs"
+  },
+  {
+    heading: { family: "Abril Fatface", weight: 400 },
+    body: { family: "Poppins", weight: 400 },
+    category: "display-sans",
+    tag: "Magazine",
+    rationale: "Didone display face with geometric sans — high-fashion magazine aesthetic"
+  },
+  {
+    heading: { family: "Bitter", weight: 700 },
+    body: { family: "Raleway", weight: 400 },
+    category: "serif-sans",
+    tag: "Warm Professional",
+    rationale: "Slab serif heading with elegant sans body — warm yet professional"
+  },
+  {
+    heading: { family: "Archivo Black", weight: 400 },
+    body: { family: "Libre Franklin", weight: 400 },
+    category: "display-sans",
+    tag: "Bold Statement",
+    rationale: "Ultra-bold grotesque with classic Franklin — strong brand presence"
+  },
+  {
+    heading: { family: "Crimson Pro", weight: 700 },
+    body: { family: "Work Sans", weight: 400 },
+    category: "serif-sans",
+    tag: "Literary Modern",
+    rationale: "Old-style serif with industrial sans — bridges classic and contemporary"
+  },
+  {
+    heading: { family: "Josefin Sans", weight: 700 },
+    body: { family: "Lora", weight: 400 },
+    category: "sans-sans",
+    tag: "Art Deco",
+    rationale: "Vintage geometric sans with calligraphic serif — retro-modern elegance"
+  },
+  {
+    heading: { family: "Merriweather", weight: 900 },
+    body: { family: "Source Sans 3", weight: 400 },
+    category: "serif-sans",
+    tag: "Readable Classic",
+    rationale: "Screen-optimized serif pair — maximum readability for long-form content"
+  },
+  {
+    heading: { family: "Sora", weight: 700 },
+    body: { family: "Inter", weight: 400 },
+    category: "sans-sans",
+    tag: "Clean UI",
+    rationale: "Modern variable font pair — crisp and minimal for dashboards and apps"
+  },
+  {
+    heading: { family: "Vollkorn", weight: 700 },
+    body: { family: "Vollkorn", weight: 400 },
+    category: "serif-serif",
+    tag: "Mono-Family Serif",
+    rationale: "Single serif family at different weights — effortless cohesion for text-heavy sites"
+  }
+];
+
+// Collect all unique font families
+const allFonts = [...new Set(PAIRS.flatMap(p => [p.heading.family, p.body.family]))];
+
+// Load Google Fonts dynamically
+function loadFonts() {
+  const families = allFonts.map(f => {
+    const weights = new Set();
+    PAIRS.forEach(p => {
+      if (p.heading.family === f) weights.add(p.heading.weight);
+      if (p.body.family === f) weights.add(p.body.weight);
+    });
+    return `family=${f.replace(/ /g, '+')}:wght@${[...weights].sort().join(';')}`;
+  });
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
+  document.head.appendChild(link);
+}
+loadFonts();
+
+let selectedIndex = 0;
+
+function renderGrid(filter = 'all') {
+  const grid = document.getElementById('pairGrid');
+  grid.innerHTML = '';
+  PAIRS.forEach((pair, i) => {
+    if (filter !== 'all' && pair.category !== filter) return;
+    const card = document.createElement('div');
+    card.className = `pair-card${i === selectedIndex ? ' selected' : ''}`;
+    card.onclick = () => selectPair(i);
+    card.innerHTML = `
+      <div class="pair-tag"><span>${pair.tag}</span></div>
+      <div class="pair-heading" style="font-family:'${pair.heading.family}',serif;font-weight:${pair.heading.weight}">${document.getElementById('headingText').value || 'The quick brown fox'}</div>
+      <div class="pair-body" style="font-family:'${pair.body.family}',sans-serif;font-weight:${pair.body.weight}">${pair.rationale}</div>
+      <div class="pair-meta">
+        <span class="pair-names">${pair.heading.family} + ${pair.body.family}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function selectPair(index) {
+  selectedIndex = index;
+  const pair = PAIRS[index];
+  const headingText = document.getElementById('headingText').value || 'The quick brown fox jumps over the lazy dog';
+  const bodyText = document.getElementById('bodyText').value || 'Typography is the art and technique of arranging type.';
+
+  // Update preview
+  const ph = document.getElementById('previewHeading');
+  const pb = document.getElementById('previewBody');
+  ph.style.fontFamily = `'${pair.heading.family}', serif`;
+  ph.style.fontWeight = pair.heading.weight;
+  ph.textContent = headingText;
+  pb.style.fontFamily = `'${pair.body.family}', sans-serif`;
+  pb.style.fontWeight = pair.body.weight;
+  pb.textContent = bodyText;
+
+  // Generate CSS
+  const hSlug = pair.heading.family.replace(/ /g, '+');
+  const bSlug = pair.body.family.replace(/ /g, '+');
+  const importUrl = `https://fonts.googleapis.com/css2?family=${hSlug}:wght@${pair.heading.weight}&family=${bSlug}:wght@${pair.body.weight}&display=swap`;
+
+  const css = `/* ${pair.tag} — ${pair.heading.family} + ${pair.body.family} */
+@import url('${importUrl}');
+
+h1, h2, h3 {
+  font-family: '${pair.heading.family}', serif;
+  font-weight: ${pair.heading.weight};
+}
+
+body, p {
+  font-family: '${pair.body.family}', sans-serif;
+  font-weight: ${pair.body.weight};
+  line-height: 1.7;
+}`;
+
+  document.getElementById('codeBlock').textContent = css;
+
+  // Update card selection
+  document.querySelectorAll('.pair-card').forEach((c, i) => {
+    // need to match against filtered view
+    c.classList.toggle('selected', c.onclick.toString().includes(`selectPair(${index})`));
+  });
+  // Simpler: re-render
+  const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+  renderGrid(activeFilter);
+}
+
+function copyCSS() {
+  const code = document.getElementById('codeBlock').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25z"/></svg> Copy`;
+    }, 2000);
+  });
+}
+
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(btn.dataset.filter);
+  });
+});
+
+// Live update on text change
+document.getElementById('headingText').addEventListener('input', () => {
+  const activeFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+  renderGrid(activeFilter);
+  if (PAIRS[selectedIndex]) selectPair(selectedIndex);
+});
+document.getElementById('bodyText').addEventListener('input', () => {
+  if (PAIRS[selectedIndex]) selectPair(selectedIndex);
+});
+
+// Init
+renderGrid();
+selectPair(0);
+</script>
+
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:0 auto 2rem;padding:0 1.5rem}
+.pro-section h2{font-size:1rem;color:var(--text2);margin-bottom:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.pro-section h2::before{content:'';width:3px;height:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:2px}
+.pro-wrapper{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-wrapper:hover{transform:translateY(-2px)}
+.pro-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;padding:2rem;filter:blur(5px);pointer-events:none;user-select:none}
+.pro-card{background:var(--surface);border-radius:var(--radius);padding:1.5rem;border:1px solid rgba(255,255,255,.06)}
+.pro-card-icon{font-size:2rem;margin-bottom:.75rem}
+.pro-card h3{font-size:1.1rem;color:#fff;margin-bottom:.5rem;font-weight:700}
+.pro-card p{font-size:.9rem;color:var(--text2);line-height:1.6}
+.pro-overlay{position:absolute;inset:0;background:rgba(22,33,62,.7);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;border-radius:var(--radius);border:2px dashed rgba(233,69,96,.3)}
+.pro-overlay .lock-icon{font-size:2.5rem}
+.pro-overlay .lock-text{font-size:1.2rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.pro-overlay .lock-sub{font-size:.85rem;color:var(--text2)}
+
+/* Modal */
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.5);text-align:center;position:relative;border:1px solid rgba(255,255,255,.06)}
+.pro-modal h3{font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:1.5rem}
+.pro-modal-features{text-align:left;margin-bottom:1.5rem}
+.pro-modal-features li{display:flex;align-items:start;gap:10px;padding:.55rem 0;font-size:.95rem;color:var(--text);line-height:1.5;list-style:none}
+.pro-modal-features li .check{color:#2ea043;font-weight:700;font-size:1.1rem;flex-shrink:0}
+.pro-modal-price{font-size:2rem;font-weight:800;color:var(--accent);margin-bottom:1.5rem}
+.pro-modal-price span{font-size:.9rem;font-weight:400;color:var(--text2);margin-left:4px}
+.pro-cta{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#ff6b8a);border:none;border-radius:10px;color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
+.pro-cta:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.pro-later{display:inline-block;margin-top:1rem;background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:6px 12px;transition:color .2s}
+.pro-later:hover{color:var(--text)}
+</style>
+
+<section class="pro-section">
+  <h2>Pro Features</h2>
+  <div class="pro-wrapper" onclick="document.getElementById('proModal').classList.add('open')">
+    <div class="pro-cards">
+      <div class="pro-card">
+        <div class="pro-card-icon">📤</div>
+        <h3>Custom Font Upload</h3>
+        <p>Upload your own .woff2, .ttf, or .otf files and preview pairings with any custom font.</p>
+      </div>
+      <div class="pro-card">
+        <div class="pro-card-icon">🎨</div>
+        <h3>Brand Font Packs</h3>
+        <p>50+ curated font sets for SaaS, editorial, e-commerce, and more — ready to use.</p>
+      </div>
+      <div class="pro-card">
+        <div class="pro-card-icon">⚡</div>
+        <h3>CSS Variables Export</h3>
+        <p>Export your pairings as CSS custom properties for seamless design-system integration.</p>
+      </div>
+    </div>
+    <div class="pro-overlay">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-text">Pro Features</div>
+      <div class="lock-sub">Click to unlock</div>
+    </div>
+  </div>
+</section>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pro-modal">
+    <h3>Unlock Pro Features</h3>
+    <ul class="pro-modal-features">
+      <li><span class="check">✓</span>Custom Font Upload &amp; Preview</li>
+      <li><span class="check">✓</span>Brand Font Packs (50+ curated sets)</li>
+      <li><span class="check">✓</span>CSS Variables Export</li>
+    </ul>
+    <div class="pro-modal-price">$9 <span>one-time</span></div>
+    <a class="pro-cta" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $9</a>
+    <br>
+    <button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+  </div>
+</div>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS line-clamp generator for truncating multi-line text. Set maximum visible lines with ellipsis overflow. Preview and copy cross-browser compatible CSS.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-line-clamp/">
+<title>CSS Line Clamp Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin:20px 0 8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:var(--text2);margin-bottom:30px;font-size:.95rem}
+.wrap{max-width:900px;margin:0 auto}
+.panel{background:var(--surface);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.pt{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:var(--accent)}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px}
+.row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.row>*{flex:1;min-width:200px}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#0f3460;outline:none;margin-top:8px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer}
+input[type=text],textarea{width:100%;padding:10px 12px;background:var(--bg);border:1px solid #333;border-radius:6px;color:var(--text);font-size:.9rem;outline:none}
+input[type=text]:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px;font-family:inherit}
+.val{display:inline-block;background:var(--accent);color:#fff;padding:2px 10px;border-radius:12px;font-size:.85rem;font-weight:600;min-width:32px;text-align:center;margin-left:8px}
+.pw{margin:0 auto;background:var(--bg);border:1px dashed #444;border-radius:8px;padding:20px}
+.ptext{line-height:1.6;font-size:1rem;color:var(--text);word-break:break-word}
+.code{position:relative;background:var(--bg);border-radius:8px;padding:16px;font-family:Monaco,Consolas,monospace;font-size:.85rem;line-height:1.7;color:#7ec8e3;white-space:pre}
+.cbtn{position:absolute;top:10px;right:10px;background:var(--accent);color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8rem}
+.cbtn:hover{opacity:.85}
+.cbtn.ok{background:#27ae60}
+.wd{text-align:center;color:var(--text2);font-size:.8rem;margin-top:8px}
+.note{background:var(--surface2);border-radius:8px;padding:12px 16px;font-size:.8rem;color:var(--text2);line-height:1.6;margin-top:12px}
+.note code{background:rgba(255,255,255,.1);padding:1px 5px;border-radius:3px}
+footer{text-align:center;color:#555;font-size:.75rem;margin-top:40px;padding:20px 0}
+@media(max-width:600px){body{padding:12px}h1{font-size:1.4rem}.panel{padding:16px}.row{flex-direction:column;gap:12px}.row>*{min-width:100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CSS Line Clamp Generator</h1>
+<p class="sub">Generate CSS text truncation with multi-line ellipsis support</p>
+<div class="panel">
+<div class="pt">Settings</div>
+<div class="row"><div>
+<label>Line Clamp <span class="val" id="lv">3</span></label>
+<input type="range" id="lines" min="1" max="10" value="3">
+</div><div>
+<label>Container Width <span class="val" id="wv">100%</span></label>
+<input type="range" id="width" min="20" max="100" value="100">
+</div></div>
+<div class="row"><div>
+<label>Custom Ellipsis</label>
+<input type="text" id="ell" value="..." placeholder="e.g. ... or [more]">
+</div></div>
+<div>
+<label>Preview Text</label>
+<textarea id="txt" rows="3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</textarea>
+</div></div>
+<div class="panel">
+<div class="pt">Preview</div>
+<div class="pw" id="pw"><div class="ptext" id="pv"></div></div>
+<div class="wd" id="wd">Width: 100%</div>
+</div>
+<div class="panel">
+<div class="pt">Generated CSS</div>
+<div style="position:relative">
+<div class="code" id="code"></div>
+<button class="cbtn" id="cb">Copy</button>
+</div>
+<div class="note"><strong>Note:</strong> <code>-webkit-line-clamp</code> is supported in all modern browsers. The <code>-webkit-</code> prefix is still required.</div>
+</div>
+</div>
+<footer>CSS Line Clamp Generator</footer>
+<script>
+var li=document.getElementById('lines'),wi=document.getElementById('width'),
+el=document.getElementById('ell'),tx=document.getElementById('txt'),
+pv=document.getElementById('pv'),pw=document.getElementById('pw'),
+co=document.getElementById('code'),cb=document.getElementById('cb');
+
+function up(){
+var n=li.value,w=wi.value,e=el.value.trim()||'...';
+document.getElementById('lv').textContent=n;
+document.getElementById('wv').textContent=w+'%';
+document.getElementById('wd').textContent='Width: '+w+'%';
+pw.style.width=w+'%';
+var t=tx.value||'Sample text for preview...';
+pv.textContent=t;
+pv.style.display='-webkit-box';
+pv.style.webkitLineClamp=n;
+pv.style.webkitBoxOrient='vertical';
+pv.style.overflow='hidden';
+pv.style.textOverflow='ellipsis';
+var css='display: -webkit-box;\n-webkit-line-clamp: '+n+';\n-webkit-box-orient: vertical;\noverflow: hidden;\ntext-overflow: ellipsis;';
+if(e!=='...'){
+css+='\n\n/* Custom ellipsis: use a pseudo-element */\n/* Note: -webkit-line-clamp only supports "..." natively.\n   For custom ellipsis like "'+e+'", consider JS or\n   a wrapper approach. CSS code above handles standard truncation. */';
+}
+co.textContent=css;
+}
+
+cb.addEventListener('click',function(){
+var t=co.textContent;
+navigator.clipboard.writeText(t).then(function(){
+cb.textContent='Copied!';cb.classList.add('ok');
+setTimeout(function(){cb.textContent='Copy';cb.classList.remove('ok');},1500);
+});
+});
+
+li.addEventListener('input',up);
+wi.addEventListener('input',up);
+el.addEventListener('input',up);
+tx.addEventListener('input',up);
+up();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

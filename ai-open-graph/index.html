@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Graph Preview Tool - Preview &amp; Generate OG Meta Tags for Social Media</title>
+<meta name="description" content="Free Open Graph preview tool. Generate and preview OG meta tags for Facebook, Twitter/X, LinkedIn, and Discord. See how your links look before sharing.">
+<link rel="canonical" href="https://lifa-su.com/ai-open-graph/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F517;</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--bd:#2a2a4e;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--tx2);font-size:1rem}
+.frow{display:flex;gap:10px;margin-bottom:30px;flex-wrap:wrap}
+.frow input{flex:1;min-width:200px;padding:12px 16px;border-radius:var(--r);border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-size:1rem;outline:none;transition:border .2s}
+.frow input:focus{border-color:var(--ac)}
+.btn{padding:12px 24px;border-radius:var(--r);border:none;cursor:pointer;font-size:.95rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px;color:#fff}
+.btn-p{background:var(--ac)}.btn-p:hover{background:#d63050;transform:translateY(-1px)}
+.btn-s{background:var(--sf2);color:var(--tx)}.btn-s:hover{background:#1a4a80}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:30px}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
+.pan{background:var(--sf);border-radius:var(--r);padding:24px;border:1px solid var(--bd)}
+.pan h2{font-size:1.1rem;margin-bottom:16px}
+.fd{margin-bottom:12px}
+.fd label{display:block;font-size:.8rem;color:var(--tx2);margin-bottom:4px;font-weight:500}
+.fd input,.fd textarea,.fd select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:.9rem;outline:none;font-family:inherit;transition:border .2s}
+.fd input:focus,.fd textarea:focus{border-color:var(--ac)}
+.fd textarea{resize:vertical;min-height:56px}
+.sep{font-size:.85rem;color:var(--ac);text-transform:uppercase;letter-spacing:1px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.pc{background:var(--sf);border-radius:var(--r);padding:20px;border:1px solid var(--bd)}
+.pc h3{font-size:.9rem;margin-bottom:12px;color:var(--tx2)}
+.ib{width:100%;aspect-ratio:1.91/1;background:#3a3b3c;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ib img{width:100%;height:100%;object-fit:cover}
+.ib .ph{color:#666;font-size:.85rem}
+.fb{background:#242526;border-radius:8px;overflow:hidden;border:1px solid #3a3b3c}
+.fb .bd2{padding:10px 12px}
+.fb .dm{font-size:.75rem;color:#b0b3b8;text-transform:uppercase;margin-bottom:3px}
+.fb .tt{font-size:.95rem;font-weight:600;color:#e4e6eb;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fb .ds{font-size:.8rem;color:#b0b3b8;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tw{border-radius:16px;overflow:hidden;border:1px solid #536471;background:#000}
+.tw .ib{aspect-ratio:2/1;background:#1a1a1a;position:relative}
+.tw .ol{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.77);color:#fff;font-size:.75rem;padding:2px 6px;border-radius:4px}
+.tw .bd2{padding:10px 12px}
+.tw .tt{font-size:.9rem;color:#e7e9ea;line-height:1.3;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tw .ds{font-size:.8rem;color:#71767b;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px}
+.tw .dm{font-size:.8rem;color:#71767b}
+.li{background:#1b1f23;border-radius:2px;overflow:hidden;border:1px solid #38434f}
+.li .bd2{padding:10px 12px}
+.li .tt{font-size:.9rem;font-weight:600;color:#fff;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.li .dm{font-size:.75rem;color:#ffffffa6}
+.dc{background:#2f3136;border-radius:4px;border-left:4px solid #5865f2;padding:12px 16px}
+.dc .sn{font-size:.75rem;color:#b9bbbe;margin-bottom:4px}
+.dc .tt{font-size:1rem;font-weight:600;color:#00aff4;line-height:1.3;margin-bottom:6px}
+.dc .ds{font-size:.875rem;color:#dcddde;line-height:1.3;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dc .di{border-radius:4px;overflow:hidden;max-width:400px}
+.dc .di img{width:100%;display:block;border-radius:4px}
+.cbox{background:var(--sf);border-radius:var(--r);padding:24px;border:1px solid var(--bd);margin-bottom:30px}
+.cbox h2{font-size:1.1rem;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.code{background:var(--bg);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;color:#8be9fd;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;line-height:1.5;border:1px solid var(--bd)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ac);color:#fff;padding:12px 24px;border-radius:var(--r);font-weight:600;transition:transform .3s;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:30px 20px;color:var(--tx2);font-size:.85rem}
+.pro-section{position:relative;max-width:1200px;margin:30px auto 0;padding:0 20px}
+.pro-inner{position:relative;border-radius:12px;overflow:hidden}
+.pro-blur{filter:blur(3px);pointer-events:none;opacity:.7;padding:24px;background:var(--sf);border:1px solid var(--bd);border-radius:12px}
+.pro-blur h3{font-size:1rem;font-weight:700;margin-bottom:12px}
+.pro-blur .mock-tbl{width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:16px}
+.pro-blur .mock-tbl th,.pro-blur .mock-tbl td{padding:8px 10px;border:1px solid var(--bd);text-align:left}
+.pro-blur .mock-tbl th{background:var(--bg);color:var(--tx2);font-size:.72rem;text-transform:uppercase}
+.pro-blur .mock-bar{display:flex;align-items:flex-end;gap:6px;height:60px;padding:8px 0}
+.pro-blur .mock-bar div{flex:1;border-radius:4px 4px 0 0;min-width:20px}
+.pro-blur .mock-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px;font-size:.85rem}
+.pro-blur .mock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.45);border-radius:12px;transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.6)}
+.pro-lock{font-size:2.2rem;margin-bottom:8px}
+.pro-cta{font-size:1rem;font-weight:700;color:var(--ac);letter-spacing:.02em}
+.pro-badge{position:absolute;top:12px;right:12px;z-index:3;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.05em}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:6px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pm-sub{color:var(--tx2);font-size:.88rem;margin-bottom:18px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:22px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--bd);font-size:.9rem;display:flex;align-items:center;gap:8px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✓';color:var(--ac);font-weight:700}
+.pro-buy{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:1rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;text-align:center}
+.pro-buy:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-later{display:block;margin:12px auto 0;background:none;border:none;color:var(--tx2);font-size:.85rem;cursor:pointer;padding:6px}
+.pro-later:hover{color:var(--tx)}
+.status{font-size:.85rem;color:var(--tx2);margin-bottom:10px;min-height:20px}
+
+</style>
+</head>
+<body>
+<header>
+<h1>&#x1F517; Open Graph Preview Tool</h1>
+<p>Fetch, edit, and preview Open Graph meta tags for any URL. See how your links appear on social media.</p>
+</header>
+<div class="wrap">
+<div class="frow">
+<input type="url" id="urlInput" placeholder="Enter a URL to fetch OG tags (e.g. https://example.com)" aria-label="URL to fetch">
+<button class="btn btn-p" id="fetchBtn" onclick="fetchOG()">&#x1F50D; Fetch Tags</button>
+<button class="btn btn-s" onclick="clearAll()">&#x1F5D1; Clear</button>
+</div>
+<div class="status" id="status"></div>
+<div class="g2">
+<div class="pan">
+<h2>&#x1F3F7;&#xFE0F; Open Graph Tags</h2>
+<div class="fd"><label>og:title</label><input id="og_title" oninput="updatePreview()"></div>
+<div class="fd"><label>og:description</label><textarea id="og_description" oninput="updatePreview()"></textarea></div>
+<div class="fd"><label>og:image</label><input id="og_image" oninput="updatePreview()" placeholder="https://example.com/image.jpg"></div>
+<div class="fd"><label>og:url</label><input id="og_url" oninput="updatePreview()"></div>
+<div class="fd"><label>og:type</label>
+<select id="og_type" onchange="updatePreview()">
+<option value="website">website</option>
+<option value="article">article</option>
+<option value="product">product</option>
+<option value="video.other">video</option>
+<option value="music.song">music</option>
+<option value="profile">profile</option>
+</select></div>
+<div class="fd"><label>og:site_name</label><input id="og_site_name" oninput="updatePreview()"></div>
+<div class="fd"><label>og:locale</label><input id="og_locale" oninput="updatePreview()" placeholder="en_US"></div>
+<div class="sep">Twitter Card Tags</div>
+<div class="fd"><label>twitter:card</label>
+<select id="tw_card" onchange="updatePreview()">
+<option value="summary_large_image">summary_large_image</option>
+<option value="summary">summary</option>
+<option value="app">app</option>
+<option value="player">player</option>
+</select></div>
+<div class="fd"><label>twitter:title</label><input id="tw_title" oninput="updatePreview()"></div>
+<div class="fd"><label>twitter:description</label><textarea id="tw_description" oninput="updatePreview()"></textarea></div>
+<div class="fd"><label>twitter:image</label><input id="tw_image" oninput="updatePreview()" placeholder="https://example.com/image.jpg"></div>
+<div class="fd"><label>twitter:site</label><input id="tw_site" oninput="updatePreview()" placeholder="@username"></div>
+</div>
+<div class="pan">
+<h2>&#x1F4CB; Generated Meta Tags</h2>
+<div style="margin-bottom:12px"><button class="btn btn-p" onclick="copyCode()" style="padding:8px 16px;font-size:.85rem">&#x1F4CB; Copy Code</button></div>
+<div class="code" id="codeOutput"></div>
+</div>
+</div>
+<h2 style="margin-bottom:20px;font-size:1.3rem">&#x1F441;&#xFE0F; Live Preview</h2>
+<div class="g2">
+<div class="pc">
+<h3>&#x1F535; Facebook</h3>
+<div class="fb" id="fbPreview">
+<div class="ib" id="fbImg"><span class="ph">No image</span></div>
+<div class="bd2">
+<div class="dm" id="fbDomain">example.com</div>
+<div class="tt" id="fbTitle">Page Title</div>
+<div class="ds" id="fbDesc">Page description will appear here</div>
+</div>
+</div>
+</div>
+<div class="pc">
+<h3>&#x1D54F; Twitter / X</h3>
+<div class="tw" id="twPreview">
+<div class="ib" id="twImg"><span class="ph">No image</span><span class="ol" id="twDomainOverlay">example.com</span></div>
+<div class="bd2">
+<div class="tt" id="twTitle">Page Title</div>
+<div class="ds" id="twDesc">Page description will appear here</div>
+<div class="dm" id="twDomain">example.com</div>
+</div>
+</div>
+</div>
+<div class="pc">
+<h3>&#x1F310; LinkedIn</h3>
+<div class="li" id="liPreview">
+<div class="ib" id="liImg"><span class="ph">No image</span></div>
+<div class="bd2">
+<div class="tt" id="liTitle">Page Title</div>
+<div class="dm" id="liDomain">example.com</div>
+</div>
+</div>
+</div>
+<div class="pc">
+<h3>&#x1F3AE; Discord</h3>
+<div class="dc" id="dcPreview">
+<div class="sn" id="dcSiteName">Site Name</div>
+<div class="tt" id="dcTitle">Page Title</div>
+<div class="ds" id="dcDesc">Page description will appear here</div>
+<div class="di" id="dcImg"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-section">
+<div class="pro-inner">
+<div class="pro-badge">🔒 PRO</div>
+<div class="pro-blur">
+<h3>📦 Batch OG Detection</h3>
+<table class="mock-tbl">
+<tr><th>URL</th><th>Title</th><th>Image</th><th>Status</th></tr>
+<tr><td>example.com</td><td>Example Site</td><td>✓ 1200×630</td><td style="color:#27ae60">✓ Pass</td></tr>
+<tr><td>blog.example.com</td><td>Blog Home</td><td>⚠ 800×400</td><td style="color:#e67e22">⚠ Warn</td></tr>
+<tr><td>shop.example.com</td><td>—</td><td>✗ Missing</td><td style="color:#c0392b">✗ Fail</td></tr>
+</table>
+<h3>🔍 Competitor Analysis</h3>
+<div class="mock-row"><div class="mock-dot" style="background:var(--ac)"></div><span>Your site</span><span style="margin-left:auto;font-size:.78rem;color:var(--ac)">Score: 92/100</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:#4fc3f7"></div><span>competitor-a.com</span><span style="margin-left:auto;font-size:.78rem;color:#4fc3f7">Score: 88/100</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:#27ae60"></div><span>competitor-b.com</span><span style="margin-left:auto;font-size:.78rem;color:#27ae60">Score: 75/100</span></div>
+<h3 style="margin-top:16px">📈 History Tracking</h3>
+<div style="background:var(--bg);border-radius:8px;padding:14px">
+<div style="font-size:.78rem;color:var(--tx2);margin-bottom:8px">OG Score — Last 30 Days</div>
+<div class="mock-bar">
+<div style="height:40%;background:var(--ac2)"></div>
+<div style="height:55%;background:var(--ac2)"></div>
+<div style="height:50%;background:var(--ac2)"></div>
+<div style="height:65%;background:var(--ac2)"></div>
+<div style="height:70%;background:var(--ac)"></div>
+<div style="height:75%;background:var(--ac)"></div>
+<div style="height:80%;background:var(--ac)"></div>
+<div style="height:85%;background:var(--ac)"></div>
+<div style="height:82%;background:var(--ac)"></div>
+<div style="height:92%;background:#27ae60"></div>
+</div>
+</div>
+</div>
+<div class="pro-overlay" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-lock">🔒</div>
+<div class="pro-cta">Unlock Pro Features</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h2>🔗 Open Graph Pro</h2>
+<p class="pm-sub">Complete OG tag management for teams &amp; agencies</p>
+<ul>
+<li>Batch scan up to 500 URLs at once</li>
+<li>Side-by-side competitor OG comparison</li>
+<li>OG score tracking over time</li>
+<li>Broken image &amp; missing tag alerts</li>
+<li>CSV / PDF export reports</li>
+<li>Scheduled weekly audits via email</li>
+</ul>
+<a class="pro-buy" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $14</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<footer>Open Graph Preview Tool &mdash; Free, open-source, no tracking.</footer>
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const PROXIES = [
+  url => 'https://api.allorigins.win/get?url=' + encodeURIComponent(url),
+  url => 'https://corsproxy.io/?' + encodeURIComponent(url)
+];
+
+function $(id) { return document.getElementById(id); }
+
+function setStatus(msg, isError) {
+  const el = $('status');
+  el.textContent = msg;
+  el.style.color = isError ? '#e94560' : '#aab';
+}
+
+async function fetchOG() {
+  const url = $('urlInput').value.trim();
+  if (!url) { setStatus('Please enter a URL', true); return; }
+  const btn = $('fetchBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Fetching...';
+  setStatus('Fetching page via CORS proxy...');
+
+  let html = null;
+  for (let i = 0; i < PROXIES.length; i++) {
+    try {
+      const proxyUrl = PROXIES[i](url);
+      const resp = await fetch(proxyUrl);
+      const data = await resp.json ? await resp.json().catch(() => null) : null;
+      if (data && data.contents) { html = data.contents; break; }
+      const text = await resp.text();
+      if (text && text.length > 100) { html = text; break; }
+    } catch(e) { console.log('Proxy ' + i + ' failed:', e); }
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔍 Fetch Tags';
+
+  if (!html) { setStatus('Failed to fetch. Try a different URL or check CORS proxy availability.', true); return; }
+
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const getMeta = (prop) => {
+    const el = doc.querySelector(`meta[property="${prop}"]`) ||
+               doc.querySelector(`meta[name="${prop}"]`);
+    return el ? (el.getAttribute('content') || '') : '';
+  };
+
+  $('og_title').value = getMeta('og:title') || doc.querySelector('title')?.textContent || '';
+  $('og_description').value = getMeta('og:description') || getMeta('description') || '';
+  $('og_image').value = getMeta('og:image') || '';
+  $('og_url').value = getMeta('og:url') || url;
+  const ogType = getMeta('og:type');
+  if (ogType) {
+    const opt = $('og_type').querySelector(`option[value="${ogType}"]`);
+    if (opt) $('og_type').value = ogType;
+  }
+  $('og_site_name').value = getMeta('og:site_name') || '';
+  $('og_locale').value = getMeta('og:locale') || '';
+
+  const twCard = getMeta('twitter:card');
+  if (twCard) {
+    const opt = $('tw_card').querySelector(`option[value="${twCard}"]`);
+    if (opt) $('tw_card').value = twCard;
+  }
+  $('tw_title').value = getMeta('twitter:title') || '';
+  $('tw_description').value = getMeta('twitter:description') || '';
+  $('tw_image').value = getMeta('twitter:image') || '';
+  $('tw_site').value = getMeta('twitter:site') || '';
+
+  setStatus('Tags fetched successfully!');
+  updatePreview();
+}
+
+function getDomain(urlStr) {
+  try { return new URL(urlStr).hostname; } catch { return urlStr || 'example.com'; }
+}
+
+function updatePreview() {
+  const title = $('og_title').value || 'Page Title';
+  const desc = $('og_description').value || 'Page description will appear here';
+  const image = $('og_image').value;
+  const url = $('og_url').value;
+  const siteName = $('og_site_name').value;
+  const twTitle = $('tw_title').value || title;
+  const twDesc = $('tw_description').value || desc;
+  const twImage = $('tw_image').value || image;
+  const domain = getDomain(url);
+
+  // Facebook
+  setImg('fbImg', image);
+  $('fbDomain').textContent = domain;
+  $('fbTitle').textContent = title;
+  $('fbDesc').textContent = desc;
+
+  // Twitter
+  setImg('twImg', twImage, true);
+  $('twDomainOverlay').textContent = domain;
+  $('twTitle').textContent = twTitle;
+  $('twDesc').textContent = twDesc;
+  $('twDomain').textContent = domain;
+
+  // LinkedIn
+  setImg('liImg', image);
+  $('liTitle').textContent = title;
+  $('liDomain').textContent = domain;
+
+  // Discord
+  $('dcSiteName').textContent = siteName || domain;
+  $('dcTitle').textContent = title;
+  $('dcDesc').textContent = desc;
+  const dcImgEl = $('dcImg');
+  if (image) {
+    dcImgEl.innerHTML = '<img src="' + escHtml(image) + '" alt="Preview" onerror="this.parentElement.innerHTML=\'\'">';
+  } else {
+    dcImgEl.innerHTML = '';
+  }
+
+  generateCode();
+}
+
+function setImg(containerId, src, hasOverlay) {
+  const el = $(containerId);
+  if (src) {
+    let extra = '';
+    if (hasOverlay) {
+      const overlayEl = el.querySelector('.ol');
+      const overlayHtml = overlayEl ? overlayEl.outerHTML : '';
+      extra = overlayHtml;
+    }
+    el.innerHTML = '<img src="' + escHtml(src) + '" alt="Preview" onerror="this.style.display=\'none\'">' + extra;
+  } else {
+    let extra = '';
+    if (hasOverlay) {
+      const domain = getDomain($('og_url').value);
+      extra = '<span class="ol">' + escHtml(domain) + '</span>';
+    }
+    el.innerHTML = '<span class="ph">No image</span>' + extra;
+  }
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function generateCode() {
+  const tags = [];
+  const add = (prop, id, isName) => {
+    const val = $(id).value.trim();
+    if (val) {
+      const attr = isName ? 'name' : 'property';
+      tags.push('<meta ' + attr + '="' + prop + '" content="' + escHtml(val) + '">');
+    }
+  };
+  add('og:title', 'og_title');
+  add('og:description', 'og_description');
+  add('og:image', 'og_image');
+  add('og:url', 'og_url');
+  add('og:type', 'og_type');
+  add('og:site_name', 'og_site_name');
+  add('og:locale', 'og_locale');
+  tags.push('');
+  add('twitter:card', 'tw_card', true);
+  add('twitter:title', 'tw_title', true);
+  add('twitter:description', 'tw_description', true);
+  add('twitter:image', 'tw_image', true);
+  add('twitter:site', 'tw_site', true);
+
+  $('codeOutput').textContent = tags.join('\n');
+}
+
+function copyCode() {
+  const code = $('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const t = $('toast');
+    t.textContent = 'Copied to clipboard!';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+function clearAll() {
+  ['og_title','og_description','og_image','og_url','og_site_name','og_locale',
+   'tw_title','tw_description','tw_image','tw_site'].forEach(id => $(id).value = '');
+  $('og_type').value = 'website';
+  $('tw_card').value = 'summary_large_image';
+  $('urlInput').value = '';
+  setStatus('');
+  updatePreview();
+}
+
+// Init
+updatePreview();
+
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

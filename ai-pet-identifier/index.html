@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Identify pet breeds with AI image recognition. Upload a photo of any dog or cat to get breed information, characteristics, and care tips powered by AI.">
+<link rel="canonical" href="https://lifa-su.com/ai-pet-identifier/">
+<title>AI Pet Breed Identifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;
+--text:#e4e4ef;--text2:#9494a8;--accent:#7c5cfc;--accent2:#5c8cfc;
+--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;
+--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+a{color:var(--accent2);text-decoration:none;}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.header h1{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:flex;align-items:center;gap:8px;}
+.header-actions{display:flex;gap:8px;}
+
+/* Buttons */
+.btn{padding:10px 20px;border-radius:var(--radius);border:none;cursor:pointer;font-family:inherit;font-size:0.9rem;font-weight:500;transition:all 0.3s ease;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 16px rgba(124,92,252,0.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,92,252,0.4);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);background:var(--surface);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-danger:hover{opacity:0.9;}
+.btn-sm{padding:6px 14px;font-size:0.8rem;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none !important;}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+
+/* Container */
+.container{max-width:960px;margin:0 auto;padding:24px 16px;}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:var(--surface);border-radius:var(--radius);padding:4px;margin-bottom:24px;border:1px solid var(--border);}
+.tab{flex:1;padding:10px 16px;text-align:center;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:500;color:var(--text2);transition:all 0.3s ease;}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.tab:hover:not(.active){color:var(--text);background:var(--surface2);}
+
+/* Upload Area */
+.upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.3s ease;background:var(--surface);}
+.upload-area:hover,.upload-area.dragover{border-color:var(--accent);background:rgba(124,92,252,0.05);}
+.upload-area.dragover{box-shadow:0 0 30px rgba(124,92,252,0.15);}
+.upload-icon{font-size:3rem;margin-bottom:12px;}
+.upload-text{color:var(--text2);font-size:0.95rem;}
+.upload-text span{color:var(--accent);font-weight:500;}
+
+/* Camera */
+.camera-section{display:none;margin-top:16px;}
+.camera-section.active{display:block;}
+.video-container{position:relative;border-radius:var(--radius);overflow:hidden;background:#000;aspect-ratio:4/3;max-height:400px;}
+.video-container video,.video-container canvas{width:100%;height:100%;object-fit:cover;display:block;}
+.video-container canvas{display:none;}
+.camera-controls{display:flex;gap:12px;justify-content:center;margin-top:16px;}
+.capture-btn{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:4px solid var(--surface2);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.capture-btn:hover{transform:scale(1.1);box-shadow:0 0 24px rgba(124,92,252,0.4);}
+
+/* Preview */
+.preview-section{display:none;margin-top:24px;}
+.preview-section.active{display:block;}
+.preview-img-wrap{position:relative;border-radius:var(--radius);overflow:hidden;max-height:400px;display:flex;justify-content:center;background:#000;}
+.preview-img-wrap img{max-width:100%;max-height:400px;object-fit:contain;}
+.preview-actions{display:flex;gap:12px;justify-content:center;margin-top:16px;}
+
+/* Analysis Animation */
+.analysis-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,15,0.9);z-index:200;justify-content:center;align-items:center;flex-direction:column;gap:24px;}
+.analysis-overlay.active{display:flex;}
+.spinner{width:80px;height:80px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.analysis-text{font-size:1.2rem;color:var(--text);text-align:center;}
+.analysis-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite;}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+/* Results */
+.results-section{display:none;margin-top:24px;}
+.results-section.active{display:block;}
+.results-title{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:var(--text2);}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:12px;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:16px;}
+.result-card:hover{border-color:var(--accent);transform:translateX(4px);}
+.result-card.selected{border-color:var(--success);background:rgba(76,218,138,0.05);}
+.result-icon{font-size:2.5rem;flex-shrink:0;}
+.result-info{flex:1;}
+.result-name{font-size:1.1rem;font-weight:600;}
+.result-name-cn{font-size:0.85rem;color:var(--text2);}
+.confidence-bar{height:6px;background:var(--surface2);border-radius:3px;margin-top:8px;overflow:hidden;}
+.confidence-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1s ease;}
+.confidence-text{font-size:0.8rem;color:var(--text2);margin-top:4px;}
+
+/* Breed Detail */
+.breed-detail{display:none;margin-top:24px;}
+.breed-detail.active{display:block;}
+.breed-header{display:flex;align-items:center;gap:16px;padding:24px;border-bottom:1px solid var(--border);}
+.breed-emoji{font-size:3.5rem;}
+.breed-title{font-size:1.5rem;font-weight:700;}
+.breed-title-cn{font-size:1rem;color:var(--text2);}
+.breed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:24px;}
+.breed-stat{background:var(--surface2);border-radius:8px;padding:14px;}
+.breed-stat-label{font-size:0.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.breed-stat-value{font-size:1rem;font-weight:600;}
+.breed-section{padding:0 24px 24px;}
+.breed-section-title{font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--accent2);}
+.breed-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.breed-tag{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.8rem;color:var(--text2);}
+.care-list{list-style:none;padding:0;}
+.care-list li{padding:8px 0;border-bottom:1px solid var(--border);font-size:0.9rem;color:var(--text2);display:flex;align-items:flex-start;gap:8px;}
+.care-list li:last-child{border-bottom:none;}
+.care-list li::before{content:'💡';flex-shrink:0;}
+.health-list li::before{content:'⚕️';}
+
+/* History */
+.history-section{margin-top:24px;}
+.history-empty{text-align:center;padding:48px 24px;color:var(--text2);}
+.history-item{display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--border);transition:background 0.2s;}
+.history-item:last-child{border-bottom:none;}
+.history-item:hover{background:var(--surface2);}
+.history-thumb{width:56px;height:56px;border-radius:8px;object-fit:cover;background:var(--surface2);}
+.history-info{flex:1;}
+.history-breed{font-weight:600;font-size:0.95rem;}
+.history-date{font-size:0.8rem;color:var(--text2);}
+.history-confidence{font-size:0.8rem;color:var(--accent);}
+.history-actions{display:flex;gap:8px;}
+
+/* Level bars */
+.level-bar{display:flex;gap:3px;margin-top:4px;}
+.level-dot{width:24px;height:6px;border-radius:3px;background:var(--surface2);}
+.level-dot.filled{background:var(--accent);}
+.level-dot.filled.low{background:var(--success);}
+.level-dot.filled.med{background:var(--warn);}
+.level-dot.filled.high{background:var(--danger);}
+
+/* Responsive */
+@media(max-width:640px){
+.header{padding:12px 16px;}
+.header h1{font-size:1.1rem;}
+.breed-grid{grid-template-columns:1fr 1fr;}
+.breed-header{flex-direction:column;text-align:center;}
+.tabs{flex-wrap:wrap;}
+.upload-area{padding:32px 16px;}
+}
+@media(max-width:400px){
+.breed-grid{grid-template-columns:1fr;}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+
+/* Fade in animation */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.4s ease forwards;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>🐾 AI Pet Breed Identifier</h1>
+  <div class="header-actions">
+    <button class="btn btn-secondary btn-sm" onclick="showTab('history')" id="historyBtn">📋 History</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('upload')">📁 Upload</div>
+    <div class="tab" onclick="showTab('camera')">📷 Camera</div>
+    <div class="tab" onclick="showTab('history')">📋 History</div>
+  </div>
+
+  <!-- Upload Tab -->
+  <div id="uploadTab">
+    <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">📤</div>
+      <p class="upload-text">Drag & drop your pet photo here<br>or <span>click to browse</span></p>
+      <p style="color:var(--text2);font-size:0.8rem;margin-top:8px;">Supports JPG, PNG, WebP • Max 10MB</p>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+  </div>
+
+  <!-- Camera Tab -->
+  <div id="cameraTab" style="display:none;">
+    <div class="card">
+      <div class="video-container" id="videoContainer">
+        <video id="cameraVideo" autoplay playsinline></video>
+        <canvas id="cameraCanvas"></canvas>
+      </div>
+      <div class="camera-controls">
+        <button class="btn btn-secondary" id="switchCamBtn" onclick="switchCamera()">🔄 Switch</button>
+        <button class="capture-btn" id="captureBtn" onclick="capturePhoto()">📸</button>
+        <button class="btn btn-secondary" id="startCamBtn" onclick="startCamera()">Start Camera</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-section" id="previewSection">
+    <div class="card">
+      <div class="preview-img-wrap">
+        <img id="previewImg" alt="Pet preview">
+      </div>
+    </div>
+    <div class="preview-actions">
+      <button class="btn btn-primary" onclick="analyzeImage()">🔍 Identify Breed</button>
+      <button class="btn btn-secondary" onclick="clearPreview()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-section" id="resultsSection">
+    <p class="results-title">🎯 Possible Matches</p>
+    <div id="resultsList"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn btn-secondary btn-sm" onclick="clearPreview()">Try Another Photo</button>
+    </div>
+  </div>
+
+  <!-- Breed Detail -->
+  <div class="breed-detail card" id="breedDetail"></div>
+
+  <!-- History Tab -->
+  <div id="historyTab" style="display:none;">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);">
+        <h3 style="font-size:1rem;font-weight:600;">Recognition History</h3>
+        <button class="btn btn-danger btn-sm" onclick="clearHistory()">🗑 Clear All</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Analysis Overlay -->
+<div class="analysis-overlay" id="analysisOverlay">
+  <div class="spinner"></div>
+  <div class="analysis-text">AI Analyzing<span class="analysis-dots"></span></div>
+  <p style="color:var(--text2);font-size:0.85rem;">Examining features, coat pattern, body structure...</p>
+</div>
+
+<script>
+const DOG_BREEDS = [
+{name:"Labrador Retriever",nameCn:"拉布拉多寻回犬",icon:"🐕",personality:"Friendly, outgoing, active, gentle, intelligent, trusting",size:"Large",weightRange:"25-36 kg",heightRange:"55-62 cm",lifespan:"10-14 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, families with children, first-time owners",careTips:["Provide at least 1 hour of exercise daily","Watch food intake to prevent obesity","Regular brushing during shedding season","Early socialization and obedience training","Mental stimulation with puzzle toys"],healthIssues:["Hip dysplasia","Elbow dysplasia","Progressive retinal atrophy","Obesity"]},
+{name:"German Shepherd",nameCn:"德国牧羊犬",icon:"🐕‍🦺",personality:"Loyal, confident, courageous, intelligent, steady, obedient",size:"Large",weightRange:"30-40 kg",heightRange:"55-65 cm",lifespan:"9-13 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Experienced owners, active families, homes with yard",careTips:["Vigorous daily exercise and mental challenges","Consistent training from puppyhood","Regular grooming for heavy shedding","Socialize early to prevent over-protectiveness","Regular vet checkups for joint health"],healthIssues:["Hip dysplasia","Degenerative myelopathy","Bloat","Elbow dysplasia"]},
+{name:"Golden Retriever",nameCn:"金毛寻回犬",icon:"🦮",personality:"Intelligent, friendly, reliable, devoted, kind, confident",size:"Large",weightRange:"25-34 kg",heightRange:"51-61 cm",lifespan:"10-12 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Families with children, active households, therapy work",careTips:["Daily exercise of at least 1 hour","Brush 2-3 times per week","Monitor for ear infections","Maintain healthy weight","Swimming opportunities when possible"],healthIssues:["Hip dysplasia","Cancer","Heart disease","Skin allergies"]},
+{name:"French Bulldog",nameCn:"法国斗牛犬",icon:"🐶",personality:"Playful, adaptable, smart, affectionate, sociable, alert",size:"Small",weightRange:"8-14 kg",heightRange:"28-33 cm",lifespan:"10-12 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Apartment dwellers, singles, seniors, families",careTips:["Avoid overexertion in hot weather","Clean facial wrinkles regularly","Short daily walks are sufficient","Monitor breathing during exercise","Keep at healthy weight"],healthIssues:["Brachycephalic syndrome","Hip dysplasia","Allergies","Intervertebral disc disease"]},
+{name:"Bulldog",nameCn:"英国斗牛犬",icon:"🐶",personality:"Calm, courageous, friendly, dignified, willful, docile",size:"Medium",weightRange:"18-25 kg",heightRange:"31-40 cm",lifespan:"8-10 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Apartment living, families, low-activity households",careTips:["Clean skin folds daily","Avoid heat and strenuous exercise","Short gentle walks are ideal","Monitor weight carefully","Keep wrinkles dry and clean"],healthIssues:["Brachycephalic syndrome","Hip dysplasia","Cherry eye","Skin infections"]},
+{name:"Poodle",nameCn:"贵宾犬",icon:"🐩",personality:"Intelligent, active, alert, faithful, trainable, instinctual",size:"Medium",weightRange:"20-32 kg",heightRange:"38-62 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Allergy sufferers, active families, show enthusiasts",careTips:["Professional grooming every 4-6 weeks","Daily brushing to prevent matting","Regular mental stimulation","Moderate daily exercise","Regular ear cleaning"],healthIssues:["Hip dysplasia","Progressive retinal atrophy","Epilepsy","Addison's disease"]},
+{name:"Beagle",nameCn:"比格犬",icon:"🐕",personality:"Merry, friendly, curious, determined, amiable, gentle",size:"Small",weightRange:"9-11 kg",heightRange:"33-41 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Families with children, active households, multi-pet homes",careTips:["Secure fencing as they follow scents","Regular exercise to prevent obesity","Keep on leash during walks","Provide scent-based games","Check ears weekly"],healthIssues:["Epilepsy","Hypothyroidism","Hip dysplasia","Cherry eye"]},
+{name:"Rottweiler",nameCn:"罗威纳犬",icon:"🐕‍🦺",personality:"Loyal, confident, loving, courageous, calm, good-natured",size:"Large",weightRange:"36-60 kg",heightRange:"56-69 cm",lifespan:"8-10 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Experienced owners, homes with yard, active families",careTips:["Early socialization is critical","Firm consistent training","Daily vigorous exercise","Regular joint health monitoring","Provide structured activities"],healthIssues:["Hip dysplasia","Aortic stenosis","Osteosarcoma","Bloat"]},
+{name:"German Shorthaired Pointer",nameCn:"德国短毛指示犬",icon:"🐕",personality:"Friendly, smart, willing to please, enthusiastic, bold",size:"Large",weightRange:"20-32 kg",heightRange:"53-64 cm",lifespan:"12-14 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Very active families, hunters, outdoor enthusiasts",careTips:["Needs 1-2 hours of exercise daily","Excellent swimming companion","Off-leash running opportunities","Mental stimulation through training","Not suited for apartments"],healthIssues:["Hip dysplasia","Cancer","Lymphedema","Entropion"]},
+{name:"Dachshund",nameCn:"腊肠犬",icon:"🌭",personality:"Clever, stubborn, devoted, lively, playful, courageous",size:"Small",weightRange:"7-15 kg",heightRange:"20-23 cm",lifespan:"12-16 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Apartment dwellers, singles, seniors, families",careTips:["Prevent jumping to protect spine","Maintain healthy weight","Use ramps for high surfaces","Moderate daily walks","Support back when carrying"],healthIssues:["Intervertebral disc disease","Diabetes","Dental issues","Epilepsy"]},
+{name:"Pembroke Welsh Corgi",nameCn:"彭布罗克威尔士柯基犬",icon:"🐕",personality:"Affectionate, smart, alert, bold, playful, tenacious",size:"Small",weightRange:"10-14 kg",heightRange:"25-30 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Families, apartment with exercise, active singles",careTips:["Daily moderate exercise","Watch weight as prone to obesity","Regular brushing for double coat","Mental stimulation games","Watch for back issues"],healthIssues:["Hip dysplasia","Degenerative myelopathy","Von Willebrand's disease","Obesity"]},
+{name:"Australian Shepherd",nameCn:"澳大利亚牧羊犬",icon:"🐕",personality:"Smart, work-oriented, exuberant, good-natured, protective",size:"Medium",weightRange:"18-29 kg",heightRange:"46-58 cm",lifespan:"13-15 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, farms, agility enthusiasts",careTips:["Needs extensive daily exercise","Thrives with a job to do","Regular brushing for double coat","Early socialization important","Agility or herding activities recommended"],healthIssues:["Hip dysplasia","Epilepsy","Cataracts","MDR1 gene mutation"]},
+{name:"Yorkshire Terrier",nameCn:"约克夏梗",icon:"🐕",personality:"Sprightly, tomboyish, affectionate, bold, confident",size:"Small",weightRange:"2-3 kg",heightRange:"18-23 cm",lifespan:"13-16 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Apartment dwellers, singles, seniors, families",careTips:["Daily coat brushing required","Regular dental care essential","Short daily walks sufficient","Keep warm in cold weather","Professional grooming every 6-8 weeks"],healthIssues:["Patellar luxation","Portosystemic shunt","Tracheal collapse","Dental disease"]},
+{name:"Boxer",nameCn:"拳师犬",icon:"🐕",personality:"Fun-loving, bright, active, loyal, playful, patient",size:"Large",weightRange:"25-32 kg",heightRange:"53-63 cm",lifespan:"10-12 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families with children, homes with yard",careTips:["Plenty of daily exercise","Avoid extreme heat","Early training and socialization","Interactive play sessions","Regular heart checkups"],healthIssues:["Cancer","Heart conditions","Hip dysplasia","Degenerative myelopathy"]},
+{name:"Cavalier King Charles Spaniel",nameCn:"骑士查理王小猎犬",icon:"🐕",personality:"Affectionate, gentle, graceful, patient, playful, fearless",size:"Small",weightRange:"5-8 kg",heightRange:"30-33 cm",lifespan:"9-14 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Seniors, families, apartment dwellers, therapy work",careTips:["Moderate daily exercise","Regular ear cleaning","Brush coat several times weekly","Monitor heart health","Keep at healthy weight"],healthIssues:["Mitral valve disease","Syringomyelia","Hip dysplasia","Patellar luxation"]},
+{name:"Doberman Pinscher",nameCn:"杜宾犬",icon:"🐕",personality:"Loyal, fearless, alert, energetic, obedient, intelligent",size:"Large",weightRange:"27-45 kg",heightRange:"61-72 cm",lifespan:"10-13 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Experienced owners, active families, security-minded",careTips:["Vigorous daily exercise needed","Consistent firm training","Early socialization essential","Mental stimulation important","Regular cardiac screening"],healthIssues:["Dilated cardiomyopathy","Von Willebrand's disease","Hip dysplasia","Wobbler syndrome"]},
+{name:"Miniature Schnauzer",nameCn:"迷你雪纳瑞",icon:"🐕",personality:"Friendly, smart, obedient, spirited, alert, fearless",size:"Small",weightRange:"5-9 kg",heightRange:"30-36 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families, apartment dwellers, allergy sufferers",careTips:["Regular professional grooming","Daily moderate exercise","Mental stimulation games","Regular dental care","Brush beard after meals"],healthIssues:["Pancreatitis","Urinary stones","Cataracts","Hyperlipidemia"]},
+{name:"Great Dane",nameCn:"大丹犬",icon:"🐕",personality:"Friendly, patient, dependable, gentle, devoted, loving",size:"Large",weightRange:"50-82 kg",heightRange:"71-86 cm",lifespan:"7-10 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families with space, experienced large-dog owners",careTips:["Moderate exercise to protect joints","Elevated food bowls recommended","Multiple small meals to prevent bloat","Soft bedding for joint support","Early training while manageable size"],healthIssues:["Bloat","Hip dysplasia","Heart disease","Osteosarcoma"]},
+{name:"Shih Tzu",nameCn:"西施犬",icon:"🐕",personality:"Affectionate, playful, outgoing, loyal, gentle, happy",size:"Small",weightRange:"4-7 kg",heightRange:"20-28 cm",lifespan:"10-16 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Seniors, apartment dwellers, families, lap dog lovers",careTips:["Daily coat brushing essential","Regular professional grooming","Clean face folds daily","Short walks sufficient","Keep hair out of eyes"],healthIssues:["Brachycephalic syndrome","Hip dysplasia","Patellar luxation","Eye problems"]},
+{name:"Siberian Husky",nameCn:"西伯利亚哈士奇",icon:"🐺",personality:"Outgoing, mischievous, loyal, friendly, gentle, alert",size:"Medium",weightRange:"16-27 kg",heightRange:"50-60 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Very active families, cold climates, experienced owners",careTips:["Extensive daily exercise required","Secure high fencing needed","Heavy shedding twice yearly","Not suited for hot climates","Never off-leash in unfenced areas"],healthIssues:["Hip dysplasia","Cataracts","Progressive retinal atrophy","Hypothyroidism"]},
+{name:"Bernese Mountain Dog",nameCn:"伯恩山犬",icon:"🐕",personality:"Good-natured, calm, strong, affectionate, loyal, intelligent",size:"Large",weightRange:"36-50 kg",heightRange:"58-70 cm",lifespan:"7-10 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families with space, cold climates, gentle giant lovers",careTips:["Moderate daily exercise","Regular brushing for thick coat","Avoid hot weather exercise","Joint supplements recommended","Socialization from young age"],healthIssues:["Hip dysplasia","Cancer","Bloat","Progressive retinal atrophy"]},
+{name:"Pomeranian",nameCn:"博美犬",icon:"🐕",personality:"Lively, bold, inquisitive, playful, friendly, sociable",size:"Small",weightRange:"1.4-3.2 kg",heightRange:"18-24 cm",lifespan:"12-16 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Apartment dwellers, singles, seniors",careTips:["Regular brushing to prevent matting","Dental care is essential","Short daily walks","Watch for overheating","Supervise around larger dogs"],healthIssues:["Patellar luxation","Tracheal collapse","Dental disease","Alopecia X"]},
+{name:"Boston Terrier",nameCn:"波士顿梗",icon:"🐕",personality:"Friendly, bright, amusing, lively, gentle, adaptable",size:"Small",weightRange:"5-11 kg",heightRange:"38-43 cm",lifespan:"11-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Apartment dwellers, families, seniors, first-time owners",careTips:["Moderate daily exercise","Avoid extreme temperatures","Clean facial wrinkles","Monitor breathing","Short walks in cool weather"],healthIssues:["Brachycephalic syndrome","Patellar luxation","Cataracts","Deafness"]},
+{name:"Havanese",nameCn:"哈瓦那犬",icon:"🐕",personality:"Playful, intelligent, outgoing, funny, affectionate, gentle",size:"Small",weightRange:"3-6 kg",heightRange:"23-27 cm",lifespan:"14-16 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families, apartment dwellers, allergy sufferers",careTips:["Daily brushing required","Moderate exercise needs","Regular professional grooming","Socialization important","Great for trick training"],healthIssues:["Patellar luxation","Heart murmurs","Cataracts","Deafness"]},
+{name:"Shetland Sheepdog",nameCn:"喜乐蒂牧羊犬",icon:"🐕",personality:"Playful, energetic, bright, obedient, loyal, affectionate",size:"Small",weightRange:"6-12 kg",heightRange:"33-41 cm",lifespan:"12-14 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Active families, agility enthusiasts, homes with yard",careTips:["Daily exercise and mental stimulation","Regular brushing for double coat","Early socialization","Agility training recommended","Watch for excessive barking"],healthIssues:["Collie eye anomaly","Hip dysplasia","Dermatomyositis","Von Willebrand's disease"]},
+{name:"Brittany",nameCn:"布列塔尼犬",icon:"🐕",personality:"Bright, fun-loving, upbeat, agile, adaptable, eager",size:"Medium",weightRange:"14-18 kg",heightRange:"44-52 cm",lifespan:"12-14 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, hunters, outdoor enthusiasts",careTips:["Extensive daily exercise needed","Great hiking companion","Regular ear cleaning","Positive training methods","Off-leash exercise in safe areas"],healthIssues:["Hip dysplasia","Epilepsy","Hypothyroidism","Canine discoid lupus"]},
+{name:"English Springer Spaniel",nameCn:"英国史宾格犬",icon:"🐕",personality:"Friendly, playful, obedient, alert, intelligent, active",size:"Medium",weightRange:"18-25 kg",heightRange:"46-51 cm",lifespan:"12-14 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, hunters, homes with yard",careTips:["Plenty of daily exercise","Regular ear cleaning essential","Brush coat twice weekly","Mental stimulation important","Great for field activities"],healthIssues:["Hip dysplasia","Progressive retinal atrophy","Elbow dysplasia","Ear infections"]},
+{name:"Cocker Spaniel",nameCn:"可卡犬",icon:"🐕",personality:"Gentle, smart, happy, merry, playful, trusting",size:"Small",weightRange:"12-16 kg",heightRange:"36-41 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families, seniors, apartment with exercise access",careTips:["Regular professional grooming","Daily ear checks and cleaning","Moderate daily exercise","Brush coat frequently","Watch for weight gain"],healthIssues:["Ear infections","Progressive retinal atrophy","Hip dysplasia","Autoimmune hemolytic anemia"]},
+{name:"Miniature American Shepherd",nameCn:"迷你美国牧羊犬",icon:"🐕",personality:"Intelligent, loyal, good-natured, versatile, energetic",size:"Small",weightRange:"9-18 kg",heightRange:"33-46 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, agility enthusiasts, apartment with exercise",careTips:["Daily vigorous exercise","Mental stimulation essential","Regular brushing","Agility or herding activities","Early socialization"],healthIssues:["Hip dysplasia","MDR1 gene mutation","Progressive retinal atrophy","Epilepsy"]},
+{name:"Border Collie",nameCn:"边境牧羊犬",icon:"🐕",personality:"Tenacious, keen, energetic, responsive, intelligent, alert",size:"Medium",weightRange:"14-20 kg",heightRange:"46-56 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Very active families, farms, agility competitors",careTips:["Extensive daily exercise essential","Needs a job or purpose","Mental challenges critical","Regular brushing","Not suited for sedentary homes"],healthIssues:["Hip dysplasia","Epilepsy","Collie eye anomaly","Osteochondritis dissecans"]},
+{name:"Vizsla",nameCn:"维兹拉犬",icon:"🐕",personality:"Gentle, energetic, loyal, affectionate, quiet, protective",size:"Medium",weightRange:"18-29 kg",heightRange:"53-64 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Very active families, runners, outdoor enthusiasts",careTips:["Extensive daily exercise required","Thrives on human companionship","Low grooming maintenance","Positive training methods","Not suited for being left alone"],healthIssues:["Hip dysplasia","Epilepsy","Lymphosarcoma","Allergies"]},
+{name:"Pug",nameCn:"巴哥犬",icon:"🐕",personality:"Charming, mischievous, loving, sociable, playful, stubborn",size:"Small",weightRange:"6-8 kg",heightRange:"25-33 cm",lifespan:"12-15 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Apartment dwellers, seniors, families, first-time owners",careTips:["Avoid overheating","Clean facial wrinkles daily","Short walks in cool weather","Monitor weight carefully","Regular eye care"],healthIssues:["Brachycephalic syndrome","Pug dog encephalitis","Eye problems","Hip dysplasia"]},
+{name:"Weimaraner",nameCn:"魏玛犬",icon:"🐕",personality:"Friendly, fearless, alert, obedient, energetic, intelligent",size:"Large",weightRange:"25-40 kg",heightRange:"56-69 cm",lifespan:"11-14 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Very active families, hunters, experienced owners",careTips:["Needs extensive daily exercise","Prone to separation anxiety","Early socialization critical","Secure fencing required","Mental stimulation essential"],healthIssues:["Bloat","Hip dysplasia","Entropion","Hypertrophic osteodystrophy"]},
+{name:"Chihuahua",nameCn:"吉娃娃",icon:"🐕",personality:"Charming, graceful, sassy, devoted, lively, alert",size:"Small",weightRange:"1.5-3 kg",heightRange:"15-23 cm",lifespan:"14-16 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Apartment dwellers, singles, seniors",careTips:["Keep warm in cold weather","Gentle handling required","Short daily walks","Regular dental care","Supervise around larger dogs"],healthIssues:["Patellar luxation","Heart disease","Hydrocephalus","Dental problems"]},
+{name:"Maltese",nameCn:"马尔济斯犬",icon:"🐕",personality:"Gentle, playful, charming, affectionate, lively, responsive",size:"Small",weightRange:"2-4 kg",heightRange:"20-25 cm",lifespan:"12-15 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Apartment dwellers, seniors, allergy sufferers",careTips:["Daily brushing essential","Regular professional grooming","Tear stain cleaning","Short gentle walks","Dental care important"],healthIssues:["Patellar luxation","Portosystemic shunt","Progressive retinal atrophy","White dog shaker syndrome"]},
+{name:"Dalmatian",nameCn:"达尔马提亚犬",icon:"🐕",personality:"Dignified, smart, outgoing, energetic, playful, sensitive",size:"Large",weightRange:"23-32 kg",heightRange:"48-61 cm",lifespan:"11-13 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Very active families, runners, experienced owners",careTips:["Extensive daily exercise needed","Regular brushing for shedding","Ensure adequate water intake","Early socialization important","Hearing test for puppies"],healthIssues:["Deafness","Urinary stones","Hip dysplasia","Skin allergies"]},
+{name:"Akita",nameCn:"秋田犬",icon:"🐕",personality:"Courageous, dignified, profoundly loyal, alert, responsive",size:"Large",weightRange:"32-59 kg",heightRange:"61-71 cm",lifespan:"10-13 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Experienced owners, single-pet homes, homes with yard",careTips:["Firm consistent training essential","Heavy shedding twice yearly","Daily exercise needed","Early socialization critical","Not ideal for first-time owners"],healthIssues:["Hip dysplasia","Autoimmune thyroiditis","Progressive retinal atrophy","Bloat"]},
+{name:"Samoyed",nameCn:"萨摩耶犬",icon:"🐕",personality:"Friendly, gentle, adaptable, alert, playful, stubborn",size:"Medium",weightRange:"16-30 kg",heightRange:"48-60 cm",lifespan:"12-14 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Active families, cold climates, experienced groomers",careTips:["Daily brushing essential","Extensive exercise needed","Not suited for hot climates","Regular professional grooming","Thrives on companionship"],healthIssues:["Hip dysplasia","Diabetes","Hypothyroidism","Progressive retinal atrophy"]},
+{name:"Shiba Inu",nameCn:"柴犬",icon:"🐕",personality:"Alert, active, attentive, faithful, keen, confident",size:"Small",weightRange:"8-11 kg",heightRange:"33-43 cm",lifespan:"13-16 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Experienced owners, apartment with exercise, singles",careTips:["Secure fencing essential","Regular brushing for double coat","Moderate daily exercise","Early socialization important","Independent nature requires patience"],healthIssues:["Allergies","Hip dysplasia","Patellar luxation","Eye problems"]},
+{name:"Bichon Frise",nameCn:"比熊犬",icon:"🐕",personality:"Playful, curious, peppy, gentle, cheerful, sensitive",size:"Small",weightRange:"3-5 kg",heightRange:"23-30 cm",lifespan:"14-15 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families, apartment dwellers, allergy sufferers, seniors",careTips:["Professional grooming every 4-6 weeks","Daily brushing to prevent matting","Moderate daily exercise","Regular dental care","Tear stain cleaning"],healthIssues:["Patellar luxation","Bladder stones","Allergies","Dental disease"]},
+{name:"Belgian Malinois",nameCn:"比利时马林诺斯犬",icon:"🐕",personality:"Confident, smart, hardworking, protective, alert, trainable",size:"Large",weightRange:"25-34 kg",heightRange:"56-66 cm",lifespan:"14-16 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Experienced owners, working dog handlers, very active homes",careTips:["Extensive daily exercise and training","Needs a job or purpose","Early socialization critical","Not for first-time owners","Mental challenges essential"],healthIssues:["Hip dysplasia","Elbow dysplasia","Progressive retinal atrophy","Cataracts"]},
+{name:"Collie",nameCn:"柯利犬",icon:"🐕",personality:"Graceful, devoted, proud, friendly, loyal, intelligent",size:"Large",weightRange:"22-34 kg",heightRange:"51-61 cm",lifespan:"12-14 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families with children, suburban homes, first-time owners",careTips:["Regular brushing for long coat","Moderate daily exercise","Great family companion","Early socialization","Watch for sun sensitivity on nose"],healthIssues:["Collie eye anomaly","Hip dysplasia","Dermatomyositis","Bloat"]},
+{name:"Basset Hound",nameCn:"巴吉度猎犬",icon:"🐕",personality:"Patient, low-key, charming, stubborn, devoted, tenacious",size:"Medium",weightRange:"20-29 kg",heightRange:"33-38 cm",lifespan:"12-13 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Families, low-activity households, multi-pet homes",careTips:["Regular ear cleaning essential","Moderate walks to prevent obesity","Clean facial wrinkles","Watch weight carefully","Keep nails trimmed"],healthIssues:["Ear infections","Obesity","Hip dysplasia","Bloat"]},
+{name:"Newfoundland",nameCn:"纽芬兰犬",icon:"🐕",personality:"Sweet, patient, devoted, gentle, trainable, loyal",size:"Large",weightRange:"45-68 kg",heightRange:"63-74 cm",lifespan:"9-10 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families with space, water lovers, gentle giant enthusiasts",careTips:["Regular brushing for thick coat","Moderate exercise","Excellent swimmers","Drool management needed","Joint supplements recommended"],healthIssues:["Hip dysplasia","Cystinuria","Subvalvular aortic stenosis","Bloat"]},
+{name:"Bloodhound",nameCn:"寻血猎犬",icon:"🐕",personality:"Friendly, independent, inquisitive, gentle, patient, noble",size:"Large",weightRange:"36-50 kg",heightRange:"58-69 cm",lifespan:"10-12 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Experienced owners, homes with yard, patient families",careTips:["Regular ear cleaning critical","Secure fencing needed","Moderate daily exercise","Clean facial wrinkles","Drool management"],healthIssues:["Bloat","Hip dysplasia","Ear infections","Ectropion"]},
+{name:"Saint Bernard",nameCn:"圣伯纳犬",icon:"🐕",personality:"Playful, charming, inquisitive, watchful, gentle, friendly",size:"Large",weightRange:"54-82 kg",heightRange:"65-90 cm",lifespan:"8-10 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Families with space, cold climates, gentle giant lovers",careTips:["Moderate exercise to protect joints","Regular grooming","Drool management essential","Avoid hot weather","Early training while manageable size"],healthIssues:["Hip dysplasia","Bloat","Osteosarcoma","Heart conditions"]},
+{name:"Bull Terrier",nameCn:"牛头梗",icon:"🐕",personality:"Playful, charming, mischievous, sweet, trainable, active",size:"Medium",weightRange:"22-32 kg",heightRange:"53-56 cm",lifespan:"12-13 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, experienced owners, homes with yard",careTips:["Plenty of daily exercise","Firm consistent training","Early socialization essential","Mental stimulation needed","Skin care for white coats"],healthIssues:["Deafness","Heart disease","Kidney problems","Patellar luxation"]},
+{name:"Alaskan Malamute",nameCn:"阿拉斯加雪橇犬",icon:"🐺",personality:"Affectionate, loyal, playful, dignified, devoted, strong",size:"Large",weightRange:"34-45 kg",heightRange:"58-64 cm",lifespan:"10-14 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Experienced owners, cold climates, very active homes",careTips:["Extensive daily exercise","Heavy shedding management","Not suited for hot climates","Secure fencing essential","Early socialization and training"],healthIssues:["Hip dysplasia","Chondrodysplasia","Hypothyroidism","Polyneuropathy"]},
+{name:"Whippet",nameCn:"惠比特犬",icon:"🐕",personality:"Calm, affectionate, playful, gentle, quiet, intelligent",size:"Medium",weightRange:"11-21 kg",heightRange:"44-57 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Apartment dwellers, families, quiet households",careTips:["Daily off-leash running opportunity","Coat protection in cold weather","Minimal grooming needed","Soft bedding for thin skin","Secure fenced area for exercise"],healthIssues:["Arrhythmia","Eye defects","Deafness","Von Willebrand's disease"]},
+{name:"Chinese Shar-Pei",nameCn:"中国沙皮犬",icon:"🐕",personality:"Loyal, independent, calm, devoted, alert, reserved",size:"Medium",weightRange:"18-25 kg",heightRange:"44-51 cm",lifespan:"8-12 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Experienced owners, families, homes with yard",careTips:["Clean skin folds regularly","Moderate daily exercise","Early socialization essential","Regular eye care","Watch for skin infections"],healthIssues:["Shar-Pei fever","Skin infections","Entropion","Hip dysplasia"]},
+{name:"Airedale Terrier",nameCn:"万能梗",icon:"🐕",personality:"Friendly, clever, courageous, confident, outgoing, loyal",size:"Medium",weightRange:"20-30 kg",heightRange:"56-61 cm",lifespan:"11-14 years",exerciseNeeds:"High",groomingDifficulty:"High",familyType:"Active families, experienced owners, homes with yard",careTips:["Regular professional grooming","Daily vigorous exercise","Mental stimulation important","Firm consistent training","Hand-stripping coat recommended"],healthIssues:["Hip dysplasia","Hypothyroidism","Cardiac issues","Skin allergies"]},
+{name:"Jack Russell Terrier",nameCn:"杰克罗素梗",icon:"🐕",personality:"Energetic, clever, athletic, fearless, vocal, stubborn",size:"Small",weightRange:"6-8 kg",heightRange:"25-30 cm",lifespan:"13-16 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active owners, homes with yard, experienced dog owners",careTips:["Extensive daily exercise essential","Secure high fencing needed","Mental stimulation critical","Firm consistent training","Not suited for sedentary homes"],healthIssues:["Patellar luxation","Deafness","Legg-Calve-Perthes disease","Eye problems"]},
+];
+
+const CAT_BREEDS = [
+{name:"Persian",nameCn:"波斯猫",icon:"🐱",personality:"Quiet, gentle, sweet, affectionate, calm, dignified",size:"Medium",weightRange:"3-5.5 kg",heightRange:"25-38 cm",lifespan:"12-17 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Quiet households, seniors, indoor living",careTips:["Daily brushing essential","Regular eye cleaning","Keep indoors","Regular bathing monthly","Monitor breathing in heat"],healthIssues:["Polycystic kidney disease","Brachycephalic syndrome","Progressive retinal atrophy","Hypertrophic cardiomyopathy"]},
+{name:"Maine Coon",nameCn:"缅因猫",icon:"🐱",personality:"Gentle, friendly, intelligent, playful, loyal, sociable",size:"Large",weightRange:"5-11 kg",heightRange:"25-41 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Families with children, multi-pet homes, spacious homes",careTips:["Regular brushing 2-3 times weekly","Interactive play sessions","Provide climbing structures","Regular dental care","Large litter box needed"],healthIssues:["Hypertrophic cardiomyopathy","Hip dysplasia","Spinal muscular atrophy","Polycystic kidney disease"]},
+{name:"Ragdoll",nameCn:"布偶猫",icon:"🐱",personality:"Docile, calm, affectionate, gentle, relaxed, friendly",size:"Large",weightRange:"4.5-9 kg",heightRange:"23-28 cm",lifespan:"12-17 years",exerciseNeeds:"Low",groomingDifficulty:"Medium",familyType:"Families, seniors, indoor living, gentle households",careTips:["Regular brushing twice weekly","Keep strictly indoors","Interactive gentle play","Regular nail trimming","Monitor weight"],healthIssues:["Hypertrophic cardiomyopathy","Bladder stones","Feline infectious peritonitis","Obesity"]},
+{name:"British Shorthair",nameCn:"英国短毛猫",icon:"🐱",personality:"Easygoing, calm, loyal, patient, affectionate, independent",size:"Medium",weightRange:"4-8 kg",heightRange:"30-36 cm",lifespan:"12-20 years",exerciseNeeds:"Low",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, first-time cat owners",careTips:["Weekly brushing sufficient","Monitor food intake","Interactive play to prevent obesity","Regular dental checkups","Provide scratching posts"],healthIssues:["Hypertrophic cardiomyopathy","Polycystic kidney disease","Obesity","Dental disease"]},
+{name:"Siamese",nameCn:"暹罗猫",icon:"🐱",personality:"Social, intelligent, vocal, playful, affectionate, curious",size:"Medium",weightRange:"3-5 kg",heightRange:"29-31 cm",lifespan:"15-20 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active households, families wanting interactive cats",careTips:["Plenty of interactive play","Provide companionship","Mental stimulation toys","Regular dental care","Keep warm in cold weather"],healthIssues:["Amyloidosis","Asthma","Crossed eyes","Progressive retinal atrophy"]},
+{name:"Abyssinian",nameCn:"阿比西尼亚猫",icon:"🐱",personality:"Active, playful, curious, intelligent, loyal, social",size:"Medium",weightRange:"3-5 kg",heightRange:"30-36 cm",lifespan:"9-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, multi-cat homes, interactive owners",careTips:["Lots of climbing opportunities","Interactive play daily","Minimal grooming needed","Provide puzzle feeders","Regular dental care"],healthIssues:["Renal amyloidosis","Pyruvate kinase deficiency","Progressive retinal atrophy","Patellar luxation"]},
+{name:"Bengal",nameCn:"孟加拉猫",icon:"🐆",personality:"Energetic, playful, curious, intelligent, confident, athletic",size:"Medium",weightRange:"3.5-7 kg",heightRange:"33-41 cm",lifespan:"12-16 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, experienced cat owners, spacious homes",careTips:["Extensive play and exercise","Provide climbing structures","Water play opportunities","Mental stimulation essential","Secure outdoor enclosure ideal"],healthIssues:["Hypertrophic cardiomyopathy","Progressive retinal atrophy","Patellar luxation","Flat-chested kitten syndrome"]},
+{name:"Birman",nameCn:"伯曼猫",icon:"🐱",personality:"Gentle, affectionate, friendly, curious, calm, social",size:"Medium",weightRange:"3-6 kg",heightRange:"20-25 cm",lifespan:"12-16 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Families, seniors, multi-pet homes, quiet households",careTips:["Regular brushing twice weekly","Interactive play sessions","Keep indoors","Regular nail trimming","Provide companionship"],healthIssues:["Hypertrophic cardiomyopathy","Feline infectious peritonitis","Kidney disease","Corneal dermoid"]},
+{name:"Oriental Shorthair",nameCn:"东方短毛猫",icon:"🐱",personality:"Social, intelligent, vocal, playful, curious, loyal",size:"Medium",weightRange:"3-5 kg",heightRange:"23-28 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active households, families wanting vocal interactive cats",careTips:["Lots of interactive play","Provide companionship","Mental stimulation toys","Minimal grooming","Regular dental care"],healthIssues:["Amyloidosis","Crossed eyes","Megaesophagus","Lymphoma"]},
+{name:"Sphynx",nameCn:"斯芬克斯猫",icon:"🐱",personality:"Energetic, social, intelligent, mischievous, loyal, affectionate",size:"Medium",weightRange:"3-5.5 kg",heightRange:"20-25 cm",lifespan:"8-14 years",exerciseNeeds:"Medium",groomingDifficulty:"Medium",familyType:"Indoor homes, allergy sufferers, attentive owners",careTips:["Weekly bathing essential","Keep warm in cold weather","Sunscreen for outdoor exposure","Regular ear cleaning","High-calorie diet for warmth"],healthIssues:["Hypertrophic cardiomyopathy","Skin conditions","Respiratory issues","Dental disease"]},
+{name:"Devon Rex",nameCn:"德文卷毛猫",icon:"🐱",personality:"Mischievous, playful, social, intelligent, active, loyal",size:"Small",weightRange:"2.5-4 kg",heightRange:"25-30 cm",lifespan:"9-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, interactive owners",careTips:["Gentle grooming for delicate coat","Keep warm in cold weather","Interactive play daily","Regular ear cleaning","High perches for climbing"],healthIssues:["Hypertrophic cardiomyopathy","Patellar luxation","Hereditary myopathy","Skin conditions"]},
+{name:"Scottish Fold",nameCn:"苏格兰折耳猫",icon:"🐱",personality:"Sweet, gentle, calm, adaptable, loyal, playful",size:"Medium",weightRange:"3-6 kg",heightRange:"20-25 cm",lifespan:"11-14 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, quiet households",careTips:["Regular ear checks","Moderate play sessions","Watch for joint stiffness","Weekly brushing","Provide scratching posts"],healthIssues:["Osteochondrodysplasia","Polycystic kidney disease","Cardiomyopathy","Ear infections"]},
+{name:"American Shorthair",nameCn:"美国短毛猫",icon:"🐱",personality:"Easygoing, gentle, playful, adaptable, friendly, calm",size:"Medium",weightRange:"3.5-7 kg",heightRange:"20-25 cm",lifespan:"15-20 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, first-time owners, multi-pet homes",careTips:["Weekly brushing sufficient","Interactive play to prevent obesity","Regular dental care","Provide scratching posts","Monitor food portions"],healthIssues:["Hypertrophic cardiomyopathy","Hip dysplasia","Obesity","Dental disease"]},
+{name:"Norwegian Forest Cat",nameCn:"挪威森林猫",icon:"🐱",personality:"Gentle, friendly, intelligent, independent, calm, adaptable",size:"Large",weightRange:"4-9 kg",heightRange:"30-46 cm",lifespan:"14-16 years",exerciseNeeds:"Medium",groomingDifficulty:"High",familyType:"Families with space, cold climates, multi-pet homes",careTips:["Regular brushing for thick coat","Provide climbing structures","Interactive play sessions","Regular dental care","Seasonal shedding management"],healthIssues:["Hypertrophic cardiomyopathy","Hip dysplasia","Glycogen storage disease IV","Kidney disease"]},
+{name:"Russian Blue",nameCn:"俄罗斯蓝猫",icon:"🐱",personality:"Gentle, quiet, shy, intelligent, loyal, reserved",size:"Medium",weightRange:"3-5.5 kg",heightRange:"23-25 cm",lifespan:"15-20 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Quiet households, singles, seniors, routine-oriented homes",careTips:["Minimal grooming needed","Consistent routine important","Interactive play sessions","Provide hiding spots","Gradual introduction to changes"],healthIssues:["Obesity","Bladder stones","Diabetes","Anxiety-related issues"]},
+{name:"Exotic Shorthair",nameCn:"异国短毛猫",icon:"🐱",personality:"Calm, affectionate, gentle, sweet, loyal, quiet",size:"Medium",weightRange:"3.5-6 kg",heightRange:"25-30 cm",lifespan:"12-15 years",exerciseNeeds:"Low",groomingDifficulty:"Medium",familyType:"Apartment dwellers, seniors, quiet households",careTips:["Regular eye cleaning","Brush twice weekly","Monitor breathing in heat","Keep indoors","Regular face cleaning"],healthIssues:["Polycystic kidney disease","Brachycephalic syndrome","Dental malocclusion","Respiratory issues"]},
+{name:"Burmese",nameCn:"缅甸猫",icon:"🐱",personality:"Social, playful, affectionate, vocal, intelligent, curious",size:"Medium",weightRange:"3.5-6 kg",heightRange:"25-30 cm",lifespan:"10-17 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, multi-cat homes, interactive owners",careTips:["Interactive play daily","Provide companionship","Minimal grooming needed","Regular dental care","Keep indoors"],healthIssues:["Diabetes","Hypokalemia","Cranial deformities","Glaucoma"]},
+{name:"Tonkinese",nameCn:"东奇尼猫",icon:"🐱",personality:"Social, active, playful, intelligent, affectionate, vocal",size:"Medium",weightRange:"2.5-5.5 kg",heightRange:"18-25 cm",lifespan:"12-16 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, multi-cat homes, interactive owners",careTips:["Lots of interactive play","Provide companionship","Mental stimulation toys","Minimal grooming","Regular dental care"],healthIssues:["Amyloidosis","Asthma","Inflammatory bowel disease","Lymphoma"]},
+{name:"Somali",nameCn:"索马里猫",icon:"🐱",personality:"Active, playful, curious, intelligent, social, mischievous",size:"Medium",weightRange:"3-5.5 kg",heightRange:"18-25 cm",lifespan:"11-16 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, spacious homes, interactive owners",careTips:["Regular brushing for semi-long coat","Lots of climbing opportunities","Interactive play essential","Provide puzzle toys","Regular dental care"],healthIssues:["Renal amyloidosis","Pyruvate kinase deficiency","Dental disease","Autoimmune hemolytic anemia"]},
+{name:"Turkish Angora",nameCn:"土耳其安哥拉猫",icon:"🐱",personality:"Playful, intelligent, social, graceful, affectionate, energetic",size:"Medium",weightRange:"3-5 kg",heightRange:"20-25 cm",lifespan:"12-18 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, interactive owners, spacious homes",careTips:["Regular brushing for silky coat","Interactive play daily","Provide climbing structures","Hearing test for white cats","Regular dental care"],healthIssues:["Deafness in white cats","Hypertrophic cardiomyopathy","Ataxia","Obesity"]},
+{name:"Manx",nameCn:"马恩岛猫",icon:"🐱",personality:"Playful, social, gentle, intelligent, loyal, adaptable",size:"Medium",weightRange:"3.5-5.5 kg",heightRange:"25-28 cm",lifespan:"8-14 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, multi-pet homes",careTips:["Regular brushing","Monitor for spinal issues","Interactive play sessions","Provide scratching posts","Regular vet checkups"],healthIssues:["Manx syndrome","Arthritis","Corneal dystrophy","Megacolon"]},
+{name:"Japanese Bobtail",nameCn:"日本短尾猫",icon:"🐱",personality:"Active, intelligent, playful, social, loyal, talkative",size:"Medium",weightRange:"2.5-4 kg",heightRange:"20-23 cm",lifespan:"9-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, multi-pet homes, interactive owners",careTips:["Interactive play daily","Provide climbing structures","Minimal grooming needed","Social interaction important","Puzzle toys recommended"],healthIssues:["Generally healthy breed","Obesity","Urinary tract issues","Dental disease"]},
+{name:"Ragamuffin",nameCn:"褴褛猫",icon:"🐱",personality:"Calm, friendly, affectionate, gentle, patient, docile",size:"Large",weightRange:"4.5-9 kg",heightRange:"25-30 cm",lifespan:"12-16 years",exerciseNeeds:"Low",groomingDifficulty:"Medium",familyType:"Families with children, seniors, gentle households",careTips:["Regular brushing twice weekly","Interactive gentle play","Monitor weight","Keep indoors","Regular nail trimming"],healthIssues:["Hypertrophic cardiomyopathy","Polycystic kidney disease","Obesity","Dental disease"]},
+{name:"Chartreux",nameCn:"沙特尔猫",icon:"🐱",personality:"Quiet, gentle, loyal, intelligent, observant, playful",size:"Medium",weightRange:"3-7 kg",heightRange:"23-28 cm",lifespan:"12-15 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Quiet households, singles, families, apartment dwellers",careTips:["Weekly brushing sufficient","Interactive play sessions","Provide climbing structures","Regular dental care","Monitor weight"],healthIssues:["Polycystic kidney disease","Patellar luxation","Urinary tract issues","Obesity"]},
+{name:"Cornish Rex",nameCn:"柯尼斯卷毛猫",icon:"🐱",personality:"Active, playful, adventurous, social, intelligent, affectionate",size:"Small",weightRange:"2.5-4.5 kg",heightRange:"23-30 cm",lifespan:"11-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, apartment dwellers, interactive owners",careTips:["Keep warm in cold weather","Gentle grooming for delicate coat","Interactive play daily","Regular bathing","High perches for climbing"],healthIssues:["Hypertrophic cardiomyopathy","Patellar luxation","Hypotrichosis","Vitamin K deficiency"]},
+{name:"Havana Brown",nameCn:"哈瓦那棕猫",icon:"🐱",personality:"Affectionate, intelligent, playful, curious, social, gentle",size:"Medium",weightRange:"2.5-4.5 kg",heightRange:"23-28 cm",lifespan:"8-13 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, interactive owners",careTips:["Interactive play sessions","Minimal grooming needed","Provide companionship","Regular dental care","Puzzle toys for stimulation"],healthIssues:["Calcium oxalate stones","Upper respiratory infections","Obesity","Dental disease"]},
+{name:"Singapura",nameCn:"新加坡猫",icon:"🐱",personality:"Curious, playful, affectionate, active, intelligent, mischievous",size:"Small",weightRange:"1.8-3.5 kg",heightRange:"15-20 cm",lifespan:"11-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, apartment dwellers, interactive owners",careTips:["Lots of interactive play","Provide climbing structures","Minimal grooming needed","Keep warm","Regular dental care"],healthIssues:["Pyruvate kinase deficiency","Uterine inertia","Hypothyroidism","Renal failure"]},
+{name:"Bombay",nameCn:"孟买猫",icon:"🐈‍⬛",personality:"Social, affectionate, playful, intelligent, adaptable, gentle",size:"Medium",weightRange:"3-5 kg",heightRange:"23-28 cm",lifespan:"12-16 years",exerciseNeeds:"Medium",groomingDifficulty:"Low",familyType:"Families, apartment dwellers, multi-pet homes",careTips:["Interactive play sessions","Minimal grooming needed","Provide warm spots","Regular dental care","Monitor weight"],healthIssues:["Hypertrophic cardiomyopathy","Craniofacial defect","Respiratory issues","Obesity"]},
+{name:"Egyptian Mau",nameCn:"埃及猫",icon:"🐱",personality:"Active, loyal, playful, intelligent, gentle, musical voice",size:"Medium",weightRange:"3-5 kg",heightRange:"20-25 cm",lifespan:"12-15 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Active families, spacious homes, experienced cat owners",careTips:["Lots of exercise and play","Provide climbing structures","Secure outdoor enclosure ideal","Minimal grooming","Regular dental care"],healthIssues:["Hypertrophic cardiomyopathy","Leukodystrophy","Patellar luxation","Urolithiasis"]},
+{name:"Balinese",nameCn:"巴厘猫",icon:"🐱",personality:"Social, intelligent, vocal, playful, affectionate, graceful",size:"Medium",weightRange:"3-5 kg",heightRange:"15-18 cm",lifespan:"12-20 years",exerciseNeeds:"High",groomingDifficulty:"Medium",familyType:"Active families, interactive owners, multi-cat homes",careTips:["Regular brushing for silky coat","Lots of interactive play","Provide companionship","Mental stimulation toys","Regular dental care"],healthIssues:["Amyloidosis","Asthma","Crossed eyes","Progressive retinal atrophy"]},
+{name:"Himalayan",nameCn:"喜马拉雅猫",icon:"🐱",personality:"Calm, gentle, sweet, affectionate, quiet, devoted",size:"Medium",weightRange:"3.5-5.5 kg",heightRange:"25-30 cm",lifespan:"9-15 years",exerciseNeeds:"Low",groomingDifficulty:"High",familyType:"Quiet households, seniors, indoor living",careTips:["Daily brushing essential","Regular eye cleaning","Keep indoors","Monitor breathing in heat","Regular bathing"],healthIssues:["Polycystic kidney disease","Brachycephalic syndrome","Progressive retinal atrophy","Respiratory issues"]},
+{name:"Savannah",nameCn:"萨凡纳猫",icon:"🐆",personality:"Adventurous, curious, intelligent, active, loyal, bold",size:"Large",weightRange:"5.5-11 kg",heightRange:"33-43 cm",lifespan:"12-20 years",exerciseNeeds:"High",groomingDifficulty:"Low",familyType:"Experienced cat owners, spacious homes, active households",careTips:["Extensive exercise and play","Secure outdoor enclosure","Provide climbing structures","Mental stimulation essential","Check local ownership laws"],healthIssues:["Hypertrophic cardiomyopathy","Hybrid male infertility","Sensitive to anesthesia","Inflammatory bowel disease"]},
+];
+
+let currentImage = null;
+let cameraStream = null;
+let history = JSON.parse(localStorage.getItem('petIdHistory') || '[]');
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('identifyTab').style.display = tab === 'identify' ? 'block' : 'none';
+  document.getElementById('historyTab').style.display = tab === 'history' ? 'block' : 'none';
+  if (tab === 'history') renderHistory();
+}
+
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault(); uploadArea.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) handleFile(file);
+});
+fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => { currentImage = e.target.result; showPreview(currentImage); };
+  reader.readAsDataURL(file);
+}
+
+function showPreview(src) {
+  document.getElementById('previewImg').src = src;
+  document.getElementById('previewSection').classList.add('active');
+  document.getElementById('resultsSection').classList.remove('active');
+  document.getElementById('breedDetail').style.display = 'none';
+}
+
+function clearPreview() {
+  document.getElementById('previewSection').classList.remove('active');
+  document.getElementById('resultsSection').classList.remove('active');
+  document.getElementById('breedDetail').style.display = 'none';
+  currentImage = null; fileInput.value = '';
+}
+
+async function toggleCamera() {
+  const section = document.getElementById('cameraSection');
+  const video = document.getElementById('cameraVideo');
+  const btn = document.getElementById('cameraToggleBtn');
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null; section.classList.remove('active');
+    btn.textContent = '📷 Camera'; return;
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:960} }
+    });
+    video.srcObject = cameraStream; video.play();
+    section.classList.add('active'); btn.textContent = '📷 Close Camera';
+  } catch(err) { alert('Unable to access camera. Please check permissions.'); }
+}
+
+function capturePhoto() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  currentImage = canvas.toDataURL('image/jpeg', 0.9);
+  showPreview(currentImage);
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null;
+    document.getElementById('cameraSection').classList.remove('active');
+    document.getElementById('cameraToggleBtn').textContent = '📷 Camera';
+  }
+}
+
+function switchCamera() {
+  if (!cameraStream) return;
+  const track = cameraStream.getVideoTracks()[0];
+  const facing = track.getSettings().facingMode === 'environment' ? 'user' : 'environment';
+  cameraStream.getTracks().forEach(t => t.stop());
+  navigator.mediaDevices.getUserMedia({video:{facingMode:facing,width:{ideal:1280},height:{ideal:960}}})
+    .then(s => { cameraStream = s; document.getElementById('cameraVideo').srcObject = s; })
+    .catch(() => alert('Unable to switch camera.'));
+}
+
+function analyzeImage() {
+  if (!currentImage) return;
+  const overlay = document.getElementById('analysisOverlay');
+  overlay.classList.add('active');
+  setTimeout(() => { overlay.classList.remove('active'); showResults(); }, 1500 + Math.random() * 2000);
+}
+
+function showResults() {
+  const isDog = Math.random() > 0.35;
+  const breeds = isDog ? DOG_BREEDS : CAT_BREEDS;
+  const count = Math.random() > 0.5 ? 3 : 2;
+  const picks = [...breeds].sort(() => Math.random() - 0.5).slice(0, count);
+  let confs = [], rem = 85 + Math.random() * 13;
+  for (let i = 0; i < count; i++) {
+    if (i === count - 1) confs.push(Math.max(5, rem));
+    else { const s = rem * (0.5 + Math.random() * 0.3); confs.push(s); rem -= s; }
+  }
+  confs.sort((a, b) => b - a);
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  picks.forEach((breed, i) => {
+    const conf = confs[i].toFixed(1);
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.onclick = () => {
+      document.querySelectorAll('.result-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      showBreedDetail(breed); addToHistory(breed, conf);
+    };
+    const barColor = parseFloat(conf) > 50 ? 'var(--success)' : parseFloat(conf) > 25 ? 'var(--warn)' : 'var(--danger)';
+    card.innerHTML = '<div class="result-icon">' + breed.icon + '</div><div class="result-info"><div class="result-name">' + breed.name + '</div><div class="result-name-cn">' + breed.nameCn + '</div></div><div class="confidence"><div class="confidence-text">' + conf + '%</div><div class="confidence-bar"><div class="confidence-fill" style="width:' + conf + '%;background:' + barColor + '"></div></div></div>';
+    list.appendChild(card);
+  });
+  document.getElementById('resultsSection').classList.add('active');
+}
+
+function showBreedDetail(breed) {
+  const detail = document.getElementById('breedDetail');
+  const nc = {Low:'var(--success)',Medium:'var(--warn)',High:'var(--danger)'};
+  detail.style.display = 'block';
+  detail.innerHTML = '<div class="breed-header"><div class="breed-icon">' + breed.icon + '</div><div><h2 class="breed-title">' + breed.name + '</h2><p class="breed-subtitle">' + breed.nameCn + '</p></div></div>' +
+    '<div class="breed-stats">' +
+    '<div class="stat-item"><div class="stat-label">Size</div><div class="stat-value">' + breed.size + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Weight</div><div class="stat-value">' + breed.weightRange + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Height</div><div class="stat-value">' + breed.heightRange + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Lifespan</div><div class="stat-value">' + breed.lifespan + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Exercise</div><div class="stat-value" style="color:' + (nc[breed.exerciseNeeds]||'var(--text)') + '">' + breed.exerciseNeeds + '</div></div>' +
+    '<div class="stat-item"><div class="stat-label">Grooming</div><div class="stat-value" style="color:' + (nc[breed.groomingDifficulty]||'var(--text)') + '">' + breed.groomingDifficulty + '</div></div></div>' +
+    '<div class="breed-section"><h3 class="breed-section-title">Personality</h3><p>' + breed.personality + '</p></div>' +
+    '<div class="breed-section"><h3 class="breed-section-title">Best For</h3><p>' + breed.familyType + '</p></div>' +
+    '<div class="breed-section"><h3 class="breed-section-title">Care Tips</h3><ul class="breed-list">' + breed.careTips.map(function(t){return '<li>'+t+'</li>'}).join('') + '</ul></div>' +
+    '<div class="breed-section"><h3 class="breed-section-title">Common Health Issues</h3><div class="health-tags">' + breed.healthIssues.map(function(h){return '<span class="health-tag">'+h+'</span>'}).join('') + '</div></div>';
+  detail.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function addToHistory(breed, confidence) {
+  const entry = {name:breed.name,nameCn:breed.nameCn,icon:breed.icon,confidence:confidence,timestamp:new Date().toISOString()};
+  history.unshift(entry);
+  if (history.length > 50) history = history.slice(0, 50);
+  localStorage.setItem('petIdHistory', JSON.stringify(history));
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!history.length) {
+    list.innerHTML = '<div class="history-empty"><p style="font-size:2rem;margin-bottom:8px">No history yet</p><p style="color:var(--text2)">Upload a photo to get started</p></div>';
+    return;
+  }
+  list.innerHTML = history.map(function(h) {
+    const d = new Date(h.timestamp);
+    const t = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return '<div class="history-item" onclick="showHistoryBreed(this.dataset.name)" data-name="' + h.name.replace(/"/g,'&quot;') + '"><div class="history-icon">' + h.icon + '</div><div class="history-info"><div class="history-name">' + h.name + '</div><div class="history-meta">' + h.nameCn + ' &bull; ' + h.confidence + '% match</div></div><div class="history-time">' + t + '</div></div>';
+  }).join('');
+}
+
+function showHistoryBreed(name) {
+  const breed = [...DOG_BREEDS,...CAT_BREEDS].find(function(b){return b.name===name});
+  if (breed) {
+    document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('identifyTab').style.display = 'block';
+    document.getElementById('historyTab').style.display = 'none';
+    showBreedDetail(breed);
+  }
+}
+
+function clearHistory() {
+  if (confirm('Clear all identification history?')) {
+    history = []; localStorage.removeItem('petIdHistory'); renderHistory();
+  }
+}
+
+renderHistory();
+
+</script>
+
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

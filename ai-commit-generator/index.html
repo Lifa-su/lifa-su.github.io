@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Commit Message Generator - Generate Conventional Commits with AI</title>
+<meta name="description" content="Paste your git diff and let AI generate standardized Conventional Commits messages. Powered by DeepSeek API. Free, fast, and easy to use.">
+<meta name="keywords" content="AI commit message, git commit generator, conventional commits, git diff, DeepSeek, commit message tool, developer tools">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-commit-generator/">
+<meta property="og:title" content="AI Commit Message Generator">
+<meta property="og:description" content="Paste your git diff and let AI generate standardized Conventional Commits messages. Free online tool.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-commit-generator/">
+<meta property="og:image" content="https://lifa-su.com/ai-commit-generator/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Commit Message Generator">
+<meta name="twitter:description" content="Paste your git diff and let AI generate standardized Conventional Commits messages.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Commit Message Generator","description":"Paste your git diff and let AI generate standardized Conventional Commits messages with Conventional Commits format.","url":"https://lifa-su.com/ai-commit-generator/","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Git diff analysis","Conventional Commits format","Multiple detail levels","Chinese and English support"]}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--border:#2a2a42;--text:#e8e8f4;--text2:#9898b4;--accent:#7c5cfc;--accent2:#5c8cfc;--success:#4cda8a;--danger:#fc5c6c;--radius:12px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(11,11,18,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:12px}
+.header h1{font-size:1.3rem;font-weight:700;letter-spacing:-0.02em}
+.free-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.65rem;font-weight:700;text-transform:uppercase;background:linear-gradient(135deg,var(--success),#2eb872);color:#0b0b12;letter-spacing:0.05em}
+
+.container{max-width:720px;margin:0 auto;padding:32px 16px 0}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card-title{font-size:0.95rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title span{font-size:1.1rem}
+
+.settings-row{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:600px){.settings-row{grid-template-columns:2fr 1fr 1fr}}
+.setting-group label{display:block;font-size:0.78rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+.setting-group input,.setting-group select{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.88rem;outline:none;transition:border-color .2s}
+.setting-group input:focus,.setting-group select:focus{border-color:var(--accent)}
+.setting-group select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239898b4'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.api-key-wrap{position:relative}
+.api-key-wrap input{padding-right:42px}
+.toggle-vis{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem;padding:6px;border-radius:6px;transition:color .2s}
+.toggle-vis:hover{color:var(--text)}
+
+textarea{width:100%;min-height:180px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:0.82rem;line-height:1.5;resize:vertical;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--accent)}
+textarea::placeholder{color:var(--text2);opacity:0.7}
+
+.diff-stats{display:flex;gap:16px;margin-top:10px;font-size:0.8rem;color:var(--text2);min-height:20px;flex-wrap:wrap}
+.diff-stats .add{color:var(--success)}
+.diff-stats .del{color:var(--danger)}
+.diff-stats .files{color:var(--accent2)}
+
+.generate-btn{width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.generate-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 24px rgba(124,92,252,0.35)}
+.generate-btn:active:not(:disabled){transform:translateY(0)}
+.generate-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+.spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.error-msg{margin-top:12px;padding:10px 14px;background:rgba(252,92,108,0.1);border:1px solid rgba(252,92,108,0.3);border-radius:8px;color:var(--danger);font-size:0.82rem;display:none}
+.error-msg.visible{display:block;animation:fadeIn .3s ease}
+
+.result-card{display:none;animation:fadeIn .4s ease}
+.result-card.visible{display:block}
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.result-actions{display:flex;gap:8px}
+.action-btn{padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.8rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.action-btn:hover{border-color:var(--accent);background:rgba(124,92,252,0.1)}
+.action-btn.copied{border-color:var(--success);color:var(--success)}
+.commit-output{padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:0.85rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+
+.shortcut-hint{text-align:center;margin-top:8px;font-size:0.72rem;color:var(--text2)}
+.shortcut-hint kbd{padding:2px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:0.7rem}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.pro-section{max-width:900px;margin:40px auto;padding:0 16px}
+.pro-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;position:relative;overflow:hidden}
+.pro-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--success))}
+.pro-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;margin-bottom:12px}
+.pro-card h3{font-size:1.4rem;margin-bottom:8px}
+.pro-card p{color:var(--text2);margin-bottom:24px}
+.pro-features{display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;margin-bottom:24px}
+.pro-feat{display:flex;gap:12px;padding:12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border)}
+.pf-icon{font-size:1.5rem;flex-shrink:0}
+.pf-text{font-size:0.85rem;font-weight:600}
+.pf-text span{display:block;font-size:0.75rem;font-weight:400;color:var(--text2);margin-top:2px}
+.pro-btn{display:inline-block;padding:12px 32px;background:linear-gradient(135deg,#f5a623,#f7c948);color:#1a1a2e;border-radius:10px;font-weight:700;font-size:0.95rem;transition:all .2s;text-decoration:none}
+.pro-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(245,166,35,0.4);text-decoration:none}
+@media(max-width:768px){.pro-features{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>🤖 AI Commit Generator</h1>
+  <span class="free-badge">Free</span>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-title"><span>⚙️</span> Settings</div>
+    <div class="settings-row">
+      <div class="setting-group">
+        <label for="apiKey">DeepSeek API Key</label>
+        <div class="api-key-wrap">
+          <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off">
+          <button class="toggle-vis" onclick="toggleKey()" aria-label="Toggle API key visibility">👁</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label for="lang">Language</label>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="zh">Chinese</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label for="detail">Detail Level</label>
+        <select id="detail">
+          <option value="concise">Concise</option>
+          <option value="standard" selected>Standard</option>
+          <option value="detailed">Detailed</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span>📝</span> Git Diff</div>
+    <textarea id="diffInput" placeholder="Paste your git diff output here...
+
+Tip: Run one of these commands to get your diff:
+  git diff --staged
+  git diff HEAD
+  git diff main..feature-branch"></textarea>
+    <div class="diff-stats" id="diffStats"></div>
+    <button class="generate-btn" id="generateBtn" onclick="generate()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btnText">✨ Generate Commit Message</span>
+    </button>
+    <div class="shortcut-hint"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to generate</div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="card result-card" id="resultCard">
+    <div class="result-header">
+      <div class="card-title" style="margin-bottom:0"><span>💬</span> Result</div>
+      <div class="result-actions">
+        <button class="action-btn" onclick="copyResult()">
+          <span id="copyIcon">📋</span> <span id="copyText">Copy</span>
+        </button>
+        <button class="action-btn" onclick="generate()">🔄 Regenerate</button>
+      </div>
+    </div>
+    <div class="commit-output" id="commitOutput"></div>
+  </div>
+
+</div>
+
+<section class="pro-section">
+<div class="pro-card">
+<div class="pro-badge">⭐ Pro</div>
+<h3>Unlock Pro Commit Features</h3>
+<p>Supercharge your git workflow with advanced AI capabilities.</p>
+<div class="pro-features">
+<div class="pro-feat"><div class="pf-icon">📦</div><div class="pf-text">Batch Processing<span>Generate commits for multiple diffs at once</span></div></div>
+<div class="pro-feat"><div class="pf-icon">📋</div><div class="pf-text">Custom Templates<span>Define your team's commit conventions</span></div></div>
+<div class="pro-feat"><div class="pf-icon">🔗</div><div class="pf-text">Issue Linking<span>Auto-link Jira, GitHub, GitLab issues</span></div></div>
+<div class="pro-feat"><div class="pf-icon">👥</div><div class="pf-text">Team Presets<span>Shared commit styles across your team</span></div></div>
+</div>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="pro-btn">☕ Upgrade to Pro</a>
+</div>
+</section>
+
+<footer style="text-align:center;padding:24px 16px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);">
+  © 2025 <a href="https://lifa-su.com" target="_blank" style="color:var(--accent);">FeiDev Tools</a> · Made with ❤️ · <a href="https://ko-fi.com/feidev" target="_blank" style="color:var(--accent);">Support on Ko-fi</a>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY_STORAGE='deepseek_api_key';
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem(KEY_STORAGE);
+  if(saved) $('apiKey').value=saved;
+  $('diffInput').addEventListener('input',updateStats);
+});
+
+function toggleKey(){
+  const input=$('apiKey');
+  const btn=input.nextElementSibling;
+  if(input.type==='password'){input.type='text';btn.textContent='🙈';}
+  else{input.type='password';btn.textContent='👁';}
+}
+
+function updateStats(){
+  const diff=$('diffInput').value;
+  if(!diff.trim()){$('diffStats').innerHTML='';return;}
+  const lines=diff.split('\n');
+  let adds=0,dels=0,files=new Set();
+  for(const line of lines){
+    if(line.startsWith('+++ b/')||line.startsWith('--- a/')){
+      const f=line.slice(6);
+      if(f&&f!=='/dev/null') files.add(f);
+    }else if(line.startsWith('+')&&!line.startsWith('+++')){
+      adds++;
+    }else if(line.startsWith('-')&&!line.startsWith('---')){
+      dels++;
+    }
+  }
+  $('diffStats').innerHTML=
+    '<span class="files">'+files.size+' file'+(files.size!==1?'s':'')+'</span>'+
+    '<span class="add">+'+adds+' line'+(adds!==1?'s':'')+'</span>'+
+    '<span class="del">-'+dels+' line'+(dels!==1?'s':'')+'</span>';
+}
+
+function buildPrompt(diff,lang,detail){
+  const langInstr=lang==='zh'
+    ?'请用中文撰写 commit message。'
+    :'Write the commit message in English.';
+  const detailInstr={
+    concise:'只需一行标题，不需要 body。保持极简。',
+    standard:'包含一行标题和简短的 body（2-3 行），说明主要变更。',
+    detailed:'包含标题、详细的 body 说明变更原因和内容，以及影响范围。如有 breaking changes 请注明。'
+  }[detail];
+  return '你是一个 Git commit message 专家。请根据以下 git diff 生成规范的 Conventional Commits 格式的 commit message。\n\n规则：\n1. 使用 Conventional Commits 格式：<type>(<scope>): <description>\n2. type 包括：feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\n3. scope 是可选的，表示影响范围\n4. description 用祈使语气，首字母小写，不加句号\n5. '+detailInstr+'\n6. '+langInstr+'\n7. 只输出 commit message 本身，不要加任何解释或 markdown 格式\n\nGit Diff:\n```\n'+diff.slice(0,12000)+'\n```';
+}
+
+function showError(msg){
+  const el=$('errorMsg');
+  el.textContent=msg;
+  el.classList.add('visible');
+}
+function hideError(){$('errorMsg').classList.remove('visible');}
+
+async function generate(){
+  hideError();
+  const apiKey=$('apiKey').value.trim();
+  const diff=$('diffInput').value.trim();
+  const lang=$('lang').value;
+  const detail=$('detail').value;
+
+  if(!apiKey){showError('Please enter your DeepSeek API Key');return;}
+  if(!diff){showError('Please paste your git diff content');return;}
+
+  localStorage.setItem(KEY_STORAGE,apiKey);
+
+  const btn=$('generateBtn');
+  const spinner=$('spinner');
+  const btnText=$('btnText');
+  btn.disabled=true;
+  spinner.style.display='block';
+  btnText.textContent='Generating...';
+
+  try{
+    const resp=await fetch('https://api.deepseek.com/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'deepseek-chat',
+        messages:[
+          {role:'system',content:'You are a helpful assistant that generates git commit messages.'},
+          {role:'user',content:buildPrompt(diff,lang,detail)}
+        ],
+        temperature:0.3,
+        max_tokens:500
+      })
+    });
+
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({}));
+      throw new Error(err.error?.message||'API request failed ('+resp.status+')');
+    }
+
+    const data=await resp.json();
+    const message=data.choices?.[0]?.message?.content?.trim();
+    if(!message) throw new Error('API returned empty response');
+
+    $('commitOutput').textContent=message;
+    $('resultCard').classList.add('visible');
+    $('resultCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(err){
+    showError(err.message||'Generation failed. Please check your API key and network.');
+  }finally{
+    btn.disabled=false;
+    spinner.style.display='none';
+    btnText.textContent='✨ Generate Commit Message';
+  }
+}
+
+async function copyResult(){
+  const text=$('commitOutput').textContent;
+  if(!text) return;
+  try{
+    await navigator.clipboard.writeText(text);
+    $('copyIcon').textContent='✅';
+    $('copyText').textContent='Copied!';
+    const btn=$('copyIcon').parentElement;
+    btn.classList.add('copied');
+    setTimeout(()=>{$('copyIcon').textContent='📋';$('copyText').textContent='Copy';btn.classList.remove('copied');},2000);
+  }catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    $('copyText').textContent='Copied!';
+    setTimeout(()=>{$('copyText').textContent='Copy';},2000);
+  }
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();generate();}
+});
+</script>
+<footer style="text-align:center;padding:24px 16px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);">
+  <a href="https://lifa-su.com/" style="color:var(--accent);">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" style="color:var(--accent);">☕ Support on Ko-fi</a>
+</footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

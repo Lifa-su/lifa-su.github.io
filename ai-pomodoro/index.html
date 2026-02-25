@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Pomodoro - Focus Timer</title>
+<meta name="description" content="A clean Pomodoro timer. 25-min work, 5-min break.">
+<link rel="canonical" href="https://lifa-su.com/ai-pomodoro/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍅</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#0f3460;--tx:#eee;--td:#8892b0;--r:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.c{max-width:420px;width:100%;text-align:center}
+h1{font-size:1.4rem;font-weight:600;margin-bottom:8px;letter-spacing:1px}
+.sub{color:var(--td);font-size:.85rem;margin-bottom:32px}
+.ring{position:relative;width:260px;height:260px;margin:0 auto 32px}
+.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}
+.rbg{stroke:#2a2a4a}
+.rp{stroke:var(--ac);stroke-linecap:round;transition:stroke-dashoffset .5s linear}
+.td{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.tm{font-size:3.6rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.ph{font-size:.85rem;color:var(--td);margin-top:4px;text-transform:uppercase;letter-spacing:2px}
+.ctrl{display:flex;gap:12px;justify-content:center;margin-bottom:28px}
+.b{border:none;border-radius:50px;padding:12px 32px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+.bp{background:var(--ac);color:#fff}.bp:hover{background:#d63851;transform:scale(1.03)}
+.bs{background:var(--sf);color:var(--tx);border:1px solid #2a2a4a}.bs:hover{border-color:var(--ac)}
+.set{background:var(--sf);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.set summary{cursor:pointer;font-size:.9rem;color:var(--td);list-style:none;text-align:center}
+.set summary::-webkit-details-marker{display:none}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.f label{display:block;font-size:.75rem;color:var(--td);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+.f input{width:100%;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:8px;padding:8px 12px;color:var(--tx);font-size:1rem;text-align:center}
+.f input:focus{outline:none;border-color:var(--ac)}
+.st{background:var(--sf);border-radius:var(--r);padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center}
+.sv{font-size:1.8rem;font-weight:700;color:var(--ac)}
+.sl{font-size:.75rem;color:var(--td);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+@media(max-width:480px){.ring{width:220px;height:220px}.tm{font-size:2.8rem}}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>🍅 AI Pomodoro</h1>
+<p class="sub">Stay focused, one tomato at a time</p>
+<div class="ring">
+<svg width="100%" height="100%" viewBox="0 0 260 260">
+<circle class="rbg" cx="130" cy="130" r="120"/>
+<circle class="rp" id="prog" cx="130" cy="130" r="120" stroke-dasharray="753.98" stroke-dashoffset="0"/>
+</svg>
+<div class="td">
+<div class="tm" id="time">25:00</div>
+<div class="ph" id="phase">Work</div>
+</div>
+</div>
+<div class="ctrl">
+<button class="b bp" id="sbtn" onclick="toggle()">Start</button>
+<button class="b bs" onclick="reset()">Reset</button>
+</div>
+<details class="set">
+<summary>⚙️ Settings</summary>
+<div class="sg">
+<div class="f"><label>Work (min)</label><input type="number" id="wm" value="25" min="1" max="120" onchange="upd()"></div>
+<div class="f"><label>Break (min)</label><input type="number" id="bm" value="5" min="1" max="60" onchange="upd()"></div>
+</div>
+</details>
+<div class="st">
+<div><div class="sv" id="pc">0</div><div class="sl">Pomodoros</div></div>
+<div><div class="sv" id="ft">0m</div><div class="sl">Focus Time</div></div>
+</div>
+
+<!-- Pro Section -->
+<style>
+.pro-section{position:relative;margin-top:24px;border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-section:hover{transform:translateY(-2px)}
+.pro-blur{filter:blur(5px);pointer-events:none;opacity:.65;padding:20px;background:var(--sf);border-radius:var(--r)}
+.pro-blur-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pro-blur-item{background:var(--bg);border-radius:10px;padding:14px;text-align:center}
+.pro-blur-item .mock-icon{font-size:1.5rem;margin-bottom:6px}
+.pro-blur-item .mock-title{font-size:.85rem;color:var(--td);font-weight:600}
+.pro-blur-item .mock-bar{height:6px;background:#2a2a4a;border-radius:3px;margin-top:8px;overflow:hidden}
+.pro-blur-item .mock-bar span{display:block;height:100%;width:65%;background:var(--ac);border-radius:3px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);border-radius:var(--r);border:2px dashed rgba(233,69,96,.4)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:700;color:#fff}
+.pro-sublabel{font-size:.85rem;color:var(--td);margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:var(--sf);border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;border:1px solid #2a2a4a;animation:proIn .25s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;color:var(--ac);margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0}
+.pro-modal li{padding:10px 0;border-bottom:1px solid #2a2a4a;font-size:.95rem;display:flex;align-items:center;gap:10px}
+.pro-modal li:last-child{border-bottom:none}
+.pro-modal li .li-icon{font-size:1.1rem;flex-shrink:0}
+.btn-upgrade{display:block;width:100%;padding:14px;background:var(--ac);color:#fff;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:20px;transition:background .2s;text-decoration:none;text-align:center}
+.btn-upgrade:hover{background:#d63851}
+.btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:8px}
+.btn-later:hover{color:#fff}
+</style>
+
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-grid">
+<div class="pro-blur-item"><div class="mock-icon">📋</div><div class="mock-title">Task Manager</div><div class="mock-bar"><span></span></div></div>
+<div class="pro-blur-item"><div class="mock-icon">📊</div><div class="mock-title">Weekly Report</div><div class="mock-bar"><span style="width:80%"></span></div></div>
+<div class="pro-blur-item"><div class="mock-icon">🎵</div><div class="mock-title">White Noise</div><div class="mock-bar"><span style="width:45%"></span></div></div>
+<div class="pro-blur-item"><div class="mock-icon">📈</div><div class="mock-title">Focus Trends</div><div class="mock-bar"><span style="width:70%"></span></div></div>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock task management, reports & white noise</div>
+</div>
+</div>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>🍅 Pomodoro Pro</h2>
+<p style="color:var(--td);font-size:.9rem">Supercharge your focus sessions</p>
+<div class="pro-price">$9</div>
+<ul>
+<li><span class="li-icon">📋</span>Task Management Integration — organize & track tasks per session</li>
+<li><span class="li-icon">📊</span>Statistics & Reports — daily/weekly/monthly focus analytics</li>
+<li><span class="li-icon">🎵</span>White Noise Generator — rain, café, nature & more ambient sounds</li>
+<li><span class="li-icon">📈</span>Focus Trends — visualize your productivity patterns over time</li>
+<li><span class="li-icon">♾️</span>Lifetime access — one-time payment, no subscription</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+
+</div>
+<script>
+var C=2*Math.PI*120,wd=25*60,bd=5*60,rem=wd,tot=wd,run=false,iv=null,isW=true;
+var $t=document.getElementById('time'),$ph=document.getElementById('phase'),
+$pr=document.getElementById('prog'),$sb=document.getElementById('sbtn');
+
+function fmt(s){var m=Math.floor(s/60),sc=s%60;return(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc}
+
+function render(){
+$t.textContent=fmt(rem);
+$pr.style.strokeDashoffset=C*(rem/tot);
+$pr.style.stroke=isW?'#e94560':'#0f3460';
+$ph.textContent=isW?'Work':'Break';
+document.title=fmt(rem)+' - '+(isW?'Work':'Break')+' | AI Pomodoro';
+}
+
+function beep(done){
+try{var x=new(window.AudioContext||window.webkitAudioContext)();
+var ns=done?[[660,0,.15],[880,.15,.15],[1100,.3,.3]]:[[440,0,.15],[330,.15,.3]];
+ns.forEach(function(n){var o=x.createOscillator(),g=x.createGain();
+o.type='sine';o.frequency.value=n[0];
+g.gain.setValueAtTime(.3,x.currentTime+n[1]);
+g.gain.exponentialRampToValueAtTime(.01,x.currentTime+n[1]+n[2]);
+o.connect(g);g.connect(x.destination);
+o.start(x.currentTime+n[1]);o.stop(x.currentTime+n[1]+n[2]);});}catch(e){}}
+
+function tkey(){return'pom-'+new Date().toISOString().slice(0,10)}
+function loadStats(){var d=JSON.parse(localStorage.getItem(tkey())||'{"p":0,"m":0}');
+document.getElementById('pc').textContent=d.p;
+document.getElementById('ft').textContent=d.m+'m';}
+function saveStat(){var k=tkey(),d=JSON.parse(localStorage.getItem(k)||'{"p":0,"m":0}');
+d.p++;d.m+=Math.round(wd/60);localStorage.setItem(k,JSON.stringify(d));loadStats();}
+
+function tick(){
+if(rem<=0){
+if(isW){beep(true);saveStat();isW=false;rem=bd;tot=bd;}
+else{beep(false);isW=true;rem=wd;tot=wd;}
+render();return;}
+rem--;render();}
+
+function toggle(){
+if(run){clearInterval(iv);iv=null;run=false;$sb.textContent='Start';}
+else{iv=setInterval(tick,1000);run=true;$sb.textContent='Pause';}
+}
+
+function reset(){
+if(iv){clearInterval(iv);iv=null;}
+run=false;isW=true;rem=wd;tot=wd;$sb.textContent='Start';render();}
+
+function upd(){
+var w=parseInt(document.getElementById('wm').value)||25;
+var b=parseInt(document.getElementById('bm').value)||5;
+wd=Math.max(1,Math.min(120,w))*60;bd=Math.max(1,Math.min(60,b))*60;
+if(!run){rem=isW?wd:bd;tot=isW?wd:bd;render();}}
+
+render();loadStats();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

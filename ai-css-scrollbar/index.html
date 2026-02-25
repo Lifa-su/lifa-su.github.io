@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS Scrollbar Style Generator - Customize scrollbar width, colors, border-radius with real-time preview. Generate cross-browser CSS code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-scrollbar/">
+<title>CSS Scrollbar Style Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#1a1a2e;color:#eee;min-height:100vh;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin-bottom:8px;color:#fff}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:#16213e;border-radius:12px;padding:24px;border:1px solid #0f3460}
+.card h2{font-size:1.1rem;margin-bottom:18px;color:#e94560}
+.cg{margin-bottom:16px}
+.cg label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.9rem;color:#ccc}
+.cg label span{color:#e94560;font-weight:600}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#0f3460;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#e94560;cursor:pointer;border:2px solid #fff}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#e94560;cursor:pointer;border:2px solid #fff}
+.cr{display:flex;align-items:center;gap:10px}
+.cr input[type=color]{-webkit-appearance:none;border:2px solid #0f3460;border-radius:8px;width:44px;height:36px;cursor:pointer;background:transparent;padding:2px}
+.cr input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.cr input[type=color]::-webkit-color-swatch{border:none;border-radius:5px}
+.cr .hex{font-family:monospace;font-size:.85rem;color:#aaa}
+.preview-box{background:#0f3460;border-radius:8px;height:260px;overflow-y:scroll;padding:16px;font-size:.9rem;color:#aaa;line-height:1.8}
+.preview-box p{margin-bottom:12px}
+.code-section{margin-top:24px}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.code-header h2{margin-bottom:0;color:#e94560;font-size:1.1rem}
+.btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s}
+.btn-primary{background:#e94560;color:#fff}.btn-primary:hover{background:#c73652}
+.btn-secondary{background:#0f3460;color:#ccc;border:1px solid #1a4080}.btn-secondary:hover{background:#1a4080}
+.code-block{background:#0a0a1a;border-radius:8px;padding:16px;font-family:monospace;font-size:.82rem;line-height:1.7;color:#a8d8ea;white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;border:1px solid #0f3460}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#e94560;color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;color:#555;font-size:.8rem;margin-top:40px;padding-bottom:20px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>CSS Scrollbar Style Generator</h1>
+<p class="subtitle">Customize your scrollbar and grab the CSS</p>
+<div class="grid">
+<div class="card">
+<h2>Settings</h2>
+<div class="cg"><label>Scrollbar Width <span id="widthVal">10px</span></label><input type="range" id="sbWidth" min="2" max="30" value="10"></div>
+<div class="cg"><label>Border Radius <span id="radiusVal">5px</span></label><input type="range" id="sbRadius" min="0" max="15" value="5"></div>
+<div class="cg"><label>Thumb Color</label><div class="cr"><input type="color" id="thumbColor" value="#e94560"><span class="hex" id="thumbHex">#e94560</span></div></div>
+<div class="cg"><label>Thumb Hover Color</label><div class="cr"><input type="color" id="thumbHoverColor" value="#ff6b81"><span class="hex" id="thumbHoverHex">#ff6b81</span></div></div>
+<div class="cg"><label>Track Color</label><div class="cr"><input type="color" id="trackColor" value="#16213e"><span class="hex" id="trackHex">#16213e</span></div></div>
+<div style="margin-top:20px"><button class="btn btn-secondary" onclick="resetAll()">Reset Defaults</button></div>
+</div>
+<div class="card">
+<h2>Live Preview</h2>
+<div class="preview-box" id="previewBox">
+<p>This is a live preview of your custom scrollbar. Scroll down to see it in action!</p>
+<p>CSS scrollbars can be styled using ::-webkit-scrollbar pseudo-elements for Chrome, Safari, Edge, and Opera.</p>
+<p>Firefox uses scrollbar-width and scrollbar-color properties for basic customization.</p>
+<p>Custom scrollbars improve the look and feel of your website, making it cohesive with your design system.</p>
+<p>Control width, colors, border-radius, and hover effects of the thumb and track independently.</p>
+<p>The thumb is the draggable part, while the track is the background area behind it.</p>
+<p>Hover effects add interactivity, giving users visual feedback when they interact with the scrollbar.</p>
+<p>Keep scrolling to test your custom scrollbar style in this preview area.</p>
+<p>Try adjusting the settings on the left to see changes in real-time right here.</p>
+<p>When you are happy with the result, copy the generated CSS code below.</p>
+</div></div></div>
+<div class="code-section">
+<div class="card">
+<div class="code-header">
+<h2>Generated CSS</h2>
+<div style="display:flex;gap:8px">
+<button class="btn btn-primary" onclick="copyCSS()">Copy CSS</button>
+</div>
+</div>
+<div class="code-block" id="codeOutput"></div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast">Copied to clipboard!</div>
+<footer>CSS Scrollbar Style Generator</footer>
+<style id="previewStyle"></style>
+<script>
+var defaults={width:10,radius:5,thumb:'#e94560',thumbHover:'#ff6b81',track:'#16213e'};
+var els={
+  width:document.getElementById('sbWidth'),
+  radius:document.getElementById('sbRadius'),
+  thumb:document.getElementById('thumbColor'),
+  thumbHover:document.getElementById('thumbHoverColor'),
+  track:document.getElementById('trackColor'),
+  widthVal:document.getElementById('widthVal'),
+  radiusVal:document.getElementById('radiusVal'),
+  thumbHex:document.getElementById('thumbHex'),
+  thumbHoverHex:document.getElementById('thumbHoverHex'),
+  trackHex:document.getElementById('trackHex'),
+  code:document.getElementById('codeOutput'),
+  style:document.getElementById('previewStyle'),
+  toast:document.getElementById('toast')
+};
+function getVals(){
+  return{
+    w:parseInt(els.width.value),
+    r:parseInt(els.radius.value),
+    tc:els.thumb.value,
+    thc:els.thumbHover.value,
+    trc:els.track.value
+  };
+}
+function mapFW(w){return w<=6?'thin':'auto';}
+function generateCSS(){
+  var v=getVals();
+  var fw=mapFW(v.w);
+  var lines=[
+    '/* Webkit browsers (Chrome, Safari, Edge, Opera) */',
+    '::-webkit-scrollbar {',
+    '  width: '+v.w+'px;',
+    '  height: '+v.w+'px;',
+    '}',
+    '',
+    '::-webkit-scrollbar-track {',
+    '  background: '+v.trc+';',
+    '  border-radius: '+v.r+'px;',
+    '}',
+    '',
+    '::-webkit-scrollbar-thumb {',
+    '  background: '+v.tc+';',
+    '  border-radius: '+v.r+'px;',
+    '}',
+    '',
+    '::-webkit-scrollbar-thumb:hover {',
+    '  background: '+v.thc+';',
+    '}',
+    '',
+    '/* Firefox */',
+    '* {',
+    '  scrollbar-width: '+fw+';',
+    '  scrollbar-color: '+v.tc+' '+v.trc+';',
+    '}'
+  ];
+  return lines.join('\n');
+}
+function updatePreview(){
+  var v=getVals();
+  els.widthVal.textContent=v.w+'px';
+  els.radiusVal.textContent=v.r+'px';
+  els.thumbHex.textContent=v.tc;
+  els.thumbHoverHex.textContent=v.thc;
+  els.trackHex.textContent=v.trc;
+  var fw=mapFW(v.w);
+  els.style.textContent='#previewBox::-webkit-scrollbar{width:'+v.w+'px;height:'+v.w+'px}'
+    +'#previewBox::-webkit-scrollbar-track{background:'+v.trc+';border-radius:'+v.r+'px}'
+    +'#previewBox::-webkit-scrollbar-thumb{background:'+v.tc+';border-radius:'+v.r+'px}'
+    +'#previewBox::-webkit-scrollbar-thumb:hover{background:'+v.thc+'}'
+    +'#previewBox{scrollbar-width:'+fw+';scrollbar-color:'+v.tc+' '+v.trc+'}';
+  els.code.textContent=generateCSS();
+}
+function resetAll(){
+  els.width.value=defaults.width;
+  els.radius.value=defaults.radius;
+  els.thumb.value=defaults.thumb;
+  els.thumbHover.value=defaults.thumbHover;
+  els.track.value=defaults.track;
+  updatePreview();
+}
+function copyCSS(){
+  navigator.clipboard.writeText(generateCSS()).then(function(){
+    els.toast.classList.add('show');
+    setTimeout(function(){els.toast.classList.remove('show');},2000);
+  });
+}
+var inputs=document.querySelectorAll('input');
+for(var i=0;i<inputs.length;i++){inputs[i].addEventListener('input',updatePreview);}
+updatePreview();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1100px;margin:30px auto 0;padding:0 20px}
+.pro-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#e94560,#533483);padding:6px 16px;border-radius:20px;font-size:.85rem;font-weight:600;margin-bottom:16px;color:#fff}
+.pro-mock{position:relative;background:#16213e;border-radius:12px;border:1px solid #0f3460;padding:30px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-mock:hover{transform:translateY(-2px)}
+.pro-mock-content{filter:blur(3px);opacity:.5;pointer-events:none}
+.pro-mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pro-mock-card{background:rgba(255,255,255,.04);border-radius:10px;padding:20px;text-align:center}
+.pro-mock-card .pm-icon{font-size:1.8rem;margin-bottom:8px}
+.pro-mock-card h4{font-size:.9rem;color:#eee;margin-bottom:4px}
+.pro-mock-card p{font-size:.78rem;color:#888}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:10px}
+.pro-ov-text{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-ov-sub{font-size:.85rem;color:#aaa;margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.active{display:flex}
+.pro-modal{background:#16213e;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(233,69,96,.2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:#e94560;margin:12px 0}
+.pro-modal .pro-price span{font-size:.9rem;color:#aaa;font-weight:400}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal ul li::before{content:'✓';color:#e94560;font-weight:700;flex-shrink:0}
+.pro-modal .btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:600;cursor:pointer;transition:opacity .2s;text-decoration:none;text-align:center}
+.pro-modal .btn-upgrade:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;cursor:pointer;font-size:.9rem;margin-top:8px;transition:color .2s}
+.pro-modal .btn-later:hover{color:#eee}
+@media(max-width:768px){.pro-mock-grid{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-badge">⚡ PRO Features</div>
+<div class="pro-mock" id="proMock">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-ov-text">Unlock Pro Features</div>
+<div class="pro-ov-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-grid">
+<div class="pro-mock-card"><div class="pm-icon">🎬</div><h4>Animated Scrollbars</h4><p>Smooth color transitions, pulse effects on scroll activity</p></div>
+<div class="pro-mock-card"><div class="pm-icon">🌐</div><h4>Browser Compat Pack</h4><p>Full cross-browser support: Firefox, Safari, Edge fallbacks</p></div>
+<div class="pro-mock-card"><div class="pm-icon">⚛️</div><h4>React Components</h4><p>Drop-in React scrollbar components with props API</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModalBg">
+<div class="pro-modal">
+<h3>Upgrade to Pro</h3>
+<div class="pro-price">$9 <span>one-time</span></div>
+<ul>
+<li>Animated scrollbar effects (color transitions, pulse, glow)</li>
+<li>Full cross-browser compatibility package</li>
+<li>React scrollbar components with props API</li>
+<li>Firefox & Safari specific fallback styles</li>
+<li>Priority support & future updates</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="btn-later" id="proLater">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var mock=document.getElementById('proMock');
+var bg=document.getElementById('proModalBg');
+var later=document.getElementById('proLater');
+mock.addEventListener('click',function(){bg.classList.add('active');});
+later.addEventListener('click',function(){bg.classList.remove('active');});
+bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('active');});
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

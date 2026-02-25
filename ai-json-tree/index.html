@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Visualize JSON data as an interactive tree structure. Expand and collapse nodes, search keys, copy paths, and explore complex JSON objects with ease.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-tree/">
+<title>AI JSON Tree - JSON树形可视化工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column}
+.header{padding:16px 24px;background:#16213e;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.header h1{font-size:20px;color:#e94560;font-weight:700;white-space:nowrap}
+.header h1 span{color:#66d9ef}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:8px 12px 8px 36px;background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;color:#e0e0e0;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:#e94560}
+.search-box::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px}
+.search-info{font-size:12px;color:#888;margin-left:8px;white-space:nowrap}
+.toolbar{padding:12px 24px;background:#16213e;border-bottom:1px solid #0f3460;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{padding:6px 14px;border:1px solid #0f3460;background:#1a1a2e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;white-space:nowrap}
+.btn:hover{background:#0f3460;border-color:#e94560}
+.btn-primary{background:#e94560;border-color:#e94560;color:#fff}
+.btn-primary:hover{background:#c73652}
+.input-area{padding:12px 24px;background:#16213e;border-bottom:1px solid #0f3460}
+.input-area textarea{width:100%;height:120px;background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;color:#e0e0e0;padding:12px;font-size:13px;font-family:inherit;resize:vertical;outline:none;transition:border-color .2s}
+.input-area textarea:focus{border-color:#e94560}
+.error-msg{color:#f92672;font-size:13px;margin-top:6px;display:none}
+.tree-container{flex:1;padding:16px 24px;overflow:auto}
+.tree-node{padding-left:20px;position:relative}
+.tree-node.root{padding-left:0}
+.node-row{display:flex;align-items:flex-start;padding:2px 4px;border-radius:4px;cursor:default;line-height:1.6;gap:4px}
+.node-row:hover{background:rgba(233,69,96,0.08)}
+.node-row.highlight{background:rgba(233,69,96,0.25)}
+.toggle{cursor:pointer;user-select:none;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#888;flex-shrink:0;margin-top:3px;transition:transform .15s}
+.toggle.collapsed{transform:rotate(-90deg)}
+.toggle.leaf{visibility:hidden}
+.node-key{color:#a6e22e}
+.node-colon{color:#888;margin:0 4px}
+.type-string{color:#e6db74}
+.type-number{color:#ae81ff}
+.type-boolean{color:#66d9ef}
+.type-null{color:#f92672;font-style:italic}
+.type-bracket{color:#888}
+.node-count{color:#555;font-size:12px;margin-left:4px}
+.children{overflow:hidden}
+.children.collapsed{display:none}
+.match-hl{background:#e9456055;border-radius:2px;padding:0 1px}
+.stats{padding:8px 24px;background:#16213e;border-top:1px solid #0f3460;font-size:12px;color:#666;display:flex;gap:16px;flex-wrap:wrap}
+.legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.legend span{font-size:12px;display:flex;align-items:center;gap:4px}
+.legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+@media(max-width:600px){.header{padding:12px 16px}.toolbar,.input-area,.tree-container,.stats{padding-left:16px;padding-right:16px}.tree-node{padding-left:14px}}
+.pro-section{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;margin:16px 24px}
+.pro-mock{padding:16px;background:#16213e;border:1px solid #0f3460;border-radius:8px;filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.7}
+.pro-mock-title{font-size:12px;text-transform:uppercase;color:#888;margin-bottom:8px;letter-spacing:.5px;font-weight:600}
+.pro-mock-item{background:rgba(255,255,255,.05);border-radius:4px;padding:6px 10px;margin-bottom:5px;font-size:12px;color:#888}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:8px;z-index:10;transition:background .2s}
+.pro-section:hover .pro-lock-overlay{background:rgba(0,0,0,.55)}
+.pro-lock-icon{font-size:32px;margin-bottom:6px}
+.pro-lock-text{font-size:13px;color:#fff;font-weight:600}
+.pro-lock-sub{font-size:11px;color:#aaa;margin-top:2px}
+#proModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+#proModal.show{display:flex}
+.pro-modal{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.pro-modal h2{font-size:20px;margin-bottom:4px;color:#e94560}
+.pro-modal .pro-price{font-size:32px;font-weight:700;color:#fff;margin:12px 0}
+.pro-modal .pro-features{text-align:left;margin:16px 0;padding:0;list-style:none}
+.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal .pro-features li:last-child{border-bottom:none}
+.pro-modal .pro-features li::before{content:'✓';color:#4ecca3;font-weight:700;font-size:16px}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;text-align:center;transition:opacity .2s}
+.pro-btn-upgrade:hover{opacity:.9}
+.pro-btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;font-size:14px;cursor:pointer;margin-top:8px}
+.pro-btn-later:hover{color:#ccc}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🌳 AI <span>JSON</span> Tree</h1>
+  <div class="search-box"><input type="text" id="searchInput" placeholder="搜索键名或值..." oninput="handleSearch()" aria-label="搜索键名或值"></div>
+  <span class="search-info" id="searchInfo"></span>
+</div>
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="parseJSON()">解析 JSON</button>
+  <button class="btn" onclick="formatJSON()">格式化</button>
+  <button class="btn" onclick="clearAll()">清空</button>
+  <button class="btn" onclick="loadSample()">示例 JSON</button>
+  <button class="btn" onclick="expandAll()">全部展开</button>
+  <button class="btn" onclick="collapseAll()">全部折叠</button>
+  <button class="btn" onclick="copyJSON()">复制 JSON</button>
+</div>
+<div class="input-area">
+  <textarea id="jsonInput" placeholder="在此粘贴 JSON 数据，或点击「示例 JSON」快速体验..." spellcheck="false" aria-label="JSON输入"></textarea>
+  <div class="error-msg" id="errorMsg"></div>
+</div>
+<div class="tree-container" id="treeContainer"><div style="color:#555;text-align:center;padding:60px 20px;font-size:15px">粘贴 JSON 数据开始可视化 🌳</div></div>
+<div class="stats" id="stats">
+  <span id="statsText"></span>
+  <div class="legend">
+    <span><i class="dot" style="background:#a6e22e"></i>key</span>
+    <span><i class="dot" style="background:#e6db74"></i>string</span>
+    <span><i class="dot" style="background:#ae81ff"></i>number</span>
+    <span><i class="dot" style="background:#66d9ef"></i>boolean</span>
+    <span><i class="dot" style="background:#f92672"></i>null</span>
+  </div>
+</div>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-mock">
+<div class="pro-mock-title">&#128202; Large File Support</div>
+<div class="pro-mock-item">&#9654; Load JSON files up to 50MB</div>
+<div class="pro-mock-item">&#9654; Virtual scrolling for 100K+ nodes</div>
+<div class="pro-mock-title" style="margin-top:10px">&#128269; Search &amp; Replace</div>
+<div class="pro-mock-item">&#9654; Find &amp; replace keys or values</div>
+<div class="pro-mock-item">&#9654; Regex pattern matching</div>
+<div class="pro-mock-title" style="margin-top:10px">&#128247; Export as Image</div>
+<div class="pro-mock-item">&#9654; Export tree as PNG / SVG</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">&#128274;</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+<script>
+let jsonData=null;
+const $=id=>document.getElementById(id);
+const ta=$('jsonInput');
+ta.addEventListener('paste',()=>setTimeout(parseJSON,50));
+ta.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')parseJSON()});
+
+const SAMPLE=JSON.stringify({
+  "name":"AI JSON Tree",
+  "version":"1.0.0",
+  "description":"JSON树形可视化工具",
+  "features":["树形展示","展开折叠","搜索过滤","类型颜色标记"],
+  "config":{"theme":"dark","primaryColor":"#1a1a2e","supportedTypes":{"string":true,"number":true,"boolean":true,"null":true}},
+  "stats":{"stars":128,"forks":32,"issues":5,"license":"MIT"},
+  "contributors":[
+    {"name":"Alice","role":"developer","active":true},
+    {"name":"Bob","role":"designer","active":false},
+    {"name":"Charlie","role":"tester","active":true}
+  ],
+  "metadata":{"created":"2024-01-01","updated":"2024-12-01","deprecated":null,"tags":["json","tree","visualization","tool"]}
+},null,2);
+
+function parseJSON(){
+  const raw=ta.value.trim(),err=$('errorMsg'),tc=$('treeContainer');
+  if(!raw){err.style.display='none';tc.innerHTML='<div style="color:#555;text-align:center;padding:60px 20px;font-size:15px">粘贴 JSON 数据开始可视化 🌳</div>';$('statsText').textContent='';return}
+  try{
+    jsonData=JSON.parse(raw);
+    err.style.display='none';
+    renderTree();
+  }catch(e){
+    err.textContent='❌ JSON 格式错误: '+e.message;
+    err.style.display='block';
+    tc.innerHTML='';$('statsText').textContent='';
+  }
+}
+
+function formatJSON(){
+  const raw=ta.value.trim();
+  if(!raw)return;
+  try{ta.value=JSON.stringify(JSON.parse(raw),null,2)}catch(e){$('errorMsg').textContent='❌ 无法格式化: '+e.message;$('errorMsg').style.display='block'}
+}
+
+function clearAll(){
+  ta.value='';jsonData=null;$('errorMsg').style.display='none';
+  $('treeContainer').innerHTML='<div style="color:#555;text-align:center;padding:60px 20px;font-size:15px">粘贴 JSON 数据开始可视化 🌳</div>';
+  $('statsText').textContent='';$('searchInput').value='';$('searchInfo').textContent='';
+}
+
+function loadSample(){ta.value=SAMPLE;parseJSON()}
+
+function copyJSON(){
+  if(ta.value.trim()){navigator.clipboard.writeText(ta.value).then(()=>{}).catch(()=>{})}
+}
+
+function countNodes(v){
+  let c=1;
+  if(v&&typeof v==='object'){for(const k in v)c+=countNodes(v[k])}
+  return c;
+}
+
+function getType(v){
+  if(v===null)return'null';
+  if(Array.isArray(v))return'array';
+  return typeof v;
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function hlText(text,q){
+  if(!q)return esc(text);
+  const s=esc(text),ql=esc(q).toLowerCase();
+  let r='',i=0,sl=s.toLowerCase();
+  while(i<s.length){
+    const idx=sl.indexOf(ql,i);
+    if(idx===-1){r+=s.slice(i);break}
+    r+=s.slice(i,idx)+'<span class="match-hl">'+s.slice(idx,idx+ql.length)+'</span>';
+    i=idx+ql.length;
+  }
+  return r;
+}
+
+function renderTree(){
+  if(jsonData===null)return;
+  const stats={object:0,array:0,string:0,number:0,boolean:0,null:0};
+  const q=$('searchInput').value.trim().toLowerCase();
+  const html=buildNode(jsonData,null,true,stats,q,0);
+  $('treeContainer').innerHTML=html;
+  const total=stats.object+stats.array+stats.string+stats.number+stats.boolean+stats.null;
+  $('statsText').textContent='共 '+total+' 个节点 | object:'+stats.object+' array:'+stats.array+' string:'+stats.string+' number:'+stats.number+' boolean:'+stats.boolean+' null:'+stats.null;
+  if(q){
+    const matches=document.querySelectorAll('.match-hl');
+    $('searchInfo').textContent='找到 '+matches.length+' 处匹配';
+  }else{$('searchInfo').textContent=''}
+}
+
+function buildNode(val,key,isRoot,stats,q,depth){
+  const type=getType(val);
+  stats[type]=(stats[type]||0)+1;
+  const isObj=type==='object'||type==='array';
+  const hasMatch=q&&((key!==null&&String(key).toLowerCase().includes(q))||(!isObj&&String(val).toLowerCase().includes(q)));
+  let h='<div class="tree-node'+(isRoot?' root':'')+'">';
+  h+='<div class="node-row'+(hasMatch?' highlight':'')+'">';
+
+  if(isObj){
+    const keys=Object.keys(val);
+    const len=keys.length;
+    const bracket=type==='array'?'[...]':'{...}';
+    const collapsed=depth>2;
+    h+='<span class="toggle'+(collapsed?' collapsed':'')+'" onclick="toggleNode(this)">▼</span>';
+    if(key!==null)h+='<span class="node-key">'+hlText(String(key),q)+'</span><span class="node-colon">:</span>';
+    h+='<span class="type-bracket">'+(type==='array'?'[':'{')+' </span>';
+    h+='<span class="node-count">'+len+(type==='array'?' items':' keys')+'</span>';
+    h+='</div>';
+    h+='<div class="children'+(collapsed?' collapsed':'')+'">';
+    for(let i=0;i<len;i++){
+      const k=type==='array'?i:keys[i];
+      h+=buildNode(val[k],k,false,stats,q,depth+1);
+    }
+    h+='<div class="node-row"><span class="toggle leaf"></span><span class="type-bracket">'+(type==='array'?']':'}')+'</span></div>';
+    h+='</div>';
+  }else{
+    h+='<span class="toggle leaf"></span>';
+    if(key!==null)h+='<span class="node-key">'+hlText(String(key),q)+'</span><span class="node-colon">:</span>';
+    if(type==='string')h+='<span class="type-string">"'+hlText(val,q)+'"</span>';
+    else if(type==='number')h+='<span class="type-number">'+hlText(String(val),q)+'</span>';
+    else if(type==='boolean')h+='<span class="type-boolean">'+hlText(String(val),q)+'</span>';
+    else if(type==='null')h+='<span class="type-null">null</span>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function toggleNode(el){
+  el.classList.toggle('collapsed');
+  const children=el.parentElement.nextElementSibling;
+  if(children&&children.classList.contains('children'))children.classList.toggle('collapsed');
+}
+
+function expandAll(){
+  document.querySelectorAll('.toggle.collapsed').forEach(t=>{t.classList.remove('collapsed')});
+  document.querySelectorAll('.children.collapsed').forEach(c=>{c.classList.remove('collapsed')});
+}
+
+function collapseAll(){
+  document.querySelectorAll('.toggle:not(.leaf)').forEach(t=>{t.classList.add('collapsed')});
+  document.querySelectorAll('.children').forEach(c=>{c.classList.add('collapsed')});
+}
+
+function handleSearch(){renderTree()}
+</script>
+<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>&#128640; JSON Tree Pro</h2>
+<div class="pro-price">$9</div>
+<ul class="pro-features">
+<li>Large File Support — handle JSON up to 50MB</li>
+<li>Search &amp; Replace — find and replace keys or values with regex</li>
+<li>Export as Image — save tree view as PNG or SVG</li>
+<li>Priority support &amp; all future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+<button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

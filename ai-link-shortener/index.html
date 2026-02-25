@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered link shortener tool. Create short URLs with custom aliases, QR codes, and click tracking. Generate clean shareable links for social media posts.">
+<link rel="canonical" href="https://lifa-su.com/ai-link-shortener/">
+<title>AI Link Shortener - 智能短链接生成器</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#16213e;--text:#e8e8e8;--text2:#a0a0b8;--border:#2a2a4a;--danger:#f87171;--radius:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:800px;margin:0 auto;padding:20px 16px 80px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+header p{color:var(--text2);font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.card h2{font-size:1.1rem;margin-bottom:16px}
+textarea{width:100%;min-height:120px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-size:1rem;resize:vertical;outline:none;transition:border .2s}
+textarea:focus{border-color:#667eea}
+textarea::placeholder{color:var(--text2)}
+.hint{font-size:.8rem;color:var(--text2);margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 28px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;color:#fff}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);box-shadow:0 4px 15px rgba(102,126,234,.3)}
+.btn-primary:hover{background:linear-gradient(135deg,#764ba2,#667eea);transform:translateY(-1px)}
+.btn-sm{padding:6px 14px;font-size:.8rem;border-radius:8px}
+.btn-copy{background:#334155}.btn-copy:hover{background:#475569}
+.btn-del{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:5px 12px}
+.btn-del:hover{background:var(--danger);color:#fff}
+.btn-dl{background:#334155}.btn-dl:hover{background:#475569}
+.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.results{margin-top:20px}
+.r-item{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.r-item .orig{font-size:.8rem;color:var(--text2);word-break:break-all;margin-bottom:6px}
+.r-item .short{font-size:1.05rem;color:#667eea;font-weight:600;word-break:break-all}
+.r-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.qr-box{margin-top:12px;text-align:center}
+.qr-box img{border-radius:8px;background:#fff;padding:8px}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#334155;color:#fff;padding:10px 24px;border-radius:10px;font-size:.9rem;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.h-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.h-info{flex:1;min-width:0}
+.h-info .short{color:#667eea;font-weight:600;font-size:.95rem;word-break:break-all}
+.h-info .orig{color:var(--text2);font-size:.78rem;word-break:break-all;margin-top:2px}
+.h-info .time{color:var(--text2);font-size:.72rem;margin-top:4px}
+.h-actions{display:flex;gap:6px;flex-shrink:0}
+.empty{text-align:center;color:var(--text2);padding:30px 0}
+.badge{display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle}
+#clearAll{background:transparent;color:var(--danger);border:1px solid var(--danger);margin-left:auto}
+#clearAll:hover{background:var(--danger);color:#fff}
+.hdr{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr h2{margin-bottom:0}
+@media(max-width:600px){header h1{font-size:1.5rem}.container{padding:14px 10px 80px}.card{padding:16px}.btn{padding:10px 20px;font-size:.9rem}.h-item{flex-direction:column}.h-actions{align-self:flex-end}}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>⚡ AI Link Shortener</h1><p>智能短链接生成器 · 批量生成 · QR码 · 历史记录</p></header>
+<div class="card">
+<h2>🔗 输入链接</h2>
+<textarea id="urlInput" placeholder="输入URL，每行一个&#10;https://www.example.com/very/long/path&#10;https://another-site.com/page?id=123" spellcheck="false"></textarea>
+<p class="hint">支持批量：每行一个URL，一次生成多个短链接</p>
+<div class="btn-row"><button class="btn btn-primary" onclick="gen()">⚡ 生成短链接</button></div>
+</div>
+<div id="resCard" class="card" style="display:none"><h2>✨ 生成结果</h2><div id="results" class="results"></div></div>
+<div class="card">
+<div class="hdr"><h2>📋 历史记录 <span id="hCount" class="badge">0</span></h2><button id="clearAll" class="btn btn-sm btn-del" onclick="clearHist()" style="display:none">清空全部</button></div>
+<div id="hList"></div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const D='https://short.link/',K='ai_links_hist';
+function hash(u){let h=0x811c9dc5;for(let i=0;i<u.length;i++){h^=u.charCodeAt(i);h=Math.imul(h,0x01000193)}return(h>>>0).toString(36)}
+function mkShort(u){const t=Date.now().toString(36).slice(-3);return D+hash(u)+t}
+function getHist(){try{return JSON.parse(localStorage.getItem(K))||[]}catch(e){return[]}}
+function saveHist(h){localStorage.setItem(K,JSON.stringify(h))}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function copy(t){navigator.clipboard.writeText(t).then(()=>toast('已复制到剪贴板 ✓')).catch(()=>toast('复制失败'))}
+function mkQR(text){const q=qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(4,8)}
+function dlQR(url,name){const a=document.createElement('a');a.href=url;a.download=name+'.png';a.click()}
+function gen(){
+  const raw=document.getElementById('urlInput').value.trim();
+  if(!raw){toast('请输入至少一个URL');return}
+  const urls=raw.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+  const res=document.getElementById('results');
+  const card=document.getElementById('resCard');
+  res.innerHTML='';card.style.display='block';
+  const hist=getHist();
+  urls.forEach((u,i)=>{
+    let url=u;
+    if(!/^https?:\/\//i.test(url))url='https://'+url;
+    const short=mkShort(url);
+    const qrImg=mkQR(url);
+    hist.unshift({orig:url,short:short,qr:qrImg,time:Date.now()});
+    const d=document.createElement('div');d.className='r-item';
+    d.innerHTML='<div class="orig">'+esc(url)+'</div>'
+      +'<div class="short">'+esc(short)+'</div>'
+      +'<div class="r-actions">'
+      +'<button class="btn btn-sm btn-copy" onclick="copy(\''+esc2(short)+'\')">📋 复制</button>'
+      +'<button class="btn btn-sm btn-dl" onclick="dlQR(\''+esc2(qrImg)+'\',\'qr_'+i+'\')">💾 下载QR</button>'
+      +'</div>'
+      +'<div class="qr-box"><img src="'+qrImg+'" alt="QR Code" width="140" height="140"></div>';
+    res.appendChild(d);
+  });
+  saveHist(hist);renderHist();
+  toast('已生成 '+urls.length+' 个短链接 ✓');
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function esc2(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+function delItem(idx){const h=getHist();h.splice(idx,1);saveHist(h);renderHist();toast('已删除')}
+function clearHist(){if(confirm('确定清空所有历史记录？')){localStorage.removeItem(K);renderHist();toast('已清空')}}
+function renderHist(){
+  const h=getHist(),el=document.getElementById('hList');
+  document.getElementById('hCount').textContent=h.length;
+  const cb=document.getElementById('clearAll');
+  cb.style.display=h.length?'inline-flex':'none';
+  if(!h.length){el.innerHTML='<div class="empty">暂无历史记录</div>';return}
+  el.innerHTML=h.map((item,i)=>{
+    const d=new Date(item.time);
+    const ts=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    return '<div class="h-item"><div class="h-info">'
+      +'<div class="short">'+esc(item.short)+'</div>'
+      +'<div class="orig">'+esc(item.orig)+'</div>'
+      +'<div class="time">'+ts+'</div></div>'
+      +'<div class="h-actions">'
+      +'<button class="btn btn-sm btn-copy" onclick="copy(\''+esc2(item.short)+'\')">📋</button>'
+      +'<button class="btn btn-sm btn-del" onclick="delItem('+i+')">🗑️</button>'
+      +'</div></div>';
+  }).join('');
+}
+renderHist();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="133652" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

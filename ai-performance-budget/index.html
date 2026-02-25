@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculate web performance budgets for your site. Set size limits for JavaScript, CSS, images, and fonts. Track bundle sizes against your performance goals.">
+<link rel="canonical" href="https://lifa-su.com/ai-performance-budget/">
+<title>AI Performance Budget Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text-dim:#aab;--success:#00d2a0;--warn:#f5a623;--danger:#e94560;--border:#2a2a4a}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text-dim);margin-top:6px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card h2{font-size:1.1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.resource-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.resource-row select,.resource-row input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:.9rem}
+.resource-row select{width:120px}.resource-row input[type="text"]{flex:1;min-width:80px}
+.resource-row input[type="number"]{width:90px}.unit-select{width:65px!important}
+button{cursor:pointer;border:none;border-radius:8px;padding:8px 16px;font-size:.85rem;transition:all .2s}
+.btn-add{background:var(--card);color:var(--text);border:1px dashed var(--border);width:100%;padding:10px;margin-top:4px}
+.btn-add:hover{border-color:var(--accent);color:var(--accent)}
+.btn-remove{background:transparent;color:var(--danger);font-size:1.2rem;padding:4px 8px;line-height:1}
+.btn-calc{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1rem;padding:12px 32px;margin-top:16px;width:100%;font-weight:600}
+.btn-calc:hover{opacity:.9;transform:translateY(-1px)}
+.budget-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.budget-row label{width:130px;font-size:.9rem;color:var(--text-dim);flex-shrink:0}
+.budget-row input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:.9rem}
+.results{grid-column:1/-1}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:var(--bg);border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border)}
+.stat-card .value{font-size:1.8rem;font-weight:700;margin:4px 0}
+.stat-card .label{font-size:.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px}
+.stat-card.over .value{color:var(--danger)}.stat-card.under .value{color:var(--success)}
+.net-row{margin-bottom:14px}.net-label{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:4px}
+.net-label .time{font-weight:600}
+.bar-bg{background:var(--bg);border-radius:6px;height:24px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:6px;transition:width .8s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:.75rem;font-weight:600;min-width:30px}
+.bar-3g{background:linear-gradient(90deg,#e94560,#ff6b6b)}
+.bar-4g{background:linear-gradient(90deg,#f5a623,#ffd93d)}
+.bar-wifi{background:linear-gradient(90deg,#00d2a0,#6bffb8)}
+.breakdown-table{width:100%;border-collapse:collapse;margin:16px 0}
+.breakdown-table th,.breakdown-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);font-size:.9rem}
+.breakdown-table th{color:var(--text-dim);font-weight:500;font-size:.8rem;text-transform:uppercase}
+.type-badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.8rem;font-weight:500}
+.type-js{background:rgba(241,196,15,.15);color:#f1c40f}.type-css{background:rgba(52,152,219,.15);color:#3498db}
+.type-image{background:rgba(46,204,113,.15);color:#2ecc71}.type-font{background:rgba(155,89,182,.15);color:#9b59b6}
+.type-other{background:rgba(170,170,187,.15);color:#aab}
+.advice-list{list-style:none;padding:0}
+.advice-list li{padding:10px 14px;margin-bottom:8px;background:var(--bg);border-radius:8px;border-left:3px solid var(--warn);font-size:.9rem;line-height:1.5}
+.advice-list li.good{border-left-color:var(--success)}.advice-list li.bad{border-left-color:var(--danger)}
+.budget-bar-wrap{margin-bottom:12px}.budget-bar-label{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:3px}
+.budget-bar-outer{background:var(--bg);border-radius:6px;height:20px;overflow:visible;position:relative;border:1px solid var(--border)}
+.budget-bar-inner{height:100%;border-radius:6px;transition:width .6s}
+.budget-bar-limit{position:absolute;top:-2px;height:calc(100% + 4px);width:2px;background:#fff;z-index:2}
+.pie-container{display:flex;justify-content:center;align-items:center;gap:30px;flex-wrap:wrap;margin:16px 0}
+.pie-svg{width:180px;height:180px}.pie-legend{display:flex;flex-direction:column;gap:6px}
+.pie-legend-item{display:flex;align-items:center;gap:8px;font-size:.85rem}
+.pie-legend-color{width:12px;height:12px;border-radius:3px}
+.hidden{display:none}
+.section-title{font-size:1rem;font-weight:600;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+footer{text-align:center;padding:30px 0 10px;color:var(--text-dim);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>&#9889; AI Performance Budget Calculator</h1><p>分析页面资源，预估加载时间，获取智能优化建议</p></header>
+<div class="grid">
+<div class="card">
+<h2><span>&#128230;</span> 添加页面资源</h2>
+<div id="resources"></div>
+<button class="btn-add" onclick="addResource()">+ 添加资源</button>
+</div>
+<div class="card">
+<h2><span>&#127919;</span> 性能预算设定</h2>
+<div class="budget-row"><label>总大小上限</label><input type="number" id="budgetSize" value="500" min="0"> <span style="color:var(--text-dim);font-size:.9rem">KB</span></div>
+<div class="budget-row"><label>JS 上限</label><input type="number" id="budgetJS" value="200" min="0"> <span style="color:var(--text-dim);font-size:.9rem">KB</span></div>
+<div class="budget-row"><label>CSS 上限</label><input type="number" id="budgetCSS" value="100" min="0"> <span style="color:var(--text-dim);font-size:.9rem">KB</span></div>
+<div class="budget-row"><label>图片上限</label><input type="number" id="budgetImage" value="300" min="0"> <span style="color:var(--text-dim);font-size:.9rem">KB</span></div>
+<div class="budget-row"><label>字体上限</label><input type="number" id="budgetFont" value="100" min="0"> <span style="color:var(--text-dim);font-size:.9rem">KB</span></div>
+</div>
+</div>
+<button class="btn-calc" onclick="calculate()">&#128640; 分析性能预算</button>
+<div id="resultsSection" class="hidden">
+<div class="card results" style="margin-top:20px">
+<h2><span>&#128202;</span> 分析结果</h2>
+<div id="summaryGrid" class="summary-grid"></div>
+<div class="section-title">&#127760; 网络加载时间模拟</div>
+<div id="networkBars"></div>
+<div class="section-title">&#128203; 资源明细</div>
+<table class="breakdown-table"><thead><tr><th>名称</th><th>类型</th><th>大小</th><th>占比</th></tr></thead><tbody id="breakdownBody"></tbody></table>
+<div class="section-title">&#128200; 资源分布</div>
+<div id="pieChart" class="pie-container"></div>
+<div class="section-title">&#127919; 预算对比</div>
+<div id="budgetCompare"></div>
+<div class="section-title">&#128161; 优化建议</div>
+<ul id="adviceList" class="advice-list"></ul>
+</div>
+</div>
+</div>
+<footer>AI Performance Budget Calculator &copy; 2025</footer>
+</div>
+<script>
+let resourceId=0;
+function addResource(type,name,size,unit){
+  type=type||'js';name=name||'';size=size||'';unit=unit||'KB';
+  const row=document.createElement('div');row.className='resource-row';row.dataset.id=resourceId++;
+  row.innerHTML=`<select onchange="updateIcon(this)"><option value="js" ${type==='js'?'selected':''}>📜 JavaScript</option><option value="css" ${type==='css'?'selected':''}>🎨 CSS</option><option value="image" ${type==='image'?'selected':''}>🖼️ 图片</option><option value="font" ${type==='font'?'selected':''}>🔤 字体</option><option value="other" ${type==='other'?'selected':''}>📦 其他</option></select><input type="text" placeholder="资源名称" value="${name}"><input type="number" placeholder="大小" min="0" step="0.1" value="${size}"><select class="unit-select"><option value="KB" ${unit==='KB'?'selected':''}>KB</option><option value="MB" ${unit==='MB'?'selected':''}>MB</option></select><button class="btn-remove" onclick="this.parentElement.remove()">&times;</button>`;
+  document.getElementById('resourceList').appendChild(row);
+}
+function getResources(){
+  const rows=document.querySelectorAll('.resource-row');const res=[];
+  rows.forEach(r=>{
+    const sel=r.querySelectorAll('select');const inp=r.querySelectorAll('input');
+    const type=sel[0].value;const name=inp[0].value||sel[0].options[sel[0].selectedIndex].text;
+    let size=parseFloat(inp[1].value)||0;const unit=sel[1].value;
+    if(unit==='MB')size*=1024;
+    if(size>0)res.push({type,name,sizeKB:size});
+  });return res;
+}
+function formatSize(kb){return kb>=1024?(kb/1024).toFixed(2)+' MB':kb.toFixed(1)+' KB';}
+function calcLoadTime(kb,mbps){return(kb*8)/(mbps*1024);}
+function formatTime(s){return s>=60?(s/60).toFixed(1)+' min':s>=1?s.toFixed(2)+' s':(s*1000).toFixed(0)+' ms';}
+const COLORS={js:'#f1c40f',css:'#3498db',image:'#2ecc71',font:'#9b59b6',other:'#aab'};
+const LABELS={js:'JavaScript',css:'CSS',image:'图片',font:'字体',other:'其他'};
+function calculate(){
+  const resources=getResources();
+  if(resources.length===0){alert('请至少添加一个资源');return;}
+  const totalKB=resources.reduce((s,r)=>s+r.sizeKB,0);
+  const networks=[{name:'3G (1.6 Mbps)',mbps:1.6,cls:'bar-3g'},{name:'4G (20 Mbps)',mbps:20,cls:'bar-4g'},{name:'WiFi (50 Mbps)',mbps:50,cls:'bar-wifi'}];
+  const budgetTotal=parseFloat(document.getElementById('budgetTotal').value)||500;
+  const budgetJS=parseFloat(document.getElementById('budgetJS').value)||200;
+  const budgetCSS=parseFloat(document.getElementById('budgetCSS').value)||100;
+  const budgetImg=parseFloat(document.getElementById('budgetImg').value)||300;
+  const budgetFont=parseFloat(document.getElementById('budgetFont').value)||100;
+  // Summary
+  const numRes=resources.length;
+  const overBudget=totalKB>budgetTotal;
+  let sg=document.getElementById('summaryGrid');
+  sg.innerHTML=`<div class="stat-card ${overBudget?'over':'under'}"><div class="value">${formatSize(totalKB)}</div><div class="label">总大小</div></div><div class="stat-card"><div class="value">${numRes}</div><div class="label">资源数量</div></div><div class="stat-card"><div class="value">${formatTime(calcLoadTime(totalKB,1.6))}</div><div class="label">3G 加载</div></div><div class="stat-card ${overBudget?'over':'under'}"><div class="value">${overBudget?'超出':'达标'}</div><div class="label">预算状态</div></div>`;
+  // Network bars
+  let nb=document.getElementById('networkBars');nb.innerHTML='';
+  const maxTime=calcLoadTime(totalKB,1.6);
+  networks.forEach(n=>{
+    const t=calcLoadTime(totalKB,n.mbps);const pct=Math.min((t/maxTime)*100,100);
+    nb.innerHTML+=`<div class="net-row"><div class="net-label"><span>${n.name}</span><span class="time">${formatTime(t)}</span></div><div class="bar-bg"><div class="bar-fill ${n.cls}" style="width:${pct}%"></div></div></div>`;
+  });
+  // Breakdown table
+  let bb=document.getElementById('breakdownBody');bb.innerHTML='';
+  resources.sort((a,b)=>b.sizeKB-a.sizeKB);
+  resources.forEach(r=>{
+    const pct=((r.sizeKB/totalKB)*100).toFixed(1);
+    bb.innerHTML+=`<tr><td>${r.name}</td><td><span class="type-badge type-${r.type}">${LABELS[r.type]}</span></td><td>${formatSize(r.sizeKB)}</td><td>${pct}%</td></tr>`;
+  });
+  // Pie chart
+  const byType={};resources.forEach(r=>{byType[r.type]=(byType[r.type]||0)+r.sizeKB;});
+  let pc=document.getElementById('pieChart');
+  let slices='',legendHtml='',startAngle=0;
+  const entries=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  entries.forEach(([type,kb])=>{
+    const pct=kb/totalKB;const angle=pct*360;const endAngle=startAngle+angle;
+    const x1=90+80*Math.cos((startAngle-90)*Math.PI/180);
+    const y1=90+80*Math.sin((startAngle-90)*Math.PI/180);
+    const x2=90+80*Math.cos((endAngle-90)*Math.PI/180);
+    const y2=90+80*Math.sin((endAngle-90)*Math.PI/180);
+    const large=angle>180?1:0;
+    if(pct>=0.999){slices+=`<circle cx="90" cy="90" r="80" fill="${COLORS[type]}"/>`;
+    }else{slices+=`<path d="M90,90 L${x1},${y1} A80,80 0 ${large},1 ${x2},${y2} Z" fill="${COLORS[type]}"/>`;}
+    legendHtml+=`<div class="pie-legend-item"><div class="pie-legend-color" style="background:${COLORS[type]}"></div>${LABELS[type]}: ${formatSize(kb)} (${(pct*100).toFixed(1)}%)</div>`;
+    startAngle=endAngle;
+  });
+  pc.innerHTML=`<svg class="pie-svg" viewBox="0 0 180 180">${slices}</svg><div class="pie-legend">${legendHtml}</div>`;
+  // Budget compare
+  const budgets=[{label:'总计',actual:totalKB,limit:budgetTotal},{label:'JavaScript',actual:byType.js||0,limit:budgetJS},{label:'CSS',actual:byType.css||0,limit:budgetCSS},{label:'图片',actual:byType.image||0,limit:budgetImg},{label:'字体',actual:byType.font||0,limit:budgetFont}];
+  let bc=document.getElementById('budgetCompare');bc.innerHTML='';
+  budgets.forEach(b=>{
+    const pct=Math.min((b.actual/b.limit)*100,150);const over=b.actual>b.limit;
+    const color=over?'var(--danger)':'var(--success)';
+    const limitPct=Math.min(100,(b.limit/Math.max(b.actual,b.limit))*100);
+    bc.innerHTML+=`<div class="budget-bar-wrap"><div class="budget-bar-label"><span>${b.label}: ${formatSize(b.actual)}</span><span style="color:${color}">${over?'超出 '+formatSize(b.actual-b.limit):'剩余 '+formatSize(b.limit-b.actual)}</span></div><div class="budget-bar-outer"><div class="budget-bar-inner" style="width:${Math.min(pct,100)}%;background:${color}"></div><div class="budget-bar-limit" style="left:${limitPct}%" title="预算: ${formatSize(b.limit)}"></div></div></div>`;
+  });
+  // Advice
+  let al=document.getElementById('adviceList');al.innerHTML='';
+  const advice=[];
+  if(byType.js>200)advice.push({c:'bad',t:'⚠️ JavaScript 总计 '+formatSize(byType.js)+'，建议代码分割、Tree Shaking、延迟加载非关键脚本'});
+  else if(byType.js)advice.push({c:'good',t:'✅ JavaScript 大小合理 ('+formatSize(byType.js)+')'});
+  if(byType.css>100)advice.push({c:'bad',t:'⚠️ CSS 总计 '+formatSize(byType.css)+'，建议移除未使用样式、使用 PurgeCSS、内联关键 CSS'});
+  else if(byType.css)advice.push({c:'good',t:'✅ CSS 大小合理 ('+formatSize(byType.css)+')'});
+  if(byType.image>300)advice.push({c:'bad',t:'⚠️ 图片总计 '+formatSize(byType.image)+'，建议使用 WebP/AVIF 格式、懒加载、响应式图片'});
+  else if(byType.image)advice.push({c:'good',t:'✅ 图片大小合理 ('+formatSize(byType.image)+')'});
+  if(byType.font>100)advice.push({c:'bad',t:'⚠️ 字体总计 '+formatSize(byType.font)+'，建议使用 font-display:swap、子集化、WOFF2 格式'});
+  else if(byType.font)advice.push({c:'good',t:'✅ 字体大小合理 ('+formatSize(byType.font)+')'});
+  resources.forEach(r=>{if(r.sizeKB>500)advice.push({c:'bad',t:'⚠️ '+r.name+' ('+formatSize(r.sizeKB)+') 单文件过大，考虑拆分或压缩'});});
+  if(totalKB>1024)advice.push({c:'bad',t:'⚠️ 页面总大小超过 1MB，首次加载体验可能较差，建议优化到 500KB 以内'});
+  if(totalKB<=500)advice.push({c:'good',t:'✅ 页面总大小控制在 500KB 以内，加载性能优秀'});
+  const t3g=calcLoadTime(totalKB,1.6);
+  if(t3g>5)advice.push({c:'bad',t:'⚠️ 3G 网络加载时间 '+formatTime(t3g)+'，移动端用户体验差，建议大幅精简资源'});
+  if(numRes>15)advice.push({c:'bad',t:'⚠️ 资源请求数 '+numRes+' 个，建议合并文件减少 HTTP 请求'});
+  advice.forEach(a=>{al.innerHTML+=`<li class="${a.c}">${a.t}</li>`;});
+  document.getElementById('resultsSection').classList.remove('hidden');
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+}
+// Init with sample resources
+addResource('js','react.min.js',42,'KB');
+addResource('js','app.bundle.js',185,'KB');
+addResource('css','styles.css',35,'KB');
+addResource('image','hero-banner.webp',120,'KB');
+addResource('font','inter-var.woff2',95,'KB');
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

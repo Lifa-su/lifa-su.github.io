@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculate CSS specificity scores instantly. Paste any CSS selector to see its specificity weight. Learn how browsers resolve conflicting style declarations.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-specificity/">
+<title>CSS Specificity Calculator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--bd:#2a2a4e;--gn:#00d2a0;--yl:#f5c542;--bl:#4fc3f7;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.ct{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--ac2),var(--bl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);margin-top:8px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.cd h2{font-size:1.15rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ir{display:flex;gap:10px}
+.ir input{flex:1;padding:12px 16px;border-radius:var(--r);border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:1rem;font-family:monospace;outline:none;transition:border .2s}
+.ir input:focus{border-color:var(--ac)}
+.btn{padding:12px 20px;border:none;border-radius:var(--r);cursor:pointer;font-size:.95rem;font-weight:600;transition:all .2s}
+.bp{background:var(--ac);color:#fff}.bp:hover{background:#d63050}
+.bs{background:var(--sf2);color:var(--tx)}.bs:hover{background:#1a4a80}
+.rb{margin-top:16px;padding:20px;background:var(--bg);border-radius:var(--r);border:1px solid var(--bd);display:none}
+.rb.show{display:block}
+.sd{display:flex;align-items:center;justify-content:center;gap:6px;margin:16px 0}
+.dg{width:72px;height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r);font-size:2rem;font-weight:700}
+.da{background:rgba(233,69,96,.15);color:var(--ac);border:2px solid var(--ac)}
+.db{background:rgba(245,197,66,.15);color:var(--yl);border:2px solid var(--yl)}
+.dc{background:rgba(79,195,247,.15);color:var(--bl);border:2px solid var(--bl)}
+.dg small{font-size:.65rem;font-weight:400;color:var(--tx2);margin-top:2px}
+.cm{font-size:1.5rem;color:var(--tx2);font-weight:700}
+.st{text-align:center;font-family:monospace;font-size:1.1rem;margin-bottom:8px;word-break:break-all}
+.bd{margin-top:12px;font-size:.85rem;color:var(--tx2);text-align:center}
+.cl{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ci{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg);border-radius:var(--r);border:1px solid var(--bd)}
+.ci:first-child{border-color:var(--gn)}
+.cr{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;background:var(--sf2);color:var(--tx2);flex-shrink:0}
+.ci:first-child .cr{background:var(--gn);color:#000}
+.cs{flex:1;font-family:monospace;font-size:.95rem;word-break:break-all}
+.cp{display:flex;gap:4px;flex-shrink:0}
+.cp span{padding:3px 8px;border-radius:4px;font-size:.8rem;font-weight:600;font-family:monospace}
+.cp .xa{background:rgba(233,69,96,.15);color:var(--ac)}
+.cp .xb{background:rgba(245,197,66,.15);color:var(--yl)}
+.cp .xc{background:rgba(79,195,247,.15);color:var(--bl)}
+.cx{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:1.1rem;padding:4px;opacity:.5}
+.cx:hover{opacity:1;color:var(--ac)}
+.ca{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.es{text-align:center;color:var(--tx2);padding:20px;font-size:.9rem}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd)}
+th{color:var(--tx2);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+td{font-size:.9rem}
+td:first-child{font-family:monospace;color:var(--bl)}
+td:nth-child(2){color:var(--tx2)}
+.rs{display:inline-flex;gap:3px}
+.rs span{padding:2px 6px;border-radius:3px;font-size:.75rem;font-weight:600;font-family:monospace}
+footer{text-align:center;padding:30px 0;color:var(--tx2);font-size:.8rem}
+@media(max-width:600px){header h1{font-size:1.5rem}.ct{padding:12px}.cd{padding:16px}.ir{flex-direction:column}.dg{width:56px;height:56px;font-size:1.5rem}.ci{flex-wrap:wrap}.cp{width:100%}}
+</style>
+</head>
+<body>
+<div class="ct">
+<header>
+<h1>CSS Specificity Calculator</h1>
+<p>CSS选择器优先级计算器 — 输入选择器，可视化 (a, b, c) 权重</p>
+</header>
+<div class="cd">
+<h2><span>⚡</span> 计算优先级</h2>
+<div class="ir">
+<input type="text" id="si" placeholder="输入CSS选择器，如 #nav .item > a:hover" autofocus>
+<button class="btn bp" onclick="calc()">计算</button>
+</div>
+<div class="rb" id="rb">
+<div class="st" id="rt"></div>
+<div class="sd" id="sd"></div>
+<div class="bd" id="bk"></div>
+</div>
+</div>
+<div class="cd">
+<h2><span>📊</span> 多选择器对比</h2>
+<div class="ir">
+<input type="text" id="ci" placeholder="输入选择器并添加到对比列表">
+<button class="btn bs" onclick="addCmp()">添加</button>
+</div>
+<div id="clist"></div>
+<div class="ca" id="cacts" style="display:none">
+<button class="btn bs" onclick="sortCmp()" style="padding:8px 14px;font-size:.85rem">🔽 按优先级排序</button>
+<button class="btn bs" onclick="clearCmp()" style="padding:8px 14px;font-size:.85rem;border:1px solid var(--ac);color:var(--ac);background:transparent">清空列表</button>
+</div>
+</div>
+<div class="cd">
+<h2><span>📖</span> 常见选择器参考表</h2>
+<div style="overflow-x:auto">
+<table id="reftbl"></table>
+</div>
+</div>
+</div>
+<footer>CSS Specificity Calculator &copy; 2025 — Built for developers</footer>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script>
+const pseudoElements=['::before','::after','::first-line','::first-letter','::marker','::placeholder','::selection','::backdrop','::file-selector-button','::cue','::part','::slotted'];
+const pseudoClasses=[':hover',':focus',':active',':visited',':link',':first-child',':last-child',':nth-child',':nth-last-child',':nth-of-type',':nth-last-of-type',':first-of-type',':last-of-type',':only-child',':only-of-type',':not',':is',':where',':has',':checked',':disabled',':enabled',':required',':optional',':valid',':invalid',':empty',':target',':root',':lang',':focus-within',':focus-visible',':placeholder-shown',':read-only',':read-write',':any-link',':local-link',':default',':indeterminate',':in-range',':out-of-range'];
+
+function parseSpec(sel){
+  sel=sel.trim();
+  if(!sel)return null;
+  let a=0,b=0,c=0;
+  let parts={ids:[],classes:[],elements:[]};
+  let s=sel;
+  // Remove :not() content but parse inside
+  let notRe=/:not\(([^)]+)\)/g;
+  let m;
+  while((m=notRe.exec(s))!==null){
+    let inner=parseSpec(m[1]);
+    if(inner){a+=inner.a;b+=inner.b;c+=inner.c;}
+  }
+  s=s.replace(notRe,'');
+  // :where() contributes 0 specificity
+  s=s.replace(/:where\([^)]*\)/g,'');
+  // :is() and :has() take the most specific argument
+  let isHasRe=/:(is|has)\(([^)]+)\)/g;
+  while((m=isHasRe.exec(s))!==null){
+    let args=m[2].split(',');
+    let best={a:0,b:0,c:0};
+    args.forEach(arg=>{
+      let p=parseSpec(arg.trim());
+      if(p&&(p.a>best.a||(p.a===best.a&&p.b>best.b)||(p.a===best.a&&p.b===best.b&&p.c>best.c)))best=p;
+    });
+    a+=best.a;b+=best.b;c+=best.c;
+  }
+  s=s.replace(isHasRe,'');
+  // Remove attribute selectors, count as class-level
+  let attrRe=/\[[^\]]*\]/g;
+  let attrs=s.match(attrRe);
+  if(attrs){b+=attrs.length;attrs.forEach(x=>parts.classes.push(x));}
+  s=s.replace(attrRe,'');
+  // Pseudo-elements (::)
+  pseudoElements.forEach(pe=>{
+    let re=new RegExp(pe.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    let found=s.match(re);
+    if(found){c+=found.length;found.forEach(()=>parts.elements.push(pe));s=s.replace(re,'');}
+  });
+  // Single-colon pseudo-elements
+  [':before',':after',':first-line',':first-letter'].forEach(pe=>{
+    let re=new RegExp('(?<!:)'+pe.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
+    let found=s.match(re);
+    if(found){c+=found.length;found.forEach(()=>parts.elements.push(pe));s=s.replace(re,'');}
+  });
+  // Pseudo-classes (:)
+  let pcRe=/::?[\w-]+(\([^)]*\))?/g;
+  let pcs=s.match(pcRe);
+  if(pcs){pcs.forEach(pc=>{b++;parts.classes.push(pc);});s=s.replace(pcRe,'');}
+  // IDs
+  let idRe=/#[\w-]+/g;
+  let ids=s.match(idRe);
+  if(ids){a+=ids.length;ids.forEach(x=>parts.ids.push(x));}
+  s=s.replace(idRe,'');
+  // Classes
+  let clsRe=/\.[\w-]+/g;
+  let cls=s.match(clsRe);
+  if(cls){b+=cls.length;cls.forEach(x=>parts.classes.push(x));}
+  s=s.replace(clsRe,'');
+  // Remove combinators and whitespace
+  s=s.replace(/[>+~]/g,' ').trim();
+  // Elements (not * which has 0 specificity)
+  let tokens=s.split(/\s+/).filter(t=>t&&t!=='*');
+  tokens.forEach(t=>{
+    if(/^[a-zA-Z][\w-]*$/.test(t)){c++;parts.elements.push(t);}
+  });
+  return{a,b,c,parts,selector:sel};
+}
+
+function calc(){
+  let v=document.getElementById('si').value;
+  let r=parseSpec(v);
+  let box=document.getElementById('rb');
+  if(!r){box.classList.remove('show');return;}
+  box.classList.add('show');
+  document.getElementById('rt').textContent=r.selector;
+  document.getElementById('sd').innerHTML=
+    '<div class="dg da">'+r.a+'<small>ID</small></div>'+
+    '<div class="cm">,</div>'+
+    '<div class="dg db">'+r.b+'<small>类/属性</small></div>'+
+    '<div class="cm">,</div>'+
+    '<div class="dg dc">'+r.c+'<small>元素</small></div>';
+  let bd=[];
+  if(r.parts.ids.length)bd.push('ID: '+r.parts.ids.join(', '));
+  if(r.parts.classes.length)bd.push('类/属性/伪类: '+r.parts.classes.join(', '));
+  if(r.parts.elements.length)bd.push('元素/伪元素: '+r.parts.elements.join(', '));
+  document.getElementById('bk').textContent=bd.join(' | ')||'无匹配项';
+}
+
+document.getElementById('si').addEventListener('keydown',e=>{if(e.key==='Enter')calc();});
+
+let cmpList=[];
+function addCmp(){
+  let v=document.getElementById('ci').value.trim();
+  if(!v)return;
+  let r=parseSpec(v);
+  if(!r)return;
+  cmpList.push(r);
+  document.getElementById('ci').value='';
+  renderCmp();
+}
+document.getElementById('ci').addEventListener('keydown',e=>{if(e.key==='Enter')addCmp();});
+
+function removeCmp(i){cmpList.splice(i,1);renderCmp();}
+function sortCmp(){
+  cmpList.sort((x,y)=>y.a-x.a||y.b-x.b||y.c-x.c);
+  renderCmp();
+}
+function clearCmp(){cmpList=[];renderCmp();}
+
+function renderCmp(){
+  let el=document.getElementById('clist');
+  let acts=document.getElementById('cacts');
+  if(!cmpList.length){el.innerHTML='<div class="es">添加选择器开始对比</div>';acts.style.display='none';return;}
+  acts.style.display='flex';
+  let h='<div class="cl">';
+  cmpList.forEach((r,i)=>{
+    h+='<div class="ci"><div class="cr">'+(i+1)+'</div>'+
+      '<div class="cs">'+esc(r.selector)+'</div>'+
+      '<div class="cp"><span class="xa">'+r.a+'</span><span class="xb">'+r.b+'</span><span class="xc">'+r.c+'</span></div>'+
+      '<button class="cx" onclick="removeCmp('+i+')" title="移除">&times;</button></div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+function esc(s){let d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+renderCmp();
+
+const refData=[
+  ['*','通配符','0','0','0'],
+  ['div','元素','0','0','1'],
+  ['div p','两个元素','0','0','2'],
+  ['div > p','子选择器 + 元素','0','0','2'],
+  ['.class','类选择器','0','1','0'],
+  ['div.class','元素 + 类','0','1','1'],
+  ['.a.b','两个类','0','2','0'],
+  ['[type="text"]','属性选择器','0','1','0'],
+  [':hover','伪类','0','1','0'],
+  [':nth-child(2)','伪类','0','1','0'],
+  ['::before','伪元素','0','0','1'],
+  ['#id','ID选择器','1','0','0'],
+  ['#id .class','ID + 类','1','1','0'],
+  ['#a #b','两个ID','2','0','0'],
+  ['#id .class div','ID + 类 + 元素','1','1','1'],
+  [':not(.class)','否定伪类','0','1','0'],
+  [':is(.a, #b)','取最高参数','1','0','0'],
+  [':where(.a, #b)','零优先级','0','0','0'],
+];
+let tbl=document.getElementById('reftbl');
+let th='<thead><tr><th>选择器</th><th>说明</th><th>优先级 (a,b,c)</th></tr></thead><tbody>';
+refData.forEach(r=>{
+  th+='<tr><td>'+esc(r[0])+'</td><td>'+r[1]+'</td><td><div class="rs">'+
+    '<span style="background:rgba(233,69,96,.15);color:var(--ac)">'+r[2]+'</span>'+
+    '<span style="background:rgba(245,197,66,.15);color:var(--yl)">'+r[3]+'</span>'+
+    '<span style="background:rgba(79,195,247,.15);color:var(--bl)">'+r[4]+'</span>'+
+    '</div></td></tr>';
+});
+th+='</tbody>';
+tbl.innerHTML=th;
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered SVG editor for creating and editing vector graphics in the browser. Draw shapes, edit paths, transform elements, and export optimized SVG code.">
+<link rel="canonical" href="https://lifa-su.com/ai-svg-editor/">
+<title>AI SVG Editor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--text:#eee;--text2:#aaa;--border:#2a2a4a;--panel:#1e1e3a}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+header{background:var(--bg2);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);height:48px;flex-shrink:0}
+header h1{font-size:16px;font-weight:600;color:var(--accent)}
+header .actions{display:flex;gap:8px}
+header .actions button{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+header .actions button:hover{background:var(--accent);border-color:var(--accent)}
+.main{display:flex;flex:1;overflow:hidden}
+.toolbar{width:56px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0}
+.toolbar button{width:42px;height:42px;background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .2s;font-size:18px}
+.toolbar button:hover{background:var(--bg3);color:var(--text)}
+.toolbar button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toolbar .sep{width:32px;height:1px;background:var(--border);margin:4px 0}
+.canvas-wrap{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:#12122a;position:relative}
+.canvas-wrap svg{background:#1e1e3a;border-radius:4px;box-shadow:0 0 40px rgba(0,0,0,.4)}
+.panel{width:240px;background:var(--bg2);border-left:1px solid var(--border);padding:12px;overflow-y:auto;flex-shrink:0;font-size:13px}
+.panel h3{font-size:12px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;letter-spacing:.5px}
+.panel .group{margin-bottom:16px}
+.panel label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;color:var(--text2)}
+.panel input[type="number"],.panel input[type="text"]{width:80px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:12px}
+.panel input[type="color"]{width:36px;height:28px;border:1px solid var(--border);border-radius:4px;background:var(--bg);cursor:pointer;padding:2px}
+.panel input[type="range"]{width:100%;accent-color:var(--accent)}
+.panel .row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.panel .row label{flex:1;margin-bottom:0}
+.panel button{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;margin-top:4px}
+.panel button:hover{opacity:.85}
+.panel button.danger{background:#c0392b}
+#svgModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+#svgModal.show{display:flex}
+#svgModal .modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;width:600px;max-width:90vw;max-height:80vh;display:flex;flex-direction:column}
+#svgModal .modal h2{font-size:16px;margin-bottom:12px;color:var(--accent)}
+#svgModal .modal textarea{flex:1;min-height:300px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'Fira Code',monospace;font-size:12px;resize:none}
+#svgModal .modal .btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+#svgModal .modal .btns button{width:auto;padding:8px 20px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.sel-outline{pointer-events:none}
+@media(max-width:768px){.panel{width:200px}.toolbar{width:48px}.toolbar button{width:36px;height:36px;font-size:15px}}
+.pro-section{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;margin-top:16px}
+.pro-mock{padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.7}
+.pro-mock-title{font-size:11px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;letter-spacing:.5px;font-weight:600}
+.pro-mock-item{background:rgba(255,255,255,.05);border-radius:4px;padding:5px 8px;margin-bottom:4px;font-size:11px;color:var(--text2)}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:8px;z-index:10;transition:background .2s}
+.pro-section:hover .pro-lock-overlay{background:rgba(0,0,0,.55)}
+.pro-lock-icon{font-size:28px;margin-bottom:4px}
+.pro-lock-text{font-size:12px;color:#fff;font-weight:600}
+.pro-lock-sub{font-size:10px;color:#aaa;margin-top:2px}
+#proModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+#proModal.show{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.pro-modal h2{font-size:20px;margin-bottom:4px;color:var(--accent)}
+.pro-modal .pro-price{font-size:32px;font-weight:700;color:#fff;margin:12px 0}
+.pro-modal .pro-features{text-align:left;margin:16px 0;padding:0;list-style:none}
+.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal .pro-features li:last-child{border-bottom:none}
+.pro-modal .pro-features li::before{content:'✓';color:#4ecca3;font-weight:700;font-size:16px}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;text-align:center;transition:opacity .2s}
+.pro-btn-upgrade:hover{opacity:.9}
+.pro-btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;font-size:14px;cursor:pointer;margin-top:8px}
+.pro-btn-later:hover{color:#ccc}
+</style>
+</head>
+<body>
+<header>
+<h1>&#9670; AI SVG Editor</h1>
+<div class="actions">
+<button onclick="exportSVG()" title="Export SVG Code">&#128196; Export</button>
+<button onclick="clearCanvas()" title="Clear All">&#128465; Clear</button>
+</div>
+</header>
+<div class="main">
+<div class="toolbar" id="toolbar">
+<button data-tool="select" class="active" title="Select (V)">&#9754;</button>
+<button data-tool="rect" title="Rectangle (R)">&#9645;</button>
+<button data-tool="circle" title="Circle (C)">&#9711;</button>
+<button data-tool="line" title="Line (L)">&#9585;</button>
+<button data-tool="polygon" title="Polygon (P)">&#11206;</button>
+<button data-tool="text" title="Text (T)">T</button>
+<div class="sep"></div>
+<button onclick="deleteSelected()" title="Delete (Del)">&#128465;</button>
+</div>
+<div class="canvas-wrap" id="canvasWrap">
+<svg id="canvas" width="800" height="600" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+<div class="panel" id="panel">
+<div class="group">
+<h3>Fill</h3>
+<div class="row">
+<label>Color</label>
+<input type="color" id="fillColor" value="#e94560">
+</div>
+<div class="row">
+<label>Opacity</label>
+<input type="range" id="fillOpacity" min="0" max="1" step="0.05" value="1">
+</div>
+</div>
+<div class="group">
+<h3>Stroke</h3>
+<div class="row">
+<label>Color</label>
+<input type="color" id="strokeColor" value="#ffffff">
+</div>
+<div class="row">
+<label>Width</label>
+<input type="number" id="strokeWidth" min="0" max="50" value="2">
+</div>
+</div>
+<div class="group" id="propGroup" style="display:none">
+<h3>Properties</h3>
+<div id="propFields"></div>
+</div>
+<div class="group" id="textGroup" style="display:none">
+<h3>Text</h3>
+<div class="row">
+<label>Content</label>
+<input type="text" id="textContent" value="Text" style="width:120px">
+</div>
+<div class="row">
+<label>Font Size</label>
+<input type="number" id="fontSize" min="8" max="200" value="24">
+</div>
+</div>
+<div class="group">
+<h3>Canvas</h3>
+<div class="row">
+<label>W</label>
+<input type="number" id="canvasW" value="800" min="100" max="4000" style="width:60px">
+<label>H</label>
+<input type="number" id="canvasH" value="600" min="100" max="4000" style="width:60px">
+</div>
+</div>
+<div class="group" id="selectedActions" style="display:none">
+<button class="danger" onclick="deleteSelected()">&#128465; Delete Element</button>
+<button onclick="duplicateSelected()" style="margin-top:4px">&#128203; Duplicate</button>
+<button onclick="bringToFront()" style="margin-top:4px;background:var(--bg3)">&#8593; Bring to Front</button>
+<button onclick="sendToBack()" style="margin-top:4px;background:var(--bg3)">&#8595; Send to Back</button>
+</div>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-mock">
+<div class="pro-mock-title">&#128204; Layers</div>
+<div class="pro-mock-item">&#9654; Layer 3 — Shape</div>
+<div class="pro-mock-item">&#9654; Layer 2 — Text</div>
+<div class="pro-mock-item">&#9654; Layer 1 — Background</div>
+<div class="pro-mock-title" style="margin-top:8px">&#9998; Path Editor</div>
+<div class="pro-mock-item">Add Node &#8226; Delete &#8226; Smooth</div>
+<div class="pro-mock-title" style="margin-top:8px">&#127916; Animation</div>
+<div class="pro-mock-item">&#9654; 0s ——&#9679;—— 2s ——&#9679;—— 4s</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">&#128274;</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+</div>
+</div>
+<div id="svgModal">
+<div class="modal">
+<h2>SVG Code</h2>
+<textarea id="svgCode" readonly></textarea>
+<div class="btns">
+<button onclick="copySVG()">&#128203; Copy</button>
+<button onclick="closeSVGModal()" style="background:var(--bg3)">Close</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const svg = document.getElementById('canvas');
+const toolbar = document.getElementById('toolbar');
+const propGroup = document.getElementById('propGroup');
+const propFields = document.getElementById('propFields');
+const textGroup = document.getElementById('textGroup');
+const fillColor = document.getElementById('fillColor');
+const strokeColor = document.getElementById('strokeColor');
+const strokeWidth = document.getElementById('strokeWidth');
+const fillOpacity = document.getElementById('fillOpacity');
+const textInput = document.getElementById('textInput');
+const fontSize = document.getElementById('fontSize');
+
+let currentTool = 'select';
+let selectedEl = null;
+let isDrawing = false;
+let startX = 0, startY = 0;
+let tempEl = null;
+let dragOffset = {x:0, y:0};
+let isDragging = false;
+let polygonPoints = [];
+let resizing = false;
+let resizeHandle = null;
+let resizeStartX = 0, resizeStartY = 0;
+let resizeOrigBox = null;
+
+// Selection outline group
+const selGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+selGroup.setAttribute('class','sel-outline');
+selGroup.setAttribute('id','selGroup');
+svg.appendChild(selGroup);
+
+function getSVGPoint(e) {
+  const rect = svg.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+// Tool switching
+toolbar.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-tool]');
+  if (!btn) return;
+  currentTool = btn.dataset.tool;
+  toolbar.querySelectorAll('button[data-tool]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (currentTool !== 'select') deselectAll();
+  if (currentTool !== 'polygon') { polygonPoints = []; removeTempPolygon(); }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const key = e.key.toLowerCase();
+  const toolMap = {v:'select',r:'rect',c:'circle',l:'line',p:'polygon',t:'text'};
+  if (toolMap[key]) {
+    currentTool = toolMap[key];
+    toolbar.querySelectorAll('button[data-tool]').forEach(b => b.classList.remove('active'));
+    toolbar.querySelector(`[data-tool="${currentTool}"]`).classList.add('active');
+    if (currentTool !== 'polygon') { polygonPoints = []; removeTempPolygon(); }
+  }
+  if ((e.key === 'Delete' || e.key === 'Backspace') && selectedEl) { deleteSelected(); e.preventDefault(); }
+  if (e.key === 'Escape') { deselectAll(); polygonPoints = []; removeTempPolygon(); }
+});
+
+function deselectAll() {
+  selectedEl = null;
+  selGroup.innerHTML = '';
+  propGroup.style.display = 'none';
+  textGroup.style.display = 'none';
+}
+
+function selectElement(el) {
+  if (!el || el === selGroup || el.closest('#selGroup')) return;
+  selectedEl = el;
+  drawSelectionBox();
+  showProperties();
+}
+
+function drawSelectionBox() {
+  selGroup.innerHTML = '';
+  if (!selectedEl) return;
+  const bbox = selectedEl.getBBox();
+  const pad = 4;
+  // Dashed outline
+  const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  r.setAttribute('x', bbox.x - pad);
+  r.setAttribute('y', bbox.y - pad);
+  r.setAttribute('width', bbox.width + pad*2);
+  r.setAttribute('height', bbox.height + pad*2);
+  r.setAttribute('fill','none');
+  r.setAttribute('stroke','#e94560');
+  r.setAttribute('stroke-width','1.5');
+  r.setAttribute('stroke-dasharray','5,3');
+  selGroup.appendChild(r);
+  // Resize handles
+  const handles = [
+    {cx: bbox.x - pad, cy: bbox.y - pad, cursor:'nw-resize', pos:'tl'},
+    {cx: bbox.x + bbox.width + pad, cy: bbox.y - pad, cursor:'ne-resize', pos:'tr'},
+    {cx: bbox.x - pad, cy: bbox.y + bbox.height + pad, cursor:'sw-resize', pos:'bl'},
+    {cx: bbox.x + bbox.width + pad, cy: bbox.y + bbox.height + pad, cursor:'se-resize', pos:'br'}
+  ];
+  handles.forEach(h => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    c.setAttribute('x', h.cx - 4);
+    c.setAttribute('y', h.cy - 4);
+    c.setAttribute('width', 8);
+    c.setAttribute('height', 8);
+    c.setAttribute('fill','#e94560');
+    c.setAttribute('stroke','#fff');
+    c.setAttribute('stroke-width','1');
+    c.setAttribute('rx','2');
+    c.setAttribute('style',`cursor:${h.cursor};pointer-events:all`);
+    c.dataset.handle = h.pos;
+    c.addEventListener('mousedown', startResize);
+    selGroup.appendChild(c);
+  });
+}
+
+function showProperties() {
+  if (!selectedEl) return;
+  propGroup.style.display = 'block';
+  propFields.innerHTML = '';
+  const tag = selectedEl.tagName.toLowerCase();
+  // Update color inputs from element
+  const f = selectedEl.getAttribute('fill');
+  const s = selectedEl.getAttribute('stroke');
+  const sw = selectedEl.getAttribute('stroke-width');
+  const fo = selectedEl.getAttribute('fill-opacity');
+  if (f && f !== 'none') fillColor.value = rgbToHex(f);
+  if (s && s !== 'none') strokeColor.value = rgbToHex(s);
+  if (sw) strokeWidth.value = sw;
+  if (fo) fillOpacity.value = fo;
+
+  if (tag === 'text') {
+    textGroup.style.display = 'block';
+    textInput.value = selectedEl.textContent;
+    fontSize.value = parseInt(selectedEl.getAttribute('font-size')) || 24;
+  } else {
+    textGroup.style.display = 'none';
+  }
+
+  const bbox = selectedEl.getBBox();
+  const fields = [
+    {label:'X', value: Math.round(bbox.x), key:'x'},
+    {label:'Y', value: Math.round(bbox.y), key:'y'},
+    {label:'W', value: Math.round(bbox.width), key:'w'},
+    {label:'H', value: Math.round(bbox.height), key:'h'}
+  ];
+  fields.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<label>${f.label}</label><input type="number" value="${f.value}" data-prop="${f.key}">`;
+    row.querySelector('input').addEventListener('change', onPropChange);
+    propFields.appendChild(row);
+  });
+}
+
+function onPropChange(e) {
+  if (!selectedEl) return;
+  const key = e.target.dataset.prop;
+  const val = parseFloat(e.target.value);
+  const tag = selectedEl.tagName.toLowerCase();
+  const bbox = selectedEl.getBBox();
+  if (tag === 'rect') {
+    if (key === 'x') selectedEl.setAttribute('x', val);
+    if (key === 'y') selectedEl.setAttribute('y', val);
+    if (key === 'w') selectedEl.setAttribute('width', val);
+    if (key === 'h') selectedEl.setAttribute('height', val);
+  } else if (tag === 'circle') {
+    if (key === 'x') selectedEl.setAttribute('cx', val + bbox.width/2);
+    if (key === 'y') selectedEl.setAttribute('cy', val + bbox.height/2);
+    if (key === 'w' || key === 'h') selectedEl.setAttribute('r', val/2);
+  } else if (tag === 'ellipse') {
+    if (key === 'x') selectedEl.setAttribute('cx', val + bbox.width/2);
+    if (key === 'y') selectedEl.setAttribute('cy', val + bbox.height/2);
+    if (key === 'w') selectedEl.setAttribute('rx', val/2);
+    if (key === 'h') selectedEl.setAttribute('ry', val/2);
+  } else if (tag === 'line') {
+    if (key === 'x') { const dx = val - bbox.x; selectedEl.setAttribute('x1', parseFloat(selectedEl.getAttribute('x1'))+dx); selectedEl.setAttribute('x2', parseFloat(selectedEl.getAttribute('x2'))+dx); }
+    if (key === 'y') { const dy = val - bbox.y; selectedEl.setAttribute('y1', parseFloat(selectedEl.getAttribute('y1'))+dy); selectedEl.setAttribute('y2', parseFloat(selectedEl.getAttribute('y2'))+dy); }
+  } else if (tag === 'text') {
+    if (key === 'x') selectedEl.setAttribute('x', val);
+    if (key === 'y') selectedEl.setAttribute('y', val + bbox.height);
+  }
+  drawSelectionBox();
+}
+
+function rgbToHex(c) {
+  if (c.startsWith('#')) return c.length === 7 ? c : c;
+  const m = c.match(/\d+/g);
+  if (!m) return '#000000';
+  return '#' + m.slice(0,3).map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+// Color/stroke change listeners
+fillColor.addEventListener('input', () => { if (selectedEl) { selectedEl.setAttribute('fill', fillColor.value); }});
+strokeColor.addEventListener('input', () => { if (selectedEl) { selectedEl.setAttribute('stroke', strokeColor.value); }});
+strokeWidth.addEventListener('input', () => { if (selectedEl) { selectedEl.setAttribute('stroke-width', strokeWidth.value); }});
+fillOpacity.addEventListener('input', () => { if (selectedEl) { selectedEl.setAttribute('fill-opacity', fillOpacity.value); }});
+textInput.addEventListener('input', () => { if (selectedEl && selectedEl.tagName.toLowerCase() === 'text') { selectedEl.textContent = textInput.value; drawSelectionBox(); }});
+fontSize.addEventListener('input', () => { if (selectedEl && selectedEl.tagName.toLowerCase() === 'text') { selectedEl.setAttribute('font-size', fontSize.value); drawSelectionBox(); }});
+
+// Resize
+function startResize(e) {
+  e.stopPropagation();
+  resizing = true;
+  resizeHandle = e.target.dataset.handle;
+  const pt = getSVGPoint(e);
+  resizeStartX = pt.x;
+  resizeStartY = pt.y;
+  resizeOrigBox = selectedEl.getBBox();
+}
+
+function doResize(e) {
+  if (!resizing || !selectedEl) return;
+  const pt = getSVGPoint(e);
+  const dx = pt.x - resizeStartX;
+  const dy = pt.y - resizeStartY;
+  const ob = resizeOrigBox;
+  const tag = selectedEl.tagName.toLowerCase();
+  let nx = ob.x, ny = ob.y, nw = ob.width, nh = ob.height;
+  if (resizeHandle === 'br') { nw = Math.max(10, ob.width + dx); nh = Math.max(10, ob.height + dy); }
+  else if (resizeHandle === 'bl') { nx = ob.x + dx; nw = Math.max(10, ob.width - dx); nh = Math.max(10, ob.height + dy); }
+  else if (resizeHandle === 'tr') { ny = ob.y + dy; nw = Math.max(10, ob.width + dx); nh = Math.max(10, ob.height - dy); }
+  else if (resizeHandle === 'tl') { nx = ob.x + dx; ny = ob.y + dy; nw = Math.max(10, ob.width - dx); nh = Math.max(10, ob.height - dy); }
+
+  if (tag === 'rect') {
+    selectedEl.setAttribute('x', nx); selectedEl.setAttribute('y', ny);
+    selectedEl.setAttribute('width', nw); selectedEl.setAttribute('height', nh);
+  } else if (tag === 'circle') {
+    selectedEl.setAttribute('cx', nx + nw/2); selectedEl.setAttribute('cy', ny + nh/2);
+    selectedEl.setAttribute('r', Math.max(nw, nh)/2);
+  } else if (tag === 'ellipse') {
+    selectedEl.setAttribute('cx', nx + nw/2); selectedEl.setAttribute('cy', ny + nh/2);
+    selectedEl.setAttribute('rx', nw/2); selectedEl.setAttribute('ry', nh/2);
+  } else if (tag === 'line') {
+    const sx = nw / ob.width, sy = nh / ob.height;
+    selectedEl.setAttribute('x1', nx + (parseFloat(selectedEl.getAttribute('x1')) - ob.x) * sx);
+    selectedEl.setAttribute('y1', ny + (parseFloat(selectedEl.getAttribute('y1')) - ob.y) * sy);
+    selectedEl.setAttribute('x2', nx + (parseFloat(selectedEl.getAttribute('x2')) - ob.x) * sx);
+    selectedEl.setAttribute('y2', ny + (parseFloat(selectedEl.getAttribute('y2')) - ob.y) * sy);
+  } else if (tag === 'polygon') {
+    const pts = selectedEl.getAttribute('points').trim().split(/\s+/).map(p => {
+      const [px, py] = p.split(',').map(Number);
+      return [(nx + (px - ob.x) / ob.width * nw), (ny + (py - ob.y) / ob.height * nh)];
+    });
+    selectedEl.setAttribute('points', pts.map(p => p.join(',')).join(' '));
+  } else if (tag === 'text') {
+    selectedEl.setAttribute('x', nx);
+    selectedEl.setAttribute('y', ny + nh);
+    selectedEl.setAttribute('font-size', Math.max(8, nh));
+  }
+  drawSelectionBox();
+}
+
+// SVG mouse events
+svg.addEventListener('mousedown', e => {
+  const pt = getSVGPoint(e);
+  startX = pt.x; startY = pt.y;
+
+  if (currentTool === 'select') {
+    const target = e.target;
+    // Check if clicking a resize handle
+    if (target.dataset && target.dataset.handle) return;
+    if (target === svg || target.closest('#selGroup')) {
+      deselectAll();
+      return;
+    }
+    selectElement(target);
+    isDragging = true;
+    const bbox = target.getBBox();
+    dragOffset.x = pt.x - bbox.x;
+    dragOffset.y = pt.y - bbox.y;
+    return;
+  }
+
+  if (currentTool === 'polygon') {
+    polygonPoints.push(`${pt.x},${pt.y}`);
+    drawTempPolygon();
+    return;
+  }
+
+  isDrawing = true;
+  const fill = fillColor.value;
+  const stroke = strokeColor.value;
+  const sw = strokeWidth.value;
+  const fo = fillOpacity.value;
+
+  if (currentTool === 'rect') {
+    tempEl = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    tempEl.setAttribute('x', pt.x); tempEl.setAttribute('y', pt.y);
+    tempEl.setAttribute('width', 0); tempEl.setAttribute('height', 0);
+    tempEl.setAttribute('fill', fill); tempEl.setAttribute('stroke', stroke);
+    tempEl.setAttribute('stroke-width', sw); tempEl.setAttribute('fill-opacity', fo);
+    tempEl.setAttribute('rx', '4');
+    svg.insertBefore(tempEl, selGroup);
+  } else if (currentTool === 'circle') {
+    tempEl = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    tempEl.setAttribute('cx', pt.x); tempEl.setAttribute('cy', pt.y);
+    tempEl.setAttribute('r', 0);
+    tempEl.setAttribute('fill', fill); tempEl.setAttribute('stroke', stroke);
+    tempEl.setAttribute('stroke-width', sw); tempEl.setAttribute('fill-opacity', fo);
+    svg.insertBefore(tempEl, selGroup);
+  } else if (currentTool === 'line') {
+    tempEl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    tempEl.setAttribute('x1', pt.x); tempEl.setAttribute('y1', pt.y);
+    tempEl.setAttribute('x2', pt.x); tempEl.setAttribute('y2', pt.y);
+    tempEl.setAttribute('stroke', stroke); tempEl.setAttribute('stroke-width', Math.max(sw, 2));
+    tempEl.setAttribute('stroke-linecap', 'round');
+    svg.insertBefore(tempEl, selGroup);
+  } else if (currentTool === 'text') {
+    isDrawing = false;
+    const txt = prompt('Enter text:', 'Hello');
+    if (txt) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg','text');
+      el.setAttribute('x', pt.x); el.setAttribute('y', pt.y);
+      el.setAttribute('fill', fill); el.setAttribute('stroke', 'none');
+      el.setAttribute('font-size', fontSize.value || '24');
+      el.setAttribute('font-family', 'sans-serif');
+      el.setAttribute('fill-opacity', fo);
+      el.textContent = txt;
+      svg.insertBefore(el, selGroup);
+      selectElement(el);
+    }
+  }
+});
+
+svg.addEventListener('mousemove', e => {
+  const pt = getSVGPoint(e);
+
+  if (resizing) { doResize(e); return; }
+
+  if (isDragging && selectedEl) {
+    const tag = selectedEl.tagName.toLowerCase();
+    const nx = pt.x - dragOffset.x;
+    const ny = pt.y - dragOffset.y;
+    if (tag === 'rect') { selectedEl.setAttribute('x', nx); selectedEl.setAttribute('y', ny); }
+    else if (tag === 'circle') { selectedEl.setAttribute('cx', nx + parseFloat(selectedEl.getAttribute('r'))); selectedEl.setAttribute('cy', ny + parseFloat(selectedEl.getAttribute('r'))); }
+    else if (tag === 'ellipse') { selectedEl.setAttribute('cx', nx + parseFloat(selectedEl.getAttribute('rx'))); selectedEl.setAttribute('cy', ny + parseFloat(selectedEl.getAttribute('ry'))); }
+    else if (tag === 'line') {
+      const bbox = selectedEl.getBBox();
+      const dx = nx - bbox.x, dy = ny - bbox.y;
+      selectedEl.setAttribute('x1', parseFloat(selectedEl.getAttribute('x1'))+dx);
+      selectedEl.setAttribute('y1', parseFloat(selectedEl.getAttribute('y1'))+dy);
+      selectedEl.setAttribute('x2', parseFloat(selectedEl.getAttribute('x2'))+dx);
+      selectedEl.setAttribute('y2', parseFloat(selectedEl.getAttribute('y2'))+dy);
+    } else if (tag === 'polygon') {
+      const bbox = selectedEl.getBBox();
+      const dx = nx - bbox.x, dy = ny - bbox.y;
+      const pts = selectedEl.getAttribute('points').trim().split(/\s+/).map(p => {
+        const [px, py] = p.split(',').map(Number);
+        return `${px+dx},${py+dy}`;
+      });
+      selectedEl.setAttribute('points', pts.join(' '));
+    } else if (tag === 'text') {
+      selectedEl.setAttribute('x', nx);
+      const bbox = selectedEl.getBBox();
+      selectedEl.setAttribute('y', ny + bbox.height);
+    }
+    drawSelectionBox();
+    showProperties();
+    return;
+  }
+
+  if (!isDrawing || !tempEl) return;
+  if (currentTool === 'rect') {
+    const w = pt.x - startX, h = pt.y - startY;
+    tempEl.setAttribute('x', w < 0 ? pt.x : startX);
+    tempEl.setAttribute('y', h < 0 ? pt.y : startY);
+    tempEl.setAttribute('width', Math.abs(w));
+    tempEl.setAttribute('height', Math.abs(h));
+  } else if (currentTool === 'circle') {
+    const r = Math.sqrt((pt.x-startX)**2 + (pt.y-startY)**2);
+    tempEl.setAttribute('r', r);
+  } else if (currentTool === 'line') {
+    tempEl.setAttribute('x2', pt.x);
+    tempEl.setAttribute('y2', pt.y);
+  }
+});
+
+svg.addEventListener('mouseup', () => {
+  if (resizing) { resizing = false; resizeHandle = null; showProperties(); return; }
+  if (isDragging) { isDragging = false; return; }
+  if (isDrawing && tempEl) {
+    isDrawing = false;
+    // Remove if too small
+    const bbox = tempEl.getBBox();
+    if (bbox.width < 3 && bbox.height < 3 && currentTool !== 'line') {
+      tempEl.remove();
+    } else {
+      selectElement(tempEl);
+    }
+    tempEl = null;
+  }
+});
+
+svg.addEventListener('dblclick', e => {
+  if (currentTool === 'polygon' && polygonPoints.length >= 3) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    el.setAttribute('points', polygonPoints.join(' '));
+    el.setAttribute('fill', fillColor.value);
+    el.setAttribute('stroke', strokeColor.value);
+    el.setAttribute('stroke-width', strokeWidth.value);
+    el.setAttribute('fill-opacity', fillOpacity.value);
+    el.setAttribute('stroke-linejoin', 'round');
+    svg.insertBefore(el, selGroup);
+    selectElement(el);
+    polygonPoints = [];
+    removeTempPolygon();
+  }
+});
+
+function drawTempPolygon() {
+  removeTempPolygon();
+  if (polygonPoints.length < 1) return;
+  const el = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  el.setAttribute('points', polygonPoints.join(' '));
+  el.setAttribute('fill','none');
+  el.setAttribute('stroke','#e94560');
+  el.setAttribute('stroke-width','1.5');
+  el.setAttribute('stroke-dasharray','4,3');
+  el.setAttribute('id','tempPoly');
+  svg.insertBefore(el, selGroup);
+  // Draw dots
+  polygonPoints.forEach(p => {
+    const [x,y] = p.split(',').map(Number);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',x); dot.setAttribute('cy',y); dot.setAttribute('r','3');
+    dot.setAttribute('fill','#e94560'); dot.setAttribute('class','tempPolyDot');
+    svg.insertBefore(dot, selGroup);
+  });
+}
+
+function removeTempPolygon() {
+  const tp = svg.querySelector('#tempPoly');
+  if (tp) tp.remove();
+  svg.querySelectorAll('.tempPolyDot').forEach(d => d.remove());
+}
+
+function deleteSelected() {
+  if (selectedEl) { selectedEl.remove(); deselectAll(); }
+}
+
+function clearCanvas() {
+  if (!confirm('Clear all elements?')) return;
+  const children = [...svg.children].filter(c => c !== selGroup);
+  children.forEach(c => c.remove());
+  deselectAll();
+}
+
+function exportSVG() {
+  const clone = svg.cloneNode(true);
+  const sg = clone.querySelector('#selGroup');
+  if (sg) sg.remove();
+  clone.querySelectorAll('#tempPoly,.tempPolyDot').forEach(e => e.remove());
+  const code = new XMLSerializer().serializeToString(clone);
+  const formatted = code.replace(/></g, '>\n<');
+  document.getElementById('svgCode').value = formatted;
+  document.getElementById('svgModal').classList.add('show');
+}
+
+function closeSVGModal() {
+  document.getElementById('svgModal').classList.remove('show');
+}
+
+function copySVGCode() {
+  const ta = document.getElementById('svgCode');
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(() => showToast('Copied to clipboard!')).catch(() => {
+    document.execCommand('copy');
+    showToast('Copied!');
+  });
+}
+
+function downloadSVG() {
+  const code = document.getElementById('svgCode').value;
+  const blob = new Blob([code], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'drawing.svg';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Close modal on backdrop click
+document.getElementById('svgModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('svgModal')) closeSVGModal();
+});
+</script>
+<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>&#128640; SVG Editor Pro</h2>
+<div class="pro-price">$14</div>
+<ul class="pro-features">
+<li>Layer Management — organize complex multi-layer designs</li>
+<li>Path Editing — precise node &amp; bezier curve control</li>
+<li>SVG Animation — keyframe-based motion &amp; transitions</li>
+<li>Priority support &amp; all future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $14</a>
+<button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

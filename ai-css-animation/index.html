@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI CSS animation generator with visual timeline editor. Create complex keyframe animations, preview in real-time, and export clean CSS animation code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-animation/">
+<title>AI CSS Animation Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--card:#1e1e3a;--success:#00d2d3;--radius:10px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,var(--bg2),var(--accent2));padding:20px 30px;text-align:center;border-bottom:2px solid var(--accent)}
+.header h1{font-size:1.8rem;background:linear-gradient(90deg,var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.container{display:grid;grid-template-columns:300px 1fr 1fr;gap:16px;padding:16px;max-width:1600px;margin:0 auto}
+@media(max-width:1200px){.container{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.container{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;overflow:hidden}
+.panel-title{font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--success);display:flex;align-items:center;gap:8px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preset-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 8px;border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s;text-align:center}
+.preset-btn:hover{border-color:var(--accent);background:var(--bg3)}
+.preset-btn.active{border-color:var(--accent);background:rgba(233,69,96,.15);color:var(--accent)}
+.control-group{margin-bottom:14px}
+.control-group label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.control-group input[type=range]{width:100%;accent-color:var(--accent)}
+.control-group select,.control-group input[type=number]{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:8px;border-radius:6px;font-size:.85rem}
+.control-group select:focus,.control-group input:focus{outline:none;border-color:var(--accent)}
+.range-val{float:right;color:var(--accent);font-size:.8rem;font-weight:600}
+.preview-area{min-height:300px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:8px;border:2px dashed var(--border);position:relative;overflow:hidden}
+.preview-box{width:100px;height:100px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;box-shadow:0 4px 20px rgba(233,69,96,.3)}
+.preview-controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63851}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-success{background:var(--success);color:var(--bg)}
+.btn-success:hover{background:#00b8b8}
+.timeline-container{position:relative;margin-top:10px}
+.timeline-track{height:40px;background:var(--bg);border-radius:6px;position:relative;cursor:pointer;border:1px solid var(--border)}
+.timeline-ruler{display:flex;justify-content:space-between;padding:0 4px;font-size:.65rem;color:var(--text2);margin-top:2px}
+.kf-node{position:absolute;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;background:var(--accent);border:2px solid #fff;border-radius:50%;cursor:grab;z-index:2;transition:box-shadow .2s}
+.kf-node:hover,.kf-node.active{box-shadow:0 0 10px var(--accent);transform:translate(-50%,-50%) scale(1.2)}
+.kf-node.active{background:var(--success)}
+.kf-line{position:absolute;top:50%;height:3px;background:linear-gradient(90deg,var(--accent),var(--success));transform:translateY(-50%);z-index:1;border-radius:2px}
+.kf-editor{margin-top:12px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.kf-editor h4{font-size:.85rem;color:var(--success);margin-bottom:8px}
+.kf-props{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kf-prop label{font-size:.7rem;color:var(--text2)}
+.kf-prop input{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:6px;border-radius:4px;font-size:.8rem;width:100%}
+.kf-actions{display:flex;gap:6px;margin-top:8px}
+.code-output{background:var(--bg);border-radius:8px;padding:12px;font-family:'Fira Code',monospace;font-size:.78rem;color:var(--success);white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;border:1px solid var(--border);line-height:1.5}
+.copy-toast{position:fixed;top:20px;right:20px;background:var(--success);color:var(--bg);padding:12px 24px;border-radius:8px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.copy-toast.show{opacity:1}
+.shape-options{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.shape-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--bg2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s}
+.shape-btn:hover,.shape-btn.active{border-color:var(--accent);background:rgba(233,69,96,.15)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+#dynamicStyle{display:none}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>&#x1f3ac; AI CSS Animation Generator</h1>
+<p>Create stunning CSS animations with visual keyframe editor</p>
+</div>
+<div class="container">
+<!-- Left Panel: Presets & Controls -->
+<div class="panel">
+<div class="panel-title"><span>&#x1f3a8;</span> Presets</div>
+<div class="preset-grid" id="presetGrid"></div>
+<hr style="border-color:var(--border);margin:16px 0">
+<div class="panel-title"><span>&#x2699;&#xfe0f;</span> Parameters</div>
+<div class="control-group">
+<label>Duration <span class="range-val" id="durVal">1s</span></label>
+<input type="range" id="duration" min="0.1" max="5" step="0.1" value="1">
+</div>
+<div class="control-group">
+<label>Delay <span class="range-val" id="delayVal">0s</span></label>
+<input type="range" id="delay" min="0" max="3" step="0.1" value="0">
+</div>
+<div class="control-group">
+<label>Iteration Count</label>
+<select id="iterCount">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="5">5</option>
+<option value="infinite" selected>Infinite</option>
+</select>
+</div>
+<div class="control-group">
+<label>Direction</label>
+<select id="direction">
+<option value="normal">Normal</option>
+<option value="reverse">Reverse</option>
+<option value="alternate">Alternate</option>
+<option value="alternate-reverse">Alternate Reverse</option>
+</select>
+</div>
+<div class="control-group">
+<label>Timing Function</label>
+<select id="timing">
+<option value="ease">Ease</option>
+<option value="linear">Linear</option>
+<option value="ease-in">Ease In</option>
+<option value="ease-out">Ease Out</option>
+<option value="ease-in-out">Ease In Out</option>
+<option value="cubic-bezier(0.68,-0.55,0.265,1.55)">Bounce</option>
+</select>
+</div>
+<div class="control-group">
+<label>Preview Shape</label>
+<div class="shape-options">
+<button class="shape-btn active" data-shape="square" title="Square">&#x25a0;</button>
+<button class="shape-btn" data-shape="circle" title="Circle">&#x25cf;</button>
+<button class="shape-btn" data-shape="star" title="Star">&#x2605;</button>
+<button class="shape-btn" data-shape="text" title="Text">A</button>
+</div>
+</div>
+</div>
+<!-- Middle Panel: Preview & Timeline -->
+<div class="panel">
+<div class="panel-title"><span>&#x25b6;&#xfe0f;</span> Live Preview</div>
+<div class="preview-area" id="previewArea">
+<div class="preview-box" id="previewBox">&#x25a0;</div>
+</div>
+<div class="preview-controls">
+<button class="btn btn-primary" onclick="restartAnimation()">&#x21bb; Restart</button>
+<button class="btn btn-secondary" onclick="pauseAnimation()">&#x23f8; Pause</button>
+<button class="btn btn-secondary" onclick="resumeAnimation()">&#x25b6; Resume</button>
+</div>
+<div class="panel-title" style="margin-top:16px"><span>&#x23f1;&#xfe0f;</span> Keyframe Timeline</div>
+<div class="timeline-container">
+<div class="timeline-track" id="timelineTrack"></div>
+<div class="timeline-ruler" id="timelineRuler"></div>
+</div>
+<div class="preview-controls">
+<button class="btn btn-success" onclick="addKeyframe()">+ Add Keyframe</button>
+<button class="btn btn-primary" onclick="deleteKeyframe()">&#x1f5d1; Delete Selected</button>
+</div>
+<div class="kf-editor" id="kfEditor" style="display:none">
+<h4>Edit Keyframe: <span id="kfPercent">0%</span></h4>
+<div class="kf-props" id="kfProps"></div>
+<div class="kf-actions">
+<button class="btn btn-primary" onclick="applyKfEdit()">Apply</button>
+</div>
+</div>
+</div>
+<!-- Right Panel: Code Output -->
+<div class="panel">
+<div class="panel-title"><span>&#x1f4cb;</span> Generated CSS</div>
+<div class="code-output" id="codeOutput">Select a preset or create custom keyframes...</div>
+<div class="preview-controls" style="margin-top:10px">
+<button class="btn btn-success" onclick="copyCode()">&#x1f4cb; Copy CSS</button>
+<button class="btn btn-secondary" onclick="copyWithElement()">Copy with Element</button>
+</div>
+</div>
+</div>
+<div class="copy-toast" id="copyToast">Copied to clipboard!</div>
+<style id="dynamicStyle"></style>
+<script>
+const PRESETS = {
+  bounce: {name:'Bounce',icon:'\u2b06',keyframes:{'0%':{transform:'translateY(0)'},'20%':{transform:'translateY(0)'},'40%':{transform:'translateY(-30px)'},'50%':{transform:'translateY(0)'},'60%':{transform:'translateY(-15px)'},'80%':{transform:'translateY(0)'},'100%':{transform:'translateY(0)'}}},
+  rotate: {name:'Rotate',icon:'\u27f3',keyframes:{'0%':{transform:'rotate(0deg)'},'100%':{transform:'rotate(360deg)'}}},
+  fadeIn: {name:'Fade In',icon:'\u25d0',keyframes:{'0%':{opacity:'0'},'100%':{opacity:'1'}}},
+  fadeOut: {name:'Fade Out',icon:'\u25d1',keyframes:{'0%':{opacity:'1'},'100%':{opacity:'0'}}},
+  slideIn: {name:'Slide In',icon:'\u27a1',keyframes:{'0%':{transform:'translateX(-100%)',opacity:'0'},'100%':{transform:'translateX(0)',opacity:'1'}}},
+  slideOut: {name:'Slide Out',icon:'\u2b05',keyframes:{'0%':{transform:'translateX(0)',opacity:'1'},'100%':{transform:'translateX(100%)',opacity:'0'}}},
+  pulse: {name:'Pulse',icon:'\u2764',keyframes:{'0%':{transform:'scale(1)'},'50%':{transform:'scale(1.15)'},'100%':{transform:'scale(1)'}}},
+  shake: {name:'Shake',icon:'\u21c4',keyframes:{'0%':{transform:'translateX(0)'},'10%':{transform:'translateX(-10px)'},'20%':{transform:'translateX(10px)'},'30%':{transform:'translateX(-10px)'},'40%':{transform:'translateX(10px)'},'50%':{transform:'translateX(-10px)'},'60%':{transform:'translateX(10px)'},'70%':{transform:'translateX(-10px)'},'80%':{transform:'translateX(10px)'},'90%':{transform:'translateX(-10px)'},'100%':{transform:'translateX(0)'}}},
+  flip: {name:'Flip',icon:'\u21c5',keyframes:{'0%':{transform:'perspective(400px) rotateY(0)'},'40%':{transform:'perspective(400px) rotateY(170deg)'},'50%':{transform:'perspective(400px) rotateY(190deg)'},'80%':{transform:'perspective(400px) rotateY(360deg)'},'100%':{transform:'perspective(400px) rotateY(360deg)'}}},
+  zoom: {name:'Zoom',icon:'\u1f50d',keyframes:{'0%':{transform:'scale(0)',opacity:'0'},'50%':{transform:'scale(1.2)',opacity:'1'},'100%':{transform:'scale(1)',opacity:'1'}}},
+  flash: {name:'Flash',icon:'\u26a1',keyframes:{'0%':{opacity:'1'},'25%':{opacity:'0'},'50%':{opacity:'1'},'75%':{opacity:'0'},'100%':{opacity:'1'}}},
+  swing: {name:'Swing',icon:'\u21ba',keyframes:{'0%':{transform:'rotate(0deg)'},'20%':{transform:'rotate(15deg)'},'40%':{transform:'rotate(-10deg)'},'60%':{transform:'rotate(5deg)'},'80%':{transform:'rotate(-5deg)'},'100%':{transform:'rotate(0deg)'}}}
+};
+
+const CSS_PROPS = ['transform','opacity','background','border-radius','box-shadow','filter','color','width','height'];
+let currentPreset = null;
+let keyframes = {};
+let selectedKf = null;
+let animName = 'customAnimation';
+let isPaused = false;
+
+// Init presets
+const presetGrid = document.getElementById('presetGrid');
+Object.entries(PRESETS).forEach(([key, val]) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn';
+  btn.textContent = val.icon + ' ' + val.name;
+  btn.onclick = () => selectPreset(key);
+  btn.dataset.key = key;
+  presetGrid.appendChild(btn);
+});
+
+// Range sliders
+document.getElementById('duration').oninput = function(){
+  document.getElementById('durVal').textContent = this.value + 's';
+  updateAnimation();
+};
+document.getElementById('delay').oninput = function(){
+  document.getElementById('delayVal').textContent = this.value + 's';
+  updateAnimation();
+};
+['iterCount','direction','timing'].forEach(id => {
+  document.getElementById(id).onchange = updateAnimation;
+});
+
+// Shape buttons
+document.querySelectorAll('.shape-btn').forEach(btn => {
+  btn.onclick = function(){
+    document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const box = document.getElementById('previewBox');
+    const shape = this.dataset.shape;
+    box.style.borderRadius = shape === 'circle' ? '50%' : '12px';
+    box.textContent = shape === 'star' ? '\u2605' : shape === 'text' ? 'Aa' : shape === 'circle' ? '\u25cf' : '\u25a0';
+  };
+});
+
+function selectPreset(key){
+  currentPreset = key;
+  animName = key;
+  keyframes = JSON.parse(JSON.stringify(PRESETS[key].keyframes));
+  selectedKf = null;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  renderTimeline();
+  updateAnimation();
+  document.getElementById('kfEditor').style.display = 'none';
+}
+
+function getParams(){
+  return {
+    duration: document.getElementById('duration').value + 's',
+    delay: document.getElementById('delay').value + 's',
+    iterCount: document.getElementById('iterCount').value,
+    direction: document.getElementById('direction').value,
+    timing: document.getElementById('timing').value
+  };
+}
+
+function generateCSS(){
+  if(!Object.keys(keyframes).length) return '';
+  const sorted = Object.keys(keyframes).sort((a,b) => parseFloat(a) - parseFloat(b));
+  let css = '@keyframes ' + animName + ' {\n';
+  sorted.forEach(pct => {
+    css += '  ' + pct + ' {\n';
+    Object.entries(keyframes[pct]).forEach(([prop, val]) => {
+      css += '    ' + prop + ': ' + val + ';\n';
+    });
+    css += '  }\n';
+  });
+  css += '}\n\n';
+  const p = getParams();
+  css += '.animated-element {\n';
+  css += '  animation-name: ' + animName + ';\n';
+  css += '  animation-duration: ' + p.duration + ';\n';
+  css += '  animation-delay: ' + p.delay + ';\n';
+  css += '  animation-iteration-count: ' + p.iterCount + ';\n';
+  css += '  animation-direction: ' + p.direction + ';\n';
+  css += '  animation-timing-function: ' + p.timing + ';\n';
+  css += '  animation-fill-mode: both;\n';
+  css += '}';
+  return css;
+}
+
+function updateAnimation(){
+  const css = generateCSS();
+  document.getElementById('codeOutput').textContent = css || 'Select a preset or create custom keyframes...';
+  if(!Object.keys(keyframes).length) return;
+  const sorted = Object.keys(keyframes).sort((a,b) => parseFloat(a) - parseFloat(b));
+  let styleCSS = '@keyframes ' + animName + ' {';
+  sorted.forEach(pct => {
+    styleCSS += pct + ' {';
+    Object.entries(keyframes[pct]).forEach(([prop, val]) => {
+      styleCSS += prop + ':' + val + ';';
+    });
+    styleCSS += '}';
+  });
+  styleCSS += '}';
+  document.getElementById('dynamicStyle').textContent = styleCSS;
+  const p = getParams();
+  const box = document.getElementById('previewBox');
+  box.style.animation = 'none';
+  box.offsetHeight;
+  box.style.animation = animName + ' ' + p.duration + ' ' + p.timing + ' ' + p.delay + ' ' + p.iterCount + ' ' + p.direction + ' both';
+  isPaused = false;
+}
+
+function restartAnimation(){
+  updateAnimation();
+}
+
+function pauseAnimation(){
+  document.getElementById('previewBox').style.animationPlayState = 'paused';
+  isPaused = true;
+}
+
+function resumeAnimation(){
+  document.getElementById('previewBox').style.animationPlayState = 'running';
+  isPaused = false;
+}
+
+function renderTimeline(){
+  const track = document.getElementById('timelineTrack');
+  const ruler = document.getElementById('timelineRuler');
+  track.innerHTML = '';
+  ruler.innerHTML = '';
+  const sorted = Object.keys(keyframes).sort((a,b) => parseFloat(a) - parseFloat(b));
+  if(sorted.length > 1){
+    const first = parseFloat(sorted[0]);
+    const last = parseFloat(sorted[sorted.length-1]);
+    const line = document.createElement('div');
+    line.className = 'kf-line';
+    line.style.left = first + '%';
+    line.style.width = (last - first) + '%';
+    track.appendChild(line);
+  }
+  sorted.forEach(pct => {
+    const node = document.createElement('div');
+    node.className = 'kf-node' + (selectedKf === pct ? ' active' : '');
+    node.style.left = parseFloat(pct) + '%';
+    node.title = pct;
+    node.onclick = (e) => { e.stopPropagation(); selectKeyframe(pct); };
+    // Drag
+    let dragging = false;
+    node.onmousedown = (e) => {
+      e.preventDefault();
+      dragging = true;
+      const trackRect = track.getBoundingClientRect();
+      const onMove = (ev) => {
+        if(!dragging) return;
+        let x = (ev.clientX - trackRect.left) / trackRect.width * 100;
+        x = Math.max(0, Math.min(100, Math.round(x)));
+        const newPct = x + '%';
+        if(newPct !== pct && !keyframes[newPct]){
+          keyframes[newPct] = keyframes[pct];
+          delete keyframes[pct];
+          if(selectedKf === pct) selectedKf = newPct;
+          pct = newPct;
+          renderTimeline();
+          updateAnimation();
+        }
+      };
+      const onUp = () => { dragging = false; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    };
+    track.appendChild(node);
+  });
+  for(let i = 0; i <= 100; i += 10){
+    const span = document.createElement('span');
+    span.textContent = i + '%';
+    ruler.appendChild(span);
+  }
+  // Click on track to add
+  track.onclick = (e) => {
+    const rect = track.getBoundingClientRect();
+    let x = Math.round((e.clientX - rect.left) / rect.width * 100);
+    x = Math.max(0, Math.min(100, x));
+    const pctKey = x + '%';
+    if(!keyframes[pctKey]){
+      keyframes[pctKey] = {transform:'none',opacity:'1'};
+      renderTimeline();
+      updateAnimation();
+      selectKeyframe(pctKey);
+    }
+  };
+}
+
+function selectKeyframe(pct){
+  selectedKf = pct;
+  renderTimeline();
+  showKfEditor(pct);
+}
+
+function showKfEditor(pct){
+  const editor = document.getElementById('kfEditor');
+  editor.style.display = 'block';
+  document.getElementById('kfPercent').textContent = pct;
+  const propsDiv = document.getElementById('kfProps');
+  propsDiv.innerHTML = '';
+  const data = keyframes[pct] || {};
+  CSS_PROPS.forEach(prop => {
+    const div = document.createElement('div');
+    div.className = 'kf-prop';
+    const label = document.createElement('label');
+    label.textContent = prop;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = data[prop] || '';
+    input.placeholder = 'e.g. ' + getPlaceholder(prop);
+    input.dataset.prop = prop;
+    div.appendChild(label);
+    div.appendChild(input);
+    propsDiv.appendChild(div);
+  });
+}
+
+function getPlaceholder(prop){
+  const map = {transform:'rotate(45deg)',opacity:'0.5',background:'#ff0',
+    'border-radius':'50%','box-shadow':'0 0 10px #000',filter:'blur(2px)',
+    color:'#fff',width:'150px',height:'150px'};
+  return map[prop] || '';
+}
+
+function applyKfEdit(){
+  if(!selectedKf) return;
+  const inputs = document.querySelectorAll('#kfProps input');
+  const data = {};
+  inputs.forEach(inp => {
+    if(inp.value.trim()) data[inp.dataset.prop] = inp.value.trim();
+  });
+  if(Object.keys(data).length) keyframes[selectedKf] = data;
+  updateAnimation();
+}
+
+function addKeyframe(){
+  let pct = 50;
+  while(keyframes[pct + '%'] && pct < 100) pct += 5;
+  if(pct > 100) pct = 0;
+  while(keyframes[pct + '%'] && pct < 100) pct++;
+  const key = pct + '%';
+  keyframes[key] = {transform:'none',opacity:'1'};
+  selectedKf = key;
+  renderTimeline();
+  updateAnimation();
+  showKfEditor(key);
+}
+
+function deleteKeyframe(){
+  if(!selectedKf) return;
+  delete keyframes[selectedKf];
+  selectedKf = null;
+  document.getElementById('kfEditor').style.display = 'none';
+  renderTimeline();
+  updateAnimation();
+}
+
+function copyCode(){
+  const code = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast());
+}
+
+function copyWithElement(){
+  const code = document.getElementById('codeOutput').textContent;
+  const full = code + '\n\n/* HTML */\n<div class="animated-element">Your content</div>';
+  navigator.clipboard.writeText(full).then(() => showToast());
+}
+
+function showToast(){
+  const t = document.getElementById('copyToast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Init with bounce
+selectPreset('bounce');
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1600px;margin:20px auto;padding:0 16px}
+.pro-header{text-align:center;margin-bottom:16px}
+.pro-header h2{font-size:1.3rem;color:#e94560;display:inline-flex;align-items:center;gap:8px}
+.pro-badge{background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+.pro-mock{position:relative;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .3s}
+.pro-mock:hover{border-color:var(--accent)}
+.pro-mock-content{padding:20px;filter:blur(4px);opacity:.5;pointer-events:none;user-select:none}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.pro-mock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{color:var(--success);font-size:.85rem;margin-bottom:8px}
+.pro-mock-track{height:24px;background:var(--bg2);border-radius:4px;margin:4px 0;position:relative;overflow:hidden}
+.pro-mock-track span{position:absolute;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.pro-mock-list{list-style:none;font-size:.8rem;color:var(--text2)}
+.pro-mock-list li{padding:4px 0;border-bottom:1px solid var(--border)}
+.pro-mock-list li:last-child{border-bottom:none}
+.pro-mock-btn{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text2);font-size:.8rem;margin:4px 2px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.35)}
+.pro-lock{font-size:3rem;margin-bottom:8px}
+.pro-overlay-text{color:#fff;font-size:1.1rem;font-weight:600}
+.pro-overlay-sub{color:#aaa;font-size:.8rem;margin-top:4px}
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.pro-modal-backdrop.open{display:flex}
+.pro-modal{background:#1e1e3a;border:1px solid #2a2a4a;border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:16px 0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✓ ';color:#00d68f;font-weight:700}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-cta{display:inline-block;background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:700;text-decoration:none;margin-top:16px;transition:opacity .2s;border:none;cursor:pointer}
+.pro-cta:hover{opacity:.85}
+.pro-later{display:block;margin-top:12px;color:#aaa;font-size:.85rem;cursor:pointer;background:none;border:none;padding:8px}
+.pro-later:hover{color:#fff}
+@media(max-width:768px){.pro-mock-row{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>⚡ Pro Features <span class="pro-badge">PRO</span></h2></div>
+<div class="pro-mock" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-overlay-text">Unlock Pro Features</div>
+<div class="pro-overlay-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>🎬 Timeline Editor</h4>
+<div class="pro-mock-track"><span style="left:5%;width:30%"></span></div>
+<div class="pro-mock-track"><span style="left:20%;width:45%"></span></div>
+<div class="pro-mock-track"><span style="left:10%;width:60%"></span></div>
+<div class="pro-mock-track"><span style="left:35%;width:25%"></span></div>
+<div style="display:flex;gap:6px;margin-top:8px">
+<span class="pro-mock-btn">▶ Play All</span>
+<span class="pro-mock-btn">⏸ Pause</span>
+<span class="pro-mock-btn">🔄 Loop</span>
+</div>
+</div>
+<div class="pro-mock-card">
+<h4>🔗 Animation Sequences</h4>
+<ul class="pro-mock-list">
+<li>1. fadeIn → 0.3s ease-in</li>
+<li>2. slideUp → 0.5s cubic-bezier</li>
+<li>3. scaleIn → 0.4s ease-out</li>
+<li>4. rotate360 → 1s linear</li>
+<li>5. bounceIn → 0.6s spring</li>
+</ul>
+<span class="pro-mock-btn">+ Add Step</span>
+<span class="pro-mock-btn">⚡ Run Sequence</span>
+</div>
+<div class="pro-mock-card">
+<h4>⚛️ React Component Export</h4>
+<div style="background:var(--bg2);border-radius:6px;padding:10px;font-family:monospace;font-size:.75rem;color:var(--success);line-height:1.6">
+import { motion } from 'framer-motion'<br><br>
+export const AnimatedBox = () =&gt; (<br>
+&nbsp;&nbsp;&lt;motion.div<br>
+&nbsp;&nbsp;&nbsp;&nbsp;animate={{ rotate: 360 }}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;transition={{ duration: 1 }}<br>
+&nbsp;&nbsp;/&gt;<br>
+)
+</div>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">📋 Copy JSX</span>
+<span class="pro-mock-btn">📦 Download</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-backdrop" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>🚀 CSS Animation Pro</h3>
+<div class="pro-price">$14</div>
+<ul>
+<li>Multi-track Timeline Editor with drag & drop</li>
+<li>Animation Sequences — chain multiple animations</li>
+<li>React / Framer Motion component export</li>
+<li>CSS-in-JS output (styled-components, emotion)</li>
+<li>SVG path animation support</li>
+<li>Export as GIF / MP4 preview</li>
+<li>Priority updates & new presets</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $14</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

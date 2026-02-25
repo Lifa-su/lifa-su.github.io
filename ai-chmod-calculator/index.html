@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Unix chmod permission calculator. Convert between symbolic and numeric file permissions, visualize rwx flags, and generate chmod commands instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-chmod-calculator/">
+<title>Unix Chmod Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#0f3460;--hi:#e94560;--text:#eee;--dim:#8892b0;--border:#233554;--ok:#64ffda;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;line-height:1.6}
+.ctn{max-width:720px;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin-bottom:6px;background:linear-gradient(135deg,var(--hi),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:var(--dim);font-size:.9rem;margin-bottom:28px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.ct{font-size:1.05rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ct em{font-size:1.2rem;font-style:normal}
+.pg{display:grid;grid-template-columns:80px repeat(3,1fr);gap:0;margin-bottom:4px}
+.ph{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;padding:8px 0;text-align:center;font-weight:600}
+.pl{display:flex;align-items:center;font-weight:500;font-size:.9rem;padding:10px 0}
+.pc{display:flex;justify-content:center;align-items:center;padding:10px 0}
+.cw{position:relative;width:44px;height:44px;cursor:pointer}
+.cw input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;z-index:2}
+.cb{width:44px;height:44px;border:2px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;transition:all .2s;background:rgba(255,255,255,.03)}
+.cw input:checked+.cb{border-color:var(--hi);background:rgba(233,69,96,.15);color:var(--hi)}
+.cw:hover .cb{border-color:var(--hi);transform:scale(1.05)}
+.ir{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.ig{flex:1;min-width:140px}
+.ig label{display:block;font-size:.78rem;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.ig input{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1rem;font-family:monospace;transition:border-color .2s}
+.ig input:focus{outline:none;border-color:var(--hi)}
+.ig input::placeholder{color:var(--dim);opacity:.6}
+.cmd{margin-top:16px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cmdt{font-family:'SF Mono',Monaco,monospace;font-size:1.05rem;color:var(--ok);word-break:break-all}
+.cpb{background:var(--accent);color:var(--text);border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:.85rem;white-space:nowrap;transition:all .2s}
+.cpb:hover{background:var(--hi)}.cpb:active{transform:scale(.95)}
+.psg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.psb{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;transition:all .2s;color:var(--text)}
+.psb:hover{border-color:var(--hi);background:rgba(233,69,96,.08);transform:translateY(-1px)}
+.psn{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--hi)}
+.pss{font-family:monospace;font-size:.8rem;color:var(--dim);margin-top:2px}
+.psd{font-size:.78rem;color:var(--dim);margin-top:4px}
+.bd{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bdi{background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;text-align:center}
+.bdl{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.bdv{font-family:monospace;font-size:1.3rem;font-weight:700;margin-top:2px}
+.bds{font-family:monospace;font-size:.85rem;color:var(--dim);margin-top:2px}
+.oc{color:#ff6b6b}.gc{color:#ffd93d}.tc{color:#6bcb77}
+footer{text-align:center;color:var(--dim);font-size:.78rem;margin-top:30px;padding-bottom:20px}
+footer a{color:var(--hi);text-decoration:none}
+@media(max-width:500px){.card{padding:16px}h1{font-size:1.4rem}.pg{grid-template-columns:60px repeat(3,1fr)}.cb,.cw{width:38px;height:38px}.cb{font-size:1rem}.ir{flex-direction:column}.psg{grid-template-columns:1fr}.bd{grid-template-columns:1fr}.cmd{flex-direction:column;align-items:stretch;text-align:center}}
+</style>
+</head>
+<body>
+<div class="ctn">
+<h1>&#128274; Unix Chmod Calculator</h1>
+<p class="sub">Numeric &#8596; Symbolic mode conversion &middot; Visual permission editor</p>
+
+<div class="card">
+<div class="ct"><em>&#9989;</em> Permission Settings</div>
+<div class="pg">
+<div></div><div class="ph">Read (r)</div><div class="ph">Write (w)</div><div class="ph">Execute (x)</div>
+<div class="pl">Owner</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="4" aria-label="Owner Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="2" aria-label="Owner Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="0" data-b="1" aria-label="Owner Execute"><div class="cb">x</div></label></div>
+<div class="pl">Group</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="4" aria-label="Group Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="2" aria-label="Group Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="1" data-b="1" aria-label="Group Execute"><div class="cb">x</div></label></div>
+<div class="pl">Others</div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="4" aria-label="Others Read"><div class="cb">r</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="2" aria-label="Others Write"><div class="cb">w</div></label></div>
+<div class="pc"><label class="cw"><input type="checkbox" data-w="2" data-b="1" aria-label="Others Execute"><div class="cb">x</div></label></div>
+</div>
+<div class="bd">
+<div class="bdi"><div class="bdl">Owner</div><div class="bdv oc" id="ov">7</div><div class="bds" id="os">rwx</div></div>
+<div class="bdi"><div class="bdl">Group</div><div class="bdv gc" id="gv">5</div><div class="bds" id="gs">r-x</div></div>
+<div class="bdi"><div class="bdl">Others</div><div class="bdv tc" id="tv">5</div><div class="bds" id="ts">r-x</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="ct"><em>&#128259;</em> Mode Conversion</div>
+<div class="ir">
+<div class="ig"><label>Numeric Mode</label><input type="text" id="numIn" placeholder="e.g. 755" maxlength="3"></div>
+<div class="ig"><label>Symbolic Mode</label><input type="text" id="symIn" placeholder="e.g. rwxr-xr-x" maxlength="9"></div>
+<div class="ig"><label>Filename</label><input type="text" id="fnIn" placeholder="e.g. script.sh" value="filename"></div>
+</div>
+<div class="cmd">
+<code class="cmdt" id="cmdOut">chmod 755 filename</code>
+<button class="cpb" id="cpBtn" aria-label="Copy command">Copy</button>
+</div>
+</div>
+
+<div class="card">
+<div class="ct"><em>&#9889;</em> Common Presets</div>
+<div class="psg" id="presets"></div>
+</div>
+
+<!-- Pro Section -->
+<style>
+.pro-section{margin-top:24px;margin-bottom:24px}
+.pro-label{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:700;color:var(--hi);margin-bottom:14px}
+.pro-blur-wrap{position:relative;border-radius:var(--r);overflow:hidden;cursor:pointer;border:1px solid var(--border)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;padding:20px;background:var(--card)}
+.pro-mock-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.pro-mock-card{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{font-size:.85rem;color:var(--hi);margin-bottom:10px}
+.pro-mock-bar{height:8px;background:var(--border);border-radius:4px;margin-bottom:6px}
+.pro-mock-bar.w60{width:60%}.pro-mock-bar.w80{width:80%}.pro-mock-bar.w45{width:45%}.pro-mock-bar.w70{width:70%}
+.pro-mock-line{height:12px;background:var(--border);border-radius:3px;margin-bottom:5px;width:90%}
+.pro-mock-line.short{width:55%}
+.pro-mock-table{width:100%;border-collapse:collapse}
+.pro-mock-table td{height:10px;background:var(--border);border:2px solid var(--bg);border-radius:3px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);transition:background .2s}
+.pro-blur-wrap:hover .pro-overlay{background:rgba(26,26,46,.65)}
+.pro-lock-icon{font-size:2.4rem;margin-bottom:8px}
+.pro-unlock-text{font-size:.95rem;color:#fff;font-weight:600;background:var(--hi);padding:8px 20px;border-radius:8px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s}
+.pro-modal h3{font-size:1.3rem;margin-bottom:6px}
+.pro-modal .pro-price{font-size:1.05rem;color:var(--hi);font-weight:700;margin-bottom:16px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:20px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.92rem;color:var(--dim)}
+.pro-modal ul li::before{content:'✓ ';color:var(--ok);font-weight:700}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:var(--hi);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:background .2s}
+.pro-btn-upgrade:hover{background:#d63a52}
+.pro-btn-later{background:none;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;padding:8px}
+.pro-btn-later:hover{color:var(--text)}
+@keyframes proIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+</style>
+<div class="pro-section">
+<div class="pro-label"><span>🔒</span> Pro Features</div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-blur-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>📋 Batch Permissions</h4><table class="pro-mock-table"><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table></div>
+<div class="pro-mock-card"><h4>🛡️ ACL Management</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-bar w70"></div></div>
+</div>
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>📜 Script Generation</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-bar w45"></div></div>
+</div>
+</div>
+<div class="pro-overlay"><div class="pro-lock-icon">🔒</div><div class="pro-unlock-text">Click to unlock Pro features</div></div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>Chmod Calculator Pro</h3>
+<div class="pro-price">$9 — one-time purchase</div>
+<ul>
+<li>Batch permissions — set chmod on multiple files/dirs at once</li>
+<li>ACL management — fine-grained access control lists editor</li>
+<li>Script generation — export bash/shell scripts for automation</li>
+<li>Recursive permission templates for common setups</li>
+<li>Lifetime access &amp; future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+<button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<footer>Unix Chmod Calculator &middot; <a href="https://github.com/Lifa-su/ai-chmod-calculator" target="_blank" rel="noopener">GitHub</a></footer>
+</div>
+<script>
+(function(){
+const cbs=document.querySelectorAll('.cw input');
+const numIn=document.getElementById('numIn');
+const symIn=document.getElementById('symIn');
+const fnIn=document.getElementById('fnIn');
+const cmdOut=document.getElementById('cmdOut');
+const cpBtn=document.getElementById('cpBtn');
+const presetsEl=document.getElementById('presets');
+let perms=[7,5,5];
+const PRESETS=[
+{n:'777',d:'Full access for everyone (risky)'},
+{n:'755',d:'Owner full, others read+execute'},
+{n:'750',d:'Owner full, group read+execute'},
+{n:'700',d:'Owner full, others none'},
+{n:'644',d:'Owner read+write, others read only'},
+{n:'640',d:'Owner rw, group read, others none'},
+{n:'600',d:'Owner read+write only'},
+{n:'400',d:'Owner read only'},
+{n:'444',d:'Read only for everyone'},
+{n:'555',d:'Read+execute for everyone'},
+{n:'775',d:'Owner+group full, others read+exec'},
+{n:'664',d:'Owner+group rw, others read'}
+];
+function numToSym(n){
+let s='';
+for(let i=0;i<3;i++){
+s+=(n[i]&4)?'r':'-';
+s+=(n[i]&2)?'w':'-';
+s+=(n[i]&1)?'x':'-';
+}
+return s;
+}
+function symToNum(s){
+if(s.length!==9)return null;
+let r=[];
+for(let i=0;i<3;i++){
+let v=0;
+let o=i*3;
+if(s[o]==='r')v+=4;else if(s[o]!=='-')return null;
+if(s[o+1]==='w')v+=2;else if(s[o+1]!=='-')return null;
+if(s[o+2]==='x')v+=1;else if(s[o+2]!=='-')return null;
+r.push(v);
+}
+return r;
+}
+function updateUI(source){
+let sym=numToSym(perms);
+let numStr=perms.join('');
+if(source!=='num')numIn.value=numStr;
+if(source!=='sym')symIn.value=sym;
+cbs.forEach(function(cb){
+let w=parseInt(cb.dataset.w);
+let b=parseInt(cb.dataset.b);
+cb.checked=(perms[w]&b)!==0;
+});
+document.getElementById('ov').textContent=perms[0];
+document.getElementById('os').textContent=sym.substring(0,3);
+document.getElementById('gv').textContent=perms[1];
+document.getElementById('gs').textContent=sym.substring(3,6);
+document.getElementById('tv').textContent=perms[2];
+document.getElementById('ts').textContent=sym.substring(6,9);
+let fn=fnIn.value.trim()||'filename';
+cmdOut.textContent='chmod '+numStr+' '+fn;
+}
+cbs.forEach(function(cb){
+cb.addEventListener('change',function(){
+let w=parseInt(this.dataset.w);
+let b=parseInt(this.dataset.b);
+if(this.checked)perms[w]|=b;
+else perms[w]&=~b;
+updateUI('cb');
+});
+});
+numIn.addEventListener('input',function(){
+let v=this.value.replace(/[^0-7]/g,'');
+if(v.length>3)v=v.substring(0,3);
+this.value=v;
+if(v.length===3){
+perms=[parseInt(v[0]),parseInt(v[1]),parseInt(v[2])];
+updateUI('num');
+}
+});
+symIn.addEventListener('input',function(){
+let v=this.value.toLowerCase();
+if(v.length===9){
+let r=symToNum(v);
+if(r){perms=r;updateUI('sym');}
+}
+});
+fnIn.addEventListener('input',function(){updateUI('fn');});
+cpBtn.addEventListener('click',function(){
+navigator.clipboard.writeText(cmdOut.textContent).then(function(){
+cpBtn.textContent='Copied!';
+setTimeout(function(){cpBtn.textContent='Copy';},1500);
+});
+});
+PRESETS.forEach(function(p){
+let btn=document.createElement('button');
+btn.className='psb';
+btn.setAttribute('aria-label','Set permission to '+p.n);
+btn.innerHTML='<div class="psn">'+p.n+'</div><div class="pss">'+numToSym([parseInt(p.n[0]),parseInt(p.n[1]),parseInt(p.n[2])])+'</div><div class="psd">'+p.d+'</div>';
+btn.addEventListener('click',function(){
+perms=[parseInt(p.n[0]),parseInt(p.n[1]),parseInt(p.n[2])];
+updateUI('preset');
+});
+presetsEl.appendChild(btn);
+});
+updateUI('init');
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

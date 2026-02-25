@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI crontab monitoring dashboard. Visualize your cron schedule, detect overlapping jobs, and get notifications when scheduled tasks fail or timeout.">
+<link rel="canonical" href="https://lifa-su.com/ai-crontab-monitor/">
+<title>AI Crontab Monitor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#242836;--bd:#2e3348;--tx:#e4e6f0;--tx2:#8b8fa8;--ac:#6c5ce7;--ac2:#a29bfe;--dg:#ff6b6b;--ok:#00cec9}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.c{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--ac2),var(--ok));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);font-size:.95rem;margin-top:8px}
+.p{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:20px}
+.p h2{font-size:1.1rem;margin-bottom:14px;color:var(--ac2)}
+textarea{width:100%;height:180px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;padding:14px;resize:vertical;outline:none}
+textarea:focus{border-color:var(--ac)}
+textarea::placeholder{color:var(--tx2)}
+.btn{background:linear-gradient(135deg,var(--ac),#7c6cf0);color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:.9rem;cursor:pointer;font-weight:600}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(108,92,231,.4)}
+.br{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.b2{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);padding:10px 20px;border-radius:8px;font-size:.85rem;cursor:pointer}
+.b2:hover{border-color:var(--ac);color:var(--ac2)}
+.sts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.st{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;text-align:center}
+.st .n{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--ac2),var(--ok));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.st .l{font-size:.75rem;color:var(--tx2);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.tw{overflow-x:auto}
+.th{display:flex;border-bottom:1px solid var(--bd);padding-bottom:8px;margin-bottom:4px}
+.tl{width:180px;min-width:180px;font-size:.75rem;color:var(--tx2)}
+.hs{display:flex;flex:1}.hs span{flex:1;text-align:center;font-size:.65rem;color:var(--tx2)}
+.tr{display:flex;align-items:center;min-height:32px;border-bottom:1px solid rgba(46,51,72,.4)}
+.tr:hover{background:rgba(108,92,231,.05)}
+.tr .rl{width:180px;min-width:180px;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:10px}
+.tb{flex:1;position:relative;height:24px}
+.bk{position:absolute;height:18px;top:3px;border-radius:3px;min-width:2px;opacity:.85;cursor:pointer}
+.bk:hover{opacity:1;z-index:5}
+.bk.cf{animation:pl 1.5s ease-in-out infinite;box-shadow:0 0 8px rgba(255,107,107,.5)}
+@keyframes pl{0%,100%{opacity:.85}50%{opacity:1}}
+.tk{position:absolute;top:0;bottom:0;width:1px;background:rgba(46,51,72,.5)}
+.ci{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:8px;padding:12px 16px;margin-bottom:8px;font-size:.85rem}
+.ci strong{color:var(--dg)}
+.ni{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(46,51,72,.4);font-size:.85rem}
+.ni:last-child{border-bottom:none}
+.nc{font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:12px}
+.nt{color:var(--ok);white-space:nowrap;font-weight:600}
+.nx{color:var(--tx2);font-family:monospace;font-size:.75rem;margin-right:12px}
+.em{text-align:center;padding:40px;color:var(--tx2)}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+.li{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--tx2)}
+.lc{width:14px;height:14px;border-radius:3px}
+footer{text-align:center;padding:30px 0 20px;color:var(--tx2);font-size:.8rem}
+footer a{color:var(--ac2);text-decoration:none}
+@media(max-width:768px){header h1{font-size:1.5rem}.c{padding:12px}.p{padding:16px}textarea{height:140px}.tl,.tr .rl{width:100px;min-width:100px;font-size:.7rem}.sts{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="c">
+<header><h1>&#9200; AI Crontab Monitor</h1><p>Visualize, analyze, and detect conflicts in your cron jobs</p></header>
+<div class="p"><h2>&#128221; Crontab Input</h2>
+<textarea id="inp" placeholder="# Paste your crontab here&#10;*/5 * * * * /usr/bin/check_health&#10;0 2 * * * /backup/run.sh&#10;30 8 * * 1-5 /scripts/report.sh"></textarea>
+<div class="br"><button class="btn" onclick="analyze()">&#9654; Analyze</button><button class="b2" onclick="loadEx()">Load Example</button><button class="b2" onclick="clr()">Clear</button></div></div>
+<div class="sts" id="stats" style="display:none">
+<div class="st"><div class="n" id="sT">0</div><div class="l">Total Jobs</div></div>
+<div class="st"><div class="n" id="sC">0</div><div class="l">Conflicts</div></div>
+<div class="st"><div class="n" id="sF">-</div><div class="l">Most Frequent</div></div>
+<div class="st"><div class="n" id="sB">-</div><div class="l">Busiest Hour</div></div></div>
+<div id="timeline" style="display:none" class="p"><h2>&#128202; 24-Hour Timeline</h2><div class="tw" id="tlC"></div><div class="lg" id="lgd"></div></div>
+<div id="conflicts" style="display:none" class="p"><h2>&#9888;&#65039; Conflict Detection</h2><div id="cfC"></div></div>
+<div id="nextrun" style="display:none" class="p"><h2>&#128337; Next Execution Times</h2><div id="nrC"></div></div>
+</div>
+<footer><p>AI Crontab Monitor &mdash; Built for DevOps</p></footer>
+<script>
+const COLORS=['#6c5ce7','#00cec9','#fdcb6e','#ff6b6b','#55efc4','#fd79a8','#74b9ff','#ffeaa7','#e17055','#81ecec','#fab1a0','#dfe6e9'];
+
+function parseField(field, min, max) {
+  const vals = new Set();
+  field.split(',').forEach(part => {
+    let step = 1, range = part;
+    if (part.includes('/')) { const s = part.split('/'); range = s[0]; step = parseInt(s[1]); }
+    if (range === '*') { for (let i = min; i <= max; i += step) vals.add(i); }
+    else if (range.includes('-')) {
+      const [a, b] = range.split('-').map(Number);
+      for (let i = a; i <= b; i += step) vals.add(i);
+    } else { vals.add(parseInt(range)); }
+  });
+  return [...vals].filter(v => v >= min && v <= max).sort((a,b) => a - b);
+}
+
+function parseCrontab(text) {
+  const jobs = [];
+  text.split('\n').forEach(line => {
+    line = line.trim();
+    if (!line || line.startsWith('#') || line.startsWith('@')) {
+      if (line.startsWith('@')) {
+        let schedule, cmd = line.split(/\s+/).slice(1).join(' ');
+        const kw = line.split(/\s+/)[0];
+        const map = {'@yearly':'0 0 1 1 *','@annually':'0 0 1 1 *','@monthly':'0 0 1 * *','@weekly':'0 0 * * 0','@daily':'0 0 * * *','@midnight':'0 0 * * *','@hourly':'0 * * * *'};
+        if (map[kw]) {
+          schedule = map[kw];
+          const parts = schedule.split(/\s+/);
+          jobs.push({raw: kw, cmd: cmd || kw, min: parseField(parts[0],0,59), hour: parseField(parts[1],0,23), dom: parseField(parts[2],1,31), mon: parseField(parts[3],1,12), dow: parseField(parts[4],0,6)});
+        }
+      }
+      return;
+    }
+    const parts = line.split(/\s+/);
+    if (parts.length < 6) return;
+    const [m, h, d, mo, dw] = parts;
+    const cmd = parts.slice(5).join(' ');
+    try {
+      jobs.push({raw: [m,h,d,mo,dw].join(' '), cmd, min: parseField(m,0,59), hour: parseField(h,0,23), dom: parseField(d,1,31), mon: parseField(mo,1,12), dow: parseField(dw,0,6)});
+    } catch(e) {}
+  });
+  return jobs;
+}
+
+function getMinuteSlots(job) {
+  const slots = new Set();
+  job.hour.forEach(h => { job.min.forEach(m => { slots.add(h * 60 + m); }); });
+  return slots;
+}
+
+function findConflicts(jobs) {
+  const conflicts = [];
+  for (let i = 0; i < jobs.length; i++) {
+    const slotsA = getMinuteSlots(jobs[i]);
+    for (let j = i + 1; j < jobs.length; j++) {
+      const slotsB = getMinuteSlots(jobs[j]);
+      const overlap = [...slotsA].filter(s => slotsB.has(s));
+      if (overlap.length > 0) {
+        const times = overlap.slice(0, 5).map(s => {
+          const hh = String(Math.floor(s/60)).padStart(2,'0');
+          const mm = String(s%60).padStart(2,'0');
+          return hh+':'+mm;
+        });
+        conflicts.push({a: i, b: j, times, count: overlap.length});
+      }
+    }
+  }
+  return conflicts;
+}
+
+function getNextRun(job) {
+  const now = new Date();
+  for (let d = 0; d < 400; d++) {
+    const date = new Date(now.getTime() + d * 86400000);
+    if (!job.mon.includes(date.getMonth() + 1)) continue;
+    if (!job.dom.includes(date.getDate()) && !job.dow.includes(date.getDay())) continue;
+    for (const h of job.hour) {
+      for (const m of job.min) {
+        const candidate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m, 0);
+        if (candidate > now) return candidate;
+      }
+    }
+  }
+  return null;
+}
+
+function renderTimeline(jobs, conflicts) {
+  const el = document.getElementById('tlC');
+  let html = '<div class="th"><div class="tl">Job</div><div class="hs">';
+  for (let i = 0; i < 24; i++) html += '<span>' + String(i).padStart(2,'0') + '</span>';
+  html += '</div></div>';
+
+  const conflictSlots = {};
+  conflicts.forEach(c => {
+    const key = c.a + '-' + c.b;
+    const sA = getMinuteSlots(jobs[c.a]);
+    const sB = getMinuteSlots(jobs[c.b]);
+    [...sA].filter(s => sB.has(s)).forEach(s => {
+      if (!conflictSlots[c.a]) conflictSlots[c.a] = new Set();
+      if (!conflictSlots[c.b]) conflictSlots[c.b] = new Set();
+      conflictSlots[c.a].add(s);
+      conflictSlots[c.b].add(s);
+    });
+  });
+
+  jobs.forEach((job, idx) => {
+    const color = COLORS[idx % COLORS.length];
+    const label = job.cmd.length > 25 ? job.cmd.slice(0,22) + '...' : job.cmd;
+    html += '<div class="tr"><div class="rl" title="' + job.cmd.replace(/"/g,'&quot;') + '">' + label + '</div><div class="tb">';
+    for (let i = 0; i < 24; i++) html += '<div class="tk" style="left:' + (i/24*100) + '%"></div>';
+
+    const slots = getMinuteSlots(job);
+    const cSlots = conflictSlots[idx] || new Set();
+    const sorted = [...slots].sort((a,b) => a - b);
+
+    let i = 0;
+    while (i < sorted.length) {
+      let start = sorted[i], end = sorted[i];
+      const isCf = cSlots.has(start);
+      while (i + 1 < sorted.length && sorted[i+1] - sorted[i] <= 5 && cSlots.has(sorted[i+1]) === isCf) {
+        i++; end = sorted[i];
+      }
+      const left = (start / 1440 * 100).toFixed(3);
+      const width = Math.max(((end - start + 1) / 1440 * 100), 0.15).toFixed(3);
+      const bg = isCf ? 'var(--dg)' : color;
+      const cls = isCf ? 'bk cf' : 'bk';
+      const hh1 = String(Math.floor(start/60)).padStart(2,'0');
+      const mm1 = String(start%60).padStart(2,'0');
+      const hh2 = String(Math.floor(end/60)).padStart(2,'0');
+      const mm2 = String(end%60).padStart(2,'0');
+      html += '<div class="' + cls + '" style="left:' + left + '%;width:' + width + '%;background:' + bg + '" title="' + hh1 + ':' + mm1 + '-' + hh2 + ':' + mm2 + '"></div>';
+      i++;
+    }
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+
+  const lgd = document.getElementById('lgd');
+  lgd.innerHTML = jobs.map((j, i) => {
+    const lbl = j.cmd.length > 20 ? j.cmd.slice(0,17) + '...' : j.cmd;
+    return '<div class="li"><div class="lc" style="background:' + COLORS[i%COLORS.length] + '"></div>' + lbl + '</div>';
+  }).join('');
+}
+
+function renderConflicts(jobs, conflicts) {
+  const el = document.getElementById('cfC');
+  if (conflicts.length === 0) {
+    el.innerHTML = '<div class="em">&#10004; No conflicts detected</div>';
+    return;
+  }
+  el.innerHTML = conflicts.map(c => {
+    const a = jobs[c.a].cmd.length > 30 ? jobs[c.a].cmd.slice(0,27)+'...' : jobs[c.a].cmd;
+    const b = jobs[c.b].cmd.length > 30 ? jobs[c.b].cmd.slice(0,27)+'...' : jobs[c.b].cmd;
+    return '<div class="ci">&#9888; <strong>' + a + '</strong> and <strong>' + b + '</strong> overlap at ' + c.times.join(', ') + (c.count > 5 ? ' (+' + (c.count-5) + ' more)' : '') + '</div>';
+  }).join('');
+}
+
+function renderNextRuns(jobs) {
+  const el = document.getElementById('nrC');
+  const runs = jobs.map((j, i) => ({job: j, next: getNextRun(j), idx: i})).filter(r => r.next).sort((a,b) => a.next - b.next);
+  if (runs.length === 0) { el.innerHTML = '<div class="em">No upcoming runs found</div>'; return; }
+  el.innerHTML = runs.map(r => {
+    const t = r.next;
+    const ts = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0') + ' ' + String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
+    const cmd = r.job.cmd.length > 40 ? r.job.cmd.slice(0,37)+'...' : r.job.cmd;
+    return '<div class="ni"><span class="nc">' + cmd + '</span><span class="nx">' + r.job.raw + '</span><span class="nt">' + ts + '</span></div>';
+  }).join('');
+}
+
+function analyze() {
+  const text = document.getElementById('inp').value;
+  if (!text.trim()) return;
+  const jobs = parseCrontab(text);
+  if (jobs.length === 0) { alert('No valid crontab entries found'); return; }
+
+  const conflicts = findConflicts(jobs);
+
+  document.getElementById('sT').textContent = jobs.length;
+  document.getElementById('sC').textContent = conflicts.length;
+
+  const freqs = jobs.map(j => getMinuteSlots(j).size);
+  const maxFreq = Math.max(...freqs);
+  const maxIdx = freqs.indexOf(maxFreq);
+  document.getElementById('sF').textContent = maxFreq + '/day';
+
+  const hourCount = new Array(24).fill(0);
+  jobs.forEach(j => { j.hour.forEach(h => { j.min.forEach(() => hourCount[h]++); }); });
+  const busyH = hourCount.indexOf(Math.max(...hourCount));
+  document.getElementById('sB').textContent = String(busyH).padStart(2,'0') + ':00';
+
+  document.getElementById('stats').style.display = '';
+  document.getElementById('timeline').style.display = '';
+  document.getElementById('conflicts').style.display = '';
+  document.getElementById('nextrun').style.display = '';
+
+  renderTimeline(jobs, conflicts);
+  renderConflicts(jobs, conflicts);
+  renderNextRuns(jobs);
+}
+
+function loadEx() {
+  document.getElementById('inp').value = "*/5 * * * * /usr/bin/check_health\n0 2 * * * /backup/full_backup.sh\n0 2 * * * /scripts/db_dump.sh\n30 */6 * * * /usr/local/bin/sync_data\n0 8 * * 1-5 /scripts/weekday_report.sh\n15 8 * * 1-5 /scripts/send_emails.sh\n0 0 1 * * /scripts/monthly_cleanup.sh\n*/15 * * * * /usr/bin/monitor_disk\n0 12 * * * /scripts/noon_task.sh\n0 3 * * 0 /scripts/weekly_maintenance.sh";
+  analyze();
+}
+
+function clr() {
+  document.getElementById('inp').value = '';
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('timeline').style.display = 'none';
+  document.getElementById('conflicts').style.display = 'none';
+  document.getElementById('nextrun').style.display = 'none';
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

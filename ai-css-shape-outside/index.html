@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS shape-outside generator for creative text wrapping. Create circle, ellipse, polygon, and inset shapes. Preview text flow around custom CSS shapes.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-shape-outside/">
+<title>CSS Shape Outside Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aaa;--bd:#2a2a4a;--r:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--sf);padding:14px 24px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bd)}
+header h1{font-size:1.3rem;font-weight:600}
+header .logo{color:var(--ac);font-size:1.4rem}
+.main{display:flex;flex:1;overflow:hidden}
+.left{width:280px;min-width:280px;background:var(--sf);border-right:1px solid var(--bd);padding:16px;overflow-y:auto}
+.right{flex:1;display:flex;flex-direction:column}
+.preview{flex:1;padding:20px;overflow:hidden}
+.codebar{background:var(--sf);border-top:1px solid var(--bd);padding:16px}
+h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:10px}
+.sbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
+.sbtn{padding:10px;border:2px solid var(--bd);background:0 0;color:var(--tx);border-radius:var(--r);cursor:pointer;font-size:.85rem;transition:.2s}
+.sbtn:hover{border-color:var(--ac2)}
+.sbtn.on{border-color:var(--ac);background:rgba(233,69,96,.1)}
+.cg{margin-bottom:14px}
+.cg label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--tx2);margin-bottom:4px}
+.cg label span{color:var(--tx)}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--bd);outline:0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ac);cursor:pointer}
+.pact{display:flex;gap:6px;margin-bottom:12px}
+.pact button{padding:8px 14px;border:0;border-radius:var(--r);cursor:pointer;font-size:.8rem;background:var(--sf2);color:var(--tx);transition:.2s}
+.pact button:hover{background:var(--ac2)}
+.pbox{width:100%;height:100%;position:relative;background:var(--sf);border-radius:var(--r);overflow:hidden}
+.pcontent{width:100%;height:100%;padding:20px;overflow-y:auto}
+.sfloat{float:left;width:200px;height:200px;position:relative}
+.sfloat svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.ptxt{font-size:.9rem;line-height:1.7;color:var(--tx2)}
+.cp{width:14px;height:14px;border-radius:50%;background:var(--ac);border:2px solid #fff;position:absolute;transform:translate(-50%,-50%);cursor:grab;z-index:20;transition:box-shadow .15s}
+.cp:hover,.cp.drag{box-shadow:0 0 12px rgba(233,69,96,.6);transform:translate(-50%,-50%) scale(1.2)}
+.cp.ctr{background:var(--ac2)}
+.cout{display:flex;gap:10px;align-items:stretch}
+.cout pre{flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;color:#7fdbca;overflow-x:auto;white-space:pre-wrap;word-break:break-all;min-height:60px}
+.cbtn{padding:8px 16px;border:0;border-radius:var(--r);background:var(--ac);color:#fff;cursor:pointer;font-size:.85rem;transition:.2s}
+.cbtn:hover{background:#d63851}
+.cbtn.ok{background:#2ecc71}
+.hint{font-size:.75rem;color:var(--tx2);margin-top:10px;line-height:1.5}
+@media(max-width:768px){.main{flex-direction:column}.left{width:100%;min-width:auto;max-height:40vh}}
+</style>
+</head>
+<body>
+<header><span class="logo">&#9670;</span><h1>CSS Shape Outside Generator</h1></header>
+<div class="main">
+<div class="left">
+<h3>Shape Type</h3>
+<div class="sbtns" id="sbtns">
+<button class="sbtn on" data-s="circle">&#9679; Circle</button>
+<button class="sbtn" data-s="ellipse">&#11044; Ellipse</button>
+<button class="sbtn" data-s="polygon">&#9651; Polygon</button>
+<button class="sbtn" data-s="inset">&#9633; Inset</button>
+</div>
+<div id="ctrls"></div>
+<div class="hint" id="hint"></div>
+</div>
+<div class="right">
+<div class="preview"><div class="pbox" id="pbox">
+<div class="pcontent" id="pc">
+<div class="sfloat" id="sf"><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+<p class="ptxt" id="ptxt"></p>
+</div>
+<div id="cpl"></div>
+</div></div>
+<div class="codebar">
+<h3>Generated CSS</h3>
+<div class="cout"><pre id="code"></pre><button class="cbtn" id="cbtn">&#128203; Copy</button></div>
+</div>
+</div>
+</div>
+<script id="appScript">
+(function(){
+var LOREM="The CSS shape-outside property allows you to define a shape that adjacent inline content should wrap around. This powerful feature enables creative text layouts that go beyond simple rectangular boxes. With shape-outside you can create circular elliptical polygonal or inset shapes that text will flow around naturally. This creates visually appealing designs that draw the readers eye and make your web pages stand out. Combined with float shape-outside opens up a world of creative possibilities for web designers and developers. The text wraps smoothly around the defined shape creating organic and dynamic layouts. Try adjusting the control points to see how the text reflow changes in real time. Each shape type offers different parameters and control points for fine tuning. Circle and ellipse shapes are great for rounded elements like profile pictures. Polygon shapes give you complete freedom to define any arbitrary shape with multiple vertices. Inset shapes let you create rectangular cutouts with optional rounded corners. Experiment with different shapes and settings to find the perfect layout for your design. The generated CSS code can be copied and used directly in your stylesheets. Shape outside works best with floated elements and can dramatically improve the visual flow of your content. Modern browsers have excellent support for this property making it a practical choice for production websites. Keep exploring and creating beautiful text layouts with CSS shapes.";
+var shape="circle";
+var W=200,H=200;
+var state={
+  circle:{r:50,cx:50,cy:50},
+  ellipse:{rx:45,ry:35,cx:50,cy:50},
+  polygon:[{x:50,y:5},{x:95,y:35},{x:80,y:90},{x:20,y:90},{x:5,y:35}],
+  inset:{top:5,right:5,bottom:5,left:5,round:10}
+};
+var sf=document.getElementById("sf"),svg=document.getElementById("svg"),ptxt=document.getElementById("ptxt");
+var ctrls=document.getElementById("ctrls"),hint=document.getElementById("hint"),cpl=document.getElementById("cpl");
+var code=document.getElementById("code"),cbtn=document.getElementById("cbtn"),pbox=document.getElementById("pbox");
+ptxt.textContent=LOREM;
+// shape buttons
+document.getElementById("sbtns").addEventListener("click",function(e){
+  var b=e.target.closest("[data-s]");if(!b)return;
+  document.querySelectorAll(".sbtn").forEach(function(x){x.classList.remove("on")});
+  b.classList.add("on");shape=b.dataset.s;render();
+});
+function slider(id,label,min,max,val,cb){
+  var d=document.createElement("div");d.className="cg";
+  d.innerHTML='<label>'+label+' <span id="v_'+id+'">'+val+'%</span></label><input type="range" id="'+id+'" min="'+min+'" max="'+max+'" value="'+val+'">';
+  ctrls.appendChild(d);
+  var inp=d.querySelector("input");
+  inp.addEventListener("input",function(){
+    d.querySelector("span").textContent=inp.value+"%";cb(+inp.value);render();
+  });
+}
+function render(){
+  ctrls.innerHTML="";cpl.innerHTML="";
+  var s=state[shape],css="",svgH="",pts=[];
+  if(shape==="circle"){
+    slider("cr","Radius",10,50,s.r,function(v){s.r=v});
+    slider("ccx","Center X",0,100,s.cx,function(v){s.cx=v});
+    slider("ccy","Center Y",0,100,s.cy,function(v){s.cy=v});
+    css="circle("+s.r+"% at "+s.cx+"% "+s.cy+"%)";
+    var rx=s.r*W/100,cx=s.cx*W/100,cy=s.cy*H/100;
+    svgH='<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+rx+'" fill="rgba(233,69,96,0.2)" stroke="#e94560" stroke-width="2"/>';
+    pts=[{x:s.cx,y:s.cy,k:"ctr",onMove:function(px,py){s.cx=px;s.cy=py}},{x:s.cx+s.r,y:s.cy,k:"r",onMove:function(px){s.r=Math.max(5,Math.min(50,Math.round(px-s.cx)));}}];
+    hint.textContent="Drag the purple dot to move center. Drag the red dot to resize radius.";
+  } else if(shape==="ellipse"){
+    slider("erx","Radius X",10,50,s.rx,function(v){s.rx=v});
+    slider("ery","Radius Y",10,50,s.ry,function(v){s.ry=v});
+    slider("ecx","Center X",0,100,s.cx,function(v){s.cx=v});
+    slider("ecy","Center Y",0,100,s.cy,function(v){s.cy=v});
+    css="ellipse("+s.rx+"% "+s.ry+"% at "+s.cx+"% "+s.cy+"%)";
+    var erx=s.rx*W/100,ery=s.ry*H/100,ecx=s.cx*W/100,ecy=s.cy*H/100;
+    svgH='<ellipse cx="'+ecx+'" cy="'+ecy+'" rx="'+erx+'" ry="'+ery+'" fill="rgba(233,69,96,0.2)" stroke="#e94560" stroke-width="2"/>';
+    pts=[{x:s.cx,y:s.cy,k:"ctr",onMove:function(px,py){s.cx=px;s.cy=py}},{x:s.cx+s.rx,y:s.cy,k:"rx",onMove:function(px){s.rx=Math.max(5,Math.min(50,Math.round(px-s.cx)))}},{x:s.cx,y:s.cy+s.ry,k:"ry",onMove:function(_,py){s.ry=Math.max(5,Math.min(50,Math.round(py-s.cy)))}}];
+    hint.textContent="Drag purple dot for center. Red dots adjust X and Y radii.";
+  } else if(shape==="polygon"){
+    var pa=document.createElement("div");pa.className="pact";
+    pa.innerHTML='<button id="addPt">+ Add Point</button><button id="delPt">- Remove Last</button>';
+    ctrls.appendChild(pa);
+    document.getElementById("addPt").onclick=function(){
+      s.push({x:Math.round(Math.random()*80+10),y:Math.round(Math.random()*80+10)});render();
+    };
+    document.getElementById("delPt").onclick=function(){if(s.length>3){s.pop();render();}};
+    var polyPts=s.map(function(p){return (p.x*W/100)+","+(p.y*H/100)}).join(" ");
+    svgH='<polygon points="'+polyPts+'" fill="rgba(233,69,96,0.2)" stroke="#e94560" stroke-width="2"/>';
+    css="polygon("+s.map(function(p){return p.x+"% "+p.y+"%"}).join(", ")+")";
+    s.forEach(function(p,i){
+      pts.push({x:p.x,y:p.y,k:"p"+i,onMove:function(px,py){s[i].x=px;s[i].y=py}});
+    });
+    hint.textContent="Drag points to reshape. Use buttons to add/remove vertices.";
+  } else if(shape==="inset"){
+    slider("it","Top",0,45,s.top,function(v){s.top=v});
+    slider("ir","Right",0,45,s.right,function(v){s.right=v});
+    slider("ib","Bottom",0,45,s.bottom,function(v){s.bottom=v});
+    slider("il","Left",0,45,s.left,function(v){s.left=v});
+    slider("ird","Border Radius",0,50,s.round,function(v){s.round=v});
+    var t=s.top*H/100,r=s.right*W/100,b=s.bottom*H/100,l=s.left*W/100;
+    var rr=s.round*Math.min(W,H)/100;
+    svgH='<rect x="'+l+'" y="'+t+'" width="'+(W-l-r)+'" height="'+(H-t-b)+'" rx="'+rr+'" fill="rgba(233,69,96,0.2)" stroke="#e94560" stroke-width="2"/>';
+    css="inset("+s.top+"% "+s.right+"% "+s.bottom+"% "+s.left+"% round "+s.round+"%)";
+    pts=[
+      {x:50,y:s.top,k:"t",onMove:function(_,py){s.top=Math.max(0,Math.min(45,py))}},
+      {x:100-s.right,y:50,k:"r",onMove:function(px){s.right=Math.max(0,Math.min(45,100-px))}},
+      {x:50,y:100-s.bottom,k:"b",onMove:function(_,py){s.bottom=Math.max(0,Math.min(45,100-py))}},
+      {x:s.left,y:50,k:"l",onMove:function(px){s.left=Math.max(0,Math.min(45,px))}}
+    ];
+    hint.textContent="Drag edge points to adjust inset distances. Use slider for border radius.";
+  }
+  svg.innerHTML=svgH;
+  sf.style.shapeOutside=css;sf.style.clipPath=css;
+  var fullCSS=".shape {\n  float: left;\n  width: 200px;\n  height: 200px;\n  shape-outside: "+css+";\n  clip-path: "+css+";\n  background: #e94560;\n}";
+  code.textContent=fullCSS;
+  // control points
+  var rect=sf.getBoundingClientRect(),pRect=pbox.getBoundingClientRect();
+  var offX=rect.left-pRect.left,offY=rect.top-pRect.top;
+  pts.forEach(function(p){
+    var dot=document.createElement("div");
+    dot.className="cp"+(p.k==="ctr"?" ctr":"");
+    dot.style.left=(offX+p.x*W/100)+"px";
+    dot.style.top=(offY+p.y*H/100)+"px";
+    cpl.appendChild(dot);
+    dot.addEventListener("mousedown",startDrag);
+    dot.addEventListener("touchstart",startDrag,{passive:false});
+    function startDrag(e){
+      e.preventDefault();dot.classList.add("drag");
+      var move=function(ev){
+        var cx=ev.clientX||ev.touches[0].clientX,cy=ev.clientY||ev.touches[0].clientY;
+        var px=Math.max(0,Math.min(100,Math.round((cx-rect.left)/W*100)));
+        var py=Math.max(0,Math.min(100,Math.round((cy-rect.top)/H*100)));
+        p.onMove(px,py);render();
+      };
+      var up=function(){dot.classList.remove("drag");document.removeEventListener("mousemove",move);document.removeEventListener("mouseup",up);document.removeEventListener("touchmove",move);document.removeEventListener("touchend",up);};
+      document.addEventListener("mousemove",move);document.addEventListener("mouseup",up);
+      document.addEventListener("touchmove",move,{passive:false});document.addEventListener("touchend",up);
+    }
+  });
+}
+cbtn.addEventListener("click",function(){
+  navigator.clipboard.writeText(code.textContent).then(function(){
+    cbtn.textContent="Copied!";cbtn.classList.add("ok");
+    setTimeout(function(){cbtn.innerHTML="&#128203; Copy";cbtn.classList.remove("ok")},2000);
+  });
+});
+render();
+window.addEventListener("resize",function(){render()});
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

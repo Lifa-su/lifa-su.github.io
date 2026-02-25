@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive CSS isolation property explorer. Learn how stacking contexts work with visual demos. Understand z-index and isolation behavior in practice.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-isolation/">
+<title>CSS Isolation Explorer - Interactive Demo Tool</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--dm:#999}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6}
+code{background:rgba(255,255,255,.08);padding:.1em .3em;border-radius:4px;font-size:.88em}
+.hdr{text-align:center;padding:2.5rem 1rem 1.5rem}
+.hdr h1{font-size:clamp(1.4rem,4vw,2.3rem);background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr p{color:var(--dm);font-size:.92rem;max-width:580px;margin:.4rem auto 0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 1rem 1rem}
+.sec{background:var(--sf);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,.06)}
+.sec h2{font-size:1.2rem;margin-bottom:1rem}
+.ctrls{display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:1.2rem;align-items:flex-end}
+.cg{display:flex;flex-direction:column;gap:.25rem}
+.cg label{font-size:.72rem;color:var(--dm);text-transform:uppercase;letter-spacing:.5px}
+select{background:var(--cd);color:var(--tx);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.4rem .65rem;font-size:.84rem;cursor:pointer}
+input[type=range]{width:110px;accent-color:var(--ac)}
+input[type=color]{width:38px;height:32px;padding:1px;background:var(--cd);border:1px solid rgba(255,255,255,.12);border-radius:8px;cursor:pointer}
+.vd{font-size:.72rem;color:var(--ac);text-align:center}
+.tg{display:inline-flex;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+.tb{padding:.4rem .9rem;background:var(--cd);color:var(--dm);border:none;cursor:pointer;font-size:.8rem;transition:all .2s}
+.tb.on{background:var(--ac);color:#fff}
+.tb:hover:not(.on){background:rgba(233,69,96,.2)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden}
+.pan{padding:1.2rem;display:flex;align-items:center;justify-content:center;min-height:210px;position:relative}
+.pan .tag{position:absolute;top:.4rem;left:.6rem;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.55);background:rgba(0,0,0,.4);padding:.12rem .45rem;border-radius:4px;z-index:10}
+.bp{width:170px;height:170px;position:relative}
+.bs{width:95px;height:95px;border-radius:50%;position:absolute;transition:all .3s}
+.bs.a{top:8px;left:38px}.bs.b{bottom:8px;left:12px}.bs.c{bottom:8px;right:12px}
+.ss{width:100%;max-width:400px;height:240px;position:relative;margin:0 auto}
+.sl{position:absolute;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:600;transition:all .4s;border:2px solid rgba(255,255,255,.15)}
+.sl:hover{filter:brightness(1.15)}
+.cb{position:relative;background:#0d1117;border-radius:8px;padding:1rem;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;line-height:1.7;overflow-x:auto;border:1px solid rgba(255,255,255,.08)}
+.cb pre{margin:0;color:#c9d1d9;white-space:pre}
+.cpb{position:absolute;top:.5rem;right:.5rem;background:var(--ac);color:#fff;border:none;border-radius:6px;padding:.25rem .65rem;font-size:.73rem;cursor:pointer;opacity:.85;transition:all .2s}
+.cpb:hover{opacity:1}.cpb.ok{background:#2ea043}
+.info{background:rgba(83,52,131,.15);border-left:3px solid var(--ac2);border-radius:0 8px 8px 0;padding:.75rem 1rem;margin-top:1rem;font-size:.84rem;color:var(--dm)}
+.info b{color:var(--tx)}
+.ft{text-align:center;padding:2rem 1rem;color:var(--dm);font-size:.78rem}
+@media(max-width:768px){.split{grid-template-columns:1fr}.cg{flex:1;min-width:90px}.bp{width:130px;height:130px}.bs{width:72px;height:72px}.bs.a{top:5px;left:28px}.bs.b{bottom:5px;left:8px}.bs.c{bottom:5px;right:8px}.sec{padding:1rem}}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>&#127912; CSS Isolation Explorer</h1><p>Interactive tool for CSS <code>isolation</code>, <code>mix-blend-mode</code>, and stacking contexts</p></div>
+<div class="wrap">
+<!-- S1: isolate vs auto -->
+<div class="sec">
+<h2>&#9889; Isolation: isolate vs auto</h2>
+<div class="ctrls">
+<div class="cg"><label>Blend Mode</label><select id="c1bm"><option value="multiply">multiply</option><option value="screen">screen</option><option value="overlay" selected>overlay</option><option value="difference">difference</option><option value="color-dodge">color-dodge</option><option value="color-burn">color-burn</option><option value="hard-light">hard-light</option><option value="exclusion">exclusion</option></select></div>
+<div class="cg"><label>BG Color</label><input type="color" id="c1bg" value="#1a1a2e"></div>
+<div class="cg"><label>Shape 1</label><input type="color" id="c1s1" value="#e94560"></div>
+<div class="cg"><label>Shape 2</label><input type="color" id="c1s2" value="#533483"></div>
+<div class="cg"><label>Shape 3</label><input type="color" id="c1s3" value="#0f3460"></div>
+<div class="cg"><label>Opacity</label><input type="range" id="c1op" min="0.1" max="1" step="0.05" value="0.85"><div class="vd" id="c1opv">0.85</div></div>
+</div>
+<div class="split">
+<div class="pan" id="p1a"><div class="tag">isolation: auto</div><div class="bp" id="bp1a"><div class="bs a"></div><div class="bs b"></div><div class="bs c"></div></div></div>
+<div class="pan" id="p1i"><div class="tag">isolation: isolate</div><div class="bp" id="bp1i" style="isolation:isolate"><div class="bs a"></div><div class="bs b"></div><div class="bs c"></div></div></div>
+</div>
+<div class="info"><b>How it works:</b> With <code>isolation: auto</code> (left), child elements blend with everything behind them, including the page background. With <code>isolation: isolate</code> (right), a new stacking context is created — children only blend within their parent container.</div>
+<div class="cb" id="code1"><pre></pre><button class="cpb" onclick="copyCode('code1')">Copy</button></div>
+</div>
+
+<!-- S2: Blend Mode Gallery -->
+<div class="sec">
+<h2>&#127912; Mix-Blend-Mode + Isolation</h2>
+<div class="ctrls">
+<div class="cg"><label>Isolation</label>
+<div class="tg"><button class="tb on" onclick="setS2Iso(this,'auto')">auto</button><button class="tb" onclick="setS2Iso(this,'isolate')">isolate</button></div></div>
+<div class="cg"><label>Color A</label><input type="color" id="c2a" value="#e94560"></div>
+<div class="cg"><label>Color B</label><input type="color" id="c2b" value="#0f3460"></div>
+<div class="cg"><label>Opacity</label><input type="range" id="c2op" min="0.1" max="1" step="0.05" value="1"><div class="vd" id="c2opv">1</div></div>
+</div>
+<div id="gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px"></div>
+<div class="cb" id="code2"><pre></pre><button class="cpb" onclick="copyCode('code2')">Copy</button></div>
+</div>
+
+<!-- S3: Stacking Context -->
+<div class="sec">
+<h2>&#128218; Stacking Context Visualization</h2>
+<div class="ctrls">
+<div class="cg"><label>Parent Isolation</label>
+<div class="tg"><button class="tb on" onclick="setS3Iso(this,'auto')">auto</button><button class="tb" onclick="setS3Iso(this,'isolate')">isolate</button></div></div>
+<div class="cg"><label>Child z-index</label><input type="range" id="c3z" min="-1" max="10" step="1" value="2"><div class="vd" id="c3zv">2</div></div>
+</div>
+<div class="ss" id="stackScene">
+<div class="sl" style="width:90%;height:85%;left:5%;top:7%;background:rgba(15,52,96,.7);z-index:0">Background (z:0)
+<div class="sl" id="stackParent" style="width:60%;height:55%;right:5%;bottom:10%;background:rgba(83,52,131,.6);z-index:1;position:absolute">
+Parent (z:1)<div class="sl" id="stackChild" style="width:70%;height:50%;left:15%;top:10%;background:rgba(233,69,96,.7);z-index:2;position:absolute">Child (z:<span id="c3zt">2</span>)</div></div>
+<div class="sl" id="stackSibling" style="width:35%;height:40%;left:5%;bottom:10%;background:rgba(26,26,46,.8);z-index:3;position:absolute;border-color:var(--ac)">Sibling (z:3)</div>
+</div>
+</div>
+<div class="info"><b>Stacking Context:</b> When a parent has <code>isolation: isolate</code>, it creates a new stacking context. Its children's z-index values are scoped within the parent — they cannot escape above or below elements outside the parent's context, regardless of their z-index value.</div>
+<div class="cb" id="code3"><pre></pre><button class="cpb" onclick="copyCode('code3')">Copy</button></div>
+</div>
+<!-- S4: Interactive Playground -->
+<div class="sec">
+<h2>&#128295; Interactive Playground</h2>
+<div class="ctrls">
+<div class="cg"><label>Isolation</label>
+<div class="tg"><button class="tb on" onclick="setS4Iso(this,'auto')">auto</button><button class="tb" onclick="setS4Iso(this,'isolate')">isolate</button></div></div>
+<div class="cg"><label>Blend Mode</label><select id="c4bm"><option value="normal">normal</option><option value="multiply" selected>multiply</option><option value="screen">screen</option><option value="overlay">overlay</option><option value="difference">difference</option><option value="color-dodge">color-dodge</option><option value="color-burn">color-burn</option><option value="hard-light">hard-light</option><option value="exclusion">exclusion</option><option value="hue">hue</option><option value="saturation">saturation</option><option value="color">color</option><option value="luminosity">luminosity</option></select></div>
+<div class="cg"><label>FG Color</label><input type="color" id="c4fg" value="#e94560"></div>
+<div class="cg"><label>BG Color</label><input type="color" id="c4bg" value="#533483"></div>
+<div class="cg"><label>Opacity</label><input type="range" id="c4op" min="0" max="1" step="0.05" value="1"><div class="vd" id="c4opv">1</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+<div id="pg4wrap" style="border-radius:10px;overflow:hidden;min-height:180px;display:flex;align-items:center;justify-content:center;position:relative">
+<div style="position:absolute;top:.4rem;left:.6rem;font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.55);background:rgba(0,0,0,.4);padding:.12rem .45rem;border-radius:4px;z-index:10">Preview</div>
+<div id="pg4parent" style="width:140px;height:140px;border-radius:12px;display:flex;align-items:center;justify-content:center">
+<div id="pg4child" style="width:90px;height:90px;border-radius:50%"></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:8px;font-size:.82rem;color:var(--dm)">
+<div>&#128161; <b style="color:var(--tx)">Try this:</b></div>
+<div>1. Set blend mode to <code>difference</code></div>
+<div>2. Toggle between auto and isolate</div>
+<div>3. Notice how isolate prevents blending with the page background</div>
+<div>4. Adjust opacity to see partial blending effects</div>
+</div>
+</div>
+<div class="cb" id="code4"><pre></pre><button class="cpb" onclick="copyCode('code4')">Copy</button></div>
+</div>
+
+</div><!-- /wrap -->
+<div class="ft">CSS Isolation Explorer &mdash; Built for learning CSS isolation, mix-blend-mode, and stacking contexts</div>
+<script>
+// Helpers
+const $=s=>document.getElementById(s);
+const $$=s=>document.querySelectorAll(s);
+
+// Copy code
+function copyCode(id){
+  const pre=$(id).querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(()=>{
+    const btn=$(id).querySelector('.cpb');
+    btn.textContent='Copied!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},1500);
+  });
+}
+
+// S1: isolate vs auto
+let s1bm='overlay';
+function updateS1(){
+  const bm=$('c1bm').value;
+  const bg=$('c1bg').value;
+  const colors=[$('c1s1').value,$('c1s2').value,$('c1s3').value];
+  const op=parseFloat($('c1op').value);
+  $('c1opv').textContent=op;
+  s1bm=bm;
+  ['bp1a','bp1i'].forEach(id=>{
+    const el=$(id);
+    el.parentElement.style.background=bg;
+    el.querySelectorAll('.bs').forEach((s,i)=>{
+      s.style.background=colors[i];
+      s.style.mixBlendMode=bm;
+      s.style.opacity=op;
+    });
+  });
+  // Code
+  $('code1').querySelector('pre').textContent=
+`.parent-auto {
+  /* isolation: auto (default) */
+  /* Children blend with everything behind */
+}
+
+.parent-isolated {
+  isolation: isolate;
+  /* Creates new stacking context */
+  /* Children only blend within this container */
+}
+
+.child {
+  mix-blend-mode: ${bm};
+  opacity: ${op};
+  background: ${colors[0]};
+}`;
+}
+['c1bm','c1bg','c1s1','c1s2','c1s3','c1op'].forEach(id=>{
+  $(id).addEventListener('input',updateS1);
+});
+
+// S2: Blend gallery
+const blendModes=['multiply','screen','overlay','darken','lighten','color-dodge','color-burn','hard-light','soft-light','difference','exclusion','hue','saturation','color','luminosity'];
+let s2iso='auto',s2selBm='multiply';
+function buildGallery(){
+  const g=$('gallery');
+  const ca=$('c2a').value,cb=$('c2b').value,op=parseFloat($('c2op').value);
+  $('c2opv').textContent=op;
+  g.innerHTML='';
+  blendModes.forEach(bm=>{
+    const card=document.createElement('div');
+    card.style.cssText=`background:var(--cd);border-radius:10px;padding:10px;cursor:pointer;border:2px solid ${bm===s2selBm?'var(--ac)':'transparent'};transition:border-color .2s`;
+    card.onclick=()=>{s2selBm=bm;buildGallery()};
+    const iso=s2iso==='isolate'?'isolation:isolate;':'';
+    card.innerHTML=`<div style="height:80px;border-radius:8px;overflow:hidden;position:relative;${iso}background:${cb}">
+      <div style="position:absolute;inset:0;background:${ca};mix-blend-mode:${bm};opacity:${op}"></div>
+    </div><div style="text-align:center;font-size:.75rem;margin-top:6px;color:var(--dm)">${bm}</div>`;
+    g.appendChild(card);
+  });
+  $('code2').querySelector('pre').textContent=
+`.container {
+  isolation: ${s2iso};
+  background: ${cb};
+}
+
+.overlay-element {
+  mix-blend-mode: ${s2selBm};
+  background: ${ca};
+  opacity: ${op};
+}`;
+}
+function setS2Iso(btn,v){
+  s2iso=v;
+  btn.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildGallery();
+}
+['c2a','c2b','c2op'].forEach(id=>$(id).addEventListener('input',buildGallery));
+
+// S3: Stacking context
+let s3iso='auto';
+function updateS3(){
+  const z=parseInt($('c3z').value);
+  $('c3zv').textContent=z;
+  $('c3zt').textContent=z;
+  const child=$('stackChild');
+  child.style.zIndex=z;
+  const parent=$('stackParent');
+  parent.style.isolation=s3iso;
+  // Visual: if isolate, child can't escape parent
+  if(s3iso==='isolate'){
+    parent.style.borderColor='var(--ac)';
+    parent.style.borderStyle='dashed';
+  }else{
+    parent.style.borderColor='rgba(255,255,255,.15)';
+    parent.style.borderStyle='solid';
+  }
+  $('code3').querySelector('pre').textContent=
+`.background { z-index: 0; }
+
+.parent {
+  z-index: 1;
+  isolation: ${s3iso};${s3iso==='isolate'?'\n  /* Creates stacking context - child z-index is scoped */':''}
+}
+
+.child {
+  z-index: ${z};${s3iso==='isolate'?'\n  /* Cannot escape parent stacking context */':'\n  /* Can overlap elements outside parent if z-index is high enough */'}
+}
+
+.sibling { z-index: 3; }`;
+}
+function setS3Iso(btn,v){
+  s3iso=v;
+  btn.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  updateS3();
+}
+$('c3z').addEventListener('input',updateS3);
+// S4: Playground
+let s4iso='auto';
+function updateS4(){
+  const bm=$('c4bm').value;
+  const fg=$('c4fg').value;
+  const bg=$('c4bg').value;
+  const op=parseFloat($('c4op').value);
+  $('c4opv').textContent=op;
+  const wrap=$('pg4wrap');
+  wrap.style.background='var(--bg)';
+  const parent=$('pg4parent');
+  parent.style.background=bg;
+  parent.style.isolation=s4iso;
+  const child=$('pg4child');
+  child.style.background=fg;
+  child.style.mixBlendMode=bm;
+  child.style.opacity=op;
+  $('code4').querySelector('pre').textContent=
+`.wrapper {
+  background: #1a1a2e;
+}
+
+.parent {
+  background: ${bg};
+  isolation: ${s4iso};
+}
+
+.child {
+  mix-blend-mode: ${bm};
+  background: ${fg};
+  opacity: ${op};
+}`;
+}
+function setS4Iso(btn,v){
+  s4iso=v;
+  btn.parentElement.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  updateS4();
+}
+['c4bm','c4fg','c4bg','c4op'].forEach(id=>$(id).addEventListener('input',updateS4));
+
+// Init all
+updateS1();
+buildGallery();
+updateS3();
+updateS4();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

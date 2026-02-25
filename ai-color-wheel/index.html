@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive AI color wheel for finding perfect color harmonies. Explore complementary, triadic, and analogous color schemes with real-time preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-color-wheel/">
+<title>AI Color Wheel — Interactive Color Harmony Tool</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.6rem;margin:10px 0 4px;color:#fff}
+.sub{font-size:.85rem;color:#888;margin-bottom:18px}
+.app{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;max-width:960px;width:100%}
+.left{display:flex;flex-direction:column;align-items:center;gap:14px}
+.cwrap{position:relative;width:320px;height:320px;cursor:crosshair}
+canvas{border-radius:50%;box-shadow:0 0 30px rgba(100,100,255,.15)}
+.mk{position:absolute;width:18px;height:18px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 6px rgba(0,0,0,.6);pointer-events:none;transform:translate(-50%,-50%);transition:left .15s,top .15s}
+.mk.m0{border-color:#fff;z-index:10;width:22px;height:22px;border-width:3px}
+.sbtn{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.sbtn button{background:#16213e;color:#ccc;border:1.5px solid #333;padding:6px 13px;border-radius:20px;cursor:pointer;font-size:.78rem;transition:all .2s}
+.sbtn button:hover{border-color:#6c63ff;color:#fff}
+.sbtn button.on{background:#6c63ff;color:#fff;border-color:#6c63ff}
+.slc{display:flex;gap:14px;align-items:center;width:100%;max-width:300px}
+.slc label{font-size:.75rem;color:#999;min-width:65px;text-align:right}
+.slc input[type=range]{flex:1;accent-color:#6c63ff}
+.right{flex:1;min-width:280px;max-width:400px;display:flex;flex-direction:column;gap:12px}
+.card{background:#16213e;border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center;border:1px solid #222}
+.card:hover{border-color:#444}
+.sw{width:52px;height:52px;border-radius:10px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.ci{flex:1;display:flex;flex-direction:column;gap:3px}
+.cl{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px}
+.cv{font-size:.82rem;color:#ddd;font-family:'SF Mono',Consolas,monospace;cursor:pointer;padding:2px 6px;border-radius:4px}
+.cv:hover{background:rgba(108,99,255,.2)}
+.cpb{margin-top:6px;background:#6c63ff;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:.85rem;width:100%;max-width:400px}
+.cpb:hover{background:#5a52d5}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#6c63ff;color:#fff;padding:10px 24px;border-radius:8px;font-size:.85rem;opacity:0;transition:all .3s;pointer-events:none;z-index:100}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{margin-top:30px;font-size:.7rem;color:#555}
+footer a{color:#6c63ff;text-decoration:none}
+@media(max-width:640px){.app{flex-direction:column;align-items:center}.right{width:100%;max-width:340px}.cwrap{width:280px;height:280px}}
+</style>
+</head>
+<body>
+<h1>&#127912; AI Color Wheel</h1>
+<p class="sub">Click the wheel &middot; Choose a harmony scheme</p>
+<div class="app">
+<div class="left">
+<div class="cwrap" id="cw"><canvas id="wh" width="320" height="320"></canvas></div>
+<div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+<div class="sbtn" id="sb">
+<button data-s="complementary" class="on">Complementary</button>
+<button data-s="triadic">Triadic</button>
+<button data-s="tetradic">Tetradic</button>
+<button data-s="analogous">Analogous</button>
+<button data-s="split">Split Comp.</button>
+</div>
+<div class="slc"><label>Saturation</label><input type="range" id="sr" min="10" max="100" value="80"></div>
+<div class="slc"><label>Lightness</label><input type="range" id="lr" min="10" max="90" value="55"></div>
+</div>
+</div>
+<div class="right" id="pn"></div>
+</div>
+<button class="cpb" id="cb">&#128203; Copy CSS Variables</button>
+<div class="toast" id="tt" role="status"></div>
+<footer>Built with &#10084; &middot; <a href="https://github.com/Lifa-su/ai-color-wheel" target="_blank">GitHub</a></footer>
+<script>
+!function(){
+var cv=document.getElementById('wh'),ctx=cv.getContext('2d'),cw=document.getElementById('cw'),pn=document.getElementById('pn'),cb=document.getElementById('cb'),tt=document.getElementById('tt'),sr=document.getElementById('sr'),lr=document.getElementById('lr'),sb=document.getElementById('sb');
+var W=320,H=320,CX=160,CY=160,R=156;
+var hue=0,sat=80,lit=55,sch='complementary',mks=[];
+
+function drawWheel(){
+  ctx.clearRect(0,0,W,H);
+  for(var a=0;a<360;a++){
+    var r1=a*Math.PI/180,r2=(a+1.5)*Math.PI/180;
+    var g=ctx.createRadialGradient(CX,CY,0,CX,CY,R);
+    g.addColorStop(0,'hsl('+a+',10%,'+lit+'%)');
+    g.addColorStop(1,'hsl('+a+','+sat+'%,'+lit+'%)');
+    ctx.beginPath();ctx.moveTo(CX,CY);ctx.arc(CX,CY,R,r1,r2);ctx.closePath();
+    ctx.fillStyle=g;ctx.fill();
+  }
+}
+
+function hsl2rgb(h,s,l){
+  s/=100;l/=100;
+  var c=(1-Math.abs(2*l-1))*s,X=c*(1-Math.abs((h/60)%2-1)),m=l-c/2,r=0,g=0,b=0;
+  if(h<60){r=c;g=X}else if(h<120){r=X;g=c}else if(h<180){g=c;b=X}
+  else if(h<240){g=X;b=c}else if(h<300){r=X;b=c}else{r=c;b=X}
+  return[Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
+}
+
+function rgb2hex(r,g,b){return'#'+[r,g,b].map(function(v){return v.toString(16).padStart(2,'0')}).join('')}
+
+function getHarmony(h){
+  switch(sch){
+    case'complementary':return[h,(h+180)%360];
+    case'triadic':return[h,(h+120)%360,(h+240)%360];
+    case'tetradic':return[h,(h+90)%360,(h+180)%360,(h+270)%360];
+    case'analogous':return[(h-30+360)%360,h,(h+30)%360];
+    case'split':return[h,(h+150)%360,(h+210)%360];
+    default:return[h,(h+180)%360];
+  }
+}
+
+var schNames={complementary:['Base','Complementary'],triadic:['Base','Triadic 2','Triadic 3'],tetradic:['Base','Tetradic 2','Tetradic 3','Tetradic 4'],analogous:['Analogous 1','Base','Analogous 3'],split:['Base','Split 2','Split 3']};
+
+function hueToPos(h){
+  var rad=h*Math.PI/180-Math.PI/2;
+  return{x:CX+R*0.78*Math.cos(rad),y:CY+R*0.78*Math.sin(rad)};
+}
+
+function updateMarkers(hues){
+  while(mks.length>hues.length){cw.removeChild(mks.pop())}
+  for(var i=0;i<hues.length;i++){
+    var el;
+    if(i<mks.length){el=mks[i]}else{el=document.createElement('div');el.className='mk'+(i===0?' m0':'');cw.appendChild(el);mks.push(el)}
+    var p=hueToPos(hues[i]);
+    el.style.left=p.x+'px';el.style.top=p.y+'px';
+    var rgb=hsl2rgb(hues[i],sat,lit);
+    el.style.background=rgb2hex(rgb[0],rgb[1],rgb[2]);
+  }
+}
+
+function updatePanel(hues){
+  var names=schNames[sch]||[];
+  var html='';
+  for(var i=0;i<hues.length;i++){
+    var h=hues[i],rgb=hsl2rgb(h,sat,lit),hex=rgb2hex(rgb[0],rgb[1],rgb[2]);
+    var label=names[i]||('Color '+(i+1));
+    html+='<div class="card"><div class="sw" style="background:'+hex+'"></div><div class="ci">';
+    html+='<div class="cl">'+label+'</div>';
+    html+='<span class="cv" onclick="C(this)" title="Click to copy">HEX: '+hex+'</span>';
+    html+='<span class="cv" onclick="C(this)" title="Click to copy">RGB: '+rgb[0]+', '+rgb[1]+', '+rgb[2]+'</span>';
+    html+='<span class="cv" onclick="C(this)" title="Click to copy">HSL: '+Math.round(h)+'°, '+sat+'%, '+lit+'%</span>';
+    html+='</div></div>';
+  }
+  pn.innerHTML=html;
+}
+
+window.C=function(el){
+  var t=el.textContent.split(': ')[1];
+  navigator.clipboard.writeText(t).then(function(){toast('Copied: '+t)});
+};
+
+function toast(msg){
+  tt.textContent=msg;tt.classList.add('show');
+  setTimeout(function(){tt.classList.remove('show')},1800);
+}
+
+function update(){
+  var hues=getHarmony(hue);
+  drawWheel();updateMarkers(hues);updatePanel(hues);
+}
+
+function handleClick(e){
+  var rect=cv.getBoundingClientRect();
+  var mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  var sx=mx*(W/rect.width),sy=my*(H/rect.height);
+  var dx=sx-CX,dy=sy-CY,dist=Math.sqrt(dx*dx+dy*dy);
+  if(dist>R)return;
+  hue=((Math.atan2(dy,dx)*180/Math.PI)+90+360)%360;
+  update();
+}
+
+cw.addEventListener('click',handleClick);
+cw.addEventListener('mousemove',function(e){if(e.buttons===1)handleClick(e)});
+
+sb.addEventListener('click',function(e){
+  var btn=e.target.closest('button');if(!btn)return;
+  sb.querySelectorAll('button').forEach(function(b){b.classList.remove('on')});
+  btn.classList.add('on');sch=btn.getAttribute('data-s');update();
+});
+
+sr.addEventListener('input',function(){sat=+this.value;update()});
+lr.addEventListener('input',function(){lit=+this.value;update()});
+
+cb.addEventListener('click',function(){
+  var hues=getHarmony(hue),css=':root {\n';
+  var names=schNames[sch]||[];
+  for(var i=0;i<hues.length;i++){
+    var h=hues[i],rgb=hsl2rgb(h,sat,lit),hex=rgb2hex(rgb[0],rgb[1],rgb[2]);
+    var n=(names[i]||'color-'+(i+1)).toLowerCase().replace(/\s+/g,'-');
+    css+='  --'+n+': '+hex+';\n';
+  }
+  css+='}';
+  navigator.clipboard.writeText(css).then(function(){toast('CSS variables copied!')});
+});
+
+update();
+}();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:960px;width:100%;margin:30px auto 0;position:relative;cursor:pointer}
+.pro-blur{background:#16213e;border-radius:12px;padding:24px;filter:blur(3px);pointer-events:none;opacity:.6;border:1px solid #333}
+.pro-blur-inner{display:flex;gap:16px;flex-wrap:wrap}
+.pro-blur-card{flex:1;min-width:200px;background:#1a1a2e;border-radius:10px;padding:20px;text-align:center}
+.pro-blur-card h4{color:#6c63ff;font-size:.95rem;margin-bottom:8px}
+.pro-blur-card p{color:#888;font-size:.8rem}
+.pro-lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2}
+.pro-lock .lock-icon{font-size:2.5rem;display:block;margin-bottom:8px}
+.pro-lock .lock-text{color:#fff;font-size:1.1rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.pro-lock .lock-sub{color:#aaa;font-size:.8rem;margin-top:4px}
+.pro-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-overlay.show{display:flex}
+.pro-modal{background:#16213e;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid #333;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:1.8rem;font-weight:800;color:#6c63ff;margin:10px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.pro-modal ul li::before{content:'✓ ';color:#6c63ff;font-weight:700}
+.pro-modal .btn-pro{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#6c63ff,#5a52d5);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:16px;text-decoration:none;transition:opacity .2s}
+.pro-modal .btn-pro:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.85rem;cursor:pointer;margin-top:8px}
+.pro-modal .btn-later:hover{color:#bbb}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-inner">
+<div class="pro-blur-card"><h4>🎨 AI Color Suggestions</h4><p>Get AI-powered palette recommendations based on your brand, mood, or industry</p></div>
+<div class="pro-blur-card"><h4>📦 Export ASE / Sketch</h4><p>Export palettes to Adobe ASE and Sketch format for seamless workflow</p></div>
+<div class="pro-blur-card"><h4>🧠 Smart Harmony</h4><p>Advanced harmony algorithms with accessibility contrast checking</p></div>
+</div>
+</div>
+<div class="pro-lock">
+<span class="lock-icon">🔒</span>
+<span class="lock-text">Pro Features</span>
+<span class="lock-sub">Click to unlock</span>
+</div>
+</div>
+<div class="pro-overlay" id="proModal">
+<div class="pro-modal">
+<h2>🎨 Color Wheel Pro</h2>
+<div class="price">$9</div>
+<p style="color:#aaa;font-size:.85rem">One-time payment · Lifetime access</p>
+<ul>
+<li>AI-powered color suggestions for any brand or mood</li>
+<li>Export to Adobe ASE palette format</li>
+<li>Export to Sketch palette format</li>
+<li>Advanced harmony with contrast checking</li>
+<li>Unlimited palette saves</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});</script>
+<script src="https://cdn.buysellads.com/pub/lifa.js" async></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered Unix permission calculator. Quickly set file permissions with an interactive chmod tool. Supports symbolic and octal notation with examples.">
+<link rel="canonical" href="https://lifa-su.com/ai-chmod/">
+<title>AI Chmod - Unix Permission Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4e;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:var(--text2);margin-bottom:28px;font-size:.95rem}
+.wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.ct{font-size:.85rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:16px;font-weight:600}
+.ir{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.ir label{font-size:.85rem;color:var(--text2);min-width:70px}
+.ir input{flex:1;min-width:120px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-size:1.05rem;font-family:monospace;outline:none;transition:border .2s}
+.ir input:focus{border-color:var(--accent)}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pg{background:var(--bg);border-radius:8px;padding:16px;text-align:center}
+.pg h3{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px}
+.cks{display:flex;flex-direction:column;gap:10px}
+.ci{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;user-select:none}
+.ci input[type=checkbox]{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:2px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;position:relative;transition:all .15s}
+.ci input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+.ci input[type=checkbox]:checked::after{content:'\2713';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:13px;font-weight:700}
+.pr{display:flex;flex-wrap:wrap;gap:10px}
+.pb{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 16px;color:var(--text);cursor:pointer;font-family:monospace;font-size:.95rem;transition:all .2s}
+.pb:hover{border-color:var(--accent);background:var(--card);transform:translateY(-1px)}
+.pb small{display:block;font-size:.7rem;color:var(--text2);margin-top:2px;font-family:sans-serif}
+.cb{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.co{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-family:monospace;font-size:1rem;color:#0f0;word-break:break-all}
+.cpb{background:var(--accent);border:none;border-radius:6px;padding:10px 18px;color:#fff;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .2s;white-space:nowrap}
+.cpb:hover{opacity:.85;transform:translateY(-1px)}
+.fi{width:140px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:monospace;font-size:.95rem;outline:none;transition:border .2s}
+.fi:focus{border-color:var(--accent)}
+footer{margin-top:40px;padding:20px;text-align:center;color:var(--text2);font-size:.8rem}
+@media(max-width:500px){.cg{grid-template-columns:1fr}h1{font-size:1.4rem}.ir{flex-direction:column;align-items:stretch}.ir label{min-width:auto}.cb{flex-direction:column;align-items:stretch}.fi{width:100%}}
+</style>
+</head>
+<body>
+<h1>&#128274; AI Chmod</h1>
+<p class="sub">Unix File Permission Calculator</p>
+<div class="wrap">
+<div class="card">
+<div class="ct">Permission Input</div>
+<div class="ir" style="margin-bottom:12px"><label for="ni">Numeric</label><input type="text" id="ni" placeholder="e.g. 755" maxlength="4"></div>
+<div class="ir"><label for="si">Symbolic</label><input type="text" id="si" placeholder="e.g. rwxr-xr-x" maxlength="10"></div>
+</div>
+<div class="card"><div class="ct">Visual Permissions</div><div class="cg" id="cg"></div></div>
+<div class="card"><div class="ct">Common Presets</div><div class="pr" id="pr"></div></div>
+<div class="card"><div class="ct">Generated Command</div>
+<div class="cb"><div class="co" id="co">chmod 755 filename</div><input type="text" class="fi" id="fn" value="filename" placeholder="filename"><button class="cpb" id="cp">&#128203; Copy</button></div>
+</div>
+</div>
+<footer>AI Chmod &mdash; Fast, visual Unix permission calculator</footer>
+<script>
+(function(){
+var G=['Owner','Group','Others'],P=['Read','Write','Execute'],B=[4,2,1];
+var presets=[['777','Full Access'],['755','Standard Dir'],['750','Group Read'],['700','Owner Only'],['666','All RW'],['644','Standard File'],['640','Group Read'],['600','Private RW'],['555','Read+Exec'],['444','Read Only'],['400','Owner Read']];
+var ni=document.getElementById('ni'),si=document.getElementById('si'),cg=document.getElementById('cg'),pr=document.getElementById('pr'),co=document.getElementById('co'),fn=document.getElementById('fn'),cp=document.getElementById('cp');
+var boxes=[];
+function buildUI(){
+for(var g=0;g<3;g++){
+var d=document.createElement('div');d.className='pg';
+var h=document.createElement('h3');h.textContent=G[g];d.appendChild(h);
+var ck=document.createElement('div');ck.className='cks';
+for(var p=0;p<3;p++){
+var lb=document.createElement('label');lb.className='ci';
+var cb=document.createElement('input');cb.type='checkbox';cb.dataset.g=g;cb.dataset.p=p;
+cb.addEventListener('change',fromBoxes);
+var sp=document.createElement('span');sp.textContent=P[p];
+lb.appendChild(cb);lb.appendChild(sp);ck.appendChild(lb);
+if(!boxes[g])boxes[g]=[];boxes[g][p]=cb;
+}
+d.appendChild(ck);cg.appendChild(d);
+}
+for(var i=0;i<presets.length;i++){
+var b=document.createElement('button');b.className='pb';b.dataset.v=presets[i][0];
+b.innerHTML=presets[i][0]+'<small>'+presets[i][1]+'</small>';
+b.addEventListener('click',function(){applyOctal(this.dataset.v)});
+pr.appendChild(b);
+}
+}
+function octalToPerms(o){
+var r=[];
+for(var i=0;i<3;i++){
+var d=parseInt(o[i])||0;
+r.push([(d&4)?1:0,(d&2)?1:0,(d&1)?1:0]);
+}
+return r;
+}
+function permsToOctal(pm){
+var s='';
+for(var i=0;i<3;i++){s+=''+(pm[i][0]*4+pm[i][1]*2+pm[i][2]*1);}
+return s;
+}
+function permsToSym(pm){
+var m='rwx',s='';
+for(var i=0;i<3;i++){for(var j=0;j<3;j++){s+=pm[i][j]?m[j]:'-';}}
+return s;
+}
+function symToPerms(s){
+s=s.replace(/[^rwx\-]/g,'');
+if(s.length!==9)return null;
+var r=[];
+for(var i=0;i<3;i++){
+var o=s.substr(i*3,3);
+r.push([o[0]==='r'?1:0,o[1]==='w'?1:0,o[2]==='x'?1:0]);
+}
+return r;
+}
+function setBoxes(pm){
+for(var i=0;i<3;i++)for(var j=0;j<3;j++)boxes[i][j].checked=!!pm[i][j];
+}
+function getBoxes(){
+var r=[];
+for(var i=0;i<3;i++){r.push([boxes[i][0].checked?1:0,boxes[i][1].checked?1:0,boxes[i][2].checked?1:0]);}
+return r;
+}
+function updateCmd(oct){
+co.textContent='chmod '+oct+' '+(fn.value||'filename');
+}
+function applyOctal(o){
+o=o.replace(/[^0-7]/g,'');
+while(o.length<3)o='0'+o;
+if(o.length>3)o=o.slice(-3);
+var pm=octalToPerms(o);
+ni.value=o;si.value=permsToSym(pm);setBoxes(pm);updateCmd(o);
+}
+function fromBoxes(){
+var pm=getBoxes(),o=permsToOctal(pm);
+ni.value=o;si.value=permsToSym(pm);updateCmd(o);
+}
+ni.addEventListener('input',function(){
+var v=this.value.replace(/[^0-7]/g,'');
+if(v.length>=3){applyOctal(v);}
+});
+si.addEventListener('input',function(){
+var v=this.value.toLowerCase();
+var pm=symToPerms(v);
+if(pm){var o=permsToOctal(pm);ni.value=o;setBoxes(pm);updateCmd(o);}
+});
+fn.addEventListener('input',function(){
+var o=ni.value||'755';updateCmd(o);
+});
+cp.addEventListener('click',function(){
+var t=co.textContent;
+if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){cp.textContent='Copied!';setTimeout(function(){cp.innerHTML='&#128203; Copy'},1500)});}
+});
+buildUI();applyOctal('755');
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

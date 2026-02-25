@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS transition generator with visual controls. Set duration, timing function, delay, and properties. Preview smooth CSS transitions and copy the code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-transition/">
+<title>CSS Transition Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header{text-align:center;padding:24px 16px 8px}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.container{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.container{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-title{font-size:.95rem;font-weight:600;margin-bottom:12px;color:var(--accent)}
+.trans-list{display:flex;flex-direction:column;gap:8px}
+.trans-row{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;display:grid;grid-template-columns:1fr 80px 1fr 80px 32px;gap:8px;align-items:end}
+@media(max-width:500px){.trans-row{grid-template-columns:1fr 1fr}.trans-row .del-btn{grid-column:span 2;justify-self:end}}
+label.small{font-size:.72rem;color:var(--text2);display:block;margin-bottom:2px}
+select,input[type=text],input[type=number]{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:.85rem;width:100%;outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+input[type=number]{-moz-appearance:textfield;width:100%}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.del-btn{background:none;border:none;color:var(--accent);font-size:1.2rem;cursor:pointer;padding:4px;border-radius:4px;transition:background .2s;align-self:end}
+.del-btn:hover{background:rgba(233,69,96,.15)}
+.add-btn{background:var(--surface2);color:var(--accent);border:1px dashed var(--border);border-radius:6px;padding:8px;cursor:pointer;font-size:.85rem;width:100%;transition:background .2s;margin-top:8px}
+.add-btn:hover{background:var(--bg)}
+.bezier-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+#bezierCanvas{background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:crosshair;display:block}
+.bezier-presets{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.preset-btn{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.preset-btn:hover,.preset-btn.active{border-color:var(--accent);color:var(--accent)}
+.bezier-values{font-size:.82rem;color:var(--text2);font-family:monospace}
+.preview-area{display:flex;flex-direction:column;align-items:center;gap:12px}
+.preview-box-wrap{width:100%;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:6px;position:relative;overflow:hidden}
+.preview-box{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius)}
+.preview-box.moved{left:calc(100% - 70px);border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent))}
+.play-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:10px 32px;font-size:.9rem;cursor:pointer;font-weight:600;transition:opacity .2s}
+.play-btn:hover{opacity:.85}
+.code-wrap{position:relative}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;color:#7ec8e3;white-space:pre-wrap;word-break:break-all;min-height:60px;line-height:1.6}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:4px;padding:4px 12px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:#4ade80;border-color:#4ade80}
+footer{text-align:center;padding:24px 16px;color:var(--text2);font-size:.78rem}
+</style>
+</head>
+<body>
+<header>
+<h1>CSS Transition Generator</h1>
+<p>Build, visualize and copy CSS transitions with a custom cubic-bezier editor</p>
+</header>
+<div class="container">
+<div style="display:flex;flex-direction:column;gap:16px">
+  <div class="card">
+    <div class="card-title">&#9881;&#65039; Transition Properties</div>
+    <div class="trans-list" id="transList"></div>
+    <button class="add-btn" id="addBtn">+ Add Property</button>
+  </div>
+  <div class="card">
+    <div class="card-title">&#128208; Cubic Bezier Editor</div>
+    <div class="bezier-wrap">
+      <div class="bezier-presets" id="presets"></div>
+      <canvas id="bezierCanvas" width="200" height="200"></canvas>
+      <div class="bezier-values" id="bezierValues"></div>
+    </div>
+  </div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+  <div class="card">
+    <div class="card-title">&#9654;&#65039; Live Preview</div>
+    <div class="preview-area">
+      <div class="preview-box-wrap">
+        <div class="preview-box" id="previewBox"></div>
+      </div>
+      <button class="play-btn" id="playBtn">Play Transition</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">&#128203; Generated CSS</div>
+    <div class="code-wrap">
+      <pre class="code-block" id="codeBlock"></pre>
+      <button class="copy-btn" id="copyBtn">Copy</button>
+    </div>
+  </div>
+</div>
+</div>
+<footer>CSS Transition Generator &mdash; No dependencies, pure HTML/CSS/JS</footer>
+<script>
+const PROPS=['all','opacity','transform','background','background-color','color','width','height','margin','padding','border','border-radius','box-shadow','font-size','left','top','right','bottom'];
+const PRESETS={'ease':[.25,.1,.25,1],'linear':[0,0,1,1],'ease-in':[.42,0,1,1],'ease-out':[0,0,.58,1],'ease-in-out':[.42,0,.58,1],'ease-in-back':[.6,-.28,.735,.045],'ease-out-back':[.175,.885,.32,1.275],'ease-in-out-back':[.68,-.55,.265,1.55],'fast-out-slow-in':[.4,0,.2,1]};
+let transitions=[];
+let bezier=[.25,.1,.25,1];
+let dragging=null;
+let activeRowIdx=null;
+const $=s=>document.querySelector(s);
+const transList=$('#transList');
+const canvas=$('#bezierCanvas');
+const ctx=canvas.getContext('2d');
+const bezierVal=$('#bezierValues');
+const previewBox=$('#previewBox');
+const codeBlock=$('#codeBlock');
+const copyBtn=$('#copyBtn');
+const presetsDiv=$('#presets');
+const PAD=20,SZ=160;
+function toC(x,y){return[PAD+x*SZ,PAD+(1-y)*SZ]}
+function fromC(cx,cy){return[(cx-PAD)/SZ,1-(cy-PAD)/SZ]}
+function drawBezier(){
+  ctx.clearRect(0,0,200,200);
+  ctx.strokeStyle='#2a2a4a';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){let v=PAD+(SZ*i/4);ctx.beginPath();ctx.moveTo(v,PAD);ctx.lineTo(v,PAD+SZ);ctx.stroke();ctx.beginPath();ctx.moveTo(PAD,v);ctx.lineTo(PAD+SZ,v);ctx.stroke()}
+  ctx.strokeStyle='#3a3a5a';ctx.setLineDash([4,4]);ctx.beginPath();
+  let[dx0,dy0]=toC(0,0);let[dx1,dy1]=toC(1,1);
+  ctx.moveTo(dx0,dy0);ctx.lineTo(dx1,dy1);ctx.stroke();ctx.setLineDash([]);
+  let[p0x,p0y]=toC(0,0);let[c1x,c1y]=toC(bezier[0],bezier[1]);
+  let[c2x,c2y]=toC(bezier[2],bezier[3]);let[p1x,p1y]=toC(1,1);
+  ctx.strokeStyle='rgba(233,69,96,0.4)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(p0x,p0y);ctx.lineTo(c1x,c1y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(p1x,p1y);ctx.lineTo(c2x,c2y);ctx.stroke();
+  ctx.strokeStyle='#e94560';ctx.lineWidth=2.5;ctx.beginPath();
+  ctx.moveTo(p0x,p0y);ctx.bezierCurveTo(c1x,c1y,c2x,c2y,p1x,p1y);ctx.stroke();
+  [[c1x,c1y,'1'],[c2x,c2y,'2']].forEach(([x,y,label])=>{
+    ctx.fillStyle='#e94560';ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(label,x,y);
+  });
+  [[p0x,p0y],[p1x,p1y]].forEach(([x,y])=>{
+    ctx.fillStyle='#aaa';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+  });
+  bezierVal.textContent='cubic-bezier('+bezier.map(v=>v.toFixed(2)).join(', ')+')';
+  updateActiveRowBezier();
+}
+function updateActiveRowBezier(){
+  if(activeRowIdx!==null&&transitions[activeRowIdx]){
+    let tf=transitions[activeRowIdx].timingFunction;
+    if(tf.startsWith('cubic-bezier')||tf==='cubic-bezier'){
+      transitions[activeRowIdx].timingFunction='cubic-bezier('+bezier.map(v=>v.toFixed(2)).join(', ')+')';
+      update();
+    }
+  }
+}
+function hitTest(mx,my){
+  let[c1x,c1y]=toC(bezier[0],bezier[1]);
+  let[c2x,c2y]=toC(bezier[2],bezier[3]);
+  if(Math.hypot(mx-c1x,my-c1y)<12)return 0;
+  if(Math.hypot(mx-c2x,my-c2y)<12)return 1;
+  return-1;
+}
+canvas.addEventListener('mousedown',e=>{
+  let r=canvas.getBoundingClientRect();
+  let mx=e.clientX-r.left,my=e.clientY-r.top;
+  let h=hitTest(mx,my);
+  if(h>=0)dragging=h;
+});
+canvas.addEventListener('mousemove',e=>{
+  if(dragging===null)return;
+  let r=canvas.getBoundingClientRect();
+  let mx=e.clientX-r.left,my=e.clientY-r.top;
+  let[x,y]=fromC(mx,my);
+  x=Math.max(-0.5,Math.min(1.5,x));y=Math.max(-0.5,Math.min(1.5,y));
+  bezier[dragging*2]=x;bezier[dragging*2+1]=y;
+  drawBezier();
+});
+canvas.addEventListener('mouseup',()=>{dragging=null});
+canvas.addEventListener('mouseleave',()=>{dragging=null});
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault();let t=e.touches[0];let r=canvas.getBoundingClientRect();
+  let mx=t.clientX-r.left,my=t.clientY-r.top;
+  let h=hitTest(mx,my);if(h>=0)dragging=h;
+},{passive:false});
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault();if(dragging===null)return;
+  let t=e.touches[0];let r=canvas.getBoundingClientRect();
+  let mx=t.clientX-r.left,my=t.clientY-r.top;
+  let[x,y]=fromC(mx,my);
+  x=Math.max(-0.5,Math.min(1.5,x));y=Math.max(-0.5,Math.min(1.5,y));
+  bezier[dragging*2]=x;bezier[dragging*2+1]=y;
+  drawBezier();
+},{passive:false});
+canvas.addEventListener('touchend',()=>{dragging=null});
+function addTransition(prop,dur,tf,del){
+  transitions.push({property:prop||'all',duration:dur||'0.3',timingFunction:tf||'ease',delay:del||'0'});
+  renderRows();update();
+}
+function removeTransition(i){
+  transitions.splice(i,1);
+  if(activeRowIdx===i)activeRowIdx=transitions.length?0:null;
+  else if(activeRowIdx>i)activeRowIdx--;
+  renderRows();update();
+}
+function renderRows(){
+  transList.innerHTML='';
+  transitions.forEach((t,i)=>{
+    let row=document.createElement('div');row.className='trans-row';
+    if(activeRowIdx===i)row.style.borderColor='var(--accent)';
+    let propOpts=PROPS.map(p=>'<option value="'+p+'"'+(t.property===p?' selected':'')+'>'+p+'</option>').join('');
+    let tfNames=['ease','linear','ease-in','ease-out','ease-in-out','cubic-bezier'];
+    let isCubic=t.timingFunction.startsWith('cubic-bezier');
+    let tfOpts=tfNames.map(n=>{
+      let sel=(n==='cubic-bezier'&&isCubic)||t.timingFunction===n?' selected':'';
+      return'<option value="'+n+'"'+sel+'>'+n+'</option>';
+    }).join('');
+    row.innerHTML='<div><label class="small">Property</label><select data-i="'+i+'" data-f="property">'+propOpts+'</select></div>'
+      +'<div><label class="small">Duration (s)</label><input type="number" step="0.1" min="0" value="'+t.duration+'" data-i="'+i+'" data-f="duration"></div>'
+      +'<div><label class="small">Timing</label><select data-i="'+i+'" data-f="timingFunction">'+tfOpts+'</select></div>'
+      +'<div><label class="small">Delay (s)</label><input type="number" step="0.1" min="0" value="'+t.delay+'" data-i="'+i+'" data-f="delay"></div>'
+      +'<button class="del-btn" data-i="'+i+'" title="Remove">&times;</button>';
+    row.addEventListener('click',e=>{
+      if(e.target.tagName==='BUTTON'||e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;
+      activeRowIdx=i;
+      let tf=transitions[i].timingFunction;
+      if(tf.startsWith('cubic-bezier')){let m=tf.match(/cubic-bezier\(([^)]+)\)/);if(m)bezier=m[1].split(',').map(Number)}
+      else if(PRESETS[tf])bezier=[...PRESETS[tf]];
+      drawBezier();renderRows();
+    });
+    row.querySelectorAll('select,input').forEach(el=>{
+      el.addEventListener('change',()=>{
+        let idx=+el.dataset.i,field=el.dataset.f;
+        if(field==='timingFunction'&&el.value==='cubic-bezier'){
+          transitions[idx][field]='cubic-bezier('+bezier.map(v=>v.toFixed(2)).join(', ')+')';
+          activeRowIdx=idx;renderRows();
+        }else{transitions[idx][field]=el.value}
+        update();
+      });
+    });
+    row.querySelector('.del-btn').addEventListener('click',()=>removeTransition(i));
+    transList.appendChild(row);
+  });
+}
+function getTransitionCSS(){
+  if(!transitions.length)return'transition: all 0.3s ease 0s;';
+  let parts=transitions.map(t=>t.property+' '+t.duration+'s '+t.timingFunction+' '+t.delay+'s');
+  return'transition: '+parts.join(',\n             ')+';';
+}
+function update(){
+  codeBlock.textContent=getTransitionCSS();
+  let raw=transitions.length?transitions.map(t=>t.property+' '+t.duration+'s '+t.timingFunction+' '+t.delay+'s').join(', '):'all 0.3s ease 0s';
+  previewBox.style.transition=raw;
+}
+// Presets
+Object.keys(PRESETS).forEach(name=>{
+  let btn=document.createElement('button');btn.className='preset-btn';btn.textContent=name;
+  btn.addEventListener('click',()=>{
+    bezier=[...PRESETS[name]];drawBezier();
+    presetsDiv.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+  presetsDiv.appendChild(btn);
+});
+// Play button
+$('#playBtn').addEventListener('click',()=>{
+  previewBox.classList.toggle('moved');
+});
+// Copy button
+copyBtn.addEventListener('click',()=>{
+  navigator.clipboard.writeText(codeBlock.textContent).then(()=>{
+    copyBtn.textContent='Copied!';copyBtn.classList.add('copied');
+    setTimeout(()=>{copyBtn.textContent='Copy';copyBtn.classList.remove('copied')},2000);
+  });
+});
+// Add button
+$('#addBtn').addEventListener('click',()=>addTransition());
+// Init
+addTransition('all','0.3','ease','0');
+activeRowIdx=0;
+drawBezier();
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

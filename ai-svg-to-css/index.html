@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert SVG images to CSS background properties. Encode SVG as data URI for inline CSS backgrounds. Optimize and minify SVG code for better performance.">
+<link rel="canonical" href="https://lifa-su.com/ai-svg-to-css/">
+<title>SVG to CSS Background Converter</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.card-title{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+textarea{width:100%;height:220px;background:var(--bg);color:#7ec8e3;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:13px;resize:vertical;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--accent)}
+.encoding-toggle{display:flex;gap:0;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.encoding-toggle button{padding:6px 16px;background:transparent;color:var(--text2);border:none;cursor:pointer;font-size:.8rem;transition:all .2s}
+.encoding-toggle button.active{background:var(--accent);color:#fff}
+.preview-svg{width:100%;height:200px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
+.preview-svg svg{max-width:100%;max-height:100%}
+.css-output{width:100%;min-height:120px;background:var(--bg);color:#a8e6cf;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:12px;word-break:break-all;white-space:pre-wrap;overflow-y:auto;max-height:200px}
+.btn-copy{padding:6px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.8rem;transition:all .2s}
+.btn-copy:hover{opacity:.85}
+.btn-copy:active{transform:scale(.96)}
+.bg-preview{width:100%;height:200px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background-color:#fff;background-repeat:no-repeat;background-position:center;background-size:contain;transition:background-image .3s}
+.bg-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bg-controls select,.bg-controls input{padding:5px 10px;background:var(--bg);color:var(--text);border:1px solid rgba(255,255,255,.1);border-radius:6px;font-size:.8rem;outline:none}
+.full-width{grid-column:1/-1}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;padding:30px 0 10px;color:var(--text2);font-size:.75rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>SVG → CSS Background Converter</h1>
+    <p>Paste your SVG code and get a ready-to-use CSS background-image property</p>
+  </header>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">
+        <span>SVG Input</span>
+        <div class="encoding-toggle">
+          <button class="active" data-enc="url" onclick="setEncoding('url')">URL Encode</button>
+          <button data-enc="base64" onclick="setEncoding('base64')">Base64</button>
+        </div>
+      </div>
+      <textarea id="svgInput" spellcheck="false" aria-label="SVG code input"></textarea>
+    </div>
+    <div class="card">
+      <div class="card-title"><span>SVG Preview</span></div>
+      <div class="preview-svg" id="svgPreview" role="img" aria-label="SVG preview"></div>
+    </div>
+    <div class="card full-width">
+      <div class="card-title">
+        <span>Generated CSS</span>
+        <button class="btn-copy" onclick="copyCSS()" aria-label="Copy CSS to clipboard">Copy CSS</button>
+      </div>
+      <div class="css-output" id="cssOutput" role="textbox" aria-readonly="true"></div>
+    </div>
+    <div class="card full-width">
+      <div class="card-title"><span>Background Preview</span></div>
+      <div class="bg-preview" id="bgPreview" role="img" aria-label="Background effect preview"></div>
+      <div class="bg-controls">
+        <select id="bgSize" onchange="updateBgPreview()" aria-label="Background size">
+          <option value="contain">contain</option>
+          <option value="cover">cover</option>
+          <option value="100% 100%">stretch</option>
+          <option value="50px 50px">50×50</option>
+        </select>
+        <select id="bgRepeat" onchange="updateBgPreview()" aria-label="Background repeat">
+          <option value="no-repeat">no-repeat</option>
+          <option value="repeat">repeat</option>
+          <option value="repeat-x">repeat-x</option>
+          <option value="repeat-y">repeat-y</option>
+        </select>
+        <select id="bgPos" onchange="updateBgPreview()" aria-label="Background position">
+          <option value="center">center</option>
+          <option value="top left">top left</option>
+          <option value="top right">top right</option>
+          <option value="bottom left">bottom left</option>
+        </select>
+        <input type="color" id="bgColor" value="#ffffff" onchange="updateBgPreview()" aria-label="Background color">
+      </div>
+    </div>
+  </div>
+  <footer>SVG to CSS Background Converter — Free Online Tool</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const svgInput=document.getElementById('svgInput');
+const svgPreview=document.getElementById('svgPreview');
+const cssOutput=document.getElementById('cssOutput');
+const bgPreview=document.getElementById('bgPreview');
+let encoding='url';
+
+const defaultSVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e94560"/>
+      <stop offset="100%" stop-color="#533483"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="80" fill="url(#g)"/>
+  <text x="100" y="112" text-anchor="middle" fill="#fff" font-size="32" font-family="sans-serif">SVG</text>
+</svg>`;
+
+svgInput.value=defaultSVG;
+
+function setEncoding(enc){
+  encoding=enc;
+  document.querySelectorAll('.encoding-toggle button').forEach(b=>{
+    b.classList.toggle('active',b.dataset.enc===enc);
+  });
+  convert();
+}
+
+function encodeSVG(svg){
+  const cleaned=svg.trim().replace(/\n\s*/g,' ').replace(/>\s+</g,'><');
+  if(encoding==='base64'){
+    return 'data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(cleaned)));
+  }
+  const encoded=cleaned
+    .replace(/"/g,"'")
+    .replace(/%/g,'%25')
+    .replace(/#/g,'%23')
+    .replace(/{/g,'%7B')
+    .replace(/}/g,'%7D')
+    .replace(/</g,'%3C')
+    .replace(/>/g,'%3E');
+  return 'data:image/svg+xml,'+encoded;
+}
+
+function convert(){
+  const svg=svgInput.value.trim();
+  if(!svg){
+    cssOutput.textContent='';
+    svgPreview.innerHTML='';
+    bgPreview.style.backgroundImage='none';
+    return;
+  }
+  svgPreview.innerHTML=svg;
+  const dataUri=encodeSVG(svg);
+  const css=`background-image: url("${dataUri}");`;
+  cssOutput.textContent=css;
+  bgPreview.style.backgroundImage=`url("${dataUri}")`;
+  updateBgPreview();
+}
+
+function updateBgPreview(){
+  bgPreview.style.backgroundSize=document.getElementById('bgSize').value;
+  bgPreview.style.backgroundRepeat=document.getElementById('bgRepeat').value;
+  bgPreview.style.backgroundPosition=document.getElementById('bgPos').value;
+  bgPreview.style.backgroundColor=document.getElementById('bgColor').value;
+}
+
+function copyCSS(){
+  const text=cssOutput.textContent;
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!')).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    showToast('Copied to clipboard!');
+  });
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+let debounceTimer;
+svgInput.addEventListener('input',()=>{
+  clearTimeout(debounceTimer);
+  debounceTimer=setTimeout(convert,200);
+});
+
+convert();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

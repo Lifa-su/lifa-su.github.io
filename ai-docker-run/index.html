@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Docker Run 命令生成器 - 可视化配置 Docker 容器启动命令</title>
+<meta name="description" content="在线可视化生成 Docker run 命令和 docker-compose.yml，支持端口映射、卷挂载、环境变量等配置，内置常用镜像预设，一键复制。">
+<meta name="keywords" content="docker run, docker compose, docker command generator, 容器配置, 命令生成器">
+<meta property="og:title" content="AI Docker Run 命令生成器">
+<meta property="og:description" content="可视化配置并生成 Docker run 命令和 docker-compose.yml">
+<link rel="canonical" href="https://lifa-su.com/ai-docker-run/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐳</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--success:#00d2a0;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent)}
+header{text-align:center;padding:2rem 1rem 1rem;background:linear-gradient(135deg,var(--surface),var(--accent2) 150%)}
+header h1{font-size:2rem;margin-bottom:.3rem}
+header h1 span{color:var(--accent)}
+header p{color:var(--text2);font-size:.95rem}
+.container{max-width:1200px;margin:0 auto;padding:1rem}
+.presets{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:1.2rem 0}
+.preset-btn{padding:.5rem 1.1rem;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer;font-size:.9rem;transition:all .2s}
+.preset-btn:hover,.preset-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem}
+.card h2{font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:.3rem;margin-top:.8rem}
+label:first-of-type{margin-top:0}
+input,select,textarea{width:100%;padding:.55rem .75rem;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:.9rem;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:flex;gap:.5rem;align-items:flex-end}
+.row>*{flex:1}
+.add-btn{padding:.55rem .9rem;border:none;border-radius:6px;background:var(--accent2);color:#fff;cursor:pointer;font-size:.85rem;white-space:nowrap;flex:none;transition:background .2s}
+.add-btn:hover{background:var(--accent)}
+.remove-btn{background:none;border:none;color:var(--accent);cursor:pointer;font-size:1.1rem;padding:0 .3rem;flex:none}
+.items{display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem}
+.item{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:var(--bg);border-radius:6px;font-size:.85rem;font-family:'SF Mono',Monaco,Consolas,monospace}
+.item span{flex:1;word-break:break-all}
+.output-section{grid-column:1/-1}
+.tabs{display:flex;gap:0}
+.tab{padding:.6rem 1.2rem;border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0;background:var(--bg);color:var(--text2);cursor:pointer;font-size:.9rem;transition:all .2s}
+.tab.active{background:var(--surface);color:var(--text);border-color:var(--border)}
+.output-card{background:var(--surface);border:1px solid var(--border);border-radius:0 var(--radius) var(--radius) var(--radius);padding:1.2rem;position:relative}
+.output-card pre{background:var(--bg);padding:1rem;border-radius:6px;overflow-x:auto;font-size:.85rem;line-height:1.7;font-family:'SF Mono',Monaco,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+.copy-btn{position:absolute;top:.8rem;right:.8rem;padding:.4rem .9rem;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;font-size:.8rem;transition:all .2s;z-index:1}
+.copy-btn:hover{background:#d63050}
+.copy-btn.copied{background:var(--success)}
+.cm{color:#6a9955}.fl{color:#569cd6}.vl{color:#ce9178}
+.checkbox-row{display:flex;align-items:center;gap:.5rem;margin-top:.8rem}
+.checkbox-row input[type=checkbox]{width:auto}
+footer{text-align:center;padding:2rem 1rem;color:var(--text2);font-size:.8rem;margin-top:2rem}
+.tip{font-size:.78rem;color:var(--text2);margin-top:.3rem}
+</style>
+</head>
+<body>
+<header>
+<h1>🐳 AI <span>Docker Run</span> 命令生成器</h1>
+<p>可视化配置 Docker 容器，实时生成 docker run 命令和 docker-compose.yml</p>
+</header>
+<div class="container">
+<div class="presets">
+<button class="preset-btn" onclick="applyPreset('nginx')">🌐 Nginx</button>
+<button class="preset-btn" onclick="applyPreset('mysql')">🐬 MySQL</button>
+<button class="preset-btn" onclick="applyPreset('redis')">🔴 Redis</button>
+<button class="preset-btn" onclick="applyPreset('postgres')">🐘 PostgreSQL</button>
+<button class="preset-btn" onclick="applyPreset('mongo')">🍃 MongoDB</button>
+</div>
+<div class="grid">
+<!-- Basic -->
+<div class="card">
+<h2>📦 基本配置</h2>
+<label for="image">镜像名称 *</label>
+<input id="image" placeholder="nginx:latest" oninput="generate()">
+<label for="cname">容器名称</label>
+<input id="cname" placeholder="my-nginx" oninput="generate()">
+<label for="hostname">主机名</label>
+<input id="hostname" placeholder="容器内主机名" oninput="generate()">
+<div class="checkbox-row"><input type="checkbox" id="detach" checked onchange="generate()"><label for="detach" style="margin:0">后台运行 (-d)</label></div>
+<div class="checkbox-row"><input type="checkbox" id="rm" onchange="generate()"><label for="rm" style="margin:0">退出后自动删除 (--rm)</label></div>
+<div class="checkbox-row"><input type="checkbox" id="interactive" onchange="generate()"><label for="interactive" style="margin:0">交互模式 (-it)</label></div>
+<label for="restart">重启策略</label>
+<select id="restart" onchange="generate()">
+<option value="">不设置</option>
+<option value="no">no</option>
+<option value="always">always</option>
+<option value="unless-stopped">unless-stopped</option>
+<option value="on-failure">on-failure</option>
+</select>
+<label for="network">网络模式</label>
+<select id="network" onchange="generate()">
+<option value="">默认 (bridge)</option>
+<option value="host">host</option>
+<option value="none">none</option>
+<option value="custom">自定义网络...</option>
+</select>
+<input id="customNet" placeholder="自定义网络名" oninput="generate()" style="display:none;margin-top:.3rem">
+<label for="cmd">启动命令 (CMD)</label>
+<input id="cmd" placeholder="例如 /bin/bash" oninput="generate()">
+</div>
+<!-- Ports -->
+<div class="card">
+<h2>🔌 端口映射</h2>
+<div class="row">
+<div><label for="hostPort">主机端口</label><input id="hostPort" placeholder="8080"></div>
+<div><label for="containerPort">容器端口</label><input id="containerPort" placeholder="80"></div>
+<button class="add-btn" onclick="addPort()">添加</button>
+</div>
+<div class="tip">格式：主机端口:容器端口</div>
+<div id="portList" class="items"></div>
+<h2 style="margin-top:1.2rem">📁 卷挂载</h2>
+<div class="row">
+<div><label for="hostPath">主机路径</label><input id="hostPath" placeholder="/data"></div>
+<div><label for="containerPath">容器路径</label><input id="containerPath" placeholder="/var/lib/data"></div>
+<button class="add-btn" onclick="addVolume()">添加</button>
+</div>
+<div class="tip">格式：主机路径:容器路径</div>
+<div id="volumeList" class="items"></div>
+</div>
+<!-- Env -->
+<div class="card">
+<h2>🔑 环境变量</h2>
+<div class="row">
+<div><label for="envKey">变量名</label><input id="envKey" placeholder="MYSQL_ROOT_PASSWORD"></div>
+<div><label for="envVal">值</label><input id="envVal" placeholder="secret123"></div>
+<button class="add-btn" onclick="addEnv()">添加</button>
+</div>
+<div id="envList" class="items"></div>
+</div>
+<!-- Advanced -->
+<div class="card">
+<h2>⚙️ 高级选项</h2>
+<label for="cpus">CPU 限制</label>
+<input id="cpus" placeholder="例如 1.5" oninput="generate()">
+<label for="memory">内存限制</label>
+<input id="memory" placeholder="例如 512m, 1g" oninput="generate()">
+<label for="workdir">工作目录</label>
+<input id="workdir" placeholder="/app" oninput="generate()">
+<label for="user">运行用户</label>
+<input id="user" placeholder="1000:1000" oninput="generate()">
+<label for="extraArgs">额外参数</label>
+<input id="extraArgs" placeholder="--privileged --cap-add=SYS_ADMIN" oninput="generate()">
+</div>
+<!-- Output -->
+<div class="output-section">
+<div class="tabs">
+<div class="tab active" onclick="switchTab('run')">docker run</div>
+<div class="tab" onclick="switchTab('compose')">docker-compose.yml</div>
+</div>
+<div class="output-card">
+<button class="copy-btn" onclick="copyOutput()">📋 复制</button>
+<pre id="output"><span class="cm"># 👆 填写配置后，命令将在此实时生成</span></pre>
+</div>
+</div>
+</div>
+</div>
+<footer>
+<p>AI Docker Run Generator &copy; 2024 | 开源工具，助你快速生成 Docker 命令</p>
+</footer>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script>
+const state={ports:[],volumes:[],envs:[],tab:'run'};
+const presets={
+nginx:{image:'nginx:latest',cname:'my-nginx',ports:[['80','80']],volumes:[['/data/nginx/html','/usr/share/nginx/html'],[ '/data/nginx/conf','/etc/nginx/conf.d']],envs:[],restart:'unless-stopped',network:'bridge'},
+mysql:{image:'mysql:8',cname:'my-mysql',ports:[['3306','3306']],volumes:[['/data/mysql','/var/lib/mysql']],envs:[['MYSQL_ROOT_PASSWORD','your_password'],['MYSQL_DATABASE','mydb']],restart:'unless-stopped',network:'bridge'},
+redis:{image:'redis:7-alpine',cname:'my-redis',ports:[['6379','6379']],volumes:[['/data/redis','/data']],envs:[],restart:'unless-stopped',network:'bridge'},
+postgres:{image:'postgres:16-alpine',cname:'my-postgres',ports:[['5432','5432']],volumes:[['/data/postgres','/var/lib/postgresql/data']],envs:[['POSTGRES_PASSWORD','your_password'],['POSTGRES_DB','mydb']],restart:'unless-stopped',network:'bridge'},
+mongo:{image:'mongo:7',cname:'my-mongo',ports:[['27017','27017']],volumes:[['/data/mongo','/data/db']],envs:[['MONGO_INITDB_ROOT_USERNAME','admin'],['MONGO_INITDB_ROOT_PASSWORD','your_password']],restart:'unless-stopped',network:'bridge'}
+};
+function $(id){return document.getElementById(id)}
+function applyPreset(name){
+const p=presets[name];
+$('image').value=p.image;$('cname').value=p.cname;
+$('restart').value=p.restart;$('network').value=p.network;
+$('hostname').value='';$('detach').checked=true;$('rm').checked=false;$('interactive').checked=false;
+$('cpus').value='';$('memory').value='';$('workdir').value='';$('user').value='';$('extraArgs').value='';
+state.ports=p.ports.map(x=>[...x]);state.volumes=p.volumes.map(x=>[...x]);state.envs=p.envs.map(x=>[...x]);
+renderAll();generate();
+document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+event.target.classList.add('active');
+}
+function renderAll(){renderPorts();renderVolumes();renderEnvs()}
+function renderPorts(){
+const el=$('portList');el.innerHTML='';
+state.ports.forEach((p,i)=>{el.innerHTML+=`<div class="item"><span>${p[0]}:${p[1]}</span><button class="remove-btn" onclick="state.ports.splice(${i},1);renderPorts();generate()">✕</button></div>`});
+}
+function renderVolumes(){
+const el=$('volList');el.innerHTML='';
+state.volumes.forEach((v,i)=>{el.innerHTML+=`<div class="item"><span>${v[0]}:${v[1]}</span><button class="remove-btn" onclick="state.volumes.splice(${i},1);renderVolumes();generate()">✕</button></div>`});
+}
+function renderEnvs(){
+const el=$('envList');el.innerHTML='';
+state.envs.forEach((e,i)=>{el.innerHTML+=`<div class="item"><span>${e[0]}=${e[1]}</span><button class="remove-btn" onclick="state.envs.splice(${i},1);renderEnvs();generate()">✕</button></div>`});
+}
+function addPort(){
+const h=$('hostPort').value.trim(),c=$('containerPort').value.trim();
+if(h&&c){state.ports.push([h,c]);$('hostPort').value='';$('containerPort').value='';renderPorts();generate()}
+}
+function addVolume(){
+const h=$('hostPath').value.trim(),c=$('containerPath').value.trim();
+if(h&&c){state.volumes.push([h,c]);$('hostPath').value='';$('containerPath').value='';renderVolumes();generate()}
+}
+function addEnv(){
+const k=$('envKey').value.trim(),v=$('envVal').value.trim();
+if(k){state.envs.push([k,v]);$('envKey').value='';$('envVal').value='';renderEnvs();generate()}
+}
+function switchTab(t){
+state.tab=t;
+document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+event.target.classList.add('active');
+generate();
+}
+function generate(){
+const img=$('image').value.trim();
+if(!img){$('output').innerHTML='<span class="cm"># 👆 填写镜像名称后，命令将在此实时生成</span>';return}
+if(state.tab==='run') genRun(img); else genCompose(img);
+}
+function genRun(img){
+const lines=[];const cname=$('cname').value.trim();const hn=$('hostname').value.trim();
+const det=$('detach').checked;const rm=$('rm').checked;const it=$('interactive').checked;
+const rst=$('restart').value;const net=$('network').value;
+const cpus=$('cpus').value.trim();const mem=$('memory').value.trim();
+const wd=$('workdir').value.trim();const usr=$('user').value.trim();
+const extra=$('extraArgs').value.trim();
+lines.push('<span class="fl">docker run</span> \\');
+if(det) lines.push('  <span class="fl">-d</span> \\  <span class="cm"># 后台运行</span>');
+if(rm) lines.push('  <span class="fl">--rm</span> \\  <span class="cm"># 退出后自动删除</span>');
+if(it) lines.push('  <span class="fl">-it</span> \\  <span class="cm"># 交互模式</span>');
+if(cname) lines.push('  <span class="fl">--name</span> <span class="vl">'+esc(cname)+'</span> \\  <span class="cm"># 容器名称</span>');
+if(hn) lines.push('  <span class="fl">--hostname</span> <span class="vl">'+esc(hn)+'</span> \\  <span class="cm"># 主机名</span>');
+if(rst&&rst!=='no') lines.push('  <span class="fl">--restart</span> <span class="vl">'+rst+'</span> \\  <span class="cm"># 重启策略</span>');
+if(net&&net!=='bridge') lines.push('  <span class="fl">--network</span> <span class="vl">'+net+'</span> \\  <span class="cm"># 网络模式</span>');
+state.ports.forEach(p=>lines.push('  <span class="fl">-p</span> <span class="vl">'+esc(p[0])+':'+esc(p[1])+'</span> \\  <span class="cm"># 端口映射</span>'));
+state.volumes.forEach(v=>lines.push('  <span class="fl">-v</span> <span class="vl">'+esc(v[0])+':'+esc(v[1])+'</span> \\  <span class="cm"># 卷挂载</span>'));
+state.envs.forEach(e=>lines.push('  <span class="fl">-e</span> <span class="vl">'+esc(e[0])+'='+esc(e[1])+'</span> \\  <span class="cm"># 环境变量</span>'));
+if(cpus) lines.push('  <span class="fl">--cpus</span> <span class="vl">'+esc(cpus)+'</span> \\  <span class="cm"># CPU限制</span>');
+if(mem) lines.push('  <span class="fl">-m</span> <span class="vl">'+esc(mem)+'</span> \\  <span class="cm"># 内存限制</span>');
+if(wd) lines.push('  <span class="fl">-w</span> <span class="vl">'+esc(wd)+'</span> \\  <span class="cm"># 工作目录</span>');
+if(usr) lines.push('  <span class="fl">--user</span> <span class="vl">'+esc(usr)+'</span> \\  <span class="cm"># 运行用户</span>');
+if(extra) lines.push('  '+esc(extra)+' \\  <span class="cm"># 额外参数</span>');
+let last=lines.length-1;
+lines[last]=lines[last].replace(' \\','');
+lines.push('  <span class="vl">'+esc(img)+'</span>  <span class="cm"># 镜像</span>');
+$('output').innerHTML=lines.join('\n');
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function genCompose(img){
+const cname=$('cname').value.trim()||'app';const hn=$('hostname').value.trim();
+const rst=$('restart').value;const net=$('network').value;
+const cpus=$('cpus').value.trim();const mem=$('memory').value.trim();
+const wd=$('workdir').value.trim();const usr=$('user').value.trim();
+let y='<span class="cm"># docker-compose.yml</span>\n';
+y+='<span class="fl">version:</span> <span class="vl">"3.8"</span>\n\n';
+y+='<span class="fl">services:</span>\n';
+y+='  <span class="fl">'+esc(cname)+':</span>\n';
+y+='    <span class="fl">image:</span> <span class="vl">'+esc(img)+'</span>\n';
+y+='    <span class="fl">container_name:</span> <span class="vl">'+esc(cname)+'</span>\n';
+if(hn) y+='    <span class="fl">hostname:</span> <span class="vl">'+esc(hn)+'</span>\n';
+if(rst&&rst!=='no') y+='    <span class="fl">restart:</span> <span class="vl">'+rst+'</span>\n';
+if(state.ports.length){
+y+='    <span class="fl">ports:</span>\n';
+state.ports.forEach(p=>y+='      - <span class="vl">"'+esc(p[0])+':'+esc(p[1])+'"</span>\n');
+}
+if(state.volumes.length){
+y+='    <span class="fl">volumes:</span>\n';
+state.volumes.forEach(v=>y+='      - <span class="vl">'+esc(v[0])+':'+esc(v[1])+'</span>\n');
+}
+if(state.envs.length){
+y+='    <span class="fl">environment:</span>\n';
+state.envs.forEach(e=>y+='      - <span class="vl">'+esc(e[0])+'='+esc(e[1])+'</span>\n');
+}
+if(net&&net!=='bridge'){
+y+='    <span class="fl">network_mode:</span> <span class="vl">'+net+'</span>\n';
+}
+let deploy=false;let dp='    <span class="fl">deploy:</span>\n      <span class="fl">resources:</span>\n        <span class="fl">limits:</span>\n';
+if(cpus){dp+='          <span class="fl">cpus:</span> <span class="vl">"'+esc(cpus)+'"</span>\n';deploy=true}
+if(mem){dp+='          <span class="fl">memory:</span> <span class="vl">'+esc(mem)+'</span>\n';deploy=true}
+if(deploy) y+=dp;
+if(wd) y+='    <span class="fl">working_dir:</span> <span class="vl">'+esc(wd)+'</span>\n';
+if(usr) y+='    <span class="fl">user:</span> <span class="vl">"'+esc(usr)+'"</span>\n';
+$('output').innerHTML=y;
+}
+function copyOutput(){
+const pre=$('output');
+const text=pre.innerText||pre.textContent;
+navigator.clipboard.writeText(text).then(()=>{
+const btn=document.querySelector('.copy-btn');
+btn.textContent='✅ 已复制';btn.classList.add('copied');
+setTimeout(()=>{btn.textContent='📋 复制';btn.classList.remove('copied')},2000);
+});
+}
+['hostPort','containerPort','hostPath','containerPath','envKey','envVal'].forEach(id=>{
+document.getElementById(id).addEventListener('keydown',function(e){
+if(e.key==='Enter'){
+if(id.startsWith('host')&&id.includes('Port'))addPort();
+else if(id.startsWith('host')||id.startsWith('container'))addVolume();
+else addEnv();
+}
+});
+});
+generate();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

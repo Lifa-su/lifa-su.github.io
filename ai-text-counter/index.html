@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Text Counter - Word, Character &amp; Readability Analyzer</title>
+<meta name="description" content="Free online text analysis tool with word count, readability scores, and keyword density.">
+<link rel="canonical" href="https://lifa-su.com/ai-text-counter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#533483;--tx:#eee;--tm:#aab;--bd:#2a2a4a;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.c{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tm);margin-top:6px;font-size:.95rem}
+textarea{width:100%;min-height:220px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px;color:var(--tx);font-size:1rem;resize:vertical;outline:none;transition:border-color .2s;margin:20px 0}
+textarea:focus{border-color:var(--ac)}
+textarea::placeholder{color:var(--tm)}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:20px 0}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center;transition:transform .15s,border-color .15s}
+.sc:hover{transform:translateY(-2px);border-color:var(--ac)}
+.sv{font-size:1.8rem;font-weight:700;color:var(--ac)}
+.sl{font-size:.8rem;color:var(--tm);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.sec{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin:20px 0}
+.sec h2{font-size:1.1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.tr,.rr{display:flex;gap:20px;flex-wrap:wrap}
+.ti,.ri{flex:1;min-width:200px;background:var(--bg);border-radius:8px;padding:14px;text-align:center}
+.tv{font-size:1.5rem;font-weight:700;color:var(--ac)}
+.tl,.rl{font-size:.8rem;color:var(--tm);margin-top:2px}
+.rs{font-size:2rem;font-weight:700}
+.rd{font-size:.75rem;color:var(--tm);margin-top:6px;font-style:italic}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:8px 12px;border-bottom:1px solid var(--bd);color:var(--tm);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px 12px;border-bottom:1px solid var(--bd);font-size:.9rem}
+tr:last-child td{border-bottom:none}
+.bar{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;min-width:80px}
+.bf{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:3px;transition:width .3s}
+.em{text-align:center;color:var(--tm);padding:20px;font-size:.9rem}
+footer{text-align:center;padding:30px 0 20px;color:var(--tm);font-size:.8rem}
+@media(max-width:600px){.c{padding:12px}h1{font-size:1.4rem}textarea{min-height:160px}.sg{grid-template-columns:repeat(2,1fr);gap:10px}.sv{font-size:1.4rem}.tr,.rr{flex-direction:column;gap:10px}}
+</style>
+</head>
+<body>
+<div class="c">
+<header><h1>AI Text Counter</h1><p>Analyze your text instantly — words, readability, keyword density &amp; more</p></header>
+<textarea id="inp" placeholder="Start typing or paste your text here..." aria-label="Text input"></textarea>
+<div class="sg">
+<div class="sc"><div class="sv" id="w">0</div><div class="sl">Words</div></div>
+<div class="sc"><div class="sv" id="ch">0</div><div class="sl">Characters</div></div>
+<div class="sc"><div class="sv" id="chn">0</div><div class="sl">Chars (no spaces)</div></div>
+<div class="sc"><div class="sv" id="sn">0</div><div class="sl">Sentences</div></div>
+<div class="sc"><div class="sv" id="pa">0</div><div class="sl">Paragraphs</div></div>
+<div class="sc"><div class="sv" id="sy">0</div><div class="sl">Syllables</div></div>
+</div>
+<div class="sec"><h2>&#9201;&#65039; Estimated Time</h2>
+<div class="tr">
+<div class="ti"><div class="tv" id="rt">0 sec</div><div class="tl">Reading Time (200-250 wpm)</div></div>
+<div class="ti"><div class="tv" id="st">0 sec</div><div class="tl">Speaking Time (130-150 wpm)</div></div>
+</div></div>
+<div class="sec"><h2>&#128202; Readability Scores</h2>
+<div class="rr">
+<div class="ri"><div class="rs" id="fe" style="color:var(--ac)">—</div><div class="rl">Flesch Reading Ease</div><div class="rd" id="fed">Enter text to analyze</div></div>
+<div class="ri"><div class="rs" id="fg" style="color:var(--ac2)">—</div><div class="rl">Flesch-Kincaid Grade</div><div class="rd" id="fgd">Enter text to analyze</div></div>
+</div></div>
+<div class="sec"><h2>&#128273; Keyword Density (Top 10)</h2>
+<div id="kw"><div class="em">Enter text to see keyword analysis</div></div>
+</div>
+<!-- Pro Section -->
+<style>
+.pro-section{position:relative;margin-top:24px;border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-section:hover{transform:translateY(-2px)}
+.pro-blur{filter:blur(5px);pointer-events:none;opacity:.65;padding:20px;background:var(--sf);border-radius:var(--r)}
+.pro-blur-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.pro-blur-grid{grid-template-columns:1fr}}
+.pro-blur-item{background:var(--bg);border-radius:10px;padding:14px;text-align:center}
+.pro-blur-item .mock-icon{font-size:1.5rem;margin-bottom:6px}
+.pro-blur-item .mock-title{font-size:.85rem;color:var(--tm);font-weight:600;margin-bottom:8px}
+.pro-blur-item .mock-bar{height:6px;background:#2a2a4a;border-radius:3px;margin-top:6px;overflow:hidden}
+.pro-blur-item .mock-bar span{display:block;height:100%;background:var(--ac);border-radius:3px}
+.pro-blur-item .mock-list{margin-top:8px}
+.pro-blur-item .mock-list-item{height:8px;background:#2a2a4a;border-radius:3px;margin-bottom:5px}
+.pro-blur-item .mock-list-item:nth-child(2){width:80%}
+.pro-blur-item .mock-list-item:nth-child(3){width:60%}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);border-radius:var(--r);border:2px dashed rgba(233,69,96,.4)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:700;color:#fff}
+.pro-sublabel{font-size:.85rem;color:var(--tm);margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:var(--sf);border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;border:1px solid var(--bd);animation:proIn .25s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;color:var(--ac);margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0}
+.pro-modal li{padding:10px 0;border-bottom:1px solid var(--bd);font-size:.95rem;display:flex;align-items:center;gap:10px}
+.pro-modal li:last-child{border-bottom:none}
+.pro-modal li .li-icon{font-size:1.1rem;flex-shrink:0}
+.btn-upgrade{display:block;width:100%;padding:14px;background:var(--ac);color:#fff;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:20px;transition:background .2s;text-decoration:none;text-align:center}
+.btn-upgrade:hover{background:#d63851}
+.btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:8px}
+.btn-later:hover{color:#fff}
+</style>
+
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-grid">
+<div class="pro-blur-item"><div class="mock-icon">🌍</div><div class="mock-title">Multi-Language</div><div class="mock-list"><div class="mock-list-item"></div><div class="mock-list-item"></div><div class="mock-list-item"></div></div></div>
+<div class="pro-blur-item"><div class="mock-icon">🔍</div><div class="mock-title">SEO Analysis</div><div class="mock-bar"><span style="width:72%"></span></div><div class="mock-bar" style="margin-top:4px"><span style="width:58%"></span></div></div>
+<div class="pro-blur-item"><div class="mock-icon">⚔️</div><div class="mock-title">Competitor Compare</div><div class="mock-list"><div class="mock-list-item"></div><div class="mock-list-item"></div><div class="mock-list-item"></div></div></div>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock multi-language, SEO & competitor analysis</div>
+</div>
+</div>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>📝 Text Counter Pro</h2>
+<p style="color:var(--tm);font-size:.9rem">Advanced text analysis for professionals</p>
+<div class="pro-price">$9</div>
+<ul>
+<li><span class="li-icon">🌍</span>Multi-Language Support — analyze Chinese, Japanese, Korean & more</li>
+<li><span class="li-icon">🔍</span>SEO Analysis — keyword optimization, meta tag suggestions & scores</li>
+<li><span class="li-icon">⚔️</span>Competitor Comparison — compare your content against top-ranking pages</li>
+<li><span class="li-icon">📄</span>Export Reports — download analysis as PDF or CSV</li>
+<li><span class="li-icon">♾️</span>Lifetime access — one-time payment, no subscription</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+
+<footer>AI Text Counter — Free text analysis tool</footer>
+</div>
+<script>
+const STOP=new Set(['the','be','to','of','and','a','in','that','have','i','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us','is','was','are','were','been','being','had','has','did','does','am','may','might','shall','should','must','need','dare','ought','used','very','much','more','many','such','still','own','each','every','both','few','those','between','same','another','while','since','until','before','during','without','within','through','against','among','per','around','above','below','under','again','further','once','here','where','why','too','down','off','let','put','run','set','try','ask','went','old','right','tell','call','hand','high','keep','last','long','big','small','end','turn','move','play','next','live','begin','seem','help','show','part','place','case','point','group','number','world','area','course','fact','upon','head','far','however','yet','away','today','already','never','always','often','though','quite','rather','enough','almost','sure','thing','something','nothing','anything','everything','someone','anyone','everyone','man','woman','child','world','life','house','school','state','family','student','country','problem','city','company','system','program','question','government','room','night','home','water','money','story','young','week','level','side','kind','body','eye','service','door','line','car','mother','father']);
+
+function countSyllables(word) {
+  word = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (word.length <= 2) return word.length > 0 ? 1 : 0;
+  var syl = 0;
+  var vowels = 'aeiouy';
+  var prevVowel = false;
+  for (var i = 0; i < word.length; i++) {
+    var isV = vowels.indexOf(word[i]) >= 0;
+    if (isV && !prevVowel) syl++;
+    prevVowel = isV;
+  }
+  if (word.endsWith('e') && !word.endsWith('le') && syl > 1) syl--;
+  if (word.endsWith('le') && word.length > 2 && vowels.indexOf(word[word.length-3]) < 0) syl++;
+  if (word.endsWith('ed') && syl > 1) {
+    var before = word[word.length-3];
+    if (before !== 't' && before !== 'd') syl--;
+  }
+  return Math.max(1, syl);
+}
+
+function formatTime(minutes) {
+  if (minutes < 1) return Math.round(minutes * 60) + ' sec';
+  if (minutes < 60) return Math.round(minutes) + ' min';
+  var h = Math.floor(minutes / 60);
+  var m = Math.round(minutes % 60);
+  return h + ' hr ' + m + ' min';
+}
+
+function easeLabel(s) {
+  if (s >= 90) return 'Very Easy (5th grade)';
+  if (s >= 80) return 'Easy (6th grade)';
+  if (s >= 70) return 'Fairly Easy (7th grade)';
+  if (s >= 60) return 'Standard (8th-9th grade)';
+  if (s >= 50) return 'Fairly Difficult (10th-12th)';
+  if (s >= 30) return 'Difficult (College level)';
+  return 'Very Difficult (Graduate)';
+}
+
+function gradeLabel(g) {
+  if (g < 1) return 'Below 1st grade';
+  if (g <= 5) return 'Elementary school';
+  if (g <= 8) return 'Middle school';
+  if (g <= 12) return 'High school';
+  if (g <= 16) return 'College level';
+  return 'Graduate level';
+}
+
+function analyze() {
+  var text = document.getElementById('inp').value;
+  var chars = text.length;
+  var charsNoSpace = text.replace(/\s/g, '').length;
+  var wordsArr = text.trim() ? text.trim().split(/\s+/) : [];
+  var wordCount = wordsArr.length;
+  var sentArr = text.match(/[^.!?]+[.!?]+/g) || [];
+  var sentCount = sentArr.length || (wordCount > 0 ? 1 : 0);
+  var paraArr = text.split(/
+\s*
+/).filter(function(p){return p.trim().length > 0;});
+  var paraCount = text.trim() ? Math.max(paraArr.length, 1) : 0;
+  var totalSyl = 0;
+  wordsArr.forEach(function(w){ totalSyl += countSyllables(w); });
+
+  document.getElementById('w').textContent = wordCount;
+  document.getElementById('ch').textContent = chars;
+  document.getElementById('chn').textContent = charsNoSpace;
+  document.getElementById('sn').textContent = sentCount;
+  document.getElementById('pa').textContent = paraCount;
+  document.getElementById('sy').textContent = totalSyl;
+
+  var readMin = wordCount / 225;
+  var speakMin = wordCount / 140;
+  document.getElementById('rt').textContent = formatTime(readMin);
+  document.getElementById('st').textContent = formatTime(speakMin);
+
+  if (wordCount >= 5 && sentCount > 0) {
+    var avgSentLen = wordCount / sentCount;
+    var avgSylWord = totalSyl / wordCount;
+    var ease = 206.835 - 1.015 * avgSentLen - 84.6 * avgSylWord;
+    var grade = 0.39 * avgSentLen + 11.8 * avgSylWord - 15.59;
+    ease = Math.round(ease * 10) / 10;
+    grade = Math.round(grade * 10) / 10;
+    document.getElementById('fe').textContent = ease;
+    document.getElementById('fed').textContent = easeLabel(ease);
+    document.getElementById('fg').textContent = grade;
+    document.getElementById('fgd').textContent = gradeLabel(grade);
+  } else {
+    document.getElementById('fe').textContent = '—';
+    document.getElementById('fed').textContent = 'Need at least 5 words';
+    document.getElementById('fg').textContent = '—';
+    document.getElementById('fgd').textContent = 'Need at least 5 words';
+  }
+
+  var kwDiv = document.getElementById('kw');
+  if (wordCount === 0) {
+    kwDiv.innerHTML = '<div class="em">Enter text to see keyword analysis</div>';
+    return;
+  }
+  var freq = {};
+  wordsArr.forEach(function(w){
+    var lw = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (lw.length > 1 && !STOP.has(lw)) freq[lw] = (freq[lw]||0) + 1;
+  });
+  var sorted = Object.entries(freq).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+  if (sorted.length === 0) {
+    kwDiv.innerHTML = '<div class="em">No significant keywords found</div>';
+    return;
+  }
+  var maxC = sorted[0][1];
+  var html = '<table><tr><th>#</th><th>Keyword</th><th>Count</th><th>Density</th><th>Distribution</th></tr>';
+  sorted.forEach(function(item, i){
+    var pct = (item[1] / wordCount * 100).toFixed(1);
+    var bw = (item[1] / maxC * 100).toFixed(0);
+    html += '<tr><td>' + (i+1) + '</td><td>' + item[0] + '</td><td>' + item[1] + '</td><td>' + pct + '%</td><td><div class="bar"><div class="bf" style="width:' + bw + '%"></div></div></td></tr>';
+  });
+  html += '</table>';
+  kwDiv.innerHTML = html;
+}
+
+document.getElementById('inp').addEventListener('input', analyze);
+analyze();
+<\/script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"><\/script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

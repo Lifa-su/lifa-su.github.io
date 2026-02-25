@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Changelog Generator — Create Beautiful Changelogs Instantly</title>
+<meta name="description" content="Generate professional changelogs following the Keep a Changelog standard. Semantic versioning, multiple categories, one-click export to Markdown. Free online tool.">
+<meta name="keywords" content="changelog generator, keep a changelog, semantic versioning, release notes, markdown changelog, version history, software releases, AI changelog">
+<meta name="author" content="Feifei Dev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-changelog/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Changelog Generator — Create Beautiful Changelogs Instantly">
+<meta property="og:description" content="Generate professional changelogs following the Keep a Changelog standard. Semantic versioning, multiple categories, one-click export.">
+<meta property="og:url" content="https://lifa-su.com/ai-changelog/">
+<meta property="og:site_name" content="Feifei AI Tools">
+<meta property="og:image" content="https://lifa-su.com/assets/og-changelog.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Changelog Generator — Create Beautiful Changelogs Instantly">
+<meta name="twitter:description" content="Generate professional changelogs with semantic versioning. Free online tool.">
+<meta name="twitter:image" content="https://lifa-su.com/assets/og-changelog.png">
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Changelog Generator","url":"https://lifa-su.com/ai-changelog/","description":"Generate professional changelogs following the Keep a Changelog standard with semantic versioning.","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Feifei Dev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--success:#4ecca3;--warn:#f0a500;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+button{cursor:pointer;font-family:inherit;border:none;border-radius:var(--radius);padding:8px 16px;font-size:.9rem;transition:all .2s}
+input,select{font-family:inherit;font-size:.9rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;outline:none;transition:border-color .2s;width:100%}
+input:focus,select:focus{border-color:var(--accent)}
+header{text-align:center;padding:40px 20px 30px;background:linear-gradient(135deg,var(--surface) 0%,var(--accent2) 100%);border-bottom:2px solid var(--accent)}
+header h1{font-size:2rem;margin-bottom:6px;background:linear-gradient(90deg,var(--accent),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2)}
+header a{color:var(--accent)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.panel-title{font-size:1.1rem;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:4px;font-weight:500}
+.form-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.form-row .form-group{flex:1;min-width:100px}
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#d63851}
+.btn-secondary{background:var(--surface2);color:var(--text)}.btn-secondary:hover{background:#1a4a7a}
+.btn-success{background:var(--success);color:#1a1a2e}.btn-success:hover{background:#3db88a}
+.btn-warn{background:var(--warn);color:#1a1a2e}.btn-warn:hover{background:#d99200}
+.btn-sm{padding:5px 10px;font-size:.8rem}
+.btn-danger{background:#c0392b;color:#fff}.btn-danger:hover{background:#a93226}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.vc{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.vc:hover{border-color:var(--accent)}
+.vh{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.vh h3{font-size:1rem;color:var(--accent)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:600;margin:2px}
+.b-Added{background:#27ae6033;color:#4ecca3}.b-Changed{background:#f39c1233;color:#f0a500}
+.b-Deprecated{background:#8e44ad33;color:#bb6bd9}.b-Removed{background:#c0392b33;color:#e74c3c}
+.b-Fixed{background:#2980b933;color:#3498db}.b-Security{background:#e9456033;color:#e94560}
+.b-unrel{background:var(--warn);color:#1a1a2e}
+.ei{display:flex;align-items:start;gap:8px;padding:4px 0;font-size:.88rem}
+.ei span{flex:1}.ei button{background:none;color:var(--text2);padding:2px 6px;font-size:.75rem}.ei button:hover{color:var(--accent)}
+.ar{display:flex;gap:6px;margin-top:6px}.ar input{flex:1}
+.preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-family:"SFMono-Regular",Consolas,monospace;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:70vh;overflow-y:auto;color:#ccc}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--success);color:#1a1a2e;padding:12px 20px;border-radius:var(--radius);font-weight:500;transform:translateY(100px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.empty{text-align:center;padding:40px 20px;color:var(--text2)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aab' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.footer{text-align:center;padding:30px 20px;color:var(--text2);font-size:.8rem;margin-top:40px;border-top:1px solid var(--border)}
+.csec{margin-top:8px;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.csec-h{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;cursor:pointer;user-select:none;font-weight:600;font-size:.85rem}
+.csec-h:hover{background:rgba(15,52,96,.3)}
+.csec-b{padding:8px 12px;display:none}
+.csec.open .csec-b{display:block}
+.csec.open .arrow{transform:rotate(90deg)}
+.arrow{transition:transform .2s;font-size:.7rem;color:var(--text2)}
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+body{animation:fadeIn .3s ease-out}
+.panel{animation:slideUp .4s ease-out both}
+.layout .panel:nth-child(2){animation-delay:.1s}
+header{animation:slideUp .4s ease-out}
+/* Pro Section */
+.pro-section{background:linear-gradient(135deg,rgba(233,69,96,.08),rgba(83,52,131,.12));border:1px solid rgba(233,69,96,.25);border-radius:var(--radius);padding:28px;text-align:center;margin-top:24px;position:relative;overflow:hidden;animation:slideUp .5s ease-out both;animation-delay:.2s}
+.pro-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f0a500,#e94560);color:#fff;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.5px}
+.pro-section h3{font-size:1.15rem;margin-bottom:14px;color:var(--text)}
+.pro-features{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.pro-feature{padding:8px 16px;background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.15);border-radius:8px;font-size:.85rem;color:var(--text2)}
+.btn-pro{display:inline-block;padding:12px 36px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border-radius:var(--radius);font-weight:600;text-decoration:none;transition:all .3s;font-size:.95rem}
+.btn-pro:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(233,69,96,.35)}
+</style>
+</head>
+<body>
+<header>
+<h1>📋 AI Changelog Generator</h1>
+<p>Generate beautiful changelogs following the <a href="https://keepachangelog.com/" target="_blank">Keep a Changelog</a> standard</p>
+</header>
+<div class="container">
+<div class="layout">
+<div>
+<div class="panel">
+<div class="panel-title">🏷️ Add Version</div>
+<div class="form-row">
+<div class="form-group"><label>Version</label><input type="text" id="verInput" placeholder="1.0.0"></div>
+<div class="form-group"><label>Date</label><input type="date" id="dateInput"></div>
+</div>
+<div class="form-group" style="margin-top:8px">
+<label>Quick Bump</label>
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<button class="btn btn-sm btn-secondary" onclick="bump('patch')">Patch +0.0.1</button>
+<button class="btn btn-sm btn-secondary" onclick="bump('minor')">Minor +0.1.0</button>
+<button class="btn btn-sm btn-secondary" onclick="bump('major')">Major +1.0.0</button>
+</div>
+</div>
+<div class="form-group">
+<label>Category</label>
+<select id="catSelect">
+<option value="Added">Added — New features</option>
+<option value="Changed">Changed — Changes in existing functionality</option>
+<option value="Deprecated">Deprecated — Soon-to-be removed features</option>
+<option value="Removed">Removed — Removed features</option>
+<option value="Fixed">Fixed — Bug fixes</option>
+<option value="Security">Security — Vulnerability fixes</option>
+</select>
+</div>
+<div class="form-group">
+<label>Entry</label>
+<div class="ar">
+<input type="text" id="entryInput" placeholder="Describe the change..." onkeydown="if(event.key==='Enter')addEntry()">
+<button class="btn btn-sm btn-primary" onclick="addEntry()">+ Add</button>
+</div>
+</div>
+<div id="pendingEntries"></div>
+<div class="btn-group">
+<button class="btn btn-success" onclick="addVersion()">✅ Add Version</button>
+<button class="btn btn-warn" onclick="addUnreleased()">📌 Add as Unreleased</button>
+</div>
+</div>
+<div class="panel" style="margin-top:24px">
+<div class="panel-title">📚 Versions</div>
+<div id="versionList">
+<div class="empty"><span style="font-size:2.5rem;display:block;margin-bottom:12px">📭</span>No versions yet. Add your first version above.</div>
+</div>
+</div>
+</div>
+<div>
+<div class="panel" style="position:sticky;top:20px">
+<div class="panel-title">📄 Markdown Preview</div>
+<div class="btn-group" style="margin-top:0;margin-bottom:12px">
+<button class="btn btn-sm btn-primary" onclick="copyMd()">📋 Copy Markdown</button>
+<button class="btn btn-sm btn-success" onclick="downloadMd()">💾 Download CHANGELOG.md</button>
+</div>
+<div class="preview" id="preview"># Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:30px auto 0;padding:0 20px}
+.pro-header{text-align:center;margin-bottom:18px}
+.pro-header h2{font-size:1.3rem;color:var(--accent2);display:flex;align-items:center;justify-content:center;gap:8px}
+.pro-header p{color:var(--text2);font-size:.85rem;margin-top:4px}
+.pro-blur-wrap{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s}
+.pro-blur-wrap:hover{border-color:var(--accent)}
+.pro-mock{filter:blur(4px);pointer-events:none;user-select:none;padding:24px;background:var(--surface)}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:600px){.pro-mock-row{grid-template-columns:1fr}}
+.pro-mock-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.pro-mock-card h4{font-size:.85rem;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pro-mock-label{font-size:.75rem;color:var(--text2);margin-bottom:4px}
+.pro-mock-input{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:#555;font-size:.8rem;width:100%;margin-bottom:8px}
+.pro-mock-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:.8rem;opacity:.7;width:100%;margin-top:8px}
+.pro-mock-tag{display:inline-block;background:rgba(233,69,96,.12);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:.75rem;margin:2px;font-weight:500}
+.pro-mock-commit{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.8rem;color:#777}
+.pro-mock-commit:last-child{border-bottom:none}
+.pro-mock-hash{color:var(--accent);font-family:monospace;font-size:.75rem}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);gap:8px}
+.pro-lock{font-size:2.5rem;filter:drop-shadow(0 0 20px rgba(233,69,96,.5))}
+.pro-overlay span:last-child{color:#ccc;font-size:.9rem;font-weight:500}
+.pro-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);padding:20px}
+.pro-modal{background:var(--surface);border:1px solid var(--accent);border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:proFadeIn .25s ease}
+@keyframes proFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;background:linear-gradient(90deg,var(--accent),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:#888;margin-bottom:20px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:24px;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);color:#ccc;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✅';font-size:.8rem}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(90deg,var(--accent),#ff6b6b);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;margin-bottom:12px}
+.pro-upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;padding:8px;transition:color .2s}
+.pro-later-btn:hover{color:#aaa}
+</style>
+
+<div class="pro-section">
+<div class="pro-header">
+<h2>🔒 Pro Features</h2>
+<p>Git integration, multi-project & RSS feeds</p>
+</div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').style.display='flex'">
+<div class="pro-mock">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>🔗 Git Integration</h4>
+<div class="pro-mock-label">Repository URL</div>
+<div class="pro-mock-input">https://github.com/user/repo.git</div>
+<div class="pro-mock-label">Recent Commits</div>
+<div class="pro-mock-commit"><span class="pro-mock-hash">a3f8c21</span> fix: resolve auth token refresh issue</div>
+<div class="pro-mock-commit"><span class="pro-mock-hash">b7d2e09</span> feat: add dark mode support</div>
+<div class="pro-mock-commit"><span class="pro-mock-hash">c1a4f56</span> docs: update API documentation</div>
+<div class="pro-mock-btn">Auto-Generate Changelog from Commits</div>
+</div>
+<div class="pro-mock-card">
+<h4>📁 Multi-Project Management</h4>
+<div class="pro-mock-label">Projects</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div class="pro-mock-tag" style="display:flex;justify-content:space-between;align-items:center">📦 frontend-app <span style="opacity:.6">v2.3.1</span></div>
+<div class="pro-mock-tag" style="display:flex;justify-content:space-between;align-items:center">⚙️ backend-api <span style="opacity:.6">v1.8.0</span></div>
+<div class="pro-mock-tag" style="display:flex;justify-content:space-between;align-items:center">📱 mobile-app <span style="opacity:.6">v3.0.0-beta</span></div>
+</div>
+<div class="pro-mock-btn">Switch Project</div>
+</div>
+</div>
+<div class="pro-mock-card" style="width:100%">
+<h4>📡 RSS Feed</h4>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+<div style="flex:1;min-width:200px">
+<div class="pro-mock-label">Feed URL</div>
+<div class="pro-mock-input">https://yourapp.com/changelog.xml</div>
+</div>
+<div style="flex:1;min-width:200px">
+<div class="pro-mock-label">Format</div>
+<div style="display:flex;gap:6px">
+<span class="pro-mock-tag">RSS 2.0</span>
+<span class="pro-mock-tag">Atom</span>
+<span class="pro-mock-tag">JSON Feed</span>
+</div>
+</div>
+</div>
+<div class="pro-mock-btn">Generate & Publish Feed</div>
+</div>
+</div>
+<div class="pro-overlay">
+<span class="pro-lock">🔒</span>
+<span>Click to unlock Pro features</span>
+</div>
+</div>
+</div>
+
+<div id="proModal" class="pro-modal-bg" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+<div class="pro-modal">
+<h3>📋 AI Changelog Pro</h3>
+<p class="pro-price">One-time purchase — $14</p>
+<ul>
+<li>Git integration — auto-generate from commits & tags</li>
+<li>Multi-project management — switch between repos</li>
+<li>RSS/Atom/JSON feed generation & publishing</li>
+<li>Conventional Commits parsing & categorization</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $14</a>
+<button class="pro-later-btn" onclick="document.getElementById('proModal').style.display='none'">Maybe later</button>
+</div>
+<!-- Pro Section -->
+<div class="pro-section">
+  <div class="pro-badge">⭐ PRO</div>
+  <h3>🚀 Unlock Pro Features</h3>
+  <div class="pro-features">
+    <div class="pro-feature">📦 Import from Git Commits</div>
+    <div class="pro-feature">🎨 Custom Templates</div>
+    <div class="pro-feature">👥 Team Collaboration</div>
+    <div class="pro-feature">📤 Export to PDF/HTML</div>
+  </div>
+  <a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Unlock Pro →</a>
+</div>
+</div>
+
+<div class="footer">
+<p>Built with ❤️ — Following <a href="https://keepachangelog.com/" target="_blank" style="color:var(--accent)">Keep a Changelog</a> &amp; <a href="https://semver.org/" target="_blank" style="color:var(--accent)">Semantic Versioning</a></p>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const CATS = ['Added','Changed','Deprecated','Removed','Fixed','Security'];
+let versions = [];
+let pending = {};
+CATS.forEach(c => pending[c] = []);
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+document.getElementById('dateInput').value = today();
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getLatestVersion() {
+  for (let v of versions) {
+    if (v.version !== 'Unreleased') return v.version;
+  }
+  return '0.0.0';
+}
+
+function bump(type) {
+  const ver = getLatestVersion();
+  const parts = ver.split('.').map(Number);
+  if (type === 'major') { parts[0]++; parts[1] = 0; parts[2] = 0; }
+  else if (type === 'minor') { parts[1]++; parts[2] = 0; }
+  else { parts[2]++; }
+  document.getElementById('verInput').value = parts.join('.');
+}
+
+function addEntry() {
+  const input = document.getElementById('entryInput');
+  const cat = document.getElementById('catSelect').value;
+  const text = input.value.trim();
+  if (!text) return;
+  pending[cat].push(text);
+  input.value = '';
+  renderPending();
+}
+
+function removeEntry(cat, idx) {
+  pending[cat].splice(idx, 1);
+  renderPending();
+}
+
+function renderPending() {
+  const el = document.getElementById('pendingEntries');
+  let html = '';
+  CATS.forEach(cat => {
+    if (pending[cat].length === 0) return;
+    html += '<div class="csec open" style="margin-top:8px">';
+    html += '<div class="csec-h"><span class="badge b-' + cat + '">' + cat + '</span><span>' + pending[cat].length + ' entries</span></div>';
+    html += '<div class="csec-b">';
+    pending[cat].forEach((e, i) => {
+      html += '<div class="ei"><span>• ' + esc(e) + '</span><button onclick="removeEntry(\'' + cat + '\',' + i + ')">✕</button></div>';
+    });
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function hasPendingEntries() {
+  return CATS.some(c => pending[c].length > 0);
+}
+
+function collectPending() {
+  const entries = {};
+  CATS.forEach(c => {
+    if (pending[c].length > 0) entries[c] = [...pending[c]];
+  });
+  return entries;
+}
+
+function clearPending() {
+  CATS.forEach(c => pending[c] = []);
+  renderPending();
+}
+
+function addVersion() {
+  const ver = document.getElementById('verInput').value.trim();
+  const date = document.getElementById('dateInput').value;
+  if (!ver) { toast('Please enter a version number'); return; }
+  if (!hasPendingEntries()) { toast('Please add at least one entry'); return; }
+  if (!/^\d+\.\d+\.\d+/.test(ver)) { toast('Version should follow SemVer (e.g. 1.0.0)'); return; }
+  const existing = versions.findIndex(v => v.version === ver);
+  if (existing !== -1) {
+    const entries = collectPending();
+    CATS.forEach(c => {
+      if (entries[c]) {
+        if (!versions[existing].entries[c]) versions[existing].entries[c] = [];
+        versions[existing].entries[c].push(...entries[c]);
+      }
+    });
+  } else {
+    versions.push({ version: ver, date: date || today(), entries: collectPending() });
+    versions.sort((a, b) => {
+      if (a.version === 'Unreleased') return -1;
+      if (b.version === 'Unreleased') return 1;
+      return compareSemver(b.version, a.version);
+    });
+  }
+  clearPending();
+  document.getElementById('verInput').value = '';
+  document.getElementById('dateInput').value = today();
+  renderVersions();
+  renderPreview();
+  toast('Version ' + ver + ' added!');
+}
+
+function addUnreleased() {
+  if (!hasPendingEntries()) { toast('Please add at least one entry'); return; }
+  const existing = versions.findIndex(v => v.version === 'Unreleased');
+  if (existing !== -1) {
+    const entries = collectPending();
+    CATS.forEach(c => {
+      if (entries[c]) {
+        if (!versions[existing].entries[c]) versions[existing].entries[c] = [];
+        versions[existing].entries[c].push(...entries[c]);
+      }
+    });
+  } else {
+    versions.unshift({ version: 'Unreleased', date: '', entries: collectPending() });
+  }
+  clearPending();
+  renderVersions();
+  renderPreview();
+  toast('Unreleased section updated!');
+}
+
+function compareSemver(a, b) {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+    if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+  }
+  return 0;
+}
+
+function removeVersion(idx) {
+  if (!confirm('Remove version ' + versions[idx].version + '?')) return;
+  versions.splice(idx, 1);
+  renderVersions();
+  renderPreview();
+  toast('Version removed');
+}
+
+function removeVersionEntry(vi, cat, ei) {
+  versions[vi].entries[cat].splice(ei, 1);
+  if (versions[vi].entries[cat].length === 0) delete versions[vi].entries[cat];
+  if (Object.keys(versions[vi].entries).length === 0) {
+    versions.splice(vi, 1);
+  }
+  renderVersions();
+  renderPreview();
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderVersions() {
+  const el = document.getElementById('versionList');
+  if (versions.length === 0) {
+    el.innerHTML = '<div class="empty"><span style="font-size:2.5rem;display:block;margin-bottom:12px">📭</span>No versions yet. Add your first version above.</div>';
+    return;
+  }
+  let html = '';
+  versions.forEach((v, vi) => {
+    html += '<div class="vc">';
+    html += '<div class="vh">';
+    if (v.version === 'Unreleased') {
+      html += '<h3><span class="badge b-unrel">Unreleased</span></h3>';
+    } else {
+      html += '<h3>' + esc(v.version) + ' <span style="color:var(--text2);font-size:.85rem;font-weight:400">— ' + esc(v.date) + '</span></h3>';
+    }
+    html += '<button class="btn btn-sm btn-danger" onclick="removeVersion(' + vi + ')">🗑️</button>';
+    html += '</div>';
+    CATS.forEach(cat => {
+      if (!v.entries[cat] || v.entries[cat].length === 0) return;
+      html += '<div style="margin-top:6px"><span class="badge b-' + cat + '">' + cat + '</span></div>';
+      v.entries[cat].forEach((e, ei) => {
+        html += '<div class="ei"><span>• ' + esc(e) + '</span><button onclick="removeVersionEntry(' + vi + ',\'' + cat + '\',' + ei + ')">✕</button></div>';
+      });
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function generateMarkdown() {
+  let md = '# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n';
+  md += 'The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),\n';
+  md += 'and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n';
+  versions.forEach(v => {
+    md += '\n';
+    if (v.version === 'Unreleased') {
+      md += '## [Unreleased]\n';
+    } else {
+      md += '## [' + v.version + '] - ' + v.date + '\n';
+    }
+    CATS.forEach(cat => {
+      if (!v.entries[cat] || v.entries[cat].length === 0) return;
+      md += '\n### ' + cat + '\n\n';
+      v.entries[cat].forEach(e => {
+        md += '- ' + e + '\n';
+      });
+    });
+  });
+  return md;
+}
+
+function renderPreview() {
+  document.getElementById('preview').textContent = generateMarkdown();
+}
+
+function copyMd() {
+  const md = generateMarkdown();
+  navigator.clipboard.writeText(md).then(() => {
+    toast('Markdown copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = md;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Markdown copied!');
+  });
+}
+
+function downloadMd() {
+  const md = generateMarkdown();
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CHANGELOG.md';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CHANGELOG.md downloaded!');
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

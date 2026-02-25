@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Visual CSS Grid area editor. Draw grid template areas by clicking cells, name regions, and generate clean CSS grid-template-areas code automatically.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-grid-area/">
+<title>CSS Grid Area Visual Editor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--card2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4)}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+h1{text-align:center;font-size:1.6rem;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:var(--text2);font-size:.85rem;margin-bottom:20px}
+.app{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.ctrls{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.cg{display:flex;align-items:center;gap:8px}
+.cg label{font-size:.85rem;color:var(--text2);white-space:nowrap}
+.cg input[type=range]{width:100px;accent-color:var(--accent)}
+.cg .v{background:var(--card2);padding:2px 10px;border-radius:6px;font-size:.85rem;min-width:28px;text-align:center}
+.cg select{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.82rem}
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:opacity .2s,transform .1s}
+.btn:hover{opacity:.9;transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-s{padding:5px 12px;font-size:.78rem}
+.btn-o{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.btn-o:hover{background:var(--accent);color:#fff}
+.main{display:flex;gap:16px;flex-wrap:wrap}
+.ep{flex:1;min-width:340px}
+.pp{flex:1;min-width:340px;display:flex;flex-direction:column;gap:16px}
+.gc{position:relative;display:inline-grid;gap:2px;background:var(--border);border-radius:8px;padding:2px;width:100%;user-select:none}
+.cell{background:var(--card2);border-radius:4px;min-height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,outline .15s;position:relative;font-size:.8rem;color:var(--text2);outline:2px solid transparent}
+.cell:hover{outline:2px solid rgba(233,69,96,.5)}
+.cell.sel{outline:2px dashed var(--accent)!important;background:rgba(233,69,96,.2)!important}
+.cell .an{font-size:.78rem;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);pointer-events:none;word-break:break-all;text-align:center;padding:2px}
+.cell .cc{position:absolute;bottom:2px;right:4px;font-size:.55rem;color:rgba(255,255,255,.2);pointer-events:none}
+.ni{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;background:var(--bg);border:1px solid var(--accent);color:#fff;border-radius:4px;padding:4px 6px;font-size:.78rem;text-align:center;z-index:10;outline:none}
+.leg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.li{display:flex;align-items:center;gap:4px;font-size:.75rem;color:var(--text2)}
+.lc{width:14px;height:14px;border-radius:3px}
+.cb{background:#0d1117;border-radius:8px;padding:16px;font-family:'Fira Code',Consolas,monospace;font-size:.8rem;line-height:1.6;overflow-x:auto;color:#c9d1d9;position:relative;white-space:pre;border:1px solid var(--border);min-height:80px}
+.cb .cpb{position:absolute;top:8px;right:8px}
+.pb{border-radius:8px;padding:12px;min-height:180px;border:1px dashed var(--border)}
+.pg{display:grid;gap:6px;width:100%;min-height:160px}
+.pg .ab{border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);min-height:40px;padding:4px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.st{font-size:.9rem;font-weight:600;margin-bottom:10px;color:var(--text2)}
+@media(max-width:768px){.main{flex-direction:column}.ctrls{gap:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div>
+    <h1>CSS Grid Area Visual Editor</h1>
+    <p class="sub">Click cells to name areas · Drag to merge · Generate clean CSS</p>
+  </div>
+  <div class="card">
+    <div class="ctrls">
+      <div class="cg"><label>Rows</label><input type="range" id="rs" min="1" max="12" value="3"><span class="v" id="rv">3</span></div>
+      <div class="cg"><label>Cols</label><input type="range" id="cs" min="1" max="12" value="3"><span class="v" id="cv">3</span></div>
+      <div class="cg"><label>Row Size</label><select id="ru"><option value="1fr">1fr</option><option value="auto">auto</option><option value="minmax(0,1fr)">minmax</option></select></div>
+      <div class="cg"><label>Col Size</label><select id="cu"><option value="1fr">1fr</option><option value="auto">auto</option><option value="minmax(0,1fr)">minmax</option></select></div>
+      <button class="btn btn-s btn-o" onclick="clearAll()">Clear All</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="ep card">
+      <div class="st">Grid Editor</div>
+      <div class="gc" id="grid"></div>
+      <div class="leg" id="legend"></div>
+    </div>
+    <div class="pp">
+      <div class="card">
+        <div class="st">Generated CSS</div>
+        <div class="cb" id="code"><span class="cpb"><button class="btn btn-s" onclick="copyCode()">Copy</button></span></div>
+      </div>
+      <div class="card">
+        <div class="st">Live Preview</div>
+        <div class="pb"><div class="pg" id="preview"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const COLORS=['#e94560','#533483','#0f3460','#e9b44c','#50b2c0','#9b5de5','#f15bb5','#00bbf9','#00f5d4','#fee440','#8ac926','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ffeaa7','#dfe6e9','#fd79a8'];
+let rows=3,cols=3,grid=[],colorMap={},colorIdx=0;
+let dragging=false,dragStart=null,dragCells=[];
+function init(){grid=[];for(let r=0;r<rows;r++){grid[r]=[];for(let c=0;c<cols;c++)grid[r][c]='.';}colorMap={};colorIdx=0;render();}
+function getColor(n){if(n==='.'||!n)return null;if(!colorMap[n])colorMap[n]=COLORS[colorIdx++%COLORS.length];return colorMap[n];}
+function render(){const el=document.getElementById('grid');el.style.gridTemplateColumns='repeat('+cols+',1fr)';el.style.gridTemplateRows='repeat('+rows+',1fr)';el.innerHTML='';for(let r=0;r<rows;r++){for(let c=0;c<cols;c++){const d=document.createElement('div');d.className='cell';d.dataset.r=r;d.dataset.c=c;const name=grid[r][c];const color=getColor(name);if(color)d.style.background=color+'cc';if(name&&name!=='.'){const s=document.createElement('span');s.className='an';s.textContent=name;d.appendChild(s);}const co=document.createElement('span');co.className='cc';co.textContent=(r+1)+','+(c+1);d.appendChild(co);d.addEventListener('mousedown',onDown);d.addEventListener('mouseenter',onEnter);d.addEventListener('dblclick',onDbl);el.appendChild(d);}}updateLegend();updateCode();updatePreview();}
+function onDown(e){e.preventDefault();dragging=true;const r=+e.currentTarget.dataset.r,c=+e.currentTarget.dataset.c;dragStart={r:r,c:c};dragCells=[{r:r,c:c}];hlDrag();}
+function onEnter(e){if(!dragging)return;const r=+e.currentTarget.dataset.r,c=+e.currentTarget.dataset.c;dragCells=[];const r1=Math.min(dragStart.r,r),r2=Math.max(dragStart.r,r),c1=Math.min(dragStart.c,c),c2=Math.max(dragStart.c,c);for(let ri=r1;ri<=r2;ri++)for(let ci=c1;ci<=c2;ci++)dragCells.push({r:ri,c:ci});hlDrag();}
+document.addEventListener('mouseup',function(){if(!dragging)return;dragging=false;clrHl();if(dragCells.length>1)doMerge(dragCells);});
+function hlDrag(){document.querySelectorAll('.cell').forEach(function(c){c.classList.remove('sel');});dragCells.forEach(function(p){const idx=p.r*cols+p.c;const cells=document.querySelectorAll('.cell');if(cells[idx])cells[idx].classList.add('sel');});}
+function clrHl(){document.querySelectorAll('.cell').forEach(function(c){c.classList.remove('sel');});}
+function doMerge(cells){const ex=new Set();cells.forEach(function(p){if(grid[p.r][p.c]!=='.')ex.add(grid[p.r][p.c]);});let def=ex.size===1?[...ex][0]:'';const name=prompt('Area name for merged cells:',def);if(name===null)return;const n=name.trim()||'.';cells.forEach(function(p){grid[p.r][p.c]=n;});render();}
+function onDbl(e){const cell=e.currentTarget;const r=+cell.dataset.r,c=+cell.dataset.c;if(cell.querySelector('.ni'))return;const inp=document.createElement('input');inp.className='ni';inp.value=grid[r][c]==='.'?'':grid[r][c];inp.placeholder='name';cell.appendChild(inp);inp.focus();inp.select();const fin=function(){const v=inp.value.trim();grid[r][c]=v||'.';if(inp.parentNode)inp.remove();render();};inp.addEventListener('blur',fin);inp.addEventListener('keydown',function(ev){if(ev.key==='Enter')fin();if(ev.key==='Escape'){inp.remove();render();}});}
+function updateLegend(){const el=document.getElementById('legend');el.innerHTML='';const names=new Set();grid.forEach(function(row){row.forEach(function(c){if(c!=='.')names.add(c);});});names.forEach(function(name){const item=document.createElement('span');item.className='li';item.innerHTML='<span class="lc" style="background:'+getColor(name)+'"></span>'+name;el.appendChild(item);});}
+function genCSS(){const ru=document.getElementById('ru').value,cu=document.getElementById('cu').value;let a='  grid-template-areas:\n';for(let r=0;r<rows;r++){const row=grid[r].map(function(c){return c||'.';}).join(' ');a+='    "'+row+'"';a+=r<rows-1?'\n':';\n';}return'.container {\n  display: grid;\n'+a+'  grid-template-rows: repeat('+rows+', '+ru+');\n  grid-template-columns: repeat('+cols+', '+cu+');\n  gap: 8px;\n}';}
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function updateCode(){const el=document.getElementById('code');el.innerHTML='<span class="cpb"><button class="btn btn-s" onclick="copyCode()">Copy</button></span>'+escH(genCSS());}
+function updatePreview(){const el=document.getElementById('preview');const ru=document.getElementById('ru').value,cu=document.getElementById('cu').value;let a='';for(let r=0;r<rows;r++)a+='"'+grid[r].join(' ')+'" ';el.style.gridTemplateAreas=a.trim();el.style.gridTemplateRows='repeat('+rows+','+ru+')';el.style.gridTemplateColumns='repeat('+cols+','+cu+')';el.innerHTML='';const names=new Set();grid.forEach(function(row){row.forEach(function(c){if(c!=='.')names.add(c);});});names.forEach(function(name){const d=document.createElement('div');d.className='ab';d.style.gridArea=name;d.style.background=getColor(name)+'cc';d.textContent=name;el.appendChild(d);});}
+function copyCode(){navigator.clipboard.writeText(genCSS()).then(function(){showToast('Copied to clipboard!');}).catch(function(){showToast('Copy failed');});}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
+function clearAll(){grid.forEach(function(row,r){row.forEach(function(_,c){grid[r][c]='.';});});colorMap={};colorIdx=0;render();}
+document.getElementById('rs').addEventListener('input',function(e){rows=+e.target.value;document.getElementById('rv').textContent=rows;init();});
+document.getElementById('cs').addEventListener('input',function(e){cols=+e.target.value;document.getElementById('cv').textContent=cols;init();});
+document.getElementById('ru').addEventListener('change',function(){updateCode();updatePreview();});
+document.getElementById('cu').addEventListener('change',function(){updateCode();updatePreview();});
+init();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:30px auto 0;padding:0 20px}
+.pro-header{text-align:center;margin-bottom:20px}
+.pro-header h2{font-size:1.3rem;color:var(--accent,#e94560)}
+.pro-header p{color:var(--text2,#aaa);font-size:.9rem}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--border,#2a2a4a)}
+.pro-blur-content{filter:blur(6px);pointer-events:none;padding:24px;background:var(--card,#16213e);opacity:.7}
+.pro-blur-content .pro-mock-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.pro-blur-content .pro-mock-item{flex:1;min-width:140px;background:rgba(233,69,96,.08);border:1px solid rgba(233,69,96,.15);border-radius:8px;padding:14px;font-size:.85rem;color:var(--text2,#aaa)}
+.pro-blur-content .pro-mock-item strong{display:block;color:var(--text,#eee);margin-bottom:4px}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);z-index:2}
+.pro-lock-overlay .lock-icon{font-size:2.5rem;margin-bottom:10px}
+.pro-lock-overlay .lock-text{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-lock-overlay .lock-sub{font-size:.85rem;color:var(--text2,#aaa);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--card,#16213e);border:1px solid var(--border,#2a2a4a);border-radius:16px;padding:36px;max-width:480px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent,#e94560),var(--accent2,#533483));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:10px 0}
+.pro-modal ul{text-align:left;margin:20px 0;padding:0;list-style:none}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:var(--text2,#aaa)}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent,#e94560),var(--accent2,#533483));color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:10px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{display:inline-block;margin-top:14px;background:none;border:none;color:var(--text2,#aaa);cursor:pointer;font-size:.9rem;padding:8px 16px}
+.pro-modal .btn-later:hover{color:#fff}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>🔒 Pro Features</h2><p>Unlock advanced grid editing capabilities</p></div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-blur-content">
+<div class="pro-mock-row">
+<div class="pro-mock-item"><strong>📱 Responsive Breakpoints</strong>Edit grid layouts for mobile, tablet & desktop with visual breakpoint editor</div>
+<div class="pro-mock-item"><strong>📦 Template Library</strong>50+ pre-built grid templates: dashboards, landing pages, portfolios</div>
+</div>
+<div class="pro-mock-row">
+<div class="pro-mock-item"><strong>⚛️ React Export</strong>Export grid as React JSX components with styled-components or CSS modules</div>
+<div class="pro-mock-item"><strong>💚 Vue Export</strong>Export grid as Vue SFC with scoped styles and responsive mixins</div>
+</div>
+</div>
+<div class="pro-lock-overlay"><div class="lock-icon">🔒</div><div class="lock-text">Pro Features Locked</div><div class="lock-sub">Click to unlock — $9 one-time</div></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal">
+<div class="pro-modal">
+<h3>⚡ Upgrade to Pro</h3>
+<div class="pro-price">$9</div>
+<p style="color:var(--text2,#aaa);font-size:.9rem">One-time payment · Lifetime access</p>
+<ul>
+<li>Responsive breakpoint editor (mobile/tablet/desktop)</li>
+<li>50+ pre-built grid template library</li>
+<li>React JSX component export</li>
+<li>Vue SFC component export</li>
+<li>CSS Modules & styled-components output</li>
+<li>Priority updates & new templates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-upgrade">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script>document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});</script>
+<script src="https://cdn.buysellads.com/pub/lifa.js" async></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

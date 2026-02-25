@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI Markdown table generator. Create and edit Markdown tables visually with a spreadsheet-like interface. Add rows, columns, and alignment, then copy the code.">
+<link rel="canonical" href="https://lifa-su.com/ai-markdown-table/">
+<title>AI Markdown Table Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a2e;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.6rem;margin:20px 0 24px;color:#fff;letter-spacing:.5px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;margin-bottom:20px;background:#16213e;padding:14px 20px;border-radius:10px;border:1px solid #0f3460}
+.controls label{font-size:.85rem;color:#a0a0c0}
+.controls input[type=number]{width:56px;padding:6px 8px;border:1px solid #0f3460;border-radius:6px;background:#1a1a2e;color:#e0e0e0;font-size:.9rem;text-align:center}
+.controls input[type=number]:focus{outline:none;border-color:#e94560}
+.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:500;transition:all .2s}
+.btn-primary{background:#e94560;color:#fff}
+.btn-primary:hover{background:#c73652}
+.btn-secondary{background:#0f3460;color:#e0e0e0}
+.btn-secondary:hover{background:#1a4a8a}
+.btn-danger{background:#533;color:#e88}
+.btn-danger:hover{background:#744;color:#faa}
+.table-wrapper{overflow-x:auto;max-width:95vw;margin-bottom:20px}
+table{border-collapse:collapse;width:100%;min-width:400px}
+th,td{border:1px solid #0f3460;padding:0;position:relative}
+th{background:#16213e}
+td{background:#1a1a2e}
+th .cell-input,td .cell-input{width:100%;padding:8px 10px;border:none;background:transparent;color:#e0e0e0;font-size:.88rem;outline:none;min-width:80px}
+th .cell-input{color:#fff;font-weight:600}
+th .cell-input::placeholder,td .cell-input::placeholder{color:#555}
+.cell-input:focus{background:rgba(233,69,96,.08)}
+.align-row{display:flex;justify-content:center;gap:2px;padding:4px;background:#0d1b36;border-top:1px solid #0f3460}
+.align-btn{width:28px;height:24px;border:1px solid #0f3460;background:transparent;color:#667;cursor:pointer;border-radius:4px;font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.align-btn:hover{border-color:#e94560;color:#e94560}
+.align-btn.active{background:#e94560;color:#fff;border-color:#e94560}
+.output-section{width:100%;max-width:800px;margin-top:10px}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.output-header h2{font-size:1rem;color:#a0a0c0}
+.output-box{background:#16213e;border:1px solid #0f3460;border-radius:10px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.84rem;white-space:pre;overflow-x:auto;line-height:1.6;color:#c0c0e0;min-height:80px;position:relative}
+.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#e94560;color:#fff;padding:8px 20px;border-radius:6px;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}
+.copy-toast.show{opacity:1}
+@media(max-width:600px){
+  h1{font-size:1.2rem}
+  .controls{padding:10px 14px;gap:6px}
+  .btn{padding:5px 10px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+
+<h1>AI Markdown Table Generator</h1>
+
+<div class="controls">
+  <label>Rows</label>
+  <input type="number" id="rowCount" min="1" max="50" value="3">
+  <label>Cols</label>
+  <input type="number" id="colCount" min="1" max="20" value="3">
+  <button class="btn btn-secondary" onclick="addRow()">+ Row</button>
+  <button class="btn btn-danger" onclick="removeRow()">− Row</button>
+  <button class="btn btn-secondary" onclick="addCol()">+ Col</button>
+  <button class="btn btn-danger" onclick="removeCol()">− Col</button>
+</div>
+
+<div class="table-wrapper">
+  <table id="editTable"></table>
+</div>
+
+<div class="output-section">
+  <div class="output-header">
+    <h2>Markdown Output</h2>
+    <button class="btn btn-primary" onclick="copyMarkdown()">📋 Copy</button>
+  </div>
+  <div class="output-box" id="markdownOutput"></div>
+</div>
+
+<div class="copy-toast" id="toast">Copied to clipboard!</div>
+
+<script>
+let rows = 3, cols = 3;
+let data = [], aligns = [];
+
+function init() {
+  data = [];
+  aligns = Array(cols).fill('left');
+  for (let r = 0; r <= rows; r++) {
+    const row = [];
+    for (let c = 0; c < cols; c++) {
+      row.push(r === 0 ? 'Header ' + (c + 1) : '');
+    }
+    data.push(row);
+  }
+  render();
+}
+
+function render() {
+  document.getElementById('rowCount').value = rows;
+  document.getElementById('colCount').value = cols;
+  const table = document.getElementById('editTable');
+  let html = '';
+  // Header row
+  html += '<thead><tr>';
+  for (let c = 0; c < cols; c++) {
+    html += '<th><input class="cell-input" data-r="0" data-c="' + c + '" value="' + esc(data[0][c]) + '" placeholder="Header"></th>';
+  }
+  html += '</tr><tr>';
+  for (let c = 0; c < cols; c++) {
+    html += '<th><div class="align-row">' +
+      '<button class="align-btn' + (aligns[c]==='left'?' active':'') + '" data-c="'+c+'" data-a="left" title="Left">⬅</button>' +
+      '<button class="align-btn' + (aligns[c]==='center'?' active':'') + '" data-c="'+c+'" data-a="center" title="Center">⬌</button>' +
+      '<button class="align-btn' + (aligns[c]==='right'?' active':'') + '" data-c="'+c+'" data-a="right" title="Right">➡</button>' +
+      '</div></th>';
+  }
+  html += '</tr></thead><tbody>';
+  for (let r = 1; r <= rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      html += '<td><input class="cell-input" data-r="' + r + '" data-c="' + c + '" value="' + esc(data[r][c]) + '" placeholder="cell"></td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  table.querySelectorAll('.cell-input').forEach(el => {
+    el.addEventListener('input', function() {
+      data[+this.dataset.r][+this.dataset.c] = this.value;
+      genMarkdown();
+    });
+  });
+  table.querySelectorAll('.align-btn').forEach(el => {
+    el.addEventListener('click', function() {
+      aligns[+this.dataset.c] = this.dataset.a;
+      render();
+    });
+  });
+  genMarkdown();
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function genMarkdown() {
+  const colWidths = [];
+  for (let c = 0; c < cols; c++) {
+    let max = 3;
+    for (let r = 0; r <= rows; r++) {
+      const len = (data[r][c] || '').length;
+      if (len > max) max = len;
+    }
+    colWidths.push(max);
+  }
+  let md = '| ';
+  for (let c = 0; c < cols; c++) {
+    md += (data[0][c] || '').padEnd(colWidths[c]) + ' | ';
+  }
+  md = md.trimEnd() + '\n| ';
+  for (let c = 0; c < cols; c++) {
+    const w = colWidths[c];
+    if (aligns[c] === 'center') md += ':' + '-'.repeat(w - 2) + ':';
+    else if (aligns[c] === 'right') md += '-'.repeat(w - 1) + ':';
+    else md += ':' + '-'.repeat(w - 1);
+    md += ' | ';
+  }
+  md = md.trimEnd();
+  for (let r = 1; r <= rows; r++) {
+    md += '\n| ';
+    for (let c = 0; c < cols; c++) {
+      md += (data[r][c] || '').padEnd(colWidths[c]) + ' | ';
+    }
+    md = md.trimEnd();
+  }
+  document.getElementById('markdownOutput').textContent = md;
+}
+
+function addRow() { rows++; data.push(Array(cols).fill('')); render(); }
+function removeRow() { if (rows > 1) { rows--; data.pop(); render(); } }
+function addCol() { cols++; aligns.push('left'); for (let r = 0; r <= rows; r++) data[r].push(r===0?'Header '+cols:''); render(); }
+function removeCol() { if (cols > 1) { cols--; aligns.pop(); for (let r = 0; r <= rows; r++) data[r].pop(); render(); } }
+
+document.getElementById('rowCount').addEventListener('change', function() {
+  const v = Math.max(1, Math.min(50, +this.value));
+  while (rows < v) { rows++; data.push(Array(cols).fill('')); }
+  while (rows > v) { rows--; data.pop(); }
+  render();
+});
+document.getElementById('colCount').addEventListener('change', function() {
+  const v = Math.max(1, Math.min(20, +this.value));
+  while (cols < v) { cols++; aligns.push('left'); for (let r = 0; r <= rows; r++) data[r].push(r===0?'Header '+cols:''); }
+  while (cols > v) { cols--; aligns.pop(); for (let r = 0; r <= rows; r++) data[r].pop(); }
+  render();
+});
+
+function copyMarkdown() {
+  const text = document.getElementById('markdownOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  });
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

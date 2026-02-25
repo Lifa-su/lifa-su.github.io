@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate SQL queries with AI assistance. Build SELECT, INSERT, UPDATE, and DELETE statements visually. Supports MySQL, PostgreSQL, SQLite, and SQL Server.">
+<link rel="canonical" href="https://lifa-su.com/ai-sql-generator/">
+<title>AI SQL Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--sf:#1a1b26;--s2:#24253a;--bd:#2f3146;--tx:#c0caf5;--t2:#565f89;--ac:#7aa2f7;--a2:#bb9af7;--gn:#9ece6a;--rd:#f7768e;--or:#ff9e64;--cy:#7dcfff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.w{max-width:960px;margin:0 auto;padding:24px 20px}
+header{text-align:center;padding:40px 0 32px}
+header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--ac),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--t2);margin-top:6px;font-size:.95rem}
+.c{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.ct{font-size:.85rem;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.dbs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.db{padding:8px 18px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--t2);cursor:pointer;font-size:.85rem;transition:all .2s}
+.db:hover{border-color:var(--ac);color:var(--tx)}
+.db.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+textarea{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);padding:14px;font-size:.95rem;font-family:inherit;resize:vertical;line-height:1.6;transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--ac)}
+textarea::placeholder{color:var(--t2)}
+.st{display:flex;align-items:center;gap:8px;margin:12px 0;cursor:pointer;color:var(--t2);font-size:.85rem;user-select:none}
+.st:hover{color:var(--tx)}.st svg{transition:transform .2s}.st.open svg{transform:rotate(90deg)}
+.sa{display:none;margin-bottom:16px}.sa.show{display:block}
+.sa textarea{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;min-height:100px}
+.gb{width:100%;padding:14px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--ac),var(--a2));color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:16px}
+.gb:hover{opacity:.9}.gb:disabled{opacity:.5;cursor:not-allowed}
+.rc{display:none}.rc.show{display:block}
+.rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cb{padding:6px 14px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);color:var(--t2);cursor:pointer;font-size:.8rem;transition:all .2s}
+.cb:hover{border-color:var(--ac);color:var(--tx)}.cb.ok{border-color:var(--gn);color:var(--gn)}
+.out{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px;overflow-x:auto;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.88rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;min-height:60px}
+.out .kw{color:var(--ac);font-weight:600}.out .fn{color:var(--a2)}.out .str{color:var(--gn)}.out .num{color:var(--or)}.out .cm{color:var(--t2);font-style:italic}.out .op{color:var(--rd)}.out .tp{color:var(--cy)}
+.ld{display:flex;align-items:center;gap:10px;color:var(--t2);padding:20px 0}
+.sp{width:20px;height:20px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.er{color:var(--rd);background:rgba(247,118,142,.1);border:1px solid rgba(247,118,142,.2);border-radius:8px;padding:12px 16px;font-size:.9rem;margin-top:12px;display:none}.er.show{display:block}
+.kr{display:flex;gap:8px}
+.kr input{flex:1;padding:10px 14px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:.9rem;font-family:monospace}
+.kr input:focus{outline:none;border-color:var(--ac)}
+.kr button{padding:10px 16px;border:1px solid var(--bd);border-radius:8px;background:var(--s2);color:var(--t2);cursor:pointer;font-size:.8rem;white-space:nowrap}
+.kr button:hover{border-color:var(--ac);color:var(--tx)}
+footer{text-align:center;padding:32px 0 24px;color:var(--t2);font-size:.8rem}
+@media(max-width:600px){.w{padding:16px 12px}header{padding:24px 0 20px}header h1{font-size:1.4rem}.c{padding:16px}.db{padding:7px 14px;font-size:.8rem}}
+</style>
+</head>
+<body>
+<div class="w">
+<header><h1>⚡ AI SQL Generator</h1><p>用自然语言描述你的需求，AI 帮你生成 SQL</p></header>
+
+<div class="c"><div class="ct">🔑 DeepSeek API Key</div><div class="kr"><input type="password" id="apiKey" placeholder="sk-..." autocomplete="off"><button onclick="toggleKey()" id="tgk">显示</button><button onclick="saveKey()">保存</button></div></div>
+
+<div class="c">
+<div class="ct">🗄️ 数据库类型</div>
+<div class="dbs" id="dbs"><button class="db on" data-db="MySQL">MySQL</button><button class="db" data-db="PostgreSQL">PostgreSQL</button><button class="db" data-db="SQLite">SQLite</button></div>
+<div class="ct">💬 描述你的需求</div>
+<textarea id="prompt" rows="4" placeholder="例如：查询最近30天每个用户的订单总金额，按金额降序排列，只显示前10名"></textarea>
+<div class="st" id="stog" onclick="toggleSchema()"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>表结构（可选，提高准确性）</div>
+<div class="sa" id="sarea"><textarea id="schema" rows="5" placeholder="users(id INT PK, name VARCHAR, email VARCHAR)&#10;orders(id INT PK, user_id INT FK, amount DECIMAL)"></textarea></div>
+<div class="er" id="err"></div>
+<button class="gb" id="genBtn" onclick="generate()">生成 SQL ✨</button>
+</div>
+
+<div class="c rc" id="result">
+<div class="rh"><div class="ct" style="margin:0">📋 生成结果</div><button class="cb" id="cpBtn" onclick="copySQL()">复制 SQL</button></div>
+<div class="out" id="sqlOut"></div>
+</div>
+
+<footer>Powered by DeepSeek API · AI SQL Generator MVP</footer>
+</div>
+<script>
+let currentDB = 'MySQL';
+let rawSQL = '';
+
+// API Key management
+const keyInput = document.getElementById('apiKey');
+const saved = localStorage.getItem('deepseek_key');
+if (saved) keyInput.value = saved;
+
+function toggleKey() {
+  const btn = document.getElementById('tgk');
+  if (keyInput.type === 'password') { keyInput.type = 'text'; btn.textContent = '隐藏'; }
+  else { keyInput.type = 'password'; btn.textContent = '显示'; }
+}
+function saveKey() {
+  localStorage.setItem('deepseek_key', keyInput.value.trim());
+  const btn = event.target;
+  btn.textContent = '✓ 已保存'; btn.style.color = '#9ece6a'; btn.style.borderColor = '#9ece6a';
+  setTimeout(() => { btn.textContent = '保存'; btn.style.color = ''; btn.style.borderColor = ''; }, 1500);
+}
+
+// DB selector
+document.getElementById('dbs').addEventListener('click', e => {
+  const btn = e.target.closest('.db');
+  if (!btn) return;
+  document.querySelectorAll('.db').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  currentDB = btn.dataset.db;
+});
+
+// Schema toggle
+function toggleSchema() {
+  const tog = document.getElementById('stog');
+  const area = document.getElementById('sarea');
+  tog.classList.toggle('open');
+  area.classList.toggle('show');
+}
+
+// SQL syntax highlighter
+function highlightSQL(sql) {
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const keywords = ['SELECT','FROM','WHERE','INSERT','INTO','VALUES','UPDATE','SET','DELETE',
+    'CREATE','TABLE','ALTER','DROP','INDEX','JOIN','INNER','LEFT','RIGHT','OUTER','FULL','CROSS',
+    'ON','AND','OR','NOT','IN','EXISTS','BETWEEN','LIKE','ILIKE','IS','NULL','AS','DISTINCT',
+    'ORDER','BY','GROUP','HAVING','LIMIT','OFFSET','UNION','ALL','CASE','WHEN','THEN','ELSE','END',
+    'ASC','DESC','PRIMARY','KEY','FOREIGN','REFERENCES','DEFAULT','AUTO_INCREMENT','SERIAL',
+    'BIGSERIAL','CONSTRAINT','UNIQUE','CHECK','IF','REPLACE','TRUNCATE','CASCADE','RETURNING',
+    'WITH','RECURSIVE','OVER','PARTITION','ROW_NUMBER','RANK','DENSE_RANK','COALESCE','NULLIF',
+    'FETCH','NEXT','ROWS','ONLY','EXCEPT','INTERSECT','TEMPORARY','TEMP','VIEW','TRIGGER',
+    'PROCEDURE','FUNCTION','BEGIN','COMMIT','ROLLBACK','TRANSACTION','GRANT','REVOKE','EXPLAIN',
+    'ANALYZE','VACUUM','PRAGMA','AUTOINCREMENT','ROWID','INTEGER','BOOLEAN','USING','NATURAL',
+    'COUNT','SUM','AVG','MIN','MAX','UPPER','LOWER','LENGTH','SUBSTRING','TRIM','CAST',
+    'CONCAT','NOW','CURRENT_TIMESTAMP','CURRENT_DATE','DATE','EXTRACT','ROUND','ABS','IFNULL',
+    'GROUP_CONCAT','STRING_AGG','ARRAY_AGG','JSON_AGG','LATERAL','MATERIALIZED','WINDOW',
+    'GENERATED','ALWAYS','STORED','VIRTUAL','CONFLICT','DO','NOTHING','UPSERT','MERGE'];
+  const types = ['INT','INTEGER','BIGINT','SMALLINT','TINYINT','FLOAT','DOUBLE','DECIMAL','NUMERIC',
+    'VARCHAR','CHAR','TEXT','BLOB','CLOB','DATE','TIME','DATETIME','TIMESTAMP','BOOLEAN','BOOL',
+    'JSON','JSONB','UUID','BYTEA','REAL','SERIAL','BIGSERIAL','SMALLSERIAL','MONEY',
+    'INTERVAL','ARRAY','ENUM','XML','INET','CIDR','MACADDR','BIT','VARBIT','POINT','LINE',
+    'POLYGON','CIRCLE','BOX','PATH','TSQUERY','TSVECTOR','REGCLASS','OID'];
+  const kwSet = new Set(keywords);
+  const tySet = new Set(types);
+
+  let result = '';
+  let i = 0;
+  while (i < sql.length) {
+    // Line comments
+    if (sql[i] === '-' && sql[i+1] === '-') {
+      let end = sql.indexOf('\n', i);
+      if (end === -1) end = sql.length;
+      result += '<span class="cm">' + esc(sql.slice(i, end)) + '</span>';
+      i = end; continue;
+    }
+    // Block comments
+    if (sql[i] === '/' && sql[i+1] === '*') {
+      let end = sql.indexOf('*/', i + 2);
+      if (end === -1) end = sql.length; else end += 2;
+      result += '<span class="cm">' + esc(sql.slice(i, end)) + '</span>';
+      i = end; continue;
+    }
+    // Strings
+    if (sql[i] === "'" || sql[i] === '"') {
+      const q = sql[i]; let j = i + 1;
+      while (j < sql.length && sql[j] !== q) { if (sql[j] === '\\') j++; j++; }
+      j = Math.min(j + 1, sql.length);
+      result += '<span class="str">' + esc(sql.slice(i, j)) + '</span>';
+      i = j; continue;
+    }
+    // Numbers
+    if (/[0-9]/.test(sql[i]) && (i === 0 || /[\s,()=<>!+\-*/]/.test(sql[i-1]))) {
+      let j = i;
+      while (j < sql.length && /[0-9.]/.test(sql[j])) j++;
+      result += '<span class="num">' + esc(sql.slice(i, j)) + '</span>';
+      i = j; continue;
+    }
+    // Words (keywords, types, identifiers)
+    if (/[a-zA-Z_]/.test(sql[i])) {
+      let j = i;
+      while (j < sql.length && /[a-zA-Z0-9_]/.test(sql[j])) j++;
+      const word = sql.slice(i, j);
+      const upper = word.toUpperCase();
+      if (kwSet.has(upper)) result += '<span class="kw">' + esc(word) + '</span>';
+      else if (tySet.has(upper)) result += '<span class="tp">' + esc(word) + '</span>';
+      else result += esc(word);
+      i = j; continue;
+    }
+    // Operators
+    if ('<>=!+-*/%'.includes(sql[i])) {
+      result += '<span class="op">' + esc(sql[i]) + '</span>';
+      i++; continue;
+    }
+    result += esc(sql[i]);
+    i++;
+  }
+  return result;
+}
+
+// Generate SQL
+async function generate() {
+  const key = keyInput.value.trim();
+  if (!key) { showErr('请先输入 DeepSeek API Key'); return; }
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { showErr('请描述你的 SQL 需求'); return; }
+
+  hideErr();
+  const btn = document.getElementById('genBtn');
+  const resCard = document.getElementById('result');
+  const sqlOut = document.getElementById('sqlOut');
+
+  btn.disabled = true; btn.textContent = '生成中...';
+  resCard.classList.add('show');
+  sqlOut.innerHTML = '<div class="ld"><div class="sp"></div>正在调用 DeepSeek API...</div>';
+
+  const schema = document.getElementById('schema').value.trim();
+  let sysPrompt = `You are an expert SQL developer. Generate ONLY the SQL query, no explanations, no markdown code fences. Use ${currentDB} syntax and dialect-specific features.`;
+  let userPrompt = prompt;
+  if (schema) {
+    sysPrompt += ' The user has provided their table schema below for reference.';
+    userPrompt = `Table schema:\n${schema}\n\nRequest: ${prompt}`;
+  }
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: sysPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.1,
+        max_tokens: 2048
+      })
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `API 请求失败 (${resp.status})`);
+    }
+
+    const data = await resp.json();
+    rawSQL = (data.choices?.[0]?.message?.content || '').trim();
+    // Strip markdown code fences if present
+    rawSQL = rawSQL.replace(/^```(?:sql)?\s*/i, '').replace(/\s*```$/,'').trim();
+    sqlOut.innerHTML = highlightSQL(rawSQL);
+  } catch (e) {
+    sqlOut.innerHTML = '';
+    resCard.classList.remove('show');
+    showErr(e.message || '生成失败，请检查 API Key 和网络');
+  } finally {
+    btn.disabled = false; btn.textContent = '生成 SQL ✨';
+  }
+}
+
+// Copy SQL
+function copySQL() {
+  if (!rawSQL) return;
+  navigator.clipboard.writeText(rawSQL).then(() => {
+    const btn = document.getElementById('cpBtn');
+    btn.textContent = '✓ 已复制'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '复制 SQL'; btn.classList.remove('ok'); }, 1500);
+  });
+}
+
+function showErr(msg) { const el = document.getElementById('err'); el.textContent = msg; el.classList.add('show'); }
+function hideErr() { document.getElementById('err').classList.remove('show'); }
+
+// Ctrl+Enter to generate
+document.getElementById('prompt').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate();
+});
+</script>
+<!-- PRO:START -->
+<style>
+.pro-section{max-width:960px;margin:32px auto 0;padding:0 20px}
+.pro-title{font-size:.85rem;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.pro-badge{background:linear-gradient(135deg,var(--ac),var(--a2));color:#fff;font-size:.65rem;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.pro-card{position:relative;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.pro-card:hover{border-color:var(--ac)}
+.pro-card-blur{position:absolute;inset:0;background:rgba(15,17,23,.7);backdrop-filter:blur(6px);z-index:1}
+.pro-card-lock{position:absolute;top:12px;right:12px;background:rgba(122,162,247,.15);color:var(--ac);font-size:.7rem;padding:3px 8px;border-radius:6px;font-weight:600;z-index:2}
+.pro-card-content{position:relative;z-index:0}
+.pro-card-icon{font-size:2rem;margin-bottom:10px}
+.pro-card-name{font-size:1rem;font-weight:600;color:var(--tx);margin-bottom:6px}
+.pro-card-desc{font-size:.85rem;color:var(--t2);line-height:1.5}
+.pro-card-sample{margin-top:12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem;color:var(--t2);line-height:1.6;white-space:pre-wrap}
+.pro-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:9999}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center;position:relative}
+.pro-modal h2{font-size:1.4rem;margin-bottom:6px;color:var(--tx)}
+.pro-modal .pm-sub{color:var(--t2);font-size:.85rem;margin-bottom:20px}
+.pro-modal ul{list-style:none;text-align:left;margin:0 0 24px;padding:0}
+.pro-modal ul li{padding:8px 0;font-size:.9rem;color:var(--t2);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li span:first-child{color:var(--ac);font-size:1.1rem}
+.pro-modal .pm-cta{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,var(--ac),var(--a2));color:#fff;font-size:1rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.pro-modal .pm-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(122,162,247,.4)}
+.pro-modal .pm-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--t2);font-size:1.2rem;cursor:pointer;padding:4px}
+.pro-modal .pm-close:hover{color:var(--tx)}
+</style>
+
+<section class="pro-section">
+<div class="pro-title">⚡ Pro Features <span class="pro-badge">PRO</span></div>
+<div class="pro-grid">
+  <div class="pro-card" onclick="openProModal()">
+    <div class="pro-card-blur"></div>
+    <span class="pro-card-lock">🔒 Pro</span>
+    <div class="pro-card-content">
+      <div class="pro-card-icon">🚀</div>
+      <div class="pro-card-name">Query Optimization</div>
+      <div class="pro-card-desc">AI analyzes your SQL and suggests performance improvements — index hints, join rewriting, subquery elimination.</div>
+      <div class="pro-card-sample">-- Optimization suggestion:
+-- Add index: CREATE INDEX idx_orders_user
+--   ON orders(user_id, created_at);
+-- Rewrite: Use JOIN instead of subquery
+-- Est. speedup: ~12x faster</div>
+    </div>
+  </div>
+  <div class="pro-card" onclick="openProModal()">
+    <div class="pro-card-blur"></div>
+    <span class="pro-card-lock">🔒 Pro</span>
+    <div class="pro-card-content">
+      <div class="pro-card-icon">📊</div>
+      <div class="pro-card-name">Index Recommendations</div>
+      <div class="pro-card-desc">Get smart index suggestions based on your table schema and query patterns. Covers composite, partial, and covering indexes.</div>
+      <div class="pro-card-sample">-- Recommended indexes:
+-- 1. CREATE INDEX idx_users_email
+--    ON users(email) WHERE active=1;
+-- 2. CREATE INDEX idx_orders_composite
+--    ON orders(user_id, status, amount);</div>
+    </div>
+  </div>
+  <div class="pro-card" onclick="openProModal()">
+    <div class="pro-card-blur"></div>
+    <span class="pro-card-lock">🔒 Pro</span>
+    <div class="pro-card-content">
+      <div class="pro-card-icon">🛡️</div>
+      <div class="pro-card-name">SQL Security Audit</div>
+      <div class="pro-card-desc">Detect SQL injection risks, privilege escalation patterns, and unsafe dynamic queries in your code.</div>
+      <div class="pro-card-sample">-- Security report:
+-- ⚠ Potential injection at line 3
+-- ⚠ Missing parameterized query
+-- ✓ No privilege escalation found
+-- Recommendation: Use prepared stmts</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+  <button class="pm-close" onclick="closeProModal()">&times;</button>
+  <h2>⚡ Unlock Pro SQL Tools</h2>
+  <p class="pm-sub">Supercharge your SQL workflow with AI-powered optimization</p>
+  <ul>
+    <li><span>✅</span> Query performance optimization</li>
+    <li><span>✅</span> Smart index recommendations</li>
+    <li><span>✅</span> SQL security audit</li>
+    <li><span>✅</span> Execution plan analysis</li>
+    <li><span>✅</span> Lifetime access, one-time payment</li>
+  </ul>
+  <a class="pm-cta" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $9</a>
+</div>
+</div>
+
+<script>
+function openProModal(){document.getElementById('proModal').classList.add('active')}
+function closeProModal(){document.getElementById('proModal').classList.remove('active')}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeProModal()});
+</script>
+<!-- PRO:END -->
+
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

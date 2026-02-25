@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Regex Tester</title>
+<meta name="description" content="Test and debug regular expressions in real-time with match highlighting, preset patterns, and detailed match info.">
+<meta name="keywords" content="regex tester, regular expression, regex debugger, regex match, pattern matching, regex online, regex validator, regex playground">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-regex-tester/">
+<meta property="og:title" content="AI Regex Tester - Test Regular Expressions Online">
+<meta property="og:description" content="Test and debug regular expressions in real-time with match highlighting, preset patterns, and detailed match info.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-regex-tester/">
+<meta property="og:site_name" content="AI Regex Tester">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Regex Tester - Test Regular Expressions Online">
+<meta name="twitter:description" content="Test and debug regular expressions in real-time with match highlighting and preset patterns.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Regex Tester","url":"https://lifa-su.com/ai-regex-tester/","description":"Test and debug regular expressions in real-time with match highlighting, preset patterns, and detailed match info.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--bd:#2a2a4a;--gn:#00d2a0;--yl:#f5c542;--bl:#4fc3f7;--rd:#ef5350}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.ctn{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--ac2),var(--bl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);font-size:.95rem;margin-top:4px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px}
+.ct{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);margin-bottom:12px}
+.ri{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.dl{color:var(--ac);font-size:1.5rem;font-weight:700;font-family:monospace}
+#regexInput{flex:1;min-width:200px;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:12px 16px;color:var(--tx);font-family:monospace;font-size:1rem;outline:none;transition:border-color .2s}
+#regexInput:focus{border-color:var(--ac)}
+.fg{display:flex;gap:4px;flex-wrap:wrap}
+.fb{background:var(--bg);border:2px solid var(--bd);border-radius:6px;color:var(--tx2);width:36px;height:36px;font-family:monospace;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.fb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.fb:hover{border-color:var(--ac)}
+.mc{background:var(--bg);border-radius:8px;padding:8px 16px;display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:.9rem;color:var(--tx2)}
+.mc .n{color:var(--gn);font-weight:700;font-size:1.1rem}
+.mc.err{border:1px solid var(--rd)}.mc.err .n{color:var(--rd)}
+.pw{display:flex;flex-wrap:wrap;gap:8px}
+.pb{background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:6px 14px;color:var(--tx2);font-size:.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.pb:hover{border-color:var(--ac);color:var(--tx);background:rgba(233,69,96,.1)}
+.ta{position:relative}
+#testText{width:100%;min-height:160px;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:14px 16px;color:transparent;caret-color:var(--tx);font-family:monospace;font-size:.95rem;line-height:1.7;outline:none;resize:vertical;z-index:2;position:relative}
+#testText:focus{border-color:var(--ac)}
+#hl{position:absolute;top:0;left:0;right:0;bottom:0;padding:14px 16px;font-family:monospace;font-size:.95rem;line-height:1.7;white-space:pre-wrap;word-wrap:break-word;overflow:hidden;pointer-events:none;z-index:1;border:2px solid transparent;border-radius:8px;color:var(--tx)}
+#hl mark{border-radius:3px;padding:1px 0;color:#fff}
+.rl{max-height:400px;overflow-y:auto}
+.rl::-webkit-scrollbar{width:6px}
+.rl::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.mi{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px 16px;margin-bottom:8px}
+.mi:hover{border-color:var(--ac2)}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px}
+.mx{font-size:.78rem;color:var(--tx2);background:var(--sf);padding:2px 8px;border-radius:4px}
+.ml{font-weight:600;font-size:.9rem}
+.mv{font-family:monospace;color:var(--gn);font-size:.9rem;word-break:break-all}
+.mg{margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)}
+.gi{display:flex;gap:8px;font-size:.85rem;margin-bottom:4px;flex-wrap:wrap}
+.gn{color:var(--yl);font-family:monospace;min-width:80px}
+.gv{color:var(--bl);font-family:monospace;word-break:break-all}
+.es{text-align:center;padding:40px 20px;color:var(--tx2)}
+.es .em{font-size:2.5rem;margin-bottom:10px}
+footer{text-align:center;padding:30px 0 20px;color:var(--tx2);font-size:.8rem}
+footer a{color:var(--ac);text-decoration:none}
+.kbd-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:10px 0;margin-bottom:10px;font-size:.78rem;color:var(--tx2)}
+.kbd-bar kbd{background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:2px 6px;font-family:monospace;font-size:.72rem;color:var(--tx)}
+@media(max-width:600px){
+.ctn{padding:12px}header h1{font-size:1.5rem}
+.ri{flex-direction:column;align-items:stretch}.dl{display:none}
+.fg{justify-content:center}.card{padding:14px}
+}
+</style>
+</head>
+<body>
+<div class="ctn">
+<header><h1>&#129514; AI Regex Tester</h1><p>Real-time regular expression testing with match highlighting</p></header>
+
+<div class="kbd-bar" aria-label="Keyboard shortcuts">
+<span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Test</span>
+<span><kbd>Ctrl</kbd>+<kbd>S</kbd> Copy matches</span>
+<span><kbd>Ctrl</kbd>+<kbd>L</kbd> Clear</span>
+</div>
+
+<div class="card">
+<div class="ct">&#128269; Regular Expression</div>
+<div class="ri">
+<span class="dl">/</span>
+<input type="text" id="regexInput" placeholder="Enter regex pattern..." aria-label="Regular expression pattern" spellcheck="false">
+<span class="dl">/</span>
+<div class="fg" id="flagsGroup"></div>
+</div>
+<div id="matchCount" class="mc" style="display:none"></div>
+</div>
+
+<div class="card">
+<div class="ct">&#9889; Preset Patterns</div>
+<div class="pw" id="presets"></div>
+</div>
+
+<div class="card">
+<div class="ct">&#128221; Test String</div>
+<div class="ta">
+<div id="hl"></div>
+<textarea id="testText" placeholder="Enter test string here..." aria-label="Test string" spellcheck="false"></textarea>
+</div>
+</div>
+
+<div class="card">
+<div class="ct">&#128202; Match Results</div>
+<div class="rl" id="results">
+<div class="es"><div class="em">&#128269;</div><p>Enter a regex pattern and test string to see matches</p></div>
+</div>
+</div>
+
+<!-- Pro Section -->
+<style>
+.pro-section{margin-top:24px;margin-bottom:24px}
+.pro-label{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:700;color:var(--ac);margin-bottom:14px}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--bd)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;padding:20px;background:var(--sf)}
+.pro-mock-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.pro-mock-card{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.pro-mock-card h4{font-size:.85rem;color:var(--ac);margin-bottom:10px}
+.pro-mock-bar{height:8px;background:var(--bd);border-radius:4px;margin-bottom:6px}
+.pro-mock-bar.w60{width:60%}.pro-mock-bar.w80{width:80%}.pro-mock-bar.w45{width:45%}.pro-mock-bar.w70{width:70%}
+.pro-mock-line{height:12px;background:var(--bd);border-radius:3px;margin-bottom:5px;width:90%}
+.pro-mock-line.short{width:55%}
+.pro-mock-diagram{display:flex;gap:8px;align-items:center;justify-content:center;padding:16px 0}
+.pro-mock-node{width:56px;height:28px;border-radius:14px;background:rgba(233,69,96,.2);border:1px solid var(--ac)}
+.pro-mock-arrow{color:var(--tx2);font-size:1.2rem}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);transition:background .2s}
+.pro-blur-wrap:hover .pro-overlay{background:rgba(26,26,46,.65)}
+.pro-lock-icon{font-size:2.4rem;margin-bottom:8px}
+.pro-unlock-text{font-size:.95rem;color:#fff;font-weight:600;background:var(--ac);padding:8px 20px;border-radius:8px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s}
+.pro-modal h3{font-size:1.3rem;margin-bottom:6px}
+.pro-modal .pro-price{font-size:1.05rem;color:var(--ac);font-weight:700;margin-bottom:16px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:20px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--bd);font-size:.92rem;color:var(--tx2)}
+.pro-modal ul li::before{content:'✓ ';color:var(--gn);font-weight:700}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:var(--ac);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:background .2s}
+.pro-btn-upgrade:hover{background:#d63a52}
+.pro-btn-later{background:none;border:none;color:var(--tx2);cursor:pointer;font-size:.9rem;padding:8px}
+.pro-btn-later:hover{color:var(--tx)}
+@keyframes proIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+</style>
+<div class="pro-section">
+<div class="pro-label"><span>🔒</span> Pro Features</div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-blur-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>🔀 Regex Visualization</h4><div class="pro-mock-diagram"><div class="pro-mock-node"></div><span class="pro-mock-arrow">→</span><div class="pro-mock-node"></div><span class="pro-mock-arrow">→</span><div class="pro-mock-node"></div></div><div class="pro-mock-bar w80"></div><div class="pro-mock-bar w60"></div></div>
+<div class="pro-mock-card"><h4>🔄 Find &amp; Replace</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-bar w70"></div></div>
+</div>
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>💻 Code Generation</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-bar w45"></div></div>
+</div>
+</div>
+<div class="pro-overlay"><div class="pro-lock-icon">🔒</div><div class="pro-unlock-text">Click to unlock Pro features</div></div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>Regex Tester Pro</h3>
+<div class="pro-price">$14 — one-time purchase</div>
+<ul>
+<li>Visual regex diagram — railroad chart visualization</li>
+<li>Find &amp; Replace — test replacements with live preview</li>
+<li>Code generation — export to Python, JavaScript, Go, Java</li>
+<li>Plain-English regex explanation for every pattern</li>
+<li>Lifetime access &amp; future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $14</a>
+<button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<footer>AI Regex Tester &mdash; Built for developers &middot; <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">&#9749; Support on Ko-fi</a></footer>
+</div>
+<script>
+const COLORS = [
+  'rgba(233,69,96,.4)','rgba(79,195,247,.4)','rgba(245,197,66,.4)',
+  'rgba(0,210,160,.4)','rgba(255,107,157,.4)','rgba(171,71,188,.4)'
+];
+const FLAGS = ['g','i','m','s','u'];
+const PRESETS = [
+  {name:'Email',pattern:'[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}',flags:'gi'},
+  {name:'URL',pattern:'https?://[\\w\\-._~:/?#\\[\\]@!$&\'()*+,;=%]+',flags:'gi'},
+  {name:'Phone (CN)',pattern:'1[3-9]\\d{9}',flags:'g'},
+  {name:'IP Address',pattern:'\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b',flags:'g'},
+  {name:'Date (YYYY-MM-DD)',pattern:'\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])',flags:'g'},
+  {name:'ID Card (CN)',pattern:'[1-9]\\d{5}(?:19|20)\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]',flags:'g'},
+  {name:'Hex Color',pattern:'#(?:[0-9a-fA-F]{3}){1,2}\\b',flags:'gi'},
+  {name:'IPv6',pattern:'(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}',flags:'gi'},
+  {name:'HTML Tag',pattern:'<\\/?[a-zA-Z][\\w]*(?:\\s[^>]*)?\\/?>',flags:'gi'},
+  {name:'Number',pattern:'-?\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?',flags:'g'}
+];
+
+const state = {flags:{g:true,i:false,m:false,s:false,u:false}};
+const $ = s => document.querySelector(s);
+const regexInput = $('#regexInput');
+const testText = $('#testText');
+const hl = $('#hl');
+const matchCount = $('#matchCount');
+const results = $('#results');
+const flagsGroup = $('#flagsGroup');
+const presetsEl = $('#presets');
+
+// Render flags
+FLAGS.forEach(f => {
+  const btn = document.createElement('button');
+  btn.className = 'fb' + (state.flags[f] ? ' on' : '');
+  btn.textContent = f;
+  btn.setAttribute('aria-label', 'Toggle flag ' + f);
+  btn.onclick = () => {
+    state.flags[f] = !state.flags[f];
+    btn.classList.toggle('on');
+    run();
+  };
+  flagsGroup.appendChild(btn);
+});
+
+// Render presets
+PRESETS.forEach(p => {
+  const btn = document.createElement('button');
+  btn.className = 'pb';
+  btn.textContent = p.name;
+  btn.onclick = () => {
+    regexInput.value = p.pattern;
+    // Set flags from preset
+    FLAGS.forEach(f => {
+      state.flags[f] = p.flags.includes(f);
+      flagsGroup.children[FLAGS.indexOf(f)].classList.toggle('on', state.flags[f]);
+    });
+    run();
+    regexInput.focus();
+  };
+  presetsEl.appendChild(btn);
+});
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getFlags() {
+  return FLAGS.filter(f => state.flags[f]).join('');
+}
+
+function run() {
+  const pattern = regexInput.value;
+  const text = testText.value;
+
+  if (!pattern || !text) {
+    hl.innerHTML = escapeHtml(text || '');
+    matchCount.style.display = 'none';
+    results.innerHTML = '<div class="es"><div class="em">&#128269;</div><p>Enter a regex pattern and test string to see matches</p></div>';
+    return;
+  }
+
+  let regex;
+  try {
+    let f = getFlags();
+    if (!f.includes('g')) f = 'g' + f; // need global for matchAll
+    regex = new RegExp(pattern, f);
+  } catch (e) {
+    matchCount.style.display = 'flex';
+    matchCount.className = 'mc err';
+    matchCount.innerHTML = '<span class="n">!</span> ' + escapeHtml(e.message);
+    hl.innerHTML = escapeHtml(text);
+    results.innerHTML = '<div class="es"><div class="em">&#9888;&#65039;</div><p>' + escapeHtml(e.message) + '</p></div>';
+    return;
+  }
+
+  const matches = [...text.matchAll(regex)];
+  // Show count
+  matchCount.style.display = 'flex';
+  matchCount.className = 'mc';
+  matchCount.innerHTML = '<span class="n">' + matches.length + '</span> match' + (matches.length !== 1 ? 'es' : '') + ' found';
+
+  // Build highlight
+  if (matches.length === 0) {
+    hl.innerHTML = escapeHtml(text);
+    results.innerHTML = '<div class="es"><div class="em">&#128528;</div><p>No matches found</p></div>';
+    return;
+  }
+
+  let highlighted = '';
+  let lastIdx = 0;
+  matches.forEach((m, i) => {
+    const start = m.index;
+    const end = start + m[0].length;
+    if (start > lastIdx) highlighted += escapeHtml(text.slice(lastIdx, start));
+    if (start === end) { lastIdx = end; return; } // skip zero-length
+    const color = COLORS[i % COLORS.length];
+    highlighted += '<mark style="background:' + color + '">' + escapeHtml(m[0]) + '</mark>';
+    lastIdx = end;
+  });
+  if (lastIdx < text.length) highlighted += escapeHtml(text.slice(lastIdx));
+  hl.innerHTML = highlighted;
+
+  // Build results
+  let html = '';
+  matches.forEach((m, i) => {
+    html += '<div class="mi"><div class="mh">';
+    html += '<span class="ml" style="color:' + COLORS[i % COLORS.length].replace(',.4',',.9') + '">Match #' + (i + 1) + '</span>';
+    html += '<span class="mx">index: ' + m.index + '</span></div>';
+    html += '<div class="mv">' + escapeHtml(m[0]) + '</div>';
+    // Groups
+    const hasNamedGroups = m.groups && Object.keys(m.groups).length > 0;
+    const hasNumberedGroups = m.length > 1;
+    if (hasNamedGroups || hasNumberedGroups) {
+      html += '<div class="mg">';
+      if (hasNamedGroups) {
+        for (const [k, v] of Object.entries(m.groups)) {
+          html += '<div class="gi"><span class="gn">' + escapeHtml(k) + ':</span><span class="gv">' + escapeHtml(v ?? 'undefined') + '</span></div>';
+        }
+      }
+      for (let j = 1; j < m.length; j++) {
+        html += '<div class="gi"><span class="gn">Group ' + j + ':</span><span class="gv">' + escapeHtml(m[j] ?? 'undefined') + '</span></div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  });
+  results.innerHTML = html;
+}
+
+// Sync scroll between textarea and highlight layer
+testText.addEventListener('scroll', () => {
+  hl.scrollTop = testText.scrollTop;
+  hl.scrollLeft = testText.scrollLeft;
+});
+
+regexInput.addEventListener('input', run);
+testText.addEventListener('input', run);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  const mod = e.metaKey || e.ctrlKey;
+  if (!mod) return;
+  if (e.key === 'Enter') { e.preventDefault(); run(); }
+  else if (e.key === 's' || e.key === 'S') {
+    e.preventDefault();
+    const text = results.textContent;
+    if (text) { navigator.clipboard.writeText(text); }
+  }
+  else if (e.key === 'l' || e.key === 'L') {
+    e.preventDefault();
+    regexInput.value = '';
+    testText.value = '';
+    hl.innerHTML = '';
+    matchCount.style.display = 'none';
+    results.innerHTML = '<div class="es"><div class="em">&#128269;</div><p>Enter a regex pattern and test string to see matches</p></div>';
+    regexInput.focus();
+  }
+});
+
+// Demo on load
+regexInput.value = '[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}';
+testText.value = 'Contact us at hello@example.com or support@test.org.\nInvalid: user@, @domain.com\nAnother: dev.team@company.co.uk';
+run();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

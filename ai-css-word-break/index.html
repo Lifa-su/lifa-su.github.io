@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Word Break Demo Tool</title>
+<meta name="description" content="Interactive CSS word-break and overflow-wrap demo tool. Compare normal, break-all, keep-all, break-word modes with multilingual text preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-word-break/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4e;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:1rem}
+.controls{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+.controls h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent)}
+.control-row{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;align-items:flex-start}
+.control-group{flex:1;min-width:200px}
+.control-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+select,textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:.9rem;font-family:inherit;transition:border-color .2s}
+select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+.preset-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.preset-btn{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.preset-btn:hover,.preset-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.card-header{background:var(--card);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.card-header h3{font-size:.95rem;font-weight:600}
+.card-header code{font-size:.75rem;color:var(--accent);background:rgba(233,69,96,.1);padding:3px 8px;border-radius:4px}
+.card-body{padding:18px;min-height:120px;overflow:hidden}
+.demo-text{font-size:.9rem;line-height:1.7;color:var(--text)}
+.code-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px}
+.code-section h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent);display:flex;align-items:center;justify-content:space-between}
+.copy-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.85rem;cursor:pointer;transition:all .2s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#2ecc71}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;overflow-x:auto;font-size:.85rem;line-height:1.6;color:#e6e6e6}
+footer{text-align:center;padding:30px 20px;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:600px){
+header h1{font-size:1.5rem}
+.container{padding:12px}
+.controls{padding:16px}
+.grid{grid-template-columns:1fr}
+.control-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>CSS Word Break Demo Tool</h1>
+<p>Compare word-break &amp; overflow-wrap behaviors across languages and content types</p>
+</header>
+<div class="container">
+<div class="controls">
+<h2>Settings</h2>
+<div class="control-row">
+<div class="control-group">
+<label for="overflowWrap">overflow-wrap</label>
+<select id="overflowWrap">
+<option value="normal">normal</option>
+<option value="anywhere">anywhere</option>
+<option value="break-word" selected>break-word</option>
+</select>
+</div>
+<div class="control-group">
+<label for="containerWidth">Container Width</label>
+<select id="containerWidth">
+<option value="100%">100%</option>
+<option value="300px">300px</option>
+<option value="200px">200px</option>
+<option value="150px">150px</option>
+</select>
+</div>
+</div>
+<div class="control-group">
+<label for="customText">Custom Text</label>
+<textarea id="customText" placeholder="Enter your own text to test..." rows="3"></textarea>
+</div>
+<div style="margin-top:12px">
+<label style="font-size:.85rem;color:var(--text2);margin-bottom:6px;display:block;font-weight:500">Preset Texts</label>
+<div class="preset-btns">
+<button class="preset-btn active" data-preset="mixed">Mixed</button>
+<button class="preset-btn" data-preset="chinese">Chinese</button>
+<button class="preset-btn" data-preset="english">English</button>
+<button class="preset-btn" data-preset="japanese">Japanese</button>
+<button class="preset-btn" data-preset="url">Long URL</button>
+</div>
+</div>
+</div>
+<div class="grid" id="demoGrid"></div>
+<div class="code-section">
+<h2><span>Generated CSS</span><button class="copy-btn" id="copyBtn">Copy</button></h2>
+<pre id="codeOutput"></pre>
+</div>
+</div>
+<footer><p>CSS Word Break Demo Tool — A visual guide to CSS text wrapping properties</p></footer>
+<script>
+const presets = {
+  mixed: "CSS word-break property specifies how words should break when reaching the end of a line. This is a superlongwordthatdoesnotcontainanyspacesorbreakpoints. Visit https://www.example.com/very/long/path/to/resource?query=parameter&another=value for more info.\n\nCSS的word-break属性指定了怎样在单词内断行，这是一段用于测试的中文文本。\n\n日本語のテキストも含まれています。これはワードブレークのテストです。",
+  chinese: "CSS的word-break属性指定了怎样在单词内断行。浏览器默认的换行规则在处理中英文混排时可能会出现意想不到的效果。通过合理设置word-break和overflow-wrap属性，可以让文本在容器中更好地显示。这是一段较长的中文测试文本，用于演示不同断行模式下的表现差异。",
+  english: "The CSS word-break property specifies how words should break when reaching the end of a line. Supercalifragilisticexpialidocious is a very long word. Pneumonoultramicroscopicsilicovolcanoconiosis is even longer. Sometimes URLs like https://developer.mozilla.org/en-US/docs/Web/CSS/word-break need special handling too.",
+  japanese: "日本語のテキストでword-breakプロパティをテストします。CSSのワードブレーク設定は、日本語と英語が混在するテキストで特に重要です。ブラウザのデフォルトの改行ルールでは、日本語テキストは文字単位で改行されますが、英語は単語単位で改行されます。",
+  url: "https://www.example.com/very/long/path/to/some/deeply/nested/resource/page?query=parameter&another=value&third=something#section-anchor\n\nhttps://subdomain.website.co.uk/api/v2/users/12345/posts/67890/comments?page=1&limit=50&sort=created_at&order=desc\n\nftp://files.example.org/pub/documents/2024/reports/quarterly/Q4-financial-summary-final-revised-v3.pdf"
+};
+
+const modes = [
+  { name: "normal", desc: "Default browser behavior" },
+  { name: "break-all", desc: "Break anywhere between characters" },
+  { name: "keep-all", desc: "No breaks in CJK text" },
+  { name: "break-word", desc: "Break unbreakable words" }
+];
+
+let currentPreset = "mixed";
+
+function getText() {
+  const custom = document.getElementById("customText").value.trim();
+  return custom || presets[currentPreset];
+}
+
+function render() {
+  const ow = document.getElementById("overflowWrap").value;
+  const cw = document.getElementById("containerWidth").value;
+  const text = getText();
+  const grid = document.getElementById("demoGrid");
+  grid.innerHTML = "";
+
+  modes.forEach(function(mode) {
+    const card = document.createElement("div");
+    card.className = "card";
+    const bodyStyle = "word-break:" + mode.name + ";overflow-wrap:" + ow + ";max-width:" + cw + ";";
+    card.innerHTML = '<div class="card-header"><h3>' + mode.name + '</h3><code>' + mode.desc + '</code></div>' +
+      '<div class="card-body"><div class="demo-text" style="' + bodyStyle + '">' + escapeHtml(text).replace(/\n/g, "<br>") + '</div></div>';
+    grid.appendChild(card);
+  });
+
+  updateCode(ow, cw);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function updateCode(ow, cw) {
+  let code = "";
+  modes.forEach(function(mode) {
+    code += ".text-" + mode.name + " {\n";
+    code += "  word-break: " + mode.name + ";\n";
+    code += "  overflow-wrap: " + ow + ";\n";
+    if (cw !== "100%") code += "  max-width: " + cw + ";\n";
+    code += "}\n\n";
+  });
+  document.getElementById("codeOutput").textContent = code.trim();
+}
+
+document.getElementById("overflowWrap").addEventListener("change", render);
+document.getElementById("containerWidth").addEventListener("change", render);
+document.getElementById("customText").addEventListener("input", render);
+
+document.querySelectorAll(".preset-btn").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    document.querySelectorAll(".preset-btn").forEach(function(b) { b.classList.remove("active"); });
+    btn.classList.add("active");
+    currentPreset = btn.dataset.preset;
+    document.getElementById("customText").value = "";
+    render();
+  });
+});
+
+document.getElementById("copyBtn").addEventListener("click", function() {
+  const code = document.getElementById("codeOutput").textContent;
+  navigator.clipboard.writeText(code).then(function() {
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(function() { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+  });
+});
+
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Keyword Research Tool</title>
+<meta name="description" content="Free AI-powered keyword research tool with intent analysis, topic clustering, competitor gaps, trend prediction, and multi-language SEO insights. Powered by DeepSeek API.">
+<link rel="canonical" href="https://lifa-su.com/ai-keyword-research/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+<meta property="og:title" content="AI Keyword Research Tool — Free SEO Keyword Analysis">
+<meta property="og:description" content="Discover keywords, analyze intent, cluster topics, spy on competitors, and predict trends — all powered by AI.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-keyword-research/">
+<meta property="og:image" content="https://lifa-su.com/ai-keyword-research/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Keyword Research Tool — Free SEO Keyword Analysis">
+<meta name="twitter:description" content="Discover keywords, analyze intent, cluster topics, spy on competitors, and predict trends — all powered by AI.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-keyword-research/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Keyword Research Tool","url":"https://lifa-su.com/ai-keyword-research/","description":"Free AI-powered keyword research tool with intent analysis, topic clustering, competitor gaps, trend prediction, and multi-language SEO insights.","applicationCategory":"SEO Tool","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#6366f1;--pd:#4f46e5;--pl:#818cf8;--bg:#0f172a;--bgc:#1e293b;--bgi:#334155;--t:#f8fafc;--tm:#94a3b8;--bd:#475569;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);line-height:1.6}
+header{text-align:center;padding:40px 20px 30px;background:linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b);border-bottom:1px solid var(--bd)}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--pl),#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+header p{color:var(--tm);font-size:1rem}
+.api-bar{display:flex;gap:12px;align-items:center;justify-content:center;padding:16px 20px;background:var(--bgc);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.api-bar label{color:var(--tm);font-size:.9rem;font-weight:500}
+.api-bar input{background:var(--bgi);border:1px solid var(--bd);color:var(--t);padding:8px 14px;border-radius:8px;width:340px;font-size:.9rem}
+.api-bar input:focus{outline:none;border-color:var(--p)}
+.api-bar .st{font-size:.8rem;padding:4px 10px;border-radius:20px}
+.ct{max-width:1400px;margin:0 auto;padding:20px}
+.tabs{display:flex;gap:4px;padding:16px 0 0;overflow-x:auto;flex-wrap:wrap}
+.tab{padding:10px 18px;background:0;border:0;color:var(--tm);cursor:pointer;font-size:.88rem;border-radius:8px 8px 0 0;transition:.2s;white-space:nowrap}
+.tab:hover{color:var(--t);background:var(--bgc)}
+.tab.active{color:var(--pl);background:var(--bgc);font-weight:600}
+.pnl{display:none;background:var(--bgc);border-radius:0 0 var(--r) var(--r);padding:24px;margin-bottom:20px;min-height:400px}
+.pnl.active{display:block}
+.ig{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.ig input,.ig select{flex:1;min-width:200px;background:var(--bgi);border:1px solid var(--bd);color:var(--t);padding:12px 16px;border-radius:8px;font-size:.95rem}
+.ig input:focus,.ig select:focus{outline:none;border-color:var(--p)}
+.ig select option{background:var(--bgi)}
+.btn{padding:12px 24px;border:0;border-radius:8px;cursor:pointer;font-size:.95rem;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.bp{background:var(--p);color:#fff}.bp:hover{background:var(--pd)}.bp:disabled{opacity:.5;cursor:not-allowed}
+.bs{padding:6px 14px;font-size:.8rem}
+.bg{background:#059669;color:#fff}.bg:hover{background:#047857}
+.ld{text-align:center;padding:40px;color:var(--tm)}
+.ld .sp{display:inline-block;width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--p);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.9rem}
+th{background:var(--bg);color:var(--tm);padding:12px 16px;text-align:left;font-weight:600;position:sticky;top:0;border-bottom:2px solid var(--bd)}
+td{padding:10px 16px;border-bottom:1px solid #1e293b}
+tr:hover td{background:#ffffff08}
+.b{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.bi{background:#3b82f622;color:#60a5fa}.bn{background:#8b5cf622;color:#a78bfa}
+.bt{background:#22c55e22;color:#4ade80}.bc{background:#f59e0b22;color:#fbbf24}
+.be{background:#22c55e22;color:#4ade80}.bm{background:#f59e0b22;color:#fbbf24}.bh{background:#ef444422;color:#f87171}
+.sc{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.si{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center}
+.si .n{font-size:1.8rem;font-weight:700;color:var(--pl)}
+.si .l{font-size:.8rem;color:var(--tm);margin-top:4px}
+.cc{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.cc h3{color:var(--pl);margin-bottom:12px;font-size:1.1rem}
+.cc .kws{display:flex;flex-wrap:wrap;gap:8px}
+.cc .kt{background:var(--bgi);padding:4px 12px;border-radius:20px;font-size:.8rem;color:var(--tm)}
+.pi{background:var(--bg);border-left:3px solid var(--p);padding:14px 18px;margin-bottom:10px;border-radius:0 8px 8px 0}
+.pi .q{font-weight:600;color:var(--t);margin-bottom:6px}
+.pi .a{color:var(--tm);font-size:.9rem}
+.tb{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tb .br{height:20px;background:linear-gradient(90deg,var(--p),var(--pl));border-radius:4px;min-width:4px}
+.tb .v{font-size:.8rem;color:var(--tm);min-width:50px}
+.eb{display:flex;gap:12px;justify-content:flex-end;margin-bottom:16px}
+.es{text-align:center;padding:60px 20px;color:var(--tm)}
+.es .ic{font-size:3rem;margin-bottom:16px}
+.gs{margin-bottom:24px}
+.gs h3{color:var(--pl);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+footer{text-align:center;padding:30px;color:var(--tm);font-size:.8rem;border-top:1px solid var(--bd);margin-top:20px}
+@media(max-width:768px){header h1{font-size:1.6rem}.ct{padding:12px}.pnl{padding:16px}.ig{flex-direction:column}.pro-grid{grid-template-columns:1fr}}
+.pro-section{max-width:1400px;margin:0 auto;padding:20px 20px 0}
+.pro-label{text-align:center;margin-bottom:16px;font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--pl),#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;position:relative;cursor:pointer}
+.pro-grid::after{content:'';position:absolute;inset:0;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);background:rgba(15,23,42,.45);border-radius:var(--r);z-index:1}
+.pro-card{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r);padding:24px;text-align:center}
+.pro-card .pro-icon{font-size:2rem;margin-bottom:10px}
+.pro-card h4{color:var(--t);margin-bottom:6px;font-size:1rem}
+.pro-card p{color:var(--tm);font-size:.85rem}
+.pro-cta{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+.pro-cta .btn{pointer-events:auto;font-size:1rem;padding:14px 32px;box-shadow:0 4px 24px #6366f155}
+.pro-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center}
+.pro-overlay.open{display:flex}
+.pro-modal{background:var(--bgc);border:1px solid var(--bd);border-radius:var(--r);padding:36px;max-width:520px;width:90%;position:relative;text-align:center}
+.pro-modal h2{font-size:1.5rem;margin-bottom:6px;background:linear-gradient(135deg,var(--pl),#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pro-modal .price{font-size:2rem;font-weight:800;color:var(--pl);margin:12px 0 4px}
+.pro-modal .price-note{color:var(--tm);font-size:.85rem;margin-bottom:20px}
+.pro-modal ul{text-align:left;list-style:none;padding:0;margin-bottom:24px}
+.pro-modal ul li{padding:10px 0;border-bottom:1px solid #334155;color:var(--t);font-size:.95rem}
+.pro-modal ul li::before{content:'✓ ';color:#22c55e;font-weight:700}
+.pro-modal .close-modal{position:absolute;top:12px;right:16px;background:0;border:0;color:var(--tm);font-size:1.4rem;cursor:pointer}
+.pro-modal .close-modal:hover{color:var(--t)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+header{animation:fadeIn .5s ease-out}
+.api-bar{animation:fadeIn .4s ease-out .1s both}
+.tabs{animation:fadeIn .4s ease-out .2s both}
+.pnl{animation:fadeIn .3s ease-out}
+.tab{transition:all .3s ease}
+.btn{transition:all .2s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.ig input,.ig select{transition:border-color .2s ease,box-shadow .2s ease}
+.ig input:focus,.ig select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+table tr{transition:background .2s ease}
+.pro-section{animation:slideUp .5s ease-out .3s both}
+.pro-overlay{animation:fadeIn .3s ease-out}
+.pro-modal{animation:slideUp .3s ease-out}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#x1F50D; AI Keyword Research Tool</h1>
+  <p>AI-powered keyword research, intent analysis, and topic clustering for modern SEO</p>
+</header>
+<div class="api-bar">
+  <label>DeepSeek API Key:</label>
+  <input type="password" id="apiKey" placeholder="Enter your DeepSeek API key">
+  <span class="st" id="apiStatus">&#9675; Not set</span>
+</div>
+<div class="ct">
+  <div class="tabs">
+    <button class="tab active" onclick="sw('kw')">&#127919; Keywords</button>
+    <button class="tab" onclick="sw('lt')">&#128279; Long-Tail</button>
+    <button class="tab" onclick="sw('cl')">&#127959; Clusters</button>
+    <button class="tab" onclick="sw('cp')">&#128373; Competitor</button>
+    <button class="tab" onclick="sw('pa')">&#10067; PAA</button>
+    <button class="tab" onclick="sw('gr')">&#128194; Groups</button>
+    <button class="tab" onclick="sw('tr')">&#128200; Trends</button>
+    <button class="tab" onclick="sw('ml')">&#127757; Multi-Lang</button>
+  </div>
+
+  <!-- Keywords Panel -->
+  <div class="pnl active" id="p-kw">
+    <div class="ig">
+      <input type="text" id="seedKw" placeholder="Enter seed keyword (e.g., AI writing tools)" onkeydown="if(event.key==='Enter')doKw()">
+      <select id="kwLang"><option value="English">English</option><option value="Spanish">Spanish</option><option value="French">French</option><option value="German">German</option><option value="Portuguese">Portuguese</option><option value="Japanese">Japanese</option><option value="Chinese">Chinese</option></select>
+      <button class="btn bp" onclick="doKw()">&#127919; Research</button>
+    </div>
+    <div class="eb" id="kwEx" style="display:none"><button class="btn bs bg" onclick="csv('kw')">&#128229; Export CSV</button></div>
+    <div id="r-kw"><div class="es"><div class="ic">&#127919;</div><p>Enter a seed keyword to discover related keywords with volume, difficulty, and intent data</p></div></div>
+  </div>
+
+  <!-- Long-Tail Panel -->
+  <div class="pnl" id="p-lt">
+    <div class="ig">
+      <input type="text" id="ltKw" placeholder="Enter keyword for long-tail suggestions" onkeydown="if(event.key==='Enter')doLt()">
+      <button class="btn bp" onclick="doLt()">&#128279; Generate</button>
+    </div>
+    <div class="eb" id="ltEx" style="display:none"><button class="btn bs bg" onclick="csv('lt')">&#128229; Export CSV</button></div>
+    <div id="r-lt"><div class="es"><div class="ic">&#128279;</div><p>Discover long-tail keyword opportunities with low competition and high conversion potential</p></div></div>
+  </div>
+
+  <!-- Topic Clusters Panel -->
+  <div class="pnl" id="p-cl">
+    <div class="ig">
+      <input type="text" id="clKw" placeholder="Enter main topic for cluster analysis" onkeydown="if(event.key==='Enter')doCl()">
+      <button class="btn bp" onclick="doCl()">&#127959; Cluster</button>
+    </div>
+    <div class="eb" id="clEx" style="display:none"><button class="btn bs bg" onclick="csv('cl')">&#128229; Export CSV</button></div>
+    <div id="r-cl"><div class="es"><div class="ic">&#127959;</div><p>Build topic cluster strategies with pillar content and supporting pages</p></div></div>
+  </div>
+
+  <!-- Competitor Panel -->
+  <div class="pnl" id="p-cp">
+    <div class="ig">
+      <input type="text" id="cpUrl" placeholder="Enter competitor URL (e.g., example.com)" onkeydown="if(event.key==='Enter')doCp()">
+      <input type="text" id="cpNiche" placeholder="Your niche (optional, e.g., SaaS marketing)">
+      <button class="btn bp" onclick="doCp()">&#128373; Analyze</button>
+    </div>
+    <div class="eb" id="cpEx" style="display:none"><button class="btn bs bg" onclick="csv('cp')">&#128229; Export CSV</button></div>
+    <div id="r-cp"><div class="es"><div class="ic">&#128373;</div><p>Analyze competitor keywords and find content gaps you can exploit</p></div></div>
+  </div>
+
+  <!-- People Also Ask Panel -->
+  <div class="pnl" id="p-pa">
+    <div class="ig">
+      <input type="text" id="paKw" placeholder="Enter topic for People Also Ask questions" onkeydown="if(event.key==='Enter')doPa()">
+      <button class="btn bp" onclick="doPa()">&#10067; Generate</button>
+    </div>
+    <div class="eb" id="paEx" style="display:none"><button class="btn bs bg" onclick="csv('pa')">&#128229; Export CSV</button></div>
+    <div id="r-pa"><div class="es"><div class="ic">&#10067;</div><p>Generate People Also Ask questions to target featured snippets</p></div></div>
+  </div>
+
+  <!-- Grouping Panel -->
+  <div class="pnl" id="p-gr">
+    <div class="ig">
+      <input type="text" id="grKw" placeholder="Enter keyword to group variations" onkeydown="if(event.key==='Enter')doGr()">
+      <button class="btn bp" onclick="doGr()">&#128194; Group</button>
+    </div>
+    <div class="eb" id="grEx" style="display:none"><button class="btn bs bg" onclick="csv('gr')">&#128229; Export CSV</button></div>
+    <div id="r-gr"><div class="es"><div class="ic">&#128194;</div><p>Automatically group keywords by intent and topic for content planning</p></div></div>
+  </div>
+
+  <!-- Trends Panel -->
+  <div class="pnl" id="p-tr">
+    <div class="ig">
+      <input type="text" id="trKw" placeholder="Enter keyword for trend prediction" onkeydown="if(event.key==='Enter')doTr()">
+      <button class="btn bp" onclick="doTr()">&#128200; Predict</button>
+    </div>
+    <div class="eb" id="trEx" style="display:none"><button class="btn bs bg" onclick="csv('tr')">&#128229; Export CSV</button></div>
+    <div id="r-tr"><div class="es"><div class="ic">&#128200;</div><p>AI-powered monthly search volume trend predictions for the next 12 months</p></div></div>
+  </div>
+
+  <!-- Multi-Language Panel -->
+  <div class="pnl" id="p-ml">
+    <div class="ig">
+      <input type="text" id="mlKw" placeholder="Enter keyword to research across languages" onkeydown="if(event.key==='Enter')doMl()">
+      <select id="mlLangs" multiple style="min-height:80px">
+        <option value="Spanish" selected>Spanish</option><option value="French" selected>French</option>
+        <option value="German" selected>German</option><option value="Portuguese">Portuguese</option>
+        <option value="Italian">Italian</option><option value="Japanese">Japanese</option>
+        <option value="Korean">Korean</option><option value="Chinese">Chinese</option>
+        <option value="Arabic">Arabic</option><option value="Hindi">Hindi</option>
+        <option value="Dutch">Dutch</option><option value="Russian">Russian</option>
+      </select>
+      <button class="btn bp" onclick="doMl()">&#127757; Research</button>
+    </div>
+    <div class="eb" id="mlEx" style="display:none"><button class="btn bs bg" onclick="csv('ml')">&#128229; Export CSV</button></div>
+    <div id="r-ml"><div class="es"><div class="ic">&#127757;</div><p>Research keyword equivalents and opportunities across multiple languages</p></div></div>
+  </div>
+
+</div>
+<section class="pro-section" onclick="document.getElementById('proModal').classList.add('open')">
+  <div class="pro-label">🚀 Pro Features</div>
+  <div class="pro-grid">
+    <div class="pro-card"><div class="pro-icon">📊</div><h4>Bulk Keyword Analysis</h4><p>Analyze hundreds of keywords at once with batch processing and priority scoring</p></div>
+    <div class="pro-card"><div class="pro-icon">🔗</div><h4>API Integration & Export</h4><p>Connect to Semrush, Ahrefs, and Google Search Console. Export to Sheets & Notion</p></div>
+    <div class="pro-card"><div class="pro-icon">📈</div><h4>Competitor Tracking Dashboard</h4><p>Monitor competitor rankings over time with automated weekly reports</p></div>
+    <div class="pro-card"><div class="pro-icon">🤖</div><h4>AI Content Strategy</h4><p>Get AI-generated content briefs, outlines, and publishing schedules</p></div>
+    <div class="pro-cta"><button class="btn bp">🔓 Unlock Pro — $19</button></div>
+  </div>
+</section>
+<div class="pro-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pro-modal">
+    <button class="close-modal" onclick="document.getElementById('proModal').classList.remove('open')">&times;</button>
+    <h2>🚀 Keyword Research Pro</h2>
+    <div class="price">$19</div>
+    <div class="price-note">One-time payment · Lifetime access</div>
+    <ul>
+      <li>Bulk Keyword Analysis — process 500+ keywords per batch</li>
+      <li>API Integration — Semrush, Ahrefs, GSC connectors</li>
+      <li>Export to CSV, Google Sheets, Notion</li>
+      <li>Competitor Tracking Dashboard with weekly reports</li>
+      <li>AI Content Strategy — briefs, outlines, schedules</li>
+      <li>Priority support & future updates</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn bp" style="width:100%;justify-content:center;font-size:1.05rem;padding:14px 24px">Get Pro Access — $19</a>
+  </div>
+</div>
+<footer>
+  <p>AI Keyword Research Tool &copy; 2026 | Powered by DeepSeek API | Part of the SEO Suite</p>
+  <p style="margin-top:4px">Volumes and difficulty are AI estimates for directional guidance. Validate with Semrush or Ahrefs for precision.</p>
+</footer>
+<script>
+// State
+const S={apiKey:localStorage.getItem('ds_key')||'',kw:[],lt:[],cl:[],cp:[],pa:[],gr:[],ml:[],tr:{}};
+
+// Init
+document.addEventListener('DOMContentLoaded',()=>{
+  const k=document.getElementById('apiKey');
+  if(S.apiKey){k.value=S.apiKey;document.getElementById('apiStatus').textContent='\u25cf Connected';document.getElementById('apiStatus').style.cssText='background:#22c55e22;color:#22c55e'}
+  k.addEventListener('input',e=>{S.apiKey=e.target.value.trim();localStorage.setItem('ds_key',S.apiKey);
+    const s=document.getElementById('apiStatus');
+    if(S.apiKey){s.textContent='\u25cf Connected';s.style.cssText='background:#22c55e22;color:#22c55e'}
+    else{s.textContent='\u25cb Not set';s.style.cssText=''}
+  });
+});
+
+// Tab switch
+function sw(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const tabs=['kw','lt','cl','cp','pa','gr','tr','ml'];
+    t.classList.toggle('active',tabs[i]===id);
+  });
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+}
+
+// API call
+async function api(prompt,temp=0.7){
+  if(!S.apiKey){alert('Please enter your DeepSeek API key first.');throw new Error('No key');}
+  const r=await fetch('https://api.deepseek.com/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.apiKey},
+    body:JSON.stringify({model:'deepseek-chat',messages:[
+      {role:'system',content:'You are an expert SEO analyst. Respond with valid JSON only. No markdown fences, no text outside JSON.'},
+      {role:'user',content:prompt}
+    ],temperature:temp,max_tokens:4096})
+  });
+  if(!r.ok)throw new Error('API Error: '+await r.text());
+  const d=await r.json();
+  const t=d.choices[0].message.content.trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/i,'');
+  return JSON.parse(t);
+}
+
+function ld(id){document.getElementById(id).innerHTML='<div class="ld"><div class="sp"></div><p style="margin-top:16px">AI is analyzing... 10-30 seconds</p></div>';}
+function err(id,m){document.getElementById(id).innerHTML='<div class="es"><div class="ic">\u26a0\ufe0f</div><p style="color:#ef4444">'+m+'</p></div>';}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function db(d){return d==='Easy'?'be':d==='Medium'?'bm':'bh';}
+function ib(i){return i==='Informational'?'bi':i==='Navigational'?'bn':i==='Transactional'?'bt':'bc';}
+
+// 1. Keyword Research
+async function doKw(){
+  const seed=document.getElementById('seedKw').value.trim();
+  const lang=document.getElementById('kwLang').value;
+  if(!seed)return alert('Enter a seed keyword.');
+  ld('r-kw');
+  try{
+    const d=await api(`Analyze the seed keyword "${seed}" for SEO (language: ${lang}). Return JSON:
+{"keywords":[{"keyword":"string","searchVolume":number,"difficulty":"Easy"|"Medium"|"Hard","intent":"Informational"|"Navigational"|"Transactional"|"Commercial","cpc":number,"trend":"Rising"|"Stable"|"Declining","relevance":number}],"summary":{"total":number,"avgVolume":number,"topIntent":"string"}}
+Generate 20 diverse keywords including short-tail, mid-tail, long-tail. Include questions, comparisons, action keywords. Realistic 2025-2026 volumes.`);
+    S.kw=d.keywords||[];
+    const k=S.kw,s=d.summary||{};
+    document.getElementById('kwEx').style.display='flex';
+    let h=`<div class="sc"><div class="si"><div class="n">${k.length}</div><div class="l">Keywords</div></div><div class="si"><div class="n">${s.avgVolume?(s.avgVolume).toLocaleString():'-'}</div><div class="l">Avg Volume</div></div><div class="si"><div class="n">${s.topIntent||'-'}</div><div class="l">Top Intent</div></div><div class="si"><div class="n">${k.filter(x=>x.difficulty==='Easy').length}</div><div class="l">Easy Wins</div></div></div>`;
+    h+='<div style="overflow-x:auto"><table><thead><tr><th>Keyword</th><th>Volume</th><th>Difficulty</th><th>Intent</th><th>CPC</th><th>Trend</th><th>Relevance</th></tr></thead><tbody>';
+    k.forEach(x=>{h+=`<tr><td><strong>${esc(x.keyword)}</strong></td><td>${(x.searchVolume||0).toLocaleString()}</td><td><span class="b ${db(x.difficulty)}">${x.difficulty}</span></td><td><span class="b ${ib(x.intent)}">${x.intent}</span></td><td>$${(x.cpc||0).toFixed(2)}</td><td>${x.trend==='Rising'?'\ud83d\udcc8':x.trend==='Declining'?'\ud83d\udcc9':'\u27a1\ufe0f'} ${x.trend}</td><td>${x.relevance||'-'}</td></tr>`;});
+    h+='</tbody></table></div>';
+    document.getElementById('r-kw').innerHTML=h;
+  }catch(e){err('r-kw','Error: '+e.message);}
+}
+
+// 2. Long-Tail
+async function doLt(){
+  const seed=document.getElementById('ltKw').value.trim();
+  if(!seed)return alert('Enter a keyword.');
+  ld('r-lt');
+  try{
+    const d=await api(`Generate long-tail keyword variations for "${seed}". Return JSON:
+{"longtail":[{"keyword":"string (4+ words)","searchVolume":number,"difficulty":"Easy"|"Medium"|"Hard","intent":"Informational"|"Navigational"|"Transactional"|"Commercial","buyerStage":"Awareness"|"Consideration"|"Decision","contentType":"Blog Post"|"Product Page"|"Guide"|"Review"|"Comparison"|"FAQ"}]}
+Generate 20 long-tail keywords. Focus on specific, low-competition phrases. Include question, comparison, location-based variations.`);
+    S.lt=d.longtail||[];
+    document.getElementById('ltEx').style.display='flex';
+    let h='<div style="overflow-x:auto"><table><thead><tr><th>Long-tail Keyword</th><th>Volume</th><th>Difficulty</th><th>Intent</th><th>Buyer Stage</th><th>Content Type</th></tr></thead><tbody>';
+    S.lt.forEach(x=>{h+=`<tr><td><strong>${esc(x.keyword)}</strong></td><td>${(x.searchVolume||0).toLocaleString()}</td><td><span class="b ${db(x.difficulty)}">${x.difficulty}</span></td><td><span class="b ${ib(x.intent)}">${x.intent}</span></td><td>${x.buyerStage||'-'}</td><td>${x.contentType||'-'}</td></tr>`;});
+    h+='</tbody></table></div>';
+    document.getElementById('r-lt').innerHTML=h;
+  }catch(e){err('r-lt','Error: '+e.message);}
+}
+
+// 3. Topic Clusters
+async function doCl(){
+  const seed=document.getElementById('clKw').value.trim();
+  if(!seed)return alert('Enter a topic.');
+  ld('r-cl');
+  try{
+    const d=await api(`Create a topic cluster strategy for "${seed}". Return JSON:
+{"pillar":{"topic":"string","keyword":"string","description":"string"},"clusters":[{"name":"string","pillarRelation":"string","keywords":["string"],"contentIdeas":["string"],"priority":"High"|"Medium"|"Low"}]}
+Generate 6-8 clusters with 4-6 keywords each. Hub-and-spoke model.`);
+    S.cl=d.clusters||[];
+    document.getElementById('clEx').style.display='flex';
+    const p=d.pillar||{};
+    let h=`<div class="cc" style="border-color:var(--p)"><h3>\ud83c\udfaf Pillar: ${esc(p.topic||p.keyword||'')}</h3><p style="color:var(--tm)">${esc(p.description||'')}</p><p style="margin-top:8px"><strong>Target:</strong> ${esc(p.keyword||'')}</p></div>`;
+    S.cl.forEach((c,i)=>{
+      const pc=c.priority==='High'?'#22c55e':c.priority==='Medium'?'#f59e0b':'var(--tm)';
+      h+=`<div class="cc"><h3>Cluster ${i+1}: ${esc(c.name)} <span class="b" style="background:${pc}22;color:${pc}">${c.priority}</span></h3><p style="color:var(--tm);margin-bottom:12px;font-size:.9rem">\u21b3 ${esc(c.pillarRelation||'')}</p><div class="kws">${(c.keywords||[]).map(k=>'<span class="kt">'+esc(k)+'</span>').join('')}</div>${c.contentIdeas?'<div style="margin-top:12px"><strong style="font-size:.85rem;color:var(--tm)">Content Ideas:</strong><ul style="margin-top:6px;padding-left:20px;color:var(--tm);font-size:.85rem">'+c.contentIdeas.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>':''}</div>`;
+    });
+    document.getElementById('r-cl').innerHTML=h;
+  }catch(e){err('r-cl','Error: '+e.message);}
+}
+
+// 4. Competitor Analysis
+async function doCp(){
+  const url=document.getElementById('cpUrl').value.trim();
+  const niche=document.getElementById('cpNiche').value.trim();
+  if(!url)return alert('Enter a competitor URL.');
+  ld('r-cp');
+  try{
+    const d=await api(`Analyze competitor "${url}"${niche?' in the '+niche+' niche':''} for SEO. Return JSON:
+{"competitor":{"domain":"string","estimatedAuthority":"High"|"Medium"|"Low","primaryNiche":"string"},"keywords":[{"keyword":"string","estimatedRank":number,"searchVolume":number,"difficulty":"Easy"|"Medium"|"Hard","intent":"Informational"|"Navigational"|"Transactional"|"Commercial","opportunity":"string","gap":true|false}],"contentGaps":["string"],"strengths":["string"],"weaknesses":["string"]}
+Generate 15 likely keywords. Identify content gaps and opportunities.`);
+    S.cp=d.keywords||[];
+    document.getElementById('cpEx').style.display='flex';
+    const c=d.competitor||{};
+    let h=`<div class="sc"><div class="si"><div class="n">${esc(c.domain||url)}</div><div class="l">Domain</div></div><div class="si"><div class="n">${c.estimatedAuthority||'-'}</div><div class="l">Authority</div></div><div class="si"><div class="n">${S.cp.length}</div><div class="l">Keywords</div></div><div class="si"><div class="n">${S.cp.filter(x=>x.gap).length}</div><div class="l">Gaps Found</div></div></div>`;
+    h+='<div style="overflow-x:auto"><table><thead><tr><th>Keyword</th><th>Rank</th><th>Volume</th><th>Difficulty</th><th>Intent</th><th>Gap?</th><th>Opportunity</th></tr></thead><tbody>';
+    S.cp.forEach(x=>{h+=`<tr><td><strong>${esc(x.keyword)}</strong></td><td>${x.estimatedRank||'-'}</td><td>${(x.searchVolume||0).toLocaleString()}</td><td><span class="b ${db(x.difficulty)}">${x.difficulty}</span></td><td><span class="b ${ib(x.intent)}">${x.intent}</span></td><td>${x.gap?'\u2705':'\u274c'}</td><td style="font-size:.85rem">${esc(x.opportunity||'')}</td></tr>`;});
+    h+='</tbody></table></div>';
+    if(d.contentGaps&&d.contentGaps.length)h+=`<div style="margin-top:20px;background:var(--bg);padding:16px;border-radius:8px"><strong style="color:var(--pl)">\ud83d\udca1 Content Gaps:</strong><ul style="margin-top:8px;padding-left:20px;color:var(--tm);font-size:.9rem">${d.contentGaps.map(x=>'<li>'+esc(x)+'</li>').join('')}</ul></div>`;
+    document.getElementById('r-cp').innerHTML=h;
+  }catch(e){err('r-cp','Error: '+e.message);}
+}
+
+// 5. People Also Ask
+async function doPa(){
+  const seed=document.getElementById('paKw').value.trim();
+  if(!seed)return alert('Enter a keyword.');
+  ld('r-pa');
+  try{
+    const d=await api(`Generate People Also Ask questions for "${seed}". Return JSON:
+{"questions":[{"question":"string","answer":"string (2-3 sentences)","intent":"Informational"|"Navigational"|"Transactional"|"Commercial","difficulty":"Easy"|"Medium"|"Hard","contentOpportunity":"string"}]}
+Generate 15 realistic PAA questions. Mix of what, how, why, when, which, comparison questions.`);
+    S.pa=d.questions||[];
+    document.getElementById('paEx').style.display='flex';
+    let h=`<div class="sc"><div class="si"><div class="n">${S.pa.length}</div><div class="l">Questions</div></div><div class="si"><div class="n">${S.pa.filter(x=>x.difficulty==='Easy').length}</div><div class="l">Easy to Rank</div></div></div>`;
+    S.pa.forEach(q=>{
+      h+=`<div class="pi"><div class="q">\u2753 ${esc(q.question)} <span class="b ${ib(q.intent)}">${q.intent}</span></div><div class="a">${esc(q.answer)}</div><div style="margin-top:8px;font-size:.8rem;color:var(--tm)">\ud83d\udcdd ${esc(q.contentOpportunity||'')} \u00b7 <span class="b ${db(q.difficulty)}">${q.difficulty}</span></div></div>`;
+    });
+    document.getElementById('r-pa').innerHTML=h;
+  }catch(e){err('r-pa','Error: '+e.message);}
+}
+
+// 6. Keyword Grouping
+async function doGr(){
+  const seed=document.getElementById('grKw').value.trim();
+  if(!seed)return alert('Enter a keyword.');
+  ld('r-gr');
+  try{
+    const d=await api(`Group keywords related to "${seed}" into logical categories. Return JSON:
+{"groups":[{"name":"string","intent":"Informational"|"Navigational"|"Transactional"|"Commercial","keywords":[{"keyword":"string","searchVolume":number,"difficulty":"Easy"|"Medium"|"Hard"}],"suggestedPage":"string"}],"totalKeywords":number}
+Create 5-8 groups with 4-6 keywords each. Group by intent and topic similarity.`);
+    S.gr=d.groups||[];
+    document.getElementById('grEx').style.display='flex';
+    let h=`<div class="sc"><div class="si"><div class="n">${S.gr.length}</div><div class="l">Groups</div></div><div class="si"><div class="n">${d.totalKeywords||S.gr.reduce((a,g)=>a+(g.keywords||[]).length,0)}</div><div class="l">Total Keywords</div></div></div>`;
+    S.gr.forEach(g=>{
+      h+=`<div class="gs"><h3>${esc(g.name)} <span class="b ${ib(g.intent)}">${g.intent}</span></h3><p style="color:var(--tm);font-size:.85rem;margin-bottom:12px">\ud83d\udcc4 ${esc(g.suggestedPage||'')}</p><table><thead><tr><th>Keyword</th><th>Volume</th><th>Difficulty</th></tr></thead><tbody>`;
+      (g.keywords||[]).forEach(k=>{h+=`<tr><td>${esc(k.keyword)}</td><td>${(k.searchVolume||0).toLocaleString()}</td><td><span class="b ${db(k.difficulty)}">${k.difficulty}</span></td></tr>`;});
+      h+='</tbody></table></div>';
+    });
+    document.getElementById('r-gr').innerHTML=h;
+  }catch(e){err('r-gr','Error: '+e.message);}
+}
+
+// 7. Trend Prediction
+async function doTr(){
+  const seed=document.getElementById('trKw').value.trim();
+  if(!seed)return alert('Enter a keyword.');
+  ld('r-tr');
+  try{
+    const d=await api(`Predict monthly search volume trends for "${seed}" over next 12 months (Mar 2026 - Feb 2027). Return JSON:
+{"keyword":"string","currentVolume":number,"overallTrend":"Growing"|"Stable"|"Declining"|"Seasonal","months":[{"month":"string","volume":number,"note":"string"}],"peakMonth":"string","lowMonth":"string","yoyChange":"string","seasonalFactors":["string"],"recommendation":"string"}
+Realistic estimates based on industry patterns, seasonality, AI search impact.`);
+    S.tr=d;
+    document.getElementById('trEx').style.display='flex';
+    const ms=d.months||[],mx=Math.max(...ms.map(m=>m.volume||0));
+    let h=`<div class="sc"><div class="si"><div class="n">${(d.currentVolume||0).toLocaleString()}</div><div class="l">Current Volume</div></div><div class="si"><div class="n">${d.overallTrend||'-'}</div><div class="l">Trend</div></div><div class="si"><div class="n">${d.yoyChange||'-'}</div><div class="l">YoY Change</div></div><div class="si"><div class="n">${d.peakMonth||'-'}</div><div class="l">Peak Month</div></div></div>`;
+    ms.forEach(m=>{
+      const pct=mx>0?(m.volume/mx*100):0;
+      h+=`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:.85rem;font-weight:500">${esc(m.month)}</span><span style="font-size:.8rem;color:var(--tm)">${esc(m.note||'')}</span></div><div class="tb"><div class="br" style="width:${pct}%"></div><div class="v">${(m.volume||0).toLocaleString()}</div></div></div>`;
+    });
+    if(d.seasonalFactors&&d.seasonalFactors.length)h+=`<div style="background:var(--bg);padding:16px;border-radius:8px;margin-top:16px"><strong style="color:var(--pl)">\ud83d\udcca Seasonal Factors:</strong><ul style="margin-top:8px;padding-left:20px;color:var(--tm);font-size:.9rem">${d.seasonalFactors.map(f=>'<li>'+esc(f)+'</li>').join('')}</ul></div>`;
+    if(d.recommendation)h+=`<div style="background:#6366f111;border:1px solid var(--p);padding:16px;border-radius:8px;margin-top:16px"><strong style="color:var(--pl)">\ud83d\udca1 Recommendation:</strong><p style="margin-top:8px;color:var(--tm)">${esc(d.recommendation)}</p></div>`;
+    document.getElementById('r-tr').innerHTML=h;
+  }catch(e){err('r-tr','Error: '+e.message);}
+}
+
+// 8. Multi-Language
+async function doMl(){
+  const seed=document.getElementById('mlKw').value.trim();
+  const langs=Array.from(document.getElementById('mlLangs').selectedOptions).map(o=>o.value);
+  if(!seed)return alert('Enter a keyword.');
+  if(!langs.length)return alert('Select at least one language.');
+  ld('r-ml');
+  try{
+    const d=await api(`Research keyword "${seed}" across languages: ${langs.join(', ')}. Return JSON:
+{"original":{"keyword":"${seed}","language":"English","searchVolume":number},"translations":[{"language":"string","keyword":"string (natural, not literal)","searchVolume":number,"difficulty":"Easy"|"Medium"|"Hard","localVariations":["string"],"marketSize":"Large"|"Medium"|"Small","opportunity":"High"|"Medium"|"Low","notes":"string"}]}
+Natural locally-used translations. Include local search behavior insights.`);
+    S.ml=d.translations||[];
+    document.getElementById('mlEx').style.display='flex';
+    let h=`<div class="sc"><div class="si"><div class="n">${S.ml.length}</div><div class="l">Languages</div></div><div class="si"><div class="n">${S.ml.filter(t=>t.opportunity==='High').length}</div><div class="l">High Opportunity</div></div><div class="si"><div class="n">${(d.original?.searchVolume||0).toLocaleString()}</div><div class="l">English Volume</div></div></div>`;
+    h+='<div style="overflow-x:auto"><table><thead><tr><th>Language</th><th>Keyword</th><th>Volume</th><th>Difficulty</th><th>Market</th><th>Opportunity</th><th>Variations</th><th>Notes</th></tr></thead><tbody>';
+    S.ml.forEach(t=>{
+      const ob=t.opportunity==='High'?'be':t.opportunity==='Medium'?'bm':'bh';
+      h+=`<tr><td><strong>${esc(t.language)}</strong></td><td>${esc(t.keyword)}</td><td>${(t.searchVolume||0).toLocaleString()}</td><td><span class="b ${db(t.difficulty)}">${t.difficulty}</span></td><td>${t.marketSize||'-'}</td><td><span class="b ${ob}">${t.opportunity}</span></td><td style="font-size:.8rem">${(t.localVariations||[]).map(v=>esc(v)).join(', ')}</td><td style="font-size:.8rem;color:var(--tm)">${esc(t.notes||'')}</td></tr>`;
+    });
+    h+='</tbody></table></div>';
+    document.getElementById('r-ml').innerHTML=h;
+  }catch(e){err('r-ml','Error: '+e.message);}
+}
+
+// CSV Export
+function csv(type){
+  let rows=[];let fn='keywords';
+  switch(type){
+    case 'kw':rows=[['Keyword','Volume','Difficulty','Intent','CPC','Trend','Relevance']];S.kw.forEach(k=>rows.push([k.keyword,k.searchVolume,k.difficulty,k.intent,k.cpc,k.trend,k.relevance]));fn='keyword-research';break;
+    case 'lt':rows=[['Keyword','Volume','Difficulty','Intent','Buyer Stage','Content Type']];S.lt.forEach(k=>rows.push([k.keyword,k.searchVolume,k.difficulty,k.intent,k.buyerStage,k.contentType]));fn='longtail-keywords';break;
+    case 'cl':rows=[['Cluster','Priority','Keywords','Content Ideas']];S.cl.forEach(c=>rows.push([c.name,c.priority,(c.keywords||[]).join('; '),(c.contentIdeas||[]).join('; ')]));fn='topic-clusters';break;
+    case 'cp':rows=[['Keyword','Rank','Volume','Difficulty','Intent','Gap','Opportunity']];S.cp.forEach(k=>rows.push([k.keyword,k.estimatedRank,k.searchVolume,k.difficulty,k.intent,k.gap,k.opportunity]));fn='competitor-keywords';break;
+    case 'pa':rows=[['Question','Answer','Intent','Difficulty','Content Opportunity']];S.pa.forEach(q=>rows.push([q.question,q.answer,q.intent,q.difficulty,q.contentOpportunity]));fn='people-also-ask';break;
+    case 'gr':rows=[['Group','Intent','Keyword','Volume','Difficulty']];(S.gr||[]).forEach(g=>(g.keywords||[]).forEach(k=>rows.push([g.name,g.intent,k.keyword,k.searchVolume,k.difficulty])));fn='keyword-groups';break;
+    case 'tr':rows=[['Month','Volume','Note']];(S.tr.months||[]).forEach(m=>rows.push([m.month,m.volume,m.note]));fn='trend-prediction';break;
+    case 'ml':rows=[['Language','Keyword','Volume','Difficulty','Market','Opportunity','Variations','Notes']];S.ml.forEach(t=>rows.push([t.language,t.keyword,t.searchVolume,t.difficulty,t.marketSize,t.opportunity,(t.localVariations||[]).join('; '),t.notes]));fn='multilang-keywords';break;
+  }
+  if(rows.length<=1)return alert('No data to export.');
+  const c=rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const b=new Blob(['\ufeff'+c],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn+'.csv';a.click();URL.revokeObjectURL(a.href);
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

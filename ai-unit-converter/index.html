@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Unit Converter - Smart Unit Conversion Tool</title>
+<meta name="description" content="Free online unit converter supporting length, weight, temperature, area, volume, speed, data storage, and time conversions.">
+<link rel="canonical" href="https://lifa-su.com/ai-unit-converter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+header{text-align:center;padding:28px 16px 12px}
+header h1{font-size:1.6rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.85rem;margin-top:4px}
+.categories{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:8px 16px 16px;max-width:700px}
+.cat-btn{padding:8px 16px;border:none;border-radius:20px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:.82rem;transition:all .25s}
+.cat-btn:hover{background:var(--card)}
+.cat-btn.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 2px 12px rgba(233,69,96,.3)}
+.converter{background:var(--surface);border-radius:var(--radius);padding:24px;width:92%;max-width:500px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.swap-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.unit-group{flex:1;display:flex;flex-direction:column;gap:6px}
+.unit-group label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.unit-group select{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;font-size:.95rem;width:100%;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aab'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+.unit-group select:focus{outline:none;border-color:var(--accent)}
+.swap-btn{background:var(--card);border:none;color:var(--accent);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:transform .3s,background .2s;flex-shrink:0;margin-top:18px}
+.swap-btn:hover{background:var(--accent);color:#fff;transform:rotate(180deg)}
+.input-row{display:flex;gap:12px;margin-bottom:12px}
+.input-box{flex:1;display:flex;flex-direction:column;gap:6px}
+.input-box label{font-size:.75rem;color:var(--text2)}
+.input-box input{background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px;font-size:1.1rem;width:100%;transition:border-color .2s}
+.input-box input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(233,69,96,.15)}
+.fav-btn{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:4px;transition:transform .2s}
+.fav-btn:hover{transform:scale(1.2)}
+.fav-row{display:flex;justify-content:center;margin-top:8px}
+.formula{text-align:center;color:var(--text2);font-size:.8rem;margin-top:12px;padding:8px;background:rgba(255,255,255,.03);border-radius:8px}
+.favorites-section{width:92%;max-width:500px;margin:20px auto}
+.fav-title{font-size:.85rem;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fav-list{display:flex;flex-direction:column;gap:6px}
+.fav-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:8px;padding:10px 14px;cursor:pointer;transition:background .2s}
+.fav-item:hover{background:var(--card)}
+.fav-item span{font-size:.85rem}
+.fav-item .remove{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem;padding:0 4px}
+.fav-item .remove:hover{color:var(--accent)}
+footer{margin-top:auto;padding:24px 16px;text-align:center;color:var(--text2);font-size:.75rem}
+@media(max-width:480px){
+header h1{font-size:1.3rem}
+.converter{padding:16px;width:95%}
+.input-row{flex-direction:column;gap:10px}
+.swap-row{flex-direction:column;gap:8px}
+.swap-btn{margin-top:0;transform:rotate(90deg)}
+.swap-btn:hover{transform:rotate(270deg)}
+.categories{gap:6px}
+.cat-btn{padding:6px 12px;font-size:.78rem}
+}
+.pro-section{position:relative;width:92%;max-width:500px;margin:24px auto;border-radius:var(--radius);overflow:hidden}
+.pro-blur{filter:blur(4px);pointer-events:none;user-select:none;opacity:.6;padding:24px;background:var(--surface);border-radius:var(--radius)}
+.pro-blur h3{font-size:1rem;margin-bottom:12px;color:var(--text)}
+.pro-blur .pro-mock-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.pro-blur .pro-mock-input{flex:1;min-width:120px;padding:10px 14px;background:var(--bg);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text2);font-size:.85rem}
+.pro-blur .pro-mock-btn{padding:10px 20px;background:var(--accent);border-radius:8px;color:#fff;font-size:.85rem;font-weight:600}
+.pro-blur .pro-mock-table{width:100%;border-collapse:collapse;font-size:.8rem;color:var(--text2)}
+.pro-blur .pro-mock-table td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.3);border-radius:var(--radius);z-index:10;transition:background .2s}
+.pro-overlay:hover{background:rgba(0,0,0,.45)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-sublabel{font-size:.85rem;color:rgba(255,255,255,.7);margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:var(--accent);margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.95rem}
+.pro-modal li::before{content:'✓ ';color:#2ecc71;font-weight:700}
+.pro-modal .pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-size:1.1rem;font-weight:600;cursor:pointer;margin-top:16px;text-decoration:none;text-align:center;transition:transform .2s,box-shadow .2s}
+.pro-modal .pro-cta:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .pro-later{background:none;border:none;color:var(--text2);cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-modal .pro-later:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<header>
+<h1>⚡ AI Unit Converter</h1>
+<p>Smart unit conversion across 8 categories</p>
+</header>
+<nav class="categories" id="categories"></nav>
+<div class="converter">
+<div class="swap-row">
+<div class="unit-group"><label>From</label><select id="fromUnit" onchange="onUnitChange()"></select></div>
+<button class="swap-btn" onclick="swapUnits()" title="Swap">⇄</button>
+<div class="unit-group"><label>To</label><select id="toUnit" onchange="onUnitChange()"></select></div>
+</div>
+<div class="input-row">
+<div class="input-box"><label id="fromLabel">Value</label><input type="number" id="fromValue" placeholder="Enter value" oninput="convert('from')"></div>
+<div class="input-box"><label id="toLabel">Result</label><input type="number" id="toValue" placeholder="Result" oninput="convert('to')"></div>
+</div>
+<div class="fav-row"><button class="fav-btn" id="favBtn" onclick="toggleFav()" title="Favorite">☆</button></div>
+<div class="formula" id="formula"></div>
+</div>
+<div class="favorites-section" id="favSection" style="display:none">
+<div class="fav-title">⭐ Favorites</div>
+<div class="fav-list" id="favList"></div>
+</div>
+<footer><p>&copy; 2026 AI Unit Converter</p></footer>
+<script>
+const D={
+length:{icon:'📏',name:'Length',units:{mm:'Millimeter',cm:'Centimeter',m:'Meter',km:'Kilometer',in:'Inch',ft:'Foot',yd:'Yard',mi:'Mile',nm:'Nautical Mile'},
+base:{mm:0.001,cm:0.01,m:1,km:1000,in:0.0254,ft:0.3048,yd:0.9144,mi:1609.344,nm:1852}},
+weight:{icon:'⚖️',name:'Weight',units:{mg:'Milligram',g:'Gram',kg:'Kilogram',t:'Metric Ton',oz:'Ounce',lb:'Pound',st:'Stone'},
+base:{mg:0.000001,g:0.001,kg:1,t:1000,oz:0.0283495,lb:0.453592,st:6.35029}},
+temperature:{icon:'🌡️',name:'Temperature',units:{c:'Celsius',f:'Fahrenheit',k:'Kelvin'},base:'special'},
+area:{icon:'📐',name:'Area',units:{mm2:'mm²',cm2:'cm²',m2:'m²',km2:'km²',in2:'in²',ft2:'ft²',ac:'Acre',ha:'Hectare'},
+base:{mm2:1e-6,cm2:1e-4,m2:1,km2:1e6,in2:6.4516e-4,ft2:0.092903,ac:4046.86,ha:10000}},
+volume:{icon:'🧪',name:'Volume',units:{ml:'Milliliter',l:'Liter',m3:'m³',gal:'Gallon(US)',qt:'Quart(US)',pt:'Pint(US)',cup:'Cup(US)',floz:'Fl Oz(US)'},
+base:{ml:0.001,l:1,m3:1000,gal:3.78541,qt:0.946353,pt:0.473176,cup:0.236588,floz:0.0295735}},
+speed:{icon:'🚀',name:'Speed',units:{ms:'m/s',kmh:'km/h',mph:'mph',kn:'Knot',fts:'ft/s',mach:'Mach'},
+base:{ms:1,kmh:0.277778,mph:0.44704,kn:0.514444,fts:0.3048,mach:343}},
+data:{icon:'💾',name:'Data',units:{b:'Bit',B:'Byte',KB:'Kilobyte',MB:'Megabyte',GB:'Gigabyte',TB:'Terabyte',PB:'Petabyte',Kib:'Kibibyte',MiB:'Mebibyte',GiB:'Gibibyte'},
+base:{b:1,B:8,KB:8000,MB:8e6,GB:8e9,TB:8e12,PB:8e15,Kib:8192,MiB:8388608,GiB:8589934592}},
+time:{icon:'⏱️',name:'Time',units:{ms:'Millisecond',s:'Second',min:'Minute',h:'Hour',d:'Day',wk:'Week',mo:'Month(30d)',yr:'Year(365d)'},
+base:{ms:0.001,s:1,min:60,h:3600,d:86400,wk:604800,mo:2592000,yr:31536000}}
+};
+let cur='length',favs=JSON.parse(localStorage.getItem('uc_favs')||'[]');
+const $=id=>document.getElementById(id);
+
+function initCats(){
+const c=$('categories');
+Object.keys(D).forEach(k=>{const b=document.createElement('button');b.className='cat-btn'+(k===cur?' active':'');b.textContent=D[k].icon+' '+D[k].name;b.onclick=()=>setCat(k);c.appendChild(b)});
+}
+function setCat(k){
+cur=k;
+document.querySelectorAll('.cat-btn').forEach((b,i)=>b.className='cat-btn'+(Object.keys(D)[i]===k?' active':''));
+populateSelects();$('fromValue').value='';$('toValue').value='';updateFormula();updateFavBtn();
+}
+function populateSelects(){
+const u=D[cur].units,f=$('fromUnit'),t=$('toUnit');
+const keys=Object.keys(u);
+f.innerHTML=t.innerHTML='';
+keys.forEach(k=>{f.add(new Option(u[k]+' ('+k+')',k));t.add(new Option(u[k]+' ('+k+')',k))});
+if(keys.length>1)t.selectedIndex=1;
+$('fromLabel').textContent=u[f.value]||'Value';
+$('toLabel').textContent=u[t.value]||'Result';
+}
+function onUnitChange(){
+$('fromLabel').textContent=D[cur].units[$('fromUnit').value];
+$('toLabel').textContent=D[cur].units[$('toUnit').value];
+convert('from');updateFormula();updateFavBtn();
+}
+function convertTemp(v,from,to){
+if(from===to)return v;
+let c=from==='c'?v:from==='f'?(v-32)*5/9:v-273.15;
+return to==='c'?c:to==='f'?c*9/5+32:c+273.15;
+}
+function convert(dir){
+const fU=$('fromUnit').value,tU=$('toUnit').value;
+const fV=$('fromValue'),tV=$('toValue');
+if(dir==='from'){
+const v=parseFloat(fV.value);
+if(isNaN(v)){tV.value='';updateFormula();return}
+let r;
+if(cur==='temperature'){r=convertTemp(v,fU,tU)}
+else{const b=D[cur].base;r=v*b[fU]/b[tU]}
+tV.value=formatNum(r);
+}else{
+const v=parseFloat(tV.value);
+if(isNaN(v)){fV.value='';updateFormula();return}
+let r;
+if(cur==='temperature'){r=convertTemp(v,tU,fU)}
+else{const b=D[cur].base;r=v*b[tU]/b[fU]}
+fV.value=formatNum(r);
+}
+updateFormula();
+}
+function formatNum(n){
+if(Math.abs(n)<0.000001&&n!==0)return n.toExponential(6);
+if(Math.abs(n)>=1e12)return n.toExponential(6);
+return parseFloat(n.toPrecision(10));
+}
+function updateFormula(){
+const fU=$('fromUnit').value,tU=$('toUnit').value,el=$('formula');
+if(cur==='temperature'){
+const map={c:'°C',f:'°F',k:'K'};
+if(fU==='c'&&tU==='f')el.textContent='°F = °C × 9/5 + 32';
+else if(fU==='f'&&tU==='c')el.textContent='°C = (°F - 32) × 5/9';
+else if(fU==='c'&&tU==='k')el.textContent='K = °C + 273.15';
+else if(fU==='k'&&tU==='c')el.textContent='°C = K - 273.15';
+else if(fU==='f'&&tU==='k')el.textContent='K = (°F - 32) × 5/9 + 273.15';
+else if(fU==='k'&&tU==='f')el.textContent='°F = (K - 273.15) × 9/5 + 32';
+else el.textContent=map[fU]+' = '+map[tU];
+}else{
+const b=D[cur].base,r=formatNum(b[fU]/b[tU]);
+el.textContent='1 '+fU+' = '+r+' '+tU;
+}
+}
+function favKey(){return cur+'|'+$('fromUnit').value+'|'+$('toUnit').value}
+function isFav(){return favs.includes(favKey())}
+function updateFavBtn(){$('favBtn').textContent=isFav()?'★':'☆'}
+function toggleFav(){
+const k=favKey();
+if(isFav()){favs=favs.filter(f=>f!==k)}else{favs.push(k)}
+localStorage.setItem('uc_favs',JSON.stringify(favs));
+updateFavBtn();renderFavs();
+}
+function renderFavs(){
+const s=$('favSection'),l=$('favList');
+if(!favs.length){s.style.display='none';return}
+s.style.display='block';l.innerHTML='';
+favs.forEach(f=>{
+const[cat,from,to]=f.split('|');
+if(!D[cat])return;
+const d=document.createElement('div');d.className='fav-item';
+const sp=document.createElement('span');
+sp.textContent=D[cat].icon+' '+D[cat].units[from]+' ⇄ '+D[cat].units[to];
+const rm=document.createElement('button');rm.className='remove';rm.textContent='✕';
+rm.onclick=e=>{e.stopPropagation();favs=favs.filter(x=>x!==f);localStorage.setItem('uc_favs',JSON.stringify(favs));updateFavBtn();renderFavs()};
+d.onclick=()=>{setCat(cat);$('fromUnit').value=from;$('toUnit').value=to;onUnitChange()};
+d.appendChild(sp);d.appendChild(rm);l.appendChild(d);
+});
+}
+function swapUnits(){
+const f=$('fromUnit'),t=$('toUnit'),fv=$('fromValue'),tv=$('toValue');
+[f.value,t.value]=[t.value,f.value];
+[fv.value,tv.value]=[tv.value,fv.value];
+onUnitChange();
+}
+initCats();populateSelects();updateFormula();renderFavs();
+$('fromValue').value=1;convert('from');
+</script>
+<!-- Pro Section -->
+<div class="pro-section">
+<div class="pro-blur">
+<h3>📐 Custom Units</h3>
+<div class="pro-mock-row">
+<div class="pro-mock-input">Unit name: Light Year</div>
+<div class="pro-mock-input">Base ratio: 9.461e+15 m</div>
+<div class="pro-mock-btn">+ Add Unit</div>
+</div>
+<h3>📦 Batch Conversion</h3>
+<table class="pro-mock-table">
+<tr><td>100 kg</td><td>→ 220.46 lb</td><td>→ 3527.40 oz</td></tr>
+<tr><td>250 km</td><td>→ 155.34 mi</td><td>→ 820,210 ft</td></tr>
+<tr><td>37.5 °C</td><td>→ 99.5 °F</td><td>→ 310.65 K</td></tr>
+</table>
+<h3 style="margin-top:12px">📊 History Export</h3>
+<div class="pro-mock-row">
+<div class="pro-mock-btn">Export CSV</div>
+<div class="pro-mock-btn">Export JSON</div>
+</div>
+</div>
+<div class="pro-overlay" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>⚡ Unit Converter Pro</h2>
+<div class="pro-price">$9</div>
+<p style="color:var(--text2);font-size:.9rem">One-time payment · Lifetime access</p>
+<ul>
+<li>Custom units — define your own conversion ratios</li>
+<li>Batch conversion — convert multiple values at once</li>
+<li>History export — CSV & JSON download</li>
+<li>Priority support & future updates</li>
+</ul>
+<a class="pro-cta" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

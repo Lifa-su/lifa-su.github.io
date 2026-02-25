@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Pixel Art Editor - Create Pixel Art Online</title>
+<meta name="description" content="Free online pixel art editor. Create pixel art with adjustable grid, color palette, flood fill, undo/redo, and PNG export.">
+<meta property="og:title" content="AI Pixel Art Editor - Create Pixel Art Online">
+<meta property="og:description" content="Free online pixel art editor with adjustable grid, color palette, and PNG export.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-pixel-art/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Pixel Art Editor">
+<meta name="twitter:description" content="Free online pixel art editor with flood fill, undo/redo, and PNG export.">
+<link rel="canonical" href="https://lifa-su.com/ai-pixel-art/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127912;</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--tx:#eee;--tx2:#aaa;--bd:#2a2a4a;--r:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--sf);padding:10px 16px;border-bottom:1px solid var(--bd)}
+header h1{font-size:1.1rem}
+header h1 span{color:var(--ac)}
+.app{display:flex;flex:1;overflow:hidden}
+.sb{width:220px;background:var(--sf);border-right:1px solid var(--bd);padding:12px;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+.sb h3{font-size:.75rem;text-transform:uppercase;color:var(--tx2);margin-bottom:6px;letter-spacing:.5px}
+.cw{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#pixelCanvas{cursor:crosshair;image-rendering:pixelated;border:2px solid var(--bd);touch-action:none}
+.tg{display:flex;flex-wrap:wrap;gap:4px}
+.tb{background:var(--sf2);border:2px solid transparent;color:var(--tx);padding:8px;border-radius:var(--r);cursor:pointer;font-size:1.1rem;width:42px;height:42px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.tb:hover{border-color:var(--ac)}
+.tb.active{border-color:var(--ac);background:var(--ac);color:#fff}
+.gp{display:flex;flex-wrap:wrap;gap:4px}
+.gp button{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.75rem}
+.gp button:hover,.gp button.active{background:var(--ac);border-color:var(--ac)}
+.cg{display:flex;gap:4px;align-items:center;margin-top:4px}
+.cg input{width:50px;background:var(--bg);border:1px solid var(--bd);color:var(--tx);padding:3px 6px;border-radius:4px;font-size:.8rem;text-align:center}
+.cg button{background:var(--ac);border:none;color:#fff;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:.75rem}
+.pal{display:flex;flex-wrap:wrap;gap:3px}
+.sw{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:border-color .1s}
+.sw:hover,.sw.active{border-color:#fff}
+.cp{display:flex;align-items:center;gap:6px;margin-top:6px}
+.cp input[type=color]{width:32px;height:32px;border:none;background:none;cursor:pointer;padding:0}
+.cp span{font-size:.8rem;color:var(--tx2)}
+.cc{width:32px;height:32px;border-radius:4px;border:2px solid var(--bd)}
+.ag{display:flex;flex-direction:column;gap:4px}
+.ab{background:var(--sf2);border:1px solid var(--bd);color:var(--tx);padding:7px 10px;border-radius:var(--r);cursor:pointer;font-size:.8rem;text-align:left;display:flex;align-items:center;gap:6px;transition:all .15s}
+.ab:hover{background:#1a3a6a;border-color:var(--ac)}
+.ab.dg:hover{background:#6b1a2a;border-color:var(--ac)}
+.er{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.er select{background:var(--bg);border:1px solid var(--bd);color:var(--tx);padding:4px;border-radius:4px;font-size:.8rem}
+.er button{background:var(--ac);border:none;color:#fff;padding:6px 12px;border-radius:var(--r);cursor:pointer;font-size:.8rem;font-weight:600}
+.tr{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.tr input[type=checkbox]{accent-color:var(--ac);width:16px;height:16px}
+.st{background:var(--sf);border-top:1px solid var(--bd);padding:4px 16px;font-size:.75rem;color:var(--tx2);display:flex;gap:16px;flex-wrap:wrap}
+@media(max-width:768px){
+.app{flex-direction:column}
+.sb{width:100%;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--bd);padding:8px;gap:8px}
+.sb section{min-width:fit-content}
+.cw{padding:8px;min-height:50vh}
+}
+.pro-section{position:relative;margin:0;border-top:1px solid var(--bd);overflow:hidden}
+.pro-blur{filter:blur(5px);pointer-events:none;padding:20px 24px;background:var(--sf);opacity:.6}
+.pro-blur h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:var(--ac);margin-bottom:10px}
+.pro-mock-layers{margin-bottom:14px}
+.pro-mock-layer{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:6px;margin-bottom:4px;font-size:.8rem}
+.pro-mock-layer .eye{font-size:.9rem}
+.pro-mock-layer .lname{flex:1;color:var(--tx2)}
+.pro-mock-layer .opacity{font-size:.7rem;color:var(--tx2)}
+.pro-mock-layer.active{border-left:3px solid var(--ac)}
+.pro-mock-frames{display:flex;gap:6px;margin-bottom:14px;overflow:hidden}
+.pro-mock-frame{width:48px;height:48px;background:rgba(0,0,0,.2);border:2px solid var(--bd);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--tx2)}
+.pro-mock-frame.active{border-color:var(--ac)}
+.pro-mock-export{display:flex;gap:8px}
+.pro-mock-export div{flex:1;padding:8px;background:rgba(0,0,0,.2);border-radius:6px;text-align:center;font-size:.75rem;color:var(--tx2)}
+.pro-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.4);transition:background .2s}
+.pro-lock-overlay:hover{background:rgba(26,26,46,.3)}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-lock-text{font-size:.95rem;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--ac),#533483);padding:10px 24px;border-radius:24px;box-shadow:0 4px 15px rgba(233,69,96,.3);transition:transform .2s}
+.pro-lock-overlay:hover .pro-lock-text{transform:scale(1.05)}
+.pro-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--sf);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);animation:proPopIn .3s ease}
+@keyframes proPopIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(135deg,var(--ac),#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:var(--tx2);margin-bottom:16px}
+.pro-features{list-style:none;text-align:left;margin:16px 0;padding:0}
+.pro-features li{padding:8px 0;font-size:.9rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pro-features li:last-child{border-bottom:none}
+.pro-features li span.pf-icon{font-size:1.1rem;flex-shrink:0}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--ac),#533483);border:none;border-radius:12px;color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:16px;text-align:center}
+.pro-upgrade-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:var(--tx2);cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-later-btn:hover{color:#fff}
+</style>
+</head>
+<body>
+<header><h1>&#127912; <span>AI Pixel Art</span> Editor</h1></header>
+<div class="app">
+<aside class="sb">
+<section><h3>Tools</h3><div class="tg" id="tools">
+<button class="tb active" data-tool="brush" title="Brush">&#9998;&#65039;</button>
+<button class="tb" data-tool="eraser" title="Eraser">&#128465;&#65039;</button>
+<button class="tb" data-tool="fill" title="Fill">&#128508;</button>
+<button class="tb" data-tool="picker" title="Eyedropper">&#128083;</button>
+</div></section>
+<section><h3>Grid Size</h3><div class="gp" id="gridPresets"></div>
+<div class="cg"><input type="number" id="customSize" min="8" max="64" value="16" aria-label="Custom grid size"><button onclick="setGrid(+document.getElementById('customSize').value)">Set</button></div></section>
+<section><h3>Colors</h3><div class="pal" id="palette"></div>
+<div class="cp"><input type="color" id="colorPicker" value="#000000" aria-label="Custom color"><div class="cc" id="curColor"></div><span id="colorHex">#000000</span></div></section>
+<section><h3>Actions</h3><div class="ag">
+<button class="ab" onclick="undo()">&#8617; Undo</button>
+<button class="ab" onclick="redo()">&#8618; Redo</button>
+<button class="ab dg" onclick="clearCanvas()">&#128465; Clear</button>
+</div>
+<div class="tr" style="margin-top:6px"><input type="checkbox" id="gridToggle" checked><label for="gridToggle">Show grid</label></div>
+</section>
+<section><h3>Export PNG</h3><div class="er">
+<select id="exportScale" aria-label="Export scale"><option value="1">1x</option><option value="2">2x</option><option value="4" selected>4x</option><option value="8">8x</option><option value="16">16x</option></select>
+<button onclick="exportPNG()">&#128190; Export</button>
+</div></section>
+</aside>
+<main class="cw"><canvas id="pixelCanvas"></canvas></main>
+</div>
+<div class="st"><span id="statusGrid">16x16</span><span id="statusPos">-</span><span id="statusTool">Brush</span></div>
+<!-- Pro Section -->
+<div class="pro-section" onclick="openProModal()">
+<div class="pro-blur">
+<h3>🚀 Pro: Layers, Animation & Sprites</h3>
+<div class="pro-mock-layers">
+<div class="pro-mock-layer active"><span class="eye">👁</span><span class="lname">Layer 3 — Details</span><span class="opacity">100%</span></div>
+<div class="pro-mock-layer"><span class="eye">👁</span><span class="lname">Layer 2 — Colors</span><span class="opacity">85%</span></div>
+<div class="pro-mock-layer"><span class="eye">👁</span><span class="lname">Layer 1 — Outline</span><span class="opacity">100%</span></div>
+</div>
+<h3>Animation Frames</h3>
+<div class="pro-mock-frames">
+<div class="pro-mock-frame active">F1</div>
+<div class="pro-mock-frame">F2</div>
+<div class="pro-mock-frame">F3</div>
+<div class="pro-mock-frame">F4</div>
+<div class="pro-mock-frame">F5</div>
+<div class="pro-mock-frame">F6</div>
+<div class="pro-mock-frame">+</div>
+</div>
+<div class="pro-mock-export">
+<div>🎞 Export GIF</div>
+<div>🖼 Sprite Sheet</div>
+<div>📦 Export All Layers</div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Unlock Pro Features</div>
+</div>
+</div>
+<!-- Pro Modal -->
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+<h2>🚀 Unlock Pro</h2>
+<p class="pro-price">One-time purchase · Lifetime access</p>
+<ul class="pro-features">
+<li><span class="pf-icon">📚</span> Layer system with opacity & visibility</li>
+<li><span class="pf-icon">🎬</span> Animation frames with onion skinning</li>
+<li><span class="pf-icon">🎞</span> Export animated GIF</li>
+<li><span class="pf-icon">🖼</span> Sprite sheet generation</li>
+<li><span class="pf-icon">♾️</span> Lifetime updates & priority support</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $14</a>
+<button class="pro-later-btn" onclick="closeProModal()">Maybe later</button>
+</div>
+</div>
+<script>function openProModal(){document.getElementById('proModal').classList.add('show')}function closeProModal(){document.getElementById('proModal').classList.remove('show')}</script>
+
+<script>
+const canvas=document.getElementById('pixelCanvas'),ctx=canvas.getContext('2d');
+let gridSize=16,cellSize=0,pixels=[],currentColor='#000000',currentTool='brush';
+let isDrawing=false,showGrid=true,undoStack=[],redoStack=[],maxUndo=50;
+const COLORS=['#000000','#ffffff','#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ff8800','#8800ff','#008888','#888888','#444444','#884400','#ff4444','#44ff44','#4444ff','#ffaa00','#aa00ff','#00aaaa'];
+const PRESETS=[8,16,24,32,48,64];
+
+function init(){
+  buildPalette();buildGridPresets();setGrid(16);
+  document.getElementById('colorPicker').addEventListener('input',e=>{setColor(e.target.value)});
+  document.querySelectorAll('[data-tool]').forEach(b=>{
+    b.addEventListener('click',()=>{currentTool=b.dataset.tool;
+      document.querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');document.getElementById('statusTool').textContent=b.title;
+    });
+  });
+  document.getElementById('gridToggle').addEventListener('change',e=>{showGrid=e.target.checked;render()});
+  canvas.addEventListener('mousedown',onDown);canvas.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+  canvas.addEventListener('touchstart',onTouchStart,{passive:false});
+  canvas.addEventListener('touchmove',onTouchMove,{passive:false});
+  canvas.addEventListener('touchend',onUp);
+  window.addEventListener('keydown',onKey);window.addEventListener('resize',resizeCanvas);
+}
+
+function buildPalette(){
+  const p=document.getElementById('palette');p.innerHTML='';
+  COLORS.forEach(c=>{
+    const d=document.createElement('div');d.className='sw'+(c===currentColor?' active':'');
+    d.style.background=c;d.addEventListener('click',()=>setColor(c));p.appendChild(d);
+  });
+}
+
+function buildGridPresets(){
+  const p=document.getElementById('gridPresets');p.innerHTML='';
+  PRESETS.forEach(s=>{
+    const b=document.createElement('button');b.textContent=s+'x'+s;
+    b.className=s===gridSize?'active':'';
+    b.addEventListener('click',()=>setGrid(s));p.appendChild(b);
+  });
+}
+
+function setColor(c){
+  currentColor=c;document.getElementById('colorPicker').value=c;
+  document.getElementById('curColor').style.background=c;
+  document.getElementById('colorHex').textContent=c;
+  document.querySelectorAll('.sw').forEach(s=>{s.classList.toggle('active',s.style.backgroundColor===hexToRgbStr(c))});
+}
+
+function hexToRgbStr(h){
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return'rgb('+r+', '+g+', '+b+')';
+}
+
+function setGrid(s){
+  s=Math.max(8,Math.min(64,s||16));gridSize=s;
+  pixels=Array.from({length:s},()=>Array(s).fill(null));
+  undoStack=[];redoStack=[];
+  document.getElementById('customSize').value=s;
+  document.getElementById('statusGrid').textContent=s+'x'+s;
+  document.querySelectorAll('.gp button').forEach(b=>{b.classList.toggle('active',b.textContent===s+'x'+s)});
+  resizeCanvas();
+}
+
+function resizeCanvas(){
+  const wrap=canvas.parentElement,maxW=wrap.clientWidth-32,maxH=wrap.clientHeight-32;
+  const maxDim=Math.min(maxW,maxH,600);
+  cellSize=Math.floor(maxDim/gridSize);
+  const size=cellSize*gridSize;
+  canvas.width=size;canvas.height=size;canvas.style.width=size+'px';canvas.style.height=size+'px';
+  render();
+}
+
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(let y=0;y<gridSize;y++)for(let x=0;x<gridSize;x++){
+    if(pixels[y][x]){ctx.fillStyle=pixels[y][x];ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);}
+  }
+  if(showGrid&&cellSize>3){
+    ctx.strokeStyle='rgba(0,0,0,0.15)';ctx.lineWidth=1;
+    for(let i=0;i<=gridSize;i++){
+      ctx.beginPath();ctx.moveTo(i*cellSize+0.5,0);ctx.lineTo(i*cellSize+0.5,canvas.height);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,i*cellSize+0.5);ctx.lineTo(canvas.width,i*cellSize+0.5);ctx.stroke();
+    }
+  }
+}
+
+function getCell(e){
+  const r=canvas.getBoundingClientRect();
+  const x=Math.floor((e.clientX-r.left)/cellSize),y=Math.floor((e.clientY-r.top)/cellSize);
+  return(x>=0&&x<gridSize&&y>=0&&y<gridSize)?{x,y}:null;
+}
+
+function saveState(){
+  undoStack.push(pixels.map(r=>[...r]));
+  if(undoStack.length>maxUndo)undoStack.shift();
+  redoStack=[];
+}
+
+function paintCell(x,y){
+  if(currentTool==='brush'){pixels[y][x]=currentColor;render();}
+  else if(currentTool==='eraser'){pixels[y][x]=null;render();}
+}
+
+function onDown(e){
+  e.preventDefault();const c=getCell(e);if(!c)return;
+  if(currentTool==='fill'){saveState();floodFill(c.x,c.y,pixels[c.y][c.x],currentColor);render();return;}
+  if(currentTool==='picker'){if(pixels[c.y][c.x])setColor(pixels[c.y][c.x]);return;}
+  isDrawing=true;saveState();paintCell(c.x,c.y);
+}
+
+function onMove(e){
+  const c=getCell(e);
+  if(c)document.getElementById('statusPos').textContent=c.x+','+c.y;
+  if(!isDrawing||!c)return;paintCell(c.x,c.y);
+}
+
+function onUp(){isDrawing=false;}
+
+function onTouchStart(e){
+  e.preventDefault();const t=e.touches[0];
+  onDown({clientX:t.clientX,clientY:t.clientY,preventDefault:()=>{}});
+}
+
+function onTouchMove(e){
+  e.preventDefault();const t=e.touches[0];
+  onMove({clientX:t.clientX,clientY:t.clientY});
+}
+
+function floodFill(sx,sy,target,fill){
+  if(target===fill)return;
+  const stack=[[sx,sy]];const visited=new Set();
+  while(stack.length){
+    const[x,y]=stack.pop();const key=x+','+y;
+    if(visited.has(key)||x<0||x>=gridSize||y<0||y>=gridSize)continue;
+    if(pixels[y][x]!==target)continue;
+    visited.add(key);pixels[y][x]=fill;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+}
+
+function undo(){
+  if(!undoStack.length)return;
+  redoStack.push(pixels.map(r=>[...r]));
+  pixels=undoStack.pop();render();
+}
+
+function redo(){
+  if(!redoStack.length)return;
+  undoStack.push(pixels.map(r=>[...r]));
+  pixels=redoStack.pop();render();
+}
+
+function clearCanvas(){
+  if(!pixels.some(r=>r.some(c=>c)))return;
+  saveState();pixels=Array.from({length:gridSize},()=>Array(gridSize).fill(null));render();
+}
+
+function onKey(e){
+  if(e.key==='z'&&(e.ctrlKey||e.metaKey)&&!e.shiftKey){e.preventDefault();undo();}
+  if(e.key==='z'&&(e.ctrlKey||e.metaKey)&&e.shiftKey){e.preventDefault();redo();}
+  if(e.key==='Z'&&(e.ctrlKey||e.metaKey)){e.preventDefault();redo();}
+}
+
+function exportPNG(){
+  const scale=parseInt(document.getElementById('exportScale').value)||1;
+  const c=document.createElement('canvas');c.width=gridSize*scale;c.height=gridSize*scale;
+  const cx=c.getContext('2d');
+  cx.fillStyle='#ffffff';cx.fillRect(0,0,c.width,c.height);
+  for(let y=0;y<gridSize;y++)for(let x=0;x<gridSize;x++){
+    if(pixels[y][x]){cx.fillStyle=pixels[y][x];cx.fillRect(x*scale,y*scale,scale,scale);}
+  }
+  const a=document.createElement('a');a.download='pixel-art-'+gridSize+'x'+gridSize+'.png';
+  a.href=c.toDataURL('image/png');a.click();
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

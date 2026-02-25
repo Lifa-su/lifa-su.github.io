@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Color Name Finder</title>
+<meta name="description" content="Find the closest CSS named color for any HEX or RGB value. Browse all 148 CSS named colors.">
+<link rel="canonical" href="https://lifa-su.com/ai-color-name/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:2rem;margin:20px 0 8px;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:0.95rem}
+.search-section{background:#16213e;border-radius:16px;padding:24px;margin-bottom:30px;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.input-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.input-group{flex:1;min-width:200px}
+.input-group label{display:block;font-size:0.85rem;color:#aaa;margin-bottom:6px}
+.input-group input{width:100%;padding:12px 16px;border:2px solid #2a2a4a;border-radius:10px;background:#1a1a2e;color:#fff;font-size:1rem;outline:none;transition:border-color 0.3s}
+.input-group input:focus{border-color:#e94560}
+.btn{padding:12px 24px;border:none;border-radius:10px;background:linear-gradient(135deg,#e94560,#c23152);color:#fff;font-size:1rem;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(233,69,96,0.4)}
+.btn:active{transform:translateY(0)}
+.result-card{margin-top:20px;display:none;background:#1a1a2e;border-radius:12px;padding:20px;border:1px solid #2a2a4a}
+.result-card.show{display:block}
+.result-colors{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.color-preview{width:100px;height:100px;border-radius:12px;border:2px solid #2a2a4a;flex-shrink:0}
+.color-info h3{font-size:1.2rem;margin-bottom:4px}
+.color-info p{color:#aaa;font-size:0.9rem}
+.color-info .hex-val{color:#e94560;font-family:monospace;font-size:1.1rem}
+.arrow-between{font-size:1.5rem;color:#555;flex-shrink:0}
+.distance-badge{display:inline-block;background:#0f3460;color:#e0e0e0;padding:4px 12px;border-radius:20px;font-size:0.8rem;margin-top:6px}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-row input{flex:1;min-width:200px;padding:10px 16px;border:2px solid #2a2a4a;border-radius:10px;background:#16213e;color:#fff;font-size:0.95rem;outline:none}
+.filter-row input:focus{border-color:#e94560}
+.filter-btn{padding:8px 16px;border:1px solid #2a2a4a;border-radius:20px;background:transparent;color:#aaa;font-size:0.85rem;cursor:pointer;transition:all 0.3s}
+.filter-btn:hover,.filter-btn.active{background:#e94560;color:#fff;border-color:#e94560}
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.color-card{background:#16213e;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;border:1px solid transparent}
+.color-card:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.3);border-color:#e94560}
+.color-card .swatch{height:90px;position:relative}
+.color-card .swatch .copied{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);color:#fff;font-weight:bold;font-size:0.95rem;opacity:0;transition:opacity 0.3s}
+.color-card .swatch .copied.show{opacity:1}
+.color-card .info{padding:10px 12px}
+.color-card .info .name{font-size:0.85rem;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.color-card .info .hex{font-family:monospace;font-size:0.8rem;color:#aaa}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#e94560;color:#fff;padding:12px 24px;border-radius:10px;font-size:0.9rem;transition:transform 0.3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.section-title{font-size:1.3rem;margin-bottom:16px;color:#ccc}
+.count-badge{font-size:0.85rem;color:#888;margin-left:8px}
+@media(max-width:600px){
+  h1{font-size:1.5rem}
+  .input-row{flex-direction:column}
+  .input-group{min-width:100%}
+  .color-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .result-colors{flex-direction:column;align-items:flex-start}
+  .arrow-between{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎨 CSS Color Name Finder</h1>
+  <p class="subtitle">Find the closest CSS named color for any HEX or RGB value</p>
+
+  <div class="search-section">
+    <div class="input-row">
+      <div class="input-group">
+        <label>HEX Color</label>
+        <input type="text" id="hexInput" placeholder="#ff6347 or ff6347" maxlength="7">
+      </div>
+      <div class="input-group">
+        <label>RGB Color</label>
+        <input type="text" id="rgbInput" placeholder="rgb(255, 99, 71) or 255,99,71">
+      </div>
+      <button class="btn" onclick="findClosest()">Find Closest</button>
+    </div>
+    <div class="result-card" id="resultCard">
+      <div class="result-colors">
+        <div>
+          <div class="color-preview" id="inputPreview"></div>
+          <div class="color-info">
+            <p>Your Color</p>
+            <p class="hex-val" id="inputHex"></p>
+          </div>
+        </div>
+        <div class="arrow-between">→</div>
+        <div>
+          <div class="color-preview" id="matchPreview" style="cursor:pointer" onclick="copyHex(this.dataset.hex)"></div>
+          <div class="color-info">
+            <h3 id="matchName"></h3>
+            <p class="hex-val" id="matchHex"></p>
+            <span class="distance-badge" id="matchDist"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">All CSS Named Colors <span class="count-badge" id="countBadge">148 colors</span></h2>
+  <div class="filter-row">
+    <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterColors()">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter(this)">All</button>
+    <button class="filter-btn" data-filter="red" onclick="setFilter(this)">Red</button>
+    <button class="filter-btn" data-filter="orange" onclick="setFilter(this)">Orange</button>
+    <button class="filter-btn" data-filter="yellow" onclick="setFilter(this)">Yellow</button>
+    <button class="filter-btn" data-filter="green" onclick="setFilter(this)">Green</button>
+    <button class="filter-btn" data-filter="blue" onclick="setFilter(this)">Blue</button>
+    <button class="filter-btn" data-filter="purple" onclick="setFilter(this)">Purple</button>
+    <button class="filter-btn" data-filter="pink" onclick="setFilter(this)">Pink</button>
+    <button class="filter-btn" data-filter="brown" onclick="setFilter(this)">Brown</button>
+    <button class="filter-btn" data-filter="white" onclick="setFilter(this)">White</button>
+    <button class="filter-btn" data-filter="gray" onclick="setFilter(this)">Gray</button>
+  </div>
+  <div class="color-grid" id="colorGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CSS_COLORS = [
+  ["AliceBlue","#F0F8FF"],["AntiqueWhite","#FAEBD7"],["Aqua","#00FFFF"],["Aquamarine","#7FFFD4"],
+  ["Azure","#F0FFFF"],["Beige","#F5F5DC"],["Bisque","#FFE4C4"],["Black","#000000"],
+  ["BlanchedAlmond","#FFEBCD"],["Blue","#0000FF"],["BlueViolet","#8A2BE2"],["Brown","#A52A2A"],
+  ["BurlyWood","#DEB887"],["CadetBlue","#5F9EA0"],["Chartreuse","#7FFF00"],["Chocolate","#D2691E"],
+  ["Coral","#FF7F50"],["CornflowerBlue","#6495ED"],["Cornsilk","#FFF8DC"],["Crimson","#DC143C"],
+  ["Cyan","#00FFFF"],["DarkBlue","#00008B"],["DarkCyan","#008B8B"],["DarkGoldenRod","#B8860B"],
+  ["DarkGray","#A9A9A9"],["DarkGreen","#006400"],["DarkKhaki","#BDB76B"],["DarkMagenta","#8B008B"],
+  ["DarkOliveGreen","#556B2F"],["DarkOrange","#FF8C00"],["DarkOrchid","#9932CC"],["DarkRed","#8B0000"],
+  ["DarkSalmon","#E9967A"],["DarkSeaGreen","#8FBC8F"],["DarkSlateBlue","#483D8B"],["DarkSlateGray","#2F4F4F"],
+  ["DarkTurquoise","#00CED1"],["DarkViolet","#9400D3"],["DeepPink","#FF1493"],["DeepSkyBlue","#00BFFF"],
+  ["DimGray","#696969"],["DodgerBlue","#1E90FF"],["FireBrick","#B22222"],["FloralWhite","#FFFAF0"],
+  ["ForestGreen","#228B22"],["Fuchsia","#FF00FF"],["Gainsboro","#DCDCDC"],["GhostWhite","#F8F8FF"],
+  ["Gold","#FFD700"],["GoldenRod","#DAA520"],["Gray","#808080"],["Green","#008000"],
+  ["GreenYellow","#ADFF2F"],["HoneyDew","#F0FFF0"],["HotPink","#FF69B4"],["IndianRed","#CD5C5C"],
+  ["Indigo","#4B0082"],["Ivory","#FFFFF0"],["Khaki","#F0E68C"],["Lavender","#E6E6FA"],
+  ["LavenderBlush","#FFF0F5"],["LawnGreen","#7CFC00"],["LemonChiffon","#FFFACD"],["LightBlue","#ADD8E6"],
+  ["LightCoral","#F08080"],["LightCyan","#E0FFFF"],["LightGoldenRodYellow","#FAFAD2"],["LightGray","#D3D3D3"],
+  ["LightGreen","#90EE90"],["LightPink","#FFB6C1"],["LightSalmon","#FFA07A"],["LightSeaGreen","#20B2AA"],
+  ["LightSkyBlue","#87CEFA"],["LightSlateGray","#778899"],["LightSteelBlue","#B0C4DE"],["LightYellow","#FFFFE0"],
+  ["Lime","#00FF00"],["LimeGreen","#32CD32"],["Linen","#FAF0E6"],["Magenta","#FF00FF"],
+  ["Maroon","#800000"],["MediumAquaMarine","#66CDAA"],["MediumBlue","#0000CD"],["MediumOrchid","#BA55D3"],
+  ["MediumPurple","#9370DB"],["MediumSeaGreen","#3CB371"],["MediumSlateBlue","#7B68EE"],["MediumSpringGreen","#00FA9A"],
+  ["MediumTurquoise","#48D1CC"],["MediumVioletRed","#C71585"],["MidnightBlue","#191970"],["MintCream","#F5FFFA"],
+  ["MistyRose","#FFE4E1"],["Moccasin","#FFE4B5"],["NavajoWhite","#FFDEAD"],["Navy","#000080"],
+  ["OldLace","#FDF5E6"],["Olive","#808000"],["OliveDrab","#6B8E23"],["Orange","#FFA500"],
+  ["OrangeRed","#FF4500"],["Orchid","#DA70D6"],["PaleGoldenRod","#EEE8AA"],["PaleGreen","#98FB98"],
+  ["PaleTurquoise","#AFEEEE"],["PaleVioletRed","#DB7093"],["PapayaWhip","#FFEFD5"],["PeachPuff","#FFDAB9"],
+  ["Peru","#CD853F"],["Pink","#FFC0CB"],["Plum","#DDA0DD"],["PowderBlue","#B0E0E6"],
+  ["Purple","#800080"],["RebeccaPurple","#663399"],["Red","#FF0000"],["RosyBrown","#BC8F8F"],
+  ["RoyalBlue","#4169E1"],["SaddleBrown","#8B4513"],["Salmon","#FA8072"],["SandyBrown","#F4A460"],
+  ["SeaGreen","#2E8B57"],["SeaShell","#FFF5EE"],["Sienna","#A0522D"],["Silver","#C0C0C0"],
+  ["SkyBlue","#87CEEB"],["SlateBlue","#6A5ACD"],["SlateGray","#708090"],["Snow","#FFFAFA"],
+  ["SpringGreen","#00FF7F"],["SteelBlue","#4682B4"],["Tan","#D2B48C"],["Teal","#008080"],
+  ["Thistle","#D8BFD8"],["Tomato","#FF6347"],["Turquoise","#40E0D0"],["Violet","#EE82EE"],
+  ["Wheat","#F5DEB3"],["White","#FFFFFF"],["WhiteSmoke","#F5F5F5"],["Yellow","#FFFF00"],
+  ["YellowGreen","#9ACD32"]
+];
+
+const COLOR_FAMILIES = {
+  red:["Red","DarkRed","FireBrick","Crimson","IndianRed","LightCoral","Salmon","DarkSalmon","LightSalmon","OrangeRed","Tomato","Coral"],
+  orange:["Orange","DarkOrange","OrangeRed","Coral","Tomato","SandyBrown","Peru","Chocolate","Sienna","SaddleBrown"],
+  yellow:["Yellow","Gold","LightYellow","LemonChiffon","LightGoldenRodYellow","PapayaWhip","Moccasin","PeachPuff","PaleGoldenRod","Khaki","DarkKhaki","GoldenRod","DarkGoldenRod","Cornsilk","BlanchedAlmond","Bisque","NavajoWhite","Wheat"],
+  green:["Green","DarkGreen","ForestGreen","Lime","LimeGreen","LawnGreen","Chartreuse","GreenYellow","SpringGreen","MediumSpringGreen","MediumAquaMarine","MediumSeaGreen","SeaGreen","DarkSeaGreen","LightGreen","PaleGreen","DarkOliveGreen","OliveDrab","Olive","YellowGreen","Teal","DarkCyan"],
+  blue:["Blue","DarkBlue","MediumBlue","Navy","MidnightBlue","RoyalBlue","DodgerBlue","DeepSkyBlue","CornflowerBlue","SteelBlue","LightSteelBlue","LightBlue","SkyBlue","LightSkyBlue","PowderBlue","CadetBlue","DarkTurquoise","MediumTurquoise","Turquoise","PaleTurquoise","LightSeaGreen","Aqua","Cyan","DarkCyan","LightCyan","Aquamarine","Teal"],
+  purple:["Purple","RebeccaPurple","Indigo","DarkMagenta","DarkViolet","DarkOrchid","MediumOrchid","MediumPurple","BlueViolet","DarkSlateBlue","SlateBlue","MediumSlateBlue","Orchid","Plum","Violet","Magenta","Fuchsia","MediumVioletRed"],
+  pink:["Pink","LightPink","HotPink","DeepPink","PaleVioletRed","MediumVioletRed","LavenderBlush","MistyRose"],
+  brown:["Brown","SaddleBrown","Sienna","Chocolate","Peru","DarkGoldenRod","GoldenRod","RosyBrown","SandyBrown","Tan","BurlyWood","Maroon","DarkRed"],
+  white:["White","Snow","HoneyDew","MintCream","Azure","AliceBlue","GhostWhite","WhiteSmoke","SeaShell","Beige","OldLace","FloralWhite","Ivory","AntiqueWhite","Linen","LavenderBlush","MistyRose","Cornsilk"],
+  gray:["Gray","DimGray","DarkSlateGray","SlateGray","LightSlateGray","LightGray","Silver","DarkGray","Gainsboro","Black"]
+};
+
+let currentFilter = "all";
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const n = parseInt(hex, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function colorDistance(r1, g1, b1, r2, g2, b2) {
+  return Math.sqrt((r1-r2)**2 + (g1-g2)**2 + (b1-b2)**2);
+}
+
+function parseInput() {
+  const hexVal = document.getElementById('hexInput').value.trim();
+  const rgbVal = document.getElementById('rgbInput').value.trim();
+  if (hexVal) {
+    const h = hexVal.replace(/^#/, '');
+    if (/^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(h)) {
+      return hexToRgb(h);
+    }
+  }
+  if (rgbVal) {
+    const m = rgbVal.match(/(\d{1,3})\s*[,\s]\s*(\d{1,3})\s*[,\s]\s*(\d{1,3})/);
+    if (m) return [parseInt(m[1]), parseInt(m[2]), parseInt(m[3])];
+  }
+  return null;
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function findClosest() {
+  const rgb = parseInput();
+  if (!rgb) { showToast('Please enter a valid HEX or RGB color'); return; }
+  const [r, g, b] = rgb;
+  let minDist = Infinity, closest = null;
+  for (const [name, hex] of CSS_COLORS) {
+    const [r2, g2, b2] = hexToRgb(hex);
+    const d = colorDistance(r, g, b, r2, g2, b2);
+    if (d < minDist) { minDist = d; closest = [name, hex]; }
+  }
+  const inputHex = rgbToHex(r, g, b);
+  document.getElementById('inputPreview').style.background = inputHex;
+  document.getElementById('inputHex').textContent = inputHex;
+  document.getElementById('matchPreview').style.background = closest[1];
+  document.getElementById('matchPreview').dataset.hex = closest[1];
+  document.getElementById('matchName').textContent = closest[0];
+  document.getElementById('matchHex').textContent = closest[1];
+  document.getElementById('matchDist').textContent = minDist === 0 ? 'Exact match!' : `Distance: ${minDist.toFixed(1)}`;
+  document.getElementById('resultCard').classList.add('show');
+}
+
+function renderGrid(colors) {
+  const grid = document.getElementById('colorGrid');
+  grid.innerHTML = '';
+  colors.forEach(([name, hex]) => {
+    const card = document.createElement('div');
+    card.className = 'color-card';
+    card.onclick = () => copyHex(hex);
+    card.innerHTML = `<div class="swatch" style="background:${hex}"><div class="copied">Copied!</div></div><div class="info"><div class="name" title="${name}">${name}</div><div class="hex">${hex}</div></div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('countBadge').textContent = colors.length + ' color' + (colors.length !== 1 ? 's' : '');
+}
+
+function filterColors() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = CSS_COLORS;
+  if (currentFilter !== 'all') {
+    const family = COLOR_FAMILIES[currentFilter] || [];
+    filtered = filtered.filter(([name]) => family.includes(name));
+  }
+  if (q) filtered = filtered.filter(([name]) => name.toLowerCase().includes(q));
+  renderGrid(filtered);
+}
+
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  filterColors();
+}
+
+function copyHex(hex) {
+  navigator.clipboard.writeText(hex).then(() => showToast('Copied ' + hex));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('hexInput').addEventListener('keydown', e => { if (e.key === 'Enter') findClosest(); });
+document.getElementById('rgbInput').addEventListener('keydown', e => { if (e.key === 'Enter') findClosest(); });
+
+renderGrid(CSS_COLORS);
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1200px;margin:40px auto 0;padding:0 20px;position:relative;cursor:pointer}
+.pro-section .pro-title{font-size:1.2rem;font-weight:700;color:#e94560;margin-bottom:16px;text-align:center}
+.pro-mock{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px;background:#16213e;border-radius:16px;filter:blur(4px);pointer-events:none;user-select:none}
+.pro-mock-card{background:#0f3460;border-radius:12px;padding:20px;text-align:center}
+.pro-mock-card .icon{font-size:2rem;margin-bottom:8px}
+.pro-mock-card h3{font-size:.9rem;color:#e0e0e0;margin-bottom:6px}
+.pro-mock-card p{font-size:.75rem;color:#888}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.pro-lock .lock-icon{font-size:3rem;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(233,69,96,.4))}
+.pro-lock .lock-text{font-size:1.1rem;font-weight:600;color:#fff;background:rgba(233,69,96,.85);padding:8px 24px;border-radius:20px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:#16213e;border-radius:20px;padding:36px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:2rem;font-weight:800;color:#e94560;margin:12px 0}
+.pro-modal .price span{font-size:.9rem;font-weight:400;color:#888}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#c23152);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-bottom:12px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;padding:8px}
+.pro-modal .btn-later:hover{color:#ccc}
+@media(max-width:600px){.pro-mock{grid-template-columns:1fr}}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+  <div class="pro-title">⚡ Pro Features</div>
+  <div class="pro-mock">
+    <div class="pro-mock-card"><div class="icon">🏢</div><h3>Brand Color Library</h3><p>500+ brand colors from top companies</p></div>
+    <div class="pro-mock-card"><div class="icon">🎨</div><h3>Palette Export</h3><p>Export palettes as ASE, JSON, CSS variables</p></div>
+    <div class="pro-mock-card"><div class="icon">🔌</div><h3>Figma Plugin</h3><p>Sync named colors directly to Figma</p></div>
+  </div>
+  <div class="pro-lock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-text">Unlock Pro Features</div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="pro-modal">
+    <h2>Color Name Pro</h2>
+    <div class="price">$9 <span>one-time</span></div>
+    <ul>
+      <li>500+ brand color library (Google, Apple, Spotify…)</li>
+      <li>Export palettes as ASE, JSON, CSS variables</li>
+      <li>Figma plugin for color sync</li>
+      <li>Color harmony suggestions</li>
+      <li>Lifetime updates</li>
+    </ul>
+    <a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+    <button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+  </div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Pointer Events 交互式演示工具</title>
+<meta name="description" content="Interactive CSS pointer-events demo tool - explore all pointer-events values with live examples">
+<link rel="canonical" href="https://lifa-su.com/ai-css-pointer-events/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--success:#00d2ff;--border:#2a2a4a}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:var(--success);text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header{background:linear-gradient(135deg,var(--surface),var(--accent2));padding:40px 0;text-align:center;position:relative;overflow:hidden}
+header::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(233,69,96,0.1) 0%,transparent 50%);animation:pulse 4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+header h1{font-size:2.5em;margin-bottom:10px;background:linear-gradient(90deg,#fff,var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:1.1em;max-width:600px;margin:0 auto}
+
+/* Navigation */
+nav{background:var(--surface);padding:15px 0;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
+nav .container{display:flex;gap:10px;overflow-x:auto;padding-bottom:5px}
+nav a{padding:8px 16px;border-radius:20px;background:var(--surface2);color:var(--text);white-space:nowrap;transition:all .3s;font-size:.9em}
+nav a:hover,nav a.active{background:var(--accent);text-decoration:none;transform:translateY(-2px)}
+
+/* Sections */
+section{padding:40px 0;border-bottom:1px solid var(--border)}
+section h2{font-size:1.8em;margin-bottom:20px;color:var(--success);display:flex;align-items:center;gap:10px}
+section h2 .icon{font-size:1.2em}
+.section-desc{color:var(--text2);margin-bottom:30px;font-size:1.05em}
+
+/* Value Cards */
+.values-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.value-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .3s;position:relative;overflow:hidden}
+.value-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 30px rgba(233,69,96,0.2)}
+.value-card h3{color:var(--accent);font-size:1.2em;margin-bottom:8px;font-family:monospace}
+.value-card .applies{font-size:.8em;color:var(--accent2);background:rgba(83,52,131,0.3);padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.value-card p{color:var(--text2);font-size:.95em;margin-bottom:12px}
+.value-card .use-case{background:rgba(0,210,255,0.1);border-left:3px solid var(--success);padding:8px 12px;border-radius:0 8px 8px 0;font-size:.85em;color:var(--success)}
+
+/* Demo Areas */
+.demo-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:25px;margin-bottom:25px}
+.demo-box h3{margin-bottom:15px;color:var(--text);font-size:1.2em}
+.demo-area{position:relative;min-height:200px;border:2px dashed var(--border);border-radius:8px;overflow:hidden;margin-bottom:15px}
+
+/* Click Through Demo */
+.click-through-demo{position:relative;height:250px;display:flex;align-items:center;justify-content:center}
+.bottom-layer{width:200px;height:60px;background:linear-gradient(135deg,#00d2ff,#3a7bd5);border:none;border-radius:12px;color:#fff;font-size:1.1em;cursor:pointer;transition:all .3s;font-weight:bold}
+.bottom-layer:hover{transform:scale(1.05);box-shadow:0 5px 20px rgba(0,210,255,0.4)}
+.bottom-layer:active{transform:scale(0.95)}
+.overlay-layer{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(233,69,96,0.15);display:flex;align-items:center;justify-content:center;font-size:1.1em;color:var(--accent);border-radius:8px;transition:pointer-events .3s}
+.overlay-layer.pass-through{pointer-events:none}
+.overlay-layer.pass-through::after{content:' ✓ pointer-events: none';color:var(--success)}
+.overlay-layer.blocking::after{content:' ✗ pointer-events: auto';color:var(--accent)}
+
+/* Toggle Switch */
+.toggle-container{display:flex;align-items:center;gap:12px;margin-bottom:15px}
+.toggle{position:relative;width:56px;height:28px;background:var(--surface2);border-radius:14px;cursor:pointer;transition:all .3s;border:2px solid var(--border)}
+.toggle.active{background:var(--accent);border-color:var(--accent)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:all .3s}
+.toggle.active::after{left:30px}
+.toggle-label{font-size:.95em;color:var(--text2)}
+
+/* Hover Demo */
+.hover-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:15px}
+.hover-item{padding:20px;background:var(--surface2);border-radius:10px;text-align:center;transition:all .3s;cursor:pointer;border:2px solid transparent;position:relative}
+.hover-item:hover{border-color:var(--accent);background:rgba(233,69,96,0.1)}
+.hover-item.pe-none{pointer-events:none;opacity:0.6}
+.hover-item .pe-val{font-family:monospace;color:var(--success);font-size:.9em;margin-top:8px}
+.hover-item .status{font-size:.8em;color:var(--text2);margin-top:5px}
+
+/* SVG Demo */
+.svg-demo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.svg-demo-item{background:var(--surface2);border-radius:10px;padding:20px;text-align:center}
+.svg-demo-item h4{margin-bottom:10px;font-family:monospace;color:var(--success);font-size:.95em}
+.svg-demo-item svg{width:200px;height:150px;margin:10px auto;display:block}
+.svg-demo-item svg *{transition:all .3s}
+.svg-demo-item p{font-size:.85em;color:var(--text2);margin-top:10px}
+
+/* Stacking Demo */
+.stack-demo{position:relative;height:300px;display:flex;align-items:center;justify-content:center}
+.stack-layer{position:absolute;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;transition:all .3s;font-size:.9em}
+.stack-layer:hover{transform:scale(1.02)}
+.stack-layer.l1{width:280px;height:200px;background:rgba(0,210,255,0.3);border:2px solid rgba(0,210,255,0.5);z-index:1}
+.stack-layer.l2{width:220px;height:160px;background:rgba(83,52,131,0.4);border:2px solid rgba(83,52,131,0.6);z-index:2}
+.stack-layer.l3{width:160px;height:120px;background:rgba(233,69,96,0.4);border:2px solid rgba(233,69,96,0.6);z-index:3}
+
+/* Code Block */
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:15px;font-family:'Fira Code',monospace;font-size:.9em;color:#c9d1d9;position:relative;overflow-x:auto;margin:15px 0}
+.code-block .copy-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.8em;transition:all .3s}
+.code-block .copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.code-block .copy-btn.copied{background:var(--success);color:#000;border-color:var(--success)}
+.code-block pre{margin:0;white-space:pre-wrap;word-break:break-all}
+.code-block .kw{color:#ff7b72}
+.code-block .prop{color:#79c0ff}
+.code-block .val{color:#a5d6ff}
+.code-block .sel{color:#7ee787}
+.code-block .cmt{color:#8b949e}
+
+/* Event Log */
+.event-log-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:20px}
+.event-log-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.event-log-header h3{font-size:1em;display:flex;align-items:center;gap:8px}
+.event-log-header .dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.event-log-header button{background:var(--accent);border:none;color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.8em}
+.event-log-body{height:200px;overflow-y:auto;padding:10px;font-family:monospace;font-size:.85em}
+.event-log-body::-webkit-scrollbar{width:6px}
+.event-log-body::-webkit-scrollbar-track{background:var(--surface)}
+.event-log-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.log-entry{padding:4px 8px;border-radius:4px;margin-bottom:2px;display:flex;gap:10px;align-items:center}
+.log-entry:hover{background:rgba(255,255,255,0.05)}
+.log-entry .time{color:var(--text2);min-width:80px}
+.log-entry .event-type{padding:2px 8px;border-radius:4px;font-size:.85em;min-width:80px;text-align:center}
+.log-entry .event-type.click{background:rgba(233,69,96,0.2);color:var(--accent)}
+.log-entry .event-type.hover{background:rgba(0,210,255,0.2);color:var(--success)}
+.log-entry .event-type.move{background:rgba(83,52,131,0.2);color:#b388ff}
+.log-entry .event-type.leave{background:rgba(255,183,77,0.2);color:#ffb74d}
+.log-entry .target{color:var(--text2)}
+
+/* Code Generator */
+.generator{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:25px;margin-top:20px}
+.generator h3{margin-bottom:15px}
+.gen-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.gen-controls select,.gen-controls input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 15px;border-radius:8px;font-size:.95em}
+.gen-controls select{cursor:pointer;min-width:200px}
+.gen-controls select:focus,.gen-controls input:focus{outline:none;border-color:var(--accent)}
+.gen-output{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:15px;font-family:monospace;font-size:.9em;color:#c9d1d9;position:relative;min-height:80px}
+.gen-output .copy-btn{position:absolute;top:8px;right:8px}
+
+/* Footer */
+footer{padding:30px 0;text-align:center;color:var(--text2);font-size:.9em;border-top:1px solid var(--border)}
+footer a{color:var(--success)}
+
+/* Responsive */
+@media(max-width:768px){
+header h1{font-size:1.8em}
+header p{font-size:.95em}
+nav .container{gap:6px}
+nav a{padding:6px 12px;font-size:.8em}
+.values-grid{grid-template-columns:1fr}
+.hover-grid{grid-template-columns:repeat(2,1fr)}
+.svg-demo-grid{grid-template-columns:1fr}
+section{padding:25px 0}
+.stack-demo{height:250px}
+.stack-layer.l1{width:240px;height:170px}
+.stack-layer.l2{width:180px;height:130px}
+.stack-layer.l3{width:120px;height:90px;font-size:.8em}
+.gen-controls{flex-direction:column}
+.gen-controls select{min-width:100%}
+}
+@media(max-width:480px){
+header{padding:25px 0}
+header h1{font-size:1.4em}
+.hover-grid{grid-template-columns:1fr}
+.demo-box{padding:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+<div class="container">
+<h1>🖱️ CSS Pointer Events 演示工具</h1>
+<p>交互式探索所有 pointer-events 属性值，理解事件穿透、SVG 特有行为与实际应用场景</p>
+</div>
+</header>
+
+<!-- Navigation -->
+<nav>
+<div class="container">
+<a href="#values" class="active">📋 属性值总览</a>
+<a href="#click-through">👆 点击穿透</a>
+<a href="#hover-demo">🎯 悬停效果</a>
+<a href="#svg-demo">🔷 SVG 演示</a>
+<a href="#layers">📚 叠层传递</a>
+<a href="#code-gen">💻 代码生成</a>
+<a href="#event-log">📊 事件日志</a>
+</div>
+</nav>
+
+<!-- Section 1: All Values Overview -->
+<section id="values">
+<div class="container">
+<h2><span class="icon">📋</span> Pointer Events 属性值总览</h2>
+<p class="section-desc">pointer-events 属性定义元素在何种情况下可以成为鼠标事件的目标。以下是所有可用值：</p>
+<div class="values-grid">
+
+<div class="value-card">
+<h3>auto</h3>
+<span class="applies">HTML + SVG</span>
+<p>默认值。元素正常响应鼠标事件，行为由浏览器决定。</p>
+<div class="use-case">💡 默认行为，无需特别设置</div>
+</div>
+
+<div class="value-card">
+<h3>none</h3>
+<span class="applies">HTML + SVG</span>
+<p>元素永远不会成为鼠标事件的目标。事件会"穿透"到下层元素。</p>
+<div class="use-case">💡 加载遮罩、装饰性覆盖层、禁用交互</div>
+</div>
+
+<div class="value-card">
+<h3>visiblePainted</h3>
+<span class="applies">仅 SVG</span>
+<p>SVG 默认值。仅当 visibility 为 visible 且鼠标在填充区域（fill 非 none）或描边区域（stroke 非 none）上时响应。</p>
+<div class="use-case">💡 SVG 图形的默认交互行为</div>
+</div>
+
+<div class="value-card">
+<h3>visibleFill</h3>
+<span class="applies">仅 SVG</span>
+<p>仅当 visibility 为 visible 且鼠标在填充区域上时响应，不管 fill 是否设置。</p>
+<div class="use-case">💡 只需要填充区域可点击的 SVG</div>
+</div>
+
+<div class="value-card">
+<h3>visibleStroke</h3>
+<span class="applies">仅 SVG</span>
+<p>仅当 visibility 为 visible 且鼠标在描边区域上时响应，不管 stroke 是否设置。</p>
+<div class="use-case">💡 只需要描边可点击的 SVG 路径</div>
+</div>
+
+<div class="value-card">
+<h3>visible</h3>
+<span class="applies">仅 SVG</span>
+<p>仅当 visibility 为 visible 时响应，不管 fill 和 stroke 的值。</p>
+<div class="use-case">💡 可见即可交互的 SVG 元素</div>
+</div>
+
+<div class="value-card">
+<h3>painted</h3>
+<span class="applies">仅 SVG</span>
+<p>鼠标在填充区域（fill 非 none）或描边区域（stroke 非 none）上时响应，不管 visibility。</p>
+<div class="use-case">💡 不考虑可见性的绘制区域交互</div>
+</div>
+
+<div class="value-card">
+<h3>fill</h3>
+<span class="applies">仅 SVG</span>
+<p>鼠标在填充区域上时响应，不管 fill 和 visibility 的值。</p>
+<div class="use-case">💡 填充区域始终可交互</div>
+</div>
+
+<div class="value-card">
+<h3>stroke</h3>
+<span class="applies">仅 SVG</span>
+<p>鼠标在描边区域上时响应，不管 stroke 和 visibility 的值。</p>
+<div class="use-case">💡 描边区域始终可交互</div>
+</div>
+
+<div class="value-card">
+<h3>all</h3>
+<span class="applies">仅 SVG</span>
+<p>只要鼠标在填充或描边区域上就响应，不管 fill、stroke、visibility。</p>
+<div class="use-case">💡 SVG 元素始终可交互</div>
+</div>
+
+<div class="value-card">
+<h3>inherit</h3>
+<span class="applies">HTML + SVG</span>
+<p>继承父元素的 pointer-events 值。</p>
+<div class="use-case">💡 子元素跟随父元素的交互策略</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Section 2: Click Through Demo -->
+<section id="click-through">
+<div class="container">
+<h2><span class="icon">👆</span> 点击穿透演示</h2>
+<p class="section-desc">当上层元素设置 pointer-events: none 时，鼠标事件会穿透到下层元素。切换开关体验差异。</p>
+
+<div class="demo-box">
+<h3>🔄 点击穿透开关</h3>
+<div class="toggle-container">
+<div class="toggle active" id="clickToggle" onclick="toggleClickThrough()"></div>
+<span class="toggle-label" id="clickToggleLabel">pointer-events: none（事件穿透 ✓）</span>
+</div>
+<div class="demo-area">
+<div class="click-through-demo">
+<button class="bottom-layer" id="bottomBtn" onclick="handleBottomClick()">点击我！🎉</button>
+<div class="overlay-layer pass-through" id="overlayLayer">
+<span>覆盖层</span>
+</div>
+</div>
+</div>
+<div id="clickResult" class="demo-result">👆 尝试点击上方的按钮</div>
+</div>
+
+<div class="demo-box">
+<h3>🎭 实际应用：加载遮罩</h3>
+<div class="demo-area" style="height:200px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;padding:20px">
+<button class="bottom-layer" style="width:150px;height:45px;font-size:.9em" onclick="logEvent('按钮1被点击')">操作按钮 1</button>
+<button class="bottom-layer" style="width:150px;height:45px;font-size:.9em;background:linear-gradient(135deg,#e94560,#533483)" onclick="logEvent('按钮2被点击')">操作按钮 2</button>
+<button class="bottom-layer" style="width:150px;height:45px;font-size:.9em;background:linear-gradient(135deg,#f7971e,#ffd200);color:#333" onclick="logEvent('按钮3被点击')">操作按钮 3</button>
+<div id="loadingOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(26,26,46,0.85);display:flex;align-items:center;justify-content:center;border-radius:8px;pointer-events:auto;transition:all .5s">
+<div style="text-align:center">
+<div class="spinner"></div>
+<p style="margin-top:15px;color:var(--text2)">加载中...</p>
+</div>
+</div>
+</div>
+<div class="toggle-container" style="margin-top:15px">
+<div class="toggle" id="loadingToggle" onclick="toggleLoading()"></div>
+<span class="toggle-label" id="loadingLabel">遮罩阻止交互（pointer-events: auto）</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Section 3: Hover Demo -->
+<section id="hover-demo">
+<div class="container">
+<h2><span class="icon">🎯</span> 悬停效果演示</h2>
+<p class="section-desc">不同 pointer-events 值下的 hover 行为差异。将鼠标悬停在各个卡片上观察效果。</p>
+
+<div class="demo-box">
+<h3>🖱️ Hover 行为对比</h3>
+<div class="hover-grid">
+<div class="hover-item" onmouseenter="hoverLog(this,'enter')" onmouseleave="hoverLog(this,'leave')">
+<div style="font-size:2em">✅</div>
+<div>pointer-events: auto</div>
+<div class="pe-val">auto</div>
+<div class="status">可悬停 · 可点击</div>
+</div>
+<div class="hover-item pe-none" onmouseenter="hoverLog(this,'enter')" onmouseleave="hoverLog(this,'leave')">
+<div style="font-size:2em">🚫</div>
+<div>pointer-events: none</div>
+<div class="pe-val">none</div>
+<div class="status">不可悬停 · 不可点击</div>
+</div>
+<div class="hover-item" style="pointer-events:auto" onmouseenter="hoverLog(this,'enter')" onmouseleave="hoverLog(this,'leave')">
+<div style="font-size:2em">🔘</div>
+<div>正常按钮</div>
+<div class="pe-val">auto</div>
+<div class="status">hover 效果正常</div>
+</div>
+<div class="hover-item" onmouseenter="hoverLog(this,'enter')" onmouseleave="hoverLog(this,'leave')" onclick="this.style.background='rgba(233,69,96,0.3)'">
+<div style="font-size:2em">🎨</div>
+<div>可点击变色</div>
+<div class="pe-val">auto</div>
+<div class="status">点击试试</div>
+</div>
+</div>
+</div>
+
+<div class="demo-box">
+<h3>🔀 动态切换 pointer-events</h3>
+<p style="color:var(--text2);margin-bottom:15px">点击按钮切换下方区域的 pointer-events 值：</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px">
+<button class="btn-sm" onclick="setDynamicPE('auto')">auto</button>
+<button class="btn-sm" onclick="setDynamicPE('none')">none</button>
+<button class="btn-sm" onclick="setDynamicPE('inherit')">inherit</button>
+</div>
+<div id="dynamicPEArea" class="hover-item" style="padding:40px;text-align:center;cursor:pointer" onmouseenter="hoverLog(this,'enter')" onmouseleave="hoverLog(this,'leave')" onclick="logEvent('动态区域被点击！当前值: '+this.style.pointerEvents)">
+<div style="font-size:3em" id="dynamicEmoji">🖱️</div>
+<div style="font-size:1.2em;margin:10px 0">悬停和点击这个区域</div>
+<div class="pe-val" id="dynamicPEVal">当前值: auto</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Section 4: SVG Demo -->
+<section id="svg-demo">
+<div class="container">
+<h2><span class="icon">🔷</span> SVG Pointer Events 演示</h2>
+<p class="section-desc">SVG 元素拥有更多 pointer-events 值，可以精确控制填充区域和描边区域的事件响应。</p>
+
+<div class="svg-demo-grid">
+<div class="svg-demo-item">
+<h4>visiblePainted（SVG 默认）</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="#e94560" stroke="#00d2ff" stroke-width="8" pointer-events="visiblePainted" style="cursor:pointer" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('SVG visiblePainted: 点击了填充/描边区域')"/>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">点击填充或描边区域</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">仅 fill≠none 和 stroke≠none 的可见区域响应</p>
+</div>
+
+<div class="svg-demo-item">
+<h4>visibleFill</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="none" stroke="#00d2ff" stroke-width="8" pointer-events="visibleFill" style="cursor:pointer" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('SVG visibleFill: 点击了填充区域（即使fill=none）')"/>
+<text x="100" y="75" text-anchor="middle" fill="#aaa" font-size="10">fill=none 但填充区域仍可点击</text>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">点击圆内部试试</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">填充区域始终响应（不管 fill 值）</p>
+</div>
+
+<div class="svg-demo-item">
+<h4>visibleStroke</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="#533483" stroke="none" stroke-width="8" pointer-events="visibleStroke" style="cursor:pointer" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('SVG visibleStroke: 点击了描边区域')"/>
+<text x="100" y="75" text-anchor="middle" fill="#eee" font-size="10">stroke=none</text>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">描边区域仍可点击</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">描边区域始终响应（不管 stroke 值）</p>
+</div>
+
+<div class="svg-demo-item">
+<h4>all</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="none" stroke="none" pointer-events="all" style="cursor:pointer" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('SVG all: 无论fill/stroke/visibility都响应！')"/>
+<circle cx="100" cy="75" r="50" fill="none" stroke="#2a2a4a" stroke-width="1" stroke-dasharray="5,5" pointer-events="none"/>
+<text x="100" y="75" text-anchor="middle" fill="#aaa" font-size="10">fill=none stroke=none</text>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">但仍然可以点击！</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">所有区域始终响应，无视一切</p>
+</div>
+
+<div class="svg-demo-item">
+<h4>painted</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="#e94560" stroke="#00d2ff" stroke-width="8" visibility="hidden" pointer-events="painted" style="cursor:pointer" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('SVG painted: 隐藏但绘制区域仍响应！')"/>
+<circle cx="100" cy="75" r="50" fill="none" stroke="#2a2a4a" stroke-width="1" stroke-dasharray="5,5" pointer-events="none"/>
+<text x="100" y="75" text-anchor="middle" fill="#aaa" font-size="10">visibility: hidden</text>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">隐藏但仍可点击！</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">不管 visibility，绘制区域响应</p>
+</div>
+
+<div class="svg-demo-item">
+<h4>none</h4>
+<svg viewBox="0 0 200 150">
+<circle cx="100" cy="75" r="50" fill="#e94560" stroke="#00d2ff" stroke-width="8" pointer-events="none" style="cursor:default" onmouseenter="svgHover(this,true)" onmouseleave="svgHover(this,false)" onclick="logEvent('这条不应该出现')"/>
+<text x="100" y="140" text-anchor="middle" fill="#aaa" font-size="11">完全不响应任何事件</text>
+</svg>
+<p style="font-size:.85em;color:var(--text2)">元素完全忽略鼠标事件</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Section 5: Layer Demo -->
+<section id="layers">
+<div class="container">
+<h2><span class="icon">📚</span> 叠层元素事件传递</h2>
+<p class="section-desc">多层叠加元素中，pointer-events 控制事件如何在层级间传递。点击不同层观察事件冒泡。</p>
+
+<div class="demo-box">
+<h3>🏗️ 三层叠加演示</h3>
+<p style="color:var(--text2);margin-bottom:15px">三个叠加的层，分别可以设置不同的 pointer-events 值：</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px">
+<label style="color:var(--text2);font-size:.9em">第三层(顶):
+<select id="layer3PE" onchange="updateLayerPE()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:6px">
+<option value="auto">auto</option><option value="none" selected>none</option>
+</select></label>
+<label style="color:var(--text2);font-size:.9em">第二层(中):
+<select id="layer2PE" onchange="updateLayerPE()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:6px">
+<option value="auto" selected>auto</option><option value="none">none</option>
+</select></label>
+<label style="color:var(--text2);font-size:.9em">第一层(底):
+<select id="layer1PE" onchange="updateLayerPE()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:4px 8px;border-radius:6px">
+<option value="auto" selected>auto</option><option value="none">none</option>
+</select></label>
+</div>
+<div class="demo-area" style="height:300px;position:relative">
+<div id="layer1" class="layer-item" style="position:absolute;top:20px;left:20px;width:80%;height:80%;background:rgba(0,210,255,0.2);border:2px solid #00d2ff;border-radius:12px;display:flex;align-items:flex-end;justify-content:flex-start;padding:10px;cursor:pointer" onclick="layerClick(1)">
+<span style="background:rgba(0,0,0,0.5);padding:4px 10px;border-radius:6px;font-size:.85em">第一层 (底) 🔵</span>
+</div>
+<div id="layer2" class="layer-item" style="position:absolute;top:50px;left:50px;width:70%;height:65%;background:rgba(233,69,96,0.2);border:2px solid #e94560;border-radius:12px;display:flex;align-items:flex-end;justify-content:flex-start;padding:10px;cursor:pointer" onclick="layerClick(2)">
+<span style="background:rgba(0,0,0,0.5);padding:4px 10px;border-radius:6px;font-size:.85em">第二层 (中) 🔴</span>
+</div>
+<div id="layer3" class="layer-item" style="position:absolute;top:80px;left:80px;width:60%;height:50%;background:rgba(83,52,131,0.2);border:2px solid #533483;border-radius:12px;display:flex;align-items:flex-end;justify-content:flex-start;padding:10px;pointer-events:none;cursor:pointer" onclick="layerClick(3)">
+<span style="background:rgba(0,0,0,0.5);padding:4px 10px;border-radius:6px;font-size:.85em">第三层 (顶) 🟣 pointer-events:none</span>
+</div>
+</div>
+<div id="layerResult" class="demo-result">👆 点击叠层区域，观察哪一层接收到事件</div>
+</div>
+</div>
+</section>
+
+<!-- Section 6: Code Generator -->
+<section id="code-gen">
+<div class="container">
+<h2><span class="icon">💻</span> CSS 代码生成器</h2>
+<p class="section-desc">选择 pointer-events 值，生成可直接使用的 CSS 代码，支持一键复制。</p>
+
+<div class="demo-box">
+<h3>⚙️ 配置选项</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:15px;margin-bottom:20px">
+<div>
+<label style="color:var(--text2);font-size:.9em;display:block;margin-bottom:5px">选择器</label>
+<input type="text" id="codeSelector" value=".my-element" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px;border-radius:8px;font-family:monospace">
+</div>
+<div>
+<label style="color:var(--text2);font-size:.9em;display:block;margin-bottom:5px">pointer-events 值</label>
+<select id="codePEValue" onchange="generateCode()" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px;border-radius:8px">
+<option value="auto">auto</option>
+<option value="none">none</option>
+<option value="visiblePainted">visiblePainted</option>
+<option value="visibleFill">visibleFill</option>
+<option value="visibleStroke">visibleStroke</option>
+<option value="visible">visible</option>
+<option value="painted">painted</option>
+<option value="fill">fill</option>
+<option value="stroke">stroke</option>
+<option value="all">all</option>
+<option value="inherit">inherit</option>
+</select>
+</div>
+<div>
+<label style="color:var(--text2);font-size:.9em;display:block;margin-bottom:5px">应用场景</label>
+<select id="codeScenario" onchange="generateCode()" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px;border-radius:8px">
+<option value="basic">基础用法</option>
+<option value="overlay">覆盖层穿透</option>
+<option value="disabled">禁用按钮</option>
+<option value="loading">加载遮罩</option>
+<option value="decorative">装饰元素</option>
+<option value="svg">SVG 交互</option>
+</select>
+</div>
+</div>
+
+<div style="position:relative">
+<pre id="codeOutput" class="code-block"></pre>
+<button class="copy-btn" onclick="copyCode()">📋 复制代码</button>
+</div>
+<div id="copyFeedback" style="color:var(--success);font-size:.9em;margin-top:8px;opacity:0;transition:opacity .3s"></div>
+</div>
+</div>
+</section>
+
+<!-- Section 7: Event Log -->
+<section id="event-log">
+<div class="container">
+<h2><span class="icon">📊</span> 实时事件日志</h2>
+<p class="section-desc">所有交互事件都会记录在这里。在页面上进行各种操作，观察事件触发情况。</p>
+
+<div class="demo-box" style="position:relative">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+<h3>📝 事件记录</h3>
+<button class="btn-sm" onclick="clearLog()" style="background:var(--accent)">🗑️ 清空日志</button>
+</div>
+<div id="eventLogPanel" class="event-log-panel">
+<div class="log-entry log-info">👋 欢迎！在页面上进行交互操作，事件将记录在这里...</div>
+</div>
+<div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+<span style="font-size:.8em;color:var(--text2)">图例：</span>
+<span style="font-size:.8em;color:#00d2ff">🔵 点击事件</span>
+<span style="font-size:.8em;color:#e94560">🔴 穿透事件</span>
+<span style="font-size:.8em;color:#f7971e">🟡 悬停事件</span>
+<span style="font-size:.8em;color:#533483">🟣 SVG 事件</span>
+<span style="font-size:.8em;color:#4ade80">🟢 层级事件</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer style="background:var(--surface);padding:30px 0;text-align:center;border-top:1px solid var(--border)">
+<div class="container">
+<p style="color:var(--text2);font-size:.9em">CSS Pointer Events 交互式演示工具 | 使用纯 HTML/CSS/JS 构建</p>
+<p style="color:var(--text2);font-size:.8em;margin-top:8px">
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events" target="_blank">MDN 文档</a> ·
+<a href="https://github.com/Lifa-su/ai-css-pointer-events" target="_blank">GitHub</a>
+</p>
+</div>
+</footer>
+
+<script>
+// ===== Event Log System =====
+const eventLog = document.getElementById('eventLogPanel');
+let logCount = 0;
+const MAX_LOG = 50;
+
+function logEvent(msg, type='click') {
+  logCount++;
+  const colors = {click:'#00d2ff',through:'#e94560',hover:'#f7971e',svg:'#533483',layer:'#4ade80',info:'#aaa'};
+  const icons = {click:'🔵',through:'🔴',hover:'🟡',svg:'🟣',layer:'🟢',info:'ℹ️'};
+  const time = new Date().toLocaleTimeString('zh-CN');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry log-' + type;
+  entry.innerHTML = '<span style="color:'+colors[type]+'">'+icons[type]+' ['+time+'] #'+logCount+'</span> ' + msg;
+  eventLog.insertBefore(entry, eventLog.firstChild);
+  if(eventLog.children.length > MAX_LOG) eventLog.removeChild(eventLog.lastChild);
+  entry.style.animation = 'fadeIn .3s ease';
+}
+
+function clearLog() {
+  eventLog.innerHTML = '<div class="log-entry log-info">🗑️ 日志已清空</div>';
+  logCount = 0;
+}
+
+// ===== Click Through Demo =====
+let clickThrough = true;
+function toggleClickThrough() {
+  clickThrough = !clickThrough;
+  const toggle = document.getElementById('clickToggle');
+  const label = document.getElementById('clickToggleLabel');
+  const overlay = document.getElementById('overlayLayer');
+  toggle.classList.toggle('active', clickThrough);
+  if(clickThrough) {
+    overlay.classList.add('pass-through');
+    overlay.classList.remove('blocking');
+    label.textContent = 'pointer-events: none（事件穿透 ✓）';
+    logEvent('覆盖层设为 pointer-events: none，事件可穿透', 'through');
+  } else {
+    overlay.classList.remove('pass-through');
+    overlay.classList.add('blocking');
+    label.textContent = 'pointer-events: auto（阻止穿透 ✗）';
+    logEvent('覆盖层设为 pointer-events: auto，事件被阻止', 'through');
+  }
+}
+
+let bottomClickCount = 0;
+function handleBottomClick() {
+  bottomClickCount++;
+  const result = document.getElementById('clickResult');
+  result.innerHTML = '🎉 按钮被点击了！（第 ' + bottomClickCount + ' 次）事件成功穿透覆盖层！';
+  result.style.color = '#4ade80';
+  logEvent('底层按钮被点击（第 ' + bottomClickCount + ' 次）- 事件穿透成功', 'click');
+}
+
+// ===== Loading Overlay Demo =====
+let loadingActive = true;
+function toggleLoading() {
+  loadingActive = !loadingActive;
+  const toggle = document.getElementById('loadingToggle');
+  const label = document.getElementById('loadingLabel');
+  const overlay = document.getElementById('loadingOverlay');
+  toggle.classList.toggle('active', loadingActive);
+  if(loadingActive) {
+    overlay.style.pointerEvents = 'auto';
+    overlay.style.opacity = '1';
+    label.textContent = '遮罩阻止交互（pointer-events: auto）';
+    logEvent('加载遮罩启用 - 按钮不可点击', 'through');
+  } else {
+    overlay.style.pointerEvents = 'none';
+    overlay.style.opacity = '0';
+    label.textContent = '遮罩已移除（pointer-events: none）';
+    logEvent('加载遮罩禁用 - 按钮可点击', 'through');
+  }
+}
+
+// ===== Hover Demo =====
+function hoverLog(el, action) {
+  const val = el.querySelector('.pe-val')?.textContent || '';
+  if(action === 'enter') {
+    logEvent('鼠标进入: ' + val, 'hover');
+  }
+}
+
+function setDynamicPE(val) {
+  const area = document.getElementById('dynamicPEArea');
+  const label = document.getElementById('dynamicPEVal');
+  const emoji = document.getElementById('dynamicEmoji');
+  area.style.pointerEvents = val;
+  label.textContent = '当前值: ' + val;
+  emoji.textContent = val === 'none' ? '🚫' : '🖱️';
+  logEvent('动态区域 pointer-events 设为: ' + val, 'click');
+}
+
+// ===== SVG Demo =====
+function svgHover(el, enter) {
+  if(enter) {
+    el.style.filter = 'brightness(1.3) drop-shadow(0 0 8px rgba(233,69,96,0.5))';
+    el.style.transform = 'scale(1.05)';
+  } else {
+    el.style.filter = '';
+    el.style.transform = '';
+  }
+}
+
+// ===== Layer Demo =====
+function updateLayerPE() {
+  document.getElementById('layer3').style.pointerEvents = document.getElementById('layer3PE').value;
+  document.getElementById('layer2').style.pointerEvents = document.getElementById('layer2PE').value;
+  document.getElementById('layer1').style.pointerEvents = document.getElementById('layer1PE').value;
+  logEvent('层级 pointer-events 已更新', 'layer');
+}
+
+function layerClick(n) {
+  const colors = {1:'#00d2ff',2:'#e94560',3:'#533483'};
+  const names = {1:'第一层(底)🔵',2:'第二层(中)🔴',3:'第三层(顶)🟣'};
+  document.getElementById('layerResult').innerHTML = '✅ ' + names[n] + ' 接收到点击事件！';
+  document.getElementById('layerResult').style.color = colors[n];
+  logEvent(names[n] + ' 被点击', 'layer');
+}
+
+// ===== Code Generator =====
+function generateCode() {
+  const selector = document.getElementById('codeSelector').value || '.my-element';
+  const pe = document.getElementById('codePEValue').value;
+  const scenario = document.getElementById('codeScenario').value;
+  let code = '';
+  switch(scenario) {
+    case 'basic':
+      code = '/* 基础用法 */\n' + selector + ' {\n  pointer-events: ' + pe + ';\n}';
+      break;
+    case 'overlay':
+      code = '/* 覆盖层点击穿透 */\n.overlay {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  pointer-events: ' + pe + ';\n  z-index: 999;\n}\n\n/* 覆盖层内可点击元素 */\n.overlay .clickable {\n  pointer-events: auto;\n}';
+      break;
+    case 'disabled':
+      code = '/* 禁用按钮交互 */\n.btn-disabled {\n  pointer-events: ' + pe + ';\n  opacity: 0.5;\n  cursor: not-allowed;\n}\n\n/* 恢复交互 */\n.btn-disabled.active {\n  pointer-events: auto;\n  opacity: 1;\n  cursor: pointer;\n}';
+      break;
+    case 'loading':
+      code = '/* 加载遮罩 */\n.loading-mask {\n  position: absolute;\n  inset: 0;\n  background: rgba(0,0,0,0.6);\n  pointer-events: ' + pe + ';\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  z-index: 10;\n  transition: opacity 0.3s;\n}\n\n/* 加载完成后移除遮罩交互 */\n.loading-mask.done {\n  pointer-events: none;\n  opacity: 0;\n}';
+      break;
+    case 'decorative':
+      code = '/* 装饰性元素（不阻挡交互） */\n.decoration {\n  position: absolute;\n  pointer-events: ' + pe + ';\n  z-index: 1;\n}\n\n/* 粒子效果 */\n.particles {\n  pointer-events: none;\n  position: fixed;\n  inset: 0;\n}\n\n/* 水印 */\n.watermark {\n  pointer-events: none;\n  position: fixed;\n  opacity: 0.1;\n}';
+      break;
+    case 'svg':
+      code = '/* SVG 交互控制 */\nsvg ' + selector + ' {\n  pointer-events: ' + pe + ';\n  cursor: pointer;\n  transition: all 0.3s;\n}\n\nsvg ' + selector + ':hover {\n  filter: brightness(1.2);\n  transform: scale(1.05);\n}';
+      break;
+  }
+  document.getElementById('codeOutput').textContent = code;
+}
+
+function copyCode() {
+  const code = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    fb.textContent = '✅ 代码已复制到剪贴板！';
+    fb.style.opacity = '1';
+    setTimeout(() => fb.style.opacity = '0', 2000);
+    logEvent('代码已复制到剪贴板', 'info');
+  });
+}
+
+// Input change listener for code generator
+document.getElementById('codeSelector').addEventListener('input', generateCode);
+
+// ===== Navigation Active State =====
+const navLinks = document.querySelectorAll('nav a');
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+// ===== Init =====
+generateCode();
+logEvent('页面加载完成，开始探索 CSS pointer-events！', 'info');
+</script>
+
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

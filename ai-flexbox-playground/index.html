@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive CSS Flexbox playground. Experiment with flex properties like direction, wrap, justify-content, and align-items. Learn Flexbox with live preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-flexbox-playground/">
+<title>AI Flexbox Playground — Flexbox 练习场</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--surface3:#2e3345;
+  --border:#363b4e;--text:#e4e6f0;--text2:#9ca0b4;--accent:#6c5ce7;
+  --accent2:#a29bfe;--accent-glow:rgba(108,92,231,.15);
+  --danger:#ff6b6b;--success:#51cf66;--radius:10px;--radius-sm:6px;
+}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+
+/* Header */
+.header{padding:16px 24px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.header h1{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .subtitle{color:var(--text2);font-size:.85rem}
+
+/* Layout */
+.app{display:flex;height:calc(100vh - 60px)}
+.panel{width:340px;min-width:300px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px;flex-shrink:0}
+.preview-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Section */
+.section{margin-bottom:16px}
+.section-title{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px}
+
+/* Controls */
+.control{margin-bottom:12px}
+.control label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:5px;font-weight:500}
+.btn-group{display:flex;flex-wrap:wrap;gap:4px}
+.btn-group button{padding:5px 10px;font-size:.75rem;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s}
+.btn-group button:hover{border-color:var(--accent);color:var(--text)}
+.btn-group button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+input[type=range]{width:100%;accent-color:var(--accent);background:transparent;cursor:pointer}
+input[type=number],input[type=text],select{width:100%;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);font-size:.82rem;outline:none;transition:border-color .15s}
+input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--accent)}
+select{cursor:pointer;appearance:auto}
+
+.range-row{display:flex;align-items:center;gap:8px}
+.range-row input[type=range]{flex:1}
+.range-val{min-width:36px;text-align:center;font-size:.78rem;color:var(--accent2);font-weight:600}
+
+/* Items panel */
+.items-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.btn{padding:6px 14px;font-size:.78rem;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;transition:all .15s}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent2)}
+.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:4px 10px;font-size:.72rem}
+
+.item-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:8px;transition:border-color .15s}
+.item-card:hover{border-color:var(--accent)}
+.item-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;cursor:pointer;user-select:none}
+.item-card-header span{font-weight:600;font-size:.82rem;color:var(--accent2)}
+.item-card-body{display:none}
+.item-card.expanded .item-card-body{display:block}
+.item-card .control{margin-bottom:8px}
+.item-color{width:20px;height:20px;border-radius:4px;border:2px solid var(--border);cursor:pointer}
+
+/* Preview */
+.preview-toolbar{padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.preview-toolbar .label{font-size:.82rem;color:var(--text2);font-weight:500}
+.preview-container{flex:1;padding:24px;overflow:auto;display:flex;align-items:center;justify-content:center}
+.flex-container{width:100%;min-height:300px;max-height:80vh;background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:12px;transition:all .2s;position:relative}
+.flex-item{border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#fff;min-width:40px;min-height:40px;padding:8px 12px;transition:all .2s;position:relative;cursor:default;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+
+/* Code panel */
+.code-panel{background:var(--surface);border-top:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height .3s}
+.code-panel.open{max-height:400px}
+.code-header{padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+.code-header span{font-size:.82rem;font-weight:600;color:var(--accent2)}
+.code-content{padding:0 20px 16px;overflow:auto;max-height:320px}
+.code-content pre{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.78rem;line-height:1.6;color:var(--text);white-space:pre-wrap;word-break:break-all}
+
+/* Toggle code btn */
+.toggle-code{display:flex;align-items:center;gap:6px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:10px 20px;border-radius:var(--radius);font-size:.82rem;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Responsive */
+@media(max-width:860px){
+  .app{flex-direction:column;height:auto}
+  .panel{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:50vh;overflow-y:auto}
+  .preview-container{min-height:300px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🎯 AI Flexbox Playground</h1>
+    <div class="subtitle">可视化学习 Flexbox 布局 — 实时预览 & 代码生成</div>
+  </div>
+</div>
+
+<div class="app">
+  <!-- Left Panel -->
+  <div class="panel" id="panel">
+    <!-- Container Properties -->
+    <div class="section">
+      <div class="section-title">容器属性 Container</div>
+
+      <div class="control">
+        <label>flex-direction</label>
+        <div class="btn-group" data-prop="flexDirection">
+          <button class="active" data-val="row">row</button>
+          <button data-val="column">column</button>
+          <button data-val="row-reverse">row-reverse</button>
+          <button data-val="column-reverse">column-reverse</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>flex-wrap</label>
+        <div class="btn-group" data-prop="flexWrap">
+          <button class="active" data-val="nowrap">nowrap</button>
+          <button data-val="wrap">wrap</button>
+          <button data-val="wrap-reverse">wrap-reverse</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>justify-content</label>
+        <div class="btn-group" data-prop="justifyContent">
+          <button class="active" data-val="flex-start">flex-start</button>
+          <button data-val="center">center</button>
+          <button data-val="flex-end">flex-end</button>
+          <button data-val="space-between">space-between</button>
+          <button data-val="space-around">space-around</button>
+          <button data-val="space-evenly">space-evenly</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>align-items</label>
+        <div class="btn-group" data-prop="alignItems">
+          <button class="active" data-val="stretch">stretch</button>
+          <button data-val="flex-start">flex-start</button>
+          <button data-val="center">center</button>
+          <button data-val="flex-end">flex-end</button>
+          <button data-val="baseline">baseline</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>align-content</label>
+        <div class="btn-group" data-prop="alignContent">
+          <button class="active" data-val="stretch">stretch</button>
+          <button data-val="flex-start">flex-start</button>
+          <button data-val="center">center</button>
+          <button data-val="flex-end">flex-end</button>
+          <button data-val="space-between">space-between</button>
+          <button data-val="space-around">space-around</button>
+          <button data-val="space-evenly">space-evenly</button>
+        </div>
+      </div>
+
+      <div class="control">
+        <label>gap</label>
+        <div class="range-row">
+          <input type="range" min="0" max="40" value="10" id="gapRange">
+          <span class="range-val" id="gapVal">10px</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="section">
+      <div class="items-header">
+        <div class="section-title" style="margin-bottom:0">子元素 Items</div>
+        <button class="btn btn-accent btn-sm" onclick="addItem()">+ 添加</button>
+      </div>
+      <div id="itemsList"></div>
+    </div>
+  </div>
+
+  <!-- Right Preview -->
+  <div class="preview-area">
+    <div class="preview-toolbar">
+      <span class="label">实时预览</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-accent btn-sm toggle-code" onclick="toggleCode()">
+          <span id="codeToggleText">显示 CSS 代码</span>
+        </button>
+        <button class="btn btn-accent btn-sm" onclick="copyCSS()">📋 复制代码</button>
+      </div>
+    </div>
+    <div class="preview-container">
+      <div class="flex-container" id="flexContainer"></div>
+    </div>
+    <div class="code-panel" id="codePanel">
+      <div class="code-header">
+        <span>生成的 CSS 代码</span>
+      </div>
+      <div class="code-content">
+        <pre id="codeOutput"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS = [
+  '#6c5ce7','#00b894','#e17055','#0984e3','#fdcb6e',
+  '#e84393','#00cec9','#d63031','#74b9ff','#55efc4',
+  '#fab1a0','#81ecec','#ffeaa7','#dfe6e9','#a29bfe'
+];
+
+const state = {
+  container: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    alignContent: 'stretch',
+    gap: 10
+  },
+  items: []
+};
+
+function createDefaultItem(index) {
+  return {
+    id: Date.now() + Math.random(),
+    label: index + 1,
+    flexGrow: 0,
+    flexShrink: 1,
+    flexBasis: 'auto',
+    order: 0,
+    alignSelf: 'auto',
+    width: 80,
+    height: 80,
+    color: COLORS[index % COLORS.length]
+  };
+}
+
+// Init with 4 items
+for (let i = 0; i < 4; i++) state.items.push(createDefaultItem(i));
+
+function addItem() {
+  state.items.push(createDefaultItem(state.items.length));
+  render();
+}
+
+function removeItem(id) {
+  if (state.items.length <= 1) return showToast('至少保留一个子元素');
+  state.items = state.items.filter(it => it.id !== id);
+  render();
+}
+
+// Button groups
+document.querySelectorAll('.btn-group').forEach(group => {
+  const prop = group.dataset.prop;
+  group.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.container[prop] = btn.dataset.val;
+      render();
+    });
+  });
+});
+
+// Gap
+const gapRange = document.getElementById('gapRange');
+const gapVal = document.getElementById('gapVal');
+gapRange.addEventListener('input', () => {
+  state.container.gap = +gapRange.value;
+  gapVal.textContent = gapRange.value + 'px';
+  render();
+});
+
+function renderItemCards() {
+  const list = document.getElementById('itemsList');
+  list.innerHTML = '';
+  state.items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <div class="item-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+        <span style="display:flex;align-items:center;gap:8px">
+          <span class="item-color" style="background:${item.color}"></span>
+          Item ${item.label}
+        </span>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removeItem(${item.id})">✕</button>
+      </div>
+      <div class="item-card-body">
+        <div class="control">
+          <label>flex-grow</label>
+          <div class="range-row">
+            <input type="range" min="0" max="10" value="${item.flexGrow}" data-id="${item.id}" data-field="flexGrow" onchange="updateItem(this)">
+            <span class="range-val">${item.flexGrow}</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>flex-shrink</label>
+          <div class="range-row">
+            <input type="range" min="0" max="10" value="${item.flexShrink}" data-id="${item.id}" data-field="flexShrink" onchange="updateItem(this)">
+            <span class="range-val">${item.flexShrink}</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>flex-basis</label>
+          <select data-id="${item.id}" data-field="flexBasis" onchange="updateItem(this)">
+            <option value="auto" ${item.flexBasis==='auto'?'selected':''}>auto</option>
+            <option value="0" ${item.flexBasis==='0'?'selected':''}>0</option>
+            <option value="50px" ${item.flexBasis==='50px'?'selected':''}>50px</option>
+            <option value="100px" ${item.flexBasis==='100px'?'selected':''}>100px</option>
+            <option value="150px" ${item.flexBasis==='150px'?'selected':''}>150px</option>
+            <option value="200px" ${item.flexBasis==='200px'?'selected':''}>200px</option>
+            <option value="25%" ${item.flexBasis==='25%'?'selected':''}>25%</option>
+            <option value="33%" ${item.flexBasis==='33%'?'selected':''}>33%</option>
+            <option value="50%" ${item.flexBasis==='50%'?'selected':''}>50%</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>order</label>
+          <div class="range-row">
+            <input type="range" min="-5" max="5" value="${item.order}" data-id="${item.id}" data-field="order" onchange="updateItem(this)">
+            <span class="range-val">${item.order}</span>
+          </div>
+        </div>
+        <div class="control">
+          <label>align-self</label>
+          <select data-id="${item.id}" data-field="alignSelf" onchange="updateItem(this)">
+            ${['auto','flex-start','center','flex-end','stretch','baseline'].map(v =>
+              `<option value="${v}" ${item.alignSelf===v?'selected':''}>${v}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="control" style="display:flex;gap:8px">
+          <div style="flex:1">
+            <label>宽度 (px)</label>
+            <input type="number" min="30" max="300" value="${item.width}" data-id="${item.id}" data-field="width" onchange="updateItem(this)">
+          </div>
+          <div style="flex:1">
+            <label>高度 (px)</label>
+            <input type="number" min="30" max="300" value="${item.height}" data-id="${item.id}" data-field="height" onchange="updateItem(this)">
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+  // Also bind range input events for live update
+  list.querySelectorAll('input[type=range]').forEach(r => {
+    r.addEventListener('input', function() {
+      this.parentElement.querySelector('.range-val').textContent = this.value;
+      updateItem(this);
+    });
+  });
+}
+
+function updateItem(el) {
+  const id = +el.dataset.id;
+  const field = el.dataset.field;
+  const item = state.items.find(it => it.id === id);
+  if (!item) return;
+  const val = el.value;
+  if (['flexGrow','flexShrink','order','width','height'].includes(field)) {
+    item[field] = +val;
+  } else {
+    item[field] = val;
+  }
+  renderPreview();
+  generateCode();
+}
+
+function renderPreview() {
+  const c = document.getElementById('flexContainer');
+  const s = state.container;
+  c.style.display = 'flex';
+  c.style.flexDirection = s.flexDirection;
+  c.style.flexWrap = s.flexWrap;
+  c.style.justifyContent = s.justifyContent;
+  c.style.alignItems = s.alignItems;
+  c.style.alignContent = s.alignContent;
+  c.style.gap = s.gap + 'px';
+
+  c.innerHTML = '';
+  state.items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'flex-item';
+    el.style.flexGrow = item.flexGrow;
+    el.style.flexShrink = item.flexShrink;
+    el.style.flexBasis = item.flexBasis;
+    el.style.order = item.order;
+    el.style.alignSelf = item.alignSelf;
+    el.style.width = item.width + 'px';
+    el.style.height = item.height + 'px';
+    el.style.background = item.color;
+    el.textContent = item.label;
+    c.appendChild(el);
+  });
+}
+
+function generateCode() {
+  const s = state.container;
+  let css = `.flex-container {\n  display: flex;\n`;
+  if (s.flexDirection !== 'row') css += `  flex-direction: ${s.flexDirection};\n`;
+  if (s.flexWrap !== 'nowrap') css += `  flex-wrap: ${s.flexWrap};\n`;
+  if (s.justifyContent !== 'flex-start') css += `  justify-content: ${s.justifyContent};\n`;
+  if (s.alignItems !== 'stretch') css += `  align-items: ${s.alignItems};\n`;
+  if (s.alignContent !== 'stretch') css += `  align-content: ${s.alignContent};\n`;
+  if (s.gap > 0) css += `  gap: ${s.gap}px;\n`;
+  css += `}\n`;
+
+  state.items.forEach((item, i) => {
+    let itemCSS = '';
+    if (item.flexGrow !== 0) itemCSS += `  flex-grow: ${item.flexGrow};\n`;
+    if (item.flexShrink !== 1) itemCSS += `  flex-shrink: ${item.flexShrink};\n`;
+    if (item.flexBasis !== 'auto') itemCSS += `  flex-basis: ${item.flexBasis};\n`;
+    if (item.order !== 0) itemCSS += `  order: ${item.order};\n`;
+    if (item.alignSelf !== 'auto') itemCSS += `  align-self: ${item.alignSelf};\n`;
+    itemCSS += `  width: ${item.width}px;\n  height: ${item.height}px;\n`;
+    css += `\n.flex-item-${i + 1} {\n${itemCSS}}\n`;
+  });
+
+  document.getElementById('codeOutput').textContent = css;
+  return css;
+}
+
+function toggleCode() {
+  const panel = document.getElementById('codePanel');
+  const text = document.getElementById('codeToggleText');
+  panel.classList.toggle('open');
+  text.textContent = panel.classList.contains('open') ? '隐藏 CSS 代码' : '显示 CSS 代码';
+}
+
+function copyCSS() {
+  const css = generateCode();
+  navigator.clipboard.writeText(css).then(() => showToast('CSS 代码已复制到剪贴板 ✓'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function render() {
+  renderItemCards();
+  renderPreview();
+  generateCode();
+}
+
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

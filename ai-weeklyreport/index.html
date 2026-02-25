@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeeklyAI — AI Weekly Report Generator | Smart Work Reports</title>
+<meta name="description" content="Generate professional weekly reports, daily standups, and OKR summaries with AI. Multiple templates, tone control, one-click export. Powered by DeepSeek AI.">
+<meta name="keywords" content="weekly report generator, AI report writer, daily standup, OKR summary, work report, status update, meeting notes, productivity tool">
+<meta name="author" content="Feifei Dev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-weeklyreport/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="WeeklyAI — AI Weekly Report Generator">
+<meta property="og:description" content="Generate professional weekly reports, daily standups, and OKR summaries with AI. Multiple templates, one-click export.">
+<meta property="og:url" content="https://lifa-su.com/ai-weeklyreport/">
+<meta property="og:site_name" content="Feifei AI Tools">
+<meta property="og:image" content="https://lifa-su.com/assets/og-weeklyreport.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="WeeklyAI — AI Weekly Report Generator">
+<meta name="twitter:description" content="Generate professional weekly reports with AI. Free online tool.">
+<meta name="twitter:image" content="https://lifa-su.com/assets/og-weeklyreport.png">
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"WeeklyAI - AI Weekly Report Generator","url":"https://lifa-su.com/ai-weeklyreport/","description":"Generate professional weekly reports, daily standups, and OKR summaries with AI.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Feifei Dev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#6366f1;--primary-hover:#818cf8;--primary-light:rgba(99,102,241,.15);
+  --bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text-secondary:#94a3b8;
+  --border:#334155;--success:#10b981;--radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.4),0 4px 6px -4px rgba(0,0,0,.3);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--primary);text-decoration:none}
+
+/* Header */
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);background:rgba(15,23,42,.92)}
+.header-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:var(--text)}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--primary),#a855f7);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.header-actions{display:flex;align-items:center;gap:12px}
+.lang-toggle{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:13px;color:var(--text-secondary);transition:.2s}
+.lang-toggle:hover{border-color:var(--primary);color:var(--primary)}
+.api-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:13px;color:var(--text-secondary);transition:.2s}
+.api-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Main Layout */
+.main{max-width:1100px;margin:0 auto;padding:32px 24px}
+.hero{text-align:center;margin-bottom:40px}
+.hero h1{font-size:32px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--primary),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text-secondary);font-size:16px}
+
+/* Two Column Layout */
+.workspace{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:768px){.workspace{grid-template-columns:1fr}}
+
+/* Card */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h2{font-size:16px;font-weight:600}
+.card-body{padding:20px}
+
+/* Form Elements */
+label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:14px;font-family:inherit;resize:vertical;min-height:200px;transition:.2s;line-height:1.7;background:var(--bg);color:var(--text)}
+textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+textarea::placeholder{color:#94a3b8}
+
+/* Select & Options Row */
+.options-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.option-group{flex:1;min-width:140px}
+select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+select:focus{outline:none;border-color:var(--primary)}
+
+/* Buttons */
+.btn{padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;border:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-secondary)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#059669}
+.btn-block{width:100%;justify-content:center}
+.btn-group{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+
+/* Output */
+.output-area{min-height:200px;white-space:pre-wrap;font-size:14px;line-height:1.8;color:var(--text)}
+.output-area:empty::before{content:attr(data-placeholder);color:#94a3b8}
+.output-area h1,.output-area h2,.output-area h3{margin:12px 0 6px;color:var(--text)}
+.output-area h1{font-size:20px}
+.output-area h2{font-size:17px}
+.output-area h3{font-size:15px}
+.output-area ul,.output-area ol{padding-left:20px;margin:6px 0}
+.output-area li{margin:3px 0}
+.output-area strong{color:var(--primary)}
+
+/* Loading */
+.loading{display:flex;align-items:center;gap:10px;color:var(--text-secondary);padding:20px 0}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1e293b;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;transition:.3s;opacity:0;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--card);border-radius:var(--radius);padding:24px;max-width:440px;width:100%;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:18px;margin-bottom:16px}
+.modal input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:12px;background:var(--bg);color:var(--text)}
+.modal input:focus{outline:none;border-color:var(--primary)}
+.modal .hint{font-size:12px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+
+/* Streaming cursor */
+.streaming-cursor::after{content:'▊';animation:blink 1s infinite;color:var(--primary)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Footer */
+.footer{text-align:center;padding:40px 24px 24px;color:var(--text-secondary);font-size:13px}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero h1{font-size:24px}
+  .options-row{flex-direction:column}
+  .btn-group{flex-direction:column}
+  .btn-group .btn{width:100%;justify-content:center}
+}
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+body{animation:fadeIn .3s ease-out}
+.card{animation:slideUp .4s ease-out both}
+.workspace .card:nth-child(2){animation-delay:.1s}
+.hero{animation:slideUp .35s ease-out}
+/* Pro Section */
+.pro-section{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(168,85,247,.1));border:1px solid rgba(99,102,241,.25);border-radius:var(--radius);padding:28px;text-align:center;margin-top:24px;position:relative;overflow:hidden;animation:slideUp .5s ease-out both;animation-delay:.2s}
+.pro-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.5px}
+.pro-section h3{font-size:1.15rem;margin-bottom:14px;color:var(--text)}
+.pro-features{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.pro-feature{padding:8px 16px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.15);border-radius:8px;font-size:.85rem;color:var(--text-secondary)}
+.btn-pro{display:inline-block;padding:12px 36px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border-radius:var(--radius);font-weight:600;text-decoration:none;transition:all .3s;font-size:.95rem}
+.btn-pro:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,.4)}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📊</div>
+      <span>WeeklyAI</span>
+    </div>
+    <div class="header-actions">
+      <button class="lang-toggle" onclick="toggleLang()" id="langBtn">EN</button>
+      <button class="api-btn" onclick="openApiModal()">⚙️ API</button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<main class="main">
+  <div class="hero">
+    <h1 id="heroTitle">5分钟搞定工作汇报</h1>
+    <p id="heroDesc">输入工作要点，AI 帮你生成专业的日报/周报</p>
+  </div>
+
+  <div class="workspace">
+    <!-- Input Panel -->
+    <div class="card">
+      <div class="card-header">
+        <h2 id="inputTitle">✏️ 输入工作内容</h2>
+      </div>
+      <div class="card-body">
+        <div class="options-row">
+          <div class="option-group">
+            <label id="typeLabel">报告类型</label>
+            <select id="reportType">
+              <option value="weekly">周报 / Weekly</option>
+              <option value="daily">日报 / Daily</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label id="templateLabel">模板风格</label>
+            <select id="templateStyle">
+              <option value="concise">简洁版 / Concise</option>
+              <option value="detailed">详细版 / Detailed</option>
+              <option value="okr">OKR版 / OKR</option>
+            </select>
+          </div>
+        </div>
+        <label id="contentLabel">工作要点</label>
+        <textarea id="workInput" rows="10" placeholder="例如：&#10;- 完成用户登录模块开发&#10;- 修复了3个线上bug&#10;- 参加产品需求评审会议&#10;- 优化数据库查询性能，响应时间降低40%&#10;- 协助新同事熟悉项目代码"></textarea>
+        <button class="btn btn-primary btn-block" style="margin-top:16px" onclick="generate()" id="generateBtn">
+          🚀 <span id="genText">生成报告</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="card">
+      <div class="card-header">
+        <h2 id="outputTitle">📄 生成结果</h2>
+      </div>
+      <div class="card-body">
+        <div id="outputArea" class="output-area" data-placeholder="生成的报告将显示在这里..."></div>
+        <div class="btn-group" id="actionBtns" style="display:none">
+          <button class="btn btn-success" onclick="copyFormatted()">📋 <span class="act-copy">复制</span></button>
+          <button class="btn btn-outline" onclick="copyMarkdown()">📝 <span class="act-md">复制 Markdown</span></button>
+          <button class="btn btn-outline" onclick="downloadMd()">💾 <span class="act-dl">导出 .md</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Pro Section -->
+<div style="max-width:1100px;margin:0 auto;padding:0 24px">
+<div class="pro-section">
+  <div class="pro-badge">⭐ PRO</div>
+  <h3>🚀 Unlock Pro Features</h3>
+  <div class="pro-features">
+    <div class="pro-feature">👥 Team Reports</div>
+    <div class="pro-feature">🎨 Advanced Templates</div>
+    <div class="pro-feature">📈 Historical Analytics</div>
+    <div class="pro-feature">⏰ Auto-Scheduling</div>
+  </div>
+  <a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Unlock Pro →</a>
+</div>
+</div>
+
+<footer class="footer">
+  WeeklyAI — Powered by DeepSeek API
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- API Key Modal -->
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <h3>🔑 DeepSeek API Key</h3>
+    <input type="password" id="apiKeyInput" placeholder="sk-..." />
+    <div class="hint" id="apiHint">
+      API Key 仅保存在浏览器本地，不会上传到任何服务器。<br>
+      前往 <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> 获取。
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeApiModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveApiKey()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== State ==========
+let currentLang = 'zh';
+let rawMarkdown = '';
+
+// ========== i18n ==========
+const i18n = {
+  zh: {
+    heroTitle: '5分钟搞定工作汇报',
+    heroDesc: '输入工作要点，AI 帮你生成专业的日报/周报',
+    inputTitle: '✏️ 输入工作内容',
+    outputTitle: '📄 生成结果',
+    typeLabel: '报告类型',
+    templateLabel: '模板风格',
+    contentLabel: '工作要点',
+    genText: '生成报告',
+    placeholder: '例如：\n- 完成用户登录模块开发\n- 修复了3个线上bug\n- 参加产品需求评审会议\n- 优化数据库查询性能，响应时间降低40%\n- 协助新同事熟悉项目代码',
+    outputPlaceholder: '生成的报告将显示在这里...',
+    copy: '复制',
+    copyMd: '复制 Markdown',
+    dlMd: '导出 .md',
+    generating: '正在生成...',
+    copied: '✅ 已复制到剪贴板',
+    copiedMd: '✅ Markdown 已复制',
+    downloaded: '✅ 已导出文件',
+    noKey: '请先设置 DeepSeek API Key',
+    noInput: '请输入工作内容',
+    error: '生成失败，请检查 API Key 或网络',
+    cancel: '取消',
+    save: '保存',
+    saved: '✅ API Key 已保存',
+    apiHint: 'API Key 仅保存在浏览器本地，不会上传到任何服务器。',
+    langBtn: 'EN'
+  },
+  en: {
+    heroTitle: 'Work Reports in 5 Minutes',
+    heroDesc: 'Enter your work highlights, AI generates professional reports',
+    inputTitle: '✏️ Work Input',
+    outputTitle: '📄 Generated Report',
+    typeLabel: 'Report Type',
+    templateLabel: 'Template Style',
+    contentLabel: 'Work Highlights',
+    genText: 'Generate Report',
+    placeholder: 'e.g.:\n- Completed user login module\n- Fixed 3 production bugs\n- Attended product review meeting\n- Optimized DB queries, 40% faster response\n- Helped new team member onboard',
+    outputPlaceholder: 'Generated report will appear here...',
+    copy: 'Copy',
+    copyMd: 'Copy Markdown',
+    dlMd: 'Export .md',
+    generating: 'Generating...',
+    copied: '✅ Copied to clipboard',
+    copiedMd: '✅ Markdown copied',
+    downloaded: '✅ File exported',
+    noKey: 'Please set your DeepSeek API Key first',
+    noInput: 'Please enter your work content',
+    error: 'Generation failed. Check API Key or network.',
+    cancel: 'Cancel',
+    save: 'Save',
+    saved: '✅ API Key saved',
+    apiHint: 'API Key is stored locally in your browser only. Never uploaded.',
+    langBtn: '中文'
+  }
+};
+
+function t(key) { return i18n[currentLang][key] || key; }
+
+function toggleLang() {
+  currentLang = currentLang === 'zh' ? 'en' : 'zh';
+  applyLang();
+}
+
+function applyLang() {
+  document.getElementById('heroTitle').textContent = t('heroTitle');
+  document.getElementById('heroDesc').textContent = t('heroDesc');
+  document.getElementById('inputTitle').textContent = t('inputTitle');
+  document.getElementById('outputTitle').textContent = t('outputTitle');
+  document.getElementById('typeLabel').textContent = t('typeLabel');
+  document.getElementById('templateLabel').textContent = t('templateLabel');
+  document.getElementById('contentLabel').textContent = t('contentLabel');
+  document.getElementById('genText').textContent = t('genText');
+  document.getElementById('workInput').placeholder = t('placeholder');
+  document.getElementById('outputArea').setAttribute('data-placeholder', t('outputPlaceholder'));
+  document.getElementById('langBtn').textContent = t('langBtn');
+  document.getElementById('apiHint').innerHTML = t('apiHint') + '<br>→ <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a>';
+  document.querySelectorAll('.act-copy').forEach(el => el.textContent = t('copy'));
+  document.querySelectorAll('.act-md').forEach(el => el.textContent = t('copyMd'));
+  document.querySelectorAll('.act-dl').forEach(el => el.textContent = t('dlMd'));
+}
+
+// ========== API Key ==========
+function getApiKey() { return localStorage.getItem('deepseek_api_key') || ''; }
+function openApiModal() {
+  document.getElementById('apiModal').classList.add('active');
+  document.getElementById('apiKeyInput').value = getApiKey();
+}
+function closeApiModal() { document.getElementById('apiModal').classList.remove('active'); }
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key) localStorage.setItem('deepseek_api_key', key);
+  closeApiModal();
+  showToast(t('saved'));
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ========== Prompts ==========
+function buildPrompt(input, type, template, lang) {
+  const langInstruction = lang === 'zh'
+    ? '请用中文撰写报告。'
+    : 'Please write the report in English.';
+
+  const typeMap = {
+    weekly: lang === 'zh' ? '周报' : 'Weekly Report',
+    daily: lang === 'zh' ? '日报' : 'Daily Report'
+  };
+
+  const templateInstructions = {
+    concise: lang === 'zh'
+      ? `使用简洁版模板：
+- 标题：本周/今日工作总结
+- 分为"已完成"和"进行中/计划"两个部分
+- 每项用一行简短描述
+- 风格简练，适合快速浏览`
+      : `Use concise template:
+- Title: Weekly/Daily Summary
+- Two sections: "Completed" and "In Progress / Planned"
+- One-line description per item
+- Brief and scannable`,
+
+    detailed: lang === 'zh'
+      ? `使用详细版模板：
+- 标题：工作周报/日报
+- 分为：工作概述、重点成果、详细内容、遇到的问题与解决方案、下周/明日计划
+- 每项工作展开描述，包含背景、过程、结果
+- 适当添加量化数据
+- 风格专业正式`
+      : `Use detailed template:
+- Title: Work Report
+- Sections: Overview, Key Achievements, Details, Issues & Solutions, Next Plans
+- Expand each item with context, process, and results
+- Add quantitative data where possible
+- Professional and formal tone`,
+
+    okr: lang === 'zh'
+      ? `使用OKR版模板：
+- 标题：OKR工作周报/日报
+- 按 Objective（目标）→ Key Results（关键结果）结构组织
+- 每个KR标注完成进度百分比
+- 包含：本周OKR进展、关键产出、风险与阻塞、下周重点
+- 风格结构化，数据驱动`
+      : `Use OKR template:
+- Title: OKR Work Report
+- Structure by Objective → Key Results
+- Mark completion % for each KR
+- Include: OKR Progress, Key Outputs, Risks & Blockers, Next Focus
+- Structured and data-driven`
+  };
+
+  return `你是一个专业的工作报告撰写助手。${langInstruction}
+
+请根据以下工作要点，生成一份${typeMap[type]}。
+
+${templateInstructions[template]}
+
+请直接输出Markdown格式的报告内容，不要输出任何解释或前言。
+
+工作要点：
+${input}`;
+}
+
+// ========== Generate (Streaming) ==========
+async function generate() {
+  const apiKey = getApiKey();
+  if (!apiKey) { openApiModal(); showToast(t('noKey')); return; }
+
+  const input = document.getElementById('workInput').value.trim();
+  if (!input) { showToast(t('noInput')); return; }
+
+  const type = document.getElementById('reportType').value;
+  const template = document.getElementById('templateStyle').value;
+  const prompt = buildPrompt(input, type, template, currentLang);
+
+  const btn = document.getElementById('generateBtn');
+  const output = document.getElementById('outputArea');
+  const actions = document.getElementById('actionBtns');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> ' + t('generating');
+  output.innerHTML = '';
+  output.classList.add('streaming-cursor');
+  actions.style.display = 'none';
+  rawMarkdown = '';
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 2048
+      })
+    });
+
+    if (!resp.ok) throw new Error('API error: ' + resp.status);
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const json = JSON.parse(data);
+          const delta = json.choices?.[0]?.delta?.content;
+          if (delta) {
+            rawMarkdown += delta;
+            output.innerHTML = renderMarkdown(rawMarkdown);
+          }
+        } catch(e) {}
+      }
+    }
+
+    output.classList.remove('streaming-cursor');
+    actions.style.display = 'flex';
+  } catch (err) {
+    output.classList.remove('streaming-cursor');
+    output.innerHTML = '<span style="color:#ef4444">' + t('error') + '<br><small>' + err.message + '</small></span>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 <span id="genText">' + t('genText') + '</span>';
+  }
+}
+
+// ========== Simple Markdown Renderer ==========
+function renderMarkdown(md) {
+  let html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Bold & Italic
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Unordered list
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    // Ordered list
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Horizontal rule
+    .replace(/^---$/gm, '<hr>')
+    // Line breaks
+    .replace(/\n/g, '<br>');
+
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li>.*?<\/li><br>?)+)/g, (match) => {
+    return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
+  });
+
+  return html;
+}
+
+// ========== Copy & Export ==========
+async function copyFormatted() {
+  const output = document.getElementById('outputArea');
+  try {
+    const blob = new Blob([output.innerHTML], { type: 'text/html' });
+    const textBlob = new Blob([rawMarkdown], { type: 'text/plain' });
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'text/html': blob, 'text/plain': textBlob })
+    ]);
+    showToast(t('copied'));
+  } catch {
+    // Fallback
+    const range = document.createRange();
+    range.selectNodeContents(output);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
+    showToast(t('copied'));
+  }
+}
+
+async function copyMarkdown() {
+  try {
+    await navigator.clipboard.writeText(rawMarkdown);
+    showToast(t('copiedMd'));
+  } catch {
+    fallbackCopy(rawMarkdown);
+    showToast(t('copiedMd'));
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+function downloadMd() {
+  const type = document.getElementById('reportType').value;
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = type + '-' + date + '.md';
+  const blob = new Blob([rawMarkdown], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(t('downloaded'));
+}
+
+// ========== Init ==========
+document.addEventListener('DOMContentLoaded', () => {
+  if (!getApiKey()) setTimeout(openApiModal, 800);
+});
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Countdown Maker - Create Beautiful Countdown Pages</title>
+<meta name="description" content="Create stunning countdown timer pages with multiple styles. Flip clock, digital, progress bar. Download as standalone HTML or share via link.">
+<link rel="canonical" href="https://lifa-su.com/ai-countdown-maker/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;
+  --text:#e8e8f0;--text2:#9898b0;--accent:#6c5ce7;--accent2:#a29bfe;
+  --success:#00cec9;--danger:#ff6b6b;--radius:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent2);text-decoration:none}
+
+/* Header */
+.header{text-align:center;padding:3rem 1rem 2rem;background:linear-gradient(135deg,#0a0a1a 0%,#1a1a3e 50%,#0a0a1a 100%)}
+.header h1{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem}
+.header p{color:var(--text2);font-size:1.1rem}
+
+/* Container */
+.container{max-width:900px;margin:0 auto;padding:1.5rem}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.card h2{font-size:1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.card h2 .icon{font-size:1.4rem}
+
+/* Form */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group.full{grid-column:1/-1}
+label{font-size:.85rem;color:var(--text2);font-weight:500}
+input[type="text"],input[type="datetime-local"],select,textarea{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:.7rem .9rem;color:var(--text);font-size:.95rem;outline:none;transition:border .2s;width:100%
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input[type="color"]{width:50px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;padding:2px}
+
+/* Style selector */
+.style-options{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1rem}
+.style-option{
+  background:var(--surface2);border:2px solid var(--border);border-radius:var(--radius);
+  padding:1rem;text-align:center;cursor:pointer;transition:all .2s
+}
+.style-option:hover{border-color:var(--accent);transform:translateY(-2px)}
+.style-option.active{border-color:var(--accent);background:rgba(108,92,231,.1)}
+.style-option .style-icon{font-size:2rem;margin-bottom:.4rem}
+.style-option .style-name{font-size:.85rem;font-weight:600}
+.style-option .style-desc{font-size:.7rem;color:var(--text2);margin-top:.2rem}
+
+/* Background options */
+.bg-options{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+.bg-option{display:flex;align-items:center;gap:.5rem}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;
+  border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;
+  transition:all .2s;text-decoration:none
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(108,92,231,.4)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-success{background:linear-gradient(135deg,#00b894,var(--success));color:#fff}
+.btn-success:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(0,206,201,.4)}
+.btn-group{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem}
+
+/* Preview */
+.preview-frame{
+  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);
+  min-height:350px;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative
+}
+.preview-placeholder{color:var(--text2);text-align:center;padding:2rem}
+.preview-placeholder .big-icon{font-size:4rem;margin-bottom:1rem;opacity:.5}
+
+/* Preview countdown styles */
+.countdown-preview{text-align:center;padding:2rem;width:100%}
+.countdown-preview h2{font-size:1.8rem;margin-bottom:1.5rem;font-weight:700}
+
+/* Digital style */
+.digital-display{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.digital-unit{text-align:center}
+.digital-number{font-size:3.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.digital-label{font-size:.75rem;text-transform:uppercase;letter-spacing:2px;opacity:.7;margin-top:.3rem}
+
+/* Flip style */
+.flip-display{display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap}
+.flip-unit{text-align:center}
+.flip-card{
+  background:linear-gradient(180deg,#2a2a3e 0%,#2a2a3e 49.9%,#1a1a2e 50%,#1a1a2e 100%);
+  border-radius:8px;padding:1rem 1.2rem;min-width:80px;position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,.3)
+}
+.flip-card::after{content:'';position:absolute;left:4px;right:4px;top:50%;height:1px;background:rgba(0,0,0,.4)}
+.flip-number{font-size:3rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.flip-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;opacity:.7;margin-top:.6rem}
+
+/* Progress style */
+.progress-display{width:100%;max-width:600px;margin:0 auto}
+.progress-unit{margin-bottom:1.2rem}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:.4rem}
+.progress-name{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.progress-value{font-size:1.4rem;font-weight:700}
+.progress-bar{height:12px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:6px;transition:width .5s ease}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:.8rem 1.5rem;font-size:.9rem;z-index:1000;transition:transform .3s ease;
+  box-shadow:0 4px 20px rgba(0,0,0,.3)
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Footer */
+.footer{text-align:center;padding:2rem 1rem;color:var(--text2);font-size:.8rem;margin-top:2rem}
+
+/* Responsive */
+@media(max-width:640px){
+  .header h1{font-size:1.8rem}
+  .form-row{grid-template-columns:1fr}
+  .style-options{grid-template-columns:1fr}
+  .digital-number,.flip-number{font-size:2.2rem}
+  .flip-card{min-width:60px;padding:.7rem .9rem}
+  .btn-group{flex-direction:column}
+  .btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⏳ AI Countdown Maker</h1>
+  <p>Create beautiful countdown timer pages in seconds</p>
+</div>
+
+<div class="container">
+  <!-- Settings Card -->
+  <div class="card">
+    <h2><span class="icon">⚙️</span> Settings</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="title">Countdown Title</label>
+        <input type="text" id="title" placeholder="e.g. New Year 2027" value="New Year 2027">
+      </div>
+      <div class="form-group">
+        <label for="targetDate">Target Date & Time</label>
+        <input type="datetime-local" id="targetDate">
+      </div>
+    </div>
+  </div>
+
+  <!-- Style Card -->
+  <div class="card">
+    <h2><span class="icon">🎨</span> Countdown Style</h2>
+    <div class="style-options">
+      <div class="style-option active" data-style="flip" onclick="selectStyle('flip')">
+        <div class="style-icon">🔢</div>
+        <div class="style-name">Flip Clock</div>
+        <div class="style-desc">Classic flip card animation</div>
+      </div>
+      <div class="style-option" data-style="digital" onclick="selectStyle('digital')">
+        <div class="style-icon">💡</div>
+        <div class="style-name">Digital</div>
+        <div class="style-desc">Clean digital numbers</div>
+      </div>
+      <div class="style-option" data-style="progress" onclick="selectStyle('progress')">
+        <div class="style-icon">📊</div>
+        <div class="style-name">Progress Bar</div>
+        <div class="style-desc">Visual progress indicators</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Card -->
+  <div class="card">
+    <h2><span class="icon">🖼️</span> Background</h2>
+    <div class="bg-options">
+      <div class="bg-option">
+        <label for="bgColor">Color:</label>
+        <input type="color" id="bgColor" value="#0a0a1a">
+      </div>
+      <div class="bg-option">
+        <label for="textColor">Text:</label>
+        <input type="color" id="textColor" value="#e8e8f0">
+      </div>
+      <div class="bg-option">
+        <label for="accentColor">Accent:</label>
+        <input type="color" id="accentColor" value="#6c5ce7">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:1rem">
+      <label for="bgImage">Background Image URL (optional)</label>
+      <input type="text" id="bgImage" placeholder="https://example.com/image.jpg">
+    </div>
+  </div>
+
+  <!-- Preview Card -->
+  <div class="card">
+    <h2><span class="icon">👁️</span> Live Preview</h2>
+    <div class="preview-frame" id="previewFrame">
+      <div class="preview-placeholder" id="previewPlaceholder">
+        <div class="big-icon">⏳</div>
+        <p>Configure your countdown above<br>Preview updates in real-time</p>
+      </div>
+      <div class="countdown-preview" id="countdownPreview" style="display:none"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="downloadHTML()">⬇️ Download HTML</button>
+      <button class="btn btn-success" onclick="copyShareLink()">🔗 Copy Share Link</button>
+      <button class="btn btn-secondary" onclick="openPreview()">↗️ Open Full Preview</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>AI Countdown Maker &mdash; Create and share beautiful countdown pages</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// State
+let currentStyle = 'flip';
+let previewInterval = null;
+
+// Init default date to next New Year
+(function init() {
+  const now = new Date();
+  const ny = new Date(now.getFullYear() + 1, 0, 1, 0, 0, 0);
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('targetDate').value =
+    `${ny.getFullYear()}-${pad(ny.getMonth()+1)}-${pad(ny.getDate())}T00:00`;
+  startPreview();
+  // Listen for changes
+  ['title','targetDate','bgColor','textColor','accentColor','bgImage'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updatePreview);
+  });
+})();
+
+function selectStyle(style) {
+  currentStyle = style;
+  document.querySelectorAll('.style-option').forEach(el => {
+    el.classList.toggle('active', el.dataset.style === style);
+  });
+  updatePreview();
+}
+
+function getConfig() {
+  return {
+    title: document.getElementById('title').value || 'Countdown',
+    targetDate: document.getElementById('targetDate').value,
+    style: currentStyle,
+    bgColor: document.getElementById('bgColor').value,
+    textColor: document.getElementById('textColor').value,
+    accentColor: document.getElementById('accentColor').value,
+    bgImage: document.getElementById('bgImage').value.trim()
+  };
+}
+
+function calcTimeLeft(target) {
+  const diff = new Date(target) - new Date();
+  if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
+  return {
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor((diff % 86400000) / 3600000),
+    minutes: Math.floor((diff % 3600000) / 60000),
+    seconds: Math.floor((diff % 60000) / 1000),
+    total: diff
+  };
+}
+
+function startPreview() {
+  updatePreview();
+  if (previewInterval) clearInterval(previewInterval);
+  previewInterval = setInterval(updatePreview, 1000);
+}
+
+function updatePreview() {
+  const cfg = getConfig();
+  if (!cfg.targetDate) return;
+  const t = calcTimeLeft(cfg.targetDate);
+  const frame = document.getElementById('previewFrame');
+  const preview = document.getElementById('countdownPreview');
+  const placeholder = document.getElementById('previewPlaceholder');
+
+  placeholder.style.display = 'none';
+  preview.style.display = 'block';
+
+  // Background
+  frame.style.background = cfg.bgImage
+    ? `url(${cfg.bgImage}) center/cover no-repeat, ${cfg.bgColor}`
+    : cfg.bgColor;
+  preview.style.color = cfg.textColor;
+
+  const pad = n => String(n).padStart(2, '0');
+  const accent = cfg.accentColor;
+
+  if (t.total <= 0) {
+    preview.innerHTML = `<h2 style="color:${accent}">${cfg.title}</h2><p style="font-size:2rem;margin-top:1rem">🎉 The moment has arrived!</p>`;
+    return;
+  }
+
+  let html = `<h2 style="color:${accent}">${cfg.title}</h2>`;
+
+  if (cfg.style === 'digital') {
+    html += `<div class="digital-display">
+      ${[['days','Days'],['hours','Hours'],['minutes','Min'],['seconds','Sec']].map(([k,l]) =>
+        `<div class="digital-unit"><div class="digital-number" style="color:${accent}">${pad(t[k])}</div><div class="digital-label">${l}</div></div>`
+      ).join('<div style="font-size:2.5rem;opacity:.3;align-self:center">:</div>')}
+    </div>`;
+  } else if (cfg.style === 'flip') {
+    html += `<div class="flip-display">
+      ${[['days','Days'],['hours','Hours'],['minutes','Min'],['seconds','Sec']].map(([k,l]) =>
+        `<div class="flip-unit"><div class="flip-card"><div class="flip-number" style="color:${accent}">${pad(t[k])}</div></div><div class="flip-label">${l}</div></div>`
+      ).join('')}
+    </div>`;
+  } else {
+    const maxDays = Math.max(t.days + 1, 1);
+    const items = [
+      { name: 'Days', value: t.days, max: maxDays },
+      { name: 'Hours', value: t.hours, max: 24 },
+      { name: 'Minutes', value: t.minutes, max: 60 },
+      { name: 'Seconds', value: t.seconds, max: 60 }
+    ];
+    html += `<div class="progress-display">${items.map(i => {
+      const pct = ((i.max - i.value) / i.max * 100).toFixed(1);
+      return `<div class="progress-unit">
+        <div class="progress-header"><span class="progress-name">${i.name}</span><span class="progress-value" style="color:${accent}">${pad(i.value)}</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${accent}"></div></div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  preview.innerHTML = html;
+}
+
+function generateStandaloneHTML() {
+  const cfg = getConfig();
+  const bgStyle = cfg.bgImage
+    ? `url(${cfg.bgImage}) center/cover no-repeat fixed, ${cfg.bgColor}`
+    : cfg.bgColor;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${cfg.title} - Countdown</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:${bgStyle};color:${cfg.textColor};min-height:100vh;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.wrap{width:100%;max-width:800px}
+h1{font-size:2.5rem;font-weight:800;color:${cfg.accentColor};margin-bottom:2rem}
+.done{font-size:2rem;margin-top:1rem}
+/* Digital */
+.digital-display{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.digital-unit{text-align:center}
+.digital-number{font-size:4rem;font-weight:800;color:${cfg.accentColor};font-variant-numeric:tabular-nums;line-height:1}
+.digital-label{font-size:.75rem;text-transform:uppercase;letter-spacing:2px;opacity:.7;margin-top:.3rem}
+.sep{font-size:3rem;opacity:.3;align-self:center}
+/* Flip */
+.flip-display{display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap}
+.flip-unit{text-align:center}
+.flip-card{background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.08) 49.9%,rgba(0,0,0,.15) 50%,rgba(0,0,0,.15) 100%);
+  border-radius:10px;padding:1.2rem 1.5rem;min-width:90px;position:relative;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+.flip-card::after{content:'';position:absolute;left:6px;right:6px;top:50%;height:1px;background:rgba(0,0,0,.4)}
+.flip-number{font-size:3.5rem;font-weight:800;color:${cfg.accentColor};font-variant-numeric:tabular-nums;line-height:1}
+.flip-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;opacity:.7;margin-top:.6rem}
+/* Progress */
+.progress-display{width:100%;max-width:600px;margin:0 auto}
+.progress-unit{margin-bottom:1.5rem}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.progress-name{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.progress-value{font-size:1.5rem;font-weight:700;color:${cfg.accentColor}}
+.progress-bar{height:14px;background:rgba(255,255,255,.1);border-radius:7px;overflow:hidden}
+.progress-fill{height:100%;border-radius:7px;background:${cfg.accentColor};transition:width .5s}
+.credit{position:fixed;bottom:1rem;left:0;right:0;text-align:center;font-size:.75rem;opacity:.5}
+.credit a{color:${cfg.accentColor};text-decoration:none}
+@media(max-width:640px){.digital-number,.flip-number{font-size:2.5rem}.flip-card{min-width:65px;padding:.8rem 1rem}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>${cfg.title}</h1>
+<div id="cd"></div>
+</div>
+<div class="credit">Made with <a href="https://lifa-su.com/ai-countdown-maker/">AI Countdown Maker</a></div>
+<script>
+const T="${cfg.targetDate}",S="${cfg.style}";
+function u(){const d=new Date(T)-new Date(),p=n=>String(n).padStart(2,'0');
+if(d<=0){document.getElementById('cd').innerHTML='<p class="done">🎉 The moment has arrived!</p>';return}
+const D=Math.floor(d/864e5),H=Math.floor(d%864e5/36e5),M=Math.floor(d%36e5/6e4),s=Math.floor(d%6e4/1e3);
+let h='';
+if(S==='digital'){h='<div class="digital-display">'+[['Days',D],['Hours',H],['Min',M],['Sec',s]].map(([l,v])=>'<div class="digital-unit"><div class="digital-number">'+p(v)+'</div><div class="digital-label">'+l+'</div></div>').join('<div class="sep">:</div>')+'</div>'}
+else if(S==='flip'){h='<div class="flip-display">'+[['Days',D],['Hours',H],['Min',M],['Sec',s]].map(([l,v])=>'<div class="flip-unit"><div class="flip-card"><div class="flip-number">'+p(v)+'</div></div><div class="flip-label">'+l+'</div></div>').join('')+'</div>'}
+else{const mx=Math.max(D+1,1);h='<div class="progress-display">'+[{n:'Days',v:D,m:mx},{n:'Hours',v:H,m:24},{n:'Minutes',v:M,m:60},{n:'Seconds',v:s,m:60}].map(i=>{const pc=((i.m-i.v)/i.m*100).toFixed(1);return'<div class="progress-unit"><div class="progress-header"><span class="progress-name">'+i.n+'</span><span class="progress-value">'+p(i.v)+'</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+pc+'%"></div></div></div>'}).join('')+'</div>'}
+document.getElementById('cd').innerHTML=h}
+u();setInterval(u,1000);
+<\/script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>`;
+}
+
+function downloadHTML() {
+  const cfg = getConfig();
+  if (!cfg.targetDate) { showToast('⚠️ Please set a target date'); return; }
+  const html = generateStandaloneHTML();
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `countdown-${cfg.title.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}.html`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('✅ HTML file downloaded!');
+}
+
+function copyShareLink() {
+  const cfg = getConfig();
+  if (!cfg.targetDate) { showToast('⚠️ Please set a target date'); return; }
+  const params = new URLSearchParams({
+    t: cfg.title, d: cfg.targetDate, s: cfg.style,
+    bg: cfg.bgColor, tc: cfg.textColor, ac: cfg.accentColor
+  });
+  if (cfg.bgImage) params.set('bi', cfg.bgImage);
+  const url = location.origin + location.pathname + '?' + params.toString();
+  navigator.clipboard.writeText(url).then(() => showToast('✅ Share link copied!'));
+}
+
+function openPreview() {
+  const cfg = getConfig();
+  if (!cfg.targetDate) { showToast('⚠️ Please set a target date'); return; }
+  const html = generateStandaloneHTML();
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
+// Load from URL params
+(function loadFromURL() {
+  const p = new URLSearchParams(location.search);
+  if (p.has('t')) document.getElementById('title').value = p.get('t');
+  if (p.has('d')) document.getElementById('targetDate').value = p.get('d');
+  if (p.has('s')) selectStyle(p.get('s'));
+  if (p.has('bg')) document.getElementById('bgColor').value = p.get('bg');
+  if (p.has('tc')) document.getElementById('textColor').value = p.get('tc');
+  if (p.has('ac')) document.getElementById('accentColor').value = p.get('ac');
+  if (p.has('bi')) document.getElementById('bgImage').value = p.get('bi');
+  updatePreview();
+})();
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

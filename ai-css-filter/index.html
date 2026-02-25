@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS filter effects generator with live preview. Adjust blur, brightness, contrast, grayscale, hue-rotate, and more. Copy production-ready CSS filters.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-filter/">
+<title>CSS 滤镜效果生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin-bottom:8px;background:linear-gradient(135deg,#00d2ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{text-align:center;color:#8892b0;margin-bottom:24px;font-size:.9rem}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:#16213e;border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,.06)}
+.card-title{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#ccd6f6}
+.preview-wrap{position:relative;width:100%;border-radius:8px;overflow:hidden;background:#0a0a1a;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.preview-wrap img{width:100%;height:100%;object-fit:cover;transition:filter .15s ease}
+.img-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;transition:all .2s;color:#fff}
+.btn-upload{background:linear-gradient(135deg,#667eea,#764ba2)}
+.btn-upload:hover{opacity:.85}
+.btn-reset{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.btn-reset:hover{background:rgba(255,255,255,.15)}
+.slider-group{margin-bottom:14px}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.slider-label{font-size:.85rem;color:#8892b0}
+.slider-value{font-size:.8rem;color:#64ffda;font-family:monospace;min-width:60px;text-align:right}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:#0a0a1a;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#00d2ff,#7b2ff7);cursor:pointer;border:2px solid #16213e;box-shadow:0 0 6px rgba(0,210,255,.4)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#00d2ff,#7b2ff7);cursor:pointer;border:2px solid #16213e}
+.controls-scroll{max-height:520px;overflow-y:auto;padding-right:4px}
+.controls-scroll::-webkit-scrollbar{width:4px}
+.controls-scroll::-webkit-scrollbar-track{background:transparent}
+.controls-scroll::-webkit-scrollbar-thumb{background:#334;border-radius:2px}
+.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.preset-btn{padding:10px 6px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.04);color:#ccd6f6;cursor:pointer;font-size:.8rem;text-align:center;transition:all .2s}
+.preset-btn:hover{background:rgba(100,255,218,.08);border-color:#64ffda}
+.preset-btn.active{background:rgba(100,255,218,.12);border-color:#64ffda;color:#64ffda}
+.code-block{background:#0a0a1a;border-radius:8px;padding:16px;font-family:monospace;font-size:.82rem;color:#64ffda;position:relative;word-break:break-all;line-height:1.8;min-height:60px;border:1px solid rgba(255,255,255,.06)}
+.btn-copy{position:absolute;top:8px;right:8px;background:rgba(100,255,218,.15);color:#64ffda;border:1px solid rgba(100,255,218,.3);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.btn-copy:hover{background:rgba(100,255,218,.25)}
+.full-width{grid-column:1/-1}
+@media(max-width:768px){.main{grid-template-columns:1fr}.presets{grid-template-columns:repeat(4,1fr)}h1{font-size:1.4rem}.container{padding:12px}}
+.hidden-input{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>CSS 滤镜效果生成器</h1>
+<p class="subtitle">调整滑块或选择预设，实时预览 CSS filter 效果</p>
+<div class="main">
+<div class="card"><div class="card-title">🖼️ 图片预览</div><div class="preview-wrap"><img id="preview" src="https://picsum.photos/800/600?random=1" alt="预览"></div><div class="img-actions"><button class="btn btn-upload" onclick="document.getElementById('fileInput').click()">📁 上传图片</button><button class="btn btn-reset" onclick="resetAll()">🔄 重置全部</button><input type="file" id="fileInput" class="hidden-input" accept="image/*"></div></div>
+<div class="card"><div class="card-title">🎛️ 滤镜控制</div><div class="controls-scroll" id="controls"></div></div>
+<div class="card full-width"><div class="card-title">✨ 预设效果</div><div class="presets" id="presets"></div></div>
+<div class="card full-width"><div class="card-title">📋 CSS 代码</div><div class="code-block"><button class="btn-copy" id="copyBtn" onclick="copyCode()">复制</button><code id="codeOutput"></code></div></div>
+</div></div>
+<script>
+var F=[
+{id:'blur',name:'模糊 Blur',min:0,max:20,step:0.5,def:0,unit:'px',css:function(v){return 'blur('+v+'px)'}},
+{id:'brightness',name:'亮度 Brightness',min:0,max:300,step:1,def:100,unit:'%',css:function(v){return 'brightness('+v+'%)'}},
+{id:'contrast',name:'对比度 Contrast',min:0,max:300,step:1,def:100,unit:'%',css:function(v){return 'contrast('+v+'%)'}},
+{id:'grayscale',name:'灰度 Grayscale',min:0,max:100,step:1,def:0,unit:'%',css:function(v){return 'grayscale('+v+'%)'}},
+{id:'hueRotate',name:'色相旋转 Hue Rotate',min:0,max:360,step:1,def:0,unit:'deg',css:function(v){return 'hue-rotate('+v+'deg)'}},
+{id:'invert',name:'反色 Invert',min:0,max:100,step:1,def:0,unit:'%',css:function(v){return 'invert('+v+'%)'}},
+{id:'opacity',name:'不透明度 Opacity',min:0,max:100,step:1,def:100,unit:'%',css:function(v){return 'opacity('+v+'%)'}},
+{id:'saturate',name:'饱和度 Saturate',min:0,max:300,step:1,def:100,unit:'%',css:function(v){return 'saturate('+v+'%)'}},
+{id:'sepia',name:'褐色 Sepia',min:0,max:100,step:1,def:0,unit:'%',css:function(v){return 'sepia('+v+'%)'}},
+];
+var presets=[
+{name:'🔥 复古',v:{blur:0,brightness:110,contrast:85,grayscale:20,hueRotate:0,invert:0,opacity:100,saturate:120,sepia:60}},
+{name:'🎬 电影',v:{blur:0,brightness:90,contrast:130,grayscale:10,hueRotate:0,invert:0,opacity:100,saturate:85,sepia:20}},
+{name:'❄️ 冷色',v:{blur:0,brightness:105,contrast:110,grayscale:0,hueRotate:200,invert:0,opacity:100,saturate:90,sepia:10}},
+{name:'☀️ 暖色',v:{blur:0,brightness:110,contrast:105,grayscale:0,hueRotate:15,invert:0,opacity:100,saturate:130,sepia:25}},
+{name:'🖤 黑白',v:{blur:0,brightness:105,contrast:120,grayscale:100,hueRotate:0,invert:0,opacity:100,saturate:0,sepia:0}},
+{name:'⚡ 高对比',v:{blur:0,brightness:110,contrast:200,grayscale:0,hueRotate:0,invert:0,opacity:100,saturate:130,sepia:0}},
+{name:'🌫️ 褪色',v:{blur:0.5,brightness:115,contrast:80,grayscale:15,hueRotate:0,invert:0,opacity:90,saturate:75,sepia:15}},
+{name:'💜 梦幻',v:{blur:1,brightness:115,contrast:90,grayscale:0,hueRotate:300,invert:0,opacity:95,saturate:150,sepia:10}},
+];
+var vals={};
+function init(){
+  var cEl=document.getElementById('controls');
+  F.forEach(function(f){
+    vals[f.id]=f.def;
+    var d=document.createElement('div');d.className='slider-group';
+    d.innerHTML='<div class="slider-header"><span class="slider-label">'+f.name+'</span><span class="slider-value" id="val_'+f.id+'">'+f.def+f.unit+'</span></div><input type="range" id="s_'+f.id+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'" value="'+f.def+'">';
+    cEl.appendChild(d);
+    document.getElementById('s_'+f.id).addEventListener('input',function(e){
+      vals[f.id]=parseFloat(e.target.value);
+      document.getElementById('val_'+f.id).textContent=e.target.value+f.unit;
+      clearActivePreset();
+      update();
+    });
+  });
+  var pEl=document.getElementById('presets');
+  presets.forEach(function(p,i){
+    var b=document.createElement('button');b.className='preset-btn';b.textContent=p.name;b.setAttribute('data-idx',i);
+    b.addEventListener('click',function(){applyPreset(i)});
+    pEl.appendChild(b);
+  });
+  document.getElementById('fileInput').addEventListener('change',function(e){
+    var file=e.target.files[0];if(!file)return;
+    var r=new FileReader();r.onload=function(ev){document.getElementById('preview').src=ev.target.result};r.readAsDataURL(file);
+  });
+  update();
+}
+function update(){
+  var parts=[];
+  F.forEach(function(f){
+    var v=vals[f.id];
+    if(v!==f.def) parts.push(f.css(v));
+  });
+  var filterStr=parts.length?parts.join(' '):'none';
+  document.getElementById('preview').style.filter=filterStr;
+  document.getElementById('codeOutput').textContent='filter: '+filterStr+';';
+}
+function applyPreset(idx){
+  var p=presets[idx];
+  F.forEach(function(f){
+    var v=p.v[f.id];if(v===undefined)v=f.def;
+    vals[f.id]=v;
+    document.getElementById('s_'+f.id).value=v;
+    document.getElementById('val_'+f.id).textContent=v+f.unit;
+  });
+  document.querySelectorAll('.preset-btn').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  update();
+}
+function clearActivePreset(){document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active')})}
+function resetAll(){
+  F.forEach(function(f){
+    vals[f.id]=f.def;
+    document.getElementById('s_'+f.id).value=f.def;
+    document.getElementById('val_'+f.id).textContent=f.def+f.unit;
+  });
+  clearActivePreset();update();
+}
+function copyCode(){
+  var t=document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(t).then(function(){
+    var b=document.getElementById('copyBtn');b.textContent='已复制!';
+    setTimeout(function(){b.textContent='复制'},1500);
+  });
+}
+init();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:1200px;margin:20px auto;padding:0 20px}
+.pro-blur-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;opacity:.6;padding:24px;background:#16213e;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+.pro-blur-content .mock-title{font-size:.95rem;color:#ccd6f6;margin-bottom:12px;font-weight:600}
+.pro-blur-content .mock-row{display:flex;gap:10px;margin-bottom:10px}
+.pro-blur-content .mock-input{flex:1;height:38px;background:#0a0a1a;border:1px solid rgba(255,255,255,.06);border-radius:8px}
+.pro-blur-content .mock-btn{width:140px;height:38px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:8px}
+.pro-blur-content .mock-timeline{width:100%;height:50px;background:#0a0a1a;border:1px solid rgba(255,255,255,.06);border-radius:8px;margin:10px 0;position:relative;overflow:hidden}
+.pro-blur-content .mock-timeline::after{content:'';position:absolute;top:50%;left:0;width:60%;height:4px;background:linear-gradient(90deg,#00d2ff,#7b2ff7);border-radius:2px;transform:translateY(-50%)}
+.pro-blur-content .mock-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+.pro-blur-content .mock-thumb{aspect-ratio:4/3;background:#0a0a1a;border:1px solid rgba(255,255,255,.06);border-radius:6px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:12px;z-index:2}
+.pro-lock{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-label{font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:1px}
+.pro-sublabel{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal-box{background:#16213e;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid #7b2ff7;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.pro-modal-box h3{font-size:1.4rem;margin-bottom:4px;color:#fff}
+.pro-modal-box .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#00d2ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;color:#ccc}
+.pro-modal-box ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal-box .pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#00d2ff,#7b2ff7);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-modal-box .pro-upgrade-btn:hover{opacity:.88}
+.pro-modal-box .pro-later-btn{display:block;width:100%;padding:12px;background:transparent;color:#888;font-size:.9rem;border:none;cursor:pointer;margin-top:8px;transition:color .2s}
+.pro-modal-box .pro-later-btn:hover{color:#fff}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur-content">
+<div class="mock-title">🎬 Filter Animation Timeline</div>
+<div class="mock-timeline"></div>
+<div class="mock-row"><div class="mock-btn" style="width:100px"></div><div class="mock-btn" style="width:100px;background:rgba(255,255,255,.08)"></div><div class="mock-btn" style="width:100px;background:rgba(255,255,255,.08)"></div></div>
+<div class="mock-title">📦 Batch Image Processing</div>
+<div class="mock-grid"><div class="mock-thumb"></div><div class="mock-thumb"></div><div class="mock-thumb"></div><div class="mock-thumb"></div></div>
+<div class="mock-title">⚛️ Export as React Component</div>
+<div class="mock-row"><div class="mock-btn" style="background:linear-gradient(135deg,#61dafb,#764ba2)"></div><div class="mock-btn" style="background:#28a745"></div></div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal-box">
+<h3>🎨 CSS Filter Pro</h3>
+<div class="pro-price">$9</div>
+<p style="color:#aab;font-size:.9rem;margin-bottom:8px">One-time payment · Lifetime access</p>
+<ul>
+<li>Filter Animation with Keyframes</li>
+<li>Batch Image Processing</li>
+<li>Export as React/Vue Component</li>
+<li>Custom Preset Library</li>
+<li>Priority Support</li>
+</ul>
+<a class="pro-upgrade-btn" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UUID Generator - Generate v4 UUIDs Instantly</title>
+<meta name="description" content="Free online UUID v4 generator. Generate random UUIDs in bulk with customizable formats.">
+<link rel="canonical" href="https://lifa-su.com/ai-uuid-generator/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 6px;text-align:center}
+h1 span{color:var(--accent)}
+.sub{color:var(--text2);margin-bottom:24px;text-align:center;font-size:.95rem}
+.card{background:var(--surface);border-radius:var(--r);padding:24px;width:100%;max-width:700px;margin-bottom:16px}
+.ctrls{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.cg{display:flex;flex-direction:column;gap:4px}
+.cg label{font-size:.8rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.qr{display:flex;align-items:center;gap:10px}
+input[type=range]{-webkit-appearance:none;height:6px;background:var(--surface2);border-radius:3px;outline:none;flex:1;min-width:120px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer}
+input[type=number]{width:58px;background:var(--surface2);border:1px solid #333;color:var(--text);border-radius:6px;padding:6px 8px;text-align:center;font-size:.95rem}
+input[type=number]:focus{outline:none;border-color:var(--accent)}
+.tr{display:flex;gap:12px;flex-wrap:wrap}
+.tg{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;font-size:.9rem;background:var(--surface2);padding:6px 14px;border-radius:20px;transition:background .2s}
+.tg.on{background:var(--accent2)}
+.tg input{display:none}
+.btn{background:var(--accent);color:#fff;border:none;padding:10px 24px;border-radius:var(--r);cursor:pointer;font-size:1rem;font-weight:600;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn:active{transform:scale(.97)}
+.btn2{background:var(--surface2);font-size:.85rem;padding:8px 16px}
+.br{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.res{margin-top:10px}
+.ui{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:6px;margin-bottom:4px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;cursor:pointer;transition:background .15s;word-break:break-all}
+.ui:hover{background:var(--surface2)}
+.ui .ch{font-size:.7rem;color:var(--text2);white-space:nowrap;margin-left:10px;flex-shrink:0}
+.ui.ok{background:#1a4a2e}
+.ui.ok .ch{color:#4ade80}
+.empty{color:var(--text2);text-align:center;padding:30px;font-size:.9rem}
+.hs{max-height:300px;overflow-y:auto}
+.hs::-webkit-scrollbar{width:6px}
+.hs::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+.hi{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;color:var(--text2);padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ht{font-size:.7rem;color:#666;margin-right:8px}
+.badge{background:var(--accent);color:#fff;font-size:.7rem;padding:2px 8px;border-radius:10px;margin-left:8px}
+footer{margin-top:auto;padding:20px;text-align:center;color:#555;font-size:.8rem}
+@media(max-width:600px){h1{font-size:1.4rem}.card{padding:16px}.ui{font-size:.78rem;padding:7px 10px}.btn{padding:10px 18px;font-size:.9rem}}
+</style>
+</head>
+<body>
+<h1>&#128273; <span>UUID</span> Generator</h1>
+<p class="sub">Generate cryptographically random v4 UUIDs</p>
+<div class="card">
+<div class="ctrls">
+<div class="cg" style="flex:1;min-width:200px">
+<label>Quantity</label>
+<div class="qr">
+<input type="range" id="qr" min="1" max="100" value="5">
+<input type="number" id="qn" min="1" max="100" value="5">
+</div>
+</div>
+<div class="cg">
+<label>Format</label>
+<div class="tr">
+<label class="tg" id="ct"><input type="checkbox"><span>UPPERCASE</span></label>
+<label class="tg on" id="ht"><input type="checkbox" checked><span>Hyphens</span></label>
+</div>
+</div>
+</div>
+<div class="br">
+<button class="btn" id="gen">Generate UUIDs</button>
+<button class="btn btn2" id="ca">Copy All</button>
+</div>
+<div class="res" id="res"><div class="empty">Click "Generate UUIDs" to start</div></div>
+</div>
+<div class="card">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+<h3 style="font-size:1rem">&#128203; History <span class="badge" id="hc">0</span></h3>
+<button class="btn btn2" id="clr" style="padding:4px 12px;font-size:.75rem">Clear</button>
+</div>
+<div class="hs" id="hse"><div class="empty">No history yet</div></div>
+</div>
+<footer>UUID Generator &copy; 2025 - All UUIDs generated client-side using crypto.getRandomValues()</footer>
+<script>
+(function(){
+var qr=document.getElementById('qr'),qn=document.getElementById('qn');
+var ct=document.getElementById('ct'),ht=document.getElementById('ht');
+var res=document.getElementById('res'),hse=document.getElementById('hse');
+var hc=document.getElementById('hc');
+var uuids=[],hist=[];
+qr.oninput=function(){qn.value=qr.value};
+qn.oninput=function(){var v=Math.min(100,Math.max(1,parseInt(qn.value)||1));qn.value=v;qr.value=v};
+ct.onclick=function(){ct.classList.toggle('on');reformat()};
+ht.onclick=function(){ht.classList.toggle('on');reformat()};
+function genUUID(){
+var b=new Uint8Array(16);crypto.getRandomValues(b);
+b[6]=(b[6]&0x0f)|0x40;b[8]=(b[8]&0x3f)|0x80;
+var h='';for(var i=0;i<16;i++)h+=(b[i]<16?'0':'')+b[i].toString(16);
+return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+}
+function fmt(u){
+var s=ct.classList.contains('on')?u.toUpperCase():u;
+if(!ht.classList.contains('on'))s=s.replace(/-/g,'');
+return s;
+}
+function reformat(){
+if(!uuids.length)return;
+var items=res.querySelectorAll('.ui');
+for(var i=0;i<items.length;i++){
+items[i].querySelector('.ut').textContent=fmt(uuids[i]);
+}
+}
+function render(){
+if(!uuids.length){res.innerHTML='<div class="empty">Click "Generate UUIDs" to start</div>';return;}
+var h='';
+for(var i=0;i<uuids.length;i++){
+h+='<div class="ui" data-i="'+i+'"><span class="ut">'+fmt(uuids[i])+'</span><span class="ch">click to copy</span></div>';
+}
+res.innerHTML=h;
+}
+function copyText(t,el){
+navigator.clipboard.writeText(t).then(function(){
+if(el){el.classList.add('ok');el.querySelector('.ch').textContent='copied!';
+setTimeout(function(){el.classList.remove('ok');el.querySelector('.ch').textContent='click to copy'},1200);}
+});
+}
+function addHist(arr){
+var now=new Date();var ts=now.toLocaleTimeString();
+for(var i=0;i<arr.length;i++){
+hist.unshift({t:ts,u:arr[i]});
+}
+if(hist.length>500)hist.length=500;
+hc.textContent=hist.length;
+var h='';
+for(var i=0;i<hist.length;i++){
+h+='<div class="hi"><span class="ht">'+hist[i].t+'</span>'+hist[i].u+'</div>';
+}
+hse.innerHTML=h;
+}
+document.getElementById('gen').onclick=function(){
+var n=parseInt(qn.value)||5;
+uuids=[];
+for(var i=0;i<n;i++)uuids.push(genUUID());
+render();
+addHist(uuids);
+};
+res.onclick=function(e){
+var el=e.target.closest('.ui');
+if(!el)return;
+var i=parseInt(el.getAttribute('data-i'));
+copyText(fmt(uuids[i]),el);
+};
+document.getElementById('ca').onclick=function(){
+if(!uuids.length)return;
+var t=uuids.map(function(u){return fmt(u)}).join('\n');
+navigator.clipboard.writeText(t).then(function(){
+var b=document.getElementById('ca');b.textContent='Copied!';
+setTimeout(function(){b.textContent='Copy All'},1200);
+});
+};
+document.getElementById('clr').onclick=function(){
+hist=[];hc.textContent='0';
+hse.innerHTML='<div class="empty">No history yet</div>';
+};
+document.getElementById('gen').click();
+})();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

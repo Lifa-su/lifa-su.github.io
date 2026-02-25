@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate tsconfig.json files with AI guidance. Configure TypeScript compiler options for React, Node.js, and library projects with best practice presets.">
+<link rel="canonical" href="https://lifa-su.com/ai-tsconfig/">
+<title>AI tsconfig.json Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--card:#1e2746;--code:#0d1117;--text:#e2e8f0;--text2:#94a3b8;--accent:#6c63ff;--accent2:#a78bfa;--green:#10b981;--border:#2d3748;--hover:#2a3a5c}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent2);text-decoration:none}
+.container{max-width:1400px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-bottom:1px solid var(--border);padding:20px 0;text-align:center}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,#6c63ff,#a78bfa,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+header p{color:var(--text2);font-size:0.95rem}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px 0}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-header h2{font-size:1.1rem;font-weight:600}
+.panel-body{padding:20px;max-height:calc(100vh - 220px);overflow-y:auto}
+.panel-body::-webkit-scrollbar{width:6px}
+.panel-body::-webkit-scrollbar-track{background:transparent}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.preset-btn{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);cursor:pointer;font-size:0.85rem;transition:all .2s;display:flex;align-items:center;gap:6px}
+.preset-btn:hover{border-color:var(--accent);background:rgba(108,99,255,0.1)}
+.preset-btn.active{border-color:var(--accent);background:rgba(108,99,255,0.15);color:var(--accent2)}
+.preset-btn .icon{font-size:1.1rem}
+.section{margin-bottom:20px}
+.section-title{font-size:0.9rem;font-weight:600;color:var(--accent2);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.section-title .arrow{transition:transform .2s;font-size:0.7rem}
+.section-title .arrow.collapsed{transform:rotate(-90deg)}
+.section-content{display:grid;gap:8px}
+.section-content.collapsed{display:none}
+.option-row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;transition:background .15s}
+.option-row:hover{background:var(--hover)}
+.option-row label{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem}
+.option-row .opt-name{font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--green);font-size:0.85rem}
+.option-row .opt-desc{color:var(--text2);font-size:0.78rem;margin-left:auto;max-width:200px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tooltip-wrap{position:relative;display:inline-flex}
+.tooltip-wrap .tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:0.78rem;white-space:nowrap;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.tooltip-wrap:hover .tip{display:block}
+input[type="checkbox"]{appearance:none;width:18px;height:18px;border:2px solid var(--border);border-radius:4px;cursor:pointer;position:relative;flex-shrink:0;transition:all .15s}
+input[type="checkbox"]:checked{background:var(--accent);border-color:var(--accent)}
+input[type="checkbox"]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:12px;font-weight:bold}
+select,input[type="text"]{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:0.85rem;font-family:inherit}
+select{cursor:pointer;min-width:140px}
+select:focus,input[type="text"]:focus{outline:none;border-color:var(--accent)}
+.select-row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:8px;transition:background .15s}
+.select-row:hover{background:var(--hover)}
+.select-row .opt-name{font-family:'SF Mono',Monaco,Consolas,monospace;color:var(--green);font-size:0.85rem;min-width:140px}
+.select-row .opt-desc{color:var(--text2);font-size:0.78rem;margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.code-area{background:var(--code);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.85rem;line-height:1.7;overflow-x:auto;white-space:pre;color:#e6edf3;min-height:300px;position:relative}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:500;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5b52e0}
+.btn-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--accent);background:rgba(108,99,255,0.1)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#059669}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:12px 20px;border-radius:8px;font-size:0.9rem;transform:translateY(100px);opacity:0;transition:all .3s;z-index:1000}
+.toast.show{transform:translateY(0);opacity:1}
+.search-box{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;margin-bottom:16px}
+.search-box:focus{outline:none;border-color:var(--accent)}
+.search-box::placeholder{color:var(--text2)}
+.paths-editor{margin-top:8px;padding:12px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.path-row{display:flex;gap:8px;margin-bottom:6px;align-items:center}
+.path-row input{flex:1}
+.path-row button{background:none;border:none;color:#ef4444;cursor:pointer;font-size:1.1rem;padding:4px}
+.add-path-btn{font-size:0.8rem;color:var(--accent2);cursor:pointer;background:none;border:none;padding:4px 0}
+.add-path-btn:hover{text-decoration:underline}
+.stat-bar{display:flex;gap:16px;padding:12px 20px;background:var(--bg);border-top:1px solid var(--border);font-size:0.8rem;color:var(--text2)}
+.stat-bar span{display:flex;align-items:center;gap:4px}
+footer{text-align:center;padding:20px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);margin-top:24px}
+@media(max-width:900px){
+.main{grid-template-columns:1fr}
+.panel-body{max-height:none}
+.option-row .opt-desc{display:none}
+.select-row .opt-desc{display:none}
+}
+.highlight-key{color:#7ee787}
+.highlight-str{color:#a5d6ff}
+.highlight-bool{color:#ff7b72}
+.highlight-num{color:#d2a8ff}
+.highlight-bracket{color:#8b949e}
+.highlight-null{color:#ff7b72}
+.reset-btn{background:none;border:1px solid #ef4444;color:#ef4444;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:all .2s}
+.reset-btn:hover{background:rgba(239,68,68,0.1)}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<h1>⚡ AI tsconfig.json Generator</h1>
+<p>Visually configure TypeScript compiler options with presets and real-time preview</p>
+</div>
+</header>
+<div class="container">
+<div class="main">
+<div class="panel">
+<div class="panel-header">
+<h2>⚙️ Configuration</h2>
+<button class="reset-btn" onclick="resetAll()">↺ Reset</button>
+</div>
+<div class="panel-body" id="configPanel">
+<input type="text" class="search-box" id="searchBox" placeholder="🔍 Search options..." oninput="filterOptions()">
+<div class="presets" id="presets"></div>
+<div id="optionsContainer"></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header">
+<h2>📄 tsconfig.json</h2>
+<div class="actions">
+<button class="btn btn-primary" onclick="copyToClipboard()">📋 Copy</button>
+<button class="btn btn-success" onclick="downloadFile()">⬇ Download</button>
+</div>
+</div>
+<div class="panel-body">
+<div class="code-area" id="codeOutput"></div>
+</div>
+<div class="stat-bar">
+<span id="optionCount">0 options configured</span>
+<span id="fileSize">~0 bytes</span>
+</div>
+</div>
+</div>
+</div>
+<footer>
+<p>AI tsconfig.json Generator — Built for TypeScript developers</p>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const PRESETS = [
+  { id:'react', name:'React', icon:'⚛️', desc:'React with JSX, DOM, ES modules', options:{target:'ES2020',module:'ESNext',lib:['DOM','DOM.Iterable','ESNext'],jsx:'react-jsx',moduleResolution:'bundler',esModuleInterop:true,strict:true,skipLibCheck:true,forceConsistentCasingInFileNames:true,isolatedModules:true,allowImportingTsExtensions:true,noEmit:true}},
+  { id:'node', name:'Node.js', icon:'🟢', desc:'Node.js with CommonJS', options:{target:'ES2022',module:'CommonJS',lib:['ES2022'],moduleResolution:'node',esModuleInterop:true,strict:true,skipLibCheck:true,forceConsistentCasingInFileNames:true,outDir:'./dist',rootDir:'./src',resolveJsonModule:true}},
+  { id:'library', name:'Library', icon:'📦', desc:'Library with declarations', options:{target:'ES2020',module:'ESNext',lib:['ES2020'],declaration:true,declarationMap:true,composite:true,moduleResolution:'bundler',esModuleInterop:true,strict:true,skipLibCheck:true,outDir:'./dist',rootDir:'./src',sourceMap:true}},
+  { id:'nextjs', name:'Next.js', icon:'▲', desc:'Next.js optimized config', options:{target:'ES2017',module:'ESNext',lib:['DOM','DOM.Iterable','ESNext'],jsx:'preserve',moduleResolution:'bundler',esModuleInterop:true,strict:true,skipLibCheck:true,forceConsistentCasingInFileNames:true,isolatedModules:true,incremental:true,noEmit:true,resolveJsonModule:true,allowJs:true}},
+  { id:'vue', name:'Vue', icon:'💚', desc:'Vue.js project config', options:{target:'ES2020',module:'ESNext',lib:['ES2020','DOM','DOM.Iterable'],jsx:'preserve',moduleResolution:'bundler',esModuleInterop:true,strict:true,skipLibCheck:true,forceConsistentCasingInFileNames:true,isolatedModules:true,noEmit:true,resolveJsonModule:true}},
+  { id:'strict', name:'Strict Mode', icon:'🔒', desc:'All strict checks enabled', options:{strict:true,noImplicitAny:true,strictNullChecks:true,strictFunctionTypes:true,strictBindCallApply:true,strictPropertyInitialization:true,noImplicitThis:true,alwaysStrict:true,noUnusedLocals:true,noUnusedParameters:true,noImplicitReturns:true,noFallthroughCasesInSwitch:true,noUncheckedIndexedAccess:true,exactOptionalPropertyTypes:true}}
+];
+
+const SECTIONS = [
+  { id:'basic', title:'🎯 Basic Options', options:[
+    {name:'target',type:'select',values:['ES3','ES5','ES6','ES2015','ES2016','ES2017','ES2018','ES2019','ES2020','ES2021','ES2022','ES2023','ESNext'],desc:'JavaScript version target'},
+    {name:'module',type:'select',values:['CommonJS','AMD','UMD','System','ES6','ES2015','ES2020','ES2022','ESNext','Node16','NodeNext','None','Preserve'],desc:'Module code generation'},
+    {name:'lib',type:'multiselect',values:['ES5','ES6','ES2015','ES2016','ES2017','ES2018','ES2019','ES2020','ES2021','ES2022','ES2023','ESNext','DOM','DOM.Iterable','WebWorker','ScriptHost'],desc:'Library files to include'},
+    {name:'outDir',type:'text',desc:'Output directory for compiled files',placeholder:'./dist'},
+    {name:'rootDir',type:'text',desc:'Root directory of source files',placeholder:'./src'},
+    {name:'jsx',type:'select',values:['','preserve','react','react-jsx','react-jsxdev','react-native'],desc:'JSX code generation'},
+    {name:'allowJs',type:'bool',desc:'Allow JavaScript files to be compiled'},
+    {name:'resolveJsonModule',type:'bool',desc:'Allow importing .json files'},
+    {name:'isolatedModules',type:'bool',desc:'Ensure each file can be safely transpiled'},
+    {name:'noEmit',type:'bool',desc:'Do not emit output files'},
+  ]},
+  { id:'strict', title:'🔒 Strict Checks', options:[
+    {name:'strict',type:'bool',desc:'Enable all strict type-checking options'},
+    {name:'noImplicitAny',type:'bool',desc:'Error on expressions with implied any type'},
+    {name:'strictNullChecks',type:'bool',desc:'Enable strict null checks'},
+    {name:'strictFunctionTypes',type:'bool',desc:'Strict checking of function types'},
+    {name:'strictBindCallApply',type:'bool',desc:'Strict bind, call, apply on functions'},
+    {name:'strictPropertyInitialization',type:'bool',desc:'Strict property initialization in classes'},
+    {name:'noImplicitThis',type:'bool',desc:'Error on this with an implied any type'},
+    {name:'alwaysStrict',type:'bool',desc:'Parse in strict mode, emit "use strict"'},
+    {name:'noUnusedLocals',type:'bool',desc:'Report errors on unused local variables'},
+    {name:'noUnusedParameters',type:'bool',desc:'Report errors on unused parameters'},
+    {name:'noImplicitReturns',type:'bool',desc:'Report error when not all paths return'},
+    {name:'noFallthroughCasesInSwitch',type:'bool',desc:'Report errors for fallthrough cases'},
+    {name:'noUncheckedIndexedAccess',type:'bool',desc:'Add undefined to index signature results'},
+    {name:'exactOptionalPropertyTypes',type:'bool',desc:'Differentiate undefined vs optional'},
+  ]},
+  { id:'module', title:'📁 Module Resolution', options:[
+    {name:'moduleResolution',type:'select',values:['','classic','node','node16','nodenext','bundler'],desc:'Module resolution strategy'},
+    {name:'baseUrl',type:'text',desc:'Base directory for non-relative modules',placeholder:'./'},
+    {name:'esModuleInterop',type:'bool',desc:'Emit helpers for CommonJS/ES interop'},
+    {name:'allowSyntheticDefaultImports',type:'bool',desc:'Allow default imports from modules'},
+    {name:'forceConsistentCasingInFileNames',type:'bool',desc:'Ensure consistent casing in imports'},
+    {name:'allowImportingTsExtensions',type:'bool',desc:'Allow imports with .ts extensions'},
+  ]},
+  { id:'output', title:'📤 Output Options', options:[
+    {name:'declaration',type:'bool',desc:'Generate .d.ts declaration files'},
+    {name:'declarationMap',type:'bool',desc:'Generate sourcemaps for .d.ts files'},
+    {name:'sourceMap',type:'bool',desc:'Generate .map sourcemap files'},
+    {name:'removeComments',type:'bool',desc:'Remove comments from output'},
+    {name:'importHelpers',type:'bool',desc:'Import emit helpers from tslib'},
+    {name:'downlevelIteration',type:'bool',desc:'Full support for iterables in ES5/3'},
+    {name:'emitDecoratorMetadata',type:'bool',desc:'Emit design-type metadata for decorators'},
+    {name:'experimentalDecorators',type:'bool',desc:'Enable experimental decorators'},
+  ]},
+  { id:'advanced', title:'🔧 Advanced Options', options:[
+    {name:'incremental',type:'bool',desc:'Enable incremental compilation'},
+    {name:'composite',type:'bool',desc:'Enable project compilation constraints'},
+    {name:'skipLibCheck',type:'bool',desc:'Skip type checking of declaration files'},
+    {name:'tsBuildInfoFile',type:'text',desc:'Specify incremental build info file',placeholder:'./.tsbuildinfo'},
+    {name:'types',type:'text',desc:'Type declaration packages to include',placeholder:'node, jest'},
+    {name:'typeRoots',type:'text',desc:'Folders to include type definitions from',placeholder:'./node_modules/@types'},
+  ]}
+];
+
+let state = {};
+let activePreset = null;
+let collapsedSections = {};
+
+function init() {
+  renderPresets();
+  renderOptions();
+  updatePreview();
+}
+
+function renderPresets() {
+  const c = document.getElementById('presets');
+  c.innerHTML = PRESETS.map(p =>
+    `<button class="preset-btn${activePreset===p.id?' active':''}" onclick="applyPreset('${p.id}')" title="${p.desc}"><span class="icon">${p.icon}</span>${p.name}</button>`
+  ).join('');
+}
+
+function applyPreset(id) {
+  const preset = PRESETS.find(p=>p.id===id);
+  if(!preset) return;
+  if(activePreset===id){activePreset=null;state={};} else {activePreset=id;state={...preset.options};}
+  renderPresets();
+  renderOptions();
+  updatePreview();
+}
+
+function resetAll() {
+  state={};activePreset=null;
+  renderPresets();renderOptions();updatePreview();
+  showToast('Configuration reset');
+}
+
+function renderOptions() {
+  const c = document.getElementById('optionsContainer');
+  c.innerHTML = SECTIONS.map(sec => {
+    const isCollapsed = collapsedSections[sec.id];
+    return `<div class="section" data-section="${sec.id}">
+      <div class="section-title" onclick="toggleSection('${sec.id}')">
+        ${sec.title}
+        <span class="arrow${isCollapsed?' collapsed':''}">▼</span>
+      </div>
+      <div class="section-content${isCollapsed?' collapsed':''}" id="sec-${sec.id}">
+        ${sec.options.map(o=>renderOption(o)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderOption(o) {
+  if(o.type==='bool') {
+    const checked = state[o.name]===true?' checked':'';
+    return `<div class="option-row" data-opt="${o.name}">
+      <label>
+        <input type="checkbox" ${checked} onchange="setBool('${o.name}',this.checked)">
+        <span class="tooltip-wrap"><span class="opt-name">${o.name}</span><span class="tip">${o.desc}</span></span>
+      </label>
+      <span class="opt-desc">${o.desc}</span>
+    </div>`;
+  }
+  if(o.type==='select') {
+    const val = state[o.name]||'';
+    const opts = o.values.map(v=>`<option value="${v}"${val===v?' selected':''}>${v||'(none)'}</option>`).join('');
+    return `<div class="select-row" data-opt="${o.name}">
+      <span class="tooltip-wrap"><span class="opt-name">${o.name}</span><span class="tip">${o.desc}</span></span>
+      <select onchange="setSelect('${o.name}',this.value)">${opts}</select>
+      <span class="opt-desc">${o.desc}</span>
+    </div>`;
+  }
+  if(o.type==='text') {
+    const val = state[o.name]||'';
+    return `<div class="select-row" data-opt="${o.name}">
+      <span class="tooltip-wrap"><span class="opt-name">${o.name}</span><span class="tip">${o.desc}</span></span>
+      <input type="text" value="${val}" placeholder="${o.placeholder||''}" onchange="setText('${o.name}',this.value)" onkeyup="setText('${o.name}',this.value)">
+      <span class="opt-desc">${o.desc}</span>
+    </div>`;
+  }
+  if(o.type==='multiselect') {
+    const selected = state[o.name]||[];
+    const chips = o.values.map(v=>{
+      const active = selected.includes(v);
+      return `<button class="preset-btn${active?' active':''}" style="padding:4px 10px;font-size:0.78rem" onclick="toggleLib('${o.name}','${v}')">${v}</button>`;
+    }).join('');
+    return `<div class="select-row" data-opt="${o.name}" style="flex-wrap:wrap">
+      <span class="tooltip-wrap"><span class="opt-name">${o.name}</span><span class="tip">${o.desc}</span></span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${chips}</div>
+    </div>`;
+  }
+  return '';
+}
+
+function setBool(name,val){if(val)state[name]=true;else delete state[name];updatePreview();activePreset=null;renderPresets();}
+function setSelect(name,val){if(val)state[name]=val;else delete state[name];updatePreview();activePreset=null;renderPresets();}
+function setText(name,val){if(val.trim())state[name]=val.trim();else delete state[name];updatePreview();activePreset=null;renderPresets();}
+function toggleLib(name,val){
+  if(!state[name])state[name]=[];
+  const i=state[name].indexOf(val);
+  if(i>=0)state[name].splice(i,1);else state[name].push(val);
+  if(state[name].length===0)delete state[name];
+  renderOptions();updatePreview();activePreset=null;renderPresets();
+}
+
+function toggleSection(id){collapsedSections[id]=!collapsedSections[id];renderOptions();}
+
+function filterOptions(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('[data-opt]').forEach(el=>{
+    const name=el.dataset.opt.toLowerCase();
+    const desc=(el.querySelector('.opt-desc')?.textContent||'').toLowerCase();
+    el.style.display=(name.includes(q)||desc.includes(q))?'':'none';
+  });
+  if(q){document.querySelectorAll('.section-content').forEach(el=>el.classList.remove('collapsed'));document.querySelectorAll('.arrow').forEach(el=>el.classList.remove('collapsed'));}
+}
+
+function generateConfig(){
+  const config={compilerOptions:{}};
+  const co=config.compilerOptions;
+  SECTIONS.forEach(sec=>{
+    sec.options.forEach(o=>{
+      if(o.name in state){
+        let v=state[o.name];
+        if(o.type==='text'&&(o.name==='types'||o.name==='typeRoots')){
+          v=v.split(',').map(s=>s.trim()).filter(Boolean);
+        }
+        co[o.name]=v;
+      }
+    });
+  });
+  return config;
+}
+
+function syntaxHighlight(json){
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){
+    let cls='highlight-num';
+    if(/^"/.test(match)){cls=/:$/.test(match)?'highlight-key':'highlight-str';}
+    else if(/true|false/.test(match))cls='highlight-bool';
+    else if(/null/.test(match))cls='highlight-null';
+    return '<span class="'+cls+'">'+match+'</span>';
+  });
+}
+
+function updatePreview(){
+  const config=generateConfig();
+  const json=JSON.stringify(config,null,2);
+  document.getElementById('codeOutput').innerHTML=syntaxHighlight(json);
+  const keys=Object.keys(config.compilerOptions).length;
+  document.getElementById('optionCount').textContent=keys+' option'+(keys!==1?'s':'')+' configured';
+  document.getElementById('fileSize').textContent='~'+new Blob([json]).size+' bytes';
+}
+
+function copyToClipboard(){
+  const config=generateConfig();
+  const json=JSON.stringify(config,null,2);
+  navigator.clipboard.writeText(json).then(()=>showToast('Copied to clipboard!')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=json;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied to clipboard!');
+  });
+}
+
+function downloadFile(){
+  const config=generateConfig();
+  const json=JSON.stringify(config,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tsconfig.json';a.click();URL.revokeObjectURL(a.href);
+  showToast('Downloaded tsconfig.json');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

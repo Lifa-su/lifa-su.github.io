@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Caret Color Generator</title>
+<meta name="description" content="Generate CSS caret-color properties with live preview. Customize cursor color for input fields, textareas, and contenteditable elements.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-caret-color/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;color:#fff;margin-bottom:6px}
+header p{color:#888;font-size:0.95rem}
+.main{display:grid;grid-template-columns:320px 1fr;gap:24px;margin-top:24px}
+@media(max-width:768px){.main{grid-template-columns:1fr}}
+.panel{background:#16213e;border-radius:12px;padding:24px;border:1px solid #0f3460}
+.panel h2{font-size:1.1rem;margin-bottom:16px;color:#fff}
+.control-group{margin-bottom:20px}
+.control-group label{display:block;font-size:0.85rem;color:#aaa;margin-bottom:8px}
+.color-row{display:flex;align-items:center;gap:12px}
+.color-row input[type="color"]{width:48px;height:48px;border:none;border-radius:8px;cursor:pointer;background:transparent}
+.color-row input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+.color-row input[type="color"]::-webkit-color-swatch{border-radius:6px;border:2px solid #0f3460}
+.color-hex{background:#0f3460;border:1px solid #1a4080;color:#e0e0e0;padding:8px 12px;border-radius:6px;font-family:monospace;font-size:0.95rem;width:110px;text-align:center}
+.preview-section{display:flex;flex-direction:column;gap:16px}
+.preview-card{background:#16213e;border-radius:12px;padding:20px;border:1px solid #0f3460}
+.preview-card h3{font-size:0.9rem;color:#888;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px}
+.preview-card input[type="text"],.preview-card textarea{width:100%;padding:12px;border-radius:8px;border:2px solid #0f3460;font-size:1rem;color:#e0e0e0;outline:none;font-family:inherit;transition:border-color .2s}
+.preview-card input[type="text"]:focus,.preview-card textarea:focus,.preview-card .editable:focus{border-color:#7c83ff}
+.preview-card textarea{resize:vertical;min-height:80px}
+.preview-card .editable{width:100%;min-height:60px;padding:12px;border-radius:8px;border:2px solid #0f3460;font-size:1rem;color:#e0e0e0;outline:none;font-family:inherit;transition:border-color .2s}
+.preview-card .editable:empty:before{content:attr(data-placeholder);color:#666}
+.code-section{background:#16213e;border-radius:12px;padding:20px;border:1px solid #0f3460;margin-top:24px;position:relative}
+.code-section h2{font-size:1.1rem;margin-bottom:12px;color:#fff}
+.code-block{background:#0d1117;border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.9rem;color:#c9d1d9;line-height:1.6;overflow-x:auto;white-space:pre}
+.copy-btn{position:absolute;top:20px;right:20px;background:#7c83ff;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:0.8rem;transition:background .2s}
+.copy-btn:hover{background:#6a70e0}
+.copy-btn.copied{background:#4caf50}
+footer{text-align:center;padding:30px 0 20px;color:#555;font-size:0.8rem}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#127912; AI CSS Caret Color Generator</h1>
+    <p>Customize the cursor color for your input fields with live preview</p>
+  </header>
+  <div class="main">
+    <div class="panel">
+      <h2>Controls</h2>
+      <div class="control-group">
+        <label>Caret Color</label>
+        <div class="color-row">
+          <input type="color" id="caretColor" value="#7c83ff">
+          <input type="text" class="color-hex" id="caretHex" value="#7c83ff" maxlength="7" aria-label="Caret color hex value">
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Background Color</label>
+        <div class="color-row">
+          <input type="color" id="bgColor" value="#16213e">
+          <input type="text" class="color-hex" id="bgHex" value="#16213e" maxlength="7" aria-label="Background color hex value">
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Text Color</label>
+        <div class="color-row">
+          <input type="color" id="textColor" value="#e0e0e0">
+          <input type="text" class="color-hex" id="textHex" value="#e0e0e0" maxlength="7" aria-label="Text color hex value">
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Border Color</label>
+        <div class="color-row">
+          <input type="color" id="borderColor" value="#0f3460">
+          <input type="text" class="color-hex" id="borderHex" value="#0f3460" maxlength="7" aria-label="Border color hex value">
+        </div>
+      </div>
+    </div>
+    <div class="preview-section">
+      <div class="preview-card">
+        <h3>Input Text</h3>
+        <input type="text" id="previewInput" placeholder="Click here and type to see the caret color..." aria-label="Preview input text">
+      </div>
+      <div class="preview-card">
+        <h3>Textarea</h3>
+        <textarea id="previewTextarea" placeholder="Click here and type to see the caret color..." aria-label="Preview textarea"></textarea>
+      </div>
+      <div class="preview-card">
+        <h3>Contenteditable Div</h3>
+        <div class="editable" id="previewEditable" contenteditable="true" role="textbox" aria-label="Preview contenteditable div" data-placeholder="Click here and type to see the caret color..."></div>
+      </div>
+    </div>
+  </div>
+  <div class="code-section">
+    <h2>Generated CSS</h2>
+    <button class="copy-btn" id="copyBtn" aria-label="Copy CSS code">Copy</button>
+    <div class="code-block" id="codeOutput"></div>
+  </div>
+  <footer>
+    <p>AI CSS Caret Color Generator &mdash; A free tool for web developers</p>
+  </footer>
+</div>
+<script>
+(function(){
+  function $(id){return document.getElementById(id)}
+  var pairs=[
+    ['caretColor','caretHex'],
+    ['bgColor','bgHex'],
+    ['textColor','textHex'],
+    ['borderColor','borderHex']
+  ];
+  var previews=['previewInput','previewTextarea','previewEditable'];
+
+  pairs.forEach(function(p){
+    var picker=$(p[0]), hex=$(p[1]);
+    picker.addEventListener('input',function(){hex.value=picker.value;update()});
+    hex.addEventListener('input',function(){
+      if(/^#[0-9a-fA-F]{6}$/.test(hex.value)){picker.value=hex.value;update()}
+    });
+  });
+
+  function update(){
+    var caret=$('caretHex').value;
+    var bg=$('bgHex').value;
+    var text=$('textHex').value;
+    var border=$('borderHex').value;
+    previews.forEach(function(id){
+      var el=$(id);
+      el.style.caretColor=caret;
+      el.style.backgroundColor=bg;
+      el.style.color=text;
+      el.style.borderColor=border;
+    });
+    var css='/* Caret Color CSS */\n';
+    css+='input,\ntextarea,\n[contenteditable="true"] {\n';
+    css+='  caret-color: '+caret+';\n';
+    css+='  background-color: '+bg+';\n';
+    css+='  color: '+text+';\n';
+    css+='  border-color: '+border+';\n';
+    css+='}';
+    $('codeOutput').textContent=css;
+  }
+
+  $('copyBtn').addEventListener('click',function(){
+    var btn=$('copyBtn');
+    var text=$('codeOutput').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent='Copied!';
+      btn.classList.add('copied');
+      setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied')},2000);
+    });
+  });
+
+  update();
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

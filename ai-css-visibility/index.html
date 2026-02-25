@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Visibility 演示工具 - visible/hidden/collapse 对比</title>
+<meta name="description" content="交互式 CSS visibility 属性演示，对比 visible、hidden、collapse，与 display:none 的区别，动画过渡效果，代码生成。">
+<link rel="canonical" href="https://lifa-su.com/ai-css-visibility/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--dim:#aab;--border:#2a2a4e;--cyan:#00d2ff;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.header{text-align:center;padding:2.5rem 1rem 1.5rem}
+.header h1{font-size:clamp(1.5rem,4vw,2.4rem);background:linear-gradient(135deg,#00d2ff,#e94560);-webkit-background-clip:text;background-clip:text;color:transparent}
+.header p{color:var(--dim);font-size:.95rem;margin-top:.3rem}
+.container{max-width:1100px;margin:0 auto;padding:0 1rem 3rem}
+.section{margin-top:2.5rem}
+.stitle{font-size:1.25rem;margin-bottom:1rem;padding-left:.6rem;border-left:4px solid var(--accent);color:var(--cyan)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.4);margin-bottom:1.2rem}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.ditem{text-align:center}
+.ditem .lbl{display:block;font-size:.82rem;color:var(--dim);margin-bottom:.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.bwrap{background:rgba(255,255,255,.04);border:2px dashed var(--border);border-radius:8px;padding:1rem;min-height:100px;display:flex;align-items:center;justify-content:center}
+.dbox{width:100px;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff}
+.ba{background:linear-gradient(135deg,#e94560,#c23152)}
+.bb{background:linear-gradient(135deg,#533483,#3a1f6e)}
+.bc{background:linear-gradient(135deg,#00d2ff,#0097b2)}
+.ph{color:var(--dim);font-size:.72rem;font-style:italic}
+.brow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem;justify-content:center}
+.btn{padding:.5rem 1.1rem;border:none;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .25s;color:#fff}
+.btn:hover{transform:translateY(-1px)}
+.b1{background:var(--accent)}.b1:hover{background:#c23152}
+.b2{background:var(--accent2)}.b2:hover{background:#3a1f6e}
+.b3{background:#0097b2}.b3:hover{background:#007a91}
+.bo{background:transparent;border:1.5px solid var(--border);color:var(--dim)}.bo:hover{border-color:var(--accent);color:var(--accent)}
+.cwrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:600px){.cwrap{grid-template-columns:1fr}}
+.ccol h3{font-size:.95rem;margin-bottom:.8rem;color:var(--cyan)}
+.crow{display:flex;gap:.6rem;align-items:center;margin-bottom:.6rem;flex-wrap:wrap}
+.cb{width:65px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0}
+.csib{width:65px;height:42px;border-radius:6px;background:rgba(255,255,255,.08);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.62rem;color:var(--dim);flex-shrink:0}
+.cd{font-size:.78rem;color:var(--dim)}
+.tstage{background:rgba(255,255,255,.04);border:2px dashed var(--border);border-radius:8px;padding:2rem;text-align:center;min-height:120px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.tbox{width:160px;height:80px;background:linear-gradient(135deg,#e94560,#533483);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;color:#fff;transition:opacity .5s ease,visibility .5s ease,transform .5s ease;cursor:pointer}
+.tbox.out{opacity:0;visibility:hidden;transform:scale(.92)}
+.codew{position:relative;margin-top:1rem}
+.codeblk{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:1rem 1.2rem;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;color:#c9d1d9;overflow-x:auto;white-space:pre;line-height:1.7}
+.cpbtn{position:absolute;top:.5rem;right:.5rem;padding:.3rem .65rem;background:rgba(255,255,255,.1);border:1px solid var(--border);border-radius:6px;color:var(--dim);font-size:.72rem;cursor:pointer;transition:all .2s}
+.cpbtn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cpbtn.ok{background:var(--cyan);color:#000;border-color:var(--cyan)}
+.gform{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:500px){.gform{grid-template-columns:1fr}}
+.gform label{font-size:.8rem;color:var(--dim);display:block;margin-bottom:.3rem}
+.gform select,.gform input{width:100%;padding:.5rem .7rem;background:#0d1117;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}
+.gform select:focus,.gform input:focus{outline:none;border-color:var(--cyan)}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:600;margin-right:.3rem}
+.tg{background:rgba(0,210,255,.15);color:var(--cyan)}
+.tr{background:rgba(233,69,96,.15);color:var(--accent)}
+.tp{background:rgba(83,52,131,.2);color:#b388ff}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:1rem}
+.icard{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center}
+.icard .ic{font-size:1.8rem;margin-bottom:.4rem}
+.icard h4{font-size:.88rem;margin-bottom:.3rem;color:var(--text)}
+.icard p{font-size:.75rem;color:var(--dim)}
+.status{display:inline-block;padding:.2rem .6rem;border-radius:20px;font-size:.75rem;font-weight:600;margin-top:.5rem}
+.footer{text-align:center;padding:2rem 1rem;color:var(--dim);font-size:.8rem;border-top:1px solid var(--border);margin-top:3rem}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🎨 CSS Visibility 演示工具</h1>
+<p>交互式探索 visibility 属性的三种状态、与 display:none 的区别、动画过渡效果</p>
+</div>
+<div class="container">
+
+<!-- Section 1: Three States -->
+<div class="section">
+<h2 class="stitle">visibility 三种状态对比</h2>
+<div class="card">
+<div class="dgrid" id="triDemo">
+<div class="ditem">
+<span class="lbl"><span class="tag tg">visible</span> 可见</span>
+<div class="bwrap"><div class="dbox ba" id="triA">VISIBLE</div></div>
+</div>
+<div class="ditem">
+<span class="lbl"><span class="tag tr">hidden</span> 隐藏</span>
+<div class="bwrap"><div class="dbox bb" id="triB">HIDDEN</div></div>
+</div>
+<div class="ditem">
+<span class="lbl"><span class="tag tp">collapse</span> 折叠</span>
+<div class="bwrap"><div class="dbox bc" id="triC">COLLAPSE</div></div>
+</div>
+</div>
+<div class="brow">
+<button class="btn b1" onclick="setTri('visible')">全部显示</button>
+<button class="btn b2" onclick="setTri('hidden')">全部隐藏</button>
+<button class="btn b3" onclick="setTri('collapse')">全部折叠</button>
+<button class="btn bo" onclick="setTri('reset')">重置默认</button>
+</div>
+<div class="codew">
+<button class="cpbtn" onclick="copyCode(this,'triCode')">复制</button>
+<div class="codeblk" id="triCode">/* visibility: visible - 元素正常显示 */
+.element-a { visibility: visible; }
+
+/* visibility: hidden - 元素不可见但保留空间 */
+.element-b { visibility: hidden; }
+
+/* visibility: collapse - 用于表格行/列折叠 */
+.element-c { visibility: collapse; }</div>
+</div>
+</div>
+</div>
+
+<!-- Section 2: vs display:none -->
+<div class="section">
+<h2 class="stitle">visibility:hidden vs display:none</h2>
+<div class="card">
+<div class="cwrap">
+<div class="ccol">
+<h3>visibility: hidden <span class="tag tg">保留空间</span></h3>
+<div class="crow">
+<div class="cb ba" id="vhBox" style="visibility:visible">BOX</div>
+<div class="csib">邻居</div>
+<span class="cd">← 隐藏后邻居不动</span>
+</div>
+<button class="btn b1" onclick="toggleVH()" id="vhBtn">隐藏元素</button>
+</div>
+<div class="ccol">
+<h3>display: none <span class="tag tr">不保留空间</span></h3>
+<div class="crow">
+<div class="cb ba" id="dnBox" style="display:block">BOX</div>
+<div class="csib">邻居</div>
+<span class="cd">← 隐藏后邻居左移</span>
+</div>
+<button class="btn b1" onclick="toggleDN()" id="dnBtn">隐藏元素</button>
+</div>
+</div>
+<div class="codew">
+<button class="cpbtn" onclick="copyCode(this,'cmpCode')">复制</button>
+<div class="codeblk" id="cmpCode">/* visibility: hidden */
+/* 元素不可见，但仍占据布局空间 */
+/* 子元素可通过 visibility:visible 重新显示 */
+.hidden-keep-space {
+  visibility: hidden;
+}
+
+/* display: none */
+/* 元素完全从文档流中移除 */
+/* 不占据任何空间，子元素也无法显示 */
+.hidden-no-space {
+  display: none;
+}</div>
+</div>
+</div>
+</div>
+
+<!-- Section 3: Transition -->
+<div class="section">
+<h2 class="stitle">动画过渡效果演示</h2>
+<div class="card">
+<p style="font-size:.85rem;color:var(--dim);margin-bottom:1rem">visibility 配合 opacity 实现平滑淡入淡出（纯 display:none 无法做到过渡动画）</p>
+<div class="tstage">
+<div class="tbox" id="transBox" onclick="toggleTrans()">点击我淡出</div>
+</div>
+<div class="brow">
+<button class="btn b1" onclick="fadeOut()">淡出</button>
+<button class="btn b3" onclick="fadeIn()">淡入</button>
+<button class="btn bo" onclick="toggleTrans()">切换</button>
+</div>
+<div class="codew">
+<button class="cpbtn" onclick="copyCode(this,'transCode')">复制</button>
+<div class="codeblk" id="transCode">/* 关键：visibility 配合 opacity + transition */
+.fade-element {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition: opacity .5s ease,
+              visibility .5s ease,
+              transform .5s ease;
+}
+
+.fade-element.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+}
+
+/* 为什么不用 display:none？ */
+/* display 不支持 transition 过渡 */
+/* visibility 支持，配合 opacity 实现平滑动画 */</div>
+</div>
+</div>
+</div>
+
+<!-- Section 4: Code Generator -->
+<div class="section">
+<h2 class="stitle">CSS 代码生成器</h2>
+<div class="card">
+<div class="gform">
+<div>
+<label for="genProp">属性选择</label>
+<select id="genProp" onchange="genCode()">
+<option value="visibility-visible">visibility: visible</option>
+<option value="visibility-hidden">visibility: hidden</option>
+<option value="visibility-collapse">visibility: collapse</option>
+<option value="display-none">display: none</option>
+<option value="fade-transition">淡入淡出过渡</option>
+</select>
+</div>
+<div>
+<label for="genSel">选择器名称</label>
+<input type="text" id="genSel" value=".my-element" oninput="genCode()" placeholder=".class-name">
+</div>
+<div>
+<label for="genDur">过渡时长 (秒)</label>
+<input type="number" id="genDur" value="0.5" step="0.1" min="0.1" max="5" oninput="genCode()">
+</div>
+<div>
+<label for="genEase">缓动函数</label>
+<select id="genEase" onchange="genCode()">
+<option value="ease">ease</option>
+<option value="ease-in">ease-in</option>
+<option value="ease-out">ease-out</option>
+<option value="ease-in-out">ease-in-out</option>
+<option value="linear">linear</option>
+<option value="cubic-bezier(.4,0,.2,1)">Material Design</option>
+</select>
+</div>
+</div>
+<div class="codew">
+<button class="cpbtn" onclick="copyCode(this,'genOutput')">复制代码</button>
+<div class="codeblk" id="genOutput"></div>
+</div>
+</div>
+</div>
+
+<!-- Section 5: Quick Reference -->
+<div class="section">
+<h2 class="stitle">快速参考</h2>
+<div class="card">
+<div class="igrid">
+<div class="icard">
+<div class="ic">👁️</div>
+<h4>visibility: visible</h4>
+<p>默认值，元素正常显示</p>
+<span class="status tg">占据空间 ✓</span>
+</div>
+<div class="icard">
+<div class="ic">👻</div>
+<h4>visibility: hidden</h4>
+<p>不可见但保留布局空间</p>
+<span class="status tr">不可见 · 占空间</span>
+</div>
+<div class="icard">
+<div class="ic">📐</div>
+<h4>visibility: collapse</h4>
+<p>表格行/列折叠，其他同 hidden</p>
+<span class="status tp">表格专用</span>
+</div>
+<div class="icard">
+<div class="ic">🚫</div>
+<h4>display: none</h4>
+<p>完全移除，不占任何空间</p>
+<span class="status tr">完全移除</span>
+</div>
+</div>
+
+<div style="margin-top:1.5rem;overflow-x:auto">
+<table style="width:100%;border-collapse:collapse;font-size:.82rem">
+<thead>
+<tr style="border-bottom:2px solid var(--border)">
+<th style="text-align:left;padding:.6rem;color:var(--cyan)">特性</th>
+<th style="padding:.6rem;color:var(--cyan)">visible</th>
+<th style="padding:.6rem;color:var(--cyan)">hidden</th>
+<th style="padding:.6rem;color:var(--cyan)">collapse</th>
+<th style="padding:.6rem;color:var(--cyan)">display:none</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom:1px solid var(--border)">
+<td style="padding:.5rem;color:var(--dim)">元素可见</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+</tr>
+<tr style="border-bottom:1px solid var(--border)">
+<td style="padding:.5rem;color:var(--dim)">占据空间</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">⚠️</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+</tr>
+<tr style="border-bottom:1px solid var(--border)">
+<td style="padding:.5rem;color:var(--dim)">支持过渡动画</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+</tr>
+<tr style="border-bottom:1px solid var(--border)">
+<td style="padding:.5rem;color:var(--dim)">子元素可覆盖</td>
+<td style="padding:.5rem;text-align:center">—</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+</tr>
+<tr>
+<td style="padding:.5rem;color:var(--dim)">可被点击/聚焦</td>
+<td style="padding:.5rem;text-align:center">✅</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+<td style="padding:.5rem;text-align:center">❌</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+</div>
+<footer class="footer">CSS Visibility 演示工具 · 交互式学习 CSS 可见性属性</footer>
+<script>
+// Section 1: Tri-state demo
+function setTri(mode) {
+  var a = document.getElementById('triA');
+  var b = document.getElementById('triB');
+  var c = document.getElementById('triC');
+  if (mode === 'reset') {
+    a.style.visibility = 'visible';
+    b.style.visibility = 'hidden';
+    c.style.visibility = 'collapse';
+  } else if (mode === 'visible') {
+    a.style.visibility = 'visible';
+    b.style.visibility = 'visible';
+    c.style.visibility = 'visible';
+  } else if (mode === 'hidden') {
+    a.style.visibility = 'hidden';
+    b.style.visibility = 'hidden';
+    c.style.visibility = 'hidden';
+  } else if (mode === 'collapse') {
+    a.style.visibility = 'collapse';
+    b.style.visibility = 'collapse';
+    c.style.visibility = 'collapse';
+  }
+  updateTriCode();
+}
+function updateTriCode() {
+  var a = document.getElementById('triA').style.visibility || 'visible';
+  var b = document.getElementById('triB').style.visibility || 'hidden';
+  var c = document.getElementById('triC').style.visibility || 'collapse';
+  document.getElementById('triCode').textContent =
+    '/* 当前状态 */\n.element-a { visibility: ' + a + '; }\n.element-b { visibility: ' + b + '; }\n.element-c { visibility: ' + c + '; }';
+}
+
+// Section 2: Compare
+var vhHidden = false, dnHidden = false;
+function toggleVH() {
+  vhHidden = !vhHidden;
+  var box = document.getElementById('vhBox');
+  var btn = document.getElementById('vhBtn');
+  box.style.visibility = vhHidden ? 'hidden' : 'visible';
+  btn.textContent = vhHidden ? '显示元素' : '隐藏元素';
+}
+function toggleDN() {
+  dnHidden = !dnHidden;
+  var box = document.getElementById('dnBox');
+  var btn = document.getElementById('dnBtn');
+  box.style.display = dnHidden ? 'none' : 'flex';
+  btn.textContent = dnHidden ? '显示元素' : '隐藏元素';
+}
+
+// Section 3: Transition
+var transOut = false;
+function fadeOut() {
+  document.getElementById('transBox').classList.add('out');
+  document.getElementById('transBox').textContent = '已淡出';
+  transOut = true;
+}
+function fadeIn() {
+  document.getElementById('transBox').classList.remove('out');
+  document.getElementById('transBox').textContent = '点击我淡出';
+  transOut = false;
+}
+function toggleTrans() {
+  if (transOut) fadeIn(); else fadeOut();
+}
+
+// Section 4: Code Generator
+function genCode() {
+  var prop = document.getElementById('genProp').value;
+  var sel = document.getElementById('genSel').value || '.my-element';
+  var dur = document.getElementById('genDur').value || '0.5';
+  var ease = document.getElementById('genEase').value;
+  var code = '';
+  switch (prop) {
+    case 'visibility-visible':
+      code = sel + ' {\n  visibility: visible;\n}';
+      break;
+    case 'visibility-hidden':
+      code = sel + ' {\n  visibility: hidden;\n  /* 元素不可见但仍占据布局空间 */\n}';
+      break;
+    case 'visibility-collapse':
+      code = sel + ' {\n  visibility: collapse;\n  /* 用于表格元素：行/列被折叠 */\n  /* 非表格元素：效果同 hidden */\n}';
+      break;
+    case 'display-none':
+      code = sel + ' {\n  display: none;\n  /* 元素完全从文档流移除，不占空间 */\n}';
+      break;
+    case 'fade-transition':
+      code = '/* 默认可见状态 */\n' + sel + ' {\n  opacity: 1;\n  visibility: visible;\n  transform: scale(1);\n  transition: opacity ' + dur + 's ' + ease + ',\n             visibility ' + dur + 's ' + ease + ',\n             transform ' + dur + 's ' + ease + ';\n}\n\n/* 隐藏状态 */\n' + sel + '.hidden {\n  opacity: 0;\n  visibility: hidden;\n  transform: scale(0.92);\n}\n\n/* JavaScript 切换 */\n/* element.classList.toggle("hidden"); */';
+      break;
+  }
+  document.getElementById('genOutput').textContent = code;
+}
+
+// Copy to clipboard
+function copyCode(btn, id) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = '已复制!';
+    btn.classList.add('ok');
+    setTimeout(function() {
+      btn.textContent = '复制';
+      btn.classList.remove('ok');
+    }, 2000);
+  }).catch(function() {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '已复制!';
+    btn.classList.add('ok');
+    setTimeout(function() {
+      btn.textContent = '复制';
+      btn.classList.remove('ok');
+    }, 2000);
+  });
+}
+
+// Init
+setTri('reset');
+genCode();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Create CSS wave shapes and SVG wave dividers for web design. Customize wave height, frequency, and colors. Copy CSS or SVG code for section separators.">
+<link rel="canonical" href="https://lifa-su.com/ai-wave-generator/">
+<title>AI CSS Wave Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f1a;--surface:#1a1a2e;--surface2:#252540;--border:#333355;--text:#e0e0f0;--text2:#8888aa;--accent:#6c5ce7;--accent2:#a29bfe;--danger:#ff6b6b;--success:#2ed573}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.app{display:flex;min-height:100vh}
+.sidebar{width:340px;min-width:340px;background:var(--surface);border-right:1px solid var(--border);padding:20px;overflow-y:auto;height:100vh;position:sticky;top:0}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.preview-area{flex:1;display:flex;align-items:center;justify-content:center;padding:30px;position:relative;background:var(--bg)}
+.code-area{background:var(--surface);border-top:1px solid var(--border);max-height:300px;overflow:hidden}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.logo svg{width:32px;height:32px}
+.logo h1{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo span{font-size:11px;color:var(--text2);display:block;-webkit-text-fill-color:var(--text2)}
+.section{margin-bottom:20px}
+.section-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.control{margin-bottom:14px}
+.control label{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--text);margin-bottom:6px}
+.control label span{color:var(--accent2);font-size:12px;font-family:monospace}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--surface2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--accent2)}
+input[type=color]{-webkit-appearance:none;width:36px;height:28px;border:2px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;padding:0}
+input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+input[type=color]::-webkit-color-swatch{border-radius:3px;border:none}
+.layer-item{background:var(--surface2);border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--border);transition:border-color .2s}
+.layer-item:hover{border-color:var(--accent)}
+.layer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.layer-header span{font-size:13px;font-weight:600}
+.layer-actions{display:flex;gap:6px}
+.btn-icon{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+.btn-icon.danger:hover{border-color:var(--danger);color:var(--danger)}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--accent);background:var(--accent);color:#fff}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-block{width:100%;justify-content:center}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.toggle-row label{font-size:13px}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:var(--surface2);border-radius:12px;border:1px solid var(--border);transition:.3s}
+.toggle .slider:before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--text2);left:2px;top:2px;transition:.3s}
+.toggle input:checked+.slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.slider:before{transform:translateX(20px);background:#fff}
+.direction-btns{display:flex;gap:8px}
+.direction-btns .btn{flex:1;justify-content:center}
+.direction-btns .btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+.tab{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+.code-content{padding:16px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:12px;line-height:1.6;overflow:auto;max-height:250px;white-space:pre;color:#a0a0c0;background:var(--surface)}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;font-size:11px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .2s;z-index:5}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.copied{border-color:var(--success);color:var(--success)}
+.code-tab-content{position:relative;display:none}
+.code-tab-content.active{display:block}
+.preview-svg{width:100%;max-width:900px;border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.preview-bg{position:relative;width:100%;overflow:hidden}
+.add-layer-btn{width:100%;padding:10px;border-radius:8px;border:2px dashed var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:13px;transition:all .2s;margin-top:4px}
+.add-layer-btn:hover{border-color:var(--accent);color:var(--accent)}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-row input[type=color]{flex-shrink:0}
+.color-row .color-hex{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--text);font-size:12px;font-family:monospace}
+.preview-controls{position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:10}
+.bg-selector{display:flex;gap:6px;align-items:center}
+.bg-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.bg-dot:hover,.bg-dot.active{border-color:var(--accent);transform:scale(1.1)}
+@media(max-width:900px){.app{flex-direction:column}.sidebar{width:100%;min-width:auto;height:auto;position:relative;max-height:50vh;border-right:none;border-bottom:1px solid var(--border)}}
+.toast{position:fixed;bottom:24px;right:24px;padding:10px 20px;background:var(--success);color:#fff;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transform:translateY(10px);transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<div class="logo">
+<svg viewBox="0 0 32 32" fill="none"><path d="M2 20c4-6 8 2 12-4s8 2 12-4" stroke="url(#lg)" stroke-width="3" stroke-linecap="round"/><path d="M2 24c4-6 8 2 12-4s8 2 12-4" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" opacity=".5"/><defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#6c5ce7"/><stop offset="1" stop-color="#a29bfe"/></linearGradient></defs></svg>
+<h1>Wave Generator<span>AI CSS Wave Tool</span></h1>
+</div>
+
+<div class="section">
+<div class="section-title">⚙️ Global Settings</div>
+<div class="control">
+<label>Width <span id="widthVal">1200</span>px</label>
+<input type="range" id="svgWidth" min="400" max="1920" value="1200" step="10">
+</div>
+<div class="control">
+<label>Height <span id="heightVal">200</span>px</label>
+<input type="range" id="svgHeight" min="50" max="500" value="200" step="10">
+</div>
+<div class="control">
+<label>Direction</label>
+<div class="direction-btns">
+<button class="btn btn-sm active" data-dir="bottom" onclick="setDirection('bottom',this)">↓ Bottom</button>
+<button class="btn btn-sm" data-dir="top" onclick="setDirection('top',this)">↑ Top</button>
+</div>
+</div>
+<div class="toggle-row">
+<label>Animation</label>
+<label class="toggle"><input type="checkbox" id="animToggle" checked onchange="updateWave()"><span class="slider"></span></label>
+</div>
+<div class="control" id="speedControl">
+<label>Speed <span id="speedVal">20</span>s</label>
+<input type="range" id="animSpeed" min="2" max="60" value="20" step="1">
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">🌊 Wave Layers</div>
+<div id="layersContainer"></div>
+<button class="add-layer-btn" onclick="addLayer()">+ Add Wave Layer</button>
+</div>
+</aside>
+
+<div class="main">
+<div class="preview-area">
+<div class="preview-controls">
+<div class="bg-selector">
+<div class="bg-dot active" style="background:#0f0f1a" onclick="setBg('#0f0f1a',this)" title="Dark"></div>
+<div class="bg-dot" style="background:#1a1a2e" onclick="setBg('#1a1a2e',this)" title="Navy"></div>
+<div class="bg-dot" style="background:#ffffff;border:1px solid #ccc" onclick="setBg('#ffffff',this)" title="White"></div>
+<div class="bg-dot" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="setBg('linear-gradient(135deg,#667eea,#764ba2)',this)" title="Gradient"></div>
+</div>
+</div>
+<div class="preview-svg" id="previewContainer">
+<div class="preview-bg" id="previewBg" style="background:#0f0f1a">
+<svg id="waveSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+</div>
+</div>
+</div>
+<div class="code-area">
+<div class="tabs">
+<div class="tab active" onclick="switchTab('svg',this)">SVG Code</div>
+<div class="tab" onclick="switchTab('css',this)">CSS Code</div>
+<div class="tab" onclick="switchTab('html',this)">HTML + CSS</div>
+</div>
+<div class="code-tab-content active" id="tab-svg">
+<button class="copy-btn" onclick="copyCode('svg')">Copy</button>
+<pre class="code-content" id="code-svg"></pre>
+</div>
+<div class="code-tab-content" id="tab-css">
+<button class="copy-btn" onclick="copyCode('css')">Copy</button>
+<pre class="code-content" id="code-css"></pre>
+</div>
+<div class="code-tab-content" id="tab-html">
+<button class="copy-btn" onclick="copyCode('html')">Copy</button>
+<pre class="code-content" id="code-html"></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+const defaultLayers = [
+  { color: '#6c5ce7', opacity: 0.8, amplitude: 40, frequency: 1.5, phase: 0, speed: 20 },
+  { color: '#a29bfe', opacity: 0.6, amplitude: 30, frequency: 2, phase: 2, speed: 25 },
+  { color: '#74b9ff', opacity: 0.4, amplitude: 20, frequency: 2.5, phase: 4, speed: 30 }
+];
+
+let layers = [];
+let direction = 'bottom';
+let animEnabled = true;
+let globalSpeed = 20;
+
+function init() {
+  defaultLayers.forEach(l => layers.push({...l}));
+  renderLayers();
+  bindGlobalControls();
+  updateWave();
+}
+
+function bindGlobalControls() {
+  const ids = ['svgWidth','svgHeight','animSpeed'];
+  const vals = ['widthVal','heightVal','speedVal'];
+  ids.forEach((id, i) => {
+    document.getElementById(id).addEventListener('input', function() {
+      document.getElementById(vals[i]).textContent = this.value;
+      if (id === 'animSpeed') globalSpeed = +this.value;
+      updateWave();
+    });
+  });
+}
+
+function setDirection(dir, btn) {
+  direction = dir;
+  document.querySelectorAll('.direction-btns .btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateWave();
+}
+
+function setBg(bg, el) {
+  document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('previewBg').style.background = bg;
+}
+
+function addLayer() {
+  const hue = Math.floor(Math.random() * 360);
+  layers.push({
+    color: `hsl(${hue}, 70%, 60%)`,
+    opacity: 0.5,
+    amplitude: 20 + Math.random() * 30,
+    frequency: 1 + Math.random() * 2,
+    phase: Math.random() * Math.PI * 2,
+    speed: 15 + Math.random() * 20
+  });
+  renderLayers();
+  updateWave();
+}
+
+function removeLayer(idx) {
+  if (layers.length <= 1) return;
+  layers.splice(idx, 1);
+  renderLayers();
+  updateWave();
+}
+
+function hslToHex(hslStr) {
+  const el = document.createElement('div');
+  el.style.color = hslStr;
+  document.body.appendChild(el);
+  const rgb = getComputedStyle(el).color;
+  document.body.removeChild(el);
+  const m = rgb.match(/\d+/g);
+  if (!m) return '#6c5ce7';
+  return '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join('');
+}
+
+function renderLayers() {
+  const container = document.getElementById('layersContainer');
+  container.innerHTML = '';
+  layers.forEach((layer, i) => {
+    const colorHex = layer.color.startsWith('#') ? layer.color : hslToHex(layer.color);
+    if (!layer.color.startsWith('#')) layer.color = colorHex;
+    const div = document.createElement('div');
+    div.className = 'layer-item';
+    div.innerHTML = `
+      <div class="layer-header">
+        <span>Layer ${i + 1}</span>
+        <div class="layer-actions">
+          ${layers.length > 1 ? `<button class="btn-icon danger" onclick="removeLayer(${i})" title="Remove">✕</button>` : ''}
+        </div>
+      </div>
+      <div class="control">
+        <div class="color-row">
+          <input type="color" value="${colorHex}" onchange="layers[${i}].color=this.value;this.nextElementSibling.value=this.value;updateWave()" oninput="layers[${i}].color=this.value;this.nextElementSibling.value=this.value;updateWave()">
+          <input type="text" class="color-hex" value="${colorHex}" onchange="layers[${i}].color=this.value;this.previousElementSibling.value=this.value;updateWave()">
+        </div>
+      </div>
+      <div class="control">
+        <label>Opacity <span>${layer.opacity.toFixed(1)}</span></label>
+        <input type="range" min="0.1" max="1" step="0.1" value="${layer.opacity}"
+          oninput="layers[${i}].opacity=+this.value;this.previousElementSibling.querySelector('span').textContent=(+this.value).toFixed(1);updateWave()">
+      </div>
+      <div class="control">
+        <label>Amplitude <span>${Math.round(layer.amplitude)}</span></label>
+        <input type="range" min="5" max="100" step="1" value="${layer.amplitude}"
+          oninput="layers[${i}].amplitude=+this.value;this.previousElementSibling.querySelector('span').textContent=Math.round(this.value);updateWave()">
+      </div>
+      <div class="control">
+        <label>Frequency <span>${layer.frequency.toFixed(1)}</span></label>
+        <input type="range" min="0.5" max="5" step="0.1" value="${layer.frequency}"
+          oninput="layers[${i}].frequency=+this.value;this.previousElementSibling.querySelector('span').textContent=(+this.value).toFixed(1);updateWave()">
+      </div>
+      <div class="control">
+        <label>Phase <span>${layer.phase.toFixed(1)}</span></label>
+        <input type="range" min="0" max="6.28" step="0.1" value="${layer.phase}"
+          oninput="layers[${i}].phase=+this.value;this.previousElementSibling.querySelector('span').textContent=(+this.value).toFixed(1);updateWave()">
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function generateWavePath(w, h, amplitude, frequency, phase, offset) {
+  const points = [];
+  const steps = 200;
+  for (let i = 0; i <= steps; i++) {
+    const x = (i / steps) * w * 2;
+    const y = Math.sin((x / w) * Math.PI * 2 * frequency + phase) * amplitude;
+    points.push({ x, y: y + h / 2 + offset });
+  }
+  let d = `M${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const cpx = (prev.x + curr.x) / 2;
+    d += ` C${cpx.toFixed(1)},${prev.y.toFixed(1)} ${cpx.toFixed(1)},${curr.y.toFixed(1)} ${curr.x.toFixed(1)},${curr.y.toFixed(1)}`;
+  }
+  if (direction === 'bottom') {
+    d += ` L${(w * 2).toFixed(1)},${h} L0,${h} Z`;
+  } else {
+    d += ` L${(w * 2).toFixed(1)},0 L0,0 Z`;
+  }
+  return d;
+}
+
+function updateWave() {
+  const w = +document.getElementById('svgWidth').value;
+  const h = +document.getElementById('svgHeight').value;
+  animEnabled = document.getElementById('animToggle').checked;
+  const speed = +document.getElementById('animSpeed').value;
+  document.getElementById('speedControl').style.opacity = animEnabled ? 1 : 0.4;
+
+  const svg = document.getElementById('waveSvg');
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.style.width = '100%';
+  svg.style.height = h + 'px';
+  svg.style.display = 'block';
+
+  let svgContent = '';
+  if (animEnabled) {
+    svgContent += `<style>`;
+    layers.forEach((_, i) => {
+      const dur = speed + i * 3;
+      svgContent += `@keyframes wave${i}{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}`;
+      svgContent += `.wave-${i}{animation:wave${i} ${dur}s linear infinite}`;
+    });
+    svgContent += `</style>`;
+  }
+
+  layers.forEach((layer, i) => {
+    const offset = direction === 'bottom' ? (i * 8) : -(i * 8);
+    const d = generateWavePath(w, h, layer.amplitude, layer.frequency, layer.phase, offset);
+    const cls = animEnabled ? `class="wave-${i}"` : '';
+    svgContent += `<path ${cls} d="${d}" fill="${layer.color}" opacity="${layer.opacity}"/>`;
+  });
+
+  svg.innerHTML = svgContent;
+  generateCode(w, h, speed);
+}
+
+function generateCode(w, h, speed) {
+  // SVG code
+  let svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:${h}px;display:block">\n`;
+  if (animEnabled) {
+    svgCode += `  <style>\n`;
+    layers.forEach((_, i) => {
+      const dur = speed + i * 3;
+      svgCode += `    @keyframes wave${i} { 0% { transform: translateX(0) } 100% { transform: translateX(-50%) } }\n`;
+      svgCode += `    .wave-${i} { animation: wave${i} ${dur}s linear infinite; }\n`;
+    });
+    svgCode += `  </style>\n`;
+  }
+  layers.forEach((layer, i) => {
+    const offset = direction === 'bottom' ? (i * 8) : -(i * 8);
+    const d = generateWavePath(w, h, layer.amplitude, layer.frequency, layer.phase, offset);
+    const cls = animEnabled ? ` class="wave-${i}"` : '';
+    svgCode += `  <path${cls} d="${d}" fill="${layer.color}" opacity="${layer.opacity}"/>\n`;
+  });
+  svgCode += `</svg>`;
+  document.getElementById('code-svg').textContent = svgCode;
+
+  // CSS code
+  let cssCode = `.wave-container {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n  line-height: 0;\n}\n\n`;
+  cssCode += `.wave-container svg {\n  width: 100%;\n  height: ${h}px;\n  display: block;\n}\n`;
+  if (animEnabled) {
+    layers.forEach((_, i) => {
+      const dur = speed + i * 3;
+      cssCode += `\n@keyframes wave${i} {\n  0% { transform: translateX(0); }\n  100% { transform: translateX(-50%); }\n}\n`;
+      cssCode += `.wave-${i} {\n  animation: wave${i} ${dur}s linear infinite;\n}\n`;
+    });
+  }
+  document.getElementById('code-css').textContent = cssCode;
+
+  // HTML+CSS code
+  let htmlCode = `<div class="wave-container">\n  ${svgCode.split('\n').join('\n  ')}\n</div>\n\n<style>\n${cssCode}</style>`;
+  document.getElementById('code-html').textContent = htmlCode;
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.code-tab-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function copyCode(type) {
+  const code = document.getElementById('code-' + type).textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector(`#tab-${type} .copy-btn`);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    showToast();
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+init();
+</script>
+<!-- Pro Features -->
+<style>
+.pro-teaser{position:relative;margin:20px 0 0;padding:0;border-radius:12px;cursor:pointer;overflow:hidden;border:1px dashed rgba(108,92,231,0.3);transition:all .3s}
+.pro-teaser:hover{border-color:rgba(108,92,231,0.6);box-shadow:0 0 24px rgba(108,92,231,0.12)}
+.pro-teaser-content{padding:16px;filter:blur(3px);opacity:0.5;pointer-events:none;user-select:none}
+.pro-teaser-content .pm-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:#6c5ce7;margin-bottom:10px;font-weight:600}
+.pro-teaser-content .pm-row{display:flex;gap:8px;margin-bottom:8px}
+.pro-teaser-content .pm-block{flex:1;height:28px;background:rgba(108,92,231,0.1);border-radius:6px}
+.pro-teaser-content .pm-line{height:10px;background:rgba(108,92,231,0.07);border-radius:4px;margin-bottom:6px}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,26,0.35);z-index:2}
+.pro-lock .pl-icon{font-size:1.6rem;margin-bottom:4px}
+.pro-lock .pl-badge{font-size:.65rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#6c5ce7,#a29bfe);padding:3px 12px;border-radius:20px;letter-spacing:1.5px}
+.pro-lock .pl-hint{font-size:.68rem;color:#8888aa;margin-top:6px}
+.pro-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center}
+.pro-overlay.show{display:flex}
+.pro-card{background:linear-gradient(160deg,#1e1e38,#14142a);border:1px solid rgba(108,92,231,0.25);border-radius:20px;padding:36px 30px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.pro-card h2{font-size:1.45rem;margin-bottom:4px;background:linear-gradient(135deg,#6c5ce7,#a29bfe,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-card .pc-sub{color:#8888aa;font-size:.85rem;margin-bottom:16px}
+.pro-card .pc-price{font-size:2.5rem;font-weight:800;color:#6c5ce7;margin:8px 0 2px}
+.pro-card .pc-note{font-size:.76rem;color:#666;margin-bottom:20px}
+.pro-card ul{text-align:left;list-style:none;margin:0 0 24px;padding:0}
+.pro-card ul li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.87rem;color:#c0c0e0;display:flex;align-items:center;gap:10px}
+.pro-card ul li::before{content:'✓';color:#51cf66;font-weight:700;flex-shrink:0}
+.pro-card ul li:last-child{border-bottom:none}
+.pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;border:none;border-radius:12px;font-size:1.02rem;font-weight:700;cursor:pointer;transition:all .25s;text-decoration:none;text-align:center}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.45)}
+.pro-skip{display:inline-block;margin-top:14px;padding:8px 20px;background:none;border:none;color:#555;cursor:pointer;font-size:.84rem;transition:color .2s}
+.pro-skip:hover{color:#ccc}
+</style>
+<div class="pro-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-card">
+<h2>🔓 Unlock Pro Features</h2>
+<p class="pc-sub">Create stunning animated waves with advanced controls</p>
+<div class="pc-price">$9</div>
+<p class="pc-note">One-time payment · Lifetime access</p>
+<ul>
+<li>Animated wave transitions & motion</li>
+<li>Multi-layer wave stacking & blending</li>
+<li>React component export</li>
+<li>Vue component export</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $9</a>
+<button class="pro-skip" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var t=document.createElement('div');t.className='pro-teaser';
+t.onclick=function(){document.getElementById('proModal').classList.add('show')};
+t.innerHTML='<div class="pro-lock"><div class="pl-icon">🔒</div><div class="pl-badge">PRO</div><div class="pl-hint">Click to unlock</div></div><div class="pro-teaser-content"><div class="pm-title">🌊 Animated Waves</div><div class="pm-row"><div class="pm-block" style="height:20px;border-radius:20px"></div></div><div class="pm-row"><div class="pm-block" style="height:16px;border-radius:16px;opacity:.7"></div></div><div class="pm-line" style="width:90%"></div><div class="pm-row"><div class="pm-block" style="height:24px"></div><div class="pm-block" style="height:24px"></div></div><div class="pm-line" style="width:70%"></div></div>';
+var s=document.querySelector('.sidebar');if(s)s.appendChild(t);
+})();
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

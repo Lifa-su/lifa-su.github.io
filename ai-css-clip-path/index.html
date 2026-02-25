@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Visual CSS clip-path generator. Create custom shapes with polygon, circle, ellipse, and inset paths. Drag control points and copy the generated CSS.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-clip-path/">
+<title>CSS Clip Path Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--radius:8px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{text-align:center;padding:20px;border-bottom:1px solid var(--border)}
+header h1{font-size:1.6rem;font-weight:600;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.85rem;margin-top:4px}
+.app{display:flex;flex:1;gap:0;overflow:hidden}
+.sidebar{width:280px;min-width:280px;background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.main{flex:1;display:flex;flex-direction:column;padding:16px;gap:16px;overflow:auto}
+.section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:8px}
+.shape-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.shape-btn{padding:8px 12px;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:var(--radius);cursor:pointer;font-size:.8rem;transition:all .2s}
+.shape-btn:hover{border-color:var(--accent);color:var(--accent)}
+.shape-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.preset-btns{display:flex;flex-wrap:wrap;gap:4px}
+.preset-btn{padding:4px 10px;border:1px solid var(--border);background:var(--bg);color:var(--text2);border-radius:14px;cursor:pointer;font-size:.72rem;transition:all .2s}
+.preset-btn:hover{border-color:var(--accent);color:var(--text)}
+.preset-btn.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:.8rem;color:var(--text2)}
+.range-row{display:flex;align-items:center;gap:8px}
+.range-row input[type=range]{flex:1;accent-color:var(--accent)}
+.range-val{font-size:.75rem;color:var(--accent);min-width:36px;text-align:right}
+.btn{padding:8px 16px;border:none;border-radius:var(--radius);cursor:pointer;font-size:.8rem;transition:all .2s}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{opacity:.85}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+.action-btns{display:flex;gap:6px;flex-wrap:wrap}
+.canvas-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px}
+.canvas-wrapper{position:relative;width:100%;max-width:500px;aspect-ratio:1;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.preview-bg{position:absolute;inset:0;background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);transition:clip-path .05s}
+.checkerboard{position:absolute;inset:0;background-image:repeating-conic-gradient(#ffffff12 0% 25%,transparent 0% 50%);background-size:20px 20px}
+svg.overlay{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.cp{cursor:grab;filter:drop-shadow(0 0 3px rgba(0,0,0,.5))}
+.cp:hover{r:8}
+.shape-outline{fill:none;stroke:rgba(233,69,96,.6);stroke-width:1.5;stroke-dasharray:4 3;pointer-events:none}
+.guide-line{stroke:rgba(233,69,96,.25);stroke-width:1;stroke-dasharray:2 2;pointer-events:none}
+.code-section{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:12px;position:relative}
+.code-section pre{font-family:'SF Mono',Consolas,monospace;font-size:.82rem;color:var(--accent);white-space:pre-wrap;word-break:break-all;line-height:1.6;min-height:40px;padding-right:60px}
+.copy-btn{position:absolute;top:8px;right:8px;padding:4px 12px;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:.72rem;transition:all .2s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#27ae60}
+.inset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inset-grid label{font-size:.72rem;color:var(--text2);display:flex;flex-direction:column;gap:2px}
+.inset-grid input[type=number]{width:100%;padding:4px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:.78rem}
+.inset-grid input:focus{outline:none;border-color:var(--accent)}
+.hidden{display:none!important}
+@media(max-width:768px){
+.app{flex-direction:column}
+.sidebar{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--border);max-height:none}
+.canvas-wrapper{max-width:100%}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>CSS Clip Path Generator</h1>
+<p>Create and customize clip-path shapes visually</p>
+</header>
+<div class="app">
+<div class="sidebar">
+<div>
+<div class="section-title">Shape Type</div>
+<div class="shape-btns">
+<button class="shape-btn active" data-shape="circle">Circle</button>
+<button class="shape-btn" data-shape="ellipse">Ellipse</button>
+<button class="shape-btn" data-shape="polygon">Polygon</button>
+<button class="shape-btn" data-shape="inset">Inset</button>
+</div>
+</div>
+<div id="panelPolygon" class="hidden">
+<div class="section-title">Polygon Presets</div>
+<div class="preset-btns">
+<button class="preset-btn active" data-preset="triangle">Triangle</button>
+<button class="preset-btn" data-preset="pentagon">Pentagon</button>
+<button class="preset-btn" data-preset="hexagon">Hexagon</button>
+<button class="preset-btn" data-preset="star">Star</button>
+<button class="preset-btn" data-preset="custom">Custom</button>
+</div>
+<div class="action-btns" style="margin-top:8px">
+<button class="btn btn-outline" id="btnAddPoint" style="font-size:.72rem">+ Add Point</button>
+<button class="btn btn-outline" id="btnDelPoint" style="font-size:.72rem">- Remove Last</button>
+</div>
+</div>
+<div id="panelCircle">
+<div class="section-title">Circle Settings</div>
+<div class="control-group">
+<label>Radius</label>
+<div class="range-row"><input type="range" id="circleR" min="1" max="70" value="40"><span class="range-val" id="circleRVal">40%</span></div>
+</div>
+<div class="control-group">
+<label>Center X</label>
+<div class="range-row"><input type="range" id="circleCX" min="0" max="100" value="50"><span class="range-val" id="circleCXVal">50%</span></div>
+</div>
+<div class="control-group">
+<label>Center Y</label>
+<div class="range-row"><input type="range" id="circleCY" min="0" max="100" value="50"><span class="range-val" id="circleCYVal">50%</span></div>
+</div>
+</div>
+<div id="panelEllipse" class="hidden">
+<div class="section-title">Ellipse Settings</div>
+<div class="control-group">
+<label>Radius X</label>
+<div class="range-row"><input type="range" id="ellipseRX" min="1" max="70" value="40"><span class="range-val" id="ellipseRXVal">40%</span></div>
+</div>
+<div class="control-group">
+<label>Radius Y</label>
+<div class="range-row"><input type="range" id="ellipseRY" min="1" max="70" value="30"><span class="range-val" id="ellipseRYVal">30%</span></div>
+</div>
+<div class="control-group">
+<label>Center X</label>
+<div class="range-row"><input type="range" id="ellipseCX" min="0" max="100" value="50"><span class="range-val" id="ellipseCXVal">50%</span></div>
+</div>
+<div class="control-group">
+<label>Center Y</label>
+<div class="range-row"><input type="range" id="ellipseCY" min="0" max="100" value="50"><span class="range-val" id="ellipseCYVal">50%</span></div>
+</div>
+</div>
+<div id="panelInset" class="hidden">
+<div class="section-title">Inset Settings</div>
+<div class="inset-grid">
+<label>Top<input type="number" id="insetTop" min="0" max="50" value="10"></label>
+<label>Right<input type="number" id="insetRight" min="0" max="50" value="10"></label>
+<label>Bottom<input type="number" id="insetBottom" min="0" max="50" value="10"></label>
+<label>Left<input type="number" id="insetLeft" min="0" max="50" value="10"></label>
+</div>
+<div class="control-group" style="margin-top:8px">
+<label>Border Radius</label>
+<div class="range-row"><input type="range" id="insetRadius" min="0" max="50" value="0"><span class="range-val" id="insetRadiusVal">0%</span></div>
+</div>
+</div>
+</div>
+<div class="main">
+<div class="canvas-area">
+<div class="canvas-wrapper" id="canvasWrapper">
+<div class="checkerboard"></div>
+<div class="preview-bg" id="previewBg"></div>
+<svg class="overlay" id="svgOverlay" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+</div>
+<div class="code-section">
+<div class="section-title">Generated CSS</div>
+<pre id="codeOutput">clip-path: circle(40% at 50% 50%);</pre>
+<button class="copy-btn" id="copyBtn">Copy</button>
+</div>
+</div>
+</div>
+<script>(function(){
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const svg = $('#svgOverlay');
+const preview = $('#previewBg');
+const codeOut = $('#codeOutput');
+const wrapper = $('#canvasWrapper');
+
+let shapeType = 'circle';
+let dragging = null;
+let dragIdx = -1;
+
+// Shape data
+let circle = { r: 40, cx: 50, cy: 50 };
+let ellipse = { rx: 40, ry: 25, cx: 50, cy: 50 };
+let polygon = [];
+let inset = { top: 10, right: 10, bottom: 10, left: 10, radius: 0 };
+
+const presets = {
+  triangle: [[50,5],[95,95],[5,95]],
+  pentagon: (() => { const p=[]; for(let i=0;i<5;i++){const a=Math.PI*2*i/5-Math.PI/2;p.push([50+45*Math.cos(a),50+45*Math.sin(a)])} return p })(),
+  hexagon: (() => { const p=[]; for(let i=0;i<6;i++){const a=Math.PI*2*i/6-Math.PI/2;p.push([50+45*Math.cos(a),50+45*Math.sin(a)])} return p })(),
+  star: (() => { const p=[]; for(let i=0;i<10;i++){const a=Math.PI*2*i/10-Math.PI/2;const r=i%2===0?45:20;p.push([50+r*Math.cos(a),50+r*Math.sin(a)])} return p })(),
+  custom: [[20,20],[80,20],[80,80],[20,80]]
+};
+
+function init() {
+  polygon = presets.triangle.map(p => [...p]);
+  bindShapeBtns();
+  bindPresetBtns();
+  bindCircleControls();
+  bindEllipseControls();
+  bindInsetControls();
+  bindPolygonActions();
+  bindCopy();
+  bindSvgDrag();
+  render();
+}
+
+function bindShapeBtns() {
+  $$('.shape-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.shape-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      shapeType = btn.dataset.shape;
+      showPanel();
+      render();
+    });
+  });
+}
+
+function showPanel() {
+  ['panelPolygon','panelCircle','panelEllipse','panelInset'].forEach(id => {
+    $('#'+id).classList.add('hidden');
+  });
+  if (shapeType === 'polygon') $('#panelPolygon').classList.remove('hidden');
+  if (shapeType === 'circle') $('#panelCircle').classList.remove('hidden');
+  if (shapeType === 'ellipse') $('#panelEllipse').classList.remove('hidden');
+  if (shapeType === 'inset') $('#panelInset').classList.remove('hidden');
+}
+
+function bindPresetBtns() {
+  $$('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const preset = btn.dataset.preset;
+      polygon = presets[preset].map(p => [...p]);
+      render();
+    });
+  });
+}
+
+function bindCircleControls() {
+  const ids = [['circleR','r'],['circleCX','cx'],['circleCY','cy']];
+  ids.forEach(([id, key]) => {
+    const input = $('#'+id);
+    const val = $('#'+id+'Val');
+    input.value = circle[key];
+    val.textContent = circle[key]+'%';
+    input.addEventListener('input', () => {
+      circle[key] = +input.value;
+      val.textContent = input.value+'%';
+      render();
+    });
+  });
+}
+
+function bindEllipseControls() {
+  const ids = [['ellipseRX','rx'],['ellipseRY','ry'],['ellipseCX','cx'],['ellipseCY','cy']];
+  ids.forEach(([id, key]) => {
+    const input = $('#'+id);
+    const val = $('#'+id+'Val');
+    input.value = ellipse[key];
+    val.textContent = ellipse[key]+'%';
+    input.addEventListener('input', () => {
+      ellipse[key] = +input.value;
+      val.textContent = input.value+'%';
+      render();
+    });
+  });
+}
+
+function bindInsetControls() {
+  ['Top','Right','Bottom','Left'].forEach(side => {
+    const input = $('#inset'+side);
+    input.value = inset[side.toLowerCase()];
+    input.addEventListener('input', () => {
+      inset[side.toLowerCase()] = +input.value;
+      render();
+    });
+  });
+  const rInput = $('#insetRadius');
+  const rVal = $('#insetRadiusVal');
+  rInput.addEventListener('input', () => {
+    inset.radius = +rInput.value;
+    rVal.textContent = rInput.value+'%';
+    render();
+  });
+}
+
+function bindPolygonActions() {
+  $('#btnAddPoint').addEventListener('click', () => {
+    if (polygon.length < 2) { polygon.push([50,50]); render(); return; }
+    let maxD = 0, idx = 0;
+    for (let i = 0; i < polygon.length; i++) {
+      const j = (i+1) % polygon.length;
+      const d = Math.hypot(polygon[j][0]-polygon[i][0], polygon[j][1]-polygon[i][1]);
+      if (d > maxD) { maxD = d; idx = i; }
+    }
+    const j = (idx+1) % polygon.length;
+    const np = [(polygon[idx][0]+polygon[j][0])/2, (polygon[idx][1]+polygon[j][1])/2];
+    polygon.splice(idx+1, 0, np);
+    render();
+  });
+  $('#btnDelPoint').addEventListener('click', () => {
+    if (polygon.length > 3) { polygon.pop(); render(); }
+  });
+}
+
+function bindCopy() {
+  $('#copyBtn').addEventListener('click', () => {
+    const text = codeOut.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $('#copyBtn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  });
+}
+
+function getClipPath() {
+  switch(shapeType) {
+    case 'circle':
+      return `circle(${r(circle.r)}% at ${r(circle.cx)}% ${r(circle.cy)}%)`;
+    case 'ellipse':
+      return `ellipse(${r(ellipse.rx)}% ${r(ellipse.ry)}% at ${r(ellipse.cx)}% ${r(ellipse.cy)}%)`;
+    case 'polygon':
+      return `polygon(${polygon.map(p => `${r(p[0])}% ${r(p[1])}%`).join(', ')})`;
+    case 'inset': {
+      const s = `inset(${r(inset.top)}% ${r(inset.right)}% ${r(inset.bottom)}% ${r(inset.left)}%`;
+      return inset.radius > 0 ? s + ` round ${r(inset.radius)}%)` : s + ')';
+    }
+  }
+}
+
+function r(v) { return Math.round(v * 10) / 10; }
+
+function render() {
+  const cp = getClipPath();
+  preview.style.clipPath = cp;
+  codeOut.textContent = `clip-path: ${cp};`;
+  renderSvg();
+  syncControls();
+}
+
+function syncControls() {
+  if (shapeType === 'circle') {
+    ['circleR','circleCX','circleCY'].forEach(id => {
+      const key = id.replace('circle','').toLowerCase();
+      const k = key === 'r' ? 'r' : key;
+      $('#'+id).value = circle[k];
+      $('#'+id+'Val').textContent = Math.round(circle[k])+'%';
+    });
+  }
+  if (shapeType === 'ellipse') {
+    [['ellipseRX','rx'],['ellipseRY','ry'],['ellipseCX','cx'],['ellipseCY','cy']].forEach(([id,k]) => {
+      $('#'+id).value = ellipse[k];
+      $('#'+id+'Val').textContent = Math.round(ellipse[k])+'%';
+    });
+  }
+  if (shapeType === 'inset') {
+    ['Top','Right','Bottom','Left'].forEach(s => {
+      $('#inset'+s).value = inset[s.toLowerCase()];
+    });
+    $('#insetRadius').value = inset.radius;
+    $('#insetRadiusVal').textContent = Math.round(inset.radius)+'%';
+  }
+}
+
+function renderSvg() {
+  svg.innerHTML = '';
+  const w = 100, h = 100;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+  switch(shapeType) {
+    case 'circle': renderCircleSvg(w, h); break;
+    case 'ellipse': renderEllipseSvg(w, h); break;
+    case 'polygon': renderPolygonSvg(w, h); break;
+    case 'inset': renderInsetSvg(w, h); break;
+  }
+}
+
+function makeCP(cx, cy, idx, color) {
+  const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('cx', cx);
+  c.setAttribute('cy', cy);
+  c.setAttribute('r', 3);
+  c.setAttribute('fill', color || '#e94560');
+  c.setAttribute('stroke', '#fff');
+  c.setAttribute('stroke-width', '1');
+  c.setAttribute('class', 'cp');
+  c.dataset.idx = idx;
+  return c;
+}
+
+function renderCircleSvg() {
+  const cx = circle.cx, cy = circle.cy, cr = circle.r;
+  // Outline
+  const el = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  el.setAttribute('cx', cx); el.setAttribute('cy', cy); el.setAttribute('r', cr);
+  el.setAttribute('class','shape-outline');
+  svg.appendChild(el);
+  // Guide lines
+  const l1 = document.createElementNS('http://www.w3.org/2000/svg','line');
+  l1.setAttribute('x1',cx); l1.setAttribute('y1',cy); l1.setAttribute('x2',cx+cr); l1.setAttribute('y2',cy);
+  l1.setAttribute('class','guide-line');
+  svg.appendChild(l1);
+  // Control points: center, radius handle
+  svg.appendChild(makeCP(cx, cy, 'cc', '#533483'));
+  svg.appendChild(makeCP(cx + cr, cy, 'cr', '#e94560'));
+}
+
+function renderEllipseSvg() {
+  const {cx,cy,rx,ry} = ellipse;
+  const el = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+  el.setAttribute('cx',cx); el.setAttribute('cy',cy); el.setAttribute('rx',rx); el.setAttribute('ry',ry);
+  el.setAttribute('class','shape-outline');
+  svg.appendChild(el);
+  // Guide lines
+  [['x2',cx+rx,'y2',cy],['x2',cx,'y2',cy+ry]].forEach(([a,av,b,bv]) => {
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',cx); l.setAttribute('y1',cy); l.setAttribute(a,av); l.setAttribute(b,bv);
+    l.setAttribute('class','guide-line');
+    svg.appendChild(l);
+  });
+  svg.appendChild(makeCP(cx, cy, 'ec', '#533483'));
+  svg.appendChild(makeCP(cx+rx, cy, 'erx', '#e94560'));
+  svg.appendChild(makeCP(cx, cy+ry, 'ery', '#e94560'));
+}
+
+function renderPolygonSvg() {
+  if (!polygon.length) return;
+  const pts = polygon.map(p => p.join(',')).join(' ');
+  const el = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  el.setAttribute('points', pts);
+  el.setAttribute('class','shape-outline');
+  svg.appendChild(el);
+  polygon.forEach((p, i) => {
+    svg.appendChild(makeCP(p[0], p[1], 'p'+i, '#e94560'));
+  });
+}
+
+function renderInsetSvg() {
+  const {top:t, right:ri, bottom:b, left:l, radius:rad} = inset;
+  const x = l, y = t, w = 100-l-ri, h = 100-t-b;
+  if (w <= 0 || h <= 0) return;
+  const el = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  el.setAttribute('x', x); el.setAttribute('y', y);
+  el.setAttribute('width', w); el.setAttribute('height', h);
+  if (rad > 0) { el.setAttribute('rx', rad); el.setAttribute('ry', rad); }
+  el.setAttribute('class','shape-outline');
+  svg.appendChild(el);
+  // Control points on edges
+  svg.appendChild(makeCP(50, t, 'it', '#e94560'));       // top
+  svg.appendChild(makeCP(100-ri, 50, 'ir', '#e94560'));   // right
+  svg.appendChild(makeCP(50, 100-b, 'ib', '#e94560'));    // bottom
+  svg.appendChild(makeCP(l, 50, 'il', '#e94560'));        // left
+}
+
+function bindSvgDrag() {
+  let startX, startY, startData;
+
+  function getSvgPoint(e) {
+    const rect = wrapper.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return {
+      x: ((touch.clientX - rect.left) / rect.width) * 100,
+      y: ((touch.clientY - rect.top) / rect.height) * 100
+    };
+  }
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function onDown(e) {
+    const target = e.target.closest('.cp');
+    if (!target) return;
+    e.preventDefault();
+    dragging = target.dataset.idx;
+    const pt = getSvgPoint(e);
+    startX = pt.x; startY = pt.y;
+
+    if (dragging === 'cc') startData = { cx: circle.cx, cy: circle.cy };
+    else if (dragging === 'cr') startData = { r: circle.r };
+    else if (dragging === 'ec') startData = { cx: ellipse.cx, cy: ellipse.cy };
+    else if (dragging === 'erx') startData = { rx: ellipse.rx };
+    else if (dragging === 'ery') startData = { ry: ellipse.ry };
+    else if (dragging === 'it') startData = { top: inset.top };
+    else if (dragging === 'ir') startData = { right: inset.right };
+    else if (dragging === 'ib') startData = { bottom: inset.bottom };
+    else if (dragging === 'il') startData = { left: inset.left };
+    else if (dragging.startsWith('p')) {
+      const i = parseInt(dragging.slice(1));
+      startData = { px: polygon[i][0], py: polygon[i][1] };
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend', onUp);
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    e.preventDefault();
+    const pt = getSvgPoint(e);
+    const dx = pt.x - startX, dy = pt.y - startY;
+
+    if (dragging === 'cc') {
+      circle.cx = clamp(startData.cx + dx, 0, 100);
+      circle.cy = clamp(startData.cy + dy, 0, 100);
+    } else if (dragging === 'cr') {
+      circle.r = clamp(startData.r + dx, 1, 50);
+    } else if (dragging === 'ec') {
+      ellipse.cx = clamp(startData.cx + dx, 0, 100);
+      ellipse.cy = clamp(startData.cy + dy, 0, 100);
+    } else if (dragging === 'erx') {
+      ellipse.rx = clamp(startData.rx + dx, 1, 50);
+    } else if (dragging === 'ery') {
+      ellipse.ry = clamp(startData.ry + dy, 1, 50);
+    } else if (dragging === 'it') {
+      inset.top = clamp(startData.top + dy, 0, 50);
+    } else if (dragging === 'ir') {
+      inset.right = clamp(startData.right - dx, 0, 50);
+    } else if (dragging === 'ib') {
+      inset.bottom = clamp(startData.bottom - dy, 0, 50);
+    } else if (dragging === 'il') {
+      inset.left = clamp(startData.left + dx, 0, 50);
+    } else if (dragging.startsWith('p')) {
+      const i = parseInt(dragging.slice(1));
+      polygon[i][0] = clamp(startData.px + dx, 0, 100);
+      polygon[i][1] = clamp(startData.py + dy, 0, 100);
+    }
+    render();
+  }
+
+  function onUp() {
+    dragging = null;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+  }
+
+  svg.addEventListener('mousedown', onDown);
+  svg.addEventListener('touchstart', onDown, {passive:false});
+}
+
+showPanel();
+init();
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

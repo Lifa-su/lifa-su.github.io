@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS scroll snap generator for smooth scrolling experiences. Configure snap type, alignment, and padding. Preview horizontal and vertical scroll snapping.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-scroll-snap/">
+<title>AI CSS Scroll Snap Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:10px;--gap:16px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+a{color:var(--accent)}
+.app{max-width:1280px;margin:0 auto;padding:var(--gap)}
+header{text-align:center;padding:32px 0 24px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+header p{color:var(--text2);font-size:.95rem}
+.main-grid{display:grid;grid-template-columns:320px 1fr;gap:var(--gap);align-items:start}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.panel h2{font-size:1rem;margin-bottom:14px;color:var(--accent)}
+.cg{margin-bottom:18px}
+.cg label{display:block;font-size:.82rem;color:var(--text2);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.bg{display:flex;gap:4px;flex-wrap:wrap}
+.bg button{flex:1;min-width:0;padding:8px 6px;border:1px solid rgba(255,255,255,.1);background:var(--bg);color:var(--text2);border-radius:6px;cursor:pointer;font-size:.82rem;transition:all .2s}
+.bg button:hover{border-color:var(--accent);color:var(--text)}
+.bg button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rr{display:flex;align-items:center;gap:10px}
+.rr input[type=range]{flex:1;accent-color:var(--accent)}
+.rv{font-size:.85rem;color:var(--accent);min-width:42px;text-align:right}
+.ir{display:flex;align-items:center;gap:10px}
+.ir button{width:34px;height:34px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:var(--bg);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.ir button:hover{border-color:var(--accent);color:var(--accent)}
+.ir span{font-size:.9rem;min-width:20px;text-align:center}
+.pa{display:flex;flex-direction:column;gap:var(--gap)}
+.pb{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.pb h3{font-size:.9rem;color:var(--text2);margin-bottom:12px}
+.sc{border-radius:8px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg)}
+.sc::-webkit-scrollbar{width:6px;height:6px}
+.sc::-webkit-scrollbar-track{background:var(--bg)}
+.sc::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+.si{flex:none;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:rgba(255,255,255,.9);position:relative;overflow:hidden}
+.si::before{content:'';position:absolute;inset:0;opacity:.12;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.3),transparent 70%)}
+.si .lbl{position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.si .num{font-size:3rem;opacity:.15;position:absolute;right:12px;bottom:4px;font-weight:900}
+.p0{background:linear-gradient(135deg,#e94560,#c23152)}
+.p1{background:linear-gradient(135deg,#533483,#3a1f6e)}
+.p2{background:linear-gradient(135deg,#0f3460,#0a2647)}
+.p3{background:linear-gradient(135deg,#e94560,#ff6b6b)}
+.p4{background:linear-gradient(135deg,#16213e,#1a1a40)}
+.p5{background:linear-gradient(135deg,#533483,#e94560)}
+.p6{background:linear-gradient(135deg,#0f3460,#533483)}
+.p7{background:linear-gradient(135deg,#c23152,#0f3460)}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:10px}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s}
+.dots .d.on{background:var(--accent);transform:scale(1.3)}
+.cs{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid rgba(255,255,255,.06)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ch h2{font-size:1rem;color:var(--accent);margin:0}
+.cb{padding:7px 16px;border-radius:6px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;font-size:.82rem;transition:all .2s}
+.cb:hover{background:var(--accent);color:#fff}
+.cb.ok{background:#2ecc71;border-color:#2ecc71;color:#fff}
+pre{background:var(--bg);border-radius:8px;padding:16px;overflow-x:auto;font-size:.82rem;line-height:1.7;color:#c8d6e5;border:1px solid rgba(255,255,255,.05)}
+pre code{font-family:'SF Mono','Fira Code',Consolas,monospace}
+footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>CSS Scroll Snap Generator</h1>
+<p>Configure scroll snap properties and preview the effect in real time</p></header>
+<div class="main-grid">
+<div class="panel">
+<h2>Settings</h2>
+<div class="cg"><label>Scroll Direction</label>
+<div class="bg" id="dirG">
+<button class="active" data-val="x">Horizontal (x)</button>
+<button data-val="y">Vertical (y)</button>
+<button data-val="both">Both</button>
+</div></div>
+<div class="cg"><label>Snap Strictness</label>
+<div class="bg" id="strictG">
+<button class="active" data-val="mandatory">Mandatory</button>
+<button data-val="proximity">Proximity</button>
+</div></div>
+<div class="cg"><label>Snap Align</label>
+<div class="bg" id="alignG">
+<button data-val="start">Start</button>
+<button class="active" data-val="center">Center</button>
+<button data-val="end">End</button>
+<button data-val="none">None</button>
+</div></div>
+<div class="cg"><label>Scroll Padding</label>
+<div class="rr">
+<input type="range" id="padRange" min="0" max="80" value="0">
+<span class="rv" id="padVal">0px</span>
+</div></div>
+<div class="cg"><label>Item Size (%)</label>
+<div class="rr">
+<input type="range" id="sizeRange" min="50" max="100" value="100" step="5">
+<span class="rv" id="sizeVal">100%</span>
+</div></div>
+<div class="cg"><label>Number of Items</label>
+<div class="ir">
+<button id="decBtn">-</button>
+<span id="itemCount">5</span>
+<button id="incBtn">+</button>
+</div></div>
+</div>
+<div class="pa">
+<div class="pb">
+<h3 id="previewTitle">Horizontal Scroll Preview</h3>
+<div class="sc" id="scrollBox"></div>
+<div class="dots" id="dots"></div>
+</div>
+<div class="cs">
+<div class="ch">
+<h2>Generated CSS</h2>
+<button class="cb" id="copyBtn" onclick="copyCSS()">Copy CSS</button>
+</div>
+<pre><code id="codeOut"></code></pre>
+</div>
+</div>
+</div>
+</div>
+<footer>CSS Scroll Snap Generator &mdash; Built for developers</footer>
+
+<script>
+const state = {dir:'x', strict:'mandatory', align:'center', padding:0, size:100, count:5};
+
+function setupGroup(id, key) {
+  const el = document.getElementById(id);
+  el.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state[key] = btn.dataset.val;
+    update();
+  });
+}
+
+setupGroup('dirG','dir');
+setupGroup('strictG','strict');
+setupGroup('alignG','align');
+
+document.getElementById('padRange').addEventListener('input', e => {
+  state.padding = +e.target.value;
+  document.getElementById('padVal').textContent = state.padding + 'px';
+  update();
+});
+
+document.getElementById('sizeRange').addEventListener('input', e => {
+  state.size = +e.target.value;
+  document.getElementById('sizeVal').textContent = state.size + '%';
+  update();
+});
+
+document.getElementById('decBtn').addEventListener('click', () => {
+  if (state.count > 2) { state.count--; document.getElementById('itemCount').textContent = state.count; update(); }
+});
+document.getElementById('incBtn').addEventListener('click', () => {
+  if (state.count < 12) { state.count++; document.getElementById('itemCount').textContent = state.count; update(); }
+});
+
+function update() {
+  const box = document.getElementById('scrollBox');
+  const dots = document.getElementById('dots');
+  const isH = state.dir === 'x';
+  const isV = state.dir === 'y';
+  const isBoth = state.dir === 'both';
+
+  // Title
+  const titles = {x:'Horizontal Scroll Preview', y:'Vertical Scroll Preview', both:'Both Axes Scroll Preview'};
+  document.getElementById('previewTitle').textContent = titles[state.dir];
+
+  // Container styles
+  box.style.cssText = '';
+  box.className = 'sc';
+  box.style.scrollSnapType = state.dir + ' ' + state.strict;
+  if (state.padding > 0) box.style.scrollPadding = state.padding + 'px';
+
+  if (isBoth) {
+    box.style.display = 'grid';
+    box.style.gridTemplateColumns = 'repeat(' + Math.ceil(Math.sqrt(state.count)) + ', ' + state.size + '%)';
+    box.style.gridAutoRows = state.size + '%';
+    box.style.height = '300px';
+    box.style.width = '100%';
+  } else if (isH) {
+    box.style.display = 'flex';
+    box.style.height = '220px';
+    box.style.flexDirection = 'row';
+  } else {
+    box.style.display = 'flex';
+    box.style.height = '300px';
+    box.style.flexDirection = 'column';
+  }
+
+  // Items
+  let html = '';
+  for (let i = 0; i < state.count; i++) {
+    const cls = 'si p' + (i % 8);
+    let style = 'scroll-snap-align:' + state.align + ';';
+    if (isBoth) {
+      // grid items sized by grid
+    } else if (isH) {
+      style += 'min-width:' + state.size + '%;width:' + state.size + '%;';
+    } else {
+      style += 'min-height:' + state.size + '%;height:' + state.size + '%;';
+    }
+    html += '<div class="' + cls + '" style="' + style + '">';
+    html += '<span class="lbl">Section ' + (i+1) + '</span>';
+    html += '<span class="num">' + (i+1) + '</span></div>';
+  }
+  box.innerHTML = html;
+
+  // Dots
+  let dhtml = '';
+  for (let i = 0; i < state.count; i++) {
+    dhtml += '<span class="d' + (i===0?' on':'') + '"></span>';
+  }
+  dots.innerHTML = dhtml;
+
+  // Scroll indicator
+  box.onscroll = () => {
+    const items = box.querySelectorAll('.si');
+    let closest = 0, minDist = Infinity;
+    items.forEach((item, idx) => {
+      let dist;
+      if (isH || isBoth) {
+        dist = Math.abs(item.offsetLeft - box.scrollLeft - (state.padding || 0));
+      } else {
+        dist = Math.abs(item.offsetTop - box.scrollTop - (state.padding || 0));
+      }
+      if (dist < minDist) { minDist = dist; closest = idx; }
+    });
+    dots.querySelectorAll('.d').forEach((d, i) => {
+      d.classList.toggle('on', i === closest);
+    });
+  };
+
+  genCode();
+}
+
+function genCode() {
+  const s = state;
+  let css = '/* Container */\n';
+  css += '.scroll-container {\n';
+  css += '  overflow: auto;\n';
+  css += '  scroll-snap-type: ' + s.dir + ' ' + s.strict + ';\n';
+  if (s.padding > 0) css += '  scroll-padding: ' + s.padding + 'px;\n';
+  if (s.dir === 'x') {
+    css += '  display: flex;\n';
+    css += '  flex-direction: row;\n';
+  } else if (s.dir === 'y') {
+    css += '  display: flex;\n';
+    css += '  flex-direction: column;\n';
+    css += '  height: 100vh; /* adjust as needed */\n';
+  } else {
+    css += '  display: grid;\n';
+    css += '  grid-template-columns: repeat(auto-fill, ' + s.size + '%);\n';
+    css += '  height: 100vh; /* adjust as needed */\n';
+  }
+  css += '}\n\n';
+  css += '/* Child items */\n';
+  css += '.scroll-item {\n';
+  css += '  scroll-snap-align: ' + s.align + ';\n';
+  if (s.dir === 'x') {
+    css += '  min-width: ' + s.size + '%;\n';
+  } else if (s.dir === 'y') {
+    css += '  min-height: ' + s.size + '%;\n';
+  }
+  css += '}';
+  document.getElementById('codeOut').textContent = css;
+}
+
+function copyCSS() {
+  const code = document.getElementById('codeOut').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy CSS'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

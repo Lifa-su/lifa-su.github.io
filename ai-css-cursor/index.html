@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI CSS Cursor - Preview All CSS Cursor Styles</title>
+<meta name="description" content="Interactive CSS cursor demo. Preview 40+ cursor values, upload custom images, generate CSS code.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-cursor/">
+<style>*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--card:#1e2a4a;--text:#e0e0e0;--text2:#a0a0b0;--accent:#e94560;--accent2:#ff6b6b;--green:#4ecca3;--border:#2a3a5a;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.header{text-align:center;padding:40px 20px 20px;background:linear-gradient(135deg,var(--bg),var(--bg2))}
+.header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.header p{color:var(--text2);font-size:1rem;max-width:600px;margin:0 auto}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.upload-section{background:var(--card);border:2px dashed var(--border);border-radius:var(--radius);padding:30px;text-align:center;margin-bottom:30px;transition:border-color .3s}
+.upload-section:hover{border-color:var(--accent)}
+.upload-section h2{font-size:1.2rem;margin-bottom:10px;color:var(--accent2)}
+.upload-section .ud{color:var(--text2);font-size:.9rem;margin-bottom:15px}
+.ubtn{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.95rem;transition:background .3s}
+.ubtn:hover{background:var(--accent2)}
+#fileInput{display:none}
+#customPreview{margin-top:15px;display:none}
+.category{margin-bottom:30px}
+.ct{font-size:1.3rem;font-weight:700;color:var(--accent2);margin-bottom:15px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 25px rgba(233,69,96,.15)}
+.ca{height:100px;display:flex;align-items:center;justify-content:center;background:var(--bg2);position:relative}
+.ca::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(255,255,255,.02) 10px,rgba(255,255,255,.02) 20px)}
+.ci{font-size:2rem;opacity:.5;pointer-events:none;user-select:none}
+.cinfo{padding:10px 12px}
+.cn{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:2px;font-family:'SF Mono',Monaco,Consolas,monospace}
+.cd{font-size:.72rem;color:var(--text2)}
+.cpb{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer;opacity:0;transition:opacity .3s;z-index:2}
+.card:hover .cpb{opacity:1}
+.cpb:hover{background:var(--accent)}
+.cpb.copied{background:var(--green)}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#fff;padding:12px 24px;border-radius:8px;font-size:.9rem;transition:transform .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.footer{text-align:center;padding:40px 20px;color:var(--text2);font-size:.85rem}
+@media(max-width:768px){.header h1{font-size:1.6rem}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}.container{padding:15px}.ca{height:80px}}
+@media(max-width:480px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.header{padding:25px 15px 15px}}
+</style>
+</head>
+<body>
+<div class="header"><h1>&#128433; AI CSS Cursor</h1><p>Preview all 40+ CSS cursor styles. Hover to see each cursor in action, click to copy the CSS code.</p></div>
+<div class="container">
+<div class="upload-section" id="uploadSection">
+<h2>&#127912; Custom Cursor Image</h2>
+<p class="ud">Upload a .cur, .png, or .gif (max 128x128 recommended) to preview as custom cursor</p>
+<label class="ubtn" for="fileInput">Choose Image</label>
+<input type="file" id="fileInput" accept=".cur,.png,.gif,.jpg,.jpeg,.svg,.webp">
+<div id="customPreview"></div>
+</div>
+<div id="categories">
+<div class="category"><div class="ct"><span>⚙️</span>General</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: auto;')">Copy</button><div class="ca" style="cursor:auto"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">auto</div><div class="cd">Browser decides</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: default;')">Copy</button><div class="ca" style="cursor:default"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">default</div><div class="cd">Default arrow</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: none;')">Copy</button><div class="ca" style="cursor:none"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">none</div><div class="cd">No cursor visible</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: context-menu;')">Copy</button><div class="ca" style="cursor:context-menu"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">context-menu</div><div class="cd">Context menu</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: help;')">Copy</button><div class="ca" style="cursor:help"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">help</div><div class="cd">Help available</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: inherit;')">Copy</button><div class="ca" style="cursor:inherit"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">inherit</div><div class="cd">Inherit from parent</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: initial;')">Copy</button><div class="ca" style="cursor:initial"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">initial</div><div class="cd">Reset to initial</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: unset;')">Copy</button><div class="ca" style="cursor:unset"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">unset</div><div class="cd">Unset value</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: revert;')">Copy</button><div class="ca" style="cursor:revert"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">revert</div><div class="cd">Revert to UA style</div></div></div></div></div><div class="category"><div class="ct"><span>👆</span>Links & Actions</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: pointer;')">Copy</button><div class="ca" style="cursor:pointer"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">pointer</div><div class="cd">Clickable element</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: progress;')">Copy</button><div class="ca" style="cursor:progress"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">progress</div><div class="cd">Background loading</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: wait;')">Copy</button><div class="ca" style="cursor:wait"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">wait</div><div class="cd">Busy / loading</div></div></div></div></div><div class="category"><div class="ct"><span>🚦</span>Status</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: not-allowed;')">Copy</button><div class="ca" style="cursor:not-allowed"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">not-allowed</div><div class="cd">Action not permitted</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: no-drop;')">Copy</button><div class="ca" style="cursor:no-drop"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">no-drop</div><div class="cd">Cannot drop here</div></div></div></div></div><div class="category"><div class="ct"><span>✂️</span>Selection</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: text;')">Copy</button><div class="ca" style="cursor:text"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">text</div><div class="cd">Text selection</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: vertical-text;')">Copy</button><div class="ca" style="cursor:vertical-text"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">vertical-text</div><div class="cd">Vertical text</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: cell;')">Copy</button><div class="ca" style="cursor:cell"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">cell</div><div class="cd">Table cell</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: crosshair;')">Copy</button><div class="ca" style="cursor:crosshair"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">crosshair</div><div class="cd">Precise selection</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: alias;')">Copy</button><div class="ca" style="cursor:alias"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">alias</div><div class="cd">Alias / shortcut</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: copy;')">Copy</button><div class="ca" style="cursor:copy"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">copy</div><div class="cd">Copy action</div></div></div></div></div><div class="category"><div class="ct"><span>✋</span>Drag & Drop</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: grab;')">Copy</button><div class="ca" style="cursor:grab"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">grab</div><div class="cd">Can grab</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: grabbing;')">Copy</button><div class="ca" style="cursor:grabbing"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">grabbing</div><div class="cd">Grabbing</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: move;')">Copy</button><div class="ca" style="cursor:move"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">move</div><div class="cd">Move element</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: all-scroll;')">Copy</button><div class="ca" style="cursor:all-scroll"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">all-scroll</div><div class="cd">Scroll any direction</div></div></div></div></div><div class="category"><div class="ct"><span>↔️</span>Resize</div><div class="grid"><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: col-resize;')">Copy</button><div class="ca" style="cursor:col-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">col-resize</div><div class="cd">Resize column</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: row-resize;')">Copy</button><div class="ca" style="cursor:row-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">row-resize</div><div class="cd">Resize row</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: n-resize;')">Copy</button><div class="ca" style="cursor:n-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">n-resize</div><div class="cd">North</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: e-resize;')">Copy</button><div class="ca" style="cursor:e-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">e-resize</div><div class="cd">East</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: s-resize;')">Copy</button><div class="ca" style="cursor:s-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">s-resize</div><div class="cd">South</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: w-resize;')">Copy</button><div class="ca" style="cursor:w-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">w-resize</div><div class="cd">West</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: ne-resize;')">Copy</button><div class="ca" style="cursor:ne-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">ne-resize</div><div class="cd">NE</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: nw-resize;')">Copy</button><div class="ca" style="cursor:nw-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">nw-resize</div><div class="cd">NW</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: se-resize;')">Copy</button><div class="ca" style="cursor:se-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">se-resize</div><div class="cd">SE</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: sw-resize;')">Copy</button><div class="ca" style="cursor:sw-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">sw-resize</div><div class="cd">SW</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: ew-resize;')">Copy</button><div class="ca" style="cursor:ew-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">ew-resize</div><div class="cd">Horizontal</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: ns-resize;')">Copy</button><div class="ca" style="cursor:ns-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">ns-resize</div><div class="cd">Vertical</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: nesw-resize;')">Copy</button><div class="ca" style="cursor:nesw-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">nesw-resize</div><div class="cd">NE-SW</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: nwse-resize;')">Copy</button><div class="ca" style="cursor:nwse-resize"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">nwse-resize</div><div class="cd">NW-SE</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: zoom-in;')">Copy</button><div class="ca" style="cursor:zoom-in"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">zoom-in</div><div class="cd">Zoom in</div></div></div><div class="card"><button class="cpb" onclick="copyCSS(this,'cursor: zoom-out;')">Copy</button><div class="ca" style="cursor:zoom-out"><span class="ci">🖱</span></div><div class="cinfo"><div class="cn">zoom-out</div><div class="cd">Zoom out</div></div></div></div></div></div></div>
+<div class="toast" id="toast">Copied!</div>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1200px;margin:24px auto;padding:0 20px}
+.pro-label{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:14px}
+.pro-blur-wrap{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;border:1px solid var(--border)}
+.pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;padding:20px;background:var(--card)}
+.pro-mock-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.pro-mock-card{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{font-size:.85rem;color:var(--accent);margin-bottom:10px}
+.pro-mock-bar{height:8px;background:var(--border);border-radius:4px;margin-bottom:6px}
+.pro-mock-bar.w60{width:60%}.pro-mock-bar.w80{width:80%}.pro-mock-bar.w45{width:45%}.pro-mock-bar.w70{width:70%}
+.pro-mock-line{height:12px;background:var(--border);border-radius:3px;margin-bottom:5px;width:90%}
+.pro-mock-line.short{width:55%}
+.pro-mock-cursors{display:flex;gap:10px;justify-content:center;padding:10px 0}
+.pro-mock-cursor{width:36px;height:36px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);transition:background .2s}
+.pro-blur-wrap:hover .pro-overlay{background:rgba(26,26,46,.65)}
+.pro-lock-icon{font-size:2.4rem;margin-bottom:8px}
+.pro-unlock-text{font-size:.95rem;color:#fff;font-weight:600;background:var(--accent);padding:8px 20px;border-radius:8px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s}
+.pro-modal h3{font-size:1.3rem;margin-bottom:6px;color:var(--text)}
+.pro-modal .pro-price{font-size:1.05rem;color:var(--accent);font-weight:700;margin-bottom:16px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:20px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.92rem;color:var(--text2)}
+.pro-modal ul li::before{content:'✓ ';color:var(--green);font-weight:700}
+.pro-btn-upgrade{display:block;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:background .2s}
+.pro-btn-upgrade:hover{background:#d63a52}
+.pro-btn-later{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.9rem;padding:8px}
+.pro-btn-later:hover{color:var(--text)}
+@keyframes proIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+</style>
+<div class="pro-section">
+<div class="pro-label"><span>🔒</span> Pro Features</div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-blur-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>✨ Animated Cursors</h4><div class="pro-mock-cursors"><div class="pro-mock-cursor">🎯</div><div class="pro-mock-cursor">✨</div><div class="pro-mock-cursor">🔥</div><div class="pro-mock-cursor">💫</div></div><div class="pro-mock-bar w80"></div></div>
+<div class="pro-mock-card"><h4>📦 Cursor Pack Downloads</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-bar w60"></div></div>
+</div>
+<div class="pro-mock-row">
+<div class="pro-mock-card"><h4>⚛️ React useCursor Hook</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-bar w45"></div></div>
+</div>
+</div>
+<div class="pro-overlay"><div class="pro-lock-icon">🔒</div><div class="pro-unlock-text">Click to unlock Pro features</div></div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>CSS Cursor Pro</h3>
+<div class="pro-price">$9 — one-time purchase</div>
+<ul>
+<li>Animated cursors — CSS keyframe cursor animations with preview</li>
+<li>Cursor pack downloads — 50+ premium cursor sets (.cur/.ani)</li>
+<li>React useCursor hook — drop-in hook for React/Next.js apps</li>
+<li>Cursor trail effects — sparkle, rainbow, and custom trails</li>
+<li>Lifetime access &amp; future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+<button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<footer class="footer"><p>AI CSS Cursor &mdash; A free CSS cursor preview tool for web developers</p></footer>
+<script>
+function copyCSS(btn, css) {
+  navigator.clipboard.writeText(css).then(function() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    var t = document.getElementById('toast');
+    t.textContent = 'Copied: ' + css;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 1500);
+    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var url = ev.target.result;
+    var prev = document.getElementById('customPreview');
+    prev.style.display = 'block';
+    var css = 'cursor: url(' + url + '), auto;';
+    prev.innerHTML = '<div class="card" style="display:inline-block;min-width:200px">' +
+      '<button class="cpb" style="opacity:1" onclick="copyCSS(this,\'' + css.replace(/'/g, "\\'") + '\')">Copy</button>' +
+      '<div class="ca" style="cursor:url(' + url + '), auto;height:120px">' +
+      '<span class="ci">&#127912;</span></div>' +
+      '<div class="cinfo"><div class="cn">custom</div>' +
+      '<div class="cd">Your uploaded image</div></div></div>';
+  };
+  reader.readAsDataURL(file);
+});
+
+var ds = document.getElementById('uploadSection');
+ds.addEventListener('dragover', function(e) { e.preventDefault(); ds.style.borderColor = 'var(--accent)'; });
+ds.addEventListener('dragleave', function() { ds.style.borderColor = ''; });
+ds.addEventListener('drop', function(e) {
+  e.preventDefault();
+  ds.style.borderColor = '';
+  if (e.dataTransfer.files.length) {
+    document.getElementById('fileInput').files = e.dataTransfer.files;
+    document.getElementById('fileInput').dispatchEvent(new Event('change'));
+  }
+});
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

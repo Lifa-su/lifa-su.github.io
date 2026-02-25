@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Viewport Generator - Generate viewport &amp; PWA meta tags</title>
+<meta name="description" content="Generate meta viewport tags, PWA meta tags, and preview on real device frames. One-click copy for your HTML head.">
+<link rel="canonical" href="https://lifa-su.com/ai-meta-viewport/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--surface:#1e2a4a;--surface2:#253456;--border:#2a3a5c;--text:#e0e0e0;--text2:#a0a8c0;--accent:#e94560;--accent2:#ff6b6b;--green:#4ecca3;--blue:#4da6ff;--purple:#a855f7;--yellow:#fbbf24;--radius:10px;--shadow:0 4px 20px rgba(0,0,0,0.3)}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+a{color:var(--blue);text-decoration:none}
+h1,h2,h3{font-weight:600}
+.container{max-width:1400px;margin:0 auto;padding:0 20px}
+header{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-bottom:1px solid var(--border);padding:20px 0;text-align:center}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+header p{color:var(--text2);font-size:0.95rem}
+.main{display:grid;grid-template-columns:380px 1fr;gap:24px;padding:24px 0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.panel h2{font-size:1.1rem;margin-bottom:16px;color:var(--accent2);display:flex;align-items:center;gap:8px}
+.panel h2 .icon{font-size:1.2rem}
+.section{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section h3{font-size:0.95rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
+.presets{display:flex;flex-wrap:wrap;gap:8px}
+.preset-btn{padding:8px 14px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);cursor:pointer;font-size:0.85rem;transition:all .2s}
+.preset-btn:hover{border-color:var(--accent);color:var(--accent)}
+.preset-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.form-group{margin-bottom:14px}
+.form-group label{display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--text2);margin-bottom:6px}
+.form-group label span.val{color:var(--green);font-weight:600;font-family:monospace}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--bg2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+select,input[type=text],input[type=color]{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:0.9rem;outline:none}
+select:focus,input[type=text]:focus{border-color:var(--accent)}
+input[type=color]{height:38px;padding:4px;cursor:pointer}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.toggle-row span{font-size:0.9rem}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;inset:0;background:var(--bg2);border-radius:12px;cursor:pointer;transition:.3s;border:1px solid var(--border)}
+.toggle .slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;bottom:2px;background:#fff;border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.slider::before{transform:translateX(20px)}
+.color-row{display:flex;gap:10px;align-items:center}
+.color-row input[type=color]{width:50px;flex-shrink:0}
+.color-row input[type=text]{flex:1}
+.pwa-select{margin-bottom:10px}
+.pwa-select label{display:block;font-size:0.85rem;color:var(--text2);margin-bottom:4px}
+.right-col{display:flex;flex-direction:column;gap:24px;min-width:0}
+.device-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.device-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text2);cursor:pointer;font-size:0.8rem;transition:all .2s}
+.device-btn:hover{border-color:var(--blue);color:var(--blue)}
+.device-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.preview-area{display:flex;justify-content:center;align-items:flex-start;padding:20px;min-height:300px;overflow:auto}
+.device-frame{background:#000;border-radius:36px;padding:12px;box-shadow:0 0 0 3px #333,0 8px 40px rgba(0,0,0,0.5);position:relative;transition:all .3s}
+.device-frame.tablet{border-radius:24px;padding:16px}
+.device-notch{width:120px;height:24px;background:#000;border-radius:0 0 16px 16px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:2}
+.device-screen{background:#fff;border-radius:24px;overflow:hidden;position:relative}
+.device-frame.tablet .device-screen{border-radius:12px}
+.device-info{text-align:center;margin-top:12px;font-size:0.8rem;color:var(--text2)}
+.screen-content{width:100%;height:100%;overflow:auto;transform-origin:top left}
+.screen-content .demo-page{padding:16px;font-family:-apple-system,sans-serif;color:#333;font-size:14px}
+.screen-content .demo-page h1{font-size:18px;margin-bottom:8px;color:#1a1a2e}
+.screen-content .demo-page p{font-size:13px;color:#555;margin-bottom:12px;line-height:1.5}
+.screen-content .demo-page .demo-btn{display:inline-block;padding:8px 20px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px}
+.screen-content .demo-page .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.screen-content .demo-page .demo-card{background:#f0f0f5;border-radius:8px;padding:10px;font-size:12px;color:#666}
+.code-panel{position:relative}
+.code-panel .code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.code-panel .code-header h2{margin-bottom:0}
+.copy-btn{padding:8px 18px;border:none;border-radius:6px;background:var(--green);color:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:6px}
+.copy-btn:hover{background:#3db88a;transform:translateY(-1px)}
+.copy-btn.copied{background:var(--purple)}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:0.82rem;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--text2);max-height:400px;overflow-y:auto}
+.code-block .tag{color:var(--accent)}
+.code-block .attr{color:var(--blue)}
+.code-block .val{color:var(--green)}
+.code-block .comment{color:#555}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#fff;padding:12px 28px;border-radius:8px;font-weight:600;font-size:0.9rem;z-index:999;transition:transform .3s;box-shadow:0 4px 20px rgba(78,204,163,0.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:24px 0;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);margin-top:24px}
+@media(max-width:900px){
+.main{grid-template-columns:1fr}
+.preview-area{min-height:200px}
+}
+@media(max-width:600px){
+header h1{font-size:1.4rem}
+.panel{padding:14px}
+.device-bar{gap:4px}
+.device-btn{padding:4px 8px;font-size:0.75rem}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="container">
+<h1>&#128241; Meta Viewport Generator</h1>
+<p>Generate viewport &amp; PWA meta tags with live device preview</p>
+</div>
+</header>
+<div class="container">
+<div class="main">
+<div class="left-col">
+<div class="panel">
+<h2><span class="icon">&#9881;</span> Viewport Settings</h2>
+<div class="section">
+<h3>Presets</h3>
+<div class="presets" id="presets"></div>
+</div>
+<div class="section">
+<h3>Parameters</h3>
+<div class="form-group">
+<label>Width <span class="val" id="widthVal">device-width</span></label>
+<select id="widthType" onchange="onWidthTypeChange()">
+<option value="device-width">device-width</option>
+<option value="custom">Custom (px)</option>
+</select>
+</div>
+<div class="form-group" id="customWidthGroup" style="display:none">
+<label>Custom Width <span class="val" id="customWidthVal">980</span>px</label>
+<input type="range" id="customWidth" min="320" max="2048" value="980" oninput="onParamChange()">
+</div>
+<div class="form-group">
+<label>Initial Scale <span class="val" id="initialScaleVal">1.0</span></label>
+<input type="range" id="initialScale" min="0.1" max="5" step="0.1" value="1.0" oninput="onParamChange()">
+</div>
+<div class="form-group">
+<label>Minimum Scale <span class="val" id="minimumScaleVal">—</span></label>
+<input type="range" id="minimumScale" min="0.1" max="5" step="0.1" value="0.5" oninput="onParamChange()" disabled>
+</div>
+<div class="toggle-row">
+<span>Set minimum-scale</span>
+<label class="toggle"><input type="checkbox" id="enableMinScale" onchange="onToggle()"><span class="slider"></span></label>
+</div>
+<div class="form-group">
+<label>Maximum Scale <span class="val" id="maximumScaleVal">—</span></label>
+<input type="range" id="maximumScale" min="0.1" max="10" step="0.1" value="5.0" oninput="onParamChange()" disabled>
+</div>
+<div class="toggle-row">
+<span>Set maximum-scale</span>
+<label class="toggle"><input type="checkbox" id="enableMaxScale" onchange="onToggle()"><span class="slider"></span></label>
+</div>
+<div class="toggle-row">
+<span>user-scalable</span>
+<label class="toggle"><input type="checkbox" id="userScalable" checked onchange="onParamChange()"><span class="slider"></span></label>
+</div>
+</div>
+<div class="section">
+<h3>PWA Meta Tags</h3>
+<div class="toggle-row">
+<span>Enable PWA tags</span>
+<label class="toggle"><input type="checkbox" id="enablePwa" onchange="onParamChange()"><span class="slider"></span></label>
+</div>
+<div id="pwaOptions" style="display:none;margin-top:12px">
+<div class="form-group">
+<label>theme-color</label>
+<div class="color-row">
+<input type="color" id="themeColor" value="#1a1a2e" oninput="onParamChange()">
+<input type="text" id="themeColorText" value="#1a1a2e" oninput="syncColor('themeColor','themeColorText')" maxlength="7">
+</div>
+</div>
+<div class="toggle-row">
+<span>apple-mobile-web-app-capable</span>
+<label class="toggle"><input type="checkbox" id="appCapable" checked onchange="onParamChange()"><span class="slider"></span></label>
+</div>
+<div class="pwa-select">
+<label>Status Bar Style</label>
+<select id="statusBarStyle" onchange="onParamChange()">
+<option value="default">default</option>
+<option value="black">black</option>
+<option value="black-translucent" selected>black-translucent</option>
+</select>
+</div>
+<div class="form-group">
+<label>apple-touch-icon URL</label>
+<input type="text" id="touchIcon" placeholder="/apple-touch-icon.png" value="/apple-touch-icon.png" oninput="onParamChange()">
+</div>
+<div class="form-group">
+<label>manifest URL</label>
+<input type="text" id="manifestUrl" placeholder="/manifest.json" value="/manifest.json" oninput="onParamChange()">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="right-col">
+<div class="panel">
+<h2><span class="icon">&#128242;</span> Device Preview</h2>
+<div class="device-bar" id="deviceBar"></div>
+<div class="preview-area" id="previewArea">
+<div>
+<div class="device-frame" id="deviceFrame">
+<div class="device-notch" id="deviceNotch"></div>
+<div class="device-screen" id="deviceScreen">
+<div class="screen-content" id="screenContent"></div>
+</div>
+</div>
+<div class="device-info" id="deviceInfo"></div>
+</div>
+</div>
+</div>
+<div class="panel code-panel">
+<div class="code-header">
+<h2><span class="icon">&#128196;</span> Generated Code</h2>
+<button class="copy-btn" id="copyBtn" onclick="copyCode()">&#128203; Copy All</button>
+</div>
+<div class="code-block" id="codeOutput"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast">Copied to clipboard!</div>
+<footer>
+<div class="container">Meta Viewport Generator &mdash; Generate perfect viewport &amp; PWA meta tags for any device</div>
+</footer>
+<script>
+const PRESETS=[
+{name:'Standard Responsive',w:'device-width',is:1,minS:null,maxS:null,us:true},
+{name:'Fixed Width (980)',w:'980',is:null,minS:null,maxS:null,us:null},
+{name:'No Zoom',w:'device-width',is:1,minS:1,maxS:1,us:false},
+{name:'Allow Zoom',w:'device-width',is:1,minS:0.5,maxS:3,us:true},
+{name:'Large Scale',w:'device-width',is:1.5,minS:1,maxS:5,us:true},
+{name:'Compact',w:'device-width',is:0.8,minS:0.5,maxS:2,us:true}
+];
+const DEVICES=[
+{name:'iPhone SE',w:375,h:667,scale:2,type:'phone'},
+{name:'iPhone 12',w:390,h:844,scale:3,type:'phone'},
+{name:'iPhone 14 Pro Max',w:430,h:932,scale:3,type:'phone'},
+{name:'Galaxy S21',w:360,h:800,scale:3,type:'phone'},
+{name:'Pixel 7',w:412,h:915,scale:2.625,type:'phone'},
+{name:'iPad',w:768,h:1024,scale:2,type:'tablet'},
+{name:'iPad Pro 12.9"',w:1024,h:1366,scale:2,type:'tablet'}
+];
+let currentPreset=0,currentDevice=0;
+function init(){
+const pc=document.getElementById('presets');
+PRESETS.forEach((p,i)=>{
+const b=document.createElement('button');
+b.className='preset-btn'+(i===0?' active':'');
+b.textContent=p.name;
+b.onclick=()=>applyPreset(i);
+pc.appendChild(b);
+});
+const db=document.getElementById('deviceBar');
+DEVICES.forEach((d,i)=>{
+const b=document.createElement('button');
+b.className='device-btn'+(i===0?' active':'');
+b.textContent=d.name;
+b.onclick=()=>selectDevice(i);
+db.appendChild(b);
+});
+applyPreset(0);
+selectDevice(0);
+}
+function applyPreset(i){
+currentPreset=i;
+const p=PRESETS[i];
+document.querySelectorAll('.preset-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+if(p.w==='device-width'){
+document.getElementById('widthType').value='device-width';
+document.getElementById('customWidthGroup').style.display='none';
+}else{
+document.getElementById('widthType').value='custom';
+document.getElementById('customWidthGroup').style.display='';
+document.getElementById('customWidth').value=parseInt(p.w);
+}
+if(p.is!==null)document.getElementById('initialScale').value=p.is;
+if(p.minS!==null){
+document.getElementById('enableMinScale').checked=true;
+document.getElementById('minimumScale').value=p.minS;
+document.getElementById('minimumScale').disabled=false;
+}else{
+document.getElementById('enableMinScale').checked=false;
+document.getElementById('minimumScale').disabled=true;
+}
+if(p.maxS!==null){
+document.getElementById('enableMaxScale').checked=true;
+document.getElementById('maximumScale').value=p.maxS;
+document.getElementById('maximumScale').disabled=false;
+}else{
+document.getElementById('enableMaxScale').checked=false;
+document.getElementById('maximumScale').disabled=true;
+}
+if(p.us!==null)document.getElementById('userScalable').checked=p.us;
+onParamChange();
+}
+function onWidthTypeChange(){
+const v=document.getElementById('widthType').value;
+document.getElementById('customWidthGroup').style.display=v==='custom'?'':'none';
+clearPresetHighlight();
+onParamChange();
+}
+function onToggle(){
+document.getElementById('minimumScale').disabled=!document.getElementById('enableMinScale').checked;
+document.getElementById('maximumScale').disabled=!document.getElementById('enableMaxScale').checked;
+clearPresetHighlight();
+onParamChange();
+}
+function clearPresetHighlight(){
+document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+currentPreset=-1;
+}
+function syncColor(colorId,textId){
+const t=document.getElementById(textId).value;
+if(/^#[0-9a-fA-F]{6}$/.test(t))document.getElementById(colorId).value=t;
+onParamChange();
+}
+function onParamChange(){
+const wt=document.getElementById('widthType').value;
+const wv=wt==='device-width'?'device-width':document.getElementById('customWidth').value;
+document.getElementById('widthVal').textContent=wv;
+if(wt==='custom')document.getElementById('customWidthVal').textContent=document.getElementById('customWidth').value;
+const is=parseFloat(document.getElementById('initialScale').value);
+document.getElementById('initialScaleVal').textContent=is.toFixed(1);
+const minE=document.getElementById('enableMinScale').checked;
+const minV=parseFloat(document.getElementById('minimumScale').value);
+document.getElementById('minimumScaleVal').textContent=minE?minV.toFixed(1):'—';
+const maxE=document.getElementById('enableMaxScale').checked;
+const maxV=parseFloat(document.getElementById('maximumScale').value);
+document.getElementById('maximumScaleVal').textContent=maxE?maxV.toFixed(1):'—';
+const us=document.getElementById('userScalable').checked;
+const pwa=document.getElementById('enablePwa').checked;
+document.getElementById('pwaOptions').style.display=pwa?'':'none';
+document.getElementById('themeColorText').value=document.getElementById('themeColor').value;
+generateCode();
+updatePreview();
+}
+function getViewportContent(){
+const wt=document.getElementById('widthType').value;
+const wv=wt==='device-width'?'device-width':document.getElementById('customWidth').value;
+let parts=['width='+wv];
+parts.push('initial-scale='+parseFloat(document.getElementById('initialScale').value).toFixed(1));
+if(document.getElementById('enableMinScale').checked)
+parts.push('minimum-scale='+parseFloat(document.getElementById('minimumScale').value).toFixed(1));
+if(document.getElementById('enableMaxScale').checked)
+parts.push('maximum-scale='+parseFloat(document.getElementById('maximumScale').value).toFixed(1));
+const us=document.getElementById('userScalable').checked;
+if(!us)parts.push('user-scalable=no');
+return parts.join(', ');
+}
+function generateCode(){
+let lines=[];
+lines.push(esc('<meta charset="UTF-8">'));
+lines.push(esc('<meta name="viewport" content="')+span('val',getViewportContent())+esc('">'));
+const pwa=document.getElementById('enablePwa').checked;
+if(pwa){
+const tc=document.getElementById('themeColor').value;
+lines.push('');
+lines.push(span('comment','&lt;!-- PWA Meta Tags --&gt;'));
+lines.push(esc('<meta name="theme-color" content="')+span('val',tc)+esc('">'));
+if(document.getElementById('appCapable').checked)
+lines.push(esc('<meta name="apple-mobile-web-app-capable" content="')+span('val','yes')+esc('">'));
+const sbs=document.getElementById('statusBarStyle').value;
+lines.push(esc('<meta name="apple-mobile-web-app-status-bar-style" content="')+span('val',sbs)+esc('">'));
+const icon=document.getElementById('touchIcon').value;
+if(icon)lines.push(esc('<link rel="apple-touch-icon" href="')+span('val',icon)+esc('">'));
+const mf=document.getElementById('manifestUrl').value;
+if(mf)lines.push(esc('<link rel="manifest" href="')+span('val',mf)+esc('">'));
+}
+document.getElementById('codeOutput').innerHTML=lines.join('\n');
+}
+function esc(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&lt;(\/?)(meta|link)/g,function(m,sl,tag){return '<span class="tag">&lt;'+sl+tag+'</span>';}).replace(/(name|content|charset|rel|href)=/g,'<span class="attr">$1</span>=').replace(/"&gt;/g,'"<span class="tag">&gt;</span>');}
+function span(cls,txt){return '<span class="'+cls+'">'+txt+'</span>';}
+function selectDevice(i){
+currentDevice=i;
+document.querySelectorAll('.device-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+updatePreview();
+}
+function updatePreview(){
+const d=DEVICES[currentDevice];
+const maxH=500;
+const isTablet=d.type==='tablet';
+const ratio=Math.min(1,maxH/(d.h*0.55));
+const sw=Math.round(d.w*0.55*ratio);
+const sh=Math.round(d.h*0.55*ratio);
+const frame=document.getElementById('deviceFrame');
+const screen=document.getElementById('deviceScreen');
+const notch=document.getElementById('deviceNotch');
+const content=document.getElementById('screenContent');
+frame.className='device-frame'+(isTablet?' tablet':'');
+frame.style.width=(sw+24)+'px';
+screen.style.width=sw+'px';
+screen.style.height=sh+'px';
+notch.style.display=isTablet?'none':'';
+const wt=document.getElementById('widthType').value;
+const viewW=wt==='device-width'?d.w:parseInt(document.getElementById('customWidth').value);
+const is=parseFloat(document.getElementById('initialScale').value);
+const contentScale=(sw/viewW)*is;
+content.style.width=viewW+'px';
+content.style.height=(sh/contentScale)+'px';
+content.style.transform='scale('+contentScale+')';
+content.innerHTML=getDemoHTML(d);
+document.getElementById('deviceInfo').textContent=d.name+' — '+d.w+'×'+d.h+' @'+d.scale+'x';
+}
+function getDemoHTML(d){
+return '<div class="demo-page">'+
+'<h1>Welcome to My App</h1>'+
+'<p>This is a preview of how your page renders on '+d.name+' ('+d.w+'×'+d.h+'). The viewport settings affect layout and zoom behavior.</p>'+
+'<div class="demo-grid">'+
+'<div class="demo-card">&#128206; Feature One<br><small>Responsive layout</small></div>'+
+'<div class="demo-card">&#9889; Feature Two<br><small>Fast loading</small></div>'+
+'<div class="demo-card">&#127912; Feature Three<br><small>Beautiful UI</small></div>'+
+'<div class="demo-card">&#128274; Feature Four<br><small>Secure &amp; safe</small></div>'+
+'</div>'+
+'<a class="demo-btn" href="#">Get Started</a>'+
+'</div>';
+}
+function copyCode(){
+const el=document.getElementById('codeOutput');
+const text=el.innerText;
+navigator.clipboard.writeText(text).then(()=>{
+const btn=document.getElementById('copyBtn');
+btn.innerHTML='&#10003; Copied!';
+btn.classList.add('copied');
+const t=document.getElementById('toast');
+t.classList.add('show');
+setTimeout(()=>{t.classList.remove('show');btn.innerHTML='&#128203; Copy All';btn.classList.remove('copied');},2000);
+});
+}
+init();
+</script>
+<script async src="https://alwingulla.com/88/tag.min.js" data-zone="130747" data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

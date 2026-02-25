@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Number Converter - Binary, Octal, Decimal, Hex Converter & IEEE 754 Visualizer</title>
+<meta name="description" content="Convert numbers between binary, octal, decimal and hexadecimal in real-time. Visualize bitwise operations and IEEE 754 floating-point representation with interactive colored bit diagrams.">
+<meta name="keywords" content="number converter, binary converter, hex converter, octal converter, IEEE 754, floating point, bitwise operations, base converter">
+<meta name="author" content="AI Number Converter">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="AI Number Converter - Base Conversion & IEEE 754 Visualizer">
+<meta property="og:description" content="Real-time number base conversion, bitwise operation visualization, and IEEE 754 floating-point representation.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-number-converter/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Number Converter">
+<meta name="twitter:description" content="Convert between BIN/OCT/DEC/HEX, visualize bitwise ops and IEEE 754 floating point.">
+<link rel="canonical" href="https://lifa-su.com/ai-number-converter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--sf:#1a1d27;--sf2:#242836;--bd:#2e3348;--tx:#e4e6f0;--tx2:#8b8fa8;--ac:#6c5ce7;--ac2:#a29bfe;--gn:#00cec9;--rd:#ff6b6b;--bl:#74b9ff;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.ctn{max-width:960px;margin:0 auto;padding:20px 16px}
+header{text-align:center;padding:40px 0 30px}
+h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--ac2),var(--gn));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--tx2);font-size:.95rem}
+.sec{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:24px}
+.st{font-size:1.15rem;font-weight:600;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ig{display:flex;flex-direction:column;gap:6px}
+.ig label{font-size:.8rem;font-weight:600;color:var(--ac2);text-transform:uppercase;letter-spacing:.5px}
+.ig input,.ig select{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;color:var(--tx);font-size:1rem;font-family:'SF Mono',Monaco,Consolas,monospace;outline:none;transition:border-color .2s;width:100%}
+.ig input:focus{border-color:var(--ac)}
+.ig input.err{border-color:var(--rd)}
+select{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:.95rem;outline:none;cursor:pointer;width:100%;margin-bottom:16px}
+.bv{display:flex;flex-direction:column;gap:12px;font-family:'SF Mono',Monaco,Consolas,monospace}
+.br{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brl{min-width:55px;font-size:.8rem;color:var(--tx2);font-weight:600;text-align:right}
+.bcs{display:flex;gap:3px;flex-wrap:wrap}
+.bc{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:5px;font-size:.85rem;font-weight:600}
+.b0{background:rgba(139,143,168,.15);color:var(--tx2)}
+.b1{background:rgba(108,92,231,.3);color:var(--ac2)}
+.bres .b1{background:rgba(0,206,201,.3);color:var(--gn)}
+.ibs{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:8px}
+.ib{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:.75rem;font-weight:600}
+.ib.s{background:rgba(255,107,107,.25);color:var(--rd)}
+.ib.e{background:rgba(116,185,255,.2);color:var(--bl)}
+.ib.m{background:rgba(0,206,201,.18);color:var(--gn)}
+.leg{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.legi{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--tx2)}
+.legd{width:12px;height:12px;border-radius:3px}
+.legd.s{background:rgba(255,107,107,.4)}
+.legd.e{background:rgba(116,185,255,.35)}
+.legd.m{background:rgba(0,206,201,.3)}
+.iinf{font-size:.82rem;color:var(--tx2);line-height:1.7}
+.iinf b{color:var(--tx);font-weight:500}
+.sep{width:2px;height:28px;background:var(--bd);margin:0 2px;flex-shrink:0}
+.isec{margin-bottom:20px}
+.isec h4{font-size:.9rem;color:var(--tx2);margin-bottom:10px}
+footer{text-align:center;padding:30px 0;color:var(--tx2);font-size:.82rem}
+footer a{color:var(--ac2);text-decoration:none}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}h1{font-size:1.5rem}.sec{padding:16px}.bc{width:26px;height:26px;font-size:.75rem}.ib{width:22px;height:22px;font-size:.65rem}}
+</style>
+</head>
+<body>
+<div class="ctn">
+<header><h1>⚡ AI Number Converter</h1><p>Real-time base conversion, bitwise operations &amp; IEEE 754 visualization</p></header>
+<div class="sec">
+<div class="st"><span>🔄</span> Base Converter</div>
+<div class="grid2">
+<div class="ig"><label>Binary (BIN)</label><input type="text" id="bin" placeholder="e.g. 1010" oninput="convert('bin')"></div>
+<div class="ig"><label>Octal (OCT)</label><input type="text" id="oct" placeholder="e.g. 12" oninput="convert('oct')"></div>
+<div class="ig"><label>Decimal (DEC)</label><input type="text" id="dec" placeholder="e.g. 10" oninput="convert('dec')"></div>
+<div class="ig"><label>Hexadecimal (HEX)</label><input type="text" id="hex" placeholder="e.g. A" oninput="convert('hex')"></div>
+</div>
+</div>
+
+<div class="sec">
+<div class="st"><span>⚙️</span> Bitwise Operations</div>
+<div class="grid2">
+<div class="ig"><label>Number A (decimal)</label><input type="text" id="bitA" placeholder="e.g. 170" oninput="calcBit()"></div>
+<div class="ig"><label>Number B (decimal)</label><input type="text" id="bitB" placeholder="e.g. 105" oninput="calcBit()"></div>
+</div>
+<div style="margin-top:14px">
+<select id="bitOp" onchange="calcBit()">
+<option value="AND">AND (&amp;)</option>
+<option value="OR">OR (|)</option>
+<option value="XOR">XOR (^)</option>
+<option value="NOT">NOT (~A)</option>
+</select>
+</div>
+<div id="bitResult" class="bv"></div>
+</div>
+
+<div class="sec">
+<div class="st"><span>📊</span> IEEE 754 Floating Point</div>
+<div class="ig" style="margin-bottom:20px"><label>Decimal Number</label><input type="text" id="ieeeIn" placeholder="e.g. -3.14" oninput="calcIEEE()"></div>
+<div id="ieee32" class="isec"></div>
+<div id="ieee64" class="isec"></div>
+</div>
+</div>
+<footer><p>AI Number Converter &mdash; A developer tool for number systems</p></footer>
+<script>
+function convert(src){
+  const v=document.getElementById(src).value.trim();
+  if(!v){['bin','oct','dec','hex'].forEach(id=>{if(id!==src)document.getElementById(id).value=''});return}
+  let n;
+  try{
+    if(src==='bin')n=parseInt(v,2);
+    else if(src==='oct')n=parseInt(v,8);
+    else if(src==='dec')n=parseInt(v,10);
+    else n=parseInt(v,16);
+    if(isNaN(n))return;
+  }catch(e){return}
+  if(src!=='bin')document.getElementById('bin').value=n.toString(2);
+  if(src!=='oct')document.getElementById('oct').value=n.toString(8);
+  if(src!=='dec')document.getElementById('dec').value=n.toString(10);
+  if(src!=='hex')document.getElementById('hex').value=n.toString(16).toUpperCase();
+}
+function toBinStr(n,bits){let s=(n>>>0).toString(2);while(s.length<bits)s='0'+s;return s.slice(-bits)}
+function bitCells(bin,cls){return bin.split('').map(b=>'<div class="bc '+(b==='1'?'b1':'b0')+(cls?' '+cls:'')+'">'+b+'</div>').join('')}
+function calcBit(){
+  const a=parseInt(document.getElementById('bitA').value)||0;
+  const b=parseInt(document.getElementById('bitB').value)||0;
+  const op=document.getElementById('bitOp').value;
+  let r,label;
+  if(op==='AND'){r=a&b;label='A & B'}
+  else if(op==='OR'){r=a|b;label='A | B'}
+  else if(op==='XOR'){r=a^b;label='A ^ B'}
+  else{r=~a;label='~A'}
+  const bits=Math.max(8,Math.max(a,b,Math.abs(r)).toString(2).length);
+  const pad=Math.ceil(bits/8)*8;
+  let h='<div class="br"><span class="brl">A</span><div class="bcs">'+bitCells(toBinStr(a,pad),'')+'</div></div>';
+  if(op!=='NOT')h+='<div class="br"><span class="brl">B</span><div class="bcs">'+bitCells(toBinStr(b,pad),'')+'</div></div>';
+  h+='<div class="br" style="border-top:1px solid var(--bd);padding-top:10px;margin-top:4px"><span class="brl">'+label+'</span><div class="bcs bres">'+bitCells(toBinStr(r,pad),'')+'</div></div>';
+  h+='<div style="margin-top:8px;font-size:.82rem;color:var(--tx2)">Result: <b style="color:var(--tx)">'+label+' = '+(r>>>0)+' (unsigned) / '+r+' (signed)</b></div>';
+  document.getElementById('bitResult').innerHTML=h;
+}
+function floatToBin32(f){const buf=new ArrayBuffer(4);new DataView(buf).setFloat32(0,f);let b='';const u=new Uint8Array(buf);for(let i=0;i<4;i++)b+=u[i].toString(2).padStart(8,'0');return b}
+function floatToBin64(f){const buf=new ArrayBuffer(8);new DataView(buf).setFloat64(0,f);let b='';const u=new Uint8Array(buf);for(let i=0;i<8;i++)b+=u[i].toString(2).padStart(8,'0');return b}
+function renderIEEE(bin,expBits,mantBits,label,elId){
+  const sign=bin[0],exp=bin.slice(1,1+expBits),mant=bin.slice(1+expBits);
+  const bias=Math.pow(2,expBits-1)-1;
+  const expVal=parseInt(exp,2);
+  let h='<h4>'+label+'</h4><div class="leg">';
+  h+='<div class="legi"><div class="legd s"></div>Sign (1 bit)</div>';
+  h+='<div class="legi"><div class="legd e"></div>Exponent ('+expBits+' bits)</div>';
+  h+='<div class="legi"><div class="legd m"></div>Mantissa ('+mantBits+' bits)</div></div>';
+  h+='<div class="ibs">';
+  h+='<div class="ib s">'+sign+'</div><div class="sep"></div>';
+  for(let i=0;i<exp.length;i++)h+='<div class="ib e">'+exp[i]+'</div>';
+  h+='<div class="sep"></div>';
+  for(let i=0;i<mant.length;i++)h+='<div class="ib m">'+mant[i]+'</div>';
+  h+='</div>';
+  h+='<div class="iinf">Sign: <b>'+(sign==='0'?'+ (positive)':'− (negative)')+'</b><br>';
+  h+='Exponent: <b>'+exp+' = '+expVal+' (biased), '+(expVal-bias)+' (unbiased, bias='+bias+')</b><br>';
+  h+='Mantissa: <b>'+mant+'</b></div>';
+  document.getElementById(elId).innerHTML=h;
+}
+function calcIEEE(){
+  const v=parseFloat(document.getElementById('ieeeIn').value);
+  if(isNaN(v)){document.getElementById('ieee32').innerHTML='';document.getElementById('ieee64').innerHTML='';return}
+  renderIEEE(floatToBin32(v),8,23,'32-bit (Single Precision)','ieee32');
+  renderIEEE(floatToBin64(v),11,52,'64-bit (Double Precision)','ieee64');
+}
+</script>
+<script src="https://m.servedby-buysellads.com/monetization.js" type="text/javascript"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explore CSS direction and writing-mode properties. Interactive tool for RTL/LTR text layout, vertical writing modes, and bidirectional text handling.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-direction/">
+<title>CSS Direction & Writing Mode Tool</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text-dim:#aab;--border:#2a2a4e;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.header{text-align:center;padding:2.5rem 1rem 1.5rem}
+.header h1{font-size:2rem;font-weight:800;color:transparent;background:linear-gradient(135deg,#e94560,#533483,#00d2ff);-webkit-background-clip:text;background-clip:text}
+.header p{color:var(--text-dim);margin-top:.4rem;font-size:.95rem}
+.container{max-width:1200px;margin:0 auto;padding:1rem}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
+.panel h2{font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.field{margin-bottom:1.2rem}
+.field label{display:block;font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem;font-weight:500}
+.dir-toggle{display:flex;gap:.5rem}
+.dir-btn{flex:1;padding:.7rem;border:2px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.dir-btn.active{border-color:var(--accent);background:rgba(233,69,96,.15);color:var(--accent)}
+.dir-btn:hover:not(.active){border-color:var(--accent2)}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{padding:.35rem .7rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-dim);font-size:.78rem;cursor:pointer;transition:all .2s}
+.chip.active{border-color:var(--accent);background:rgba(233,69,96,.15);color:var(--accent)}
+.chip.lang{border-color:#00d2ff;background:rgba(0,210,255,.12);color:#00d2ff}
+.chip:hover{border-color:var(--text-dim)}
+textarea.custom-text{width:100%;padding:.6rem .8rem;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:.9rem;outline:none;resize:vertical;min-height:60px;font-family:inherit}
+textarea.custom-text:focus{border-color:var(--accent)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.compare-grid{grid-template-columns:1fr}}
+.preview-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1.2rem;position:relative;min-height:120px}
+.preview-box:hover{border-color:var(--accent2)}
+.preview-label{position:absolute;top:-.55rem;left:1rem;background:var(--surface);padding:0 .5rem;font-size:.75rem;color:var(--accent);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.preview-text{font-size:1.05rem;line-height:1.8;word-break:break-word}
+.preview-meta{margin-top:.8rem;font-size:.75rem;color:var(--text-dim);border-top:1px solid var(--border);padding-top:.5rem}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.code-header{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1rem;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.code-header span{font-size:.78rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.copy-btn{padding:.3rem .8rem;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:600;transition:all .2s}
+.copy-btn:hover{background:#d63050}
+.copy-btn.copied{background:#2ecc71}
+pre{padding:1rem;overflow-x:auto;font-size:.85rem;line-height:1.6;color:#cde}
+pre code{font-family:'SF Mono',Monaco,Consolas,monospace}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:1.5rem}
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;box-shadow:var(--shadow)}
+.info-card h3{font-size:.95rem;color:var(--accent);margin-bottom:.5rem}
+.info-card p{font-size:.83rem;color:var(--text-dim);line-height:1.5}
+.info-card code{background:rgba(233,69,96,.1);color:var(--accent);padding:.1rem .4rem;border-radius:4px;font-size:.8rem}
+.footer{text-align:center;padding:2rem 1rem;color:var(--text-dim);font-size:.8rem;margin-top:2rem;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>CSS Direction Tool</h1>
+  <p>Explore CSS direction, unicode-bidi, and writing modes with live preview</p>
+</div>
+<div class="container">
+<div class="grid">
+  <div class="panel">
+    <h2>&#9881;&#65039; Settings</h2>
+    <div class="field">
+      <label>Direction</label>
+      <div class="dir-toggle">
+        <button class="dir-btn active" onclick="setDir('ltr')">&#8592; LTR</button>
+        <button class="dir-btn" onclick="setDir('rtl')">RTL &#8594;</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Unicode Bidi</label>
+      <div class="chips" id="bidiChips"></div>
+    </div>
+    <div class="field">
+      <label>Preview Languages</label>
+      <div class="chips" id="langChips"></div>
+    </div>
+    <div class="field">
+      <label>Custom Text (optional)</label>
+      <textarea class="custom-text" id="customText" placeholder="Type your own text to preview..." oninput="update()"></textarea>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:1.2rem">
+    <div class="panel">
+      <h2>&#128065;&#65039; Live Preview</h2>
+      <div class="compare-grid" id="compareGrid"></div>
+    </div>
+    <div class="panel">
+      <h2>&#128221; Generated CSS</h2>
+      <div class="code-block">
+        <div class="code-header"><span>CSS</span><button class="copy-btn" onclick="copyCSS()">Copy</button></div>
+        <pre><code id="codeOutput"></code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="info-grid">
+  <div class="info-card">
+    <h3>&#128073; direction</h3>
+    <p>Sets the base text direction. <code>ltr</code> for left-to-right (English, Chinese), <code>rtl</code> for right-to-left (Arabic, Hebrew).</p>
+  </div>
+  <div class="info-card">
+    <h3>&#128260; unicode-bidi</h3>
+    <p>Controls how bidirectional text is handled. <code>isolate</code> is recommended for most cases. <code>bidi-override</code> forces direction regardless of content.</p>
+  </div>
+  <div class="info-card">
+    <h3>&#127760; Mixed Content</h3>
+    <p>When LTR and RTL text are mixed, the browser's bidi algorithm determines rendering. Use <code>unicode-bidi</code> and <code>dir</code> attributes for fine control.</p>
+  </div>
+  <div class="info-card">
+    <h3>&#9989; Best Practices</h3>
+    <p>Prefer HTML <code>dir</code> attribute over CSS <code>direction</code>. Use <code>logical properties</code> (inline-start/end) instead of left/right for RTL-friendly layouts.</p>
+  </div>
+</div>
+</div>
+<div class="footer">CSS Direction Tool &mdash; Built for developers working with multilingual layouts</div>
+<script>
+const BIDI_OPTIONS=['normal','embed','bidi-override','isolate','isolate-override','plaintext'];
+const LANGS=[
+  {id:'ar',name:'Arabic',text:'\u0645\u0631\u062d\u0628\u0627 \u0628\u0627\u0644\u0639\u0627\u0644\u0645\u060c \u0647\u0630\u0627 \u0646\u0635 \u062a\u062c\u0631\u064a\u0628\u064a \u0644\u0644\u0639\u0631\u0628\u064a\u0629',native:'RTL'},
+  {id:'he',name:'Hebrew',text:'\u05e9\u05dc\u05d5\u05dd \u05e2\u05d5\u05dc\u05dd\u002c \u05d6\u05d4\u05d5 \u05d8\u05e7\u05e1\u05d8 \u05dc\u05d3\u05d5\u05d2\u05de\u05d4 \u05d1\u05e2\u05d1\u05e8\u05d9\u05ea',native:'RTL'},
+  {id:'zh',name:'Chinese',text:'\u4f60\u597d\u4e16\u754c\uff0c\u8fd9\u662f\u4e00\u6bb5\u4e2d\u6587\u6d4b\u8bd5\u6587\u672c',native:'LTR'},
+  {id:'en',name:'English',text:'Hello World, this is a sample text for direction testing.',native:'LTR'},
+  {id:'mixed',name:'Mixed',text:'Hello \u0645\u0631\u062d\u0628\u0627 World \u4f60\u597d \u05e9\u05dc\u05d5\u05dd',native:'Mixed'}
+];
+let state={dir:'ltr',bidi:'normal',langs:['ar','en']};
+
+function init(){
+  const bc=document.getElementById('bidiChips');
+  BIDI_OPTIONS.forEach(b=>{
+    const el=document.createElement('button');
+    el.className='chip'+(b==='normal'?' active':'');
+    el.textContent=b;
+    el.onclick=()=>setBidi(b);
+    bc.appendChild(el);
+  });
+  const lc=document.getElementById('langChips');
+  LANGS.forEach(l=>{
+    const el=document.createElement('button');
+    el.className='chip'+(state.langs.includes(l.id)?' lang':'');
+    el.textContent=l.name;
+    el.dataset.lang=l.id;
+    el.onclick=()=>toggleLang(l.id);
+    lc.appendChild(el);
+  });
+  update();
+}
+
+function setDir(d){
+  state.dir=d;
+  document.querySelectorAll('.dir-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(d)));
+  update();
+}
+
+function setBidi(b){
+  state.bidi=b;
+  document.querySelectorAll('#bidiChips .chip').forEach(c=>c.classList.toggle('active',c.textContent===b));
+  update();
+}
+
+function toggleLang(id){
+  const i=state.langs.indexOf(id);
+  if(i>-1)state.langs.splice(i,1);else state.langs.push(id);
+  if(state.langs.length===0)state.langs.push(id);
+  document.querySelectorAll('#langChips .chip').forEach(c=>c.classList.toggle('lang',state.langs.includes(c.dataset.lang)));
+  update();
+}
+
+function update(){
+  const grid=document.getElementById('compareGrid');
+  const custom=document.getElementById('customText').value.trim();
+  const activeLangs=LANGS.filter(l=>state.langs.includes(l.id));
+  let html='';
+
+  // LTR preview
+  html+='<div class="preview-box"><span class="preview-label">LTR</span>';
+  activeLangs.forEach(l=>{
+    const txt=custom||l.text;
+    html+='<div class="preview-text" style="direction:ltr;unicode-bidi:'+state.bidi+'">'+esc(txt)+'</div>';
+  });
+  html+='<div class="preview-meta">direction: ltr; unicode-bidi: '+state.bidi+'</div></div>';
+
+  // RTL preview
+  html+='<div class="preview-box"><span class="preview-label">RTL</span>';
+  activeLangs.forEach(l=>{
+    const txt=custom||l.text;
+    html+='<div class="preview-text" style="direction:rtl;unicode-bidi:'+state.bidi+'">'+esc(txt)+'</div>';
+  });
+  html+='<div class="preview-meta">direction: rtl; unicode-bidi: '+state.bidi+'</div></div>';
+
+  // Selected direction preview
+  if(custom){
+    html+='<div class="preview-box" style="grid-column:1/-1"><span class="preview-label">Current ('+state.dir.toUpperCase()+')</span>';
+    html+='<div class="preview-text" style="direction:'+state.dir+';unicode-bidi:'+state.bidi+'">'+esc(custom)+'</div>';
+    html+='<div class="preview-meta">direction: '+state.dir+'; unicode-bidi: '+state.bidi+'</div></div>';
+  }
+
+  grid.innerHTML=html;
+  updateCode();
+}
+
+function updateCode(){
+  const css='.element {\n  direction: '+state.dir+';\n  unicode-bidi: '+state.bidi+';\n}';
+  document.getElementById('codeOutput').textContent=css;
+}
+
+function copyCSS(){
+  const css=document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(css).then(()=>{
+    const btn=document.querySelector('.copy-btn');
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+  });
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

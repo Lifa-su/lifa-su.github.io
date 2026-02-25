@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI IP Lookup - IP Address Lookup Tool</title>
+<meta name="description" content="Free IP address lookup tool. Find geolocation, ISP, and network information for any IP address.">
+<link rel="canonical" href="https://lifa-su.com/ai-ip-lookup/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.container{max-width:800px;width:100%;padding:20px}
+h1{text-align:center;margin:30px 0 10px;font-size:2em;color:#e94560}
+.subtitle{text-align:center;color:#888;margin-bottom:30px;font-size:.95em}
+.search-box{display:flex;gap:10px;margin-bottom:30px}
+.search-box input{flex:1;padding:12px 16px;border:2px solid #16213e;background:#16213e;color:#e0e0e0;border-radius:8px;font-size:1em;outline:none;transition:border-color .3s}
+.search-box input:focus{border-color:#e94560}
+.search-box input::placeholder{color:#666}
+.search-box button{padding:12px 24px;background:#e94560;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;transition:background .3s;white-space:nowrap}
+.search-box button:hover{background:#c73650}
+.search-box button:disabled{background:#555;cursor:not-allowed}
+.card{background:#16213e;border-radius:12px;padding:24px;margin-bottom:20px}
+.card h2{color:#e94560;margin-bottom:16px;font-size:1.2em}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-item{padding:10px 14px;background:#1a1a2e;border-radius:8px}
+.info-item .label{font-size:.8em;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.info-item .value{font-size:1em;color:#e0e0e0;word-break:break-all}
+.info-item.full{grid-column:1/-1}
+.ip-display{text-align:center;padding:20px;margin-bottom:20px}
+.ip-display .current-ip{font-size:1.8em;color:#e94560;font-weight:700;font-family:'Courier New',monospace}
+.ip-version{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8em;font-weight:600;margin-top:8px}
+.ipv4{background:#0f3460;color:#4fc3f7}
+.ipv6{background:#1b4332;color:#81c784}
+.loading{text-align:center;padding:40px;color:#888}
+.spinner{display:inline-block;width:30px;height:30px;border:3px solid #16213e;border-top-color:#e94560;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{background:#3d1c1c;border:1px solid #e94560;border-radius:8px;padding:16px;text-align:center;color:#ff8a80;margin-bottom:20px}
+.coords{margin-top:12px;padding:12px;background:#1a1a2e;border-radius:8px;text-align:center}
+.coords a{color:#4fc3f7;text-decoration:none}
+.coords a:hover{text-decoration:underline}
+footer{text-align:center;padding:30px 20px;color:#555;font-size:.85em;margin-top:auto}
+footer a{color:#e94560;text-decoration:none}
+@media(max-width:600px){.info-grid{grid-template-columns:1fr}.search-box{flex-direction:column}h1{font-size:1.5em}.ip-display .current-ip{font-size:1.3em}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#128270; AI IP Lookup</h1>
+<p class="subtitle">Free IP Address Geolocation &amp; Network Information Tool</p>
+<div id="ipd" class="ip-display"><div class="loading"><div class="spinner"></div><br>Detecting your IP...</div></div>
+<div class="search-box">
+<input type="text" id="ipi" placeholder="Enter IP address (e.g. 8.8.8.8)" aria-label="IP address">
+<button onclick="lookup()">Lookup</button>
+<button onclick="myIP()" style="background:#0f3460">My IP</button>
+</div>
+<div id="res"></div>
+</div>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:800px;margin:30px auto;cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid #16213e}
+.pro-blur{filter:blur(4px);opacity:.7;padding:24px;background:#16213e;pointer-events:none;user-select:none}
+.pro-blur h3{color:#e94560;font-size:1rem;margin-bottom:12px}
+.pro-blur .mock-batch{background:#1a1a2e;border-radius:8px;padding:12px;margin-bottom:14px;font-family:monospace;font-size:.8rem;color:#666;line-height:1.8}
+.pro-blur .mock-history{margin-bottom:14px}
+.pro-blur .mock-hrow{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#1a1a2e;border-radius:6px;margin-bottom:4px;font-size:.8rem;color:#888}
+.pro-blur .mock-hrow .ip{color:#4fc3f7;font-family:monospace}
+.pro-blur .mock-api{background:#0d1117;border-radius:8px;padding:12px;font-family:monospace;font-size:.78rem;color:#8be9fd;line-height:1.6}
+.pro-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(0,0,0,.55)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{color:#fff;font-size:1.15rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-sublabel{color:rgba(255,255,255,.7);font-size:.85rem;margin-top:4px}
+.pro-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-box{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;animation:proFadeIn .3s}
+@keyframes proFadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pro-modal-box h3{font-size:1.3rem;color:#fff;margin-bottom:4px}
+.pro-modal-box .pro-price{font-size:2rem;font-weight:800;color:#e94560;margin:12px 0}
+.pro-modal-box .pro-desc{color:#888;font-size:.85rem;margin-bottom:8px}
+.pro-modal-box ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal-box ul li{padding:8px 0;border-bottom:1px solid #0f3460;font-size:.9rem;color:#ccc}
+.pro-modal-box ul li:last-child{border-bottom:none}
+.pro-modal-box ul li::before{content:'✓ ';color:#e94560;font-weight:700}
+.pro-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#c73650);color:#fff;text-decoration:none;border-radius:10px;font-size:1.05rem;font-weight:700;margin-top:16px;transition:opacity .2s;text-align:center}
+.pro-btn:hover{opacity:.9}
+.pro-close{background:none;border:none;color:#888;font-size:.9rem;margin-top:12px;cursor:pointer;padding:8px}
+.pro-close:hover{color:#fff}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').style.display='flex'">
+<div class="pro-blur">
+<h3>📦 Batch Lookup</h3>
+<div class="mock-batch">8.8.8.8<br>1.1.1.1<br>208.67.222.222<br>9.9.9.9<br>185.228.168.9<br><span style="color:#e94560">▶ Process 5 IPs</span></div>
+<h3>📜 History Records</h3>
+<div class="mock-history">
+<div class="mock-hrow"><span class="ip">8.8.8.8</span><span>Google DNS — US</span><span>2 min ago</span></div>
+<div class="mock-hrow"><span class="ip">1.1.1.1</span><span>Cloudflare — AU</span><span>5 min ago</span></div>
+<div class="mock-hrow"><span class="ip">208.67.222.222</span><span>OpenDNS — US</span><span>12 min ago</span></div>
+</div>
+<h3>🔌 API Access</h3>
+<div class="mock-api">GET /api/v1/lookup?ip=8.8.8.8<br><br>Authorization: Bearer sk_pro_xxxx<br>Rate Limit: 1000 req/min</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock batch lookup, history & API access</div>
+</div>
+</div>
+<div id="proModal" class="pro-modal" onclick="if(event.target===this)this.style.display='none'">
+<div class="pro-modal-box">
+<h3>⚡ IP Lookup Pro</h3>
+<div class="pro-desc">Professional IP intelligence toolkit</div>
+<div class="pro-price">$14</div>
+<ul>
+<li>Batch Lookup — query up to 100 IPs at once with CSV export</li>
+<li>History Records — searchable log of all your past lookups</li>
+<li>API Access — RESTful API with 1000 req/min for your apps</li>
+<li>Priority support & lifetime updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn">Upgrade to Pro — $14</a>
+<button class="pro-close" onclick="event.stopPropagation();document.getElementById('proModal').style.display='none'">Maybe later</button>
+</div>
+</div>
+<footer>
+<p>AI IP Lookup &mdash; <a href="https://ipapi.co" target="_blank" rel="noopener">ipapi.co</a> &amp; <a href="https://ipwho.is" target="_blank" rel="noopener">ipwho.is</a></p>
+</footer>
+<script>
+var ipi=document.getElementById("ipi"),ipd=document.getElementById("ipd"),res=document.getElementById("res");
+ipi.addEventListener("keydown",function(e){if(e.key==="Enter")lookup()});
+function ver(ip){return ip.indexOf(":")!==-1?"IPv6":"IPv4"}
+
+async function getMyIP(){
+  try{
+    var r=await Promise.allSettled([
+      fetch("https://api.ipify.org?format=json").then(function(r){return r.json()}),
+      fetch("https://api64.ipify.org?format=json").then(function(r){return r.json()})
+    ]);
+    var v4=r[0].status==="fulfilled"?r[0].value.ip:null;
+    var v6=r[1].status==="fulfilled"?r[1].value.ip:null;
+    return{primary:v6||v4,v4:v4,v6:v6!==v4?v6:null};
+  }catch(e){return null}
+}
+
+function showIP(d){
+  if(!d||!d.primary){ipd.innerHTML='<div class="error">Could not detect your IP</div>';return}
+  var v=ver(d.primary);
+  var h='<div class="current-ip">'+d.primary+'</div><div><span class="ip-version '+v.toLowerCase()+'">'+v+'</span></div>';
+  if(d.v4&&d.v6)h+='<div style="margin-top:10px;font-size:.85em;color:#888">IPv4: <span style="color:#4fc3f7">'+d.v4+'</span> | IPv6: <span style="color:#81c784">'+d.v6+'</span></div>';
+  ipd.innerHTML=h;
+  ipi.value=d.primary;
+}
+
+function g(){for(var i=0;i<arguments.length;i++)if(arguments[i]!=null&&arguments[i]!=="")return arguments[i];return "N/A"}
+
+async function fetchInfo(ip){
+  var r=await Promise.allSettled([
+    fetch("https://ipapi.co/"+ip+"/json/").then(function(r){return r.json()}),
+    fetch("https://ipwho.is/"+ip).then(function(r){return r.json()})
+  ]);
+  var a=r[0].status==="fulfilled"?r[0].value:null;
+  var b=r[1].status==="fulfilled"?r[1].value:null;
+  if(a&&a.error)a=null;
+  if(b&&!b.success)b=null;
+  if(!a&&!b)return null;
+  return{
+    ip:ip,
+    version:ver(ip),
+    country:g(a&&a.country_name,b&&b.country),
+    countryCode:g(a&&a.country_code,b&&b.country_code),
+    region:g(a&&a.region,b&&b.region),
+    city:g(a&&a.city,b&&b.city),
+    zip:g(a&&a.postal,b&&b.postal),
+    lat:a&&a.latitude||b&&b.latitude||null,
+    lon:a&&a.longitude||b&&b.longitude||null,
+    tz:g(a&&a.timezone,b&&b.timezone&&b.timezone.id),
+    isp:g(a&&a.org,b&&b.connection&&b.connection.isp),
+    asn:g(a&&a.asn,b&&b.connection&&b.connection.asn),
+    org:g(a&&a.org,b&&b.connection&&b.connection.org),
+    flag:b&&b.flag&&b.flag.emoji||""
+  };
+}
+
+function item(label,val,full){
+  return '<div class="info-item'+(full?" full":"")+'"><div class="label">'+label+'</div><div class="value">'+val+'</div></div>';
+}
+
+function render(d){
+  if(!d){res.innerHTML='<div class="error">Could not fetch IP information. Please try again.</div>';return}
+  var h='<div class="card"><h2>'+d.flag+' Location</h2><div class="info-grid">';
+  h+=item("IP Address",d.ip,true);
+  h+=item("IP Version",'<span class="ip-version '+d.version.toLowerCase()+'">'+d.version+'</span>');
+  h+=item("Country",d.country+" "+d.flag);
+  h+=item("Region",d.region);
+  h+=item("City",d.city);
+  h+=item("Postal Code",d.zip);
+  h+=item("Timezone",d.tz);
+  h+='</div>';
+  if(d.lat&&d.lon){
+    h+='<div class="coords">&#128205; Coordinates: '+d.lat+', '+d.lon;
+    h+=' &mdash; <a href="https://www.google.com/maps?q='+d.lat+','+d.lon+'" target="_blank" rel="noopener">View on Map</a></div>';
+  }
+  h+='</div>';
+  h+='<div class="card"><h2>&#128225; Network</h2><div class="info-grid">';
+  h+=item("ISP",d.isp,true);
+  h+=item("ASN",d.asn);
+  h+=item("Organization",d.org);
+  h+='</div></div>';
+  res.innerHTML=h;
+}
+
+async function lookup(){
+  var ip=ipi.value.trim();
+  if(!ip){alert("Please enter an IP address");return}
+  res.innerHTML='<div class="loading"><div class="spinner"></div><br>Looking up '+ip+'...</div>';
+  try{var d=await fetchInfo(ip);render(d)}catch(e){res.innerHTML='<div class="error">Error: '+e.message+'</div>'}
+}
+
+async function myIP(){
+  ipd.innerHTML='<div class="loading"><div class="spinner"></div><br>Detecting...</div>';
+  var d=await getMyIP();
+  showIP(d);
+  if(d&&d.primary){ipi.value=d.primary;lookup()}
+}
+
+(async function(){
+  var d=await getMyIP();
+  showIP(d);
+  if(d&&d.primary)lookup();
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

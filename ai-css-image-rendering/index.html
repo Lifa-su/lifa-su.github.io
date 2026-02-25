@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Image Rendering Demo - Compare auto, crisp-edges, pixelated</title>
+<meta name="description" content="Interactive CSS image-rendering property demo tool. Compare auto, crisp-edges, and pixelated modes with zoom controls and code generation.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-image-rendering/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+h1{font-size:clamp(1.4rem,4vw,2rem);text-align:center;padding:1.5rem 1rem .5rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{text-align:center;color:var(--tx2);font-size:.95rem;margin-bottom:1.5rem}
+.sub code{background:var(--sf2);padding:.1rem .4rem;border-radius:4px;font-size:.85rem}
+.wrap{max-width:1200px;margin:0 auto;padding:0 1rem 2rem}
+.upload{border:2px dashed var(--sf2);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:all .3s;background:var(--sf);margin-bottom:1.5rem;position:relative}
+.upload:hover,.upload.over{border-color:var(--ac);background:rgba(233,69,96,.06)}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload .ico{font-size:2.5rem;margin-bottom:.5rem}
+.upload p{color:var(--tx2);font-size:.9rem}
+.upload .h2{font-size:.8rem;margin-top:.4rem;opacity:.7}
+.ctrl{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-bottom:1.5rem;padding:1rem;background:var(--sf);border-radius:var(--r)}
+.ctrl label{font-size:.85rem;color:var(--tx2)}
+.zv{font-weight:700;color:var(--ac)}
+.btn{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-size:.85rem;cursor:pointer;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn.s{background:var(--ac2)}
+.zp{display:flex;gap:.4rem;flex-wrap:wrap}
+.zp button{background:var(--sf2);color:var(--tx2);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:.3rem .6rem;font-size:.78rem;cursor:pointer;transition:all .2s}
+.zp button:hover,.zp button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem}
+.card{background:var(--sf);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.card-h{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.card-h h3{font-size:.95rem;font-weight:600}
+.card-h code{font-size:.75rem;background:var(--sf2);padding:.2rem .5rem;border-radius:6px;color:var(--ac)}
+.card-b{display:flex;align-items:center;justify-content:center;padding:1rem;min-height:220px;overflow:auto;background:repeating-conic-gradient(rgba(255,255,255,.03) 0% 25%,transparent 0% 50%) 0 0/20px 20px}
+.r-auto{image-rendering:auto}
+.r-crisp{image-rendering:crisp-edges;image-rendering:-webkit-optimize-contrast}
+.r-pixel{image-rendering:pixelated}
+.code-s{background:var(--sf);border-radius:var(--r);padding:1rem;margin-bottom:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.code-s h3{font-size:.95rem;margin-bottom:.75rem}
+.cb{position:relative}
+.cb pre{background:#0d1117;border-radius:8px;padding:1rem;overflow-x:auto;font-size:.82rem;line-height:1.7;color:#c9d1d9}
+.cpb{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.1);color:var(--tx2);border:none;border-radius:6px;padding:.3rem .6rem;font-size:.75rem;cursor:pointer;transition:all .2s}
+.cpb:hover{background:var(--ac);color:#fff}
+.cpb.ok{background:#2ea043;color:#fff}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ac);color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-size:.85rem;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.8rem;border-top:1px solid rgba(255,255,255,.05);margin-top:2rem}
+@media(max-width:640px){.grid{grid-template-columns:1fr}.ctrl{flex-direction:column;align-items:stretch}}
+</style>
+</head>
+<body>
+<h1>CSS Image Rendering</h1>
+<p class="sub">Compare <code>auto</code> · <code>crisp-edges</code> · <code>pixelated</code> rendering modes</p>
+<div class="wrap">
+<div class="upload" id="up">
+<input type="file" id="fi" accept="image/*" aria-label="Choose image file">
+<div class="ico">&#128444;&#65039;</div>
+<p>Drop an image here or click to upload</p>
+<p class="h2">Best with small pixel art (8×8 ~ 64×64)</p>
+</div>
+<div class="ctrl">
+<label>Zoom:</label>
+<div class="zp" id="zp"></div>
+<span>Current: <span class="zv" id="zv">8</span>x</span>
+<button class="btn s" id="rb">Reset Default</button>
+</div>
+<div class="grid" id="grid"></div>
+<div class="code-s">
+<h3>&#128196; Generated CSS</h3>
+<div class="cb"><pre id="codeOut"></pre><button class="cpb" id="cpb">Copy</button></div>
+</div>
+</div>
+<footer>CSS image-rendering demo tool &mdash; Upload your own image or use the built-in pixel art sample.</footer>
+<div class="toast" id="toast"></div>
+<script>
+const modes = [
+  {name:'auto', cls:'r-auto', css:'image-rendering: auto;'},
+  {name:'crisp-edges', cls:'r-crisp', css:'image-rendering: crisp-edges;\nimage-rendering: -webkit-optimize-contrast; /* Safari */'},
+  {name:'pixelated', cls:'r-pixel', css:'image-rendering: pixelated;'}
+];
+const zooms = [2,4,8,16,32];
+let currentZoom = 8;
+let imgSrc = null;
+
+// Generate default 8x8 pixel art using canvas
+function makeDefaultImage() {
+  const c = document.createElement('canvas');
+  c.width = 8; c.height = 8;
+  const ctx = c.getContext('2d');
+  const pixels = [
+    '00000000','01e94560','0e945600','0e9e9e90',
+    '0e945600','01e94560','00111100','00000000'
+  ];
+  const palette = {
+    '0':'#1a1a2e','1':'#e94560','e':'#533483','9':'#0f3460',
+    '4':'#16213e','5':'#e94560','6':'#0f3460'
+  };
+  // Simple pixel art: a small heart/diamond shape
+  const art = [
+    [0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,1,0,0],
+    [0,1,2,1,1,2,1,0],
+    [0,1,2,2,2,2,1,0],
+    [0,0,1,2,2,1,0,0],
+    [0,0,0,1,1,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ];
+  const colors = ['#1a1a2e','#e94560','#ff6b81'];
+  art.forEach((row, y) => row.forEach((v, x) => {
+    ctx.fillStyle = colors[v];
+    ctx.fillRect(x, y, 1, 1);
+  }));
+  return c.toDataURL('image/png');
+}
+
+// Build comparison cards
+function buildCards() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  modes.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<div class="card-h"><h3>${m.name}</h3><code>${m.css.split('\n')[0]}</code></div><div class="card-b"><img class="${m.cls}" alt="Preview with ${m.name}"></div>`;
+    grid.appendChild(card);
+  });
+  updateImages();
+}
+
+// Update all images with current source and zoom
+function updateImages() {
+  const src = imgSrc || makeDefaultImage();
+  document.querySelectorAll('.card-b img').forEach(img => {
+    img.src = src;
+    // Load image to get natural dimensions for zoom
+    img.onload = function() {
+      this.style.width = (this.naturalWidth * currentZoom) + 'px';
+      this.style.height = (this.naturalHeight * currentZoom) + 'px';
+    };
+    img.style.width = '';
+    img.style.height = '';
+    // Force reload sizing
+    const tmp = new Image();
+    tmp.onload = function() {
+      img.style.width = (tmp.naturalWidth * currentZoom) + 'px';
+      img.style.height = (tmp.naturalHeight * currentZoom) + 'px';
+    };
+    tmp.src = src;
+  });
+  updateCode();
+}
+
+// Update generated CSS code
+function updateCode() {
+  const out = document.getElementById('codeOut');
+  let css = `/* CSS Image Rendering - Generated Code */\n\n`;
+  modes.forEach(m => {
+    css += `.image-${m.name.replace('-','-')} {\n`;
+    m.css.split('\n').forEach(line => { css += `  ${line}\n`; });
+    css += `  /* Zoom: scale up small images */\n`;
+    css += `  width: ${currentZoom * 8}px;  /* ${currentZoom}x original */\n`;
+    css += `}\n\n`;
+  });
+  out.textContent = css;
+}
+
+// Zoom presets
+function buildZoomPresets() {
+  const zp = document.getElementById('zp');
+  zooms.forEach(z => {
+    const btn = document.createElement('button');
+    btn.textContent = z + 'x';
+    btn.dataset.z = z;
+    if (z === currentZoom) btn.classList.add('on');
+    btn.onclick = () => setZoom(z);
+    zp.appendChild(btn);
+  });
+}
+
+function setZoom(z) {
+  currentZoom = z;
+  document.getElementById('zv').textContent = z;
+  document.querySelectorAll('#zp button').forEach(b => {
+    b.classList.toggle('on', parseInt(b.dataset.z) === z);
+  });
+  updateImages();
+}
+
+// Toast notification
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Copy button
+document.getElementById('cpb').onclick = function() {
+  const text = document.getElementById('codeOut').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    this.textContent = 'Copied!';
+    this.classList.add('ok');
+    showToast('CSS copied to clipboard!');
+    setTimeout(() => { this.textContent = 'Copy'; this.classList.remove('ok'); }, 2000);
+  });
+};
+
+// File upload
+const upArea = document.getElementById('up');
+const fileInput = document.getElementById('fi');
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgSrc = e.target.result;
+    updateImages();
+    showToast('Image loaded!');
+  };
+  reader.readAsDataURL(file);
+}
+
+fileInput.onchange = e => handleFile(e.target.files[0]);
+
+upArea.ondragover = e => { e.preventDefault(); upArea.classList.add('over'); };
+upArea.ondragleave = () => upArea.classList.remove('over');
+upArea.ondrop = e => {
+  e.preventDefault();
+  upArea.classList.remove('over');
+  handleFile(e.dataTransfer.files[0]);
+};
+
+// Reset
+document.getElementById('rb').onclick = () => {
+  imgSrc = null;
+  setZoom(8);
+  showToast('Reset to default');
+};
+
+// Init
+buildZoomPresets();
+buildCards();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

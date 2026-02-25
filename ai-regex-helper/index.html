@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered regex helper. Build, test, and debug regular expressions with real-time matching. Get AI explanations for complex patterns and common templates.">
+<link rel="canonical" href="https://lifa-su.com/ai-regex-helper/">
+<title>AI Regex Helper - 智能正则表达式助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242736;--border:#2e3148;--text:#e4e6f0;--text2:#9498b3;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00cec9;--red:#ff6b6b;--orange:#fdcb6e;--blue:#74b9ff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:2em;background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+header p{color:var(--text2);font-size:0.95em}
+.tabs{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}
+.tab{padding:10px 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;transition:all .2s;font-size:0.9em}
+.tab:hover{border-color:var(--accent)}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.panel.active{display:block}
+label{display:block;color:var(--text2);font-size:0.85em;margin-bottom:6px;margin-top:14px}
+label:first-child{margin-top:0}
+input[type="text"],textarea{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.95em;font-family:inherit;transition:border-color .2s}
+input[type="text"]:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px}
+.btn{padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9em;transition:all .2s}
+.btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-sm{padding:6px 14px;font-size:0.82em}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);background:transparent}
+.result-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:14px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:0.9em;word-break:break-all;min-height:40px}
+.flags{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.flag-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none}
+.flag-toggle input{accent-color:var(--accent)}
+.match-highlight{background:rgba(108,92,231,0.35);border-bottom:2px solid var(--accent);padding:1px 0}
+.match-highlight:nth-child(even){background:rgba(0,206,201,0.3);border-bottom-color:var(--green)}
+.templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:14px}
+.template-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .2s}
+.template-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.template-card h3{font-size:0.95em;margin-bottom:4px;color:var(--accent2)}
+.template-card code{font-size:0.8em;color:var(--green);word-break:break-all}
+.template-card p{font-size:0.8em;color:var(--text2);margin-top:4px}
+.explain-list{list-style:none;margin-top:14px}
+.explain-list li{padding:10px 14px;background:var(--surface2);border-left:3px solid var(--accent);margin-bottom:8px;border-radius:0 8px 8px 0;font-size:0.9em}
+.explain-list li code{color:var(--green);margin-right:8px;font-size:0.95em}
+.explain-list li span{color:var(--text2)}
+.copy-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.8em;margin-left:8px;transition:all .2s}
+.copy-btn:hover{border-color:var(--green);color:var(--green)}
+.inline-flex{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.match-count{color:var(--green);font-size:0.85em;margin-top:8px}
+.error-msg{color:var(--red);font-size:0.85em;margin-top:8px}
+footer{text-align:center;padding:30px 0;color:var(--text2);font-size:0.8em}
+@media(max-width:600px){.container{padding:12px}.tabs{gap:4px}.tab{padding:8px 14px;font-size:0.82em}.templates-grid{grid-template-columns:1fr}.panel{padding:16px}header h1{font-size:1.5em}}
+
+/* Pro Features Section */
+.pro-section{margin-top:30px;margin-bottom:20px}
+.pro-section h2{text-align:center;font-size:1.3em;color:var(--text2);margin-bottom:16px}
+.pro-preview-wrapper{position:relative;border-radius:12px;overflow:hidden;cursor:pointer}
+.pro-preview-content{filter:blur(3px);pointer-events:none;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.pro-preview-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:18px}
+.pro-preview-card h3{font-size:1em;color:var(--accent2);margin-bottom:12px}
+.pro-preview-card .pro-fake-item{padding:8px 12px;background:var(--bg);border-radius:6px;margin-bottom:6px;font-size:0.85em;color:var(--text2);display:flex;justify-content:space-between}
+.pro-preview-card .pro-fake-item code{color:var(--green);font-size:0.85em}
+.pro-preview-card .pro-fake-btn{display:inline-block;padding:6px 14px;background:var(--accent);color:#fff;border-radius:6px;font-size:0.8em;margin-top:8px;opacity:.7}
+.pro-overlay{position:absolute;inset:0;background:rgba(15,17,23,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;transition:background .2s}
+.pro-overlay:hover{background:rgba(15,17,23,0.6)}
+.pro-overlay .lock-icon{font-size:2.5em;margin-bottom:10px}
+.pro-overlay .lock-text{font-size:1.1em;color:#fff;font-weight:600}
+.pro-overlay .lock-sub{font-size:0.85em;color:var(--text2);margin-top:6px}
+
+/* Pro Modal */
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;animation:proFadeIn .25s ease}
+.pro-modal-backdrop.active{display:flex}
+.pro-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:proSlideUp .3s ease}
+.pro-modal h2{font-size:1.4em;margin-bottom:6px;text-align:center}
+.pro-modal .pro-price{text-align:center;margin:16px 0;font-size:1em;color:var(--text2)}
+.pro-modal .pro-price strong{font-size:2.2em;color:var(--green);font-weight:700}
+.pro-modal .pro-features{list-style:none;margin:20px 0;padding:0}
+.pro-modal .pro-features li{padding:9px 0;font-size:0.95em;color:var(--text);border-bottom:1px solid var(--border)}
+.pro-modal .pro-features li:last-child{border-bottom:none}
+.pro-modal .pro-cta{display:block;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:1em;font-weight:600;text-align:center;text-decoration:none;transition:all .2s;margin-top:8px}
+.pro-modal .pro-cta:hover{background:var(--accent2);transform:translateY(-1px)}
+.pro-modal .pro-dismiss{display:block;width:100%;padding:10px;background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:0.9em;margin-top:8px;transition:color .2s}
+.pro-modal .pro-dismiss:hover{color:var(--text)}
+@keyframes proFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes proSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.pro-preview-content{grid-template-columns:1fr}.pro-modal{padding:24px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>🧩 AI Regex Helper</h1>
+<p>智能正则表达式助手 — 自然语言生成 · 实时测试 · 模板库 · 可视化解释</p>
+</header>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('ai')">🤖 AI 生成</div>
+<div class="tab" onclick="switchTab('tester')">🧪 正则测试</div>
+<div class="tab" onclick="switchTab('templates')">📚 模板库</div>
+<div class="tab" onclick="switchTab('explain')">🔍 可视化解释</div>
+</div>
+
+<!-- AI Generate Panel -->
+<div class="panel active" id="panel-ai">
+<label>用自然语言描述你需要的正则表达式</label>
+<input type="text" id="ai-input" placeholder="例如：匹配邮箱地址、匹配手机号、提取URL..." onkeydown="if(event.key==='Enter')generateRegex()">
+<div style="margin-top:12px"><button class="btn" onclick="generateRegex()">✨ 生成正则</button></div>
+<div id="ai-result" style="display:none">
+<label>生成结果</label>
+<div class="result-box">
+<div class="inline-flex"><code id="ai-regex-output" style="color:var(--green);font-size:1.05em"></code><button class="copy-btn" onclick="copyText(document.getElementById('ai-regex-output').textContent)">📋 复制</button><button class="copy-btn" onclick="useInTester(document.getElementById('ai-regex-output').textContent)">🧪 去测试</button></div>
+</div>
+<div id="ai-explain" class="result-box" style="color:var(--text2);margin-top:8px"></div>
+</div>
+</div>
+
+<!-- Tester Panel -->
+<div class="panel" id="panel-tester">
+<label>正则表达式</label>
+<div class="inline-flex" style="width:100%">
+<input type="text" id="regex-input" placeholder="输入正则表达式，如 \d+、[a-z]+@[a-z]+\.[a-z]+" oninput="runTest()" style="flex:1">
+</div>
+<div class="flags">
+<label class="flag-toggle"><input type="checkbox" id="flag-g" checked onchange="runTest()"> <code>g</code> 全局</label>
+<label class="flag-toggle"><input type="checkbox" id="flag-i" onchange="runTest()"> <code>i</code> 忽略大小写</label>
+<label class="flag-toggle"><input type="checkbox" id="flag-m" onchange="runTest()"> <code>m</code> 多行</label>
+<label class="flag-toggle"><input type="checkbox" id="flag-s" onchange="runTest()"> <code>s</code> 单行(dotAll)</label>
+</div>
+<label>测试文本</label>
+<textarea id="test-text" rows="5" placeholder="输入要测试的文本..." oninput="runTest()"></textarea>
+<div id="test-result"></div>
+<div id="match-output" class="result-box" style="display:none"></div>
+</div>
+
+<!-- Templates Panel -->
+<div class="panel" id="panel-templates">
+<label>点击模板即可使用</label>
+<div class="templates-grid" id="templates-grid"></div>
+</div>
+
+<!-- Explain Panel -->
+<div class="panel" id="panel-explain">
+<label>输入正则表达式进行可视化解释</label>
+<div class="inline-flex" style="width:100%">
+<input type="text" id="explain-input" placeholder="输入正则表达式，如 ^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,}$" oninput="explainRegex()" style="flex:1">
+</div>
+<ul class="explain-list" id="explain-output"></ul>
+</div>
+
+</div>
+
+<!-- Pro Features Preview -->
+<div class="pro-section">
+<h2>⚡ Pro Features</h2>
+<div class="pro-preview-wrapper" onclick="showProModal()">
+<div class="pro-preview-content">
+<div class="pro-preview-card">
+<h3>📖 Regex Pattern Library</h3>
+<div class="pro-fake-item"><span>JWT Token</span><code>[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+</code></div>
+<div class="pro-fake-item"><span>Credit Card</span><code>\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b</code></div>
+<div class="pro-fake-item"><span>UUID v4</span><code>[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}...</code></div>
+<div class="pro-fake-item"><span>Semantic Version</span><code>\d+\.\d+\.\d+(?:-[\w.]+)?</code></div>
+<div class="pro-fake-item"><span>500+ more patterns...</span><code></code></div>
+</div>
+<div class="pro-preview-card">
+<h3>🌐 Multi-Language Code Generation</h3>
+<div class="pro-fake-item"><span>Python</span><code>re.findall(pattern, text)</code></div>
+<div class="pro-fake-item"><span>Java</span><code>Pattern.compile(regex)</code></div>
+<div class="pro-fake-item"><span>Go</span><code>regexp.MustCompile(pattern)</code></div>
+<div class="pro-fake-item"><span>Rust</span><code>Regex::new(pattern)?</code></div>
+<div class="pro-fake-btn">Generate Code →</div>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="lock-icon">🔒</div>
+<div class="lock-text">Unlock Pro Features</div>
+<div class="lock-sub">Click to learn more</div>
+</div>
+</div>
+</div>
+
+<!-- Pro Modal -->
+<div class="pro-modal-backdrop" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+<h2>🚀 Upgrade to Pro</h2>
+<div class="pro-price"><strong>$9</strong><br>one-time payment</div>
+<ul class="pro-features">
+<li>✅ 500+ Regex Pattern Library</li>
+<li>✅ Multi-Language Code Gen (Python, Java, Go, Rust, C#, PHP)</li>
+<li>✅ Import/Export Pattern Collections</li>
+<li>✅ Advanced Regex Debugger</li>
+<li>✅ Performance Analyzer</li>
+<li>✅ Lifetime Access</li>
+</ul>
+<a class="pro-cta" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="pro-dismiss" onclick="closeProModal()">Maybe later</button>
+</div>
+</div>
+
+<footer>
+<p>AI Regex Helper &copy; 2026 — Built with ❤️ for developers</p>
+</footer>
+
+<script>
+// Tab switching
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['ai','tester','templates','explain'][i]===name)});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// Copy to clipboard
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const b=event.target;b.textContent='✅ 已复制';setTimeout(()=>b.textContent='📋 复制',1500);
+  });
+}
+
+// Use in tester
+function useInTester(regex){
+  document.getElementById('regex-input').value=regex;
+  switchTab('tester');
+  runTest();
+}
+
+// Templates
+const templates=[
+  {name:'邮箱地址',regex:'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',desc:'匹配标准邮箱格式'},
+  {name:'中国手机号',regex:'1[3-9]\\d{9}',desc:'匹配11位中国大陆手机号'},
+  {name:'URL链接',regex:'https?://[\\w\\-._~:/?#\\[\\]@!$&\'()*+,;=%]+',desc:'匹配http/https链接'},
+  {name:'IPv4地址',regex:'(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)',desc:'匹配有效IPv4地址'},
+  {name:'日期 YYYY-MM-DD',regex:'\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])',desc:'匹配ISO日期格式'},
+  {name:'中国身份证号',regex:'[1-9]\\d{5}(?:19|20)\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]',desc:'匹配18位身份证号'},
+  {name:'中文字符',regex:'[\\u4e00-\\u9fa5]+',desc:'匹配连续中文字符'},
+  {name:'HTML标签',regex:'<[^>]+>',desc:'匹配HTML标签'},
+  {name:'十六进制颜色',regex:'#(?:[0-9a-fA-F]{3}){1,2}',desc:'匹配#FFF或#FFFFFF格式'},
+  {name:'强密码',regex:'(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}',desc:'至少8位，含大小写字母、数字和特殊字符'},
+  {name:'中国邮政编码',regex:'[1-9]\\d{5}(?!\\d)',desc:'匹配6位邮政编码'},
+  {name:'整数或小数',regex:'-?\\d+(?:\\.\\d+)?',desc:'匹配正负整数和小数'}
+];
+
+function renderTemplates(){
+  const grid=document.getElementById('templates-grid');
+  grid.innerHTML=templates.map(t=>`<div class="template-card" onclick="useInTester('${t.regex.replace(/'/g,"\\'")}')"><h3>${t.name}</h3><code>${t.regex}</code><p>${t.desc}</p></div>`).join('');
+}
+renderTemplates();
+
+// Regex Tester
+function getFlags(){
+  let f='';
+  if(document.getElementById('flag-g').checked)f+='g';
+  if(document.getElementById('flag-i').checked)f+='i';
+  if(document.getElementById('flag-m').checked)f+='m';
+  if(document.getElementById('flag-s').checked)f+='s';
+  return f;
+}
+
+function runTest(){
+  const pattern=document.getElementById('regex-input').value;
+  const text=document.getElementById('test-text').value;
+  const resultDiv=document.getElementById('test-result');
+  const outputDiv=document.getElementById('match-output');
+  if(!pattern||!text){resultDiv.innerHTML='';outputDiv.style.display='none';return;}
+  try{
+    const flags=getFlags();
+    const re=new RegExp(pattern,flags);
+    const allMatches=[];
+    if(flags.includes('g')){
+      let m;while((m=re.exec(text))!==null){allMatches.push({index:m.index,length:m[0].length,value:m[0]});if(!m[0].length)re.lastIndex++;}
+    }else{
+      const m=re.exec(text);if(m)allMatches.push({index:m.index,length:m[0].length,value:m[0]});
+    }
+    if(allMatches.length===0){
+      resultDiv.innerHTML='<div class="error-msg">没有找到匹配</div>';
+      outputDiv.style.display='none';return;
+    }
+    resultDiv.innerHTML=`<div class="match-count">找到 ${allMatches.length} 个匹配</div>`;
+    // Build highlighted text
+    let html='';let lastIdx=0;
+    allMatches.sort((a,b)=>a.index-b.index);
+    allMatches.forEach(m=>{
+      html+=escapeHtml(text.slice(lastIdx,m.index));
+      html+=`<span class="match-highlight">${escapeHtml(m.value)}</span>`;
+      lastIdx=m.index+m.length;
+    });
+    html+=escapeHtml(text.slice(lastIdx));
+    outputDiv.innerHTML=html.replace(/\n/g,'<br>');
+    outputDiv.style.display='block';
+  }catch(e){
+    resultDiv.innerHTML=`<div class="error-msg">正则错误: ${escapeHtml(e.message)}</div>`;
+    outputDiv.style.display='none';
+  }
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// AI Regex Generator - Rule-based engine
+const aiRules=[
+  {keywords:['邮箱','email','mail','电子邮件'],regex:'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',explain:'匹配标准邮箱地址格式'},
+  {keywords:['手机','phone','电话','手机号'],regex:'1[3-9]\\d{9}',explain:'匹配中国大陆11位手机号'},
+  {keywords:['url','链接','网址','link','http'],regex:'https?://[\\w\\-._~:/?#\\[\\]@!$&\'()*+,;=%]+',explain:'匹配http/https开头的URL'},
+  {keywords:['ip','ip地址','ipv4'],regex:'(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)',explain:'匹配有效的IPv4地址'},
+  {keywords:['日期','date','年月日'],regex:'\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])',explain:'匹配YYYY-MM-DD格式日期'},
+  {keywords:['身份证','id card','身份证号'],regex:'[1-9]\\d{5}(?:19|20)\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx]',explain:'匹配18位中国身份证号'},
+  {keywords:['中文','chinese','汉字'],regex:'[\\u4e00-\\u9fa5]+',explain:'匹配连续中文字符'},
+  {keywords:['数字','number','digit','整数'],regex:'-?\\d+(?:\\.\\d+)?',explain:'匹配整数和小数'},
+  {keywords:['html','标签','tag'],regex:'<[^>]+>',explain:'匹配HTML标签'},
+  {keywords:['颜色','color','hex','十六进制'],regex:'#(?:[0-9a-fA-F]{3}){1,2}',explain:'匹配十六进制颜色值'},
+  {keywords:['密码','password'],regex:'(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}',explain:'匹配强密码（至少8位，含大小写、数字、特殊字符）'},
+  {keywords:['邮编','邮政编码','zip','postal'],regex:'[1-9]\\d{5}(?!\\d)',explain:'匹配中国6位邮政编码'},
+  {keywords:['空白','空格','whitespace','space'],regex:'\\s+',explain:'匹配一个或多个空白字符'},
+  {keywords:['换行','newline','line break'],regex:'\\r?\\n',explain:'匹配换行符'},
+  {keywords:['用户名','username'],regex:'[a-zA-Z][a-zA-Z0-9_]{2,15}',explain:'匹配用户名（字母开头，3-16位字母数字下划线）'},
+  {keywords:['域名','domain'],regex:'(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}',explain:'匹配域名格式'},
+  {keywords:['时间','time','时分秒'],regex:'(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?',explain:'匹配HH:MM或HH:MM:SS时间格式'},
+  {keywords:['ipv6'],regex:'(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}',explain:'匹配标准IPv6地址'},
+  {keywords:['mac','mac地址'],regex:'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}',explain:'匹配MAC地址'},
+  {keywords:['车牌','license plate','车牌号'],regex:'[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤川青藏琼宁][A-Z][A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳]',explain:'匹配中国车牌号'},
+  {keywords:['金额','money','价格','currency','钱'],regex:'¥?\\d+(?:,\\d{3})*(?:\\.\\d{1,2})?',explain:'匹配金额格式（支持千分位和小数）'},
+  {keywords:['文件','file','文件名','extension','扩展名'],regex:'[\\w-]+\\.[a-zA-Z]{1,10}',explain:'匹配文件名.扩展名格式'},
+  {keywords:['word','单词','英文单词'],regex:'\\b[a-zA-Z]+\\b',explain:'匹配英文单词'},
+  {keywords:['句子','sentence'],regex:'[^.!?]*[.!?]',explain:'匹配以句号/问号/感叹号结尾的句子'},
+];
+
+function generateRegex(){
+  const input=document.getElementById('ai-input').value.trim().toLowerCase();
+  const resultDiv=document.getElementById('ai-result');
+  if(!input){resultDiv.style.display='none';return;}
+  let bestMatch=null;let bestScore=0;
+  aiRules.forEach(rule=>{
+    let score=0;
+    rule.keywords.forEach(kw=>{if(input.includes(kw))score+=kw.length;});
+    if(score>bestScore){bestScore=score;bestMatch=rule;}
+  });
+  if(bestMatch){
+    document.getElementById('ai-regex-output').textContent=bestMatch.regex;
+    document.getElementById('ai-explain').textContent='💡 '+bestMatch.explain;
+    resultDiv.style.display='block';
+  }else{
+    // Fallback: try to build simple patterns from description
+    let regex=buildFromDescription(input);
+    if(regex){
+      document.getElementById('ai-regex-output').textContent=regex.pattern;
+      document.getElementById('ai-explain').textContent='💡 '+regex.explain;
+      resultDiv.style.display='block';
+    }else{
+      document.getElementById('ai-regex-output').textContent='未能识别';
+      document.getElementById('ai-explain').textContent='💡 试试更具体的描述，如"匹配邮箱"、"提取手机号"、"匹配URL"等';
+      resultDiv.style.display='block';
+    }
+  }
+}
+
+function buildFromDescription(input){
+  // Simple pattern builder for common phrases
+  if(input.match(/(\d+)\s*位\s*数字/)){const n=RegExp.$1;return{pattern:`\\d{${n}}`,explain:`匹配恰好${n}位数字`};}
+  if(input.match(/(\d+)\s*到\s*(\d+)\s*位/)){const a=RegExp.$1,b=RegExp.$2;return{pattern:`\\w{${a},${b}}`,explain:`匹配${a}到${b}位字符`};}
+  if(input.includes('开头')&&input.match(/以\s*(.+?)\s*开头/)){const s=RegExp.$1;return{pattern:`^${escapeRegex(s)}`,explain:`匹配以"${s}"开头的文本`};}
+  if(input.includes('结尾')&&input.match(/以\s*(.+?)\s*结尾/)){const s=RegExp.$1;return{pattern:`${escapeRegex(s)}$`,explain:`匹配以"${s}"结尾的文本`};}
+  if(input.includes('包含')&&input.match(/包含\s*(.+)/)){const s=RegExp.$1;return{pattern:`${escapeRegex(s)}`,explain:`匹配包含"${s}"的文本`};}
+  if(input.match(/提取?\s*引号/)||input.includes('引号内')){return{pattern:`"([^"]*)"`,explain:'匹配双引号内的内容'};}
+  if(input.match(/提取?\s*括号/)||input.includes('括号内')){return{pattern:`\\(([^)]*)\\)`,explain:'匹配圆括号内的内容'};}
+  if(input.includes('空行')||input.includes('空白行')){return{pattern:`^\\s*$`,explain:'匹配空行'};}
+  if(input.includes('非空')){return{pattern:`\\S+`,explain:'匹配非空白字符序列'};}
+  if(input.includes('重复')||input.includes('连续')){return{pattern:`(.)\\1+`,explain:'匹配连续重复的字符'};}
+  return null;
+}
+
+function escapeRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+
+// Regex Explainer
+const tokenExplanations={
+  '^':'匹配字符串的开头',
+  '$':'匹配字符串的结尾',
+  '.':'匹配任意单个字符（除换行符外）',
+  '*':'匹配前面的元素零次或多次',
+  '+':'匹配前面的元素一次或多次',
+  '?':'匹配前面的元素零次或一次',
+  '\\d':'匹配任意数字 [0-9]',
+  '\\D':'匹配任意非数字字符',
+  '\\w':'匹配字母、数字或下划线 [a-zA-Z0-9_]',
+  '\\W':'匹配非字母、数字、下划线的字符',
+  '\\s':'匹配任意空白字符（空格、制表符、换行等）',
+  '\\S':'匹配任意非空白字符',
+  '\\b':'匹配单词边界',
+  '\\B':'匹配非单词边界',
+  '\\n':'匹配换行符',
+  '\\r':'匹配回车符',
+  '\\t':'匹配制表符',
+};
+
+function explainRegex(){
+  const input=document.getElementById('explain-input').value;
+  const output=document.getElementById('explain-output');
+  if(!input){output.innerHTML='';return;}
+  const tokens=tokenize(input);
+  output.innerHTML=tokens.map(t=>`<li><code>${escapeHtml(t.token)}</code> <span>${t.explanation}</span></li>`).join('');
+}
+
+function tokenize(regex){
+  const tokens=[];
+  let i=0;
+  while(i<regex.length){
+    // Escaped characters
+    if(regex[i]==='\\' && i+1<regex.length){
+      const esc=regex.slice(i,i+2);
+      if(tokenExplanations[esc]){tokens.push({token:esc,explanation:tokenExplanations[esc]});}
+      else{tokens.push({token:esc,explanation:`转义字符 "${regex[i+1]}"`});}
+      i+=2;continue;
+    }
+    // Character class
+    if(regex[i]==='['){
+      let j=i+1;if(j<regex.length&&regex[j]==='^')j++;
+      while(j<regex.length&&regex[j]!==']'){if(regex[j]==='\\')j++;j++;}
+      const cls=regex.slice(i,j+1);
+      const neg=cls[1]==='^';
+      tokens.push({token:cls,explanation:`${neg?'不匹配':'匹配'}字符集合 ${cls} 中的${neg?'以外的':''}任意一个字符`});
+      i=j+1;continue;
+    }
+    // Groups
+    if(regex[i]==='('){
+      let label='捕获分组';
+      let skip=1;
+      if(regex.slice(i,i+3)==='(?:'){label='非捕获分组';skip=3;}
+      else if(regex.slice(i,i+4)==='(?='){label='正向前瞻断言';skip=4;}
+      else if(regex.slice(i,i+4)==='(?!'){label='负向前瞻断言';skip=4;}
+      else if(regex.slice(i,i+5)==='(?<='){label='正向后瞻断言';skip=5;}
+      else if(regex.slice(i,i+5)==='(?<!'){label='负向后瞻断言';skip=5;}
+      tokens.push({token:regex.slice(i,i+skip),explanation:`${label}开始`});
+      i+=skip;continue;
+    }
+    if(regex[i]===')'){tokens.push({token:')',explanation:'分组结束'});i++;continue;}
+    // Quantifiers
+    if(regex[i]==='{'){
+      let j=i+1;while(j<regex.length&&regex[j]!=='}')j++;
+      const q=regex.slice(i,j+1);
+      const inner=q.slice(1,-1);
+      let expl;
+      if(inner.includes(',')){
+        const parts=inner.split(',');
+        if(parts[1]==='')expl=`匹配前面的元素至少 ${parts[0]} 次`;
+        else expl=`匹配前面的元素 ${parts[0]} 到 ${parts[1]} 次`;
+      }else{expl=`匹配前面的元素恰好 ${inner} 次`;}
+      tokens.push({token:q,explanation:expl});
+      i=j+1;continue;
+    }
+    // Alternation
+    if(regex[i]==='|'){tokens.push({token:'|',explanation:'或（匹配左边或右边的表达式）'});i++;continue;}
+    // Simple tokens
+    if(tokenExplanations[regex[i]]){tokens.push({token:regex[i],explanation:tokenExplanations[regex[i]]});i++;continue;}
+    // Literal character
+    tokens.push({token:regex[i],explanation:`匹配字面字符 "${regex[i]}"`});
+    i++;
+  }
+  return tokens;
+}
+
+// Pro Modal
+function showProModal(){document.getElementById('proModal').classList.add('active');}
+function closeProModal(){document.getElementById('proModal').classList.remove('active');}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

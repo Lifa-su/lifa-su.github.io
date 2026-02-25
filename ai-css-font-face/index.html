@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS @font-face Generator</title>
+<meta name="description" content="Free online CSS @font-face generator. Upload font files and get ready-to-use CSS code instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-font-face/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--radius:10px;--code-bg:#0d1117;--success:#2ecc71;--mono:'SF Mono','Fira Code',Consolas,monospace}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent)}
+.container{max-width:960px;margin:0 auto;padding:24px 20px 60px}
+header{text-align:center;padding:40px 0 32px}
+header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:rgba(233,69,96,.06)}
+.upload-zone .uz-icon{font-size:2.4rem;margin-bottom:10px;display:block}
+.upload-zone .uz-title{font-size:1rem;font-weight:600;margin-bottom:4px}
+.upload-zone .uz-sub{font-size:.82rem;color:var(--text2)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.file-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.88rem;animation:fadeIn .3s}
+.fi-info{display:flex;align-items:center;gap:10px;min-width:0}
+.fi-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-format{background:var(--accent2);color:#fff;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:600;text-transform:uppercase;flex-shrink:0}
+.fi-size{color:var(--text2);font-size:.78rem;flex-shrink:0;margin-left:6px}
+.fi-remove{background:none;border:none;color:var(--accent);cursor:pointer;font-size:1.1rem;padding:4px;border-radius:4px}
+.fi-remove:hover{background:rgba(233,69,96,.15)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+label{font-size:.82rem;color:var(--text2);font-weight:500}
+input,select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aab'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.output-header h2{margin-bottom:0}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:none;font-size:.84rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63a52;transform:translateY(-1px)}
+.code-wrap{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.code-block{padding:20px;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;white-space:pre;color:#c9d1d9;min-height:80px}
+.hl-at{color:#ff7b72}.hl-prop{color:#79c0ff}.hl-val{color:#a5d6ff}.hl-func{color:#d2a8ff}.hl-cmt{color:#8b949e;font-style:italic}
+.empty-state{text-align:center;padding:30px 20px;color:var(--text2)}
+.empty-state .es-icon{font-size:2rem;margin-bottom:8px;display:block;opacity:.5}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--success);color:#fff;padding:10px 24px;border-radius:8px;font-size:.88rem;font-weight:600;opacity:0;transition:all .35s;pointer-events:none;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:.78rem;border-top:1px solid var(--border);margin-top:40px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:640px){header h1{font-size:1.4rem}.card{padding:18px}.code-block{font-size:.78rem}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#127912; CSS @font-face Generator</h1>
+    <p>Upload your font files and generate production-ready @font-face CSS</p>
+  </header>
+
+  <div class="card">
+    <h2><span class="icon">&#128193;</span> Upload Font Files</h2>
+    <div class="upload-zone" id="dropZone">
+      <span class="uz-icon">&#128228;</span>
+      <div class="uz-title">Drop font files here or click to browse</div>
+      <div class="uz-sub">Supports .woff2, .woff, .ttf, .otf, .eot</div>
+      <input type="file" id="fileInput" multiple accept=".woff2,.woff,.ttf,.otf,.eot">
+    </div>
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">&#9881;&#65039;</span> Font Options</h2>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label for="fontFamily">font-family</label>
+        <input type="text" id="fontFamily" placeholder="e.g. MyCustomFont" value="MyCustomFont">
+      </div>
+      <div class="form-group">
+        <label for="fontWeight">font-weight</label>
+        <select id="fontWeight">
+          <option value="normal">normal</option>
+          <option value="bold">bold</option>
+          <option value="100">100 - Thin</option>
+          <option value="200">200 - Extra Light</option>
+          <option value="300">300 - Light</option>
+          <option value="400" selected>400 - Regular</option>
+          <option value="500">500 - Medium</option>
+          <option value="600">600 - Semi Bold</option>
+          <option value="700">700 - Bold</option>
+          <option value="800">800 - Extra Bold</option>
+          <option value="900">900 - Black</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fontStyle">font-style</label>
+        <select id="fontStyle">
+          <option value="normal" selected>normal</option>
+          <option value="italic">italic</option>
+          <option value="oblique">oblique</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fontDisplay">font-display</label>
+        <select id="fontDisplay">
+          <option value="swap" selected>swap</option>
+          <option value="auto">auto</option>
+          <option value="block">block</option>
+          <option value="fallback">fallback</option>
+          <option value="optional">optional</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="output-header">
+      <h2><span class="icon">&#128187;</span> Generated CSS</h2>
+      <button class="btn btn-primary" id="copyBtn" onclick="copyCSS()">&#128203; Copy CSS</button>
+    </div>
+    <div class="code-wrap">
+      <div class="code-block" id="codeOutput">
+        <div class="empty-state">
+          <span class="es-icon">&#128196;</span>
+          Upload font files to generate @font-face CSS
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pro Section -->
+  <style>
+  .pro-section{margin-top:24px;margin-bottom:24px}
+  .pro-label{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:14px}
+  .pro-blur-wrap{position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;border:1px solid var(--border)}
+  .pro-blur-content{filter:blur(5px);pointer-events:none;user-select:none;padding:20px;background:var(--surface)}
+  .pro-mock-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+  .pro-mock-card{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+  .pro-mock-card h4{font-size:.85rem;color:var(--accent);margin-bottom:10px}
+  .pro-mock-bar{height:8px;background:var(--border);border-radius:4px;margin-bottom:6px}
+  .pro-mock-bar.w60{width:60%}.pro-mock-bar.w80{width:80%}.pro-mock-bar.w45{width:45%}.pro-mock-bar.w70{width:70%}
+  .pro-mock-line{height:12px;background:var(--border);border-radius:3px;margin-bottom:5px;width:90%}
+  .pro-mock-line.short{width:55%}
+  .pro-mock-meter{height:20px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:8px}
+  .pro-mock-meter-fill{height:100%;border-radius:4px}
+  .pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.5);transition:background .2s}
+  .pro-blur-wrap:hover .pro-overlay{background:rgba(26,26,46,.65)}
+  .pro-lock-icon{font-size:2.4rem;margin-bottom:8px}
+  .pro-unlock-text{font-size:.95rem;color:#fff;font-weight:600;background:var(--accent);padding:8px 20px;border-radius:8px}
+  .pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .pro-modal-bg.open{display:flex}
+  .pro-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s}
+  .pro-modal h3{font-size:1.3rem;margin-bottom:6px}
+  .pro-modal .pro-price{font-size:1.05rem;color:var(--accent);font-weight:700;margin-bottom:16px}
+  .pro-modal ul{text-align:left;list-style:none;margin-bottom:20px}
+  .pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.92rem;color:var(--text2)}
+  .pro-modal ul li::before{content:'✓ ';color:var(--success);font-weight:700}
+  .pro-btn-upgrade{display:block;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:background .2s}
+  .pro-btn-upgrade:hover{background:#d63a52}
+  .pro-btn-later{background:none;border:none;color:var(--text2);cursor:pointer;font-size:.9rem;padding:8px}
+  .pro-btn-later:hover{color:var(--text)}
+  @keyframes proIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  </style>
+  <div class="pro-section">
+  <div class="pro-label"><span>🔒</span> Pro Features</div>
+  <div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('open')">
+  <div class="pro-blur-content">
+  <div class="pro-mock-row">
+  <div class="pro-mock-card"><h4>✂️ Font Subsetting</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-meter"><div class="pro-mock-meter-fill" style="width:35%;background:var(--accent)"></div></div><div class="pro-mock-bar w60"></div></div>
+  <div class="pro-mock-card"><h4>📊 Performance Analysis</h4><div class="pro-mock-meter"><div class="pro-mock-meter-fill" style="width:82%;background:var(--success)"></div></div><div class="pro-mock-bar w80"></div><div class="pro-mock-bar w45"></div></div>
+  </div>
+  <div class="pro-mock-row">
+  <div class="pro-mock-card"><h4>🌐 CDN Hosting</h4><div class="pro-mock-line"></div><div class="pro-mock-line short"></div><div class="pro-mock-bar w70"></div><div class="pro-mock-bar w45"></div></div>
+  </div>
+  </div>
+  <div class="pro-overlay"><div class="pro-lock-icon">🔒</div><div class="pro-unlock-text">Click to unlock Pro features</div></div>
+  </div>
+  </div>
+  <div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pro-modal">
+  <h3>Font Face Generator Pro</h3>
+  <div class="pro-price">$9 — one-time purchase</div>
+  <ul>
+  <li>Font subsetting — strip unused glyphs, reduce file size 70%+</li>
+  <li>Performance analysis — loading time, render metrics, scores</li>
+  <li>CDN hosting — one-click deploy to global CDN with cache</li>
+  <li>WOFF2 auto-conversion from any format</li>
+  <li>Lifetime access &amp; future updates</li>
+  </ul>
+  <a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
+  <button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+  </div>
+  </div>
+
+  <footer>
+    <p>CSS @font-face Generator &mdash; Free tool for web developers</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+const dropZone=document.getElementById('dropZone');
+const fileInput=document.getElementById('fileInput');
+const fileListEl=document.getElementById('fileList');
+const codeOutput=document.getElementById('codeOutput');
+const toast=document.getElementById('toast');
+const fontFamilyInput=document.getElementById('fontFamily');
+const fontWeightSelect=document.getElementById('fontWeight');
+const fontStyleSelect=document.getElementById('fontStyle');
+const fontDisplaySelect=document.getElementById('fontDisplay');
+
+let uploadedFiles=[];
+
+const FORMAT_MAP={
+  'woff2':{format:'woff2',mime:'font/woff2'},
+  'woff':{format:'woff',mime:'font/woff'},
+  'ttf':{format:'truetype',mime:'font/ttf'},
+  'otf':{format:'opentype',mime:'font/otf'},
+  'eot':{format:'embedded-opentype',mime:'application/vnd.ms-fontobject'}
+};
+
+const FORMAT_ORDER=['eot','woff2','woff','ttf','otf'];
+
+function getExt(name){return name.split('.').pop().toLowerCase();}
+
+function formatSize(bytes){
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1048576)return (bytes/1024).toFixed(1)+' KB';
+  return (bytes/1048576).toFixed(1)+' MB';
+}
+
+function isValidFont(name){
+  const ext=getExt(name);
+  return Object.keys(FORMAT_MAP).includes(ext);
+}
+
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change',e=>handleFiles(e.target.files));
+
+function handleFiles(files){
+  for(const f of files){
+    if(isValidFont(f.name)){
+      const ext=getExt(f.name);
+      const reader=new FileReader();
+      reader.onload=function(ev){
+        uploadedFiles.push({name:f.name,size:f.size,ext:ext,dataUrl:ev.target.result});
+        renderFileList();
+        generateCSS();
+      };
+      reader.readAsDataURL(f);
+    }
+  }
+  fileInput.value='';
+}
+
+function removeFile(idx){
+  uploadedFiles.splice(idx,1);
+  renderFileList();
+  generateCSS();
+}
+
+function renderFileList(){
+  if(!uploadedFiles.length){fileListEl.innerHTML='';return;}
+  fileListEl.innerHTML=uploadedFiles.map((f,i)=>
+    '<div class="file-item">'+
+      '<div class="fi-info">'+
+        '<span class="fi-format">'+f.ext+'</span>'+
+        '<span class="fi-name">'+f.name+'</span>'+
+        '<span class="fi-size">'+formatSize(f.size)+'</span>'+
+      '</div>'+
+      '<button class="fi-remove" onclick="removeFile('+i+')" title="Remove" aria-label="Remove '+f.name+'">&times;</button>'+
+    '</div>'
+  ).join('');
+}
+
+function generateCSS(){
+  if(!uploadedFiles.length){
+    codeOutput.innerHTML='<div class="empty-state"><span class="es-icon">&#128196;</span>Upload font files to generate @font-face CSS</div>';
+    return;
+  }
+  const family=fontFamilyInput.value.trim()||'MyCustomFont';
+  const weight=fontWeightSelect.value;
+  const style=fontStyleSelect.value;
+  const display=fontDisplaySelect.value;
+
+  const sorted=[...uploadedFiles].sort((a,b)=>FORMAT_ORDER.indexOf(a.ext)-FORMAT_ORDER.indexOf(b.ext));
+
+  const srcParts=[];
+  let eotFile=null;
+  for(const f of sorted){
+    const info=FORMAT_MAP[f.ext];
+    if(f.ext==='eot'){eotFile=f;continue;}
+    srcParts.push('url("'+f.name+'") format("'+info.format+'")');
+  }
+
+  let css='';
+  css+='<span class="hl-at">@font-face</span> {\n';
+  css+='  <span class="hl-prop">font-family</span>: <span class="hl-str">"'+escHtml(family)+'"</span>;\n';
+  if(eotFile){
+    css+='  <span class="hl-prop">src</span>: <span class="hl-func">url</span>(<span class="hl-str">"'+escHtml(eotFile.name)+'"</span>);\n';
+  }
+  if(srcParts.length){
+    css+='  <span class="hl-prop">src</span>: ';
+    if(eotFile){
+      css+='<span class="hl-func">url</span>(<span class="hl-str">"'+escHtml(eotFile.name)+'?#iefix"</span>) <span class="hl-func">format</span>(<span class="hl-str">"embedded-opentype"</span>),\n       ';
+    }
+    css+=srcParts.map(p=>{
+      return p.replace(/url\("(.+?)"\)/,'<span class="hl-func">url</span>(<span class="hl-str">"$1"</span>)')
+              .replace(/format\("(.+?)"\)/,'<span class="hl-func">format</span>(<span class="hl-str">"$1"</span>)');
+    }).join(',\n       ')+';\n';
+  }
+  css+='  <span class="hl-prop">font-weight</span>: <span class="hl-val">'+weight+'</span>;\n';
+  css+='  <span class="hl-prop">font-style</span>: <span class="hl-val">'+style+'</span>;\n';
+  css+='  <span class="hl-prop">font-display</span>: <span class="hl-val">'+display+'</span>;\n';
+  css+='}';
+
+  codeOutput.innerHTML=css;
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function getPlainCSS(){
+  if(!uploadedFiles.length)return '';
+  const family=fontFamilyInput.value.trim()||'MyCustomFont';
+  const weight=fontWeightSelect.value;
+  const style=fontStyleSelect.value;
+  const display=fontDisplaySelect.value;
+  const sorted=[...uploadedFiles].sort((a,b)=>FORMAT_ORDER.indexOf(a.ext)-FORMAT_ORDER.indexOf(b.ext));
+  const srcParts=[];
+  let eotFile=null;
+  for(const f of sorted){
+    const info=FORMAT_MAP[f.ext];
+    if(f.ext==='eot'){eotFile=f;continue;}
+    srcParts.push('url("'+f.name+'") format("'+info.format+'")');
+  }
+  let css='@font-face {\n';
+  css+='  font-family: "'+family+'";\n';
+  if(eotFile)css+='  src: url("'+eotFile.name+'");\n';
+  if(srcParts.length){
+    css+='  src: ';
+    if(eotFile)css+='url("'+eotFile.name+'?#iefix") format("embedded-opentype"),\n       ';
+    css+=srcParts.join(',\n       ')+';\n';
+  }
+  css+='  font-weight: '+weight+';\n';
+  css+='  font-style: '+style+';\n';
+  css+='  font-display: '+display+';\n';
+  css+='}';
+  return css;
+}
+
+function copyCSS(){
+  const css=getPlainCSS();
+  if(!css)return;
+  navigator.clipboard.writeText(css).then(()=>showToast('Copied to clipboard!')).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=css;document.body.appendChild(ta);ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);showToast('Copied to clipboard!');
+  });
+}
+
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2000);
+}
+
+fontFamilyInput.addEventListener('input',generateCSS);
+fontWeightSelect.addEventListener('change',generateCSS);
+fontStyleSelect.addEventListener('change',generateCSS);
+fontDisplaySelect.addEventListener('change',generateCSS);
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

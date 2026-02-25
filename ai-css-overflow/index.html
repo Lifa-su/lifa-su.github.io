@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive CSS overflow property demo. Explore visible, hidden, scroll, auto, and clip values. See how overflow-x and overflow-y affect content layout.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-overflow/">
+<title>CSS Overflow 演示工具</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#533483;--tx:#eee;--dm:#999;--bd:#2a2a4a;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.w{max-width:1100px;margin:0 auto;padding:20px 16px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--dm);margin-top:6px;font-size:.95rem}
+.s{margin-bottom:30px}
+.st{font-size:1.1rem;margin-bottom:14px;padding-left:10px;border-left:3px solid var(--ac)}
+.g5{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;transition:border-color .2s}
+.cd:hover{border-color:var(--ac)}
+.cd h3{font-size:.85rem;color:var(--ac);margin-bottom:8px;font-family:monospace}
+.ob{width:100%;height:120px;background:var(--bg);border:1px dashed var(--bd);border-radius:6px;padding:8px;font-size:.75rem;color:var(--dm)}
+.ob .inn{width:250px;height:200px;line-height:1.5}
+.it{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.it{grid-template-columns:1fr}}
+.ct{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
+.cg{margin-bottom:14px}
+.cg label{display:block;font-size:.85rem;color:var(--dm);margin-bottom:6px}
+.cg select{width:100%;padding:8px 12px;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;font-size:.9rem;cursor:pointer}
+.cg select:focus{outline:none;border-color:var(--ac)}
+.dg{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.dg label{font-size:.8rem;color:var(--dm);min-width:45px}
+.dg input[type=range]{flex:1;accent-color:var(--ac)}
+.dg .dv{font-size:.8rem;color:var(--ac);min-width:45px;text-align:right;font-family:monospace}
+.pv{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px;display:flex;flex-direction:column}
+.pvl{font-size:.85rem;color:var(--dm);margin-bottom:10px}
+.pvb{flex:1;min-height:180px;background:var(--bg);border:2px solid var(--ac);border-radius:6px;padding:10px;transition:all .3s}
+.pvi{width:300px;min-height:250px;background:linear-gradient(135deg,rgba(233,69,96,.08),rgba(83,52,131,.08));border:1px dashed rgba(233,69,96,.3);border-radius:4px;padding:10px;font-size:.75rem;color:var(--dm);line-height:1.6}
+.cb{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.cbh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+.cbh span{font-size:.8rem;color:var(--dm)}
+.cpb{background:var(--ac);color:#fff;border:none;padding:5px 14px;border-radius:5px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.cpb:hover{opacity:.85}
+.cpb.ok{background:#27ae60}
+.cbc{padding:14px;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.82rem;color:#7ec8e3;white-space:pre;overflow-x:auto;line-height:1.7}
+.eg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.ec{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:16px}
+.ec h3{font-size:.85rem;color:var(--ac2);margin-bottom:10px;font-family:monospace}
+.eb{background:var(--bg);padding:10px;border-radius:6px;font-size:.85rem;color:var(--dm);border:1px dashed var(--bd)}
+.e1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e2{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;line-height:1.6}
+.ecd{margin-top:10px;background:var(--bg);padding:10px;border-radius:6px;font-family:monospace;font-size:.72rem;color:#7ec8e3;white-space:pre;overflow-x:auto}
+footer{text-align:center;padding:30px 0 20px;color:var(--dm);font-size:.8rem}</style>
+</head>
+<body>
+<div class="w">
+<header><h1>CSS Overflow 演示工具</h1><p>可视化理解 CSS overflow 属性的各种表现</p></header>
+
+<div class="s"><div class="st">五种 overflow 值对比</div><div class="g5" id="g5"></div></div>
+
+<div class="s"><div class="st">overflow-x / overflow-y 独立设置</div>
+<div class="it">
+<div class="ct">
+<div class="cg"><label>overflow-x</label><select id="sx"><option value="visible">visible</option><option value="hidden">hidden</option><option value="scroll">scroll</option><option value="auto" selected>auto</option><option value="clip">clip</option></select></div>
+<div class="cg"><label>overflow-y</label><select id="sy"><option value="visible">visible</option><option value="hidden">hidden</option><option value="scroll">scroll</option><option value="auto" selected>auto</option><option value="clip">clip</option></select></div>
+<div class="dg"><label>宽度</label><input type="range" id="rw" min="100" max="400" value="200"><span class="dv" id="vw">200px</span></div>
+<div class="dg"><label>高度</label><input type="range" id="rh" min="80" max="300" value="150"><span class="dv" id="vh">150px</span></div>
+</div>
+<div class="pv"><div class="pvl">预览区域</div>
+<div class="pvb" id="pb"><div class="pvi">这是一段超出容器的内容。CSS overflow 属性控制当内容溢出元素框时的行为。通过设置 overflow-x 和 overflow-y，你可以分别控制水平和垂直方向的溢出行为。这段文字足够长，可以同时在水平和垂直方向产生溢出效果。Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div></div>
+</div></div></div>
+
+<div class="s"><div class="st">生成的 CSS 代码</div>
+<div class="cb"><div class="cbh"><span>CSS</span><button class="cpb" onclick="copyCode()">复制代码</button></div><pre class="cbc" id="co"></pre></div></div>
+
+<div class="s"><div class="st">text-overflow: ellipsis 演示</div>
+<div class="eg">
+<div class="ec"><h3>单行文本省略</h3>
+<div class="eb e1">这是一段很长的文本内容，当它超出容器宽度时会被截断并显示省略号。CSS text-overflow: ellipsis 需要配合 white-space: nowrap 和 overflow: hidden 使用。</div>
+<pre class="ecd">white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;</pre></div>
+<div class="ec"><h3>多行文本省略（3行）</h3>
+<div class="eb e2">这是一段很长的文本内容，用于演示多行文本省略效果。当文本超过指定行数时，会在最后一行末尾显示省略号。这需要使用 -webkit-line-clamp 属性来实现。虽然带有 -webkit 前缀，但现代浏览器都已支持此特性。多行省略在卡片式布局中非常常用。</div>
+<pre class="ecd">display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+text-overflow: ellipsis;</pre></div>
+</div></div>
+
+<footer>CSS Overflow 演示工具 — 帮助你理解 overflow 属性</footer>
+</div>
+<script>
+const txt='CSS overflow 属性控制当内容超出元素框时的行为。visible 让内容溢出可见；hidden 裁剪溢出内容；scroll 始终显示滚动条；auto 按需显示滚动条；clip 类似 hidden 但禁止程序滚动。';
+const vals=['visible','hidden','scroll','auto','clip'];
+const descs={visible:'内容溢出容器可见，不裁剪',hidden:'溢出内容被裁剪隐藏',scroll:'始终显示滚动条',auto:'需要时才显示滚动条',clip:'裁剪内容，禁止滚动'};
+
+function initGrid(){
+  const g=document.getElementById('g5');
+  vals.forEach(v=>{
+    const d=document.createElement('div');
+    d.className='cd';
+    d.innerHTML=`<h3>overflow: ${v}</h3><div class="ob" style="overflow:${v}"><div class="inn">${txt} ${descs[v]}。这段额外文字确保内容足够多，能够在水平和垂直方向都产生溢出效果。</div></div><p style="font-size:.72rem;color:var(--dm);margin-top:8px">${descs[v]}</p>`;
+    g.appendChild(d);
+  });
+}
+
+function update(){
+  const ox=document.getElementById('sx').value;
+  const oy=document.getElementById('sy').value;
+  const w=document.getElementById('rw').value;
+  const h=document.getElementById('rh').value;
+  document.getElementById('vw').textContent=w+'px';
+  document.getElementById('vh').textContent=h+'px';
+  const pb=document.getElementById('pb');
+  pb.style.overflowX=ox;
+  pb.style.overflowY=oy;
+  pb.style.width=w+'px';
+  pb.style.height=h+'px';
+  genCode(ox,oy,w,h);
+}
+
+function genCode(ox,oy,w,h){
+  let c=`.container {\n  width: ${w}px;\n  height: ${h}px;\n`;
+  if(ox===oy){c+=`  overflow: ${ox};\n`}
+  else{c+=`  overflow-x: ${ox};\n  overflow-y: ${oy};\n`}
+  c+='}';
+  document.getElementById('co').textContent=c;
+}
+
+function copyCode(){
+  const code=document.getElementById('co').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const btn=document.querySelector('.cpb');
+    btn.textContent='已复制!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='复制代码';btn.classList.remove('ok')},2000);
+  });
+}
+
+document.getElementById('sx').addEventListener('change',update);
+document.getElementById('sy').addEventListener('change',update);
+document.getElementById('rw').addEventListener('input',update);
+document.getElementById('rh').addEventListener('input',update);
+
+initGrid();
+update();
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

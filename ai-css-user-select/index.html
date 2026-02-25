@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS User-Select 交互式演示工具</title>
+<meta name="description" content="交互式体验 CSS user-select 属性的五种值：none, auto, text, all, contain。">
+<link rel="canonical" href="https://lifa-su.com/ai-css-user-select/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text-dim:#aab;--success:#4ecca3;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:clamp(1.6rem,4vw,2.4rem);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text-dim);font-size:clamp(.9rem,2.5vw,1.05rem);max-width:600px;margin:0 auto}
+.card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);margin-bottom:24px;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:rgba(233,69,96,.3)}
+.card-head{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);gap:8px}
+.card-head h2{font-size:1.15rem}
+.badge{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.b-none{background:rgba(233,69,96,.2);color:var(--accent)}
+.b-auto{background:rgba(78,204,163,.2);color:var(--success)}
+.b-text{background:rgba(83,52,131,.3);color:#b388ff}
+.b-all{background:rgba(255,183,77,.2);color:#ffb74d}
+.b-contain{background:rgba(79,195,247,.2);color:#4fc3f7}
+.card-body{padding:20px}
+.demo{min-height:80px;padding:20px;border-radius:8px;background:var(--card);border:2px dashed rgba(255,255,255,.1);margin-bottom:16px;font-size:.95rem;line-height:1.7;position:relative}
+.demo::before{content:attr(data-hint);position:absolute;top:8px;right:12px;font-size:.65rem;color:var(--text-dim);opacity:.6;pointer-events:none}
+.scene{padding:12px 16px;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:16px;font-size:.85rem;color:var(--text-dim)}
+.scene strong{color:var(--text);font-weight:500}
+.code{position:relative;background:#0d1117;border-radius:8px;padding:14px 16px;font-family:'SF Mono',Consolas,monospace;font-size:.82rem;color:#c9d1d9;overflow-x:auto}
+.p{color:#d2a8ff}.v{color:#a5d6ff}
+.cbtn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.1);border:none;color:var(--text-dim);padding:6px 12px;border-radius:6px;font-size:.75rem;cursor:pointer;transition:all .2s}
+.cbtn:hover{background:var(--accent);color:#fff}
+.cbtn.ok{background:var(--success);color:#fff}
+.hint{text-align:center;padding:20px 0 10px;font-size:.8rem;color:var(--text-dim)}
+footer{text-align:center;padding:30px 0 10px;color:var(--text-dim);font-size:.78rem}
+@media(max-width:600px){.card-head{padding:12px 14px}.card-body{padding:14px}.demo{padding:14px;min-height:60px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>CSS user-select 演示工具</h1>
+<p>交互式体验五种 user-select 值的效果 — 试试在每个区域中选择文本</p>
+</header>
+<div class="hint">💡 用鼠标拖选下方文本，体验不同效果</div>
+
+<div class="card">
+<div class="card-head"><span class="badge b-none">none</span><h2>user-select: none</h2></div>
+<div class="card-body">
+<div class="demo" style="user-select:none;-webkit-user-select:none" data-hint="🚫 无法选中">试试选中这段文字 — 你会发现完全无法选中任何内容。这就是 user-select: none 的效果，文本不可被选择。适用于不希望用户复制的 UI 元素。</div>
+<div class="scene"><strong>📌 适用场景：</strong>按钮文字、图标标签、拖拽手柄、游戏界面、防止误选的导航栏、工具栏文字</div>
+<div class="code" data-code="user-select: none;
+-webkit-user-select: none;"><button class="cbtn" onclick="cc(this)">📋 复制</button><span class="p">user-select</span>: <span class="v">none</span>;<br><span class="p">-webkit-user-select</span>: <span class="v">none</span>;</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head"><span class="badge b-auto">auto</span><h2>user-select: auto</h2></div>
+<div class="card-body">
+<div class="demo" style="user-select:auto" data-hint="✅ 默认行为">这是浏览器的默认行为。文本可以正常选中，就像你平时在网页上选择文字一样。auto 值会根据元素类型自动决定是否可选。</div>
+<div class="scene"><strong>📌 适用场景：</strong>普通文本内容、文章正文、默认网页行为 — 通常不需要显式设置，这是浏览器默认值</div>
+<div class="code" data-code="user-select: auto;"><button class="cbtn" onclick="cc(this)">📋 复制</button><span class="p">user-select</span>: <span class="v">auto</span>;</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head"><span class="badge b-text">text</span><h2>user-select: text</h2></div>
+<div class="card-body">
+<div class="demo" style="user-select:text;-webkit-user-select:text" data-hint="📝 可选文本">这段文字可以被自由选中。user-select: text 明确允许文本选择，即使父元素设置了 none，子元素也可以用 text 覆盖，恢复选择能力。</div>
+<div class="scene"><strong>📌 适用场景：</strong>在 none 容器内需要可选的代码片段、错误信息、序列号、需要复制的关键内容</div>
+<div class="code" data-code="user-select: text;
+-webkit-user-select: text;"><button class="cbtn" onclick="cc(this)">📋 复制</button><span class="p">user-select</span>: <span class="v">text</span>;<br><span class="p">-webkit-user-select</span>: <span class="v">text</span>;</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head"><span class="badge b-all">all</span><h2>user-select: all</h2></div>
+<div class="card-body">
+<div class="demo" style="user-select:all;-webkit-user-select:all" data-hint="⚡ 一键全选">点击这段文字试试 — 只需单击一次，整段文本就会被全部选中！user-select: all 让用户无需拖拽，一次点击即可选中所有内容，非常适合需要整体复制的场景。</div>
+<div class="scene"><strong>📌 适用场景：</strong>命令行代码、API Key、Token、序列号、邀请链接 — 任何需要一键复制的完整文本</div>
+<div class="code" data-code="user-select: all;
+-webkit-user-select: all;"><button class="cbtn" onclick="cc(this)">📋 复制</button><span class="p">user-select</span>: <span class="v">all</span>;<br><span class="p">-webkit-user-select</span>: <span class="v">all</span>;</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-head"><span class="badge b-contain">contain</span><h2>user-select: contain</h2></div>
+<div class="card-body">
+<div class="demo" style="user-select:contain" data-hint="📦 选择限制在区域内">在这个区域内选择文本时，选择范围会被限制在此容器内，不会扩展到外部元素。注意：此属性浏览器支持有限，目前主要 IE/Edge (旧版) 支持，现代浏览器可能表现为 text。</div>
+<div class="scene"><strong>📌 适用场景：</strong>富文本编辑器、独立内容区块、嵌入式组件 — 防止选择溢出到周围内容</div>
+<div class="code" data-code="user-select: contain;"><button class="cbtn" onclick="cc(this)">📋 复制</button><span class="p">user-select</span>: <span class="v">contain</span>;</div>
+</div>
+</div>
+
+<footer>CSS user-select 交互式演示工具 · 开源项目</footer>
+</div>
+
+<script>
+function cc(btn){var t=btn.parentElement.getAttribute('data-code');if(!t)return;navigator.clipboard.writeText(t).then(function(){btn.textContent='✅ 已复制';btn.classList.add('ok');setTimeout(function(){btn.textContent='📋 复制';btn.classList.remove('ok')},1500)}).catch(function(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);btn.textContent='✅ 已复制';btn.classList.add('ok');setTimeout(function(){btn.textContent='📋 复制';btn.classList.remove('ok')},1500)})}
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

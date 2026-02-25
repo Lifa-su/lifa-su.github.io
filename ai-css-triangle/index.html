@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS triangle generator using border tricks. Create triangles of any size, direction, and color. Copy pure CSS code for arrows, tooltips, and decorations.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-triangle/">
+<title>CSS 三角形生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 30px;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.container{display:flex;flex-wrap:wrap;gap:24px;max-width:960px;width:100%;justify-content:center}
+.card{background:#16213e;border-radius:16px;padding:24px;flex:1;min-width:300px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.section-title{font-size:1rem;font-weight:600;margin-bottom:16px;color:#e94560}
+.dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:220px;margin:0 auto 20px}
+.dir-btn{background:#0f3460;border:2px solid transparent;color:#e0e0e0;padding:10px 0;border-radius:10px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.dir-btn:hover{background:#1a4a8a}
+.dir-btn.active{background:#e94560;border-color:#ff6b8a;color:#fff;box-shadow:0 0 12px rgba(233,69,96,.4)}
+.dir-btn.center-placeholder{visibility:hidden}
+.control-group{margin-bottom:16px}
+.control-group label{display:block;font-size:.85rem;color:#a0a0b8;margin-bottom:6px}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-row input[type=range]{flex:1;accent-color:#e94560;height:6px}
+.slider-row input[type=number]{width:64px;background:#0f3460;border:1px solid #2a3a5c;color:#e0e0e0;border-radius:8px;padding:6px 8px;text-align:center;font-size:.9rem}
+.slider-row input[type=number]:focus{outline:none;border-color:#e94560}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-row input[type=color]{width:48px;height:36px;border:none;border-radius:8px;cursor:pointer;background:transparent}
+.color-row span{font-size:.9rem;color:#a0a0b8;font-family:monospace}
+.preview-area{display:flex;align-items:center;justify-content:center;min-height:200px;border-radius:12px;margin-bottom:20px;background-image:linear-gradient(45deg,#2a2a4a 25%,transparent 25%),linear-gradient(-45deg,#2a2a4a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#2a2a4a 75%),linear-gradient(-45deg,transparent 75%,#2a2a4a 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+#triangle{width:0;height:0;transition:all .15s}
+.code-wrap{position:relative;background:#0d1b2a;border-radius:12px;padding:16px;margin-top:8px;overflow-x:auto}
+.code-wrap pre{font-family:'SF Mono',Consolas,'Courier New',monospace;font-size:.82rem;line-height:1.6;white-space:pre;color:#a0d0f0}
+.kw{color:#e94560}.val{color:#4ecca3}.prop{color:#f0c040}
+.copy-btn{position:absolute;top:10px;right:10px;background:#e94560;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.copy-btn:hover{background:#ff6b8a}
+.copy-btn.copied{background:#4ecca3}
+footer{margin-top:40px;color:#555;font-size:.75rem;text-align:center}
+footer a{color:#e94560;text-decoration:none}
+@media(max-width:680px){.container{flex-direction:column}.card{min-width:auto}h1{font-size:1.4rem}}
+</style>
+</head>
+<body>
+<h1>&#x1F53A; CSS 三角形生成器</h1>
+<div class="container">
+  <div class="card">
+    <div class="section-title">方向</div>
+    <div class="dir-grid">
+      <button class="dir-btn" data-dir="top-left">&#8598; 左上</button>
+      <button class="dir-btn active" data-dir="top">&#8593; 上</button>
+      <button class="dir-btn" data-dir="top-right">&#8599; 右上</button>
+      <button class="dir-btn" data-dir="left">&#8592; 左</button>
+      <button class="dir-btn center-placeholder"></button>
+      <button class="dir-btn" data-dir="right">&#8594; 右</button>
+      <button class="dir-btn" data-dir="bottom-left">&#8601; 左下</button>
+      <button class="dir-btn" data-dir="bottom">&#8595; 下</button>
+      <button class="dir-btn" data-dir="bottom-right">&#8600; 右下</button>
+    </div>
+    <div class="section-title">大小</div>
+    <div class="control-group">
+      <label>宽度</label>
+      <div class="slider-row">
+        <input type="range" id="wRange" min="10" max="300" value="80">
+        <input type="number" id="wNum" min="10" max="300" value="80"> px
+      </div>
+    </div>
+    <div class="control-group">
+      <label>高度</label>
+      <div class="slider-row">
+        <input type="range" id="hRange" min="10" max="300" value="80">
+        <input type="number" id="hNum" min="10" max="300" value="80"> px
+      </div>
+    </div>
+    <div class="section-title">颜色</div>
+    <div class="control-group">
+      <div class="color-row">
+        <input type="color" id="colorPicker" value="#e94560">
+        <span id="colorHex">#e94560</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">预览</div>
+    <div class="preview-area"><div id="triangle"></div></div>
+    <div class="section-title">CSS 代码</div>
+    <div class="code-wrap">
+      <button class="copy-btn" id="copyBtn">复制</button>
+      <pre id="codeOutput"></pre>
+    </div>
+  </div>
+</div>
+<footer><p>CSS 三角形生成器 — 使用 border 技巧生成纯 CSS 三角形</p></footer>
+
+<script>
+var dir='top', w=80, h=80, color='#e94560';
+var tri=document.getElementById('triangle');
+var codeOut=document.getElementById('codeOutput');
+var copyBtn=document.getElementById('copyBtn');
+var rawCSS='';
+
+document.querySelectorAll('.dir-btn[data-dir]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.dir-btn').forEach(function(b){b.classList.remove('active')});
+    btn.classList.add('active');
+    dir=btn.dataset.dir;
+    update();
+  });
+});
+
+function syncPair(rId,nId,cb){
+  var r=document.getElementById(rId),n=document.getElementById(nId);
+  r.addEventListener('input',function(){n.value=r.value;cb(+r.value);update()});
+  n.addEventListener('input',function(){var v=Math.min(300,Math.max(10,+n.value||10));r.value=v;cb(v);update()});
+}
+syncPair('wRange','wNum',function(v){w=v});
+syncPair('hRange','hNum',function(v){h=v});
+
+document.getElementById('colorPicker').addEventListener('input',function(e){
+  color=e.target.value;
+  document.getElementById('colorHex').textContent=color;
+  update();
+});
+
+function getBorders(){
+  var hw=Math.round(w/2), hh=Math.round(h/2);
+  var t='transparent';
+  var borders={top:0,right:0,bottom:0,left:0,topC:t,rightC:t,bottomC:t,leftC:t};
+  switch(dir){
+    case'top':    borders.left=hw;borders.right=hw;borders.bottom=h;borders.bottomC=color;break;
+    case'bottom': borders.left=hw;borders.right=hw;borders.top=h;borders.topC=color;break;
+    case'left':   borders.top=hh;borders.bottom=hh;borders.right=w;borders.rightC=color;break;
+    case'right':  borders.top=hh;borders.bottom=hh;borders.left=w;borders.leftC=color;break;
+    case'top-left':    borders.right=w;borders.bottom=h;borders.rightC=t;borders.bottomC=color;break;
+    case'top-right':   borders.left=w;borders.bottom=h;borders.leftC=t;borders.bottomC=color;break;
+    case'bottom-left': borders.right=w;borders.top=h;borders.rightC=t;borders.topC=color;break;
+    case'bottom-right':borders.left=w;borders.top=h;borders.leftC=t;borders.topC=color;break;
+  }
+  return borders;
+}
+
+function update(){
+  var b=getBorders();
+  tri.style.cssText='width:0;height:0;'
+    +'border-top:'+b.top+'px solid '+b.topC+';'
+    +'border-right:'+b.right+'px solid '+b.rightC+';'
+    +'border-bottom:'+b.bottom+'px solid '+b.bottomC+';'
+    +'border-left:'+b.left+'px solid '+b.leftC+';';
+
+  var lines=[];
+  lines.push('width: 0;');
+  lines.push('height: 0;');
+  if(b.top)    lines.push('border-top: '+b.top+'px solid '+b.topC+';');
+  if(b.right)  lines.push('border-right: '+b.right+'px solid '+b.rightC+';');
+  if(b.bottom) lines.push('border-bottom: '+b.bottom+'px solid '+b.bottomC+';');
+  if(b.left)   lines.push('border-left: '+b.left+'px solid '+b.leftC+';');
+
+  rawCSS=lines.join('\n');
+
+  var html=lines.map(function(line){
+    return line.replace(/^([\w-]+)(:)\s*(.+)(;)$/,function(_,p,c,v,s){
+      return '<span class="prop">'+p+'</span>'+c+' <span class="val">'+v+'</span>'+s;
+    });
+  }).join('\n');
+  codeOut.innerHTML=html;
+}
+
+copyBtn.addEventListener('click',function(){
+  navigator.clipboard.writeText(rawCSS).then(function(){
+    copyBtn.textContent='已复制!';
+    copyBtn.classList.add('copied');
+    setTimeout(function(){copyBtn.textContent='复制';copyBtn.classList.remove('copied')},1500);
+  });
+});
+
+update();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:960px;width:100%;margin:40px auto 0;position:relative;cursor:pointer}
+.pro-section .pro-title{font-size:1.2rem;font-weight:700;color:#e94560;margin-bottom:16px;text-align:center}
+.pro-mock{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px;background:#16213e;border-radius:16px;filter:blur(4px);pointer-events:none;user-select:none}
+.pro-mock-card{background:#0f3460;border-radius:12px;padding:20px;text-align:center}
+.pro-mock-card .icon{font-size:2rem;margin-bottom:8px}
+.pro-mock-card h3{font-size:.9rem;color:#e0e0e0;margin-bottom:6px}
+.pro-mock-card p{font-size:.75rem;color:#888}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.pro-lock .lock-icon{font-size:3rem;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(233,69,96,.4))}
+.pro-lock .lock-text{font-size:1.1rem;font-weight:600;color:#fff;background:rgba(233,69,96,.85);padding:8px 24px;border-radius:20px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:#16213e;border-radius:20px;padding:36px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:2rem;font-weight:800;color:#e94560;margin:12px 0}
+.pro-modal .price span{font-size:.9rem;font-weight:400;color:#888}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#c23152);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-bottom:12px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;padding:8px}
+.pro-modal .btn-later:hover{color:#ccc}
+@media(max-width:680px){.pro-mock{grid-template-columns:1fr}}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+  <div class="pro-title">⚡ Pro Features</div>
+  <div class="pro-mock">
+    <div class="pro-mock-card"><div class="icon">🎬</div><h3>Animated Triangles</h3><p>CSS animations with hover, spin, pulse effects</p></div>
+    <div class="pro-mock-card"><div class="icon">⬡</div><h3>Polygon Generator</h3><p>Pentagon, hexagon, star & custom polygons</p></div>
+    <div class="pro-mock-card"><div class="icon">⚛️</div><h3>React Component</h3><p>Copy-paste React/JSX triangle components</p></div>
+  </div>
+  <div class="pro-lock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-text">Unlock Pro Features</div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="pro-modal">
+    <h2>CSS Triangle Pro</h2>
+    <div class="price">$9 <span>one-time</span></div>
+    <ul>
+      <li>Animated triangles (hover, spin, pulse, bounce)</li>
+      <li>Polygon generator (pentagon, hexagon, star, custom)</li>
+      <li>React/JSX component export</li>
+      <li>Tailwind CSS class output</li>
+      <li>Lifetime updates</li>
+    </ul>
+    <a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+    <button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+  </div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

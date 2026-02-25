@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Gap Generator</title>
+<meta name="description" content="Generate CSS gap, row-gap, and column-gap properties for Flexbox, Grid, and Multi-column layouts with live preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-gap-generator/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--text:#eee;--text-dim:#a0a0b8;--border:#2a2a4a;--radius:10px;--green:#00d2ff;--purple:#7b2ff7}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+.header{text-align:center;padding:2rem 1rem 1rem}
+.header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;background:linear-gradient(135deg,var(--green),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text-dim);margin-top:.4rem;font-size:.95rem}
+.app{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;max-width:1200px;margin:0 auto;padding:1.5rem}
+@media(max-width:800px){.app{grid-template-columns:1fr;padding:1rem}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;flex-direction:column;gap:1.2rem}
+.section-title{font-size:1rem;color:var(--green);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.tabs{display:flex;gap:.5rem}
+.tab{flex:1;padding:.55rem .5rem;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-dim);cursor:pointer;font-size:.82rem;font-weight:600;transition:.2s}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.control{display:flex;flex-direction:column;gap:.4rem}
+.control label{font-size:.82rem;color:var(--text-dim);font-weight:500}
+.cr{display:flex;gap:.5rem;align-items:center}
+.cr input[type=range]{flex:1;accent-color:var(--accent);height:6px;cursor:pointer}
+.cr input[type=number]{width:60px;padding:.35rem .4rem;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:.85rem;text-align:center}
+.cr input[type=number]:focus{outline:none;border-color:var(--green)}
+.cr select{padding:.35rem .4rem;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:.82rem;cursor:pointer}
+.cr select:focus{outline:none;border-color:var(--green)}
+.ir{display:flex;gap:.5rem;align-items:center}
+.ir button{width:32px;height:32px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.ir button:hover{border-color:var(--accent);background:var(--accent);color:#fff}
+.ir span{font-size:.9rem;min-width:60px;text-align:center}
+.right-col{display:flex;flex-direction:column;gap:1rem}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;min-height:320px;display:flex;flex-direction:column}
+.preview-area{flex:1;border:2px dashed var(--border);border-radius:8px;padding:1rem;overflow:auto;background:rgba(0,0,0,.15)}
+.preview-item{border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85rem;color:#fff;min-height:60px;min-width:60px;transition:.3s}
+.code-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.code-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.copy-btn{padding:.4rem .9rem;border:1px solid var(--green);border-radius:6px;background:transparent;color:var(--green);font-size:.78rem;cursor:pointer;font-weight:600;transition:.2s}
+.copy-btn:hover,.copy-btn.copied{background:var(--green);color:var(--bg)}
+pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto;font-size:.85rem;line-height:1.7;color:#c8d6e5;font-family:"SF Mono","Fira Code",monospace}
+.footer{text-align:center;padding:2rem 1rem;color:var(--text-dim);font-size:.8rem}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:800px){.preview-box{min-height:240px}.panel{padding:1rem}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>CSS Gap Generator</h1>
+<p>Fine-tune row-gap &amp; column-gap for Flexbox, Grid, and Multi-column layouts</p>
+</div>
+<div class="app">
+<div class="panel">
+<div class="section-title">Layout Mode</div>
+<div class="tabs" id="modeTabs">
+<button class="tab active" data-mode="flex">Flexbox</button>
+<button class="tab" data-mode="grid">Grid</button>
+<button class="tab" data-mode="multicol">Multi-col</button>
+</div>
+<div class="section-title">Row Gap</div>
+<div class="control">
+<div class="cr">
+<input type="range" id="rowGapRange" min="0" max="100" value="16">
+<input type="number" id="rowGapNum" min="0" max="200" value="16">
+<select id="rowGapUnit"><option>px</option><option>em</option><option>rem</option><option>%</option></select>
+</div>
+</div>
+<div class="section-title">Column Gap</div>
+<div class="control">
+<div class="cr">
+<input type="range" id="colGapRange" min="0" max="100" value="16">
+<input type="number" id="colGapNum" min="0" max="200" value="16">
+<select id="colGapUnit"><option>px</option><option>em</option><option>rem</option><option>%</option></select>
+</div>
+</div>
+<div id="gridColsCtrl">
+<div class="section-title">Grid Columns</div>
+<div class="control">
+<div class="cr">
+<input type="range" id="gridColsRange" min="1" max="8" value="3">
+<input type="number" id="gridColsNum" min="1" max="12" value="3">
+</div>
+</div>
+</div>
+<div id="multicolCtrl" style="display:none">
+<div class="section-title">Column Count</div>
+<div class="control">
+<div class="cr">
+<input type="range" id="multicolRange" min="1" max="8" value="3">
+<input type="number" id="multicolNum" min="1" max="12" value="3">
+</div>
+</div>
+</div>
+<div class="section-title">Flex Wrap</div>
+<div class="control" id="wrapCtrl">
+<div class="tabs" id="wrapTabs">
+<button class="tab active" data-wrap="wrap">Wrap</button>
+<button class="tab" data-wrap="nowrap">No Wrap</button>
+</div>
+</div>
+<div class="section-title">Preview Items</div>
+<div class="ir">
+<button id="removeItem">−</button>
+<span id="itemCount">6 items</span>
+<button id="addItem">+</button>
+</div>
+<div class="section-title">Item Color</div>
+<div class="cr">
+<input type="color" id="itemColor" value="#e94560">
+<span id="colorLabel">#e94560</span>
+</div>
+</div>
+<div class="right-col">
+<div class="preview-box">
+<div class="section-title" style="margin-bottom:1rem">Live Preview</div>
+<div class="preview-area" id="preview"></div>
+</div>
+<div class="code-box">
+<div class="code-head">
+<div class="section-title">Generated CSS</div>
+<button class="copy-btn" id="copyBtn" onclick="copyCSS()">Copy CSS</button>
+</div>
+<pre id="codeOutput"></pre>
+</div>
+</div>
+</div>
+<div class="footer">&copy; 2026 CSS Gap Generator. Built for developers.</div>
+<script>
+const $ = id => document.getElementById(id);
+let mode = 'flex', itemCount = 6;
+const colors = ['#e94560','#7b2ff7','#00d2ff','#f8b500','#0f3460','#533483','#2ecc71','#e74c3c','#3498db','#f39c12'];
+
+// Sync range <-> number inputs
+function syncInputs(rangeId, numId) {
+  const r = $(rangeId), n = $(numId);
+  r.addEventListener('input', () => { n.value = r.value; update(); });
+  n.addEventListener('input', () => { r.value = n.value; update(); });
+}
+syncInputs('rowGapRange', 'rowGapNum');
+syncInputs('colGapRange', 'colGapNum');
+syncInputs('gridColsRange', 'gridColsNum');
+syncInputs('multiColsRange', 'multiColsNum');
+
+// Unit selects
+$('rowGapUnit').addEventListener('change', update);
+$('colGapUnit').addEventListener('change', update);
+
+// Color picker
+$('itemColor').addEventListener('input', function() {
+  $('colorLabel').textContent = this.value;
+  update();
+});
+
+// Mode tabs
+document.querySelectorAll('#modeTabs .tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('#modeTabs .tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    mode = this.dataset.mode;
+    $('gridColsCtrl').style.display = mode === 'grid' ? '' : 'none';
+    $('multiColsCtrl').style.display = mode === 'multicol' ? '' : 'none';
+    update();
+  });
+});
+
+// Item count
+$('addItem').addEventListener('click', () => { if (itemCount < 20) { itemCount++; $('itemCountLabel').textContent = itemCount + ' items'; update(); } });
+$('removeItem').addEventListener('click', () => { if (itemCount > 1) { itemCount--; $('itemCountLabel').textContent = itemCount + ' items'; update(); } });
+
+// Init visibility
+$('gridColsCtrl').style.display = 'none';
+$('multiColsCtrl').style.display = 'none';
+
+function update() {
+  const rowGap = $('rowGapNum').value + $('rowGapUnit').value;
+  const colGap = $('colGapNum').value + $('colGapUnit').value;
+  const baseColor = $('itemColor').value;
+  const preview = $('preview');
+  const gridCols = $('gridColsNum').value;
+  const multiCols = $('multiColsNum').value;
+
+  // Build preview items
+  let html = '';
+  for (let i = 0; i < itemCount; i++) {
+    const c = colors[i % colors.length];
+    html += '<div class="preview-item" style="background:' + c + '">' + (i + 1) + '</div>';
+  }
+  preview.innerHTML = html;
+
+  // Apply layout styles
+  if (mode === 'flex') {
+    preview.style.cssText = 'display:flex;flex-wrap:wrap;row-gap:' + rowGap + ';column-gap:' + colGap;
+  } else if (mode === 'grid') {
+    preview.style.cssText = 'display:grid;grid-template-columns:repeat(' + gridCols + ',1fr);row-gap:' + rowGap + ';column-gap:' + colGap;
+  } else {
+    preview.style.cssText = 'column-count:' + multiCols + ';column-gap:' + colGap;
+  }
+
+  // Generate CSS code
+  let css = '';
+  if (mode === 'flex') {
+    css = '.container {\n';
+    css += '  display: flex;\n';
+    css += '  flex-wrap: wrap;\n';
+    css += '  row-gap: ' + rowGap + ';\n';
+    css += '  column-gap: ' + colGap + ';\n';
+    css += '}';
+  } else if (mode === 'grid') {
+    css = '.container {\n';
+    css += '  display: grid;\n';
+    css += '  grid-template-columns: repeat(' + gridCols + ', 1fr);\n';
+    css += '  row-gap: ' + rowGap + ';\n';
+    css += '  column-gap: ' + colGap + ';\n';
+    css += '}';
+  } else {
+    css = '.container {\n';
+    css += '  column-count: ' + multiCols + ';\n';
+    css += '  column-gap: ' + colGap + ';\n';
+    css += '}';
+  }
+  $('codeOutput').textContent = css;
+}
+
+function copyCSS() {
+  const code = $('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = $('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy CSS'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Initial render
+update();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

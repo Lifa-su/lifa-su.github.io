@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered HTTP client for testing REST APIs. Send GET, POST, PUT, DELETE requests with custom headers and body. View formatted responses and status codes.">
+<link rel="canonical" href="https://lifa-su.com/ai-http-client/">
+<title>AI HTTP Client</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--sf:#161b22;--sf2:#21262d;--bd:#30363d;--tx:#e6edf3;--tx2:#8b949e;--ac:#58a6ff;--ac2:#1f6feb;--gn:#3fb950;--rd:#f85149;--or:#d29922;--pp:#bc8cff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+input,select,textarea,button{font-family:inherit;font-size:14px}
+input,select,textarea{background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+button{cursor:pointer;border:none;border-radius:6px;padding:8px 16px;font-weight:600}
+.bp{background:var(--ac2);color:#fff}.bp:hover{background:var(--ac)}
+.bd{background:#da3633;color:#fff}.bd:hover{background:var(--rd)}
+.bg{background:transparent;color:var(--tx2);border:1px solid var(--bd)}.bg:hover{color:var(--tx)}
+header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:700}
+header h1 span{color:var(--ac)}
+.ct{flex:1;max-width:1400px;width:100%;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+.rb{display:flex;gap:8px;align-items:center}
+.rb select{width:120px;font-weight:600}
+.rb input{flex:1}
+.rb button{padding:8px 24px;white-space:nowrap}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.tab{padding:8px 16px;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;font-size:14px;font-weight:500}
+.tab:hover{color:var(--tx)}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.pn{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px}
+.kv{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.kv input{flex:1}
+.kv button{padding:4px 10px;font-size:18px;line-height:1}
+.ab{font-size:13px;color:var(--ac);cursor:pointer;background:none;border:none;padding:4px 0}
+textarea.be{width:100%;min-height:200px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:13px;resize:vertical;line-height:1.5}
+.bt{display:flex;gap:12px;margin-bottom:8px}
+.bt label{display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--tx2);font-size:13px}
+.bt input[type=radio]{accent-color:var(--ac)}
+.mc{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1}
+.sb{display:flex;gap:16px;align-items:center;font-size:13px;flex-wrap:wrap}
+.badge{padding:4px 10px;border-radius:4px;font-weight:700;font-size:13px}
+.s2{background:rgba(63,185,80,.15);color:var(--gn)}
+.s3{background:rgba(210,153,34,.15);color:var(--or)}
+.s4,.s5{background:rgba(248,81,73,.15);color:var(--rd)}
+.rbody{flex:1;overflow:auto;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:12px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-all;min-height:200px;max-height:60vh}
+.rh{max-height:200px;overflow:auto;font-size:12px}
+.rh table{width:100%;border-collapse:collapse}
+.rh td{padding:4px 8px;border-bottom:1px solid var(--bd)}
+.rh td:first-child{color:var(--ac);font-weight:600;width:30%}
+.hi{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--bd);border-radius:6px;margin-bottom:6px;cursor:pointer;font-size:13px;background:var(--sf)}
+.hi:hover{border-color:var(--ac);background:var(--sf2)}
+.hm{font-weight:700;font-size:12px;min-width:55px}
+.hu{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx2)}
+.hs{font-weight:600;font-size:12px}
+.ht{color:var(--tx2);font-size:11px;white-space:nowrap}
+.empty{text-align:center;color:var(--tx2);padding:40px 20px}
+.ld{display:inline-block;width:16px;height:16px;border:2px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.jk{color:var(--ac)}.js{color:var(--gn)}.jn{color:var(--or)}.jb{color:var(--pp)}.jl{color:var(--rd)}
+footer{text-align:center;padding:12px;color:var(--tx2);font-size:12px;border-top:1px solid var(--bd)}
+@media(max-width:768px){.mc{grid-template-columns:1fr}.rb{flex-wrap:wrap}.rb select,.rb input{width:100%}}
+</style>
+</head>
+<body>
+<header>
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+<h1><span>AI</span> HTTP Client</h1>
+</header>
+<div class="ct">
+<div class="rb">
+<select id="method"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option><option>PATCH</option></select>
+<input id="url" type="text" placeholder="Enter request URL..." value="https://jsonplaceholder.typicode.com/posts/1">
+<button class="bp" id="sendBtn" onclick="sendRequest()">Send</button>
+</div>
+<div class="mc">
+<div>
+<div class="pn">
+<div class="tabs">
+<div class="tab active" onclick="switchReqTab(this,'headersTab')">Headers</div>
+<div class="tab" onclick="switchReqTab(this,'bodyTab')">Body</div>
+</div>
+<div id="headersTab">
+<div id="headerRows"></div>
+<button class="ab" onclick="addHeader()">+ Add Header</button>
+</div>
+<div id="bodyTab" style="display:none">
+<div class="bt">
+<label><input type="radio" name="bodyType" value="json" checked onchange="switchBodyType()">JSON</label>
+<label><input type="radio" name="bodyType" value="form" onchange="switchBodyType()">Form</label>
+<label><input type="radio" name="bodyType" value="raw" onchange="switchBodyType()">Raw</label>
+</div>
+<textarea id="bodyContent" class="be" placeholder='{"key": "value"}'></textarea>
+</div>
+</div>
+<div class="pn" style="margin-top:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<h3 style="font-size:14px">History</h3>
+<button class="bg" style="font-size:12px;padding:4px 10px" onclick="clearHistory()">Clear</button>
+</div>
+<div id="historyList"><div class="empty">No requests yet</div></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="pn" style="flex:1;display:flex;flex-direction:column">
+<div class="tabs">
+<div class="tab active" onclick="switchResTab(this,'respBody')">Body</div>
+<div class="tab" onclick="switchResTab(this,'respHeaders')">Headers</div>
+</div>
+<div id="statusBar" class="sb" style="margin-bottom:8px"></div>
+<div id="respBody" class="rbody"><div class="empty">Send a request to see the response</div></div>
+<div id="respHeaders" class="rh" style="display:none"></div>
+</div>
+</div>
+</div>
+</div>
+<footer>AI HTTP Client &mdash; A modern HTTP testing tool</footer>
+<script>
+let history = JSON.parse(localStorage.getItem('httpHistory') || '[]');
+
+function switchReqTab(el, id) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('headersTab').style.display = id === 'headersTab' ? '' : 'none';
+  document.getElementById('bodyTab').style.display = id === 'bodyTab' ? '' : 'none';
+}
+
+function switchResTab(el, id) {
+  el.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('respBody').style.display = id === 'respBody' ? '' : 'none';
+  document.getElementById('respHeaders').style.display = id === 'respHeaders' ? '' : 'none';
+}
+
+function addHeader(k, v) {
+  const row = document.createElement('div');
+  row.className = 'kv';
+  row.innerHTML = '<input placeholder="Key" value="' + (k||'') + '"><input placeholder="Value" value="' + (v||'') + '"><button class="bd" onclick="this.parentElement.remove()">&times;</button>';
+  document.getElementById('headerRows').appendChild(row);
+}
+
+function switchBodyType() {
+  const t = document.querySelector('input[name=bodyType]:checked').value;
+  const ta = document.getElementById('bodyContent');
+  if (t === 'json') ta.placeholder = '{"key": "value"}';
+  else if (t === 'form') ta.placeholder = 'key=value&key2=value2';
+  else ta.placeholder = 'Raw body content...';
+}
+
+function getHeaders() {
+  const h = {};
+  document.querySelectorAll('#headerRows .kv').forEach(r => {
+    const inputs = r.querySelectorAll('input');
+    const k = inputs[0].value.trim(), v = inputs[1].value.trim();
+    if (k) h[k] = v;
+  });
+  return h;
+}
+
+function colorMethod(m) {
+  const c = {GET:'var(--gn)',POST:'var(--or)',PUT:'var(--ac)',DELETE:'var(--rd)',PATCH:'var(--pp)'};
+  return c[m] || 'var(--tx)';
+}
+
+function syntaxHL(json) {
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(m) {
+    let c = 'jn';
+    if (/^"/.test(m)) { c = /:$/.test(m) ? 'jk' : 'js'; }
+    else if (/true|false/.test(m)) c = 'jb';
+    else if (/null/.test(m)) c = 'jl';
+    return '<span class="' + c + '">' + m + '</span>';
+  });
+}
+
+async function sendRequest() {
+  const method = document.getElementById('method').value;
+  const url = document.getElementById('url').value.trim();
+  if (!url) { alert('Please enter a URL'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  btn.innerHTML = '<span class="ld"></span>';
+  btn.disabled = true;
+
+  const headers = getHeaders();
+  const bodyType = document.querySelector('input[name=bodyType]:checked').value;
+  const bodyContent = document.getElementById('bodyContent').value;
+
+  const opts = { method, headers };
+  if (method !== 'GET' && bodyContent) {
+    opts.body = bodyContent;
+    if (bodyType === 'json' && !headers['Content-Type']) {
+      opts.headers['Content-Type'] = 'application/json';
+    } else if (bodyType === 'form' && !headers['Content-Type']) {
+      opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    }
+  }
+
+  const start = performance.now();
+  let status, statusText, respHeaders = {}, body = '', ok = false;
+
+  try {
+    const res = await fetch(url, opts);
+    const elapsed = Math.round(performance.now() - start);
+    status = res.status;
+    statusText = res.statusText;
+    ok = res.ok;
+    res.headers.forEach((v, k) => { respHeaders[k] = v; });
+    body = await res.text();
+
+    showStatus(status, statusText, elapsed, body.length);
+    showBody(body);
+    showHeaders(respHeaders);
+    saveHistory({ method, url, status, elapsed, time: Date.now(), headers: getHeaders(), bodyType, bodyContent });
+  } catch (e) {
+    const elapsed = Math.round(performance.now() - start);
+    document.getElementById('statusBar').innerHTML = '<span class="badge s4">Error</span><span>' + elapsed + 'ms</span>';
+    document.getElementById('respBody').textContent = 'Request failed: ' + e.message;
+    document.getElementById('respHeaders').innerHTML = '';
+    saveHistory({ method, url, status: 0, elapsed, time: Date.now(), error: e.message });
+  }
+
+  btn.textContent = 'Send';
+  btn.disabled = false;
+}
+
+function showStatus(code, text, ms, size) {
+  const cls = code < 300 ? 's2' : code < 400 ? 's3' : code < 500 ? 's4' : 's5';
+  const sizeStr = size > 1024 ? (size / 1024).toFixed(1) + ' KB' : size + ' B';
+  document.getElementById('statusBar').innerHTML =
+    '<span class="badge ' + cls + '">' + code + ' ' + text + '</span>' +
+    '<span>⏱ ' + ms + 'ms</span><span>📦 ' + sizeStr + '</span>';
+}
+
+function showBody(body) {
+  const el = document.getElementById('respBody');
+  try {
+    const obj = JSON.parse(body);
+    const pretty = JSON.stringify(obj, null, 2);
+    el.innerHTML = syntaxHL(pretty);
+  } catch (e) {
+    el.textContent = body;
+  }
+}
+
+function showHeaders(h) {
+  let html = '<table>';
+  for (const [k, v] of Object.entries(h)) {
+    html += '<tr><td>' + k + '</td><td>' + v + '</td></tr>';
+  }
+  html += '</table>';
+  document.getElementById('respHeaders').innerHTML = html;
+}
+
+function saveHistory(item) {
+  history.unshift(item);
+  if (history.length > 50) history.pop();
+  localStorage.setItem('httpHistory', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!history.length) { el.innerHTML = '<div class="empty">No requests yet</div>'; return; }
+  el.innerHTML = history.map((h, i) => {
+    const d = new Date(h.time);
+    const ts = d.toLocaleTimeString();
+    const sc = h.status ? (h.status < 300 ? 'color:var(--gn)' : h.status < 400 ? 'color:var(--or)' : 'color:var(--rd)') : 'color:var(--rd)';
+    return '<div class="hi" onclick="replayHistory(' + i + ')">' +
+      '<span class="hm" style="color:' + colorMethod(h.method).replace(/var\(--(\w+)\)/,'var(--$1)') + '">' + h.method + '</span>' +
+      '<span class="hu">' + h.url + '</span>' +
+      '<span class="hs" style="' + sc + '">' + (h.status || 'ERR') + '</span>' +
+      '<span class="ht">' + ts + '</span></div>';
+  }).join('');
+}
+
+function replayHistory(i) {
+  const h = history[i];
+  document.getElementById('method').value = h.method;
+  document.getElementById('url').value = h.url;
+  document.getElementById('headerRows').innerHTML = '';
+  if (h.headers) Object.entries(h.headers).forEach(([k, v]) => addHeader(k, v));
+  if (h.bodyType) {
+    document.querySelector('input[name=bodyType][value="' + h.bodyType + '"]').checked = true;
+    switchBodyType();
+  }
+  if (h.bodyContent) document.getElementById('bodyContent').value = h.bodyContent;
+}
+
+function clearHistory() {
+  history = [];
+  localStorage.removeItem('httpHistory');
+  renderHistory();
+}
+
+// Init
+addHeader('Accept', 'application/json');
+renderHistory();
+
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

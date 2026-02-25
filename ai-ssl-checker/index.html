@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI SSL Checker — SSL Certificate Analysis Tool</title>
+<meta name="description" content="Free online SSL certificate checker. Analyze SSL/TLS certificates, check expiry dates, security ratings, and certificate details.">
+<link rel="canonical" href="https://lifa-su.com/ai-ssl-checker/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e17;--surface:#111827;--surface2:#1e293b;--border:#2d3748;
+  --text:#e2e8f0;--text2:#94a3b8;--accent:#3b82f6;--accent2:#60a5fa;
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--orange:#f97316;
+  --radius:12px;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.container{max-width:800px;margin:0 auto;padding:24px 16px}
+
+/* Header */
+.header{text-align:center;padding:48px 0 32px}
+.header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.header p{color:var(--text2);font-size:1rem}
+.logo{font-size:3rem;margin-bottom:12px}
+
+/* Search Box */
+.search-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:var(--shadow)}
+.input-group{display:flex;gap:12px}
+.input-group input{flex:1;padding:14px 18px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1rem;outline:none;transition:border-color .2s}
+.input-group input:focus{border-color:var(--accent)}
+.input-group input::placeholder{color:var(--text2)}
+.btn{padding:14px 28px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;white-space:nowrap}
+.btn:hover{opacity:.9}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Loading */
+.loading{display:none;text-align:center;padding:48px 24px}
+.loading.active{display:block}
+.spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--text2);font-size:.95rem}
+.progress-bar{width:100%;max-width:300px;height:6px;background:var(--surface2);border-radius:3px;margin:16px auto 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6366f1);border-radius:3px;transition:width .5s ease;width:0%}
+
+/* Results */
+.results{display:none}
+.results.active{display:block}
+
+.grade-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;margin-bottom:24px;box-shadow:var(--shadow)}
+.grade-badge{display:inline-flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:50%;font-size:2.5rem;font-weight:800;margin-bottom:16px;border:4px solid}
+.grade-A-plus{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.grade-A{background:rgba(34,197,94,.12);border-color:var(--green);color:var(--green)}
+.grade-B{background:rgba(234,179,8,.12);border-color:var(--yellow);color:var(--yellow)}
+.grade-C{background:rgba(249,115,22,.12);border-color:var(--orange);color:var(--orange)}
+.grade-F{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
+.grade-T{background:rgba(239,68,68,.12);border-color:var(--red);color:var(--red)}
+.grade-unknown{background:rgba(148,163,184,.12);border-color:var(--text2);color:var(--text2)}
+.grade-domain{font-size:1.25rem;font-weight:600;margin-bottom:4px}
+.grade-summary{color:var(--text2);font-size:.9rem}
+
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.detail-card h3{font-size:1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.detail-card h3 span{font-size:1.2rem}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:12px}
+.detail-row:last-child{border-bottom:none}
+.detail-label{color:var(--text2);font-size:.9rem;flex-shrink:0}
+.detail-value{font-size:.9rem;text-align:right;word-break:break-all}
+
+.expiry-tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.85rem;font-weight:600}
+.expiry-green{background:rgba(34,197,94,.15);color:var(--green)}
+.expiry-yellow{background:rgba(234,179,8,.15);color:var(--yellow)}
+.expiry-red{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* History */
+.history{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:var(--shadow)}
+.history h3{font-size:1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.history-clear{font-size:.8rem;color:var(--text2);cursor:pointer;background:none;border:none;padding:4px 8px}
+.history-clear:hover{color:var(--red)}
+.history-list{display:flex;flex-wrap:wrap;gap:8px}
+.history-item{padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:.85rem;cursor:pointer;transition:border-color .2s,background .2s;display:flex;align-items:center;gap:6px}
+.history-item:hover{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.history-item .hi-grade{font-weight:700;font-size:.75rem}
+.history-empty{color:var(--text2);font-size:.9rem}
+
+/* Error */
+.error-box{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);padding:20px;margin-bottom:24px;color:var(--red);display:none}
+.error-box.active{display:block}
+
+/* Footer */
+.footer{text-align:center;padding:32px 0;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:48px}
+
+/* Responsive */
+@media(max-width:600px){
+  .header h1{font-size:1.5rem}
+  .input-group{flex-direction:column}
+  .btn{padding:14px}
+  .grade-badge{width:72px;height:72px;font-size:2rem}
+  .detail-row{flex-direction:column;gap:4px}
+  .detail-value{text-align:left}
+  .container{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo">🔒</div>
+    <h1>AI SSL Checker</h1>
+    <p>Analyze SSL/TLS certificates instantly. Check security ratings, expiry dates, and more.</p>
+  </div>
+
+  <div class="search-box">
+    <div class="input-group">
+      <input type="text" id="domainInput" placeholder="Enter domain (e.g. google.com)" autocomplete="off" spellcheck="false">
+      <button class="btn" id="checkBtn" onclick="startCheck()">Check SSL</button>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Initiating SSL analysis...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="grade-card" id="gradeCard"></div>
+    <div id="detailCards"></div>
+  </div>
+
+  <div class="history" id="historySection" style="display:none">
+    <h3>
+      <span>🕐 Recent Checks</span>
+      <button class="history-clear" onclick="clearHistory()">Clear All</button>
+    </h3>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <div class="footer">
+    <p>AI SSL Checker — Free SSL/TLS Certificate Analysis Tool</p>
+    <p style="margin-top:4px">Powered by SSL Labs API • Data refreshed in real-time</p>
+  </div>
+</div>
+
+<script>
+const CORS_PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+];
+const SSL_API = 'https://api.ssllabs.com/api/v3/analyze';
+const MAX_HISTORY = 20;
+const POLL_INTERVAL = 8000;
+const MAX_POLL_TIME = 180000;
+
+let currentAbort = null;
+
+// Init
+document.getElementById('domainInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startCheck();
+});
+renderHistory();
+
+function cleanDomain(input) {
+  let d = input.trim().toLowerCase();
+  d = d.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '');
+  return d;
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = msg;
+  box.classList.add('active');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('active');
+}
+
+function setLoading(show, text) {
+  const el = document.getElementById('loading');
+  if (show) {
+    el.classList.add('active');
+    document.getElementById('results').classList.remove('active');
+    if (text) document.getElementById('loadingText').textContent = text;
+  } else {
+    el.classList.remove('active');
+  }
+}
+
+function setProgress(pct) {
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+async function fetchWithProxy(url) {
+  // Try direct first
+  try {
+    const r = await fetch(url, { signal: currentAbort?.signal });
+    if (r.ok) return await r.json();
+  } catch(e) {}
+  // Try proxies
+  for (const proxy of CORS_PROXIES) {
+    try {
+      const r = await fetch(proxy(url), { signal: currentAbort?.signal });
+      if (r.ok) return await r.json();
+    } catch(e) {}
+  }
+  throw new Error('All fetch attempts failed. The API may be temporarily unavailable.');
+}
+
+async function startCheck() {
+  const domain = cleanDomain(document.getElementById('domainInput').value);
+  if (!domain || !/^[a-z0-9]([a-z0-9-]*\.)+[a-z]{2,}$/.test(domain)) {
+    showError('Please enter a valid domain name (e.g. example.com)');
+    return;
+  }
+
+  hideError();
+  if (currentAbort) currentAbort.abort();
+  currentAbort = new AbortController();
+
+  document.getElementById('checkBtn').disabled = true;
+  document.getElementById('results').classList.remove('active');
+  setLoading(true, 'Initiating SSL analysis for ' + domain + '...');
+  setProgress(5);
+
+  try {
+    // Start new analysis
+    const startUrl = `${SSL_API}?host=${encodeURIComponent(domain)}&startNew=on&all=done`;
+    let data;
+    try {
+      data = await fetchWithProxy(startUrl);
+    } catch(e) {
+      throw new Error('Could not reach SSL Labs API. Please try again later.');
+    }
+
+    setProgress(15);
+    setLoading(true, 'Analysis in progress... This may take 1-2 minutes.');
+
+    // Poll for results
+    const pollUrl = `${SSL_API}?host=${encodeURIComponent(domain)}&all=done`;
+    const startTime = Date.now();
+    let progress = 15;
+
+    while (true) {
+      if (Date.now() - startTime > MAX_POLL_TIME) {
+        throw new Error('Analysis timed out. The server may be busy — please try again.');
+      }
+
+      await new Promise(r => setTimeout(r, POLL_INTERVAL));
+      data = await fetchWithProxy(pollUrl);
+
+      if (data.status === 'READY') {
+        setProgress(100);
+        break;
+      } else if (data.status === 'ERROR') {
+        throw new Error(data.statusMessage || 'SSL Labs returned an error for this domain.');
+      } else if (data.status === 'DNS') {
+        setLoading(true, 'Resolving DNS for ' + domain + '...');
+        progress = Math.min(progress + 5, 30);
+      } else if (data.status === 'IN_PROGRESS') {
+        // Estimate progress from endpoints
+        let epProgress = 30;
+        if (data.endpoints) {
+          const total = data.endpoints.length;
+          const done = data.endpoints.filter(ep => ep.statusMessage === 'Ready').length;
+          const inProg = data.endpoints.filter(ep => ep.progress >= 0);
+          if (total > 0) {
+            let sum = done * 100;
+            inProg.forEach(ep => { if (ep.statusMessage !== 'Ready') sum += (ep.progress || 0); });
+            epProgress = 30 + Math.round((sum / (total * 100)) * 65);
+          }
+        }
+        progress = Math.max(progress, epProgress);
+        setLoading(true, `Analyzing ${domain}... ${data.endpoints ? data.endpoints.length + ' endpoint(s)' : ''}`);
+      }
+      setProgress(Math.min(progress, 95));
+    }
+
+    displayResults(domain, data);
+    saveHistory(domain, data);
+  } catch(e) {
+    if (e.name === 'AbortError') return;
+    showError(e.message);
+    setLoading(false);
+  } finally {
+    document.getElementById('checkBtn').disabled = false;
+  }
+}
+
+function displayResults(domain, data) {
+  setLoading(false);
+  const results = document.getElementById('results');
+  results.classList.add('active');
+
+  const ep = data.endpoints?.[0] || {};
+  const detail = ep.details || {};
+  const cert = detail.cert || {};
+  const grade = ep.grade || ep.gradeTrustIgnored || '?';
+
+  // Grade card
+  const gradeClass = grade === 'A+' ? 'grade-A-plus' : grade.startsWith('A') ? 'grade-A' : grade.startsWith('B') ? 'grade-B' : grade.startsWith('C') ? 'grade-C' : grade === 'F' || grade === 'T' ? 'grade-F' : 'grade-unknown';
+  const gradeLabel = grade === 'A+' ? 'Excellent' : grade === 'A' ? 'Good' : grade.startsWith('B') ? 'Adequate' : grade.startsWith('C') ? 'Needs Improvement' : grade === 'T' ? 'Trust Issues' : grade === 'F' ? 'Failing' : 'Unknown';
+
+  document.getElementById('gradeCard').innerHTML = `
+    <div class="grade-badge ${gradeClass}">${escHtml(grade)}</div>
+    <div class="grade-domain">${escHtml(domain)}</div>
+    <div class="grade-summary">Security Rating: ${escHtml(gradeLabel)}</div>
+  `;
+
+  let cards = '';
+
+  // Certificate Info
+  if (cert.subject || cert.issuerSubject) {
+    const notBefore = cert.notBefore ? new Date(cert.notBefore) : null;
+    const notAfter = cert.notAfter ? new Date(cert.notAfter) : null;
+    const daysLeft = notAfter ? Math.ceil((notAfter - Date.now()) / 86400000) : null;
+    let expiryHtml = '';
+    if (daysLeft !== null) {
+      const cls = daysLeft <= 0 ? 'expiry-red' : daysLeft <= 30 ? 'expiry-yellow' : 'expiry-green';
+      const label = daysLeft <= 0 ? `Expired ${Math.abs(daysLeft)} days ago` : `${daysLeft} days remaining`;
+      expiryHtml = `<span class="expiry-tag ${cls}">${label}</span>`;
+    }
+
+    const sans = (cert.altNames || []).join(', ') || '-';
+    cards += `
+    <div class="detail-card">
+      <h3><span>📜</span> Certificate Details</h3>
+      <div class="detail-row"><div class="detail-label">Common Name</div><div class="detail-value">${escHtml(cert.commonNames?.[0] || cert.subject || '-')}</div></div>
+      <div class="detail-row"><div class="detail-label">Issuer</div><div class="detail-value">${escHtml(cert.issuerLabel || cert.issuerSubject || '-')}</div></div>
+      <div class="detail-row"><div class="detail-label">Valid From</div><div class="detail-value">${notBefore ? notBefore.toLocaleDateString() : '-'}</div></div>
+      <div class="detail-row"><div class="detail-label">Valid Until</div><div class="detail-value">${notAfter ? notAfter.toLocaleDateString() : '-'} ${expiryHtml}</div></div>
+      <div class="detail-row"><div class="detail-label">SANs</div><div class="detail-value" style="font-size:.8rem">${escHtml(sans)}</div></div>
+      <div class="detail-row"><div class="detail-label">Signature Algorithm</div><div class="detail-value">${escHtml(cert.sigAlg || '-')}</div></div>
+      <div class="detail-row"><div class="detail-label">Key Strength</div><div class="detail-value">${cert.keySize ? cert.keySize + ' bit ' + (cert.keyAlg || '') : '-'}</div></div>
+    </div>`;
+  }
+
+  // Protocol Support
+  if (detail.protocols) {
+    let protoRows = detail.protocols.map(p => {
+      const name = `${p.name} ${p.version}`;
+      const safe = (p.name === 'TLS' && parseFloat(p.version) >= 1.2);
+      return `<div class="detail-row"><div class="detail-label">${escHtml(name)}</div><div class="detail-value" style="color:${safe ? 'var(--green)' : 'var(--orange)'}">${safe ? '✓ Secure' : '⚠ Weak'}</div></div>`;
+    }).join('');
+    cards += `
+    <div class="detail-card">
+      <h3><span>🔐</span> Protocol Support</h3>
+      ${protoRows}
+    </div>`;
+  }
+
+  // Server Info
+  if (ep.ipAddress || ep.serverName || detail.serverSignature) {
+    cards += `
+    <div class="detail-card">
+      <h3><span>🖥️</span> Server Information</h3>
+      ${ep.ipAddress ? `<div class="detail-row"><div class="detail-label">IP Address</div><div class="detail-value">${escHtml(ep.ipAddress)}</div></div>` : ''}
+      ${ep.serverName ? `<div class="detail-row"><div class="detail-label">Server Name</div><div class="detail-value">${escHtml(ep.serverName)}</div></div>` : ''}
+      ${detail.serverSignature ? `<div class="detail-row"><div class="detail-label">Server Software</div><div class="detail-value">${escHtml(detail.serverSignature)}</div></div>` : ''}
+      ${detail.httpForwarding ? `<div class="detail-row"><div class="detail-label">HTTP Redirect</div><div class="detail-value">${escHtml(detail.httpForwarding)}</div></div>` : ''}
+      <div class="detail-row"><div class="detail-label">HSTS</div><div class="detail-value" style="color:${detail.hstsPolicy?.status === 'present' ? 'var(--green)' : 'var(--orange)'}">${detail.hstsPolicy?.status === 'present' ? '✓ Enabled' : '✗ Not set'}</div></div>
+    </div>`;
+  }
+
+  document.getElementById('detailCards').innerHTML = cards;
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// History
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('ssl_history') || '[]'); } catch { return []; }
+}
+
+function saveHistory(domain, data) {
+  const ep = data.endpoints?.[0] || {};
+  const grade = ep.grade || ep.gradeTrustIgnored || '?';
+  let history = getHistory().filter(h => h.domain !== domain);
+  history.unshift({ domain, grade, time: Date.now() });
+  if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+  localStorage.setItem('ssl_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = getHistory();
+  const section = document.getElementById('historySection');
+  const list = document.getElementById('historyList');
+  if (!history.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = history.map(h => {
+    const gradeColor = h.grade?.startsWith('A') ? 'var(--green)' : h.grade?.startsWith('B') ? 'var(--yellow)' : h.grade?.startsWith('C') ? 'var(--orange)' : 'var(--red)';
+    return `<div class="history-item" onclick="checkDomain('${escHtml(h.domain)}')">
+      <span class="hi-grade" style="color:${gradeColor}">${escHtml(h.grade)}</span>
+      ${escHtml(h.domain)}
+    </div>`;
+  }).join('');
+}
+
+function checkDomain(domain) {
+  document.getElementById('domainInput').value = domain;
+  startCheck();
+}
+
+function clearHistory() {
+  localStorage.removeItem('ssl_history');
+  renderHistory();
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

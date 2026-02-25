@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert JSON data to CSV format instantly. Handle nested objects, arrays, and complex structures. Download CSV files or copy to clipboard with one click.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-to-csv/">
+<title>AI JSON to CSV Converter</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--text:#eee;--text2:#aaa;--border:#2a2a4a;--success:#00d2ff;--error:#e94560;--row-alt:rgba(255,255,255,.03)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 6px;background:linear-gradient(135deg,var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:var(--text2);margin-bottom:24px;font-size:.95rem}
+.container{width:100%;max-width:960px}
+textarea{width:100%;height:200px;background:var(--surface);color:var(--text);border:2px solid var(--border);border-radius:10px;padding:14px;font-family:'SF Mono',Consolas,monospace;font-size:.9rem;resize:vertical;transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--success)}
+textarea::placeholder{color:#555}
+.btn-row{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
+button{padding:10px 22px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:transform .1s,opacity .2s}
+button:active{transform:scale(.97)}
+.btn-convert{background:linear-gradient(135deg,var(--success),#0090b0);color:#111}
+.btn-download{background:linear-gradient(135deg,var(--accent),#c0392b);color:#fff}
+.btn-clear{background:var(--surface2);color:var(--text)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.error{background:rgba(233,69,96,.15);border:1px solid var(--accent);color:var(--accent);padding:10px 14px;border-radius:8px;margin:10px 0;display:none;font-size:.9rem}
+.stats{color:var(--text2);font-size:.85rem;margin:8px 0}
+.table-wrap{overflow-x:auto;margin:16px 0;border-radius:10px;border:1px solid var(--border);max-height:420px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{position:sticky;top:0;z-index:1}
+th{background:var(--surface2);color:var(--success);padding:10px 12px;text-align:left;white-space:nowrap;border-bottom:2px solid var(--accent)}
+td{padding:8px 12px;border-bottom:1px solid var(--border);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:nth-child(even){background:var(--row-alt)}
+tr:hover td{background:rgba(0,210,255,.06)}
+footer{margin-top:auto;padding:30px 0 10px;color:#444;font-size:.8rem;text-align:center}
+@media(max-width:600px){
+  body{padding:12px}
+  h1{font-size:1.4rem}
+  textarea{height:150px;font-size:.8rem}
+  .btn-row{flex-direction:column}
+  button{width:100%}
+  td,th{padding:6px 8px;font-size:.78rem}
+}
+</style>
+</head>
+<body>
+<h1>🔄 JSON to CSV Converter</h1>
+<p class="subtitle">Paste JSON, get CSV instantly. Supports nested objects.</p>
+<div class="container">
+  <textarea id="jsonInput" placeholder='Paste your JSON here...&#10;&#10;Examples:&#10;[{"name":"Alice","age":30,"address":{"city":"NYC"}}]&#10;&#10;Or a single object:&#10;{"name":"Bob","score":95}'></textarea>
+  <div class="btn-row">
+    <button class="btn-convert" onclick="convert()">Convert to CSV</button>
+    <button class="btn-download" id="dlBtn" onclick="download()" disabled>⬇ Download CSV</button>
+    <button class="btn-clear" onclick="clearAll()">Clear</button>
+  </div>
+  <div class="error" id="error"></div>
+  <div class="stats" id="stats"></div>
+  <div class="table-wrap" id="tableWrap"></div>
+</div>
+<footer>JSON to CSV Converter — Free Online Tool</footer>
+<script>
+let csvData='';
+
+function flatten(obj,prefix=''){
+  const out={};
+  for(const k in obj){
+    if(!obj.hasOwnProperty(k))continue;
+    const key=prefix?prefix+'.'+k:k;
+    const v=obj[k];
+    if(v&&typeof v==='object'&&!Array.isArray(v)){
+      Object.assign(out,flatten(v,key));
+    }else if(Array.isArray(v)){
+      out[key]=JSON.stringify(v);
+    }else{
+      out[key]=v;
+    }
+  }
+  return out;
+}
+
+function escCSV(v){
+  if(v==null)return'';
+  const s=String(v);
+  if(s.includes(',')||s.includes('"')||s.includes('\n'))
+    return'"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+
+function convert(){
+  const raw=document.getElementById('jsonInput').value.trim();
+  const errEl=document.getElementById('error');
+  const statsEl=document.getElementById('stats');
+  const tableEl=document.getElementById('tableWrap');
+  errEl.style.display='none';statsEl.textContent='';tableEl.innerHTML='';csvData='';
+  document.getElementById('dlBtn').disabled=true;
+
+  if(!raw){showErr('Please paste some JSON data.');return;}
+
+  let parsed;
+  try{parsed=JSON.parse(raw);}catch(e){showErr('Invalid JSON: '+e.message);return;}
+
+  let rows;
+  if(Array.isArray(parsed)){
+    if(!parsed.length){showErr('JSON array is empty.');return;}
+    rows=parsed.map(r=>(typeof r==='object'&&r)?flatten(r):{'value':r});
+  }else if(typeof parsed==='object'&&parsed){
+    rows=[flatten(parsed)];
+  }else{
+    showErr('JSON must be an object or array of objects.');return;
+  }
+
+  const colSet=new Set();
+  rows.forEach(r=>Object.keys(r).forEach(k=>colSet.add(k)));
+  const cols=[...colSet];
+
+  const lines=[cols.map(escCSV).join(',')];
+  rows.forEach(r=>{lines.push(cols.map(c=>escCSV(r[c])).join(','));});
+  csvData=lines.join('\n');
+
+  statsEl.textContent=rows.length+' row'+(rows.length>1?'s':'')+' × '+cols.length+' column'+(cols.length>1?'s':'');
+
+  let html='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
+  const show=Math.min(rows.length,200);
+  for(let i=0;i<show;i++){
+    html+='<tr>'+cols.map(c=>'<td title="'+esc(String(rows[i][c]??''))+'">'+esc(String(rows[i][c]??''))+'</td>').join('')+'</tr>';
+  }
+  if(rows.length>200)html+='<tr><td colspan="'+cols.length+'" style="text-align:center;color:var(--text2)">... and '+(rows.length-200)+' more rows</td></tr>';
+  html+='</tbody></table>';
+  tableEl.innerHTML=html;
+  document.getElementById('dlBtn').disabled=false;
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function showErr(msg){const e=document.getElementById('error');e.textContent='⚠️ '+msg;e.style.display='block';}
+
+function download(){
+  if(!csvData)return;
+  const bom='\uFEFF';
+  const blob=new Blob([bom+csvData],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='data.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function clearAll(){
+  document.getElementById('jsonInput').value='';
+  document.getElementById('error').style.display='none';
+  document.getElementById('stats').textContent='';
+  document.getElementById('tableWrap').innerHTML='';
+  csvData='';document.getElementById('dlBtn').disabled=true;
+}
+
+document.getElementById('jsonInput').addEventListener('input',function(){
+  clearTimeout(this._t);
+  this._t=setTimeout(()=>{if(this.value.trim())convert();},500);
+});
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{margin-top:32px;position:relative;max-width:960px;width:100%}
+.pro-section h2{text-align:center;font-size:1.3rem;margin-bottom:16px;color:var(--accent)}
+.pro-mock{position:relative;border-radius:10px;overflow:hidden;cursor:pointer}
+.pro-mock-inner{filter:blur(3px);opacity:.7;pointer-events:none;padding:16px;background:var(--surface);border-radius:10px}
+.pro-mock-card{background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:10px}
+.pro-mock-card .pm-title{font-size:.8rem;color:var(--success);font-weight:600;text-transform:uppercase;margin-bottom:4px}
+.pro-mock-card .pm-desc{font-size:.85rem;color:var(--text2)}
+.pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);border-radius:10px;z-index:2}
+.pro-lock-icon{font-size:2.8rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.05rem;font-weight:600;color:#fff}
+.pro-lock-sub{font-size:.85rem;color:var(--text2);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;position:relative;border:1px solid rgba(233,69,96,.3);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;color:#fff}
+.pro-modal .price{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:10px 0 18px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:24px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.92rem;color:var(--text)}
+.pro-modal ul li::before{content:'✓ ';color:var(--success);font-weight:700}
+.pro-modal .btn-upgrade{display:block;width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--success),#0090b0);color:#111;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .2s;margin-bottom:10px}
+.pro-modal .btn-upgrade:hover{opacity:.9}
+.pro-modal .btn-later{background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:8px;transition:color .2s}
+.pro-modal .btn-later:hover{color:var(--text)}
+</style>
+<div class="pro-section">
+  <h2>⚡ Pro Features</h2>
+  <div class="pro-mock" id="proMock">
+    <div class="pro-mock-inner">
+      <div class="pro-mock-card">
+        <div class="pm-title">Large File Processing</div>
+        <div class="pm-desc">Handle JSON files up to 500MB with streaming parser — no browser crashes</div>
+      </div>
+      <div class="pro-mock-card">
+        <div class="pm-title">Custom Field Mapping</div>
+        <div class="pm-desc">Rename columns, reorder fields, apply transforms (date format, number rounding...)</div>
+      </div>
+      <div class="pro-mock-card">
+        <div class="pm-title">REST API Access</div>
+        <div class="pm-desc">POST /api/convert — integrate JSON→CSV conversion into your workflow programmatically</div>
+      </div>
+    </div>
+    <div class="pro-lock-overlay">
+      <div class="pro-lock-icon">🔒</div>
+      <div class="pro-lock-text">Unlock Pro Features</div>
+      <div class="pro-lock-sub">Large Files · Custom Mapping · API</div>
+    </div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal">
+  <div class="pro-modal">
+    <h3>🔒 JSON to CSV Pro</h3>
+    <div class="price">$9</div>
+    <ul>
+      <li>Large file processing — up to 500MB JSON</li>
+      <li>Custom field mapping & column renaming</li>
+      <li>Data transforms (dates, numbers, strings)</li>
+      <li>REST API access for automation</li>
+      <li>Priority support & lifetime updates</li>
+    </ul>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn-upgrade">Upgrade to Pro — $9</a>
+    <button class="btn-later" id="proModalClose">Maybe later</button>
+  </div>
+</div>
+<script>
+document.getElementById('proMock').addEventListener('click',function(){document.getElementById('proModal').classList.add('active');});
+document.getElementById('proModalClose').addEventListener('click',function(e){e.stopPropagation();document.getElementById('proModal').classList.remove('active');});
+document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

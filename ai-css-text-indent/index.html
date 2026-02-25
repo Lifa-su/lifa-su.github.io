@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS text-indent generator tool. Set paragraph indentation with pixels, em, rem, or percentage values. Preview hanging indents and first-line text offsets.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-text-indent/">
+<title>AI CSS Text Indent Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{font-size:1.8rem;margin:20px 0 8px;text-align:center;background:linear-gradient(135deg,#00d2ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sub{color:#888;margin-bottom:30px;text-align:center;font-size:.95rem}
+.box{width:100%;max-width:800px}
+.card{background:#16213e;border-radius:12px;padding:24px;margin-bottom:20px;border:1px solid #0f3460}
+.card h2{font-size:1.1rem;margin-bottom:16px;color:#00d2ff}
+.cr{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.cr label{min-width:120px;font-size:.9rem;color:#aaa}
+.rw{flex:1;min-width:150px;display:flex;align-items:center;gap:10px}
+input[type=range]{flex:1;-webkit-appearance:none;height:6px;background:#0f3460;border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#7b2ff7;border-radius:50%;cursor:pointer}
+input[type=number]{width:80px;padding:6px 8px;background:#0f3460;border:1px solid #1a1a4e;border-radius:6px;color:#e0e0e0;font-size:.9rem;text-align:center}
+input[type=number]:focus{outline:none;border-color:#7b2ff7}
+select{padding:6px 10px;background:#0f3460;border:1px solid #1a1a4e;border-radius:6px;color:#e0e0e0;font-size:.9rem}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{padding:8px 18px;border-radius:8px;border:1px solid #0f3460;background:transparent;color:#aaa;cursor:pointer;font-size:.9rem;transition:all .2s}
+.tab.active{background:#7b2ff7;color:#fff;border-color:#7b2ff7}
+.pv{background:#0d1117;border-radius:8px;padding:20px;min-height:120px;border:1px solid #1a1a4e;font-size:1rem;line-height:1.7;color:#c9d1d9}
+.cb{position:relative;background:#0d1117;border-radius:8px;padding:16px 70px 16px 16px;border:1px solid #1a1a4e;font-family:Consolas,monospace;font-size:.88rem;color:#7ee787;white-space:pre;overflow-x:auto;line-height:1.6}
+.cp{position:absolute;top:10px;right:10px;padding:6px 14px;background:#7b2ff7;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.8rem}
+.cp:hover{background:#6a1fe0}
+.cp.ok{background:#238636}
+.hn{background:#1a1a3e;border-left:3px solid #7b2ff7;padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:14px;font-size:.85rem;color:#aaa;display:none}
+footer{margin-top:auto;padding:30px 0 10px;text-align:center;color:#555;font-size:.8rem}
+footer a{color:#7b2ff7;text-decoration:none}
+@media(max-width:600px){body{padding:12px}h1{font-size:1.4rem}.card{padding:16px}.cr{flex-direction:column;align-items:flex-start;gap:8px}.cr label{min-width:auto}.rw{width:100%}}
+</style>
+</head>
+<body>
+<h1>CSS Text Indent Generator</h1>
+<p class="sub">Generate text-indent CSS with live preview</p>
+<div class="box">
+  <div class="card"><h2>Settings</h2>
+    <div class="tabs"><button class="tab active" data-m="fl" onclick="sm('fl')">First-line Indent</button><button class="tab" data-m="hg" onclick="sm('hg')">Hanging Indent</button></div>
+    <div id="hn" class="hn">Hanging indent: negative text-indent + padding-left indents all lines except the first.</div>
+    <div class="cr"><label for="iv">Indent Value</label><div class="rw"><input type="range" id="ir" min="-200" max="200" value="40" oninput="sr()"><input type="number" id="iv" value="40" oninput="sn()"></div><select id="iu" onchange="up()"><option value="px">px</option><option value="em">em</option><option value="rem">rem</option><option value="%">%</option></select></div>
+    <div class="cr" id="pr" style="display:none"><label for="pv">Padding Left</label><div class="rw"><input type="range" id="prr" min="0" max="200" value="40" oninput="spr()"><input type="number" id="pv" value="40" oninput="spn()"></div><select id="pu" onchange="up()"><option value="px">px</option><option value="em">em</option><option value="rem">rem</option><option value="%">%</option></select></div>
+  </div>
+  <div class="card"><h2>Live Preview</h2><div class="pv"><p id="pt">The text-indent CSS property sets the length of empty space before lines of text in a block. This sample paragraph shows how text-indent works. Adjust the controls above to see the effect in real time. Positive values indent the first line; negative values create an outdent effect.</p></div></div>
+  <div class="card"><h2>Generated CSS</h2><div class="cb" id="co"></div><button class="cp" id="cpb" onclick="cc()">Copy</button></div>
+</div>
+<footer>CSS Text Indent Generator &mdash; <a href="https://github.com/Lifa-su">Lifa-su</a></footer>
+<script>
+let md='fl';
+function sm(m){md=m;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.m===m));document.getElementById('hn').style.display=m==='hg'?'block':'none';document.getElementById('pr').style.display=m==='hg'?'flex':'none';if(m==='hg'){let v=Math.abs(parseInt(document.getElementById('iv').value));document.getElementById('iv').value=-v;document.getElementById('ir').value=-v;}else{let v=Math.abs(parseInt(document.getElementById('iv').value));document.getElementById('iv').value=v;document.getElementById('ir').value=v;}up();}
+function sr(){document.getElementById('iv').value=document.getElementById('ir').value;up();}
+function sn(){document.getElementById('ir').value=document.getElementById('iv').value;up();}
+function spr(){document.getElementById('pv').value=document.getElementById('prr').value;up();}
+function spn(){document.getElementById('prr').value=document.getElementById('pv').value;up();}
+function up(){
+  let v=document.getElementById('iv').value,u=document.getElementById('iu').value;
+  let pt=document.getElementById('pt'),co=document.getElementById('co');
+  let ti=v+u;
+  if(md==='fl'){
+    pt.style.textIndent=ti;pt.style.paddingLeft='0';
+    co.textContent='.element {\n  text-indent: '+ti+';\n}';
+  }else{
+    let pv=document.getElementById('pv').value,pu=document.getElementById('pu').value;
+    let pl=pv+pu;
+    pt.style.textIndent=ti;pt.style.paddingLeft=pl;
+    co.textContent='.element {\n  text-indent: '+ti+';\n  padding-left: '+pl+';\n}';
+  }
+}
+function cc(){
+  let t=document.getElementById('co').textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    let b=document.getElementById('cpb');b.textContent='Copied!';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='Copy';b.classList.remove('ok');},2000);
+  });
+}
+up();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert text to beautiful images with AI styling. Create social media quotes, code screenshots, and text graphics with custom fonts, colors, and backgrounds.">
+<link rel="canonical" href="https://lifa-su.com/ai-text-diff-image/">
+<title>AI Text to Image - 文本转图片工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f13;--s:#1a1a24;--s2:#24243a;--bd:#2d2d44;--t:#e4e4f0;--t2:#9999b0;--ac:#6c5ce7;--ac2:#a29bfe}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;display:flex;flex-direction:column}
+.app{flex:1;display:flex;flex-direction:column;max-width:1400px;margin:0 auto;width:100%;padding:16px}
+header{text-align:center;padding:20px 0 16px}
+header h1{font-size:1.6rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--t2);font-size:.85rem;margin-top:4px}
+.main{display:grid;grid-template-columns:340px 1fr;gap:16px;flex:1;min-height:0}
+.panel{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px;overflow-y:auto;max-height:calc(100vh - 140px)}
+.panel h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:10px;margin-top:14px}
+.panel h3:first-child{margin-top:0}
+textarea{width:100%;height:120px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--t);padding:10px;font-size:.9rem;resize:vertical;font-family:inherit}
+textarea:focus{outline:none;border-color:var(--ac)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row label{font-size:.8rem;color:var(--t2);min-width:48px}
+select,input[type=number]{background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t);padding:6px 8px;font-size:.82rem;flex:1;min-width:0}
+select:focus,input:focus{outline:none;border-color:var(--ac)}
+input[type=range]{flex:1;accent-color:var(--ac)}
+input[type=color]{width:36px;height:30px;border:1px solid var(--bd);border-radius:6px;background:var(--s2);cursor:pointer;padding:2px}
+.presets{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pbtn{background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t);padding:6px 8px;font-size:.75rem;cursor:pointer;text-align:center;transition:all .15s}
+.pbtn:hover,.pbtn.on{border-color:var(--ac);background:rgba(108,92,231,.15);color:var(--ac2)}
+.csz{display:flex;gap:6px;margin-top:6px}
+.csz input{width:50%;background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t);padding:6px 8px;font-size:.82rem}
+.abtn{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t);padding:6px;cursor:pointer;font-size:.9rem;text-align:center;transition:all .15s}
+.abtn:hover,.abtn.on{border-color:var(--ac);background:rgba(108,92,231,.15)}
+.prev{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cwrap{background:repeating-conic-gradient(#22223a 0% 25%,#1a1a2e 0% 50%) 0 0/16px 16px;border-radius:8px;overflow:hidden;display:inline-block;max-width:100%;max-height:calc(100vh - 200px)}
+canvas{display:block;max-width:100%;height:auto}
+.ebar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+.btn{background:var(--ac);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:.85rem;cursor:pointer;font-weight:600;transition:all .15s}
+.btn:hover{background:var(--ac2);color:#111}
+.btn2{background:var(--s2);border:1px solid var(--bd);color:var(--t);border-radius:8px;padding:8px 20px;font-size:.85rem;cursor:pointer;transition:all .15s}
+.btn2:hover{border-color:var(--ac)}
+.qr{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--t2)}
+.qr input[type=range]{width:80px}
+.sw{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--t2);margin-bottom:8px}
+.sw input{accent-color:var(--ac)}
+footer{text-align:center;padding:16px;color:var(--t2);font-size:.75rem}
+@media(max-width:800px){.main{grid-template-columns:1fr}.panel{max-height:none}.cwrap{max-height:50vh}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>✨ AI Text to Image</h1><p>将文字转换为精美社交媒体图片</p></header>
+<div class="main">
+<div class="panel">
+<h3>📝 文本内容</h3>
+<textarea id="txt" placeholder="输入你的文字内容...">Hello World
+你好世界</textarea>
+<h3>🔤 字体</h3>
+<div class="row"><label>字体</label>
+<select id="ff"><option value="system-ui">System UI</option><option value="-apple-system">Apple System</option><option value="Arial">Arial</option><option value="Helvetica Neue">Helvetica Neue</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="Verdana">Verdana</option><option value="Impact">Impact</option><option value="PingFang SC">苹方</option><option value="Microsoft YaHei">微软雅黑</option></select></div>
+<div class="row"><label>字号</label><input type="range" id="fs" min="12" max="120" value="36"><span id="fsV">36px</span></div>
+<div class="row"><label>行高</label><input type="range" id="lh" min="10" max="30" value="15"><span id="lhV">1.5</span></div>
+<div class="row"><label>文字色</label><input type="color" id="tc" value="#ffffff"></div>
+<label class="sw"><input type="checkbox" id="bld"> 粗体</label>
+<label class="sw"><input type="checkbox" id="itl"> 斜体</label>
+<h3>📐 对齐</h3>
+<div class="row" style="gap:6px">
+<button class="abtn on" data-a="center">居中</button>
+<button class="abtn" data-a="left">左对齐</button>
+<button class="abtn" data-a="right">右对齐</button>
+</div>
+<h3>🎨 背景</h3>
+<div class="row"><label>颜色1</label><input type="color" id="bg1" value="#1a1a2e"></div>
+<div class="row"><label>颜色2</label><input type="color" id="bg2" value="#16213e"></div>
+<label class="sw"><input type="checkbox" id="grad" checked> 渐变背景</label>
+<div class="row"><label>方向</label>
+<select id="gdir"><option value="tb">上→下</option><option value="bt">下→上</option><option value="lr">左→右</option><option value="rl">右→左</option><option value="d1">左上→右下</option><option value="d2">右上→左下</option></select></div>
+<h3>📏 尺寸</h3>
+<div class="presets">
+<button class="pbtn on" data-w="1080" data-h="1080">Instagram<br>1080×1080</button>
+<button class="pbtn" data-w="1200" data-h="675">Twitter<br>1200×675</button>
+<button class="pbtn" data-w="1200" data-h="630">Facebook<br>1200×630</button>
+<button class="pbtn" data-w="0" data-h="0">自定义</button>
+</div>
+<div class="csz" id="cszBox" style="display:none">
+<input type="number" id="cw" placeholder="宽" value="800" min="100" max="4096">
+<input type="number" id="ch" placeholder="高" value="600" min="100" max="4096">
+</div>
+<h3>📦 内边距</h3>
+<div class="row"><label>边距</label><input type="range" id="pad" min="0" max="200" value="60"><span id="padV">60px</span></div>
+</div>
+<div class="prev">
+<div class="cwrap"><canvas id="cv" width="1080" height="1080"></canvas></div>
+<div class="ebar">
+<button class="btn" id="dlPng">导出 PNG</button>
+<button class="btn2" id="dlJpg">导出 JPEG</button>
+<div class="qr"><label>质量</label><input type="range" id="qual" min="10" max="100" value="92"><span id="qualV">92%</span></div>
+</div>
+</div>
+</div>
+</div>
+<footer>AI Text to Image Tool &copy; 2025</footer>
+<script>
+const $ = s => document.querySelector(s);
+const cv = $('#cv'), ctx = cv.getContext('2d');
+let W = 1080, H = 1080, align = 'center';
+
+function render() {
+  const text = $('#txt').value;
+  const font = $('#ff').value;
+  const size = +$('#fs').value;
+  const lh = +$('#lh').value / 10;
+  const color = $('#tc').value;
+  const bold = $('#bld').checked ? 'bold ' : '';
+  const italic = $('#itl').checked ? 'italic ' : '';
+  const bg1 = $('#bg1').value;
+  const bg2 = $('#bg2').value;
+  const useGrad = $('#grad').checked;
+  const gdir = $('#gdir').value;
+  const pad = +$('#pad').value;
+
+  cv.width = W; cv.height = H;
+
+  if (useGrad) {
+    let x0=0,y0=0,x1=0,y1=H;
+    if(gdir==='bt'){y0=H;y1=0}
+    else if(gdir==='lr'){x1=W;y1=0}
+    else if(gdir==='rl'){x0=W;x1=0;y1=0}
+    else if(gdir==='d1'){x1=W}
+    else if(gdir==='d2'){x0=W;x1=0}
+    const g = ctx.createLinearGradient(x0,y0,x1,y1);
+    g.addColorStop(0, bg1);
+    g.addColorStop(1, bg2);
+    ctx.fillStyle = g;
+  } else {
+    ctx.fillStyle = bg1;
+  }
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = color;
+  ctx.font = italic + bold + size + 'px "' + font + '", system-ui, sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.textAlign = align;
+
+  const lines = text.split('\n');
+  const lineH = size * lh;
+  const totalH = lines.length * lineH;
+  let startY = (H - totalH) / 2;
+  let x = align === 'center' ? W/2 : align === 'right' ? W - pad : pad;
+
+  lines.forEach((line, i) => {
+    ctx.fillText(line, x, startY + i * lineH);
+  });
+}
+
+// Update display values
+$('#fs').oninput = function(){ $('#fsV').textContent = this.value+'px'; render(); };
+$('#lh').oninput = function(){ $('#lhV').textContent = (this.value/10).toFixed(1); render(); };
+$('#pad').oninput = function(){ $('#padV').textContent = this.value+'px'; render(); };
+$('#qual').oninput = function(){ $('#qualV').textContent = this.value+'%'; };
+
+// Text and style changes
+$('#txt').oninput = render;
+$('#ff').onchange = render;
+$('#tc').oninput = render;
+$('#bld').onchange = render;
+$('#itl').onchange = render;
+$('#bg1').oninput = render;
+$('#bg2').oninput = render;
+$('#grad').onchange = render;
+$('#gdir').onchange = render;
+
+// Align buttons
+document.querySelectorAll('.abtn').forEach(b => {
+  b.onclick = function() {
+    document.querySelectorAll('.abtn').forEach(x => x.classList.remove('on'));
+    this.classList.add('on');
+    align = this.dataset.a;
+    render();
+  };
+});
+
+// Size presets
+document.querySelectorAll('.pbtn').forEach(b => {
+  b.onclick = function() {
+    document.querySelectorAll('.pbtn').forEach(x => x.classList.remove('on'));
+    this.classList.add('on');
+    const w = +this.dataset.w, h = +this.dataset.h;
+    if (w === 0) {
+      $('#cszBox').style.display = 'flex';
+      W = +$('#cw').value; H = +$('#ch').value;
+    } else {
+      $('#cszBox').style.display = 'none';
+      W = w; H = h;
+    }
+    render();
+  };
+});
+$('#cw').oninput = function(){ W = +this.value; render(); };
+$('#ch').oninput = function(){ H = +this.value; render(); };
+
+// Export
+function dl(type) {
+  const q = +$('#qual').value / 100;
+  const link = document.createElement('a');
+  link.download = 'text-image.' + type;
+  link.href = cv.toDataURL('image/' + (type==='jpg'?'jpeg':type), q);
+  link.click();
+}
+$('#dlPng').onclick = () => dl('png');
+$('#dlJpg').onclick = () => dl('jpg');
+
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

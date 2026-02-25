@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Border Radius Generator</title>
+<meta name="description" content="Advanced CSS border-radius generator with 8 control points, visual drag editor, preset shapes, and real-time preview.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-border-radius/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--rad:12px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.header{text-align:center;padding:2rem 1rem 1rem}
+.header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text2);margin-top:.4rem;font-size:.95rem}
+.app{display:flex;gap:1.5rem;padding:1.5rem;max-width:1200px;margin:0 auto;width:100%;flex:1}
+.panel{background:var(--surface);border-radius:var(--rad);padding:1.5rem;border:1px solid rgba(255,255,255,.06)}
+.panel-left{flex:1;min-width:0}
+.panel-right{width:340px;display:flex;flex-direction:column;gap:1rem}
+.preview-wrap{position:relative;width:100%;aspect-ratio:1;max-width:500px;margin:0 auto}
+.preview-box{width:100%;height:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));position:relative}
+.preview-box .inner{position:absolute;inset:4px;background:var(--surface);border-radius:inherit;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--text2)}
+.cp{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:grab;z-index:10;transform:translate(-50%,-50%);transition:box-shadow .2s}
+.cp:hover,.cp.active{box-shadow:0 0 14px var(--accent);transform:translate(-50%,-50%) scale(1.3)}
+.section-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:.7rem;font-weight:600}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.preset-btn{background:var(--surface2);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.5rem .3rem;color:var(--text);font-size:.75rem;cursor:pointer;transition:all .2s;text-align:center}
+.preset-btn:hover,.preset-btn.active{border-color:var(--accent);background:rgba(233,69,96,.15)}
+.preset-btn .ico{display:block;width:30px;height:30px;margin:0 auto .25rem;background:var(--accent);opacity:.65}
+.sliders{display:flex;flex-direction:column;gap:.55rem}
+.sr{display:flex;align-items:center;gap:.5rem}
+.sr label{font-size:.72rem;color:var(--text2);width:48px;flex-shrink:0}
+.sr input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:var(--surface2);border-radius:2px;outline:none}
+.sr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+.sr .v{font-size:.72rem;color:var(--text2);width:32px;text-align:right}
+.code-box{background:#0d1117;border-radius:8px;padding:1rem;font-family:'SF Mono',Consolas,monospace;font-size:.8rem;line-height:1.6;color:#c9d1d9;position:relative;word-break:break-all;border:1px solid rgba(255,255,255,.06)}
+.copy-btn{position:absolute;top:.5rem;right:.5rem;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:.3rem .7rem;font-size:.72rem;cursor:pointer;font-weight:600}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:#2ea043}
+.footer{text-align:center;padding:1.5rem;color:var(--text2);font-size:.72rem;border-top:1px solid rgba(255,255,255,.04)}
+@media(max-width:800px){.app{flex-direction:column}.panel-right{width:100%}.preview-wrap{max-width:350px}}
+@media(max-width:480px){.header h1{font-size:1.3rem}.app{padding:1rem}.presets{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>CSS Border Radius Generator</h1>
+<p>Drag the 8 control points or pick a preset to craft complex shapes</p>
+</div>
+<div class="app">
+<div class="panel panel-left">
+<div class="preview-wrap" id="pw">
+<div class="preview-box" id="box"><div class="inner">Drag the dots</div></div>
+</div>
+</div>
+<div class="panel-right">
+<div class="panel"><div class="section-title">Presets</div><div class="presets" id="presets"></div></div>
+<div class="panel"><div class="section-title">Values (%)</div><div class="sliders" id="sliders"></div></div>
+<div class="panel"><div class="section-title">CSS Output</div>
+<div class="code-box"><button class="copy-btn" id="cpb">Copy</button><code id="out"></code></div>
+</div>
+</div>
+</div>
+<div class="footer">CSS Border Radius Generator</div>
+<script>
+(function(){
+var V=[50,50,50,50,50,50,50,50];
+var N=['TL-H','TR-H','BR-H','BL-H','TL-V','TR-V','BR-V','BL-V'];
+var pw=document.getElementById('pw'),box=document.getElementById('box');
+var out=document.getElementById('out'),cpb=document.getElementById('cpb');
+var dots=[],sliderEls=[],valEls=[];
+
+var presets=[
+{name:'Rounded',icon:'border-radius:8px',v:[20,20,20,20,20,20,20,20]},
+{name:'Circle',icon:'border-radius:50%',v:[50,50,50,50,50,50,50,50]},
+{name:'Ellipse',icon:'border-radius:50% 50% 50% 50%/30% 30% 30% 30%',v:[50,50,50,50,30,30,30,30]},
+{name:'Capsule',icon:'border-radius:50% 50% 50% 50%/50% 50% 50% 50%',v:[50,50,50,50,50,50,50,50]},
+{name:'Drop',icon:'border-radius:50% 50% 50% 0',v:[50,50,50,0,50,50,50,0]},
+{name:'Leaf',icon:'border-radius:50% 0 50% 0',v:[50,0,50,0,50,0,50,0]},
+{name:'Egg',icon:'border-radius:50% 50% 50% 50%/60% 60% 40% 40%',v:[50,50,50,50,60,60,40,40]},
+{name:'Blob',icon:'border-radius:30% 70% 70% 30%/30% 30% 70% 70%',v:[30,70,70,30,30,30,70,70]},
+{name:'Shield',icon:'border-radius:50% 50% 20% 20%/80% 80% 20% 20%',v:[50,50,20,20,80,80,20,20]},
+{name:'Pebble',icon:'border-radius:40% 60% 55% 45%/45% 50% 50% 55%',v:[40,60,55,45,45,50,50,55]},
+{name:'Heart-L',icon:'border-radius:0 50% 50% 50%',v:[0,50,50,50,0,50,50,50]},
+{name:'Diamond',icon:'border-radius:10% 50% 10% 50%/50% 10% 50% 10%',v:[10,50,10,50,50,10,50,10]}
+];
+
+function getCss(){
+var h=V.slice(0,4).map(function(x){return x+'%'}).join(' ');
+var vv=V.slice(4).map(function(x){return x+'%'}).join(' ');
+return 'border-radius: '+h+' / '+vv+';';
+}
+
+function getBR(){
+var h=V.slice(0,4).map(function(x){return x+'%'}).join(' ');
+var vv=V.slice(4).map(function(x){return x+'%'}).join(' ');
+return h+' / '+vv;
+}
+
+function update(){
+box.style.borderRadius=getBR();
+out.textContent=getCss();
+for(var i=0;i<8;i++){
+sliderEls[i].value=V[i];
+valEls[i].textContent=V[i];
+}
+placeDots();
+}
+
+// Control point positions on the box edge
+// H values: distance along horizontal edge from the corner
+// V values: distance along vertical edge from the corner
+function placeDots(){
+var w=pw.offsetWidth,h=pw.offsetHeight;
+// TL-H: top edge, from left
+dots[0].style.left=V[0]+'%';dots[0].style.top='0';
+// TR-H: top edge, from right
+dots[1].style.left=(100-V[1])+'%';dots[1].style.top='0';
+// BR-H: bottom edge, from right
+dots[2].style.left=(100-V[2])+'%';dots[2].style.top='100%';
+// BL-H: bottom edge, from left
+dots[3].style.left=V[3]+'%';dots[3].style.top='100%';
+// TL-V: left edge, from top
+dots[4].style.left='0';dots[4].style.top=V[4]+'%';
+// TR-V: right edge, from top
+dots[5].style.left='100%';dots[5].style.top=V[5]+'%';
+// BR-V: right edge, from bottom
+dots[6].style.left='100%';dots[6].style.top=(100-V[6])+'%';
+// BL-V: left edge, from bottom
+dots[7].style.left='0';dots[7].style.top=(100-V[7])+'%';
+}
+
+// Create dots
+for(var i=0;i<8;i++){
+var d=document.createElement('div');
+d.className='cp';
+d.setAttribute('data-i',i);
+d.title=N[i];
+pw.appendChild(d);
+dots.push(d);
+}
+
+// Drag logic
+var dragging=null;
+function onDown(e){
+e.preventDefault();
+var idx=parseInt(this.getAttribute('data-i'));
+dragging=idx;
+this.classList.add('active');
+}
+for(var i=0;i<8;i++){
+dots[i].addEventListener('mousedown',onDown);
+dots[i].addEventListener('touchstart',onDown,{passive:false});
+}
+
+function onMove(e){
+if(dragging===null)return;
+e.preventDefault();
+var rect=pw.getBoundingClientRect();
+var cx=((e.touches?e.touches[0].clientX:e.clientX)-rect.left)/rect.width*100;
+var cy=((e.touches?e.touches[0].clientY:e.clientY)-rect.top)/rect.height*100;
+cx=Math.max(0,Math.min(100,cx));
+cy=Math.max(0,Math.min(100,cy));
+var idx=dragging;
+if(idx<4){
+// Horizontal control points
+if(idx===0)V[0]=Math.round(cx);
+else if(idx===1)V[1]=Math.round(100-cx);
+else if(idx===2)V[2]=Math.round(100-cx);
+else V[3]=Math.round(cx);
+}else{
+// Vertical control points
+if(idx===4)V[4]=Math.round(cy);
+else if(idx===5)V[5]=Math.round(cy);
+else if(idx===6)V[6]=Math.round(100-cy);
+else V[7]=Math.round(100-cy);
+}
+V[idx]=Math.max(0,Math.min(100,V[idx]));
+update();
+}
+function onUp(){
+if(dragging!==null)dots[dragging].classList.remove('active');
+dragging=null;
+}
+document.addEventListener('mousemove',onMove);
+document.addEventListener('touchmove',onMove,{passive:false});
+document.addEventListener('mouseup',onUp);
+document.addEventListener('touchend',onUp);
+
+// Sliders
+var sl=document.getElementById('sliders');
+for(var i=0;i<8;i++){
+var row=document.createElement('div');row.className='sr';
+var lb=document.createElement('label');lb.textContent=N[i];
+var inp=document.createElement('input');inp.type='range';inp.min=0;inp.max=100;inp.value=V[i];
+inp.setAttribute('data-i',i);
+var sp=document.createElement('span');sp.className='v';sp.textContent=V[i];
+row.appendChild(lb);row.appendChild(inp);row.appendChild(sp);
+sl.appendChild(row);
+sliderEls.push(inp);valEls.push(sp);
+inp.addEventListener('input',function(){
+var idx=parseInt(this.getAttribute('data-i'));
+V[idx]=parseInt(this.value);
+update();
+});
+}
+
+// Presets
+var pr=document.getElementById('presets');
+presets.forEach(function(p){
+var btn=document.createElement('button');btn.className='preset-btn';
+var ico=document.createElement('span');ico.className='ico';ico.style.cssText=p.icon;
+var txt=document.createTextNode(p.name);
+btn.appendChild(ico);btn.appendChild(txt);
+btn.addEventListener('click',function(){
+for(var j=0;j<8;j++)V[j]=p.v[j];
+update();
+document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active')});
+btn.classList.add('active');
+});
+pr.appendChild(btn);
+});
+
+// Copy
+cpb.addEventListener('click',function(){
+navigator.clipboard.writeText(getCss()).then(function(){
+cpb.textContent='Copied!';cpb.classList.add('copied');
+setTimeout(function(){cpb.textContent='Copy';cpb.classList.remove('copied')},1500);
+});
+});
+
+update();
+})();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1200px;margin:40px auto 0;padding:0 1.5rem;position:relative;cursor:pointer}
+.pro-section .pro-title{font-size:1.2rem;font-weight:700;color:var(--accent);margin-bottom:16px;text-align:center}
+.pro-mock{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px;background:var(--surface);border-radius:16px;filter:blur(4px);pointer-events:none;user-select:none}
+.pro-mock-card{background:var(--surface2);border-radius:12px;padding:20px;text-align:center}
+.pro-mock-card .icon{font-size:2rem;margin-bottom:8px}
+.pro-mock-card h3{font-size:.9rem;color:var(--text);margin-bottom:6px}
+.pro-mock-card p{font-size:.75rem;color:var(--text2)}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+.pro-lock .lock-icon{font-size:3rem;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(233,69,96,.4))}
+.pro-lock .lock-text{font-size:1.1rem;font-weight:600;color:#fff;background:rgba(233,69,96,.85);padding:8px 24px;border-radius:20px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:20px;padding:36px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:2rem;font-weight:800;color:var(--accent);margin:12px 0}
+.pro-modal .price span{font-size:.9rem;font-weight:400;color:var(--text2)}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal .btn-upgrade{display:inline-block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#c23152);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-bottom:12px}
+.pro-modal .btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .btn-later{background:none;border:none;color:var(--text2);font-size:.9rem;cursor:pointer;padding:8px}
+.pro-modal .btn-later:hover{color:#ccc}
+@media(max-width:800px){.pro-mock{grid-template-columns:1fr}}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+  <div class="pro-title">⚡ Pro Features</div>
+  <div class="pro-mock">
+    <div class="pro-mock-card"><div class="icon">🎬</div><h3>Animated Radius</h3><p>CSS keyframe animations for morphing shapes</p></div>
+    <div class="pro-mock-card"><div class="icon">📦</div><h3>Batch Generate</h3><p>Generate multiple border-radius variants at once</p></div>
+    <div class="pro-mock-card"><div class="icon">🔌</div><h3>Figma Export</h3><p>Export shapes directly to Figma plugin</p></div>
+  </div>
+  <div class="pro-lock">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-text">Unlock Pro Features</div>
+  </div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="pro-modal">
+    <h2>Border Radius Pro</h2>
+    <div class="price">$9 <span>one-time</span></div>
+    <ul>
+      <li>Animated border-radius with CSS keyframes</li>
+      <li>Batch generate multiple shape variants</li>
+      <li>Figma plugin export</li>
+      <li>SVG path export for complex shapes</li>
+      <li>Lifetime updates</li>
+    </ul>
+    <a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+    <button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+  </div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

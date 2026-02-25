@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI .htaccess Generator - Create Apache Config Rules Instantly</title>
+<meta name="description" content="Free online .htaccess generator. Create Apache configuration rules for redirects, caching, security headers, CORS, Gzip compression, and more with a visual editor.">
+<meta name="keywords" content="htaccess generator, apache config, redirect rules, security headers, CORS, gzip compression, cache control">
+<link rel="canonical" href="https://lifa-su.com/ai-htaccess/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--code-bg:#0d1117;--green:#4ecca3;--yellow:#f0c040;--blue:#4fc3f7;--orange:#ff9800;--pink:#e94560;--comment:#6a737d}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,var(--surface) 0%,var(--accent2) 100%);padding:1.2rem 2rem;text-align:center;border-bottom:2px solid var(--accent)}
+header h1{font-size:1.6rem;font-weight:700;letter-spacing:.5px}
+header h1 span{color:var(--accent)}
+header p{color:var(--text2);font-size:.85rem;margin-top:.3rem}
+.container{display:flex;flex:1;overflow:hidden}
+.panel{overflow-y:auto;padding:1.2rem}
+.left{width:42%;border-right:1px solid var(--border);background:var(--surface)}
+.right{width:58%;background:var(--bg);display:flex;flex-direction:column}
+.rule-group{margin-bottom:.8rem;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);transition:border-color .2s}
+.rule-group:hover{border-color:var(--accent2)}
+.rule-header{display:flex;align-items:center;padding:.7rem .9rem;cursor:pointer;user-select:none;gap:.6rem}
+.rule-header input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.rule-header label{flex:1;cursor:pointer;font-size:.9rem;font-weight:500}
+.rule-header .badge{font-size:.65rem;padding:2px 7px;border-radius:10px;background:var(--accent2);color:var(--text2);white-space:nowrap}
+.rule-header .expand-btn{background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:2px 6px;border-radius:4px;transition:transform .2s}
+.rule-header .expand-btn.open{transform:rotate(180deg)}
+.rule-params{display:none;padding:.6rem .9rem .9rem;border-top:1px solid var(--border);background:rgba(0,0,0,.15)}
+.rule-params.show{display:block}
+.rule-params label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:.25rem;margin-top:.5rem}
+.rule-params label:first-child{margin-top:0}
+.rule-params input,.rule-params select,.rule-params textarea{width:100%;padding:.45rem .6rem;background:var(--surface);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:.82rem;font-family:inherit}
+.rule-params input:focus,.rule-params select:focus,.rule-params textarea:focus{outline:none;border-color:var(--accent)}
+.rule-params textarea{resize:vertical;min-height:50px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem}
+.rule-params .hint{font-size:.7rem;color:var(--text2);margin-top:.2rem;opacity:.7}
+.toolbar{display:flex;gap:.6rem;padding:.8rem 1.2rem;border-bottom:1px solid var(--border);background:var(--surface);align-items:center;flex-wrap:wrap}
+.toolbar button{padding:.5rem 1rem;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:500;display:flex;align-items:center;gap:.4rem;transition:all .2s}
+.btn-copy{background:var(--accent);color:#fff}
+.btn-copy:hover{background:#d63050}
+.btn-download{background:var(--green);color:#111}
+.btn-download:hover{background:#3db88a}
+.btn-clear{background:var(--border);color:var(--text2);margin-left:auto}
+.btn-clear:hover{background:#3a3a5a}
+.toolbar .status{font-size:.78rem;color:var(--green);opacity:0;transition:opacity .3s}
+.toolbar .status.show{opacity:1}
+.code-wrap{flex:1;overflow:auto;padding:1rem 1.2rem}
+pre.code-output{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;min-height:200px;font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:.82rem;line-height:1.6;overflow-x:auto;white-space:pre;tab-size:4;color:var(--text)}
+.empty-state{color:var(--text2);text-align:center;padding:3rem 1rem;font-size:.9rem}
+.empty-state .icon{font-size:2.5rem;margin-bottom:.8rem}
+.search-box{padding:.6rem .9rem;margin-bottom:.6rem}
+.search-box input{width:100%;padding:.5rem .8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}
+.search-box input:focus{outline:none;border-color:var(--accent)}
+.search-box input::placeholder{color:var(--text2)}
+footer{text-align:center;padding:.8rem;color:var(--text2);font-size:.72rem;border-top:1px solid var(--border);background:var(--surface)}
+footer a{color:var(--accent);text-decoration:none}
+.pro-section{position:relative;margin:0;overflow:hidden}
+.pro-inner{position:relative;border-radius:0;overflow:hidden}
+.pro-blur{filter:blur(3px);pointer-events:none;opacity:.7;padding:24px;background:var(--surface);border-top:1px solid var(--border)}
+.pro-blur h3{font-size:.95rem;font-weight:700;margin-bottom:12px;color:var(--text)}
+.pro-blur .mock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.pro-blur .mock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.pro-blur .mock-card .score{font-size:1.8rem;font-weight:800;line-height:1}
+.pro-blur .mock-card .lbl{font-size:.72rem;color:var(--text2);margin-top:4px;text-transform:uppercase}
+.pro-blur .mock-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:8px;font-size:.82rem}
+.pro-blur .mock-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pro-blur .mock-meter{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.pro-blur .mock-meter-fill{height:100%;border-radius:3px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.45);transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.6)}
+.pro-lock{font-size:2.2rem;margin-bottom:8px}
+.pro-cta{font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:.02em}
+.pro-badge{position:absolute;top:12px;right:12px;z-index:3;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.05em}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.open{display:flex}
+.pro-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pm-sub{color:var(--text2);font-size:.88rem;margin-bottom:18px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:22px}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem;display:flex;align-items:center;gap:8px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✓';color:var(--accent);font-weight:700}
+.pro-buy{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;text-align:center}
+.pro-buy:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-later{display:block;margin:12px auto 0;background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;padding:6px}
+.pro-later:hover{color:var(--text)}
+/* syntax highlighting */
+.hl-comment{color:var(--comment);font-style:italic}
+.hl-directive{color:var(--pink);font-weight:600}
+.hl-tag{color:var(--yellow)}
+.hl-string{color:var(--green)}
+.hl-flag{color:var(--orange)}
+.hl-number{color:var(--blue)}
+.hl-section{color:var(--accent);font-weight:700}
+/* mobile */
+@media(max-width:768px){
+.container{flex-direction:column}
+.left,.right{width:100%}
+.left{max-height:50vh;border-right:none;border-bottom:1px solid var(--border)}
+header h1{font-size:1.2rem}
+.toolbar{gap:.4rem}
+.toolbar button{padding:.4rem .7rem;font-size:.78rem}
+}
+/* scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent2)}
+</style>
+</head>
+<body>
+<header>
+<h1>⚙️ AI <span>.htaccess</span> Generator</h1>
+<p>Select rules, customize parameters, and generate your Apache configuration instantly</p>
+</header>
+<div class="container">
+<div class="panel left">
+<div class="search-box"><input type="text" id="searchInput" placeholder="🔍 Search rules..."></div>
+<div id="rulesList"></div>
+</div>
+<div class="panel right">
+<div class="toolbar">
+<button class="btn-copy" onclick="copyCode()">📋 Copy</button>
+<button class="btn-download" onclick="downloadFile()">💾 Download</button>
+<button class="btn-clear" onclick="clearAll()">✕ Clear All</button>
+<span class="status" id="statusMsg"></span>
+</div>
+<div class="code-wrap">
+<pre class="code-output" id="codeOutput"><div class="empty-state"><div class="icon">📝</div>Select rules from the left panel to generate your .htaccess file</div></pre>
+</div>
+</div>
+</div>
+<div class="pro-section">
+<div class="pro-inner">
+<div class="pro-badge">🔒 PRO</div>
+<div class="pro-blur">
+<h3>🛡️ Security Audit</h3>
+<div class="mock-grid">
+<div class="mock-card"><div class="score" style="color:#27ae60">A+</div><div class="lbl">Security Grade</div></div>
+<div class="mock-card"><div class="score" style="color:var(--accent)">94</div><div class="lbl">Performance</div></div>
+<div class="mock-card"><div class="score" style="color:#4fc3f7">12</div><div class="lbl">Rules Active</div></div>
+</div>
+<div class="mock-row"><div class="mock-dot" style="background:#27ae60"></div><span>XSS Protection</span><div class="mock-meter"><div class="mock-meter-fill" style="width:100%;background:#27ae60"></div></div><span style="color:#27ae60;font-size:.72rem">Enabled</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:#27ae60"></div><span>Content-Security-Policy</span><div class="mock-meter"><div class="mock-meter-fill" style="width:85%;background:#27ae60"></div></div><span style="color:#27ae60;font-size:.72rem">Strong</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:#e67e22"></div><span>HSTS Preload</span><div class="mock-meter"><div class="mock-meter-fill" style="width:50%;background:#e67e22"></div></div><span style="color:#e67e22;font-size:.72rem">Partial</span></div>
+<h3 style="margin-top:16px">⚡ Performance Optimization</h3>
+<div class="mock-row"><div class="mock-dot" style="background:#27ae60"></div><span>Gzip Compression</span><span style="margin-left:auto;color:#27ae60;font-size:.72rem">~72% smaller</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:#4fc3f7"></div><span>Browser Caching</span><span style="margin-left:auto;color:#4fc3f7;font-size:.72rem">365 days</span></div>
+<h3 style="margin-top:16px">💾 Auto Backup</h3>
+<div class="mock-row"><div class="mock-dot" style="background:#27ae60"></div><span>Last backup: 2 hours ago</span><span style="margin-left:auto;color:var(--text2);font-size:.72rem">v12 &bull; 2.4 KB</span></div>
+<div class="mock-row"><div class="mock-dot" style="background:var(--text2)"></div><span>Auto-backup on every change</span><span style="margin-left:auto;color:var(--text2);font-size:.72rem">Enabled</span></div>
+</div>
+<div class="pro-overlay" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-lock">🔒</div>
+<div class="pro-cta">Unlock Pro Features</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h2>⚙️ .htaccess Pro</h2>
+<p class="pm-sub">Enterprise Apache configuration toolkit</p>
+<ul>
+<li>Full security audit with A+ grade guidance</li>
+<li>CSP, HSTS, XSS &amp; clickjacking analysis</li>
+<li>Performance optimization recommendations</li>
+<li>One-click Gzip + cache + minify rules</li>
+<li>Version history with auto-backup</li>
+<li>One-click rollback to any version</li>
+</ul>
+<a class="pro-buy" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $14</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<footer>
+AI .htaccess Generator &mdash; Free online tool to create Apache configuration files &bull;
+<a href="https://github.com/Lifa-su/ai-htaccess" target="_blank">GitHub</a>
+</footer>
+<script>
+const RULES=[
+{id:"force-https",name:"Force HTTPS",badge:"Security",params:[],code:()=>`# Force HTTPS\nRewriteEngine On\nRewriteCond %{HTTPS} off\nRewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]`},
+{id:"www-redirect",name:"WWW Redirect",badge:"Redirect",params:[{key:"dir",label:"Direction",type:"select",options:["non-www to www","www to non-www"],default:"non-www to www"}],code:(p)=>{
+if(p.dir==="www to non-www") return `# Redirect www to non-www\nRewriteEngine On\nRewriteCond %{HTTP_HOST} ^www\\.(.+)$ [NC]\nRewriteRule ^(.*)$ https://%1/$1 [R=301,L]`;
+return `# Redirect non-www to www\nRewriteEngine On\nRewriteCond %{HTTP_HOST} !^www\\. [NC]\nRewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]`}},
+{id:"redirect-301",name:"301 Permanent Redirect",badge:"Redirect",params:[{key:"from",label:"Source Path",type:"text",default:"/old-page",hint:"e.g. /old-page"},{key:"to",label:"Target URL",type:"text",default:"/new-page",hint:"e.g. /new-page or https://example.com/page"}],code:(p)=>`# 301 Permanent Redirect\nRedirect 301 ${p.from} ${p.to}`},
+{id:"redirect-302",name:"302 Temporary Redirect",badge:"Redirect",params:[{key:"from",label:"Source Path",type:"text",default:"/temp-page",hint:"e.g. /temp-page"},{key:"to",label:"Target URL",type:"text",default:"/other-page",hint:"e.g. /other-page or https://example.com/page"}],code:(p)=>`# 302 Temporary Redirect\nRedirect 302 ${p.from} ${p.to}`},
+{id:"cache-control",name:"Cache Control",badge:"Performance",params:[{key:"duration",label:"Cache Duration",type:"select",options:["1 week","1 month","3 months","1 year"],default:"1 month"}],code:(p)=>{
+const map={"1 week":"604800","1 month":"2592000","3 months":"7776000","1 year":"31536000"};
+const s=map[p.duration]||"2592000";
+return `# Cache Control\n<IfModule mod_expires.c>\n  ExpiresActive On\n  ExpiresByType image/jpeg "access plus ${p.duration}"\n  ExpiresByType image/png "access plus ${p.duration}"\n  ExpiresByType image/gif "access plus ${p.duration}"\n  ExpiresByType image/webp "access plus ${p.duration}"\n  ExpiresByType image/svg+xml "access plus ${p.duration}"\n  ExpiresByType text/css "access plus ${p.duration}"\n  ExpiresByType application/javascript "access plus ${p.duration}"\n  ExpiresByType application/x-font-woff "access plus ${p.duration}"\n  ExpiresByType font/woff2 "access plus ${p.duration}"\n</IfModule>\n\n<IfModule mod_headers.c>\n  <FilesMatch "\\.(ico|jpe?g|png|gif|webp|svg|css|js|woff2?)$">\n    Header set Cache-Control "public, max-age=${s}"\n  </FilesMatch>\n</IfModule>`}},
+{id:"gzip",name:"Gzip Compression",badge:"Performance",params:[],code:()=>`# Gzip Compression\n<IfModule mod_deflate.c>\n  AddOutputFilterByType DEFLATE text/html\n  AddOutputFilterByType DEFLATE text/css\n  AddOutputFilterByType DEFLATE text/javascript\n  AddOutputFilterByType DEFLATE application/javascript\n  AddOutputFilterByType DEFLATE application/json\n  AddOutputFilterByType DEFLATE application/xml\n  AddOutputFilterByType DEFLATE text/xml\n  AddOutputFilterByType DEFLATE text/plain\n  AddOutputFilterByType DEFLATE image/svg+xml\n  AddOutputFilterByType DEFLATE application/x-font-woff\n  AddOutputFilterByType DEFLATE font/woff2\n</IfModule>`},
+{id:"security-headers",name:"Security Headers (CSP, X-Frame, HSTS)",badge:"Security",params:[{key:"csp",label:"Content-Security-Policy",type:"text",default:"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;",hint:"CSP directive"},{key:"xframe",label:"X-Frame-Options",type:"select",options:["DENY","SAMEORIGIN"],default:"SAMEORIGIN"},{key:"hsts_age",label:"HSTS Max-Age (seconds)",type:"text",default:"31536000",hint:"31536000 = 1 year"}],code:(p)=>`# Security Headers\n<IfModule mod_headers.c>\n  Header set X-Content-Type-Options "nosniff"\n  Header set X-Frame-Options "${p.xframe}"\n  Header set X-XSS-Protection "1; mode=block"\n  Header set Referrer-Policy "strict-origin-when-cross-origin"\n  Header set Content-Security-Policy "${p.csp}"\n  Header set Strict-Transport-Security "max-age=${p.hsts_age}; includeSubDomains; preload"\n  Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n</IfModule>`},
+{id:"cors",name:"CORS (Cross-Origin Resource Sharing)",badge:"Security",params:[{key:"origin",label:"Allowed Origin",type:"text",default:"*",hint:"* for all, or specific domain like https://example.com"}],code:(p)=>`# CORS Headers\n<IfModule mod_headers.c>\n  Header set Access-Control-Allow-Origin "${p.origin}"\n  Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"\n  Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"\n  Header set Access-Control-Max-Age "86400"\n</IfModule>`},
+{id:"hotlink",name:"Hotlink Protection",badge:"Security",params:[{key:"domain",label:"Your Domain",type:"text",default:"example.com",hint:"Your website domain"},{key:"image",label:"Replacement Image URL (optional)",type:"text",default:"",hint:"URL to show instead of hotlinked image"}],code:(p)=>{
+let r=p.image?`RewriteRule \\.(jpe?g|png|gif|webp|svg)$ ${p.image} [NC,R,L]`:`RewriteRule \\.(jpe?g|png|gif|webp|svg)$ - [NC,F,L]`;
+return `# Hotlink Protection\nRewriteEngine On\nRewriteCond %{HTTP_REFERER} !^$\nRewriteCond %{HTTP_REFERER} !^https?://(www\\.)?${p.domain.replace(/\./g,'\\.')}/ [NC]\n${r}`}},
+{id:"dir-listing",name:"Disable Directory Browsing",badge:"Security",params:[],code:()=>`# Disable Directory Browsing\nOptions -Indexes`},
+{id:"error-pages",name:"Custom Error Pages",badge:"General",params:[{key:"e404",label:"404 Page Path",type:"text",default:"/errors/404.html",hint:"Path to your 404 page"},{key:"e403",label:"403 Page Path",type:"text",default:"/errors/403.html",hint:"Path to your 403 page"},{key:"e500",label:"500 Page Path",type:"text",default:"/errors/500.html",hint:"Path to your 500 page"}],code:(p)=>`# Custom Error Pages\nErrorDocument 404 ${p.e404}\nErrorDocument 403 ${p.e403}\nErrorDocument 500 ${p.e500}`},
+{id:"block-ips",name:"Block IP Addresses",badge:"Security",params:[{key:"ips",label:"IP Addresses (one per line)",type:"textarea",default:"192.168.1.100\n10.0.0.1",hint:"Enter IPs to block, one per line"}],code:(p)=>{
+const ips=p.ips.split('\n').map(s=>s.trim()).filter(Boolean);
+if(!ips.length) return '# Block IPs\n# No IPs specified';
+return `# Block IP Addresses\n<RequireAll>\n  Require all granted\n${ips.map(ip=>`  Require not ip ${ip}`).join('\n')}\n</RequireAll>`}},
+{id:"file-protection",name:"Protect Sensitive Files",badge:"Security",params:[],code:()=>`# Protect Sensitive Files\n<FilesMatch "^\\.(htaccess|htpasswd|env|git|svn)">\n  <IfModule mod_authz_core.c>\n    Require all denied\n  </IfModule>\n</FilesMatch>\n\n# Block access to backup and config files\n<FilesMatch "\\.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|yml|yaml)$">\n  <IfModule mod_authz_core.c>\n    Require all denied\n  </IfModule>\n</FilesMatch>`},
+{id:"mime-types",name:"Custom MIME Types",badge:"General",params:[],code:()=>`# Custom MIME Types\nAddType application/font-woff .woff\nAddType application/font-woff2 .woff2\nAddType application/vnd.ms-fontobject .eot\nAddType font/ttf .ttf\nAddType font/otf .otf\nAddType image/svg+xml .svg\nAddType image/webp .webp\nAddType application/json .json\nAddType video/mp4 .mp4\nAddType video/webm .webm`},
+{id:"trailing-slash",name:"Add/Remove Trailing Slash",badge:"URL",params:[{key:"action",label:"Action",type:"select",options:["Add trailing slash","Remove trailing slash"],default:"Add trailing slash"}],code:(p)=>{
+if(p.action==="Remove trailing slash") return `# Remove Trailing Slash\nRewriteEngine On\nRewriteCond %{REQUEST_FILENAME} !-d\nRewriteRule ^(.*)/$ /$1 [R=301,L]`;
+return `# Add Trailing Slash\nRewriteEngine On\nRewriteCond %{REQUEST_FILENAME} !-f\nRewriteRule ^(.*[^/])$ /$1/ [R=301,L]`}},
+{id:"php-settings",name:"PHP Settings",badge:"PHP",params:[{key:"memory",label:"Memory Limit",type:"text",default:"256M",hint:"e.g. 128M, 256M, 512M"},{key:"upload",label:"Upload Max Size",type:"text",default:"64M",hint:"e.g. 32M, 64M, 128M"},{key:"exec_time",label:"Max Execution Time (seconds)",type:"text",default:"300",hint:"e.g. 30, 60, 300"}],code:(p)=>`# PHP Settings\nphp_value memory_limit ${p.memory}\nphp_value upload_max_filesize ${p.upload}\nphp_value post_max_size ${p.upload}\nphp_value max_execution_time ${p.exec_time}\nphp_value max_input_time ${p.exec_time}`},
+{id:"etag",name:"Remove ETags",badge:"Performance",params:[],code:()=>`# Remove ETags\n<IfModule mod_headers.c>\n  Header unset ETag\n</IfModule>\nFileETag None`},
+{id:"charset",name:"Default Charset UTF-8",badge:"General",params:[],code:()=>`# Default Charset\nAddDefaultCharset UTF-8`}
+];
+
+let ruleStates={};
+RULES.forEach(r=>{ruleStates[r.id]={enabled:false,params:{}}; r.params.forEach(p=>{ruleStates[r.id].params[p.key]=p.default||''})});
+
+function renderRules(filter=''){
+const c=document.getElementById('rulesList');
+c.innerHTML='';
+const fl=filter.toLowerCase();
+RULES.forEach(r=>{
+if(fl&&!r.name.toLowerCase().includes(fl)&&!r.badge.toLowerCase().includes(fl)) return;
+const g=document.createElement('div');
+g.className='rule-group';
+g.dataset.id=r.id;
+const hasParams=r.params.length>0;
+const st=ruleStates[r.id];
+let paramsHTML='';
+if(hasParams){
+paramsHTML='<div class="rule-params'+(st._open?' show':'')+'">'; 
+r.params.forEach(p=>{
+paramsHTML+=`<label>${p.label}</label>`;
+if(p.type==='select'){
+paramsHTML+=`<select data-rule="${r.id}" data-key="${p.key}" onchange="updateParam(this)">`;
+p.options.forEach(o=>{paramsHTML+=`<option value="${o}"${st.params[p.key]===o?' selected':''}>${o}</option>`});
+paramsHTML+=`</select>`;
+}else if(p.type==='textarea'){
+paramsHTML+=`<textarea data-rule="${r.id}" data-key="${p.key}" oninput="updateParam(this)">${st.params[p.key]}</textarea>`;
+}else{
+paramsHTML+=`<input type="text" data-rule="${r.id}" data-key="${p.key}" value="${st.params[p.key].replace(/"/g,'&quot;')}" oninput="updateParam(this)">`;
+}
+if(p.hint) paramsHTML+=`<div class="hint">${p.hint}</div>`;
+});
+paramsHTML+='</div>';
+}
+g.innerHTML=`<div class="rule-header">
+<input type="checkbox" id="cb_${r.id}" ${st.enabled?'checked':''} onchange="toggleRule('${r.id}',this.checked)">
+<label for="cb_${r.id}">${r.name}</label>
+<span class="badge">${r.badge}</span>
+${hasParams?`<button class="expand-btn${st._open?' open':''}" onclick="toggleParams('${r.id}',this)" title="Edit parameters">▼</button>`:''}
+</div>${paramsHTML}`;
+c.appendChild(g)});}
+
+function toggleRule(id,checked){ruleStates[id].enabled=checked;generateCode()}
+function updateParam(el){ruleStates[el.dataset.rule].params[el.dataset.key]=el.value;generateCode()}
+function toggleParams(id,btn){
+const st=ruleStates[id];
+st._open=!st._open;
+btn.classList.toggle('open');
+const params=btn.closest('.rule-group').querySelector('.rule-params');
+if(params) params.classList.toggle('show');
+}
+
+function generateCode(){
+const parts=[];
+RULES.forEach(r=>{if(ruleStates[r.id].enabled){try{parts.push(r.code(ruleStates[r.id].params))}catch(e){parts.push(`# Error generating ${r.name}`)}}});
+const out=document.getElementById('codeOutput');
+if(!parts.length){out.innerHTML='<div class="empty-state"><div class="icon">📝</div>Select rules from the left panel to generate your .htaccess file</div>';return}
+const raw=parts.join('\n\n');
+out.innerHTML=highlightSyntax(raw);
+}
+
+function highlightSyntax(code){
+return code.split('\n').map(line=>{
+const trimmed=line.trim();
+if(trimmed.startsWith('#')) return `<span class="hl-comment">${esc(line)}</span>`;
+let l=esc(line);
+l=l.replace(/^(\s*)(&lt;\/?(?:IfModule|FilesMatch|RequireAll|Files|Directory|Location)[^&]*&gt;)/i,(m,sp,tag)=>sp+`<span class="hl-tag">${tag}</span>`);
+l=l.replace(/^(\s*)(RewriteEngine|RewriteCond|RewriteRule|Redirect|Header|ErrorDocument|Options|AddType|AddOutputFilterByType|ExpiresActive|ExpiresByType|FileETag|AddDefaultCharset|Require|php_value)\b/i,(m,sp,dir)=>sp+`<span class="hl-directive">${dir}</span>`);
+l=l.replace(/\[([A-Z0-9,=]+)\]/g,'<span class="hl-flag">[$1]</span>');
+l=l.replace(/"([^"]*)"/g,'"<span class="hl-string">$1</span>"');
+l=l.replace(/\b(\d+)\b/g,'<span class="hl-number">$1</span>');
+return l;
+}).join('\n');
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function getRawCode(){
+const parts=[];
+RULES.forEach(r=>{if(ruleStates[r.id].enabled){try{parts.push(r.code(ruleStates[r.id].params))}catch(e){}}});
+return parts.join('\n\n');
+}
+
+function copyCode(){
+const code=getRawCode();
+if(!code){showStatus('No rules selected!','var(--yellow)');return}
+navigator.clipboard.writeText(code).then(()=>showStatus('Copied to clipboard! ✓')).catch(()=>{
+const ta=document.createElement('textarea');ta.value=code;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showStatus('Copied! ✓')});
+}
+
+function downloadFile(){
+const code=getRawCode();
+if(!code){showStatus('No rules selected!','var(--yellow)');return}
+const blob=new Blob([code],{type:'text/plain'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='.htaccess';a.click();URL.revokeObjectURL(a.href);
+showStatus('Downloaded .htaccess ✓');
+}
+
+function clearAll(){
+RULES.forEach(r=>{ruleStates[r.id].enabled=false;ruleStates[r.id]._open=false;r.params.forEach(p=>{ruleStates[r.id].params[p.key]=p.default||''})});
+renderRules(document.getElementById('searchInput').value);generateCode();
+}
+
+function showStatus(msg,color){
+const el=document.getElementById('statusMsg');
+el.textContent=msg;el.style.color=color||'var(--green)';el.classList.add('show');
+setTimeout(()=>el.classList.remove('show'),2000);
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>renderRules(e.target.value));
+renderRules();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

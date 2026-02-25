@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate seamless SVG patterns for web backgrounds. Choose from geometric, organic, and abstract designs. Customize colors and scale, then copy the SVG code.">
+<link rel="canonical" href="https://lifa-su.com/ai-svg-pattern/">
+<title>SVG Pattern Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--card:#16213e;--accent:#0f3460;--hi:#e94560;--text:#eee;--text2:#aab;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{text-align:center;padding:24px 16px 8px}
+header h1{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,#e94560,#0f3460);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:var(--text2);font-size:.85rem;margin-top:4px}
+.app{display:flex;gap:20px;padding:20px;flex:1;max-width:1400px;margin:0 auto;width:100%}
+.ctrl{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+.prev{flex:1;display:flex;flex-direction:column;gap:12px}
+.c{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.c h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px}
+.pats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pb{background:var(--accent);border:2px solid transparent;border-radius:8px;padding:10px 4px;color:var(--text);cursor:pointer;font-size:.75rem;text-align:center;transition:.2s}
+.pb:hover{border-color:var(--hi)}.pb.on{border-color:var(--hi);background:rgba(233,69,96,.15)}
+.cr{margin-bottom:10px}
+.cr label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.cr label span{color:var(--text)}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--accent);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--hi);cursor:pointer}
+.clr{display:flex;gap:12px}
+.cg{flex:1}.cg label{font-size:.75rem;color:var(--text2);display:block;margin-bottom:4px}
+.cg input[type=color]{width:100%;height:36px;border:none;border-radius:6px;cursor:pointer;background:var(--accent);padding:2px}
+.pvb{flex:1;border-radius:var(--r);overflow:hidden;min-height:400px;position:relative;background:var(--card)}
+#tp{width:100%;height:100%;min-height:400px}
+.ar{display:flex;gap:10px}
+.b{flex:1;padding:10px;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:.2s}
+.b1{background:var(--hi);color:#fff}.b1:hover{background:#d63a52}
+.b2{background:var(--accent);color:var(--text)}.b2:hover{background:#1a4a7a}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 24px;border-radius:8px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+footer{text-align:center;padding:12px;color:var(--text2);font-size:.75rem}
+@media(max-width:768px){.app{flex-direction:column}.ctrl{width:100%}}
+</style>
+</head>
+<body>
+<header><h1>&#10022; SVG Pattern Generator</h1><p>Create seamless SVG patterns</p></header>
+<div class="app">
+<div class="ctrl">
+<div class="c"><h3>Pattern</h3><div class="pats" id="pb"></div></div>
+<div class="c"><h3>Colors</h3><div class="clr">
+<div class="cg"><label>Foreground</label><input type="color" id="fg" value="#e94560"></div>
+<div class="cg"><label>Background</label><input type="color" id="bg" value="#1a1a2e"></div>
+</div></div>
+<div class="c"><h3>Adjustments</h3>
+<div class="cr"><label>Size <span id="sv">20</span>px</label><input type="range" id="sz" min="5" max="80" value="20"></div>
+<div class="cr"><label>Spacing <span id="spv">10</span>px</label><input type="range" id="sp" min="0" max="60" value="10"></div>
+<div class="cr"><label>Rotation <span id="rv">0</span>&deg;</label><input type="range" id="rt" min="0" max="360" value="0"></div>
+<div class="cr"><label>Stroke <span id="stv">2</span>px</label><input type="range" id="st" min="1" max="10" value="2"></div>
+</div>
+<div class="c"><h3>Export</h3><div class="ar">
+<button class="b b1" onclick="cpSVG()">Copy SVG</button>
+<button class="b b2" onclick="dlPNG()">Download PNG</button>
+</div></div>
+</div>
+<div class="prev"><div class="pvb c" style="padding:0"><svg id="tp" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+</div>
+<div class="toast" id="tt"></div>
+<footer>SVG Pattern Generator</footer>
+<script>
+const P=['stripes','grid','dots','diamonds','waves','hexagons'];
+let cur='stripes';
+const $=id=>document.getElementById(id);
+function v(id){return +$(id).value}
+function toast(m){const t=$('tt');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+const pb=$('pb');
+P.forEach(p=>{
+  const b=document.createElement('button');
+  b.className='pb'+(p===cur?' on':'');
+  b.textContent=p.charAt(0).toUpperCase()+p.slice(1);
+  b.onclick=()=>{document.querySelectorAll('.pb').forEach(x=>x.classList.remove('on'));b.classList.add('on');cur=p;render()};
+  pb.appendChild(b);
+});
+
+['sz','sp','rt','st'].forEach(id=>{
+  const m={sz:'sv',sp:'spv',rt:'rv',st:'stv'};
+  $(id).oninput=()=>{$(m[id]).textContent=$(id).value;render()};
+});
+$('fg').oninput=$('bg').oninput=render;
+
+function mkPat(sz,sp,fg,sw){
+  const u=sz+sp;
+  const h=u/2;
+  const r=sz/2;
+  switch(cur){
+    case'stripes':return`<line x1="0" y1="0" x2="${u}" y2="${u}" stroke="${fg}" stroke-width="${sw}"/><line x1="${-u}" y1="0" x2="0" y2="${u}" stroke="${fg}" stroke-width="${sw}"/><line x1="0" y1="${-u}" x2="${u}" y2="0" stroke="${fg}" stroke-width="${sw}"/>`;
+    case'grid':return`<line x1="${h}" y1="0" x2="${h}" y2="${u}" stroke="${fg}" stroke-width="${sw}"/><line x1="0" y1="${h}" x2="${u}" y2="${h}" stroke="${fg}" stroke-width="${sw}"/>`;
+    case'dots':return`<circle cx="${h}" cy="${h}" r="${r*.4}" fill="${fg}"/>`;
+    case'diamonds':{const c=h;return`<polygon points="${c},${sp/2} ${u-sp/2},${c} ${c},${u-sp/2} ${sp/2},${c}" fill="none" stroke="${fg}" stroke-width="${sw}"/>`;}
+    case'waves':{const a=r*.6;return`<path d="M0,${h} Q${u*.25},${h-a} ${h},${h} Q${u*.75},${h+a} ${u},${h}" fill="none" stroke="${fg}" stroke-width="${sw}"/>`;}
+    case'hexagons':{const s=r;const hh=s*Math.sqrt(3)/2;const cx=h,cy=h;let pts='';for(let i=0;i<6;i++){const ang=Math.PI/3*i-Math.PI/6;pts+=`${cx+s*Math.cos(ang)},${cy+s*Math.sin(ang)} `;}return`<polygon points="${pts.trim()}" fill="none" stroke="${fg}" stroke-width="${sw}"/>`;}
+  }
+}
+
+function getSVG(){
+  const sz=v('sz'),sp=v('sp'),rt=v('rt'),sw=v('st');
+  const fg=$('fg').value,bg=$('bg').value;
+  const u=sz+sp;
+  const tr=rt?` patternTransform="rotate(${rt})"`:''
+  return`<svg xmlns="http://www.w3.org/2000/svg" width="${u}" height="${u}"><defs><pattern id="p" x="0" y="0" width="${u}" height="${u}" patternUnits="userSpaceOnUse"${tr}><rect width="${u}" height="${u}" fill="${bg}"/>${mkPat(sz,sp,fg,sw)}</pattern></defs><rect width="100%" height="100%" fill="url(#p)"/></svg>`;
+}
+
+function render(){
+  const sz=v('sz'),sp=v('sp'),rt=v('rt'),sw=v('st');
+  const fg=$('fg').value,bg=$('bg').value;
+  const u=sz+sp;
+  const tr=rt?` patternTransform="rotate(${rt})"`:''
+  const svg=$('tp');
+  svg.innerHTML=`<defs><pattern id="p" x="0" y="0" width="${u}" height="${u}" patternUnits="userSpaceOnUse"${tr}><rect width="${u}" height="${u}" fill="${bg}"/>${mkPat(sz,sp,fg,sw)}</pattern></defs><rect width="100%" height="100%" fill="url(#p)"/>`;
+}
+
+function cpSVG(){
+  navigator.clipboard.writeText(getSVG()).then(()=>toast('SVG copied to clipboard!')).catch(()=>toast('Copy failed'));
+}
+
+function dlPNG(){
+  const sz=v('sz'),sp=v('sp');
+  const u=sz+sp;
+  const W=800,H=800;
+  const svgStr=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><pattern id="p" x="0" y="0" width="${u}" height="${u}" patternUnits="userSpaceOnUse"${v('rt')?` patternTransform="rotate(${v('rt')})"`:''}>
+<rect width="${u}" height="${u}" fill="${$('bg').value}"/>${mkPat(v('sz'),v('sp'),$('fg').value,v('st'))}</pattern></defs><rect width="${W}" height="${H}" fill="url(#p)"/></svg>`;
+  const blob=new Blob([svgStr],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=()=>{
+    const c=document.createElement('canvas');c.width=W;c.height=H;
+    c.getContext('2d').drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    const a=document.createElement('a');a.download='pattern.png';
+    a.href=c.toDataURL('image/png');a.click();
+    toast('PNG downloaded!');
+  };
+  img.src=url;
+}
+
+render();
+</script>
+<!-- Pro Section -->
+<style>
+.pro-section{max-width:1400px;width:100%;margin:20px auto 0;padding:0 20px;position:relative;cursor:pointer}
+.pro-blur{background:var(--card);border-radius:var(--r);padding:24px;filter:blur(3px);pointer-events:none;opacity:.6;border:1px solid rgba(255,255,255,.06)}
+.pro-blur-inner{display:flex;gap:16px;flex-wrap:wrap}
+.pro-blur-card{flex:1;min-width:180px;background:var(--bg);border-radius:10px;padding:20px;text-align:center}
+.pro-blur-card h4{color:var(--hi);font-size:.95rem;margin-bottom:8px}
+.pro-blur-card p{color:var(--text2);font-size:.8rem}
+.pro-lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:2}
+.pro-lock .lock-icon{font-size:2.5rem;display:block;margin-bottom:8px}
+.pro-lock .lock-text{color:#fff;font-size:1.1rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.pro-lock .lock-sub{color:var(--text2);font-size:.8rem;margin-top:4px}
+.pro-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-overlay.show{display:flex}
+.pro-modal{background:var(--card);border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h2{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .price{font-size:1.8rem;font-weight:800;color:var(--hi);margin:10px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.9rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.pro-modal ul li::before{content:'✓ ';color:var(--hi);font-weight:700}
+.pro-modal .btn-pro{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--hi),#d63a52);color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:16px;text-decoration:none;transition:opacity .2s}
+.pro-modal .btn-pro:hover{opacity:.9}
+.pro-modal .btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.85rem;cursor:pointer;margin-top:8px}
+.pro-modal .btn-later:hover{color:#bbb}
+</style>
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-inner">
+<div class="pro-blur-card"><h4>📤 Custom Pattern Upload</h4><p>Upload your own shapes and motifs to create unique patterns</p></div>
+<div class="pro-blur-card"><h4>✨ Animated Patterns</h4><p>Create mesmerizing CSS & SVG animated patterns</p></div>
+<div class="pro-blur-card"><h4>🖼️ HD Export</h4><p>Export patterns in 4K resolution for print and large displays</p></div>
+</div>
+</div>
+<div class="pro-lock">
+<span class="lock-icon">🔒</span>
+<span class="lock-text">Pro Features</span>
+<span class="lock-sub">Click to unlock</span>
+</div>
+</div>
+<div class="pro-overlay" id="proModal">
+<div class="pro-modal">
+<h2>✦ SVG Pattern Pro</h2>
+<div class="price">$9</div>
+<p style="color:#aab;font-size:.85rem">One-time payment · Lifetime access</p>
+<ul>
+<li>Upload custom shapes and motifs</li>
+<li>Animated CSS & SVG patterns</li>
+<li>4K HD export for print quality</li>
+<li>20+ additional pattern types</li>
+<li>Seamless tile validation tool</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});</script>
+<script src="https://cdn.buysellads.com/pub/lifa.js" async></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

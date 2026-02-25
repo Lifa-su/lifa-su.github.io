@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<title>AI Slides Generator - Free Markdown Presentation Maker | FeiDev</title>
+<meta name="description" content="Free AI-powered markdown slide generator. Create beautiful presentations with multiple themes, speaker notes, live preview, and PDF export. No signup required.">
+<meta name="keywords" content="AI slides, presentation generator, markdown slides, slide maker, PowerPoint alternative, free presentation tool, speaker notes, PDF slides">
+<meta property="og:title" content="AI Slides Generator - Free Markdown Presentation Maker">
+<meta property="og:description" content="Create beautiful presentations from markdown. Multiple themes, speaker notes, live preview, and PDF export. 100% free.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-slides/">
+<meta property="og:image" content="https://lifa-su.com/ai-slides/og-image.png">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Slides Generator - Free Markdown Presentation Maker">
+<meta name="twitter:description" content="Create beautiful presentations from markdown instantly. No signup required.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-slides/og-image.png">
+<link rel="canonical" href="https://lifa-su.com/ai-slides/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Slides Generator","url":"https://lifa-su.com/ai-slides/","description":"Free markdown-based presentation generator with multiple themes, speaker notes, and PDF export","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","ratingCount":"186","bestRating":"5","worstRating":"1"}}
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;
+--border:#2a2a42;--border2:#363652;--text:#e8e8f4;--text2:#9898b4;--text3:#686884;
+--accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);
+--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--radius-sm:8px
+}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text)}
+button{cursor:pointer;border:none;font-family:inherit;background:none;color:inherit}
+a{text-decoration:none}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(18,18,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700}
+.brand-icon{font-size:1.4rem}
+.brand-text{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn{padding:8px 16px;border-radius:var(--radius-sm);font-weight:600;font-size:.85rem;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 2px 12px var(--accent-glow)}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(124,92,252,0.3)}
+.btn-ghost{color:var(--text2);background:var(--surface2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-icon{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);color:var(--text2);background:var(--surface2);border:1px solid var(--border)}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Layout */
+.app-layout{display:flex;height:calc(100vh - 53px)}
+.thumbnails-panel{width:180px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;padding:12px}
+.editor-panel{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border)}
+.preview-panel{flex:1.2;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+
+/* Thumbnails */
+.thumb-item{position:relative;border-radius:var(--radius-sm);border:2px solid var(--border);overflow:hidden;cursor:pointer;margin-bottom:10px;transition:all .2s;aspect-ratio:16/9;background:var(--surface2)}
+.thumb-item:hover{border-color:var(--border2)}
+.thumb-item.active{border-color:var(--accent);box-shadow:0 0 12px var(--accent-glow)}
+.thumb-num{position:absolute;bottom:4px;right:6px;font-size:.65rem;color:var(--text3);font-weight:700;background:rgba(11,11,18,0.7);padding:1px 5px;border-radius:4px}
+.thumb-content{padding:6px;font-size:.35rem;line-height:1.3;color:var(--text3);overflow:hidden;height:100%;pointer-events:none;transform-origin:top left}
+.thumb-content h1,.thumb-content h2,.thumb-content h3{font-size:.5rem;color:var(--text2);margin-bottom:2px}
+.thumb-content p{margin-bottom:2px}
+.thumb-content ul,.thumb-content ol{padding-left:8px;margin-bottom:2px}
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.toolbar-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.toolbar button{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--text2);font-size:.9rem;transition:all .15s}
+.toolbar button:hover{background:var(--surface2);color:var(--accent)}
+.toolbar .active{background:var(--accent-glow);color:var(--accent)}
+.toolbar select{padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none}
+.toolbar select:focus{border-color:var(--accent)}
+
+/* Editor */
+.editor-area{flex:1;position:relative}
+.editor-area textarea{width:100%;height:100%;padding:16px 20px;background:var(--surface);color:var(--text);border:none;outline:none;resize:none;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',monospace;font-size:.9rem;line-height:1.7;tab-size:2}
+.editor-area textarea::placeholder{color:var(--text3)}
+.editor-status{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface);border-top:1px solid var(--border);font-size:.75rem;color:var(--text3)}
+
+/* Preview */
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.preview-header .label{font-size:.85rem;color:var(--text2);font-weight:600}
+.slide-nav{display:flex;align-items:center;gap:8px}
+.slide-nav button{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:var(--text2);background:var(--surface2);border:1px solid var(--border);transition:all .15s}
+.slide-nav button:hover{border-color:var(--accent);color:var(--accent)}
+.slide-nav button:disabled{opacity:.3;cursor:not-allowed}
+.slide-nav button:disabled:hover{border-color:var(--border);color:var(--text2);transform:none}
+.slide-counter{font-size:.8rem;color:var(--text3);min-width:60px;text-align:center}
+.preview-container{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
+.slide-frame{width:100%;max-width:800px;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.4);position:relative}
+
+/* Slide Themes */
+.slide-render{width:100%;height:100%;padding:48px 56px;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+.slide-render h1{font-size:2.2em;margin-bottom:.4em;line-height:1.2}
+.slide-render h2{font-size:1.6em;margin-bottom:.4em;line-height:1.3}
+.slide-render h3{font-size:1.2em;margin-bottom:.3em}
+.slide-render p{font-size:1em;line-height:1.7;margin-bottom:.6em}
+.slide-render ul,.slide-render ol{padding-left:1.5em;margin-bottom:.6em}
+.slide-render li{margin-bottom:.3em;line-height:1.6}
+.slide-render code{font-family:'SF Mono',Monaco,monospace;font-size:.85em;padding:2px 6px;border-radius:4px}
+.slide-render pre{padding:16px;border-radius:8px;margin-bottom:.8em;overflow-x:auto}
+.slide-render pre code{padding:0;background:none}
+.slide-render img{max-width:80%;max-height:50%;border-radius:8px;margin:.5em auto;display:block}
+.slide-render blockquote{border-left:4px solid;padding:12px 20px;margin-bottom:.8em;border-radius:0 8px 8px 0;font-style:italic}
+.slide-render table{width:100%;border-collapse:collapse;margin-bottom:.8em}
+.slide-render th,.slide-render td{padding:8px 12px;border:1px solid;text-align:left}
+.slide-render strong{font-weight:700}
+.slide-render em{font-style:italic}
+
+/* Theme: Dark (default) */
+.theme-dark{background:linear-gradient(135deg,#0b0b12,#1a1a2c);color:#e8e8f4}
+.theme-dark h1,.theme-dark h2,.theme-dark h3{color:#fff}
+.theme-dark code{background:rgba(124,92,252,0.15);color:#a29bfe}
+.theme-dark pre{background:#0b0b12}
+.theme-dark blockquote{border-color:var(--accent);background:rgba(124,92,252,0.08)}
+.theme-dark th{background:var(--surface2)}
+.theme-dark th,.theme-dark td{border-color:var(--border)}
+
+/* Theme: Light */
+.theme-light{background:linear-gradient(135deg,#fafafa,#f0f0f5);color:#2d2d3a}
+.theme-light h1,.theme-light h2,.theme-light h3{color:#1a1a2e}
+.theme-light code{background:rgba(124,92,252,0.1);color:#6c5ce7}
+.theme-light pre{background:#1a1a2e;color:#e8e8f4}
+.theme-light blockquote{border-color:#6c5ce7;background:rgba(124,92,252,0.06);color:#444}
+.theme-light th{background:#e8e8f0}
+.theme-light th,.theme-light td{border-color:#ddd}
+
+/* Theme: Gradient */
+.theme-gradient{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#e8e8f4}
+.theme-gradient h1,.theme-gradient h2,.theme-gradient h3{background:linear-gradient(135deg,#f093fb,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.theme-gradient code{background:rgba(240,147,251,0.15);color:#f093fb}
+.theme-gradient pre{background:rgba(0,0,0,0.3)}
+.theme-gradient blockquote{border-color:#f093fb;background:rgba(240,147,251,0.08)}
+.theme-gradient th{background:rgba(240,147,251,0.15)}
+.theme-gradient th,.theme-gradient td{border-color:rgba(240,147,251,0.2)}
+
+/* Theme: Corporate */
+.theme-corporate{background:#ffffff;color:#333;font-family:'Segoe UI',Roboto,sans-serif}
+.theme-corporate h1,.theme-corporate h2,.theme-corporate h3{color:#1a365d}
+.theme-corporate h1{border-bottom:3px solid #2b6cb0;padding-bottom:.3em}
+.theme-corporate code{background:#edf2f7;color:#2b6cb0}
+.theme-corporate pre{background:#1a365d;color:#e2e8f0}
+.theme-corporate blockquote{border-color:#2b6cb0;background:#ebf8ff;color:#2a4365}
+.theme-corporate th{background:#2b6cb0;color:#fff}
+.theme-corporate th,.theme-corporate td{border-color:#e2e8f0}
+
+/* Theme: Creative */
+.theme-creative{background:linear-gradient(160deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:#e8e8f4}
+.theme-creative h1,.theme-creative h2,.theme-creative h3{color:#e94560}
+.theme-creative h1{text-shadow:0 0 30px rgba(233,69,96,0.3)}
+.theme-creative code{background:rgba(233,69,96,0.15);color:#e94560}
+.theme-creative pre{background:rgba(0,0,0,0.3)}
+.theme-creative blockquote{border-color:#e94560;background:rgba(233,69,96,0.08)}
+.theme-creative th{background:rgba(233,69,96,0.2)}
+.theme-creative th,.theme-creative td{border-color:rgba(233,69,96,0.2)}
+
+/* Theme: Nature */
+.theme-nature{background:linear-gradient(135deg,#0d1b0e,#1a3a1a,#0d2818);color:#d4e8d4}
+.theme-nature h1,.theme-nature h2,.theme-nature h3{color:#4cda8a}
+.theme-nature code{background:rgba(76,218,138,0.12);color:#4cda8a}
+.theme-nature pre{background:rgba(0,0,0,0.3)}
+.theme-nature blockquote{border-color:#4cda8a;background:rgba(76,218,138,0.08)}
+.theme-nature th{background:rgba(76,218,138,0.15)}
+.theme-nature th,.theme-nature td{border-color:rgba(76,218,138,0.2)}
+/* Theme: Nature */
+.theme-nature{background:linear-gradient(135deg,#1b4332,#2d6a4f,#40916c);color:#f0fff4}
+.theme-nature h1,.theme-nature h2,.theme-nature h3{color:#d8f3dc}
+.theme-nature code{background:rgba(216,243,220,0.15);color:#95d5b2}
+.theme-nature pre{background:rgba(0,0,0,0.3)}
+.theme-nature blockquote{border-color:#52b788;background:rgba(82,183,136,0.1)}
+.theme-nature th{background:rgba(82,183,136,0.25)}
+.theme-nature th,.theme-nature td{border-color:rgba(82,183,136,0.2)}
+
+/* Speaker Notes */
+.notes-panel{padding:12px 16px;background:var(--surface);border-top:1px solid var(--border);max-height:120px;overflow-y:auto}
+.notes-label{font-size:.75rem;color:var(--text3);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.notes-content{font-size:.85rem;color:var(--text2);line-height:1.5;font-style:italic}
+.notes-content:empty::before{content:'No speaker notes for this slide';color:var(--text3)}
+
+/* Fullscreen / Presenter */
+.fullscreen-overlay{position:fixed;inset:0;z-index:9999;background:#000;display:none;flex-direction:column}
+.fullscreen-overlay.active{display:flex}
+.fullscreen-slide{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+.fullscreen-slide .slide-render{max-width:1200px;width:100%;height:100%;font-size:1.4em}
+.fullscreen-controls{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px;background:rgba(18,18,30,0.9)}
+.fullscreen-controls button{color:#fff;font-size:1rem;padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.1);transition:all .2s}
+.fullscreen-controls button:hover{background:rgba(124,92,252,0.3)}
+.fullscreen-counter{color:var(--text2);font-size:.9rem;min-width:80px;text-align:center}
+.fullscreen-notes{padding:12px 24px;background:rgba(18,18,30,0.95);color:var(--text2);font-size:.85rem;max-height:100px;overflow-y:auto;border-top:1px solid var(--border);font-style:italic}
+
+/* Pro Banner */
+.pro-banner{margin:12px;padding:16px;background:linear-gradient(135deg,rgba(124,92,252,0.12),rgba(92,140,252,0.08));border:1px solid rgba(124,92,252,0.25);border-radius:var(--radius);text-align:center}
+.pro-banner h4{font-size:.85rem;color:var(--accent);margin-bottom:4px}
+.pro-banner p{font-size:.75rem;color:var(--text3);margin-bottom:8px}
+.pro-banner a{display:inline-block;padding:6px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;transition:all .2s}
+.pro-banner a:hover{box-shadow:0 4px 16px var(--accent-glow);transform:translateY(-1px)}
+
+/* Responsive */
+@media(max-width:1024px){
+.thumbnails-panel{display:none}
+.app-layout{flex-direction:column}
+.editor-panel,.preview-panel{flex:1;border-right:none}
+.editor-panel{border-bottom:1px solid var(--border)}
+}
+@media(max-width:640px){
+.header{padding:10px 14px}
+.brand{font-size:1rem}
+.header-actions .btn span{display:none}
+.slide-render{padding:24px 28px}
+.slide-render h1{font-size:1.5em}
+.slide-render h2{font-size:1.2em}
+}
+
+/* Print */
+@media print{
+.header,.thumbnails-panel,.editor-panel,.toolbar,.preview-header,.notes-panel,.fullscreen-controls,.fullscreen-notes,.pro-banner,footer{display:none!important}
+.app-layout{display:block!important;height:auto!important}
+.preview-panel{display:block!important}
+.preview-container{padding:0!important}
+.slide-frame{max-width:100%!important;box-shadow:none!important;page-break-after:always;aspect-ratio:auto;height:100vh}
+}
+</style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+<div class="brand">
+<span class="brand-icon">🎯</span>
+<span class="brand-text">AI Slides Generator</span>
+</div>
+<div class="header-actions">
+<select id="themeSelect" class="btn-ghost" style="padding:6px 12px;font-size:.8rem;border-radius:var(--radius-sm)" onchange="changeTheme(this.value)">
+<option value="dark">🌙 Dark</option>
+<option value="light">☀️ Light</option>
+<option value="gradient">🎨 Gradient</option>
+<option value="corporate">💼 Corporate</option>
+<option value="creative">🔥 Creative</option>
+<option value="nature">🌿 Nature</option>
+</select>
+<button class="btn btn-ghost" onclick="exportPDF()" title="Print / Export PDF">🖨️ <span>Print</span></button>
+<button class="btn btn-primary" onclick="enterFullscreen()" title="Present slides fullscreen">▶ <span>Present</span></button>
+</div>
+</header>
+
+<!-- Main Layout -->
+<div class="app-layout">
+<!-- Thumbnails Sidebar -->
+<div class="thumbnails-panel" id="thumbPanel"></div>
+
+<!-- Editor Panel -->
+<div class="editor-panel">
+<div class="toolbar">
+<button onclick="insertFormat('**','**')" title="Bold"><b>B</b></button>
+<button onclick="insertFormat('*','*')" title="Italic"><i>I</i></button>
+<button onclick="insertFormat('~~','~~')" title="Strikethrough"><s>S</s></button>
+<button onclick="insertFormat('`','`')" title="Inline Code">&lt;/&gt;</button>
+<div class="toolbar-sep"></div>
+<button onclick="insertLine('# ')" title="Heading 1">H1</button>
+<button onclick="insertLine('## ')" title="Heading 2">H2</button>
+<button onclick="insertLine('### ')" title="Heading 3">H3</button>
+<div class="toolbar-sep"></div>
+<button onclick="insertLine('- ')" title="Bullet List">•</button>
+<button onclick="insertLine('1. ')" title="Numbered List">1.</button>
+<button onclick="insertLine('> ')" title="Blockquote">❝</button>
+<div class="toolbar-sep"></div>
+<button onclick="insertLine('![alt](url)')" title="Image">🖼</button>
+<button onclick="insertLine('[text](url)')" title="Link">🔗</button>
+<button onclick="insertCodeBlock()" title="Code Block">{ }</button>
+<div class="toolbar-sep"></div>
+<button onclick="insertLine('---')" title="New Slide Separator">➕ Slide</button>
+<button onclick="insertLine('<!-- notes: Your speaker notes here -->')" title="Speaker Notes">📝 Notes</button>
+</div>
+<div class="editor-area">
+<textarea id="editor" spellcheck="false" placeholder="Write your slides in Markdown...&#10;&#10;Use --- to separate slides&#10;Use <!-- notes: ... --> for speaker notes"></textarea>
+</div>
+<div class="editor-status">
+<span id="slideCount">0 slides</span>
+<span id="charCount">0 chars</span>
+</div>
+</div>
+
+<!-- Preview Panel -->
+<div class="preview-panel">
+<div class="preview-header">
+<span class="label">Preview</span>
+<div class="slide-nav">
+<button onclick="prevSlide()" id="prevBtn" title="Previous slide">◀</button>
+<span class="slide-counter" id="slideCounter">0 / 0</span>
+<button onclick="nextSlide()" id="nextBtn" title="Next slide">▶</button>
+</div>
+</div>
+<div class="preview-container">
+<div class="slide-frame">
+<div class="slide-render theme-dark" id="slidePreview"></div>
+</div>
+</div>
+<div class="notes-panel">
+<div class="notes-label">📝 Speaker Notes</div>
+<div class="notes-content" id="notesContent"></div>
+</div>
+<div class="pro-banner">
+<h4>✨ Pro Themes & Features</h4>
+<p>Unlock premium themes, custom branding, and more</p>
+<a href="https://ko-fi.com/feidev" target="_blank">Support on Ko-fi — $14</a>
+</div>
+</div>
+</div>
+
+<!-- Fullscreen Presenter -->
+<div class="fullscreen-overlay" id="fullscreenOverlay">
+<div class="fullscreen-slide">
+<div class="slide-render theme-dark" id="fullscreenSlide"></div>
+</div>
+<div class="fullscreen-notes" id="fullscreenNotes"></div>
+<div class="fullscreen-controls">
+<button onclick="fsNav(-1)">◀ Prev</button>
+<span class="fullscreen-counter" id="fsCounter">0 / 0</span>
+<button onclick="fsNav(1)">Next ▶</button>
+<button onclick="exitFullscreen()">✕ Exit</button>
+</div>
+</div>
+
+<footer style="text-align:center;padding:20px;border-top:1px solid var(--border);color:var(--text2);font-size:13px"><a href="https://lifa-su.com/" style="color:var(--accent)">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank" style="color:var(--accent)">☕ Support on Ko-fi</a></footer>
+<script>
+// ===== State =====
+let slides = [];
+let currentSlide = 0;
+let currentTheme = 'dark';
+let fsSlideIndex = 0;
+
+// ===== Marked Config =====
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+  highlight: function(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(code, { language: lang }).value;
+    }
+    return hljs.highlightAuto(code).value;
+  }
+});
+
+// ===== Sample Slides =====
+const sampleMarkdown = `# Welcome to AI Slides Generator
+## Create Beautiful Presentations from Markdown
+
+- Write in **Markdown**, see slides instantly
+- Multiple professional themes
+- Speaker notes & presenter mode
+- Export to PDF with one click
+
+*Free, open-source, no signup required*
+
+<!-- notes: Welcome your audience. Mention that this tool is completely free and works in the browser. -->
+
+---
+
+## How It Works
+
+### Simple 3-Step Process
+
+1. **Write** your content in Markdown
+2. **Separate** slides with \`---\`
+3. **Present** or export to PDF
+
+> "The best presentations are simple and focused."
+
+<!-- notes: Explain that --- on its own line creates a new slide. Speaker notes use the HTML comment syntax. -->
+
+---
+
+## Formatting Features
+
+You can use all standard Markdown:
+
+- **Bold text** and *italic text*
+- ~~Strikethrough~~ and \`inline code\`
+- [Links](https://example.com)
+- Images, tables, and more
+
+### Code Blocks
+
+\`\`\`javascript
+function createSlide(content) {
+  return marked.parse(content);
+}
+\`\`\`
+
+---
+
+## Multiple Themes
+
+Choose from **6 built-in themes**:
+
+| Theme | Style |
+|-------|-------|
+| 🌙 Dark | Sleek dark background |
+| ☀️ Light | Clean and professional |
+| 🎨 Gradient | Vibrant color gradients |
+| 💼 Corporate | Business-ready |
+| 🔥 Creative | Bold and expressive |
+| 🌿 Nature | Calm earth tones |
+
+<!-- notes: Let the audience try switching themes using the dropdown in the header. Each theme is designed for different contexts. -->
+
+---
+
+## Speaker Notes
+
+Add notes that only you can see during presentation:
+
+\`\`\`markdown
+<!-- notes: These are your private notes -->
+\`\`\`
+
+Notes appear:
+- Below the preview while editing
+- At the bottom during presenter mode
+- **Never** shown to your audience in PDF export
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| ← → | Navigate slides |
+| Escape | Exit fullscreen |
+| Ctrl+P | Print / Export PDF |
+
+### Ready to create?
+
+Start editing the markdown on the left panel!
+
+*Built with ❤️ by [FeiDev](https://ko-fi.com/feidev)*
+
+<!-- notes: Encourage the audience to start editing. Remind them about the toolbar buttons for quick formatting. -->`;
+
+// ===== Core Functions =====
+function parseSlides(md) {
+  const raw = md.split(/\n---\n/);
+  return raw.map(s => {
+    let notes = '';
+    const noteMatch = s.match(/<!--\s*notes:\s*([\s\S]*?)\s*-->/);
+    if (noteMatch) {
+      notes = noteMatch[1].trim();
+      s = s.replace(/<!--\s*notes:\s*[\s\S]*?\s*-->/, '').trim();
+    }
+    return { content: s, notes: notes, html: marked.parse(s) };
+  });
+}
+
+function renderCurrentSlide() {
+  if (slides.length === 0) {
+    document.getElementById('slidePreview').innerHTML = '<p style="color:var(--text3);text-align:center">Start typing to see your slides...</p>';
+    document.getElementById('notesContent').textContent = '';
+    document.getElementById('slideCounter').textContent = '0 / 0';
+    document.getElementById('prevBtn').disabled = true;
+    document.getElementById('nextBtn').disabled = true;
+    return;
+  }
+  if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+  if (currentSlide < 0) currentSlide = 0;
+
+  const slide = slides[currentSlide];
+  const preview = document.getElementById('slidePreview');
+  preview.innerHTML = slide.html;
+  preview.className = 'slide-render theme-' + currentTheme;
+
+  document.getElementById('notesContent').textContent = slide.notes || '';
+  document.getElementById('slideCounter').textContent = (currentSlide + 1) + ' / ' + slides.length;
+  document.getElementById('prevBtn').disabled = currentSlide === 0;
+  document.getElementById('nextBtn').disabled = currentSlide === slides.length - 1;
+
+  // Update thumbnails
+  document.querySelectorAll('.thumb-item').forEach((t, i) => {
+    t.classList.toggle('active', i === currentSlide);
+  });
+}
+
+function renderThumbnails() {
+  const panel = document.getElementById('thumbPanel');
+  panel.innerHTML = '';
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'thumb-item' + (i === currentSlide ? ' active' : '');
+    div.onclick = () => { currentSlide = i; renderCurrentSlide(); };
+    div.innerHTML = '<div class="thumb-content">' + s.html + '</div><span class="thumb-num">' + (i + 1) + '</span>';
+    panel.appendChild(div);
+  });
+}
+
+function updateSlides() {
+  const md = document.getElementById('editor').value;
+  slides = parseSlides(md);
+  renderCurrentSlide();
+  renderThumbnails();
+  document.getElementById('slideCount').textContent = slides.length + ' slide' + (slides.length !== 1 ? 's' : '');
+  document.getElementById('charCount').textContent = md.length + ' chars';
+  localStorage.setItem('ai-slides-content', md);
+}
+// ===== Navigation =====
+function prevSlide() { if (currentSlide > 0) { currentSlide--; renderCurrentSlide(); } }
+function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; renderCurrentSlide(); } }
+
+// ===== Theme =====
+function changeTheme(theme) {
+  currentTheme = theme;
+  renderCurrentSlide();
+  localStorage.setItem('ai-slides-theme', theme);
+}
+
+// ===== Toolbar Formatting =====
+function insertFormat(before, after) {
+  const ta = document.getElementById('editor');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end);
+  const replacement = before + (sel || 'text') + after;
+  ta.value = ta.value.substring(0, start) + replacement + ta.value.substring(end);
+  ta.focus();
+  ta.selectionStart = start + before.length;
+  ta.selectionEnd = start + replacement.length - after.length;
+  updateSlides();
+}
+
+function insertLine(prefix) {
+  const ta = document.getElementById('editor');
+  const start = ta.selectionStart;
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(start);
+  const needsNewline = before.length > 0 && !before.endsWith('\n') ? '\n' : '';
+  const insertion = needsNewline + prefix;
+  ta.value = before + insertion + after;
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = start + insertion.length;
+  updateSlides();
+}
+
+function insertCodeBlock() {
+  const ta = document.getElementById('editor');
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end);
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+  const needsNewline = before.length > 0 && !before.endsWith('\n') ? '\n' : '';
+  const block = needsNewline + '```javascript\n' + (sel || '// your code here') + '\n```';
+  ta.value = before + block + after;
+  ta.focus();
+  updateSlides();
+}
+
+// ===== Fullscreen Presenter =====
+function enterFullscreen() {
+  if (slides.length === 0) return;
+  fsSlideIndex = currentSlide;
+  renderFsSlide();
+  document.getElementById('fullscreenOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function exitFullscreen() {
+  document.getElementById('fullscreenOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+  currentSlide = fsSlideIndex;
+  renderCurrentSlide();
+}
+
+function renderFsSlide() {
+  if (slides.length === 0) return;
+  if (fsSlideIndex < 0) fsSlideIndex = 0;
+  if (fsSlideIndex >= slides.length) fsSlideIndex = slides.length - 1;
+  const slide = slides[fsSlideIndex];
+  const el = document.getElementById('fullscreenSlide');
+  el.innerHTML = slide.html;
+  el.className = 'slide-render theme-' + currentTheme;
+  document.getElementById('fsCounter').textContent = (fsSlideIndex + 1) + ' / ' + slides.length;
+  const notesEl = document.getElementById('fullscreenNotes');
+  if (slide.notes) {
+    notesEl.textContent = '📝 ' + slide.notes;
+    notesEl.style.display = 'block';
+  } else {
+    notesEl.style.display = 'none';
+  }
+}
+
+function fsNav(dir) {
+  fsSlideIndex += dir;
+  renderFsSlide();
+}
+
+// ===== Export =====
+function exportPDF() {
+  // Render all slides for printing
+  const printWin = window.open('', '_blank');
+  const themeClass = 'theme-' + currentTheme;
+  let slidesHtml = '';
+  slides.forEach((s, i) => {
+    slidesHtml += '<div class="print-slide ' + themeClass + '" style="page-break-after:always;width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:60px 80px;box-sizing:border-box">' + s.html + '</div>';
+  });
+
+  printWin.document.write('<!DOCTYPE html><html><head><title>Slides - Print</title>');
+  printWin.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">');
+  printWin.document.write('<style>');
+  printWin.document.write('*{margin:0;padding:0;box-sizing:border-box}');
+  printWin.document.write('body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}');
+  printWin.document.write('.print-slide h1{font-size:2.5em;margin-bottom:.4em}.print-slide h2{font-size:1.8em;margin-bottom:.4em}.print-slide h3{font-size:1.3em;margin-bottom:.3em}');
+  printWin.document.write('.print-slide p{font-size:1.1em;line-height:1.7;margin-bottom:.6em}');
+  printWin.document.write('.print-slide ul,.print-slide ol{padding-left:1.5em;margin-bottom:.6em}.print-slide li{margin-bottom:.3em;line-height:1.6}');
+  printWin.document.write('.print-slide code{font-family:SF Mono,Monaco,monospace;font-size:.85em;padding:2px 6px;border-radius:4px}');
+  printWin.document.write('.print-slide pre{padding:16px;border-radius:8px;margin-bottom:.8em;overflow-x:auto}.print-slide pre code{padding:0;background:none}');
+  printWin.document.write('.print-slide blockquote{border-left:4px solid;padding:12px 20px;margin-bottom:.8em;border-radius:0 8px 8px 0;font-style:italic}');
+  printWin.document.write('.print-slide table{width:100%;border-collapse:collapse;margin-bottom:.8em}.print-slide th,.print-slide td{padding:8px 12px;border:1px solid;text-align:left}');
+  printWin.document.write('.print-slide img{max-width:80%;border-radius:8px;margin:.5em auto;display:block}');
+  // Theme styles for print
+  printWin.document.write('.theme-dark{background:linear-gradient(135deg,#0b0b12,#1a1a2c);color:#e8e8f4}.theme-dark h1,.theme-dark h2,.theme-dark h3{color:#fff}.theme-dark code{background:rgba(124,92,252,0.15);color:#a29bfe}.theme-dark pre{background:#0b0b12}.theme-dark blockquote{border-color:#7c5cfc;background:rgba(124,92,252,0.08)}.theme-dark th{background:#1a1a2c}.theme-dark th,.theme-dark td{border-color:#2a2a42}');
+  printWin.document.write('.theme-light{background:linear-gradient(135deg,#fafafa,#f0f0f5);color:#2d2d3a}.theme-light h1,.theme-light h2,.theme-light h3{color:#1a1a2e}.theme-light code{background:rgba(124,92,252,0.1);color:#6c5ce7}.theme-light pre{background:#1a1a2e;color:#e8e8f4}.theme-light blockquote{border-color:#6c5ce7;background:rgba(124,92,252,0.06);color:#444}.theme-light th{background:#e8e8f0}.theme-light th,.theme-light td{border-color:#ddd}');
+  printWin.document.write('.theme-gradient{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#e8e8f4}.theme-gradient h1,.theme-gradient h2,.theme-gradient h3{background:linear-gradient(135deg,#f093fb,#f5576c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.theme-gradient code{background:rgba(240,147,251,0.15);color:#f093fb}.theme-gradient pre{background:rgba(0,0,0,0.3)}.theme-gradient blockquote{border-color:#f093fb;background:rgba(240,147,251,0.08)}.theme-gradient th{background:rgba(240,147,251,0.15)}.theme-gradient th,.theme-gradient td{border-color:rgba(240,147,251,0.2)}');
+  printWin.document.write('.theme-corporate{background:#fff;color:#333}.theme-corporate h1,.theme-corporate h2,.theme-corporate h3{color:#1a365d}.theme-corporate h1{border-bottom:3px solid #2b6cb0;padding-bottom:.3em}.theme-corporate code{background:#edf2f7;color:#2b6cb0}.theme-corporate pre{background:#1a365d;color:#e2e8f0}.theme-corporate blockquote{border-color:#2b6cb0;background:#ebf8ff;color:#2a4365}.theme-corporate th{background:#2b6cb0;color:#fff}.theme-corporate th,.theme-corporate td{border-color:#e2e8f0}');
+  printWin.document.write('.theme-creative{background:linear-gradient(160deg,#1a1a2e,#16213e,#0f3460);color:#e8e8f4}.theme-creative h1,.theme-creative h2,.theme-creative h3{color:#e94560}.theme-creative code{background:rgba(233,69,96,0.15);color:#e94560}.theme-creative pre{background:rgba(0,0,0,0.4)}.theme-creative blockquote{border-color:#e94560;background:rgba(233,69,96,0.08)}.theme-creative th{background:rgba(233,69,96,0.2)}.theme-creative th,.theme-creative td{border-color:rgba(233,69,96,0.2)}');
+  printWin.document.write('.theme-nature{background:linear-gradient(135deg,#1b4332,#2d6a4f,#40916c);color:#f0fff4}.theme-nature h1,.theme-nature h2,.theme-nature h3{color:#d8f3dc}.theme-nature code{background:rgba(216,243,220,0.15);color:#95d5b2}.theme-nature pre{background:rgba(0,0,0,0.3)}.theme-nature blockquote{border-color:#52b788;background:rgba(82,183,136,0.1)}.theme-nature th{background:rgba(82,183,136,0.25)}.theme-nature th,.theme-nature td{border-color:rgba(82,183,136,0.2)}');
+  printWin.document.write('@media print{.print-slide{-webkit-print-color-adjust:exact;print-color-adjust:exact}}');
+  printWin.document.write('</style></head><body>');
+  printWin.document.write(slidesHtml);
+  printWin.document.write('<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>');
+  printWin.document.close();
+  setTimeout(() => { printWin.print(); }, 500);
+}
+
+// ===== Keyboard Shortcuts =====
+document.addEventListener('keydown', function(e) {
+  // Don't capture when typing in editor
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+  const fsActive = document.getElementById('fullscreenOverlay').classList.contains('active');
+
+  if (e.key === 'Escape' && fsActive) {
+    exitFullscreen();
+    e.preventDefault();
+  }
+  if (e.key === 'ArrowLeft') {
+    if (fsActive) fsNav(-1); else prevSlide();
+    e.preventDefault();
+  }
+  if (e.key === 'ArrowRight') {
+    if (fsActive) fsNav(1); else nextSlide();
+    e.preventDefault();
+  }
+});
+
+// Also handle keyboard in fullscreen
+document.getElementById('fullscreenOverlay').addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') exitFullscreen();
+  if (e.key === 'ArrowLeft') fsNav(-1);
+  if (e.key === 'ArrowRight') fsNav(1);
+});
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', function() {
+  const editor = document.getElementById('editor');
+
+  // Load saved content or sample
+  const saved = localStorage.getItem('ai-slides-content');
+  const savedTheme = localStorage.getItem('ai-slides-theme');
+  editor.value = saved || sampleMarkdown;
+  if (savedTheme) {
+    currentTheme = savedTheme;
+    document.getElementById('themeSelect').value = savedTheme;
+  }
+
+  // Debounced update
+  let timeout;
+  editor.addEventListener('input', function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(updateSlides, 150);
+  });
+
+  // Tab key support in editor
+  editor.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = this.selectionStart;
+      this.value = this.value.substring(0, start) + '  ' + this.value.substring(this.selectionEnd);
+      this.selectionStart = this.selectionEnd = start + 2;
+      updateSlides();
+    }
+  });
+
+  // Initial render
+  updateSlides();
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

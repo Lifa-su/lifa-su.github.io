@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Translate text to Morse code and back instantly. AI Morse code translator with audio playback, visual signals, and support for letters, numbers, and symbols.">
+<link rel="canonical" href="https://lifa-su.com/ai-morse-code/">
+<title>AI Morse Code Translator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#0f3460;--highlight:#e94560;--text:#eee;--text-dim:#999;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+body.flash-on{background:#fff !important}
+h1{font-size:1.8rem;margin:20px 0 8px;text-align:center}
+h1 span{color:var(--highlight)}
+.sub{color:var(--text-dim);margin-bottom:24px;font-size:.9rem;text-align:center}
+.wrap{width:100%;max-width:700px}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card-t{font-size:.85rem;color:var(--text-dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+textarea{width:100%;height:100px;background:var(--accent);border:1px solid #ffffff15;border-radius:8px;color:var(--text);padding:12px;font-size:1rem;resize:vertical;font-family:inherit}
+textarea:focus{outline:none;border-color:var(--highlight)}
+textarea::placeholder{color:#666}
+.ctrls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.bp{background:var(--highlight);color:#fff}.bp:hover{background:#d63050}.bp:disabled{opacity:.5;cursor:not-allowed}
+.bs{background:var(--accent);color:var(--text)}.bs:hover{background:#1a4a80}.bs.on{background:var(--highlight);color:#fff}
+.bi{background:none;border:1px solid #ffffff20;color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-size:1rem;transition:all .2s}
+.bi:hover{border-color:var(--highlight);color:var(--highlight)}.bi.on{background:var(--highlight);border-color:var(--highlight);color:#fff}
+.spd{display:flex;align-items:center;gap:10px;flex:1;min-width:200px}
+.spd label{font-size:.85rem;color:var(--text-dim);white-space:nowrap}
+.spd input[type=range]{flex:1;accent-color:var(--highlight)}
+.sv{font-size:.85rem;color:var(--highlight);min-width:55px}
+.outa{position:relative}.outa textarea{background:var(--bg)}
+.cpb{position:absolute;top:38px;right:12px}
+.swb{display:flex;justify-content:center;margin:-8px 0}
+.mt{display:flex;gap:8px;margin-bottom:10px}
+.st{font-size:.8rem;color:var(--text-dim);text-align:center;margin-top:8px;min-height:1.2em}
+.rt{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;max-height:200px;overflow-y:auto}
+.ri{background:var(--accent);border-radius:6px;padding:6px 8px;text-align:center;font-size:.8rem}
+.ri .ch{font-weight:700;color:var(--highlight)}.ri .co{color:var(--text-dim);font-family:monospace;font-size:.75rem}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--highlight);color:#fff;padding:10px 24px;border-radius:20px;font-size:.9rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+footer{margin-top:auto;padding:20px;text-align:center;color:var(--text-dim);font-size:.75rem}
+@media(max-width:500px){h1{font-size:1.4rem}.ctrls{flex-direction:column;align-items:stretch}.spd{min-width:unset}.rt{grid-template-columns:repeat(auto-fill,minmax(65px,1fr))}}
+.pro-section{position:relative;margin-top:24px;border-radius:var(--radius);overflow:hidden}
+.pro-blur{filter:blur(4px);pointer-events:none;user-select:none;opacity:.6;padding:24px;background:var(--surface);border-radius:var(--radius)}
+.pro-blur h3{font-size:1rem;margin-bottom:12px;color:var(--text)}
+.pro-blur .pro-mock-row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.pro-blur .pro-mock-input{flex:1;min-width:120px;padding:10px 14px;background:var(--bg);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text-dim);font-size:.85rem}
+.pro-blur .pro-mock-btn{padding:10px 20px;background:var(--highlight);border-radius:8px;color:#fff;font-size:.85rem;font-weight:600}
+.pro-blur .pro-mock-upload{border:2px dashed rgba(255,255,255,.15);border-radius:8px;padding:16px;text-align:center;color:var(--text-dim);font-size:.85rem}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.3);border-radius:var(--radius);z-index:10;transition:background .2s}
+.pro-overlay:hover{background:rgba(0,0,0,.45)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:600;color:#fff}
+.pro-sublabel{font-size:.85rem;color:rgba(255,255,255,.7);margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:var(--highlight);margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:16px 0;padding:0}
+.pro-modal li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.95rem}
+.pro-modal li::before{content:'✓ ';color:#2ecc71;font-weight:700}
+.pro-modal .pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--highlight),#a855f7);border:none;border-radius:10px;color:#fff;font-size:1.1rem;font-weight:600;cursor:pointer;margin-top:16px;text-decoration:none;text-align:center;transition:transform .2s,box-shadow .2s}
+.pro-modal .pro-cta:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-modal .pro-later{background:none;border:none;color:var(--text-dim);cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-modal .pro-later:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>&#9889; <span>Morse Code</span> Translator</h1>
+<p class="sub">Text &#8596; Morse &middot; Audio &middot; Flash</p>
+<div class="card"><div class="mt">
+<button class="btn bs on" id="mT" onclick="setMode('t')">Text &#8594; Morse</button>
+<button class="btn bs" id="mM" onclick="setMode('m')">Morse &#8594; Text</button>
+</div><textarea id="inp" placeholder="Type your message here..." oninput="convert()"></textarea></div>
+<div class="swb"><button class="bi" onclick="swapMode()">&#8645;</button></div>
+<div class="card outa"><div class="card-t">Result</div>
+<textarea id="out" readonly></textarea>
+<button class="bi cpb" onclick="copyR()">&#128203;</button></div>
+<div class="card"><div class="ctrls">
+<button class="btn bp" id="playB" onclick="togglePlay()">&#9654; Play</button>
+<button class="bi" id="flashB" onclick="toggleFlash()">&#128161;</button>
+<div class="spd"><label>Speed</label>
+<input type="range" id="wpm" min="5" max="30" value="15" oninput="updWpm()">
+<span class="sv" id="wV">15 WPM</span></div>
+</div><div class="st" id="status"></div></div>
+<div class="card"><div class="card-t">Reference</div><div class="rt" id="ref"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<footer>AI Morse Code Translator &copy; 2026</footer>
+<script>
+const M={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..'};
+const N={'0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.'};
+const P={'.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':'-..-.',':':'---...',';':'-.-.-.','+':'.-.-.','-':'-....-','_':'..--.-','(':'-.--.',')':'-.--.-','&':'.-...','@':'.--.-.','\'':'.----.','\"':'.-..-.','=':'-...-'};
+const ALL=Object.assign({},M,N,P);
+const REV={};for(const k in ALL)REV[ALL[k]]=k;
+let mode='t',playing=false,flashOn=false,stopF=false,actx=null;
+function $(id){return document.getElementById(id)}
+function setMode(m){mode=m;$('mT').classList.toggle('on',m==='t');$('mM').classList.toggle('on',m==='m');$('inp').placeholder=m==='t'?'Type your message here...':'Enter morse code (use . and -, separate letters with space, words with /)';convert()}
+function swapMode(){const v=$('out').value;setMode(mode==='t'?'m':'t');$('inp').value=v;convert()}
+function textToMorse(t){return t.toUpperCase().split(' ').map(w=>[...w].map(c=>ALL[c]||'').filter(Boolean).join(' ')).join(' / ')}
+function morseToText(m){return m.split('/').map(w=>w.trim().split(/\s+/).map(c=>REV[c]||'').join('')).join(' ')}
+function convert(){const v=$('inp').value;$('out').value=mode==='t'?textToMorse(v):morseToText(v)}
+function copyR(){const v=$('out').value;if(!v)return;navigator.clipboard.writeText(v).then(()=>toast('Copied!')).catch(()=>{const a=document.createElement('textarea');a.value=v;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('Copied!')})}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function updWpm(){$('wV').textContent=$('wpm').value+' WPM'}
+function getUnit(){return 1200/parseInt($('wpm').value)}
+function getCtx(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx}
+function beep(dur){return new Promise(r=>{const c=getCtx(),o=c.createOscillator(),g=c.createGain();o.frequency.value=600;o.type='sine';g.gain.value=0.5;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+dur/1000);o.onended=r})}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function flash(ms){return new Promise(r=>{document.body.classList.add('flash-on');setTimeout(()=>{document.body.classList.remove('flash-on');r()},ms)})}
+async function playMorse(morse){const u=getUnit();const symbols=morse.replace(/\s*\/\s*/g,' / ');for(let i=0;i<symbols.length;i++){if(stopF)return;const c=symbols[i];if(c==='.'){await beep(u);if(flashOn)await flash(u);else await wait(u);await wait(u)}else if(c==='-'){await beep(u*3);if(flashOn)await flash(u*3);else await wait(u*3);await wait(u)}else if(c===' '){if(symbols[i+1]==='/'){await wait(u*7);i+=2}else{await wait(u*3)}}}}
+async function togglePlay(){if(playing){stopF=true;return}const morse=mode==='t'?$('out').value:$('inp').value;if(!morse){toast('Nothing to play');return}playing=true;stopF=false;$('playB').innerHTML='&#9724; Stop';$('status').textContent='Playing...';try{await playMorse(morse)}catch(e){}playing=false;stopF=false;$('playB').innerHTML='&#9654; Play';$('status').textContent='';document.body.classList.remove('flash-on')}
+function toggleFlash(){flashOn=!flashOn;$('flashB').classList.toggle('on',flashOn);toast(flashOn?'Flash ON':'Flash OFF')}
+function buildRef(){let h='';for(const k in ALL)h+='<div class="ri"><div class="ch">'+k+'</div><div class="co">'+ALL[k]+'</div></div>';$('ref').innerHTML=h}
+buildRef();convert();
+</script>
+<!-- Pro Section -->
+<div class="pro-section" style="width:100%;max-width:700px;margin:24px auto 0">
+<div class="pro-blur">
+<h3>🔐 File Encryption</h3>
+<div class="pro-mock-upload">📁 Drop files here to encrypt with Morse code</div>
+<h3 style="margin-top:12px">📦 Batch Conversion</h3>
+<div class="pro-mock-row">
+<div class="pro-mock-input" style="flex:2">Line 1: Hello World → .... . .-.. .-.. ---<br>Line 2: SOS → ... --- ...</div>
+</div>
+<h3>🔊 Audio Export</h3>
+<div class="pro-mock-row">
+<div class="pro-mock-input">Format: WAV</div>
+<div class="pro-mock-input">Frequency: 600 Hz</div>
+<div class="pro-mock-btn">Export .wav</div>
+</div>
+</div>
+<div class="pro-overlay" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock</div>
+</div>
+</div>
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>⚡ Morse Code Pro</h2>
+<div class="pro-price">$9</div>
+<p style="color:var(--text-dim);font-size:.9rem">One-time payment · Lifetime access</p>
+<ul>
+<li>File encryption — encode any file with Morse code</li>
+<li>Batch conversion — translate multiple lines at once</li>
+<li>Audio export — download Morse as WAV/MP3</li>
+<li>Priority support & future updates</li>
+</ul>
+<a class="pro-cta" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

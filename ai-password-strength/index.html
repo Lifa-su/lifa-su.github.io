@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Password Strength Checker - Free Online Password Security Tool</title>
+<meta name="description" content="Check your password strength instantly. Get crack time estimates, security tips, and improvement suggestions. 100% client-side, your password never leaves your browser.">
+<link rel="canonical" href="https://lifa-su.com/ai-password-strength/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.container{max-width:600px;width:100%;margin:0 auto}
+h1{text-align:center;font-size:1.8rem;margin:30px 0 8px;color:#fff}
+.subtitle{text-align:center;color:#888;font-size:.95rem;margin-bottom:30px}
+.badge{text-align:center;margin-bottom:24px}
+.badge span{background:#16213e;color:#0f9;font-size:.8rem;padding:6px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:6px}
+.iw{position:relative;margin-bottom:16px}
+.iw input{width:100%;padding:16px 50px 16px 18px;font-size:1.1rem;border:2px solid #2a2a4a;border-radius:12px;background:#16213e;color:#fff;outline:none;transition:border-color .3s}
+.iw input:focus{border-color:#e94560}
+.tv{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;font-size:1.3rem;padding:4px}
+.tv:hover{color:#fff}
+.sb{height:8px;border-radius:4px;background:#2a2a4a;margin-bottom:8px;overflow:hidden}
+.sb .fill{height:100%;border-radius:4px;transition:width .4s,background .4s;width:0}
+.sr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.sl{font-weight:600;font-size:1rem}
+.ct{font-size:.85rem;color:#888}
+.card{background:#16213e;border-radius:12px;padding:18px;margin-bottom:16px}
+.card h3{font-size:.9rem;color:#888;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+.ci{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:.95rem}
+.ci .ic{width:20px;text-align:center;font-size:1rem}
+.ci.pass .ic{color:#0f9}.ci.fail .ic{color:#e94560}.ci.pass{color:#aaa}
+.sg{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:.9rem;color:#e94560}
+.sg .ic{flex-shrink:0}
+.scr{display:flex;justify-content:space-between;padding:4px 0;font-size:.9rem}
+.scr .v{color:#0f9}.scr .v.n{color:#e94560}
+footer{text-align:center;color:#555;font-size:.8rem;margin-top:40px;padding:20px 0}
+.hid{display:none}
+@media(max-width:480px){body{padding:12px}h1{font-size:1.4rem}.iw input{font-size:1rem;padding:14px 46px 14px 14px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#128274; Password Strength Checker</h1>
+<p class="subtitle">Check how secure your password is — instantly, privately.</p>
+<div class="badge"><span>&#128737; 100% Client-Side — Your password never leaves your browser</span></div>
+<div class="iw">
+<input type="password" id="pw" placeholder="Enter your password..." autocomplete="off" aria-label="Password input">
+<button class="tv" id="tb" aria-label="Toggle password visibility">&#128065;</button>
+</div>
+<div id="res" class="hid">
+<div class="sb"><div class="fill" id="bar"></div></div>
+<div class="sr"><span class="sl" id="lbl"></span><span class="ct" id="ct"></span></div>
+<div class="card"><h3>Security Checks</h3><div id="cl"></div></div>
+<div id="sgb" class="card hid"><h3>Suggestions</h3><div id="sgl"></div></div>
+<div class="card"><h3>Score Breakdown</h3><div id="sb"></div></div>
+</div>
+</div>
+
+<!-- Pro Section -->
+<style>
+.pro-section{position:relative;margin-top:24px;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-section:hover{transform:translateY(-2px)}
+.pro-blur{filter:blur(5px);pointer-events:none;opacity:.65;padding:20px;background:#16213e;border-radius:12px}
+.pro-blur-grid{display:grid;gap:12px}
+.pro-blur-item{background:#1a1a2e;border-radius:10px;padding:14px}
+.pro-blur-item .mock-icon{font-size:1.2rem;margin-bottom:6px}
+.pro-blur-item .mock-title{font-size:.85rem;color:#888;font-weight:600;margin-bottom:8px}
+.pro-blur-item .mock-row{display:flex;gap:8px;align-items:center}
+.pro-blur-item .mock-input{flex:1;height:32px;background:#2a2a4a;border-radius:6px}
+.pro-blur-item .mock-btn{height:32px;width:80px;background:#e94560;border-radius:6px}
+.pro-blur-item .mock-list{margin-top:8px}
+.pro-blur-item .mock-list-item{height:10px;background:#2a2a4a;border-radius:3px;margin-bottom:6px}
+.pro-blur-item .mock-list-item:nth-child(2){width:75%}
+.pro-blur-item .mock-list-item:nth-child(3){width:60%}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);border-radius:12px;border:2px dashed rgba(233,69,96,.4)}
+.pro-lock{font-size:2.5rem;margin-bottom:8px}
+.pro-label{font-size:1.1rem;font-weight:700;color:#fff}
+.pro-sublabel{font-size:.85rem;color:#888;margin-top:4px}
+.pro-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.pro-modal-bg.show{display:flex}
+.pro-modal{background:#16213e;border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;border:1px solid #2a2a4a;animation:proIn .25s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;color:#e94560;margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:20px 0}
+.pro-modal li{padding:10px 0;border-bottom:1px solid #2a2a4a;font-size:.95rem;display:flex;align-items:center;gap:10px}
+.pro-modal li:last-child{border-bottom:none}
+.pro-modal li .li-icon{font-size:1.1rem;flex-shrink:0}
+.btn-upgrade{display:block;width:100%;padding:14px;background:#e94560;color:#fff;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:20px;transition:background .2s;text-decoration:none;text-align:center}
+.btn-upgrade:hover{background:#d63851}
+.btn-later{display:block;width:100%;padding:10px;background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:8px}
+.btn-later:hover{color:#fff}
+</style>
+
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-blur">
+<div class="pro-blur-grid">
+<div class="pro-blur-item"><div class="mock-icon">🔑</div><div class="mock-title">Password Generator</div><div class="mock-row"><div class="mock-input"></div><div class="mock-btn"></div></div></div>
+<div class="pro-blur-item"><div class="mock-icon">📋</div><div class="mock-title">Batch Password Check</div><div class="mock-list"><div class="mock-list-item"></div><div class="mock-list-item"></div><div class="mock-list-item"></div></div></div>
+<div class="pro-blur-item"><div class="mock-icon">🛡️</div><div class="mock-title">Breach Database Query</div><div class="mock-row"><div class="mock-input"></div><div class="mock-btn"></div></div></div>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Click to unlock generator, batch check & breach detection</div>
+</div>
+</div>
+
+<div class="pro-modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-modal">
+<h2>🔐 Password Pro</h2>
+<p style="color:#888;font-size:.9rem">Complete password security toolkit</p>
+<div class="pro-price">$9</div>
+<ul>
+<li><span class="li-icon">🔑</span>Password Generator — create strong, customizable passwords instantly</li>
+<li><span class="li-icon">📋</span>Batch Check — analyze multiple passwords at once</li>
+<li><span class="li-icon">🛡️</span>Breach Database — check if your password appeared in known data leaks</li>
+<li><span class="li-icon">📊</span>Detailed Reports — exportable security audit results</li>
+<li><span class="li-icon">♾️</span>Lifetime access — one-time payment, no subscription</li>
+</ul>
+<a class="btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+
+<footer><p>Built for security-conscious users. No data collected. No cookies. No tracking.</p></footer>
+<script>
+(function(){
+var C=new Set(["123456","password","12345678","qwerty","123456789","12345","1234","111111","1234567","dragon",
+"123123","baseball","abc123","football","monkey","letmein","shadow","master","666666","qwertyuiop",
+"123321","mustang","1234567890","michael","654321","superman","1qaz2wsx","7777777","121212","000000",
+"qazwsx","123qwe","killer","trustno1","jordan","jennifer","zxcvbnm","asdfgh","hunter","buster",
+"soccer","harley","batman","andrew","tigger","sunshine","iloveyou","2000","charlie","robert",
+"thomas","hockey","ranger","daniel","starwars","klaster","112233","george","computer","michelle",
+"jessica","pepper","1111","zxcvbn","555555","11111111","131313","freedom","777777","pass",
+"maggie","159753","aaaaaa","ginger","princess","joshua","cheese","amanda","summer","love",
+"ashley","nicole","chelsea","biteme","matthew","access","yankees","987654321","dallas","austin",
+"thunder","taylor","matrix","mobilemail","master1","password1","diamond","1q2w3e4r","sunshine1",
+"welcome","hello","donald","password123","admin","qwerty123","abc1234","passw0rd","p@ssw0rd",
+"login","welcome1","admin123","letmein1","monkey1","charlie1","starwars1","shadow1"]);
+
+var $=function(id){return document.getElementById(id)};
+var pw=$("pw"),bar=$("bar"),lbl=$("lbl"),ct=$("ct"),res=$("res"),cl=$("cl"),sgb=$("sgb"),sgl=$("sgl"),sb=$("sb");
+
+$("tb").onclick=function(){
+  var t=pw.type==="password"?"text":"password";
+  pw.type=t;
+  this.textContent=t==="password"?"\u{1F441}":"\u{1F648}";
+};
+
+function hasRepeat(s){
+  for(var i=0;i<s.length-2;i++){
+    if(s[i]===s[i+1]&&s[i+1]===s[i+2])return true;
+  }
+  var seq="abcdefghijklmnopqrstuvwxyz0123456789";
+  var sl=s.toLowerCase();
+  for(var i=0;i<sl.length-2;i++){
+    var idx=seq.indexOf(sl[i]);
+    if(idx>=0&&idx<seq.length-2&&sl[i+1]===seq[idx+1]&&sl[i+2]===seq[idx+2])return true;
+  }
+  return false;
+}
+
+function crackEst(s){
+  var pool=0;
+  if(/[a-z]/.test(s))pool+=26;
+  if(/[A-Z]/.test(s))pool+=26;
+  if(/[0-9]/.test(s))pool+=10;
+  if(/[^a-zA-Z0-9]/.test(s))pool+=33;
+  if(pool===0)pool=26;
+  var combos=Math.pow(pool,s.length);
+  var gps=1e10;
+  var secs=combos/gps/2;
+  if(secs<1)return"Instantly";
+  if(secs<60)return Math.round(secs)+" seconds";
+  if(secs<3600)return Math.round(secs/60)+" minutes";
+  if(secs<86400)return Math.round(secs/3600)+" hours";
+  if(secs<31536000)return Math.round(secs/86400)+" days";
+  var y=secs/31536000;
+  if(y<1000)return Math.round(y)+" years";
+  if(y<1e6)return Math.round(y/1000)+"k years";
+  if(y<1e9)return Math.round(y/1e6)+"M years";
+  return Math.round(y/1e9)+"B years";
+}
+
+function analyze(s){
+  var len=s.length;
+  var checks=[
+    {name:"At least 8 characters",pass:len>=8},
+    {name:"Contains uppercase letter",pass:/[A-Z]/.test(s)},
+    {name:"Contains lowercase letter",pass:/[a-z]/.test(s)},
+    {name:"Contains number",pass:/[0-9]/.test(s)},
+    {name:"Contains special character",pass:/[^a-zA-Z0-9]/.test(s)},
+    {name:"Not a common password",pass:!C.has(s.toLowerCase())},
+    {name:"No repeated/sequential patterns",pass:!hasRepeat(s)}
+  ];
+  var score=0;var breakdown=[];
+  if(len>=8){score+=20;breakdown.push(["Length \u2265 8","+20"])}
+  else if(len>=6){score+=10;breakdown.push(["Length \u2265 6","+10"])}
+  else{breakdown.push(["Short password","0"])}
+  if(len>=12){score+=10;breakdown.push(["Length \u2265 12","+10"])}
+  if(len>=16){score+=5;breakdown.push(["Length \u2265 16","+5"])}
+  if(/[A-Z]/.test(s)){score+=15;breakdown.push(["Uppercase","+15"])}
+  if(/[a-z]/.test(s)){score+=15;breakdown.push(["Lowercase","+15"])}
+  if(/[0-9]/.test(s)){score+=15;breakdown.push(["Numbers","+15"])}
+  if(/[^a-zA-Z0-9]/.test(s)){score+=20;breakdown.push(["Special chars","+20"])}
+  if(C.has(s.toLowerCase())){score-=40;breakdown.push(["Common password","-40"])}
+  if(hasRepeat(s)){score-=15;breakdown.push(["Repeated/sequential","-15"])}
+  score=Math.max(0,Math.min(100,score));
+  var lvl,color;
+  if(score<30){lvl="Weak";color="#e94560"}
+  else if(score<55){lvl="Fair";color="#f5a623"}
+  else if(score<80){lvl="Strong";color="#0f9"}
+  else{lvl="Very Strong";color="#00ff88"}
+  var sugs=[];
+  if(len<8)sugs.push("Use at least 8 characters (12+ recommended)");
+  if(!/[A-Z]/.test(s))sugs.push("Add uppercase letters (A-Z)");
+  if(!/[a-z]/.test(s))sugs.push("Add lowercase letters (a-z)");
+  if(!/[0-9]/.test(s))sugs.push("Add numbers (0-9)");
+  if(!/[^a-zA-Z0-9]/.test(s))sugs.push("Add special characters (!@#$%^&*)");
+  if(C.has(s.toLowerCase()))sugs.push("This is a commonly used password \u2014 choose something unique");
+  if(hasRepeat(s))sugs.push("Avoid repeated characters or sequential patterns (abc, 123)");
+  return{checks:checks,score:score,lvl:lvl,color:color,sugs:sugs,breakdown:breakdown,time:crackEst(s)};
+}
+
+pw.addEventListener("input",function(){
+  var s=pw.value;
+  if(!s){res.classList.add("hid");return}
+  res.classList.remove("hid");
+  var r=analyze(s);
+  bar.style.width=r.score+"%";
+  bar.style.background=r.color;
+  lbl.textContent=r.lvl;
+  lbl.style.color=r.color;
+  ct.textContent="\u23F1 Crack time: "+r.time;
+  cl.innerHTML="";
+  r.checks.forEach(function(c){
+    var d=document.createElement("div");
+    d.className="ci "+(c.pass?"pass":"fail");
+    d.innerHTML='<span class="ic">'+(c.pass?"\u2713":"\u2717")+"</span><span>"+c.name+"</span>";
+    cl.appendChild(d);
+  });
+  if(r.sugs.length){
+    sgb.classList.remove("hid");
+    sgl.innerHTML="";
+    r.sugs.forEach(function(s){
+      var d=document.createElement("div");
+      d.className="sg";
+      d.innerHTML='<span class="ic">\u{1F4A1}</span><span>'+s+"</span>";
+      sgl.appendChild(d);
+    });
+  }else{sgb.classList.add("hid")}
+  sb.innerHTML="";
+  r.breakdown.forEach(function(b){
+    var d=document.createElement("div");
+    d.className="scr";
+    var neg=b[1].indexOf("-")===0;
+    d.innerHTML="<span>"+b[0]+'</span><span class="v'+(neg?" n":"")+'">'+b[1]+"</span>";
+    sb.appendChild(d);
+  });
+  var tot=document.createElement("div");
+  tot.className="scr";
+  tot.style.borderTop="1px solid #2a2a4a";
+  tot.style.marginTop="8px";
+  tot.style.paddingTop="8px";
+  tot.style.fontWeight="600";
+  tot.innerHTML='<span>Total</span><span class="v" style="color:'+r.color+'">'+r.score+"/100</span>";
+  sb.appendChild(tot);
+});
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

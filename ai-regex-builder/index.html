@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Regex Builder - Visual Regular Expression Constructor</title>
+<meta name="description" content="Build, test, and debug regular expressions visually with drag-and-drop interface, common pattern library, and real-time matching.">
+<link rel="canonical" href="https://lifa-su.com/ai-regex-builder/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--border:#2a2a4a;--success:#00d2ff;--group0:#e94560;--group1:#00d2ff;--group2:#f5a623;--group3:#7ed321;--group4:#bd10e0;--group5:#50e3c2;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--success)}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+header{text-align:center;padding:24px 0 16px;border-bottom:1px solid var(--border);margin-bottom:20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:16px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+.panel h2{font-size:1rem;margin-bottom:12px;color:var(--success);display:flex;align-items:center;gap:6px}
+.panel h2 span{font-size:1.1rem}
+
+/* Pattern Library */
+.pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pattern-btn{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;cursor:pointer;color:var(--text);font-size:.8rem;transition:all .2s;text-align:left}
+.pattern-btn:hover{border-color:var(--accent);background:rgba(233,69,96,.1)}
+.pattern-btn .label{font-weight:600;display:block;margin-bottom:2px}
+.pattern-btn .regex{color:var(--text2);font-family:monospace;font-size:.7rem;word-break:break-all}
+
+/* Builder Area */
+.builder-input{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.builder-input input{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;color:var(--text);font-family:monospace;font-size:1rem}
+.builder-input input:focus{outline:none;border-color:var(--accent)}
+.flags{display:flex;gap:4px;flex-wrap:wrap}
+.flag-btn{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--text2);font-size:.8rem;font-family:monospace;transition:all .2s}
+.flag-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Drag and Drop Blocks */
+.block-palette{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.block{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 10px;cursor:grab;font-family:monospace;font-size:.85rem;color:var(--text);transition:all .2s;user-select:none}
+.block:hover{border-color:var(--success);background:rgba(0,210,255,.1)}
+.block:active{cursor:grabbing}
+.block-category{font-size:.75rem;color:var(--text2);margin:8px 0 4px;font-weight:600}
+
+/* Drop Zone */
+.drop-zone{min-height:50px;background:var(--bg);border:2px dashed var(--border);border-radius:6px;padding:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;transition:all .2s}
+.drop-zone.drag-over{border-color:var(--success);background:rgba(0,210,255,.05)}
+.drop-zone .dropped{background:var(--accent2);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:3px 8px;font-family:monospace;font-size:.85rem;cursor:pointer;position:relative;display:inline-flex;align-items:center;gap:4px}
+.drop-zone .dropped .remove{font-size:.7rem;cursor:pointer;opacity:.6;margin-left:2px}
+.drop-zone .dropped .remove:hover{opacity:1;color:var(--accent)}
+.drop-zone-hint{color:var(--text2);font-size:.8rem;font-style:italic}
+
+/* Test Area */
+.test-area textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-family:monospace;font-size:.9rem;resize:vertical;min-height:100px}
+.test-area textarea:focus{outline:none;border-color:var(--accent)}
+
+/* Results */
+.results{margin-top:12px}
+.match-info{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.match-count{background:var(--bg);padding:4px 10px;border-radius:4px;font-size:.85rem}
+.match-count b{color:var(--success)}
+.result-display{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:monospace;font-size:.9rem;line-height:1.8;white-space:pre-wrap;word-break:break-all;min-height:60px}
+.hl{border-radius:3px;padding:1px 2px}
+.hl-0{background:rgba(233,69,96,.3);border-bottom:2px solid var(--group0)}
+.hl-1{background:rgba(0,210,255,.3);border-bottom:2px solid var(--group1)}
+.hl-2{background:rgba(245,166,35,.3);border-bottom:2px solid var(--group2)}
+.hl-3{background:rgba(126,211,33,.3);border-bottom:2px solid var(--group3)}
+.hl-4{background:rgba(189,16,224,.3);border-bottom:2px solid var(--group4)}
+.hl-5{background:rgba(80,227,194,.3);border-bottom:2px solid var(--group5)}
+
+/* Match Details */
+.match-details{margin-top:12px}
+.match-item{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px}
+.match-item .match-header{font-weight:600;color:var(--accent);margin-bottom:4px;font-size:.85rem}
+.match-item .group-row{font-size:.8rem;color:var(--text2);padding:2px 0}
+.match-item .group-row b{color:var(--text)}
+
+/* Legend */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:.75rem;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+
+/* Cheatsheet */
+.cheatsheet{display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:.78rem}
+.cheatsheet div{display:flex;justify-content:space-between;padding:3px 6px;background:var(--bg);border-radius:3px}
+.cheatsheet code{color:var(--success);font-family:monospace}
+
+/* Copy button */
+.copy-btn{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.copy-btn:hover{opacity:.85}
+.copy-btn.copied{background:var(--success)}
+
+/* Error */
+.error-msg{color:var(--accent);font-size:.85rem;margin-top:4px;display:none}
+.error-msg.show{display:block}
+
+/* Footer */
+footer{text-align:center;padding:20px;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:24px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>&#x1f9e9; AI Regex Builder</h1>
+<p>Visual regex constructor with real-time testing and match highlighting</p>
+</header>
+
+<div class="grid">
+<!-- Left Sidebar -->
+<div class="sidebar">
+<div class="panel">
+<h2><span>&#x1f4da;</span> Pattern Library</h2>
+<div class="pattern-grid" id="patternGrid"></div>
+</div>
+<div class="panel">
+<h2><span>&#x1f4d6;</span> Quick Reference</h2>
+<div class="cheatsheet">
+<div><code>.</code> Any char</div>
+<div><code>\d</code> Digit</div>
+<div><code>\w</code> Word char</div>
+<div><code>\s</code> Whitespace</div>
+<div><code>\b</code> Boundary</div>
+<div><code>^</code> Start</div>
+<div><code>$</code> End</div>
+<div><code>*</code> 0 or more</div>
+<div><code>+</code> 1 or more</div>
+<div><code>?</code> Optional</div>
+<div><code>{n,m}</code> Range</div>
+<div><code>[abc]</code> Char set</div>
+<div><code>(x)</code> Group</div>
+<div><code>x|y</code> Or</div>
+<div><code>(?:x)</code> Non-cap</div>
+<div><code>(?=x)</code> Lookahead</div>
+</div>
+</div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+<div class="panel">
+<h2><span>&#x1f527;</span> Regex Builder</h2>
+<div class="builder-input">
+<input type="text" id="regexInput" placeholder="Type or build your regex..." spellcheck="false" aria-label="Regular expression input">
+<div class="flags">
+<button class="flag-btn active" data-flag="g" title="Global">g</button>
+<button class="flag-btn" data-flag="i" title="Case insensitive">i</button>
+<button class="flag-btn active" data-flag="m" title="Multiline">m</button>
+<button class="flag-btn" data-flag="s" title="Dotall">s</button>
+<button class="flag-btn" data-flag="u" title="Unicode">u</button>
+</div>
+<button class="copy-btn" id="copyBtn" title="Copy regex">Copy</button>
+</div>
+<div class="error-msg" id="errorMsg"></div>
+
+<!-- Drag blocks -->
+<div class="block-category">Characters</div>
+<div class="block-palette">
+<div class="block" draggable="true" data-value=".">.</div>
+<div class="block" draggable="true" data-value="\d">\d</div>
+<div class="block" draggable="true" data-value="\D">\D</div>
+<div class="block" draggable="true" data-value="\w">\w</div>
+<div class="block" draggable="true" data-value="\W">\W</div>
+<div class="block" draggable="true" data-value="\s">\s</div>
+<div class="block" draggable="true" data-value="\S">\S</div>
+<div class="block" draggable="true" data-value="\b">\b</div>
+</div>
+<div class="block-category">Quantifiers</div>
+<div class="block-palette">
+<div class="block" draggable="true" data-value="*">*</div>
+<div class="block" draggable="true" data-value="+">+</div>
+<div class="block" draggable="true" data-value="?">?</div>
+<div class="block" draggable="true" data-value="{n}">{n}</div>
+<div class="block" draggable="true" data-value="{n,}">{n,}</div>
+<div class="block" draggable="true" data-value="{n,m}">{n,m}</div>
+</div>
+<div class="block-category">Groups &amp; Anchors</div>
+<div class="block-palette">
+<div class="block" draggable="true" data-value="()">( )</div>
+<div class="block" draggable="true" data-value="(?:)">(?:)</div>
+<div class="block" draggable="true" data-value="(?=)">(?=)</div>
+<div class="block" draggable="true" data-value="(?!)">(?!)</div>
+<div class="block" draggable="true" data-value="[]">[ ]</div>
+<div class="block" draggable="true" data-value="[^]">[^ ]</div>
+<div class="block" draggable="true" data-value="^">^</div>
+<div class="block" draggable="true" data-value="$">$</div>
+<div class="block" draggable="true" data-value="|">|</div>
+</div>
+
+<div class="block-category">Drop zone (drag blocks here)</div>
+<div class="drop-zone" id="dropZone">
+<span class="drop-zone-hint">Drag and drop regex blocks here to build your pattern</span>
+</div>
+</div>
+
+<div class="panel test-area">
+<h2><span>&#x1f9ea;</span> Test String</h2>
+<textarea id="testInput" placeholder="Enter text to test against your regex..." aria-label="Test string input">Hello, my email is user@example.com and backup is test.dev@company.co.uk
+Visit https://www.example.com or http://test.org/path?q=1
+Call me at +1-555-123-4567 or (555) 987-6543
+Server IP: 192.168.1.1 and 10.0.0.255
+Date: 2024-01-15 and 12/25/2023</textarea>
+</div>
+
+<div class="panel">
+<h2><span>&#x2728;</span> Match Results</h2>
+<div class="match-info">
+<span class="match-count" id="matchCount">Matches: <b>0</b></span>
+</div>
+<div class="legend" id="legend"></div>
+<div class="result-display" id="resultDisplay"></div>
+<div class="match-details" id="matchDetails"></div>
+</div>
+</div>
+</div>
+
+<footer>
+AI Regex Builder &mdash; Build, test, and debug regular expressions visually.
+</footer>
+</div>
+
+<script>
+// Pattern Library
+const patterns = [
+  {label:"Email",regex:"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",desc:"Email address"},
+  {label:"URL",regex:"https?://[a-zA-Z0-9.-]+(?:/[^\s]*)?",desc:"HTTP/HTTPS URL"},
+  {label:"Phone (US)",regex:"(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\d{3})[-.\s]?\d{3}[-.\s]?\d{4}",desc:"US phone number"},
+  {label:"IPv4",regex:"(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)",desc:"IPv4 address"},
+  {label:"Date",regex:"\d{4}[-/]\d{2}[-/]\d{2}|\d{2}[-/]\d{2}[-/]\d{4}",desc:"Date formats"},
+  {label:"Hex Color",regex:"#(?:[0-9a-fA-F]{3}){1,2}\b",desc:"Hex color code"},
+  {label:"Username",regex:"[a-zA-Z][a-zA-Z0-9_]{2,15}",desc:"3-16 chars, letter start"},
+  {label:"Password",regex:"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@0%*?&])[A-Za-z\d@0%*?&]{8,}",desc:"Strong password"},
+  {label:"HTML Tag",regex:"<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>.*?</\1>",desc:"HTML tag pair"},
+  {label:"Number",regex:"-?\d+(?:\.\d+)?",desc:"Integer or decimal"},
+  {label:"Whitespace",regex:"\s+",desc:"One or more spaces"},
+  {label:"Word",regex:"\b\w+\b",desc:"Whole word"}
+];
+
+const groupColors = ["var(--group0)","var(--group1)","var(--group2)","var(--group3)","var(--group4)","var(--group5)"];
+
+// DOM
+const regexInput = document.getElementById("regexInput");
+const testInput = document.getElementById("testInput");
+const resultDisplay = document.getElementById("resultDisplay");
+const matchDetails = document.getElementById("matchDetails");
+const matchCount = document.getElementById("matchCount");
+const errorMsg = document.getElementById("errorMsg");
+const dropZone = document.getElementById("dropZone");
+const copyBtn = document.getElementById("copyBtn");
+const legend = document.getElementById("legend");
+const patternGrid = document.getElementById("patternGrid");
+
+// Init pattern library
+patterns.forEach(p => {
+  const btn = document.createElement("button");
+  btn.className = "pattern-btn";
+  btn.innerHTML = '<span class="label">' + p.label + '</span><span class="regex">' + p.regex.replace(/</g,"&lt;") + '</span>';
+  btn.title = p.desc;
+  btn.addEventListener("click", () => {
+    regexInput.value = p.regex;
+    runMatch();
+  });
+  patternGrid.appendChild(btn);
+});
+
+// Flags
+let flags = {g:true, i:false, m:true, s:false, u:false};
+document.querySelectorAll(".flag-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const f = btn.dataset.flag;
+    flags[f] = !flags[f];
+    btn.classList.toggle("active");
+    runMatch();
+  });
+});
+
+function getFlags() {
+  return Object.entries(flags).filter(([k,v])=>v).map(([k])=>k).join("");
+}
+
+// Drag and Drop
+let dragData = "";
+document.querySelectorAll(".block").forEach(block => {
+  block.addEventListener("dragstart", e => {
+    dragData = block.dataset.value;
+    e.dataTransfer.effectAllowed = "copy";
+  });
+});
+
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  if (!dragData) return;
+  // Remove hint
+  const hint = dropZone.querySelector(".drop-zone-hint");
+  if (hint) hint.remove();
+  // Add block
+  const el = document.createElement("span");
+  el.className = "dropped";
+  el.textContent = dragData;
+  const rm = document.createElement("span");
+  rm.className = "remove";
+  rm.textContent = "×";
+  rm.addEventListener("click", () => { el.remove(); syncFromDropZone(); if(!dropZone.children.length){dropZone.innerHTML='<span class="drop-zone-hint">Drag and drop regex blocks here to build your pattern</span>';} });
+  el.appendChild(rm);
+  dropZone.appendChild(el);
+  syncFromDropZone();
+});
+
+function syncFromDropZone() {
+  const parts = [];
+  dropZone.querySelectorAll(".dropped").forEach(el => {
+    // Get text without the remove button
+    parts.push(el.childNodes[0].textContent);
+  });
+  regexInput.value = parts.join("");
+  runMatch();
+}
+
+// Copy
+copyBtn.addEventListener("click", () => {
+  const text = "/" + regexInput.value + "/" + getFlags();
+  navigator.clipboard.writeText(text).then(() => {
+    copyBtn.textContent = "Copied!";
+    copyBtn.classList.add("copied");
+    setTimeout(() => { copyBtn.textContent = "Copy"; copyBtn.classList.remove("copied"); }, 1500);
+  });
+});
+
+// Match engine
+function runMatch() {
+  const pattern = regexInput.value;
+  const text = testInput.value;
+  errorMsg.classList.remove("show");
+  resultDisplay.innerHTML = "";
+  matchDetails.innerHTML = "";
+  legend.innerHTML = "";
+
+  if (!pattern) {
+    resultDisplay.textContent = text;
+    matchCount.innerHTML = "Matches: <b>0</b>";
+    return;
+  }
+
+  let regex;
+  try {
+    regex = new RegExp(pattern, getFlags());
+  } catch(e) {
+    errorMsg.textContent = "⚠ " + e.message;
+    errorMsg.classList.add("show");
+    resultDisplay.textContent = text;
+    matchCount.innerHTML = "Matches: <b>0</b>";
+    return;
+  }
+
+  // Find all matches
+  const matches = [];
+  let m;
+  if (flags.g) {
+    while ((m = regex.exec(text)) !== null) {
+      matches.push({index: m.index, match: m[0], groups: [...m].slice(1), length: m[0].length});
+      if (m[0].length === 0) regex.lastIndex++;
+    }
+  } else {
+    m = regex.exec(text);
+    if (m) matches.push({index: m.index, match: m[0], groups: [...m].slice(1), length: m[0].length});
+  }
+
+  matchCount.innerHTML = "Matches: <b>" + matches.length + "</b>";
+
+  // Build highlighted text
+  if (matches.length === 0) {
+    resultDisplay.textContent = text;
+    return;
+  }
+
+  let html = "";
+  let lastIdx = 0;
+  matches.forEach((m, i) => {
+    // Text before match
+    html += escapeHtml(text.slice(lastIdx, m.index));
+    // Highlighted match
+    const colorIdx = i % 6;
+    html += '<span class="hl hl-' + colorIdx + '" title="Match ' + (i+1) + '">' + escapeHtml(m.match) + '</span>';
+    lastIdx = m.index + m.length;
+  });
+  html += escapeHtml(text.slice(lastIdx));
+  resultDisplay.innerHTML = html;
+
+  // Show legend if groups exist
+  const hasGroups = matches.some(m => m.groups.length > 0);
+  if (hasGroups) {
+    const maxGroups = Math.max(...matches.map(m => m.groups.length));
+    for (let i = 0; i < maxGroups && i < 6; i++) {
+      legend.innerHTML += '<span class="legend-item"><span class="legend-dot" style="background:' + groupColors[i] + '"></span>Group ' + (i+1) + '</span>';
+    }
+  }
+
+  // Match details
+  let detailsHtml = "";
+  matches.forEach((m, i) => {
+    detailsHtml += '<div class="match-item"><div class="match-header">Match ' + (i+1) + ' at index ' + m.index + '</div>';
+    detailsHtml += '<div class="group-row"><b>Full match:</b> ' + escapeHtml(m.match) + '</div>';
+    m.groups.forEach((g, gi) => {
+      if (g !== undefined) {
+        detailsHtml += '<div class="group-row" style="border-left:3px solid ' + groupColors[gi % 6] + ';padding-left:8px"><b>Group ' + (gi+1) + ':</b> ' + escapeHtml(g) + '</div>';
+      }
+    });
+    detailsHtml += '</div>';
+  });
+  matchDetails.innerHTML = detailsHtml;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Live update
+regexInput.addEventListener("input", runMatch);
+testInput.addEventListener("input", runMatch);
+
+// Initial run
+runMatch();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:1200px;margin:20px auto;padding:0 16px}
+.pro-header{text-align:center;margin-bottom:16px}
+.pro-header h2{font-size:1.3rem;color:#e94560;display:inline-flex;align-items:center;gap:8px}
+.pro-badge{background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+.pro-mock{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .3s}
+.pro-mock:hover{border-color:var(--accent)}
+.pro-mock-content{padding:20px;filter:blur(4px);opacity:.5;pointer-events:none;user-select:none}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.pro-mock-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+.pro-mock-card h4{color:var(--success);font-size:.85rem;margin-bottom:8px}
+.pro-mock-btn{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;color:var(--text2);font-size:.8rem;margin:4px 2px}
+.pro-mock-list{list-style:none;font-size:.8rem;color:var(--text2)}
+.pro-mock-list li{padding:4px 0;border-bottom:1px solid var(--border)}
+.pro-mock-list li:last-child{border-bottom:none}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);z-index:2;transition:background .2s}
+.pro-overlay:hover{background:rgba(26,26,46,.35)}
+.pro-lock{font-size:3rem;margin-bottom:8px}
+.pro-overlay-text{color:#fff;font-size:1.1rem;font-weight:600}
+.pro-overlay-sub{color:#aaa;font-size:.8rem;margin-top:4px}
+.pro-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+.pro-modal-backdrop.open{display:flex}
+.pro-modal{background:#1e1e3a;border:1px solid #2a2a4a;border-radius:16px;padding:32px;max-width:440px;width:90%;text-align:center;animation:proIn .3s ease}
+@keyframes proIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:4px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#e94560,#533483);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0}
+.pro-modal ul{list-style:none;text-align:left;margin:16px 0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid #2a2a4a;color:#ccc;font-size:.9rem}
+.pro-modal ul li::before{content:'✓ ';color:#00d68f;font-weight:700}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-cta{display:inline-block;background:linear-gradient(135deg,#e94560,#533483);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:700;text-decoration:none;margin-top:16px;transition:opacity .2s;border:none;cursor:pointer}
+.pro-cta:hover{opacity:.85}
+.pro-later{display:block;margin-top:12px;color:#aaa;font-size:.85rem;cursor:pointer;background:none;border:none;padding:8px}
+.pro-later:hover{color:#fff}
+@media(max-width:768px){.pro-mock-row{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-header"><h2>⚡ Pro Features <span class="pro-badge">PRO</span></h2></div>
+<div class="pro-mock" onclick="document.getElementById('proModal').classList.add('open')">
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-overlay-text">Unlock Pro Features</div>
+<div class="pro-overlay-sub">Click to see what's included</div>
+</div>
+<div class="pro-mock-content">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>📚 Regex Library</h4>
+<ul class="pro-mock-list">
+<li>📧 Email (RFC 5322 compliant)</li>
+<li>🔗 URL with protocol detection</li>
+<li>💳 Credit card (Visa/MC/Amex)</li>
+<li>📱 Phone (international E.164)</li>
+<li>🏷️ Semantic version (semver)</li>
+<li>📍 IP address (v4 & v6)</li>
+<li>🔐 Strong password validator</li>
+</ul>
+<span class="pro-mock-btn">Browse 200+ patterns</span>
+</div>
+<div class="pro-mock-card">
+<h4>🧪 Test Suite</h4>
+<div style="background:var(--bg);border-radius:6px;padding:10px;font-family:monospace;font-size:.75rem;line-height:1.8">
+<div style="color:#7ed321">✓ "test@email.com" → match</div>
+<div style="color:#7ed321">✓ "user.name+tag@domain.co" → match</div>
+<div style="color:#e94560">✗ "invalid@" → no match</div>
+<div style="color:#7ed321">✓ "@missing.user" → no match</div>
+<div style="color:#e94560">✗ "spaces in@email.com" → no match</div>
+</div>
+<div style="margin-top:8px">
+<span class="pro-mock-btn">▶ Run Suite</span>
+<span class="pro-mock-btn">+ Add Case</span>
+</div>
+</div>
+<div class="pro-mock-card">
+<h4>🌐 Multi-Language Export</h4>
+<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+<span class="pro-mock-btn">Python</span>
+<span class="pro-mock-btn">JavaScript</span>
+<span class="pro-mock-btn">Java</span>
+<span class="pro-mock-btn">Go</span>
+<span class="pro-mock-btn">C#</span>
+<span class="pro-mock-btn">PHP</span>
+<span class="pro-mock-btn">Ruby</span>
+<span class="pro-mock-btn">Rust</span>
+</div>
+<div style="background:var(--bg);border-radius:6px;padding:10px;font-family:monospace;font-size:.72rem;color:var(--success);line-height:1.6">
+import re<br><br>
+pattern = re.compile(<br>
+&nbsp;&nbsp;r'^[\w.+-]+@[\w-]+\.[\w.]+$'<br>
+)<br>
+match = pattern.match(text)
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-backdrop" id="proModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="pro-modal">
+<h3>🚀 Regex Builder Pro</h3>
+<div class="pro-price">$14</div>
+<ul>
+<li>200+ curated regex patterns with documentation</li>
+<li>Test suite — validate regex with pass/fail cases</li>
+<li>Export to Python, JavaScript, Java, Go, C#, PHP, Ruby, Rust</li>
+<li>Regex performance analyzer & optimization tips</li>
+<li>Named capture group visual editor</li>
+<li>Import/export pattern collections</li>
+<li>Priority updates & community patterns</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $14</a>
+<button class="pro-later" onclick="document.getElementById('proModal').classList.remove('open')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

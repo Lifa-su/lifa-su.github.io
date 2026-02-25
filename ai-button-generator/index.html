@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Button Style Generator</title>
+<meta name="description" content="AI Button Style Generator - Design beautiful CSS buttons with live preview. Customize colors, gradients, shadows, animations, and icons.">
+<meta name="keywords" content="button generator, CSS button, button style, button design, CSS gradient button, button animation, UI button maker">
+<meta property="og:title" content="AI Button Style Generator">
+<meta property="og:description" content="Design beautiful CSS buttons with live preview. Customize colors, gradients, shadows, animations, and icons.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-button-generator/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Button Style Generator">
+<meta name="twitter:description" content="Design beautiful CSS buttons with live preview. Customize colors, gradients, shadows, animations, and icons.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-button-generator/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔘</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Button Style Generator","description":"Design beautiful CSS buttons with live preview. Customize colors, gradients, shadows, animations, and icons.","url":"https://lifa-su.com/ai-button-generator/","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"FeiDev Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","ratingCount":"1780"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0f0f1a;color:#e0e0e0;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.panel{width:380px;min-width:380px;background:#1a1a2e;border-right:1px solid #2a2a4a;overflow-y:auto;padding:20px}
+.preview-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:#0f0f1a}
+h1{font-size:1.4rem;margin-bottom:20px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.section{margin-bottom:14px;border:1px solid #2a2a4a;border-radius:10px;padding:14px;background:#16162b;transition:border-color .2s}
+.section:hover{border-color:#3a3a5a}
+.section-title{font-size:.85rem;font-weight:600;color:#8888cc;margin-bottom:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:color .2s}
+.section-title:hover{color:#a0a0ee}
+.section-title::after{content:'▼';font-size:.6rem;transition:transform .2s}
+.section.collapsed .section-title::after{transform:rotate(-90deg)}
+.section-body{max-height:800px;overflow:hidden;transition:max-height .3s ease,opacity .3s ease;opacity:1}
+.section.collapsed .section-body{max-height:0;opacity:0;margin:0;padding:0}
+.row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
+.row label{font-size:.78rem;color:#aaa;white-space:nowrap;min-width:80px}
+.row input[type=range]{flex:1;accent-color:#667eea}
+.row input[type=color]{width:36px;height:28px;border:none;border-radius:4px;cursor:pointer;background:transparent}
+.row input[type=text],.row input[type=number],.row select{flex:1;background:#0f0f1a;border:1px solid #2a2a4a;color:#e0e0e0;padding:5px 8px;border-radius:6px;font-size:.8rem;transition:border-color .2s}
+.row input[type=text]:focus,.row input[type=number]:focus,.row select:focus{border-color:#667eea;outline:none}
+.row .val{font-size:.75rem;color:#667eea;min-width:36px;text-align:right}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.preset-btn{padding:6px 10px;border:1px solid #2a2a4a;border-radius:6px;background:#0f0f1a;color:#ccc;font-size:.72rem;cursor:pointer;transition:all .2s;text-align:center}
+.preset-btn:hover{border-color:#667eea;color:#fff}
+.icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #2a2a4a;border-radius:6px;background:#0f0f1a;cursor:pointer;transition:all .2s}
+.icon-btn:hover{border-color:#667eea}
+.icon-btn.active{border-color:#667eea;background:#1a1a3e}
+.icon-btn svg{width:18px;height:18px;fill:#ccc}
+.preview-box{text-align:center;margin-bottom:30px}
+.demo-btn{transition:all .3s ease;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+.demo-btn svg{width:1em;height:1em;fill:currentColor;flex-shrink:0}
+.code-box{width:100%;max-width:600px;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:10px;padding:16px;position:relative}
+.code-box pre{font-family:'Fira Code',monospace;font-size:.78rem;color:#a8d8a8;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto}
+.copy-btn{position:absolute;top:10px;right:10px;background:#667eea;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.copy-btn:hover{background:#764ba2;transform:scale(1.05)}
+.tab-bar{display:flex;gap:4px;margin-bottom:10px}
+.tab-bar button{background:#0f0f1a;border:1px solid #2a2a4a;color:#aaa;padding:4px 12px;border-radius:6px 6px 0 0;cursor:pointer;font-size:.75rem;transition:all .2s}
+.tab-bar button.active{background:#1a1a2e;color:#667eea;border-bottom-color:#1a1a2e}
+.tab-bar button:hover{color:#667eea}
+.preset-tabs{display:flex;gap:4px;margin-bottom:8px}
+.preset-tabs button{flex:1;padding:4px 8px;border:1px solid #2a2a4a;border-radius:6px;background:#0f0f1a;color:#aaa;cursor:pointer;font-size:.7rem;transition:all .2s}
+.preset-tabs button.active{background:#667eea;color:#fff;border-color:#667eea}
+.pro-section{width:100%;max-width:600px;margin-top:30px;background:linear-gradient(135deg,#1a1a2e,#16162b);border:1px solid #2a2a4a;border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.pro-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#667eea,#764ba2,#667eea);background-size:200% 100%;animation:proShimmer 3s ease infinite}
+@keyframes proShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.panel{animation:fadeIn .4s ease both}
+.preview-area{animation:fadeIn .4s ease .1s both}
+.section{animation:fadeIn .35s ease both}
+.section:nth-child(2){animation-delay:.05s}
+.section:nth-child(3){animation-delay:.1s}
+.section:nth-child(4){animation-delay:.15s}
+.pro-section{animation:fadeIn .5s ease .2s both}
+.pro-title{font-size:1.1rem;font-weight:700;color:#e0e0e0;margin-bottom:16px;text-align:center}
+.pro-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.pro-feature{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0f0f1a;border:1px solid #2a2a4a;border-radius:8px;font-size:.8rem;color:#bbb;transition:all .2s}
+.pro-feature:hover{border-color:#667eea;color:#e0e0e0;transform:translateY(-1px)}
+.pro-feature-icon{font-size:1.1rem;flex-shrink:0}
+.pro-cta{display:block;width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;text-align:center;text-decoration:none;transition:all .3s ease}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(102,126,234,.4);filter:brightness(1.1)}
+@media(max-width:768px){.app{flex-direction:column}.panel{width:100%;min-width:auto;border-right:none;border-bottom:1px solid #2a2a4a;max-height:50vh}.preview-area{padding:20px}.pro-features{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="panel">
+<h1>🎨 AI Button Generator</h1>
+<!-- Text & Size -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Text & Size</div>
+<div class="section-body">
+<div class="row"><label>Button Text</label><input type="text" id="btnText" value="Click Me" oninput="update()"></div>
+<div class="row"><label>Font Size</label><input type="range" id="fontSize" min="10" max="48" value="16" oninput="update()"><span class="val" id="fontSizeVal">16px</span></div>
+<div class="row"><label>Padding H</label><input type="range" id="padH" min="0" max="60" value="24" oninput="update()"><span class="val" id="padHVal">24px</span></div>
+<div class="row"><label>Padding V</label><input type="range" id="padV" min="0" max="40" value="12" oninput="update()"><span class="val" id="padVVal">12px</span></div>
+<div class="row"><label>Font Weight</label><select id="fontWeight" onchange="update()"><option value="400">Normal</option><option value="500">Medium</option><option value="600" selected>Semi Bold</option><option value="700">Bold</option></select></div>
+</div></div>
+
+<!-- Colors -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Colors</div>
+<div class="section-body">
+<div class="row"><label>Background</label><input type="color" id="bgColor" value="#667eea" oninput="update()"><input type="text" id="bgColorText" value="#667eea" oninput="syncColor(this,'bgColor')"></div>
+<div class="row"><label>Text Color</label><input type="color" id="textColor" value="#ffffff" oninput="update()"><input type="text" id="textColorText" value="#ffffff" oninput="syncColor(this,'textColor')"></div>
+<div class="row"><label>Gradient</label><select id="gradientType" onchange="update()"><option value="none">None</option><option value="linear">Linear</option><option value="radial">Radial</option></select></div>
+<div class="row" id="gradRow1" style="display:none"><label>Grad Color 2</label><input type="color" id="gradColor2" value="#764ba2" oninput="update()"><input type="text" id="gradColor2Text" value="#764ba2" oninput="syncColor(this,'gradColor2')"></div>
+<div class="row" id="gradRow2" style="display:none"><label>Angle</label><input type="range" id="gradAngle" min="0" max="360" value="135" oninput="update()"><span class="val" id="gradAngleVal">135°</span></div>
+</div></div>
+
+<!-- Border -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Border</div>
+<div class="section-body">
+<div class="row"><label>Width</label><input type="range" id="borderWidth" min="0" max="10" value="0" oninput="update()"><span class="val" id="borderWidthVal">0px</span></div>
+<div class="row"><label>Color</label><input type="color" id="borderColor" value="#667eea" oninput="update()"><input type="text" id="borderColorText" value="#667eea" oninput="syncColor(this,'borderColor')"></div>
+<div class="row"><label>Style</label><select id="borderStyle" onchange="update()"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></div>
+<div class="row"><label>Radius</label><input type="range" id="borderRadius" min="0" max="50" value="8" oninput="update()"><span class="val" id="borderRadiusVal">8px</span></div>
+</div></div>
+
+<!-- Shadow -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Shadow</div>
+<div class="section-body">
+<div class="row"><label>Offset X</label><input type="range" id="shadowX" min="-30" max="30" value="0" oninput="update()"><span class="val" id="shadowXVal">0px</span></div>
+<div class="row"><label>Offset Y</label><input type="range" id="shadowY" min="-30" max="30" value="4" oninput="update()"><span class="val" id="shadowYVal">4px</span></div>
+<div class="row"><label>Blur</label><input type="range" id="shadowBlur" min="0" max="50" value="15" oninput="update()"><span class="val" id="shadowBlurVal">15px</span></div>
+<div class="row"><label>Spread</label><input type="range" id="shadowSpread" min="-20" max="20" value="0" oninput="update()"><span class="val" id="shadowSpreadVal">0px</span></div>
+<div class="row"><label>Color</label><input type="color" id="shadowColor" value="#667eea" oninput="update()"><input type="text" id="shadowColorText" value="#667eea" oninput="syncColor(this,'shadowColor')"></div>
+<div class="row"><label>Opacity</label><input type="range" id="shadowOpacity" min="0" max="100" value="40" oninput="update()"><span class="val" id="shadowOpacityVal">40%</span></div>
+</div></div>
+
+<!-- Hover Effects -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Hover Effects</div>
+<div class="section-body">
+<div class="row"><label>BG Color</label><input type="color" id="hoverBg" value="#764ba2" oninput="update()"><input type="text" id="hoverBgText" value="#764ba2" oninput="syncColor(this,'hoverBg')"></div>
+<div class="row"><label>Text Color</label><input type="color" id="hoverText" value="#ffffff" oninput="update()"><input type="text" id="hoverTextText" value="#ffffff" oninput="syncColor(this,'hoverText')"></div>
+<div class="row"><label>Scale</label><input type="range" id="hoverScale" min="90" max="120" value="105" oninput="update()"><span class="val" id="hoverScaleVal">1.05</span></div>
+<div class="row"><label>Shadow Boost</label><input type="range" id="hoverShadowBoost" min="0" max="30" value="8" oninput="update()"><span class="val" id="hoverShadowBoostVal">8px</span></div>
+<div class="row"><label>Grad Shift</label><input type="range" id="hoverGradShift" min="0" max="60" value="20" oninput="update()"><span class="val" id="hoverGradShiftVal">20°</span></div>
+</div></div>
+
+<!-- Icons -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Icon</div>
+<div class="section-body">
+<div class="row"><label>Position</label><select id="iconPos" onchange="update()"><option value="left">Left</option><option value="right">Right</option><option value="none" selected>None</option></select></div>
+<div class="icon-grid" id="iconGrid"></div>
+</div></div>
+
+<!-- Presets -->
+<div class="section">
+<div class="section-title" onclick="toggleSection(this)">Presets</div>
+<div class="section-body">
+<div class="preset-tabs">
+<button class="active" onclick="showPresets('material',this)">Material</button>
+<button onclick="showPresets('bootstrap',this)">Bootstrap</button>
+<button onclick="showPresets('tailwind',this)">Tailwind</button>
+</div>
+<div class="preset-grid" id="presetGrid"></div>
+</div></div>
+
+</div><!-- end panel -->
+
+<div class="preview-area">
+<div class="preview-box">
+<h2 style="font-size:.9rem;color:#666;margin-bottom:20px">Preview (hover to see effect)</h2>
+<button class="demo-btn" id="demoBtn">Click Me</button>
+</div>
+<div class="code-box">
+<button class="copy-btn" onclick="copyCSS()">📋 Copy CSS</button>
+<pre id="codeOutput"></pre>
+</div>
+
+<div class="pro-section">
+<div class="pro-title">⚡ Pro Features</div>
+<div class="pro-features">
+<div class="pro-feature"><span class="pro-feature-icon">📦</span>Button component library</div>
+<div class="pro-feature"><span class="pro-feature-icon">⚛️</span>React / Vue export</div>
+<div class="pro-feature"><span class="pro-feature-icon">🎬</span>Animation presets pack</div>
+<div class="pro-feature"><span class="pro-feature-icon">🎨</span>Design token export</div>
+</div>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="pro-cta">🔓 Unlock Pro</a>
+</div>
+
+</div>
+</div>
+
+<script>
+const icons = {
+  none: '',
+  arrow: '<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>',
+  download: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',
+  heart: '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+  star: '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  mail: '<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>',
+  cart: '<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>',
+  user: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+};
+
+// Fix SVG stroke styles
+Object.keys(icons).forEach(k => {
+  if (k !== 'none' && icons[k]) {
+    icons[k] = icons[k].replace('<svg ', '<svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ');
+  }
+});
+icons.heart = icons.heart.replace('fill="none"', 'fill="currentColor"');
+icons.star = icons.star.replace('fill="none"', 'fill="currentColor"');
+
+const presets = {
+  material: [
+    {name:'Primary', bg:'#1976D2', text:'#fff', radius:4, shadow:'0 2px 4px rgba(0,0,0,.3)', padH:24, padV:10, fontSize:14, fontWeight:'500', border:'none', gradient:'none'},
+    {name:'Secondary', bg:'#9C27B0', text:'#fff', radius:4, shadow:'0 2px 4px rgba(0,0,0,.3)', padH:24, padV:10, fontSize:14, fontWeight:'500', border:'none', gradient:'none'},
+    {name:'Outlined', bg:'transparent', text:'#1976D2', radius:4, shadow:'none', padH:24, padV:10, fontSize:14, fontWeight:'500', border:'2px solid #1976D2', gradient:'none'},
+    {name:'FAB', bg:'#E91E63', text:'#fff', radius:28, shadow:'0 4px 8px rgba(0,0,0,.3)', padH:20, padV:20, fontSize:18, fontWeight:'500', border:'none', gradient:'none'},
+    {name:'Text Btn', bg:'transparent', text:'#1976D2', radius:4, shadow:'none', padH:16, padV:8, fontSize:14, fontWeight:'500', border:'none', gradient:'none'},
+    {name:'Tonal', bg:'#E8DEF8', text:'#6750A4', radius:20, shadow:'none', padH:24, padV:10, fontSize:14, fontWeight:'500', border:'none', gradient:'none'}
+  ],
+  bootstrap: [
+    {name:'Primary', bg:'#0d6efd', text:'#fff', radius:6, shadow:'none', padH:20, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #0d6efd', gradient:'none'},
+    {name:'Success', bg:'#198754', text:'#fff', radius:6, shadow:'none', padH:20, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #198754', gradient:'none'},
+    {name:'Danger', bg:'#dc3545', text:'#fff', radius:6, shadow:'none', padH:20, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #dc3545', gradient:'none'},
+    {name:'Warning', bg:'#ffc107', text:'#000', radius:6, shadow:'none', padH:20, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #ffc107', gradient:'none'},
+    {name:'Outline', bg:'transparent', text:'#0d6efd', radius:6, shadow:'none', padH:20, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #0d6efd', gradient:'none'},
+    {name:'Pill', bg:'#6f42c1', text:'#fff', radius:50, shadow:'none', padH:24, padV:10, fontSize:16, fontWeight:'400', border:'1px solid #6f42c1', gradient:'none'}
+  ],
+  tailwind: [
+    {name:'Indigo', bg:'#6366f1', text:'#fff', radius:8, shadow:'0 1px 3px rgba(0,0,0,.1)', padH:20, padV:10, fontSize:14, fontWeight:'600', border:'none', gradient:'none'},
+    {name:'Emerald', bg:'#10b981', text:'#fff', radius:8, shadow:'0 1px 3px rgba(0,0,0,.1)', padH:20, padV:10, fontSize:14, fontWeight:'600', border:'none', gradient:'none'},
+    {name:'Rose', bg:'#f43f5e', text:'#fff', radius:8, shadow:'0 1px 3px rgba(0,0,0,.1)', padH:20, padV:10, fontSize:14, fontWeight:'600', border:'none', gradient:'none'},
+    {name:'Rounded Full', bg:'#8b5cf6', text:'#fff', radius:9999, shadow:'0 1px 2px rgba(0,0,0,.05)', padH:24, padV:10, fontSize:14, fontWeight:'600', border:'none', gradient:'none'},
+    {name:'Ghost', bg:'transparent', text:'#6366f1', radius:8, shadow:'none', padH:20, padV:10, fontSize:14, fontWeight:'600', border:'2px solid #6366f1', gradient:'none'},
+    {name:'Gradient', bg:'#667eea', text:'#fff', radius:8, shadow:'0 4px 15px rgba(102,126,234,.4)', padH:24, padV:12, fontSize:14, fontWeight:'600', border:'none', gradient:'linear', gradColor2:'#764ba2', gradAngle:135}
+  ]
+};
+
+let currentIcon = 'none';
+let currentPresetTab = 'material';
+
+function $(id) { return document.getElementById(id); }
+
+function toggleSection(el) {
+  el.parentElement.classList.toggle('collapsed');
+}
+
+function syncColor(textInput, colorId) {
+  const v = textInput.value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    $(colorId).value = v;
+    update();
+  }
+}
+
+function getVal(id) { return $(id).value; }
+function getNum(id) { return parseInt($(id).value); }
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function update() {
+  const btn = $('demoBtn');
+  const text = getVal('btnText');
+  const fs = getNum('fontSize');
+  const ph = getNum('padH');
+  const pv = getNum('padV');
+  const fw = getVal('fontWeight');
+  const bg = getVal('bgColor');
+  const tc = getVal('textColor');
+  const gt = getVal('gradientType');
+  const gc2 = getVal('gradColor2');
+  const ga = getNum('gradAngle');
+  const bw = getNum('borderWidth');
+  const bc = getVal('borderColor');
+  const bs = getVal('borderStyle');
+  const br = getNum('borderRadius');
+  const sx = getNum('shadowX');
+  const sy = getNum('shadowY');
+  const sb = getNum('shadowBlur');
+  const ss = getNum('shadowSpread');
+  const sc = getVal('shadowColor');
+  const so = getNum('shadowOpacity');
+  const hbg = getVal('hoverBg');
+  const htc = getVal('hoverText');
+  const hsc = getNum('hoverScale');
+  const hsb = getNum('hoverShadowBoost');
+  const hgs = getNum('hoverGradShift');
+  const iconP = getVal('iconPos');
+
+  // Update display values
+  $('fontSizeVal').textContent = fs + 'px';
+  $('padHVal').textContent = ph + 'px';
+  $('padVVal').textContent = pv + 'px';
+  $('borderWidthVal').textContent = bw + 'px';
+  $('borderRadiusVal').textContent = br + 'px';
+  $('shadowXVal').textContent = sx + 'px';
+  $('shadowYVal').textContent = sy + 'px';
+  $('shadowBlurVal').textContent = sb + 'px';
+  $('shadowSpreadVal').textContent = ss + 'px';
+  $('shadowOpacityVal').textContent = so + '%';
+  $('hoverScaleVal').textContent = (hsc/100).toFixed(2);
+  $('hoverShadowBoostVal').textContent = hsb + 'px';
+  $('hoverGradShiftVal').textContent = hgs + '°';
+  $('gradAngleVal').textContent = ga + '°';
+
+  // Sync text inputs
+  $('bgColorText').value = bg;
+  $('textColorText').value = tc;
+  $('gradColor2Text').value = gc2;
+  $('borderColorText').value = bc;
+  $('shadowColorText').value = sc;
+  $('hoverBgText').value = hbg;
+  $('hoverTextText').value = htc;
+
+  // Show/hide gradient rows
+  const showGrad = gt !== 'none';
+  $('gradRow1').style.display = showGrad ? 'flex' : 'none';
+  $('gradRow2').style.display = (gt === 'linear') ? 'flex' : 'none';
+
+  // Build background
+  let bgCSS;
+  if (gt === 'linear') bgCSS = `linear-gradient(${ga}deg, ${bg}, ${gc2})`;
+  else if (gt === 'radial') bgCSS = `radial-gradient(circle, ${bg}, ${gc2})`;
+  else bgCSS = bg;
+
+  // Build shadow
+  const shadowRgba = hexToRgba(sc, so/100);
+  const shadowCSS = (sb === 0 && sx === 0 && sy === 0) ? 'none' : `${sx}px ${sy}px ${sb}px ${ss}px ${shadowRgba}`;
+
+  // Build border
+  const borderCSS = bw > 0 ? `${bw}px ${bs} ${bc}` : 'none';
+
+  // Icon HTML
+  const iconHTML = (currentIcon !== 'none' && icons[currentIcon]) ? icons[currentIcon] : '';
+
+  // Apply to preview button
+  btn.style.cssText = `
+    background: ${bgCSS};
+    color: ${tc};
+    font-size: ${fs}px;
+    padding: ${pv}px ${ph}px;
+    font-weight: ${fw};
+    border: ${borderCSS};
+    border-radius: ${br}px;
+    box-shadow: ${shadowCSS};
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  `;
+
+  // Set button content with icon
+  if (iconHTML) {
+    if (iconP === 'right') btn.innerHTML = text + ' ' + iconHTML;
+    else if (iconP === 'only') btn.innerHTML = iconHTML;
+    else btn.innerHTML = iconHTML + ' ' + text;
+  } else {
+    btn.textContent = text;
+  }
+
+  // Hover styles
+  let hoverBgCSS;
+  if (gt === 'linear') hoverBgCSS = `linear-gradient(${ga + hgs}deg, ${hbg}, ${gc2})`;
+  else if (gt === 'radial') hoverBgCSS = `radial-gradient(circle, ${hbg}, ${gc2})`;
+  else hoverBgCSS = hbg;
+
+  const hoverShadowRgba = hexToRgba(sc, Math.min(1, so/100 + 0.2));
+  const hoverShadowCSS = `${sx}px ${sy + hsb}px ${sb + hsb}px ${ss}px ${hoverShadowRgba}`;
+
+  btn.onmouseenter = function() {
+    this.style.background = hoverBgCSS;
+    this.style.color = htc;
+    this.style.transform = `scale(${hsc/100})`;
+    this.style.boxShadow = hoverShadowCSS;
+  };
+  btn.onmouseleave = function() {
+    this.style.background = bgCSS;
+    this.style.color = tc;
+    this.style.transform = 'scale(1)';
+    this.style.boxShadow = shadowCSS;
+  };
+
+  // Generate CSS code
+  generateCSS(bgCSS, tc, fs, pv, ph, fw, borderCSS, br, shadowCSS, hoverBgCSS, htc, hsc, hoverShadowCSS);
+}
+
+function generateCSS(bg, color, fs, pv, ph, fw, border, br, shadow, hBg, hColor, hScale, hShadow) {
+  const css = `.btn {
+  background: ${bg};
+  color: ${color};
+  font-size: ${fs}px;
+  padding: ${pv}px ${ph}px;
+  font-weight: ${fw};
+  border: ${border};
+  border-radius: ${br}px;
+  box-shadow: ${shadow};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  background: ${hBg};
+  color: ${hColor};
+  transform: scale(${(hScale/100).toFixed(2)});
+  box-shadow: ${hShadow};
+}`;
+  $('codeOutput').textContent = css;
+}
+
+function copyCSS() {
+  const code = $('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy CSS', 2000);
+  });
+}
+
+function showPresets(type, tabBtn) {
+  currentPresetTab = type;
+  document.querySelectorAll('.preset-tabs button').forEach(b => b.classList.remove('active'));
+  if (tabBtn) tabBtn.classList.add('active');
+  const grid = $('presetGrid');
+  grid.innerHTML = '';
+  presets[type].forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.textContent = p.name;
+    btn.onclick = () => applyPreset(p);
+    grid.appendChild(btn);
+  });
+}
+
+function applyPreset(p) {
+  $('bgColor').value = p.bg === 'transparent' ? '#0f0f1a' : p.bg;
+  $('bgColorText').value = p.bg === 'transparent' ? '#0f0f1a' : p.bg;
+  $('textColor').value = p.text;
+  $('textColorText').value = p.text;
+  $('borderRadius').value = Math.min(p.radius, 50);
+  $('fontSize').value = p.fontSize || 16;
+  $('padH').value = p.padH || 24;
+  $('padV').value = p.padV || 12;
+  $('fontWeight').value = p.fontWeight || '600';
+
+  if (p.border && p.border !== 'none') {
+    const parts = p.border.split(' ');
+    $('borderWidth').value = parseInt(parts[0]) || 0;
+    $('borderStyle').value = parts[1] || 'solid';
+    $('borderColor').value = parts[2] || '#667eea';
+    $('borderColorText').value = parts[2] || '#667eea';
+  } else {
+    $('borderWidth').value = 0;
+  }
+
+  if (p.gradient && p.gradient !== 'none') {
+    $('gradientType').value = p.gradient;
+    if (p.gradColor2) { $('gradColor2').value = p.gradColor2; $('gradColor2Text').value = p.gradColor2; }
+    if (p.gradAngle) $('gradAngle').value = p.gradAngle;
+  } else {
+    $('gradientType').value = 'none';
+  }
+
+  if (p.shadow && p.shadow !== 'none') {
+    const m = p.shadow.match(/([-\d]+)px\s+([-\d]+)px\s+([-\d]+)px/);
+    if (m) { $('shadowX').value = m[1]; $('shadowY').value = m[2]; $('shadowBlur').value = m[3]; }
+  } else {
+    $('shadowX').value = 0; $('shadowY').value = 0; $('shadowBlur').value = 0; $('shadowSpread').value = 0;
+  }
+
+  update();
+}
+
+function selectIcon(name, el) {
+  currentIcon = name;
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  update();
+}
+
+function renderIcons() {
+  const grid = document.querySelector('.icon-grid');
+  grid.innerHTML = '';
+  Object.keys(icons).forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'icon-btn' + (name === currentIcon ? ' active' : '');
+    btn.title = name;
+    if (name === 'none') btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    else btn.innerHTML = icons[name];
+    btn.onclick = () => selectIcon(name, btn);
+    grid.appendChild(btn);
+  });
+}
+
+// Init
+renderIcons();
+showPresets('material');
+update();
+</script>
+<footer style="text-align:center;padding:30px 20px;color:#8888cc;font-size:.85rem;border-top:1px solid #2a2a4a;margin-top:0">
+  <p>Built by <a href="https://lifa-su.com" style="color:#667eea;text-decoration:none">FeiDev Tools</a> · <a href="https://lifa-su.com/#tools" style="color:#667eea;text-decoration:none">More Free Tools</a></p>
+  <p style="margin-top:6px;font-size:.78rem;color:#555">© 2025 FeiDev Tools. Free to use.</p>
+</footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

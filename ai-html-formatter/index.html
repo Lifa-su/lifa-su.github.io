@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI HTML Formatter - Beautify & Minify HTML Online</title>
+<meta name="description" content="Free online HTML formatter, beautifier and minifier with syntax highlighting. Format, beautify or compress your HTML code instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-html-formatter/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column}
+header{background:#16213e;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid #0f3460}
+header h1{font-size:1.4rem;color:#e94560;font-weight:700}
+header h1 span{color:#e0e0e0;font-weight:400}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.toolbar label{font-size:0.85rem;color:#a0a0b8}
+.toolbar select{background:#0f3460;color:#e0e0e0;border:1px solid #533483;padding:6px 10px;border-radius:6px;font-size:0.85rem;cursor:pointer;outline:none}
+.toolbar select:focus{border-color:#e94560}
+.btn{padding:8px 18px;border:none;border-radius:6px;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:#e94560;color:#fff}
+.btn-primary:hover{background:#c73652}
+.btn-primary.active{background:#533483;box-shadow:0 0 0 2px #e94560}
+.btn-secondary{background:#533483;color:#fff}
+.btn-secondary:hover{background:#6a42a0}
+.btn-copy{background:#0f3460;color:#e0e0e0;border:1px solid #533483}
+.btn-copy:hover{background:#16213e;border-color:#e94560}
+.btn-copy.copied{background:#2ecc71;color:#fff;border-color:#2ecc71}
+.main{display:flex;flex:1;gap:0;overflow:hidden}
+.panel{flex:1;display:flex;flex-direction:column;min-width:0}
+.panel-header{background:#16213e;padding:10px 16px;font-size:0.85rem;font-weight:600;color:#a0a0b8;border-bottom:1px solid #0f3460;display:flex;align-items:center;justify-content:space-between}
+.divider{width:4px;background:#0f3460;cursor:col-resize;flex-shrink:0;transition:background .2s}
+.divider:hover{background:#e94560}
+textarea{flex:1;background:#0d1b2a;color:#e0e0e0;border:none;padding:16px;font-family:'Fira Code','Cascadia Code','Consolas',monospace;font-size:14px;line-height:1.6;resize:none;outline:none;tab-size:4}
+textarea::placeholder{color:#4a4a6a}
+.output-wrap{flex:1;overflow:auto;background:#0d1b2a;padding:16px}
+.output-wrap pre{font-family:'Fira Code','Cascadia Code','Consolas',monospace;font-size:14px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;margin:0}
+/* Syntax highlight colors */
+.hl-tag{color:#e94560}
+.hl-attr{color:#f0a500}
+.hl-val{color:#2ecc71}
+.hl-comment{color:#6a6a8a;font-style:italic}
+.hl-doctype{color:#a78bfa}
+.hl-entity{color:#56b6c2}
+.hl-text{color:#e0e0e0}
+footer{background:#16213e;padding:12px 24px;text-align:center;font-size:0.75rem;color:#6a6a8a;border-top:1px solid #0f3460}
+@media(max-width:768px){
+  .main{flex-direction:column}
+  .divider{width:100%;height:4px;cursor:row-resize}
+  header{padding:12px 16px}
+  header h1{font-size:1.1rem}
+  .toolbar{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>AI HTML <span>Formatter</span></h1>
+  <div class="toolbar">
+    <label for="indent">Indent:</label>
+    <select id="indent">
+      <option value="2">2 Spaces</option>
+      <option value="4" selected>4 Spaces</option>
+      <option value="tab">Tab</option>
+    </select>
+    <button class="btn btn-primary active" id="btnBeautify" onclick="doBeautify()">Beautify</button>
+    <button class="btn btn-primary" id="btnMinify" onclick="doMinify()">Minify</button>
+    <button class="btn btn-copy" id="btnCopy" onclick="doCopy()">📋 Copy</button>
+  </div>
+</header>
+<div class="main">
+  <div class="panel">
+    <div class="panel-header">Input HTML</div>
+    <textarea id="input" placeholder="Paste your HTML code here..." spellcheck="false"></textarea>
+  </div>
+  <div class="divider" id="divider"></div>
+  <div class="panel">
+    <div class="panel-header">
+      <span>Output</span>
+      <span id="charCount" style="font-weight:400;font-size:0.8rem"></span>
+    </div>
+    <div class="output-wrap">
+      <pre id="output"></pre>
+    </div>
+  </div>
+</div>
+<footer>&copy; 2026 AI HTML Formatter</footer>
+
+<script>
+// ---- State ----
+let currentMode = 'beautify';
+let rawOutput = '';
+
+// ---- Indent helper ----
+function getIndent() {
+  const v = document.getElementById('indent').value;
+  return v === 'tab' ? '\t' : ' '.repeat(Number(v));
+}
+
+// ---- HTML Beautifier ----
+function beautifyHTML(html) {
+  const indent = getIndent();
+  const selfClosing = new Set([
+    'area','base','br','col','embed','hr','img','input',
+    'link','meta','param','source','track','wbr'
+  ]);
+  const rawTags = new Set(['script','style','pre','code','textarea']);
+  const inlineTags = new Set([
+    'a','abbr','b','bdi','bdo','br','cite','code','data','dfn','em','i',
+    'kbd','mark','q','rp','rt','ruby','s','samp','small','span','strong',
+    'sub','sup','time','u','var','wbr'
+  ]);
+
+  // Tokenize
+  const tokens = [];
+  let i = 0;
+  while (i < html.length) {
+    if (html.startsWith('<!--', i)) {
+      const end = html.indexOf('-->', i);
+      if (end === -1) { tokens.push({ type: 'comment', value: html.slice(i) }); break; }
+      tokens.push({ type: 'comment', value: html.slice(i, end + 3) });
+      i = end + 3;
+    } else if (html.startsWith('<!', i)) {
+      const end = html.indexOf('>', i);
+      if (end === -1) { tokens.push({ type: 'doctype', value: html.slice(i) }); break; }
+      tokens.push({ type: 'doctype', value: html.slice(i, end + 1) });
+      i = end + 1;
+    } else if (html[i] === '<') {
+      const end = html.indexOf('>', i);
+      if (end === -1) { tokens.push({ type: 'text', value: html.slice(i) }); break; }
+      const tag = html.slice(i, end + 1);
+      const isClose = tag[1] === '/';
+      const nameMatch = tag.match(isClose ? /^<\/\s*([a-zA-Z][a-zA-Z0-9-]*)/  : /^<\s*([a-zA-Z][a-zA-Z0-9-]*)/);
+      const name = nameMatch ? nameMatch[1].toLowerCase() : '';
+      const isSelfClose = selfClosing.has(name) || tag.endsWith('/>');
+
+      // Handle raw content tags
+      if (!isClose && rawTags.has(name) && !isSelfClose) {
+        const closeTag = '</' + name;
+        const closeIdx = html.toLowerCase().indexOf(closeTag, end + 1);
+        if (closeIdx !== -1) {
+          const closeEnd = html.indexOf('>', closeIdx);
+          tokens.push({ type: 'open', value: tag, name, selfClose: false });
+          const rawContent = html.slice(end + 1, closeIdx);
+          if (rawContent) tokens.push({ type: 'raw', value: rawContent });
+          tokens.push({ type: 'close', value: html.slice(closeIdx, closeEnd + 1), name });
+          i = closeEnd + 1;
+          continue;
+        }
+      }
+
+      tokens.push({
+        type: isClose ? 'close' : 'open',
+        value: tag,
+        name,
+        selfClose: isSelfClose,
+        inline: inlineTags.has(name)
+      });
+      i = end + 1;
+    } else {
+      let end = html.indexOf('<', i);
+      if (end === -1) end = html.length;
+      const text = html.slice(i, end);
+      if (text.trim()) tokens.push({ type: 'text', value: text.trim() });
+      i = end;
+    }
+  }
+
+  // Build output
+  let level = 0;
+  const lines = [];
+
+  for (let t = 0; t < tokens.length; t++) {
+    const tok = tokens[t];
+    if (tok.type === 'comment' || tok.type === 'doctype') {
+      lines.push(indent.repeat(level) + tok.value);
+    } else if (tok.type === 'raw') {
+      // Preserve raw content with current indentation
+      const rawLines = tok.value.split('\n');
+      for (const rl of rawLines) {
+        lines.push(indent.repeat(level) + rl.trimStart());
+      }
+    } else if (tok.type === 'text') {
+      lines.push(indent.repeat(level) + tok.value);
+    } else if (tok.type === 'open') {
+      // Check if this is an inline element with only text inside
+      if (tok.inline && !tok.selfClose && t + 2 < tokens.length &&
+          tokens[t+1].type === 'text' && tokens[t+2].type === 'close' && tokens[t+2].name === tok.name) {
+        lines.push(indent.repeat(level) + tok.value + tokens[t+1].value + tokens[t+2].value);
+        t += 2;
+        continue;
+      }
+      lines.push(indent.repeat(level) + tok.value);
+      if (!tok.selfClose) level++;
+    } else if (tok.type === 'close') {
+      level = Math.max(0, level - 1);
+      lines.push(indent.repeat(level) + tok.value);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+// ---- HTML Minifier ----
+function minifyHTML(html) {
+  // Remove comments (but keep conditional comments)
+  let result = html.replace(/<!--(?!\[if)[\s\S]*?-->/g, '');
+  // Collapse whitespace between tags
+  result = result.replace(/>\s+</g, '><');
+  // Collapse whitespace runs
+  result = result.replace(/\s{2,}/g, ' ');
+  // Trim
+  return result.trim();
+}
+
+// ---- Syntax Highlighter ----
+function highlightHTML(str) {
+  // Escape HTML entities first
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  let result = '';
+  let i = 0;
+  while (i < str.length) {
+    // Comments
+    if (str.startsWith('<!--', i)) {
+      const end = str.indexOf('-->', i);
+      if (end === -1) {
+        result += '<span class="hl-comment">' + esc(str.slice(i)) + '</span>';
+        break;
+      }
+      result += '<span class="hl-comment">' + esc(str.slice(i, end + 3)) + '</span>';
+      i = end + 3;
+    }
+    // Doctype
+    else if (str.startsWith('<!', i)) {
+      const end = str.indexOf('>', i);
+      if (end === -1) {
+        result += '<span class="hl-doctype">' + esc(str.slice(i)) + '</span>';
+        break;
+      }
+      result += '<span class="hl-doctype">' + esc(str.slice(i, end + 1)) + '</span>';
+      i = end + 1;
+    }
+    // Tags
+    else if (str[i] === '<') {
+      const end = str.indexOf('>', i);
+      if (end === -1) {
+        result += '<span class="hl-text">' + esc(str.slice(i)) + '</span>';
+        break;
+      }
+      const tag = str.slice(i, end + 1);
+      result += highlightTag(tag);
+      i = end + 1;
+    }
+    // Text
+    else {
+      let end = str.indexOf('<', i);
+      if (end === -1) end = str.length;
+      result += '<span class="hl-text">' + esc(str.slice(i, end)) + '</span>';
+      i = end;
+    }
+  }
+  return result;
+}
+
+function highlightTag(tag) {
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // Parse tag parts
+  let result = '';
+  let i = 0;
+  // Opening < or </
+  if (tag.startsWith('</')) {
+    result += '<span class="hl-tag">&lt;/</span>';
+    i = 2;
+  } else {
+    result += '<span class="hl-tag">&lt;</span>';
+    i = 1;
+  }
+  // Tag name
+  let nameEnd = i;
+  while (nameEnd < tag.length && /[a-zA-Z0-9-]/.test(tag[nameEnd])) nameEnd++;
+  result += '<span class="hl-tag">' + esc(tag.slice(i, nameEnd)) + '</span>';
+  i = nameEnd;
+
+  // Attributes
+  while (i < tag.length) {
+    // Skip whitespace
+    if (/\s/.test(tag[i])) { result += esc(tag[i]); i++; continue; }
+    // End of tag
+    if (tag[i] === '>' || (tag[i] === '/' && i + 1 < tag.length && tag[i+1] === '>')) {
+      if (tag[i] === '/') { result += '<span class="hl-tag">/&gt;</span>'; i += 2; }
+      else { result += '<span class="hl-tag">&gt;</span>'; i++; }
+      break;
+    }
+    // Attribute name
+    let attrStart = i;
+    while (i < tag.length && tag[i] !== '=' && tag[i] !== '>' && !/\s/.test(tag[i]) && tag[i] !== '/') i++;
+    if (i > attrStart) {
+      result += '<span class="hl-attr">' + esc(tag.slice(attrStart, i)) + '</span>';
+    }
+    // =
+    if (tag[i] === '=') {
+      result += '<span class="hl-text">=</span>';
+      i++;
+      // Attribute value
+      if (tag[i] === '"' || tag[i] === "'") {
+        const q = tag[i];
+        let valEnd = tag.indexOf(q, i + 1);
+        if (valEnd === -1) valEnd = tag.length - 1;
+        result += '<span class="hl-val">' + esc(tag.slice(i, valEnd + 1)) + '</span>';
+        i = valEnd + 1;
+      } else {
+        let valEnd = i;
+        while (valEnd < tag.length && !/[\s>]/.test(tag[valEnd])) valEnd++;
+        result += '<span class="hl-val">' + esc(tag.slice(i, valEnd)) + '</span>';
+        i = valEnd;
+      }
+    }
+  }
+  return result;
+}
+
+// ---- Actions ----
+function doBeautify() {
+  currentMode = 'beautify';
+  document.getElementById('btnBeautify').classList.add('active');
+  document.getElementById('btnMinify').classList.remove('active');
+  process();
+}
+
+function doMinify() {
+  currentMode = 'minify';
+  document.getElementById('btnMinify').classList.add('active');
+  document.getElementById('btnBeautify').classList.remove('active');
+  process();
+}
+
+function process() {
+  const input = document.getElementById('input').value;
+  if (!input.trim()) {
+    document.getElementById('output').innerHTML = '';
+    document.getElementById('charCount').textContent = '';
+    rawOutput = '';
+    return;
+  }
+  rawOutput = currentMode === 'beautify' ? beautifyHTML(input) : minifyHTML(input);
+  document.getElementById('output').innerHTML = highlightHTML(rawOutput);
+  document.getElementById('charCount').textContent = rawOutput.length.toLocaleString() + ' chars';
+}
+
+function doCopy() {
+  if (!rawOutput) return;
+  navigator.clipboard.writeText(rawOutput).then(() => {
+    const btn = document.getElementById('btnCopy');
+    btn.textContent = '✅ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Auto-process on input change
+document.getElementById('input').addEventListener('input', process);
+document.getElementById('indent').addEventListener('change', () => {
+  if (currentMode === 'beautify') process();
+});
+
+// Resizable divider
+(function() {
+  const divider = document.getElementById('divider');
+  const main = divider.parentElement;
+  let dragging = false;
+  divider.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    const rect = main.getBoundingClientRect();
+    const isVertical = window.innerWidth <= 768;
+    if (isVertical) {
+      const pct = ((e.clientY - rect.top) / rect.height) * 100;
+      main.children[0].style.flex = 'none';
+      main.children[0].style.height = Math.max(20, Math.min(80, pct)) + '%';
+      main.children[2].style.flex = '1';
+    } else {
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      main.children[0].style.flex = 'none';
+      main.children[0].style.width = Math.max(20, Math.min(80, pct)) + '%';
+      main.children[2].style.flex = '1';
+    }
+  });
+  document.addEventListener('mouseup', () => { dragging = false; });
+})();
+
+// Load sample
+document.getElementById('input').value = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sample Page</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><nav><ul><li><a href="/">Home</a></li><li><a href="/about">About</a></li></ul></nav></header>
+<main><div class="container"><h1>Hello World</h1><p>This is a <strong>sample</strong> HTML page.</p><!-- A comment --><img src="image.jpg" alt="Sample"><br><input type="text" placeholder="Enter text"></div></main>
+<footer><p>&copy; 2026</p></footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>`;
+doBeautify();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

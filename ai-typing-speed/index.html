@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Typing Speed Test - Test Your Typing Speed</title>
+<meta name="description" content="Test and improve your typing speed with AI Typing Speed Test. Track your WPM, CPM, and accuracy across multiple difficulty levels.">
+<meta name="keywords" content="typing speed test, WPM test, typing practice, keyboard speed">
+<meta name="author" content="AI Typing Speed Test">
+<meta property="og:title" content="AI Typing Speed Test - Test Your Typing Speed">
+<meta property="og:description" content="Test and improve your typing speed. Track WPM, CPM, and accuracy across Easy, Medium, and Hard difficulty levels.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-typing-speed/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Typing Speed Test">
+<meta name="twitter:description" content="Test and improve your typing speed with real-time stats and multiple difficulty levels.">
+<link rel="canonical" href="https://lifa-su.com/ai-typing-speed/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--green:#00d474;--red:#ff4757;--gray:#555}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);margin-top:6px;font-size:.95rem}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.controls button,.controls select{padding:10px 20px;border:none;border-radius:8px;font-size:.95rem;cursor:pointer;transition:all .2s}
+.controls select{background:var(--bg2);color:var(--text);border:1px solid var(--bg3);outline:none}
+.btn{background:var(--bg3);color:var(--text)}.btn:hover{background:var(--accent2)}
+.btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{opacity:.85}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.stat-card{background:var(--bg2);border-radius:10px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.stat-card .label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.stat-card .value{font-size:1.6rem;font-weight:700;margin-top:4px;color:var(--accent)}
+.typing-area{position:relative;background:var(--bg2);border-radius:12px;padding:24px;margin:20px 0;border:1px solid rgba(255,255,255,.05);min-height:160px;cursor:text}
+.text-display{font-size:1.15rem;line-height:1.9;font-family:'Courier New',monospace;white-space:pre-wrap;word-break:break-all;user-select:none}
+.text-display .correct{color:var(--green)}
+.text-display .incorrect{color:var(--red);text-decoration:underline}
+.text-display .pending{color:var(--gray)}
+.text-display .cur{border-left:2px solid var(--accent);animation:blink 1s infinite;margin-left:-1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hidden-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;resize:none;border:none;outline:none;font-size:16px;padding:24px}
+</style>
+<style>
+.result-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:100;justify-content:center;align-items:center}
+.result-overlay.show{display:flex}
+.result-card{background:var(--bg2);border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);animation:popIn .3s ease}
+@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.result-card h2{font-size:1.5rem;margin-bottom:20px;color:var(--accent)}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.result-item{background:var(--bg);border-radius:10px;padding:14px}
+.result-item .r-label{font-size:.75rem;color:var(--text2);text-transform:uppercase}
+.result-item .r-value{font-size:1.4rem;font-weight:700;margin-top:4px}
+.result-card .actions{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.history-section{margin:30px 0}
+.history-section h2{font-size:1.2rem;margin-bottom:14px;color:var(--text2)}
+.history-table{width:100%;border-collapse:collapse;font-size:.9rem}
+.history-table th,.history-table td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+.history-table th{color:var(--text2);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px}
+.history-table tr:hover td{background:rgba(255,255,255,.02)}
+.no-history{text-align:center;color:var(--gray);padding:30px;font-size:.95rem}
+.diff-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.diff-badge.easy{background:rgba(0,212,116,.15);color:var(--green)}
+.diff-badge.medium{background:rgba(240,165,0,.15);color:#f0a500}
+.diff-badge.hard{background:rgba(255,71,87,.15);color:var(--red)}
+footer{text-align:center;padding:30px 0;color:var(--gray);font-size:.8rem}
+.timer-active .typing-area{border-color:var(--accent);box-shadow:0 0 20px rgba(233,69,96,.1)}
+@media(max-width:600px){.stats-bar{grid-template-columns:repeat(2,1fr)}.result-grid{grid-template-columns:1fr}header h1{font-size:1.4rem}.text-display{font-size:1rem}.container{padding:12px}.typing-area{padding:16px}.hidden-input{padding:16px}}
+.pro-section{position:relative;margin:30px 0;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.pro-blur{filter:blur(5px);pointer-events:none;padding:24px;background:var(--bg2);opacity:.6}
+.pro-blur h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px}
+.pro-mock-custom{padding:14px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:12px;font-size:.85rem;color:var(--text2);border:1px dashed rgba(255,255,255,.1);min-height:60px}
+.pro-mock-langs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.pro-mock-lang{padding:6px 14px;background:rgba(0,0,0,.2);border-radius:20px;font-size:.8rem;color:var(--text2)}
+.pro-mock-lang.active{background:var(--accent);color:#fff}
+.pro-mock-board{width:100%;border-collapse:collapse;margin-bottom:12px}
+.pro-mock-board th,.pro-mock-board td{padding:8px 10px;text-align:left;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.05)}
+.pro-mock-board th{color:var(--text2);font-size:.7rem;text-transform:uppercase}
+.pro-mock-board td{color:var(--gray)}
+.pro-mock-practice{display:flex;gap:8px}
+.pro-mock-practice div{flex:1;padding:10px;background:rgba(0,0,0,.2);border-radius:8px;text-align:center;font-size:.8rem;color:var(--text2)}
+.pro-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.4);transition:background .2s}
+.pro-lock-overlay:hover{background:rgba(26,26,46,.3)}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-lock-text{font-size:.95rem;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:10px 24px;border-radius:24px;box-shadow:0 4px 15px rgba(233,69,96,.3);transition:transform .2s}
+.pro-lock-overlay:hover .pro-lock-text{transform:scale(1.05)}
+.pro-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--bg2);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);animation:proPopIn .3s ease}
+@keyframes proPopIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:var(--text2);margin-bottom:16px}
+.pro-features{list-style:none;text-align:left;margin:16px 0;padding:0}
+.pro-features li{padding:8px 0;font-size:.9rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pro-features li:last-child{border-bottom:none}
+.pro-features li span.pf-icon{font-size:1.1rem;flex-shrink:0}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:16px;text-align:center}
+.pro-upgrade-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:var(--text2);cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-later-btn:hover{color:#fff}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>⌨️ AI Typing Speed Test</h1><p>Test your typing speed and accuracy</p></header>
+<div class="controls">
+<select id="difficulty" aria-label="Select difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select>
+<button class="btn" id="newTextBtn">New Text</button>
+<button class="btn-accent btn" id="restartBtn">Restart</button>
+</div>
+<div class="stats-bar">
+<div class="stat-card"><div class="label">WPM</div><div class="value" id="wpm">0</div></div>
+<div class="stat-card"><div class="label">CPM</div><div class="value" id="cpm">0</div></div>
+<div class="stat-card"><div class="label">Accuracy</div><div class="value" id="accuracy">100%</div></div>
+<div class="stat-card"><div class="label">Time</div><div class="value" id="timer">0s</div></div>
+</div>
+<div class="typing-area" id="typingArea">
+<div class="text-display" id="textDisplay"></div>
+<textarea class="hidden-input" id="inputField" aria-label="Type here" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+</div>
+<div class="history-section"><h2>📊 History</h2><div id="historyContainer"></div></div>
+<!-- Pro Section -->
+<div class="pro-section" onclick="openProModal()">
+<div class="pro-blur">
+<h3>🚀 Pro: Custom Text, Languages & Leaderboard</h3>
+<div class="pro-mock-custom">Paste your own text here to practice typing with custom content, code snippets, or any text you want to master...</div>
+<h3>Languages</h3>
+<div class="pro-mock-langs">
+<div class="pro-mock-lang active">English</div>
+<div class="pro-mock-lang">Español</div>
+<div class="pro-mock-lang">Français</div>
+<div class="pro-mock-lang">Deutsch</div>
+<div class="pro-mock-lang">中文</div>
+<div class="pro-mock-lang">日本語</div>
+</div>
+<h3>Leaderboard</h3>
+<table class="pro-mock-board">
+<thead><tr><th>#</th><th>User</th><th>WPM</th><th>Accuracy</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>SpeedTyper99</td><td>142</td><td>98.5%</td></tr>
+<tr><td>2</td><td>KeyMaster</td><td>128</td><td>97.2%</td></tr>
+<tr><td>3</td><td>TypeNinja</td><td>119</td><td>99.1%</td></tr>
+</tbody>
+</table>
+<div class="pro-mock-practice">
+<div>🎯 Weak Keys</div>
+<div>📖 Custom Lessons</div>
+<div>📊 Progress Charts</div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Unlock Pro Features</div>
+</div>
+</div>
+<!-- Pro Modal -->
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+<h2>🚀 Unlock Pro</h2>
+<p class="pro-price">One-time purchase · Lifetime access</p>
+<ul class="pro-features">
+<li><span class="pf-icon">📝</span> Custom text — paste anything to practice</li>
+<li><span class="pf-icon">🌍</span> Multi-language support (6+ languages)</li>
+<li><span class="pf-icon">🏆</span> Global leaderboard & rankings</li>
+<li><span class="pf-icon">🎯</span> Practice mode with weak-key training</li>
+<li><span class="pf-icon">♾️</span> Lifetime updates & priority support</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="closeProModal()">Maybe later</button>
+</div>
+</div>
+<script>function openProModal(){document.getElementById('proModal').classList.add('show')}function closeProModal(){document.getElementById('proModal').classList.remove('show')}</script>
+<footer>AI Typing Speed Test &copy; 2025</footer>
+</div>
+<div class="result-overlay" id="resultOverlay">
+<div class="result-card">
+<h2>🎉 Test Complete!</h2>
+<div class="result-grid">
+<div class="result-item"><div class="r-label">WPM</div><div class="r-value" id="rWpm">0</div></div>
+<div class="result-item"><div class="r-label">CPM</div><div class="r-value" id="rCpm">0</div></div>
+<div class="result-item"><div class="r-label">Accuracy</div><div class="r-value" id="rAcc">0%</div></div>
+<div class="result-item"><div class="r-label">Time</div><div class="r-value" id="rTime">0s</div></div>
+<div class="result-item"><div class="r-label">Errors</div><div class="r-value" id="rErrors">0</div></div>
+<div class="result-item"><div class="r-label">Difficulty</div><div class="r-value" id="rDiff">-</div></div>
+</div>
+<div class="actions">
+<button class="btn" id="rNewText">New Text</button>
+<button class="btn-accent btn" id="rRestart">Try Again</button>
+</div>
+</div>
+</div><script>
+const TEXTS={easy:[
+"The cat sat on the mat and looked out the window at the birds flying by in the clear blue sky.",
+"I like to read books and play games with my friends on sunny days when we have no school.",
+"She went to the store to buy some milk and bread for dinner tonight with her family.",
+"The dog ran fast in the park and jumped over the small fence to catch the red ball.",
+"We had a great time at the beach last summer and built a big sand castle near the water.",
+"He woke up early and made a cup of hot coffee before going for a walk in the cool morning air."
+],medium:[
+"The quick brown fox jumps over the lazy dog while the farmer watches from his old wooden porch nearby.",
+"Programming is the art of telling a computer what to do using a language it can understand and execute properly.",
+"Every morning she would walk along the river bank and watch the sunrise paint the sky in shades of orange and pink.",
+"The restaurant on the corner serves the best pasta in town and their desserts are absolutely worth trying as well.",
+"Learning a new language takes patience and dedication but the rewards of connecting with others make it worthwhile.",
+"Scientists have discovered that regular exercise not only improves physical health but also boosts mental clarity and focus."
+],hard:[
+"The juxtaposition of quantum mechanics and general relativity remains one of physics' most perplexing conundrums; reconciling them demands extraordinary ingenuity.",
+"Notwithstanding the bureaucratic complexities, the entrepreneur's perseverance culminated in an unprecedented acquisition worth approximately $4.7 billion.",
+"The archaeologist meticulously catalogued each artifact: obsidian blades, terracotta figurines, and chryselephantine statuettes from the 3rd millennium BCE.",
+"Paradoxically, the algorithm's computational efficiency (O(n log n)) deteriorated significantly when processing heterogeneous, non-deterministic datasets.",
+"The pharmaceutical conglomerate's synthesized compound exhibited remarkable efficacy against antibiotic-resistant strains of Staphylococcus aureus in vitro.",
+"Cryptocurrency's decentralized blockchain architecture fundamentally challenges traditional monetary policy frameworks, necessitating unprecedented regulatory paradigm shifts."
+]};
+let currentText="",startTime=null,timerInterval=null,isFinished=false,currentDifficulty="medium";
+const $=id=>document.getElementById(id);
+const inputField=$("inputField"),textDisplay=$("textDisplay"),wpmEl=$("wpm"),cpmEl=$("cpm"),accEl=$("accuracy"),timerEl=$("timer");
+const resultOverlay=$("resultOverlay");
+
+function pickText(){
+const texts=TEXTS[currentDifficulty];
+let t=texts[Math.floor(Math.random()*texts.length)];
+while(t===currentText&&texts.length>1)t=texts[Math.floor(Math.random()*texts.length)];
+return t;
+}
+function renderText(){
+const input=inputField.value;
+let html="";
+for(let i=0;i<currentText.length;i++){
+if(i<input.length){
+if(input[i]===currentText[i])html+=`<span class="correct">${escHtml(currentText[i])}</span>`;
+else html+=`<span class="incorrect">${escHtml(currentText[i])}</span>`;
+}else if(i===input.length){
+html+=`<span class="cur"></span><span class="pending">${escHtml(currentText[i])}</span>`;
+}else{
+html+=`<span class="pending">${escHtml(currentText[i])}</span>`;
+}
+}
+if(input.length===0)html=`<span class="cur"></span>`+html.replace('<span class="cur"></span>','');
+textDisplay.innerHTML=html;
+}
+function escHtml(c){return c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":c==='"'?"&quot;":c;}
+function updateStats(){
+const input=inputField.value;
+if(!startTime||input.length===0){wpmEl.textContent="0";cpmEl.textContent="0";accEl.textContent="100%";return;}
+const elapsed=(Date.now()-startTime)/60000;
+let correct=0,errors=0;
+for(let i=0;i<input.length;i++){
+if(i<currentText.length&&input[i]===currentText[i])correct++;else errors++;
+}
+const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;
+const cpm=elapsed>0?Math.round(correct/elapsed):0;
+const acc=input.length>0?Math.round((correct/input.length)*100):100;
+wpmEl.textContent=wpm;cpmEl.textContent=cpm;accEl.textContent=acc+"%";
+}
+function updateTimer(){
+if(!startTime)return;
+const s=Math.floor((Date.now()-startTime)/1000);
+timerEl.textContent=s+"s";
+}function startTest(){
+currentText=pickText();
+inputField.value="";startTime=null;isFinished=false;
+clearInterval(timerInterval);timerInterval=null;
+wpmEl.textContent="0";cpmEl.textContent="0";accEl.textContent="100%";timerEl.textContent="0s";
+document.body.classList.remove("timer-active");
+renderText();inputField.focus();
+resultOverlay.classList.remove("show");
+}
+function finishTest(){
+isFinished=true;clearInterval(timerInterval);
+document.body.classList.remove("timer-active");
+const input=inputField.value;
+const elapsed=(Date.now()-startTime)/60000;
+const elapsedSec=Math.round((Date.now()-startTime)/1000);
+let correct=0,errors=0;
+for(let i=0;i<input.length;i++){
+if(i<currentText.length&&input[i]===currentText[i])correct++;else errors++;
+}
+const wpm=elapsed>0?Math.round((correct/5)/elapsed):0;
+const cpm=elapsed>0?Math.round(correct/elapsed):0;
+const acc=input.length>0?Math.round((correct/input.length)*100):100;
+$("rWpm").textContent=wpm;$("rCpm").textContent=cpm;
+$("rAcc").textContent=acc+"%";$("rTime").textContent=elapsedSec+"s";
+$("rErrors").textContent=errors;$("rDiff").textContent=currentDifficulty.charAt(0).toUpperCase()+currentDifficulty.slice(1);
+resultOverlay.classList.add("show");
+saveHistory({date:new Date().toISOString(),wpm,cpm,accuracy:acc,time:elapsedSec,errors,difficulty:currentDifficulty});
+renderHistory();
+}
+function saveHistory(record){
+let h=JSON.parse(localStorage.getItem("typingHistory")||"[]");
+h.unshift(record);if(h.length>20)h=h.slice(0,20);
+localStorage.setItem("typingHistory",JSON.stringify(h));
+}
+function renderHistory(){
+const h=JSON.parse(localStorage.getItem("typingHistory")||"[]");
+const container=$("historyContainer");
+if(h.length===0){container.innerHTML='<div class="no-history">No history yet. Complete a test to see your results here.</div>';return;}
+let html='<table class="history-table"><thead><tr><th>Date</th><th>WPM</th><th>Accuracy</th><th>Time</th><th>Difficulty</th></tr></thead><tbody>';
+h.forEach(r=>{
+const d=new Date(r.date);
+const dateStr=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const dc=r.difficulty||'medium';
+html+=`<tr><td>${dateStr}</td><td>${r.wpm}</td><td>${r.accuracy}%</td><td>${r.time}s</td><td><span class="diff-badge ${dc}">${dc.charAt(0).toUpperCase()+dc.slice(1)}</span></td></tr>`;
+});
+html+='</tbody></table>';container.innerHTML=html;
+}
+inputField.addEventListener("input",function(){
+if(isFinished)return;
+if(!startTime&&inputField.value.length>0){
+startTime=Date.now();
+document.body.classList.add("timer-active");
+timerInterval=setInterval(()=>{updateTimer();updateStats();},200);
+}
+renderText();updateStats();
+if(inputField.value.length>=currentText.length)finishTest();
+});
+inputField.addEventListener("paste",e=>e.preventDefault());
+$("typingArea").addEventListener("click",()=>inputField.focus());
+$("difficulty").addEventListener("change",function(){currentDifficulty=this.value;startTest();});
+$("newTextBtn").addEventListener("click",()=>startTest());
+$("restartBtn").addEventListener("click",()=>{currentText=currentText;inputField.value="";startTime=null;isFinished=false;clearInterval(timerInterval);timerInterval=null;wpmEl.textContent="0";cpmEl.textContent="0";accEl.textContent="100%";timerEl.textContent="0s";document.body.classList.remove("timer-active");renderText();inputField.focus();resultOverlay.classList.remove("show");});
+$("rNewText").addEventListener("click",()=>startTest());
+$("rRestart").addEventListener("click",()=>{resultOverlay.classList.remove("show");inputField.value="";startTime=null;isFinished=false;clearInterval(timerInterval);timerInterval=null;wpmEl.textContent="0";cpmEl.textContent="0";accEl.textContent="100%";timerEl.textContent="0s";document.body.classList.remove("timer-active");renderText();inputField.focus();});
+startTest();renderHistory();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

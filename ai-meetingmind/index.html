@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetingMind — AI Meeting Minutes Generator | Smart Notes</title>
+<meta name="description" content="Transform meeting recordings and notes into structured meeting minutes with AI. Action items, decisions, summaries, and follow-ups. Powered by DeepSeek AI.">
+<meta name="keywords" content="meeting minutes generator, AI meeting notes, meeting summary, action items, meeting recorder, meeting transcription, productivity tool">
+<meta name="author" content="Feifei Dev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-meetingmind/">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="MeetingMind — AI Meeting Minutes Generator">
+<meta property="og:description" content="Transform meeting notes into structured minutes with AI. Action items, decisions, summaries, and follow-ups.">
+<meta property="og:url" content="https://lifa-su.com/ai-meetingmind/">
+<meta property="og:site_name" content="Feifei AI Tools">
+<meta property="og:image" content="https://lifa-su.com/assets/og-meetingmind.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MeetingMind — AI Meeting Minutes Generator">
+<meta name="twitter:description" content="Transform meeting notes into structured minutes with AI. Free online tool.">
+<meta name="twitter:image" content="https://lifa-su.com/assets/og-meetingmind.png">
+<!-- Structured Data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"MeetingMind - AI Meeting Minutes Generator","url":"https://lifa-su.com/ai-meetingmind/","description":"Transform meeting recordings and notes into structured meeting minutes with AI.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Feifei Dev","url":"https://ko-fi.com/feidev"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#6366f1;--primary-hover:#818cf8;--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text-secondary:#94a3b8;--border:#334155;--success:#10b981;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.container{max-width:960px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--primary),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text-secondary);margin-top:6px;font-size:.95rem}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:20px;border:1px solid var(--border)}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card h2 .icon{font-size:1.3rem}
+label{display:block;font-size:.875rem;font-weight:500;color:var(--text-secondary);margin-bottom:6px}
+input[type="text"],textarea,select{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;transition:border-color .2s;background:var(--bg);color:var(--text)}
+input[type="text"]:focus,textarea:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+textarea{resize:vertical;min-height:200px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}}
+.form-group{margin-bottom:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.3)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:rgba(99,102,241,.05)}
+.btn-sm{padding:8px 16px;font-size:.85rem}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap}
+.actions-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.generate-bar{text-align:center;padding:8px 0}
+#result{display:none}
+.result-content{font-size:.9rem;line-height:1.8}
+.result-content h2{font-size:1.05rem;color:var(--primary);margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.result-content h3{font-size:.95rem;margin:14px 0 6px}
+.result-content ul{padding-left:20px;margin:6px 0}
+.result-content li{margin:4px 0}
+.result-content table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}
+.result-content th,.result-content td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+.result-content th{background:var(--border);font-weight:600}
+.loading{display:none;text-align:center;padding:40px}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:var(--text-secondary);font-size:.9rem}
+.api-key-bar{display:flex;gap:10px;align-items:end}
+.api-key-bar .form-group{flex:1;margin:0}
+.api-key-bar .btn{height:42px}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-success{background:rgba(16,185,129,.2);color:#34d399}
+.badge-warn{background:rgba(245,158,11,.2);color:#fbbf24}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:8px;font-size:.875rem;opacity:0;transform:translateY(10px);transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.example-btn{font-size:.8rem;color:var(--primary);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit}
+.example-btn:hover{color:var(--primary-hover)}
+footer{text-align:center;padding:30px 0;color:var(--text-secondary);font-size:.8rem}
+.tab-bar{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.tab{padding:10px 20px;cursor:pointer;font-size:.9rem;font-weight:500;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab:hover{color:var(--primary)}
+.markdown-raw{display:none;width:100%;min-height:300px;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.85rem;padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);resize:vertical}
+/* Animations */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+body{animation:fadeIn .3s ease-out}
+.card{animation:slideUp .4s ease-out both}
+.card:nth-child(2){animation-delay:.05s}
+.card:nth-child(3){animation-delay:.1s}
+header{animation:slideUp .35s ease-out}
+/* Pro Section */
+.pro-section{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(168,85,247,.1));border:1px solid rgba(99,102,241,.25);border-radius:var(--radius);padding:28px;text-align:center;margin-top:24px;position:relative;overflow:hidden;animation:slideUp .5s ease-out both;animation-delay:.2s}
+.pro-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:700;letter-spacing:.5px}
+.pro-section h3{font-size:1.15rem;margin-bottom:14px;color:var(--text)}
+.pro-features{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.pro-feature{padding:8px 16px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.15);border-radius:8px;font-size:.85rem;color:var(--text-secondary)}
+.btn-pro{display:inline-block;padding:12px 36px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border-radius:var(--radius);font-weight:600;text-decoration:none;transition:all .3s;font-size:.95rem}
+.btn-pro:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,.4)}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🧠 MeetingMind</h1>
+    <p>AI会议纪要生成器 — 开完会，纪要就写好了</p>
+  </header>
+
+  <!-- API Key -->
+  <div class="card">
+    <h2><span class="icon">🔑</span> DeepSeek API 设置</h2>
+    <div class="api-key-bar">
+      <div class="form-group">
+        <label for="apiKey">API Key</label>
+        <input type="text" id="apiKey" placeholder="sk-..." autocomplete="off">
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="saveApiKey()">保存</button>
+    </div>
+    <p style="margin-top:8px;font-size:.8rem;color:var(--text-secondary)">
+      Key 仅存储在浏览器本地，不会上传到任何服务器。
+      <span id="keyStatus"></span>
+    </p>
+  </div>
+
+  <!-- Input -->
+  <div class="card">
+    <h2><span class="icon">📝</span> 会议内容输入</h2>
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label for="meetingTitle">会议主题（可选）</label>
+        <input type="text" id="meetingTitle" placeholder="例：Q1产品规划讨论会">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label for="meetingLang">输出语言</label>
+        <select id="meetingLang">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+          <option value="auto">自动检测</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="meetingInput">
+        会议要点 / 录音转写文字 / 聊天记录
+        <button class="example-btn" onclick="loadExample()">加载示例</button>
+      </label>
+      <textarea id="meetingInput" placeholder="粘贴会议内容、讨论要点、录音转写文字或聊天记录...&#10;&#10;支持任意格式，AI会自动识别并整理。"></textarea>
+    </div>
+    <div class="generate-bar">
+      <button class="btn btn-primary" id="generateBtn" onclick="generate()">
+        ✨ 生成会议纪要
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>AI 正在分析会议内容，生成结构化纪要...</p>
+    <p style="font-size:.8rem;margin-top:4px;color:#94a3b8">通常需要 10-30 秒</p>
+  </div>
+
+  <!-- Result -->
+  <div class="card" id="result">
+    <div class="actions-bar">
+      <h2 style="margin:0"><span class="icon">📋</span> 会议纪要</h2>
+      <div class="btn-group">
+        <button class="btn btn-outline btn-sm" onclick="toggleView()">
+          <span id="viewToggleText">查看 Markdown</span>
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="exportMarkdown()">导出 .md</button>
+        <button class="btn btn-outline btn-sm" onclick="exportText()">导出 .txt</button>
+        <button class="btn btn-outline btn-sm" onclick="copyResult()">复制</button>
+      </div>
+    </div>
+    <hr style="margin:16px 0;border:none;border-top:1px solid var(--border)">
+    <div class="result-content" id="resultContent"></div>
+    <textarea class="markdown-raw" id="markdownRaw" readonly></textarea>
+  </div>
+
+  <!-- Pro Section -->
+  <div class="pro-section">
+    <div class="pro-badge">⭐ PRO</div>
+    <h3>🚀 Unlock Pro Features</h3>
+    <div class="pro-features">
+      <div class="pro-feature">🎙️ Audio Transcription</div>
+      <div class="pro-feature">♾️ Unlimited Meetings</div>
+      <div class="pro-feature">👥 Team Sharing</div>
+      <div class="pro-feature">✅ Action Item Tracking</div>
+    </div>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn-pro">Unlock Pro →</a>
+  </div>
+
+  <footer>
+    MeetingMind &copy; 2026 — Powered by DeepSeek API
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== State =====
+let rawMarkdown = '';
+let showingMarkdown = false;
+
+// ===== API Key =====
+function saveApiKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) return showToast('请输入 API Key');
+  localStorage.setItem('deepseek_api_key', key);
+  updateKeyStatus();
+  showToast('API Key 已保存');
+}
+
+function getApiKey() {
+  return localStorage.getItem('deepseek_api_key') || '';
+}
+
+function updateKeyStatus() {
+  const el = document.getElementById('keyStatus');
+  const key = getApiKey();
+  if (key) {
+    el.innerHTML = '<span class="badge badge-success">已配置</span>';
+    document.getElementById('apiKey').value = key.slice(0, 6) + '••••••' + key.slice(-4);
+  } else {
+    el.innerHTML = '<span class="badge badge-warn">未配置</span>';
+  }
+}
+
+// ===== Example =====
+function loadExample() {
+  document.getElementById('meetingTitle').value = 'Q1产品规划讨论会';
+  document.getElementById('meetingInput').value = `参会人员：张明（产品经理）、李华（技术负责人）、王芳（设计师）、赵强（运营）
+
+张明：今天主要讨论Q1的产品规划，重点是移动端改版和AI功能上线的时间表。
+
+李华：技术侧来看，移动端改版大概需要6周，如果要加AI推荐功能的话，可能要8周。主要瓶颈在推荐算法的训练数据准备上。
+
+王芳：设计稿我这边已经完成了80%，下周可以全部交付。但有个问题，新的设计系统需要前端配合搭建组件库，这个工期要额外算。
+
+张明：组件库的事情确实要提前做。李华，能不能安排一个前端同学专门负责这个？
+
+李华：可以，让小陈来做，预计两周能搭好基础组件库。
+
+赵强：运营侧有个需求，希望在改版中加入用户成长体系，包括积分、等级、勋章这些。这个对用户留存很重要，我们竞品都在做。
+
+张明：用户成长体系确实重要，但Q1时间紧，我建议先做基础版——积分和等级，勋章放到Q2。大家觉得呢？
+
+李华：同意，分阶段来比较稳妥。
+
+王芳：设计上没问题，积分和等级的设计我可以一周内出。
+
+张明：好，那我们确定一下时间表：
+1. 2月底前：设计稿全部交付 + 组件库搭建完成
+2. 3月中旬：移动端改版开发完成
+3. 3月底：AI推荐功能第一版上线
+4. 全程需要每周同步进度，每周三下午3点开周会
+
+李华：有个风险要提一下，AI推荐需要用到用户行为数据，目前数据埋点还不完善，需要运营配合梳理埋点方案。
+
+赵强：没问题，我这周就整理出埋点需求文档。
+
+张明：还有预算的事情，AI服务器的GPU资源需要额外申请，我已经跟财务沟通过了，预计每月增加2万的服务器成本。
+
+李华：够用了，前期用4张A100就行。
+
+张明：OK，那今天的会议就到这里。下次会议2月28号，届时review设计稿和组件库进度。`;
+  showToast('已加载示例内容');
+}
+
+// ===== Generate =====
+async function generate() {
+  const apiKey = getApiKey();
+  if (!apiKey || apiKey.includes('••')) {
+    return showToast('请先配置 DeepSeek API Key');
+  }
+  const input = document.getElementById('meetingInput').value.trim();
+  if (!input) return showToast('请输入会议内容');
+  if (input.length < 20) return showToast('内容太短，请输入更多会议信息');
+
+  const title = document.getElementById('meetingTitle').value.trim();
+  const lang = document.getElementById('meetingLang').value;
+
+  const langInstruction = lang === 'zh' ? '请用中文输出。' : lang === 'en' ? 'Please output in English.' : '请根据输入内容的语言自动选择输出语言。';
+
+  const systemPrompt = `你是一位专业的会议纪要撰写专家。请根据用户提供的会议内容，生成一份结构化的会议纪要。${langInstruction}
+
+请严格按以下Markdown格式输出：
+
+## 📌 会议概要
+- **会议主题**：（从内容推断或使用用户提供的主题）
+- **参会人员**：（从对话中识别）
+- **会议日期**：（如提到则填写，否则写"未提及"）
+
+## 💡 讨论要点
+（3-5个关键讨论点，每点用简洁的段落概括）
+
+## ✅ 决策事项
+（会议中达成的决定，用编号列表）
+
+## 📋 待办任务
+| 序号 | 任务 | 负责人 | 截止日期 | 优先级 |
+|------|------|--------|----------|--------|
+（从对话中提取具体的待办事项）
+
+## ⚠️ 风险与遗留问题
+（未解决的问题或潜在风险，需要后续跟进）
+
+## 📅 下次会议
+（如果提到了下次会议的安排；如未提及则写"待定"）
+
+要求：
+1. 语言简洁专业
+2. 准确提取人名和具体事项
+3. 如果无法确定某项信息，标注"待确认"
+4. 保持客观，不添加原文中没有的信息
+5. 待办任务的优先级用 🔴高 🟡中 🟢低 标记`;
+
+  const userMsg = title ? `会议主题：${title}\n\n会议内容：\n${input}` : input;
+
+  // UI state
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  showingMarkdown = false;
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMsg }
+        ],
+        temperature: 0.3,
+        max_tokens: 4096
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API 请求失败 (${resp.status})`);
+    }
+
+    const data = await resp.json();
+    rawMarkdown = data.choices?.[0]?.message?.content || '';
+
+    if (!rawMarkdown) throw new Error('AI 返回内容为空');
+
+    document.getElementById('resultContent').innerHTML = markdownToHtml(rawMarkdown);
+    document.getElementById('markdownRaw').value = rawMarkdown;
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('会议纪要生成完成 ✅');
+  } catch (e) {
+    showToast('❌ ' + e.message, 5000);
+  } finally {
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+// ===== Markdown to HTML (lightweight) =====
+function markdownToHtml(md) {
+  let html = md
+    // tables
+    .replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)*)/gm, (_, header, sep, body) => {
+      const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+      const rows = body.trim().split('\n').map(row => {
+        const tds = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+        return `<tr>${tds}</tr>`;
+      }).join('');
+      return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+    })
+    // headers
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // unordered list
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    // ordered list
+    .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+    // wrap consecutive <li> in <ul>
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+    // paragraphs
+    .replace(/\n{2,}/g, '</p><p>')
+    // line breaks
+    .replace(/\n/g, '<br>');
+
+  // clean up
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p>\s*<(h[123]|ul|table)/g, '<$1');
+  html = html.replace(/<\/(h[123]|ul|table)>\s*<\/p>/g, '</$1>');
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p><br>/g, '<p>');
+
+  return html;
+}
+
+// ===== View Toggle =====
+function toggleView() {
+  showingMarkdown = !showingMarkdown;
+  document.getElementById('resultContent').style.display = showingMarkdown ? 'none' : 'block';
+  document.getElementById('markdownRaw').style.display = showingMarkdown ? 'block' : 'none';
+  document.getElementById('viewToggleText').textContent = showingMarkdown ? '查看渲染' : '查看 Markdown';
+}
+
+// ===== Export =====
+function exportMarkdown() {
+  if (!rawMarkdown) return;
+  download(rawMarkdown, getFilename('md'), 'text/markdown');
+  showToast('Markdown 文件已导出');
+}
+
+function exportText() {
+  if (!rawMarkdown) return;
+  const text = rawMarkdown
+    .replace(/^#{1,3}\s*/gm, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/\|/g, ' ')
+    .replace(/-{3,}/g, '');
+  download(text, getFilename('txt'), 'text/plain');
+  showToast('文本文件已导出');
+}
+
+function copyResult() {
+  if (!rawMarkdown) return;
+  navigator.clipboard.writeText(rawMarkdown).then(() => {
+    showToast('已复制到剪贴板');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = rawMarkdown;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制到剪贴板');
+  });
+}
+
+function getFilename(ext) {
+  const title = document.getElementById('meetingTitle').value.trim() || '会议纪要';
+  const date = new Date().toISOString().slice(0, 10);
+  return `${title}_${date}.${ext}`;
+}
+
+function download(content, filename, type) {
+  const blob = new Blob([content], { type: type + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== Toast =====
+function showToast(msg, duration = 3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  updateKeyStatus();
+  // restore key input focus behavior
+  const keyInput = document.getElementById('apiKey');
+  keyInput.addEventListener('focus', () => {
+    if (keyInput.value.includes('••')) keyInput.value = '';
+  });
+  keyInput.addEventListener('blur', () => {
+    if (!keyInput.value.trim()) updateKeyStatus();
+  });
+});
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

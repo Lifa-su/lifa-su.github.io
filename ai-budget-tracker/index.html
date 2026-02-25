@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="AI Budget Tracker - Smart personal finance tool with expense tracking, budget goals, visual reports, and AI-powered spending analysis.">
+<meta name="keywords" content="budget tracker, expense tracker, personal finance, AI budget analysis, money management">
+<link rel="canonical" href="https://lifa-su.com/ai-budget-tracker/">
+<meta property="og:title" content="AI Budget Tracker - AI个人预算追踪器">
+<meta property="og:description" content="AI Budget Tracker - Smart personal finance tool with expense tracking, budget goals, visual reports, and AI-powered spending analysis.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-budget-tracker/">
+<meta property="og:image" content="https://lifa-su.com/ai-budget-tracker/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Budget Tracker - AI个人预算追踪器">
+<meta name="twitter:description" content="AI Budget Tracker - Smart personal finance tool with expense tracking, budget goals, visual reports, and AI-powered spending analysis.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-budget-tracker/og-image.png">
+<meta property="og:site_name" content="AI Budget Tracker">
+<meta property="og:locale" content="zh_CN">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="robots" content="index, follow">
+<meta name="author" content="FeiDev">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Budget Tracker","description":"Smart personal finance tool with expense tracking, budget goals, visual reports, and AI-powered spending analysis.","url":"https://lifa-su.com/ai-budget-tracker/","applicationCategory":"FinanceApplication","operatingSystem":"Web","browserRequirements":"Requires JavaScript","softwareVersion":"1.0","inLanguage":["zh-CN","en"],"featureList":["Expense Tracking","Income Tracking","Budget Goals","Visual Reports","AI Spending Analysis","CSV Export","Monthly Reports"],"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<title>AI Budget Tracker - AI个人预算追踪器</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#14141f;--surface2:#1e1e2e;--border:#2a2a3e;--text:#e4e4ef;--text2:#9494a8;--accent:#7c5cfc;--accent2:#5c8cfc;--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,0.3)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+body{font-family:"Inter",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(10,10,15,0.85);border-bottom:1px solid var(--border);padding:0 20px}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:8px}
+.logo span{font-size:1.5rem;-webkit-text-fill-color:initial}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav button{background:none;border:none;color:var(--text2);padding:8px 14px;cursor:pointer;font-size:.85rem;border-radius:8px;white-space:nowrap;transition:all .2s}
+nav button:hover{color:var(--text);background:var(--surface2)}
+nav button.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+main{max-width:1200px;margin:0 auto;padding:20px}
+section{display:none}section.active{display:block;animation:tabSlideIn .35s ease}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;animation:fadeIn .4s ease forwards;opacity:0}
+.stat-card .label{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.stat-card .value{font-size:1.5rem;font-weight:700}
+.stat-card .sub{font-size:.75rem;color:var(--text2);margin-top:4px}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem;width:100%;outline:none;transition:border-color .2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--surface2);color:var(--text)}
+label{font-size:.85rem;color:var(--text2);margin-bottom:6px;display:block}
+.form-group{margin-bottom:16px}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:.85}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.type-toggle{display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.type-toggle button{flex:1;padding:10px;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s}
+.type-toggle button.active-expense{background:var(--danger);color:#fff}
+.type-toggle button.active-income{background:var(--success);color:#fff}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border);font-size:.85rem}
+th{color:var(--text2);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+tr:hover td{background:var(--surface2)}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.tag-income{background:rgba(76,218,138,.15);color:var(--success)}
+.tag-expense{background:rgba(252,92,108,.15);color:var(--danger)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.progress-bar{background:var(--surface2);border-radius:20px;height:10px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:20px;transition:width .5s ease}
+canvas{max-width:100%}
+.ai-card{background:linear-gradient(135deg,rgba(124,92,252,.1),rgba(92,140,252,.1));border:1px solid rgba(124,92,252,.3);border-radius:var(--radius);padding:20px;margin-bottom:16px;animation:fadeIn .4s ease}
+.ai-card h3{font-size:.95rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ai-card p{font-size:.85rem;color:var(--text2);line-height:1.7}
+.filter-bar{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-bar select,.filter-bar input{width:auto;min-width:140px}
+.budget-item{display:flex;align-items:center;gap:16px;padding:16px;border-bottom:1px solid var(--border)}
+.budget-item:last-child{border-bottom:none}
+.budget-info{flex:1}
+.budget-info .cat-name{font-weight:600;font-size:.9rem}
+.budget-info .cat-detail{font-size:.8rem;color:var(--text2);margin-top:2px}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text2)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:90%;max-width:480px;animation:fadeIn .3s ease}
+.modal h3{margin-bottom:16px}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:8px;color:#fff;font-size:.85rem;font-weight:600;z-index:300;animation:fadeIn .3s ease}
+.toast-success{background:var(--success)}
+.toast-error{background:var(--danger)}
+.recent-list{max-height:300px;overflow-y:auto}
+.recent-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.recent-item:last-child{border-bottom:none}
+.recent-left{display:flex;align-items:center;gap:12px}
+.recent-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.recent-detail .r-cat{font-size:.85rem;font-weight:600}
+.recent-detail .r-note{font-size:.75rem;color:var(--text2)}
+.recent-amount{font-weight:700;font-size:.9rem}
+@media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:1fr}.header-inner{flex-direction:column;height:auto;padding:12px 0;gap:8px}nav{width:100%;justify-content:center}}
+@media(max-width:480px){.grid-4{grid-template-columns:1fr}}
+.nav-pro{background:linear-gradient(135deg,#fcb44c,#fc944c)!important;color:#fff!important;font-weight:700}
+.nav-pro:hover{opacity:.9}
+.pro-modal-content{text-align:center}
+.pro-modal-content h3{font-size:1.2rem;margin-bottom:8px}
+.pro-modal-content .pro-subtitle{color:var(--text2);font-size:.9rem;margin-bottom:20px}
+.pro-features{list-style:none;text-align:left;margin-bottom:24px}
+.pro-features li{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9rem;display:flex;align-items:center;gap:10px}
+.pro-features li:last-child{border-bottom:none}
+.pro-price{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.pro-price-sub{font-size:.8rem;color:var(--text2);margin-bottom:20px}
+.btn-pro-cta{display:block;width:100%;padding:14px;border:none;border-radius:8px;background:linear-gradient(135deg,#fcb44c,#fc944c);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;text-align:center}
+.btn-pro-cta:hover{opacity:.9;transform:translateY(-1px)}
+.pro-teaser{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(124,92,252,.08),rgba(92,140,252,.08));border:1px solid rgba(124,92,252,.25);border-radius:var(--radius);padding:24px;margin-top:20px;cursor:pointer;transition:all .2s}
+.pro-teaser:hover{border-color:rgba(124,92,252,.5);transform:translateY(-2px)}
+.pro-teaser-blur{position:absolute;top:0;left:0;right:0;bottom:0;backdrop-filter:blur(2px);background:rgba(10,10,15,.3);display:flex;align-items:center;justify-content:center;border-radius:var(--radius)}
+.pro-teaser-blur span{background:linear-gradient(135deg,#fcb44c,#fc944c);color:#fff;padding:10px 24px;border-radius:8px;font-weight:700;font-size:.9rem}
+.pro-teaser-preview{opacity:.5}
+.pro-teaser-preview h4{font-size:.95rem;margin-bottom:8px}
+.pro-teaser-preview p{font-size:.8rem;color:var(--text2)}
+footer{max-width:1200px;margin:40px auto 0;padding:20px;text-align:center;border-top:1px solid var(--border);color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.tab-spinner{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50}
+.tab-spinner.show{display:block}
+.tab-spinner::after{content:'';display:block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOutRight{0%{opacity:1;transform:translateX(0);max-height:80px}80%{opacity:0;transform:translateX(60px);max-height:80px}100%{opacity:0;transform:translateX(60px);max-height:0;padding:0;margin:0;border:none;overflow:hidden}}
+@keyframes tabSlideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.record-entering{animation:slideInRight .4s ease forwards}
+.record-exiting{animation:fadeOutRight .4s ease forwards;pointer-events:none}
+.card-stagger{opacity:0;animation:slideInUp .4s ease forwards}
+.card-stagger:nth-child(1){animation-delay:0ms}
+.card-stagger:nth-child(2){animation-delay:80ms}
+.card-stagger:nth-child(3){animation-delay:160ms}
+.card-stagger:nth-child(4){animation-delay:240ms}
+.card-stagger:nth-child(5){animation-delay:320ms}
+.btn-export-report{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s;font-family:inherit}
+.btn-export-report:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="header-inner">
+<div class="logo"><span>💰</span>AI Budget Tracker</div>
+<nav>
+<button class="active" onclick="showTab('dashboard')">📊 总览</button>
+<button onclick="showTab('add')">➕ 记账</button>
+<button onclick="showTab('records')">📋 记录</button>
+<button onclick="showTab('reports')">📈 报表</button>
+<button onclick="showTab('budget')">🎯 预算</button>
+<button onclick="showTab('ai')">🤖 AI分析</button>
+<button class="nav-pro" onclick="openProModal()">⭐ Pro</button>
+</nav>
+</div></header>
+<main>
+<!-- Dashboard -->
+<section id="sec-dashboard" class="active">
+<div class="grid-4" id="dashboard-stats"></div>
+<div style="margin-top:20px" class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h3 style="font-size:1rem">最近记录</h3>
+<button class="btn btn-sm btn-secondary" onclick="showTab('add')">+ 记一笔</button>
+</div>
+<div id="recent-list" class="recent-list"></div>
+</div>
+<div class="pro-teaser" onclick="openProModal()">
+<div class="pro-teaser-preview">
+<h4>📊 高级分析 · 趋势预测 · 自定义分类</h4>
+<p>解锁 Pro 功能，获取更深入的财务洞察和高级导出功能</p>
+</div>
+<div class="pro-teaser-blur"><span>⭐ 解锁 Pro 功能</span></div>
+</div>
+</section>
+
+<!-- Add Record -->
+<section id="sec-add">
+<div class="card" style="max-width:600px;margin:0 auto">
+<h3 style="font-size:1rem;margin-bottom:20px">📝 添加记录</h3>
+<div class="type-toggle" id="type-toggle">
+<button class="active-expense" onclick="setType('expense')">支出</button>
+<button onclick="setType('income')">收入</button>
+</div>
+<div class="form-group" style="margin-top:16px">
+<label>金额 (¥)</label>
+<input type="number" id="inp-amount" placeholder="0.00" step="0.01" min="0">
+</div>
+<div class="form-group">
+<label>分类</label>
+<select id="inp-category"></select>
+</div>
+<div class="form-group">
+<label>日期</label>
+<input type="date" id="inp-date">
+</div>
+<div class="form-group">
+<label>备注</label>
+<textarea id="inp-note" rows="2" placeholder="可选备注..."></textarea>
+</div>
+<button class="btn btn-primary" style="width:100%" onclick="addRecord()">保存记录</button>
+</div>
+</section>
+
+<!-- Records -->
+<section id="sec-records">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+<h3 style="font-size:1rem">📋 所有记录</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<select id="filter-type" onchange="renderRecords()" style="width:auto;min-width:100px">
+<option value="all">全部类型</option><option value="expense">支出</option><option value="income">收入</option>
+</select>
+<select id="filter-cat" onchange="renderRecords()" style="width:auto;min-width:100px">
+<option value="all">全部分类</option>
+</select>
+<input type="month" id="filter-month" onchange="renderRecords()" style="width:auto">
+<button class="btn btn-sm btn-secondary" onclick="exportCSV()">📥 导出CSV</button>
+<button class="btn btn-sm btn-export-report" onclick="exportMonthlyReport()">📄 月度报告</button>
+</div>
+</div>
+<div id="records-table"></div>
+</div>
+</section>
+
+<!-- Reports -->
+<section id="sec-reports">
+<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+<select id="report-period" onchange="renderReports()" style="width:auto;min-width:140px">
+<option value="month">月度报表</option><option value="year">年度报表</option>
+</select>
+<input type="month" id="report-month" onchange="renderReports()" style="width:auto">
+</div>
+<div class="chart-row">
+<div class="card"><h3 style="font-size:1rem;margin-bottom:12px">🥧 支出分类占比</h3><canvas id="pie-chart" width="400" height="400"></canvas><div id="pie-legend" class="chart-legend"></div></div>
+<div class="card"><h3 style="font-size:1rem;margin-bottom:12px">📊 每日收支</h3><canvas id="bar-chart" width="400" height="400"></canvas></div>
+</div>
+</section>
+
+<!-- Budget -->
+<section id="sec-budget">
+<div class="card" style="margin-bottom:20px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+<h3 style="font-size:1rem">🎯 预算目标</h3>
+<div style="display:flex;gap:8px;align-items:center">
+<label style="margin:0;font-size:.85rem">月份:</label>
+<input type="month" id="budget-month" onchange="renderBudget()" style="width:auto">
+</div>
+</div>
+<div class="form-group" style="display:flex;gap:12px;align-items:end">
+<div style="flex:1"><label>分类</label><select id="budget-cat"></select></div>
+<div style="flex:1"><label>预算金额 (¥)</label><input type="number" id="budget-amount" placeholder="0" min="0"></div>
+<button class="btn btn-primary" onclick="setBudget()">设置</button>
+</div>
+</div>
+<div class="card"><div id="budget-list"></div></div>
+</section>
+
+<!-- AI Analysis -->
+<section id="sec-ai">
+<div style="display:flex;gap:12px;margin-bottom:16px;align-items:center">
+<h3 style="font-size:1rem">🤖 AI智能分析</h3>
+<button class="btn btn-sm btn-primary" onclick="runAI()">重新分析</button>
+</div>
+<div id="ai-results"></div>
+</section>
+</main>
+
+<footer>
+<p>AI Budget Tracker — Built by FeiDev</p>
+<p style="margin-top:6px"><a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">☕ Support this project</a></p>
+</footer>
+
+<!-- Toast -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="modal-delete">
+<div class="modal">
+<h3>确认删除</h3>
+<p style="color:var(--text2);margin-bottom:20px">确定要删除这条记录吗？此操作不可撤销。</p>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn btn-secondary" onclick="closeModal()">取消</button>
+<button class="btn btn-danger" id="btn-confirm-delete">删除</button>
+</div>
+</div>
+</div>
+
+<!-- Pro Modal -->
+<div class="modal-overlay" id="modal-pro">
+<div class="modal" style="max-width:420px">
+<div class="pro-modal-content">
+<h3>⭐ 升级到 Pro</h3>
+<p class="pro-subtitle">解锁全部高级功能，提升理财效率</p>
+<ul class="pro-features">
+<li>📊 高级数据报表与趋势预测</li>
+<li>📥 CSV 批量导入历史数据</li>
+<li>🏦 多账户管理（银行卡/信用卡/现金）</li>
+<li>🤖 AI 深度分析与个性化建议</li>
+<li>🏷️ 自定义收支分类</li>
+<li>🔔 预算超支智能提醒</li>
+<li>📈 投资收益追踪</li>
+<li>♾️ 终身使用权</li>
+</ul>
+<div class="pro-price">$9</div>
+<div class="pro-price-sub">一次付费 · 终身使用 · 无订阅</div>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn-pro-cta">立即升级 Pro ⚡</a>
+<button class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="closeProModal()">稍后再说</button>
+</div>
+</div>
+</div>
+
+<!-- Loading Spinner -->
+<div class="tab-spinner" id="tab-spinner"></div>
+
+<script>
+'use strict';
+const CATS_EXPENSE = ['餐饮','交通','购物','娱乐','住房','医疗','教育','其他'];
+const CATS_INCOME = ['工资','投资','其他'];
+const CAT_ICONS = {餐饮:'🍜',交通:'🚗',购物:'🛍️',娱乐:'🎮',住房:'🏠',医疗:'💊',教育:'📚',工资:'💼',投资:'📈',其他:'📌'};
+const CHART_COLORS = ['#7c5cfc','#5c8cfc','#4cda8a','#fcb44c','#fc5c6c','#e44cfc','#4cd4fc','#fc944c','#8cfc5c','#fc4ca4'];
+
+let records = JSON.parse(localStorage.getItem('bt_records') || '[]');
+let budgets = JSON.parse(localStorage.getItem('bt_budgets') || '{}');
+let currentType = 'expense';
+let deleteId = null;
+
+function save() {
+  localStorage.setItem('bt_records', JSON.stringify(records));
+  localStorage.setItem('bt_budgets', JSON.stringify(budgets));
+}
+
+function fmt(n) { return n.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function today() { return new Date().toISOString().slice(0, 10); }
+function thisMonth() { return new Date().toISOString().slice(0, 7); }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast toast-' + (type || 'success');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function showTab(name) {
+  const spinner = document.getElementById('tab-spinner');
+  spinner.classList.add('show');
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button:not(.nav-pro)').forEach(b => b.classList.remove('active'));
+  setTimeout(function() {
+    document.getElementById('sec-' + name).classList.add('active');
+    const tabs = ['dashboard','add','records','reports','budget','ai'];
+    const idx = tabs.indexOf(name);
+    const navBtns = document.querySelectorAll('nav button:not(.nav-pro)');
+    if (idx >= 0 && navBtns[idx]) navBtns[idx].classList.add('active');
+    if (name === 'dashboard') renderDashboard();
+    if (name === 'records') renderRecords();
+    if (name === 'reports') renderReports();
+    if (name === 'budget') renderBudget();
+    if (name === 'ai') runAI();
+    spinner.classList.remove('show');
+  }, 150);
+}
+
+function setType(t) {
+  currentType = t;
+  const btns = document.querySelectorAll('#type-toggle button');
+  btns[0].className = t === 'expense' ? 'active-expense' : '';
+  btns[1].className = t === 'income' ? 'active-income' : '';
+  populateCategories();
+}
+
+function populateCategories() {
+  const sel = document.getElementById('inp-category');
+  const cats = currentType === 'expense' ? CATS_EXPENSE : CATS_INCOME;
+  sel.innerHTML = cats.map(c => '<option value="' + c + '">' + (CAT_ICONS[c]||'') + ' ' + c + '</option>').join('');
+}
+
+function populateBudgetCats() {
+  const sel = document.getElementById('budget-cat');
+  sel.innerHTML = CATS_EXPENSE.map(c => '<option value="' + c + '">' + (CAT_ICONS[c]||'') + ' ' + c + '</option>').join('');
+}
+
+function populateFilterCats() {
+  const sel = document.getElementById('filter-cat');
+  const all = [...new Set(records.map(r => r.category))];
+  sel.innerHTML = '<option value="all">全部分类</option>' + all.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+}
+
+function addRecord() {
+  const amount = parseFloat(document.getElementById('inp-amount').value);
+  const category = document.getElementById('inp-category').value;
+  const date = document.getElementById('inp-date').value;
+  const note = document.getElementById('inp-note').value.trim();
+  if (!amount || amount <= 0) { toast('请输入有效金额', 'error'); return; }
+  if (!date) { toast('请选择日期', 'error'); return; }
+  records.push({ id: genId(), type: currentType, amount, category, date, note });
+  records.sort((a, b) => b.date.localeCompare(a.date));
+  save();
+  toast(currentType === 'expense' ? '支出已记录 ✓' : '收入已记录 ✓');
+  document.getElementById('inp-amount').value = '';
+  document.getElementById('inp-note').value = '';
+  document.getElementById('inp-date').value = today();
+  // Animate dashboard recent list update
+  renderDashboard();
+  var recentItems = document.querySelectorAll('.recent-item');
+  if (recentItems.length > 0) {
+    recentItems[0].classList.add('record-entering');
+    recentItems[0].addEventListener('animationend', function() { this.classList.remove('record-entering'); }, {once: true});
+  }
+}
+
+function deleteRecord(id) {
+  deleteId = id;
+  document.getElementById('modal-delete').classList.add('show');
+  document.getElementById('btn-confirm-delete').onclick = function() {
+    // Animate the row out before removing
+    var rows = document.querySelectorAll('#records-table tbody tr');
+    var targetRow = null;
+    rows.forEach(function(row) {
+      if (row.querySelector('button[onclick*="' + deleteId + '"]')) targetRow = row;
+    });
+    if (targetRow) {
+      targetRow.classList.add('record-exiting');
+      targetRow.addEventListener('animationend', function() {
+        records = records.filter(r => r.id !== deleteId);
+        save();
+        closeModal();
+        toast('已删除');
+        renderRecords();
+        renderDashboard();
+      }, {once: true});
+    } else {
+      records = records.filter(r => r.id !== deleteId);
+      save();
+      closeModal();
+      toast('已删除');
+      renderRecords();
+      renderDashboard();
+    }
+  };
+}
+
+function closeModal() {
+  document.getElementById('modal-delete').classList.remove('show');
+}
+
+function getMonthRecords(ym) {
+  return records.filter(r => r.date.slice(0, 7) === ym);
+}
+
+function getYearRecords(y) {
+  return records.filter(r => r.date.slice(0, 4) === y);
+}
+
+function calcStats(recs) {
+  let income = 0, expense = 0;
+  recs.forEach(r => { if (r.type === 'income') income += r.amount; else expense += r.amount; });
+  return { income, expense, balance: income - expense };
+}
+
+function renderDashboard() {
+  const ym = thisMonth();
+  const monthRecs = getMonthRecords(ym);
+  const stats = calcStats(monthRecs);
+  const allStats = calcStats(records);
+  const container = document.getElementById('dashboard-stats');
+  container.innerHTML =
+    '<div class="stat-card card-stagger"><div class="label">本月收入</div><div class="value" style="color:var(--success)">¥' + fmt(stats.income) + '</div><div class="sub">' + ym + '</div></div>' +
+    '<div class="stat-card card-stagger"><div class="label">本月支出</div><div class="value" style="color:var(--danger)">¥' + fmt(stats.expense) + '</div><div class="sub">' + monthRecs.filter(r=>r.type==="expense").length + ' 笔支出</div></div>' +
+    '<div class="stat-card card-stagger"><div class="label">本月结余</div><div class="value" style="color:var(--accent)">¥' + fmt(stats.balance) + '</div><div class="sub">' + (stats.balance >= 0 ? '盈余 👍' : '超支 ⚠️') + '</div></div>' +
+    '<div class="stat-card card-stagger"><div class="label">总资产</div><div class="value" style="color:var(--warn)">¥' + fmt(allStats.balance) + '</div><div class="sub">共 ' + records.length + ' 条记录</div></div>';
+
+  const recent = records.slice(0, 8);
+  const rl = document.getElementById('recent-list');
+  if (recent.length === 0) {
+    rl.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>还没有记录，点击记一笔开始吧</p></div>';
+    return;
+  }
+  rl.innerHTML = recent.map(r => {
+    const isExp = r.type === 'expense';
+    const color = isExp ? 'rgba(252,92,108,.15)' : 'rgba(76,218,138,.15)';
+    return '<div class="recent-item"><div class="recent-left"><div class="recent-icon" style="background:' + color + '">' + (CAT_ICONS[r.category]||'📌') + '</div><div class="recent-detail"><div class="r-cat">' + r.category + '</div><div class="r-note">' + (r.note || r.date) + '</div></div></div><div class="recent-amount" style="color:var(' + (isExp?'--danger':'--success') + ')">' + (isExp?'-':'+') + '¥' + fmt(r.amount) + '</div></div>';
+  }).join('');
+}
+
+function renderRecords() {
+  populateFilterCats();
+  const ft = document.getElementById('filter-type').value;
+  const fc = document.getElementById('filter-cat').value;
+  const fm = document.getElementById('filter-month').value;
+  let filtered = records.slice();
+  if (ft !== 'all') filtered = filtered.filter(r => r.type === ft);
+  if (fc !== 'all') filtered = filtered.filter(r => r.category === fc);
+  if (fm) filtered = filtered.filter(r => r.date.slice(0, 7) === fm);
+
+  const container = document.getElementById('records-table');
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>没有找到记录</p></div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>日期</th><th>类型</th><th>分类</th><th>金额</th><th>备注</th><th>操作</th></tr></thead><tbody>';
+  filtered.forEach(r => {
+    const isExp = r.type === 'expense';
+    html += '<tr><td>' + r.date + '</td><td><span class="tag ' + (isExp ? 'tag-expense' : 'tag-income') + '">' + (isExp ? '支出' : '收入') + '</span></td><td>' + (CAT_ICONS[r.category]||'') + ' ' + r.category + '</td><td style="color:var(' + (isExp ? '--danger' : '--success') + ');font-weight:600">' + (isExp ? '-' : '+') + '¥' + fmt(r.amount) + '</td><td style="color:var(--text2)">' + (r.note || '-') + '</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('' + r.id + '')">删除</button></td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function exportCSV() {
+  if (records.length === 0) { toast('没有数据可导出', 'error'); return; }
+  let csv = '﻿日期,类型,分类,金额,备注
+';
+  records.forEach(r => {
+    csv += r.date + ',' + (r.type === 'expense' ? '支出' : '收入') + ',' + r.category + ',' + r.amount + ',' + (r.note || '') + '
+';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'budget_' + today() + '.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('CSV已导出 ✓');
+}
+
+function exportMonthlyReport() {
+  var fm = document.getElementById('filter-month').value || thisMonth();
+  var monthRecs = getMonthRecords(fm);
+  if (monthRecs.length === 0) { toast('该月没有数据', 'error'); return; }
+  var stats = calcStats(monthRecs);
+  var catTotals = {};
+  monthRecs.filter(function(r){return r.type==='expense'}).forEach(function(r){
+    catTotals[r.category] = (catTotals[r.category]||0) + r.amount;
+  });
+  var incomeCats = {};
+  monthRecs.filter(function(r){return r.type==='income'}).forEach(function(r){
+    incomeCats[r.category] = (incomeCats[r.category]||0) + r.amount;
+  });
+
+  var lines = [];
+  lines.push('═══════════════════════════════════════');
+  lines.push('       AI Budget Tracker 月度报告');
+  lines.push('═══════════════════════════════════════');
+  lines.push('');
+  lines.push('报告月份: ' + fm);
+  lines.push('生成时间: ' + new Date().toLocaleString('zh-CN'));
+  lines.push('');
+  lines.push('───────────── 收支概览 ─────────────');
+  lines.push('总收入:  ¥' + fmt(stats.income));
+  lines.push('总支出:  ¥' + fmt(stats.expense));
+  lines.push('结  余:  ¥' + fmt(stats.balance) + (stats.balance >= 0 ? ' (盈余)' : ' (超支)'));
+  if (stats.income > 0) {
+    lines.push('储蓄率:  ' + Math.round((1 - stats.expense / stats.income) * 100) + '%');
+  }
+  lines.push('交易笔数: ' + monthRecs.length + ' 笔');
+  lines.push('');
+
+  var expEntries = Object.entries(catTotals).sort(function(a,b){return b[1]-a[1]});
+  if (expEntries.length > 0) {
+    lines.push('───────────── 支出明细 ─────────────');
+    expEntries.forEach(function(e) {
+      var pct = stats.expense > 0 ? Math.round(e[1] / stats.expense * 100) : 0;
+      lines.push('  ' + (CAT_ICONS[e[0]]||'📌') + ' ' + e[0] + ': ¥' + fmt(e[1]) + ' (' + pct + '%)');
+    });
+    lines.push('');
+  }
+
+  var incEntries = Object.entries(incomeCats).sort(function(a,b){return b[1]-a[1]});
+  if (incEntries.length > 0) {
+    lines.push('───────────── 收入明细 ─────────────');
+    incEntries.forEach(function(e) {
+      lines.push('  ' + (CAT_ICONS[e[0]]||'📌') + ' ' + e[0] + ': ¥' + fmt(e[1]));
+    });
+    lines.push('');
+  }
+
+  // Budget compliance
+  var budgetLines = [];
+  CATS_EXPENSE.forEach(function(cat) {
+    var key = fm + '_' + cat;
+    if (budgets[key]) {
+      var spent = catTotals[cat] || 0;
+      var remain = budgets[key] - spent;
+      budgetLines.push('  ' + (CAT_ICONS[cat]||'📌') + ' ' + cat + ': 预算 ¥' + fmt(budgets[key]) + ' / 已花 ¥' + fmt(spent) + (remain >= 0 ? ' (剩余 ¥' + fmt(remain) + ')' : ' (超支 ¥' + fmt(-remain) + ')'));
+    }
+  });
+  if (budgetLines.length > 0) {
+    lines.push('───────────── 预算执行 ─────────────');
+    budgetLines.forEach(function(l){lines.push(l)});
+    lines.push('');
+  }
+
+  lines.push('───────────── 交易记录 ─────────────');
+  monthRecs.forEach(function(r) {
+    var sign = r.type === 'expense' ? '-' : '+';
+    lines.push('  ' + r.date + '  ' + sign + '¥' + fmt(r.amount) + '  ' + r.category + (r.note ? '  ' + r.note : ''));
+  });
+  lines.push('');
+  lines.push('═══════════════════════════════════════');
+  lines.push('  Powered by AI Budget Tracker');
+  lines.push('  https://lifa-su.com/ai-budget-tracker/');
+  lines.push('═══════════════════════════════════════');
+
+  var text = lines.join('\n');
+  var blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'monthly_report_' + fm + '.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('月度报告已导出 ✓');
+}
+
+function renderReports() {
+  const period = document.getElementById('report-period').value;
+  const monthInput = document.getElementById('report-month');
+  let recs;
+  if (period === 'month') {
+    const ym = monthInput.value || thisMonth();
+    monthInput.value = ym;
+    recs = getMonthRecords(ym);
+  } else {
+    const y = (monthInput.value || thisMonth()).slice(0, 4);
+    recs = getYearRecords(y);
+  }
+  drawPieChart(recs);
+  drawBarChart(recs, period);
+}
+
+function drawPieChart(recs) {
+  const canvas = document.getElementById('pie-chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 400 * dpr;
+  canvas.height = 400 * dpr;
+  canvas.style.width = '400px';
+  canvas.style.height = '400px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, 400, 400);
+
+  const expenses = recs.filter(r => r.type === 'expense');
+  const catTotals = {};
+  expenses.forEach(r => { catTotals[r.category] = (catTotals[r.category] || 0) + r.amount; });
+  const entries = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((s, e) => s + e[1], 0);
+
+  const legendEl = document.getElementById('pie-legend');
+  if (total === 0) {
+    ctx.fillStyle = '#9494a8';
+    ctx.font = '14px Inter,system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('暂无支出数据', 200, 200);
+    legendEl.innerHTML = '';
+    return;
+  }
+
+  const cx = 200, cy = 200, radius = 140;
+  let startAngle = -Math.PI / 2;
+  entries.forEach((e, i) => {
+    const sliceAngle = (e[1] / total) * Math.PI * 2;
+    const color = CHART_COLORS[i % CHART_COLORS.length];
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    if (sliceAngle > 0.2) {
+      const midAngle = startAngle + sliceAngle / 2;
+      const tx = cx + Math.cos(midAngle) * (radius * 0.65);
+      const ty = cy + Math.sin(midAngle) * (radius * 0.65);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px Inter,system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(Math.round(e[1] / total * 100) + '%', tx, ty);
+    }
+    startAngle += sliceAngle;
+  });
+
+  // Center circle for donut effect
+  ctx.beginPath();
+  ctx.arc(cx, cy, 70, 0, Math.PI * 2);
+  ctx.fillStyle = '#14141f';
+  ctx.fill();
+  ctx.fillStyle = '#e4e4ef';
+  ctx.font = 'bold 16px Inter,system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('¥' + fmt(total), cx, cy - 8);
+  ctx.fillStyle = '#9494a8';
+  ctx.font = '11px Inter,system-ui';
+  ctx.fillText('总支出', cx, cy + 12);
+
+  legendEl.innerHTML = entries.map((e, i) =>
+    '<div class="legend-item"><div class="legend-dot" style="background:' + CHART_COLORS[i % CHART_COLORS.length] + '"></div>' + (CAT_ICONS[e[0]]||'') + ' ' + e[0] + ' ¥' + fmt(e[1]) + '</div>'
+  ).join('');
+}
+
+function drawBarChart(recs, period) {
+  const canvas = document.getElementById('bar-chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 400 * dpr;
+  canvas.height = 400 * dpr;
+  canvas.style.width = '400px';
+  canvas.style.height = '400px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, 400, 400);
+
+  const W = 400, H = 400;
+  const pad = {top: 20, right: 20, bottom: 50, left: 60};
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  // Group data by day or month
+  const groups = {};
+  recs.forEach(r => {
+    const key = period === 'month' ? r.date.slice(8, 10) : r.date.slice(5, 7);
+    if (!groups[key]) groups[key] = {income: 0, expense: 0};
+    if (r.type === 'income') groups[key].income += r.amount;
+    else groups[key].expense += r.amount;
+  });
+
+  let labels;
+  if (period === 'month') {
+    const daysInMonth = 31;
+    labels = [];
+    for (let i = 1; i <= daysInMonth; i++) labels.push(String(i).padStart(2, '0'));
+  } else {
+    labels = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+  }
+
+  // Filter to only labels that have data or show all for year
+  let displayLabels = period === 'year' ? labels : labels.filter(l => groups[l]);
+  if (displayLabels.length === 0) {
+    ctx.fillStyle = '#9494a8';
+    ctx.font = '14px Inter,system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('暂无数据', W / 2, H / 2);
+    return;
+  }
+
+  let maxVal = 0;
+  displayLabels.forEach(l => {
+    const g = groups[l] || {income: 0, expense: 0};
+    maxVal = Math.max(maxVal, g.income, g.expense);
+  });
+  if (maxVal === 0) maxVal = 100;
+  maxVal = Math.ceil(maxVal / 100) * 100 || 100;
+
+  // Draw grid lines
+  ctx.strokeStyle = '#2a2a3e';
+  ctx.lineWidth = 0.5;
+  ctx.fillStyle = '#9494a8';
+  ctx.font = '10px Inter,system-ui';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + ch - (i / 4) * ch;
+    const val = Math.round(maxVal * i / 4);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+    ctx.fillText(val >= 1000 ? (val/1000).toFixed(1) + 'k' : val, pad.left - 8, y);
+  }
+
+  // Draw bars
+  const n = displayLabels.length;
+  const groupWidth = cw / n;
+  const barWidth = Math.max(2, groupWidth * 0.3);
+
+  displayLabels.forEach((l, i) => {
+    const g = groups[l] || {income: 0, expense: 0};
+    const x = pad.left + i * groupWidth + groupWidth / 2;
+
+    // Income bar
+    if (g.income > 0) {
+      const bh = (g.income / maxVal) * ch;
+      const by = pad.top + ch - bh;
+      ctx.fillStyle = '#4cda8a';
+      roundRect(ctx, x - barWidth - 1, by, barWidth, bh, 3);
+    }
+    // Expense bar
+    if (g.expense > 0) {
+      const bh = (g.expense / maxVal) * ch;
+      const by = pad.top + ch - bh;
+      ctx.fillStyle = '#fc5c6c';
+      roundRect(ctx, x + 1, by, barWidth, bh, 3);
+    }
+
+    // Label
+    ctx.fillStyle = '#9494a8';
+    ctx.font = '9px Inter,system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const labelText = period === 'year' ? (parseInt(l) + '月') : parseInt(l);
+    if (n <= 15 || i % Math.ceil(n / 15) === 0) {
+      ctx.fillText(labelText, x, pad.top + ch + 8);
+    }
+  });
+
+  // Legend
+  ctx.font = '11px Inter,system-ui';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#4cda8a';
+  ctx.fillRect(W - 140, 10, 10, 10);
+  ctx.fillStyle = '#9494a8';
+  ctx.fillText('收入', W - 126, 19);
+  ctx.fillStyle = '#fc5c6c';
+  ctx.fillRect(W - 80, 10, 10, 10);
+  ctx.fillStyle = '#9494a8';
+  ctx.fillText('支出', W - 66, 19);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  if (h < 1) return;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h);
+  ctx.lineTo(x, y + h);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function setBudget() {
+  const cat = document.getElementById('budget-cat').value;
+  const amount = parseFloat(document.getElementById('budget-amount').value);
+  const month = document.getElementById('budget-month').value || thisMonth();
+  if (!amount || amount <= 0) { toast('请输入有效预算金额', 'error'); return; }
+  const key = month + '_' + cat;
+  budgets[key] = amount;
+  save();
+  toast('预算已设置 ✓');
+  document.getElementById('budget-amount').value = '';
+  renderBudget();
+}
+
+function renderBudget() {
+  const month = document.getElementById('budget-month').value || thisMonth();
+  document.getElementById('budget-month').value = month;
+  const monthRecs = getMonthRecords(month);
+  const container = document.getElementById('budget-list');
+
+  const catSpent = {};
+  monthRecs.filter(r => r.type === 'expense').forEach(r => {
+    catSpent[r.category] = (catSpent[r.category] || 0) + r.amount;
+  });
+
+  const budgetEntries = [];
+  CATS_EXPENSE.forEach(cat => {
+    const key = month + '_' + cat;
+    const budget = budgets[key];
+    const spent = catSpent[cat] || 0;
+    if (budget || spent > 0) {
+      budgetEntries.push({ cat, budget: budget || 0, spent });
+    }
+  });
+
+  if (budgetEntries.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><p>还没有设置预算，在上方设置分类预算吧</p></div>';
+    return;
+  }
+
+  container.innerHTML = budgetEntries.map(e => {
+    const pct = e.budget > 0 ? Math.min(100, (e.spent / e.budget) * 100) : 0;
+    const over = e.budget > 0 && e.spent > e.budget;
+    const color = over ? 'var(--danger)' : pct > 80 ? 'var(--warn)' : 'var(--success)';
+    const remain = e.budget > 0 ? e.budget - e.spent : 0;
+    return '<div class="budget-item">' +
+      '<div style="font-size:1.3rem;width:40px;text-align:center">' + (CAT_ICONS[e.cat]||'📌') + '</div>' +
+      '<div class="budget-info">' +
+        '<div class="cat-name">' + e.cat + '</div>' +
+        '<div class="cat-detail">已花 ¥' + fmt(e.spent) + (e.budget > 0 ? ' / 预算 ¥' + fmt(e.budget) : ' (未设预算)') + '</div>' +
+        (e.budget > 0 ? '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' : '') +
+      '</div>' +
+      '<div style="text-align:right;min-width:80px">' +
+        (e.budget > 0 ? '<div style="font-size:.8rem;color:' + color + ';font-weight:700">' + (over ? '超支 ¥' + fmt(-remain) : '剩余 ¥' + fmt(remain)) + '</div>' +
+        '<div style="font-size:.75rem;color:var(--text2)">' + Math.round(pct) + '%</div>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function runAI() {
+  const container = document.getElementById('ai-results');
+  const ym = thisMonth();
+  const monthRecs = getMonthRecords(ym);
+  const stats = calcStats(monthRecs);
+  const allRecs = records.slice();
+
+  if (allRecs.length < 2) {
+    container.innerHTML = '<div class="ai-card"><h3>🤖 数据不足</h3><p>至少需要2条记录才能进行AI分析。请先添加一些收支记录吧！</p></div>';
+    return;
+  }
+
+  const tips = [];
+
+  // 1. Spending ratio analysis
+  if (stats.income > 0) {
+    const ratio = stats.expense / stats.income;
+    if (ratio > 1) {
+      tips.push({icon:'🚨',title:'支出超过收入',text:'本月支出(¥' + fmt(stats.expense) + ')已超过收入(¥' + fmt(stats.income) + ')，入不敷出！建议立即审视非必要开支，优先削减娱乐和购物类支出。',level:'danger'});
+    } else if (ratio > 0.8) {
+      tips.push({icon:'⚠️',title:'储蓄率偏低',text:'本月储蓄率仅' + Math.round((1-ratio)*100) + '%，建议将储蓄率提升至20%以上。可以尝试先储蓄后消费的方式，发工资后先转存一部分。',level:'warn'});
+    } else if (ratio < 0.5) {
+      tips.push({icon:'🌟',title:'储蓄表现优秀',text:'本月储蓄率达到' + Math.round((1-ratio)*100) + '%，非常棒！保持这个习惯，考虑将多余资金进行投资理财。',level:'success'});
+    }
+  }
+
+  // 2. Category analysis
+  const catTotals = {};
+  monthRecs.filter(r => r.type === 'expense').forEach(r => {
+    catTotals[r.category] = (catTotals[r.category] || 0) + r.amount;
+  });
+  const catEntries = Object.entries(catTotals).sort((a,b) => b[1] - a[1]);
+
+  if (catEntries.length > 0) {
+    const topCat = catEntries[0];
+    const topPct = stats.expense > 0 ? Math.round(topCat[1] / stats.expense * 100) : 0;
+    if (topPct > 50) {
+      tips.push({icon:'📊',title:topCat[0] + '占比过高',text:topCat[0] + '支出占总支出的' + topPct + '%（¥' + fmt(topCat[1]) + '），建议关注该类别的消费频率，寻找替代方案降低开支。',level:'warn'});
+    }
+  }
+
+  // 3. Dining analysis
+  if (catTotals['餐饮']) {
+    const dining = catTotals['餐饮'];
+    const diningPerDay = dining / 30;
+    if (diningPerDay > 100) {
+      tips.push({icon:'🍜',title:'餐饮开支较大',text:'本月餐饮支出¥' + fmt(dining) + '，日均¥' + fmt(diningPerDay) + '。建议增加自己做饭的频率，工作日可以带便当，预计每月可节省30-40%的餐饮费用。',level:'warn'});
+    }
+  }
+
+  // 4. Entertainment analysis
+  if (catTotals['娱乐'] && stats.expense > 0) {
+    const entPct = catTotals['娱乐'] / stats.expense * 100;
+    if (entPct > 15) {
+      tips.push({icon:'🎮',title:'娱乐支出偏高',text:'娱乐支出占比' + Math.round(entPct) + '%，建议控制在10%以内。可以寻找免费或低成本的休闲方式，如户外运动、图书馆等。',level:'warn'});
+    }
+  }
+
+  // 5. Shopping analysis
+  if (catTotals['购物'] && stats.expense > 0) {
+    const shopPct = catTotals['购物'] / stats.expense * 100;
+    if (shopPct > 20) {
+      tips.push({icon:'🛍️',title:'购物支出需注意',text:'购物占总支出' + Math.round(shopPct) + '%。建议采用48小时冷静期策略——想买东西时先等48小时，很多冲动消费会自然消退。',level:'warn'});
+    }
+  }
+
+  // 6. Budget compliance
+  let overBudgetCount = 0;
+  CATS_EXPENSE.forEach(cat => {
+    const key = ym + '_' + cat;
+    if (budgets[key] && catTotals[cat] > budgets[key]) overBudgetCount++;
+  });
+  if (overBudgetCount > 0) {
+    tips.push({icon:'🎯',title:overBudgetCount + '个分类超出预算',text:'有' + overBudgetCount + '个分类已超出预算目标。建议在月中时检查预算执行情况，及时调整消费计划。',level:'danger'});
+  }
+
+  // 7. Trend analysis (compare with last month)
+  const lastYm = (() => { const d = new Date(); d.setMonth(d.getMonth()-1); return d.toISOString().slice(0,7); })();
+  const lastStats = calcStats(getMonthRecords(lastYm));
+  if (lastStats.expense > 0 && stats.expense > 0) {
+    const change = ((stats.expense - lastStats.expense) / lastStats.expense * 100).toFixed(0);
+    if (change > 20) {
+      tips.push({icon:'📈',title:'支出环比上升' + change + '%',text:'相比上月(¥' + fmt(lastStats.expense) + ')，本月支出增长明显。建议对比两个月的消费明细，找出增长的主要原因。',level:'warn'});
+    } else if (change < -10) {
+      tips.push({icon:'📉',title:'支出环比下降' + Math.abs(change) + '%',text:'相比上月节省了¥' + fmt(lastStats.expense - stats.expense) + '，继续保持！',level:'success'});
+    }
+  }
+
+  // 8. General tips
+  if (tips.length === 0 || stats.expense > 0) {
+    tips.push({icon:'💡',title:'理财小贴士',text:'建议遵循50/30/20法则：50%用于必要开支（住房、餐饮、交通），30%用于个人需求（购物、娱乐），20%用于储蓄和投资。',level:'info'});
+  }
+
+  const levelColors = {danger:'var(--danger)',warn:'var(--warn)',success:'var(--success)',info:'var(--accent)'};
+  container.innerHTML = tips.map(t =>
+    '<div class="ai-card"><h3>' + t.icon + ' ' + t.title + ' <span style="font-size:.7rem;padding:2px 8px;border-radius:10px;background:' + (levelColors[t.level]||levelColors.info) + '22;color:' + (levelColors[t.level]||levelColors.info) + '">' + ({danger:'需关注',warn:'建议优化',success:'表现良好',info:'建议'}[t.level]||'提示') + '</span></h3><p>' + t.text + '</p></div>'
+  ).join('');
+}
+
+function openProModal() {
+  document.getElementById('modal-pro').classList.add('show');
+}
+
+function closeProModal() {
+  document.getElementById('modal-pro').classList.remove('show');
+}
+
+// Initialize
+function init() {
+  document.getElementById('inp-date').value = today();
+  document.getElementById('budget-month').value = thisMonth();
+  document.getElementById('report-month').value = thisMonth();
+  populateCategories();
+  populateBudgetCats();
+  renderDashboard();
+}
+
+// Close modal on overlay click
+document.getElementById('modal-delete').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('modal-pro').addEventListener('click', function(e) {
+  if (e.target === this) closeProModal();
+});
+
+// Keyboard shortcut
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeModal(); closeProModal(); }
+});
+
+init();
+</script>
+<script src="monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

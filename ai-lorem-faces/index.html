@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate placeholder avatar images for UI mockups. Create diverse face placeholders with customizable size, shape, and style for design prototyping.">
+<link rel="canonical" href="https://lifa-su.com/ai-lorem-faces/">
+<title>AI Lorem Faces - Avatar Placeholder Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg-primary: #0f0f13;
+  --bg-secondary: #1a1a24;
+  --bg-tertiary: #252536;
+  --bg-card: #1e1e2e;
+  --text-primary: #e8e8f0;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6c6c80;
+  --accent: #7c5cfc;
+  --accent-hover: #9478ff;
+  --accent-glow: rgba(124,92,252,0.25);
+  --border: #2a2a3e;
+  --success: #4ade80;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+header {
+  padding: 32px 0 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), #e879f9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+header p { color: var(--text-secondary); font-size: 1.05rem; }
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.control-group {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.control-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+select:focus, input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.color-palettes { display: flex; gap: 8px; flex-wrap: wrap; }
+.palette-btn {
+  display: flex;
+  gap: 3px;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.palette-btn:hover { border-color: var(--text-muted); }
+.palette-btn.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+.palette-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.custom-color-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
+}
+.custom-color-row input[type="color"] {
+  width: 36px; height: 36px;
+  border: none; background: none;
+  cursor: pointer; border-radius: 6px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 16px var(--accent-glow); }
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--border); }
+.btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+.actions-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.avatar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
+}
+.avatar-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+.avatar-card canvas {
+  display: block;
+  margin: 0 auto 10px;
+  border-radius: 4px;
+  max-width: 100%;
+  height: auto;
+}
+.avatar-card .seed-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  word-break: break-all;
+  margin-bottom: 6px;
+}
+.avatar-card .card-actions { display: flex; gap: 6px; justify-content: center; }
+.api-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 40px;
+}
+.api-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+.api-url {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  word-break: break-all;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.api-url:hover { border-color: var(--accent); }
+.api-url .copy-hint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.api-params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.api-param {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.api-param code {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--success);
+  color: #000;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  z-index: 999;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+footer {
+  text-align: center;
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+@media (max-width: 600px) {
+  header h1 { font-size: 1.6rem; }
+  .controls { grid-template-columns: 1fr; }
+  .avatar-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .actions-bar { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎭 AI Lorem Faces</h1>
+    <p>Generate unique geometric avatar placeholders for your projects</p>
+  </header>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Style</label>
+      <select id="styleSelect">
+        <option value="circles">Circle Mosaic</option>
+        <option value="blocks">Block Mosaic</option>
+        <option value="triangles">Triangle Composition</option>
+        <option value="rings">Gradient Rings</option>
+        <option value="mixed" selected>Mixed Geometric</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Size (px)</label>
+      <select id="sizeSelect">
+        <option value="64">64 × 64</option>
+        <option value="128" selected>128 × 128</option>
+        <option value="192">192 × 192</option>
+        <option value="256">256 × 256</option>
+        <option value="384">384 × 384</option>
+        <option value="512">512 × 512</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Shape</label>
+      <select id="shapeSelect">
+        <option value="circle">Circle</option>
+        <option value="square">Square</option>
+        <option value="rounded" selected>Rounded Square</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Count</label>
+      <select id="countSelect">
+        <option value="4">4</option>
+        <option value="8" selected>8</option>
+        <option value="16">16</option>
+        <option value="32">32</option>
+      </select>
+    </div>
+    <div class="control-group" style="grid-column: 1 / -1;">
+      <label>Color Palette</label>
+      <div class="color-palettes" id="palettes"></div>
+      <div class="custom-color-row">
+        <input type="color" id="customColor1" value="#7c5cfc">
+        <input type="color" id="customColor2" value="#e879f9">
+        <input type="color" id="customColor3" value="#4ade80">
+        <input type="color" id="customColor4" value="#f97316">
+        <input type="color" id="customColor5" value="#38bdf8">
+        <button class="btn btn-secondary btn-sm" onclick="applyCustomColors()">Apply Custom</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn btn-primary" onclick="generateAll()">🎲 Generate</button>
+    <button class="btn btn-secondary" onclick="downloadAllZip()">📦 Download All (ZIP)</button>
+    <input type="text" id="seedInput" placeholder="Enter seed (optional)" style="max-width:220px;">
+  </div>
+
+  <div class="avatar-grid" id="grid"></div>
+
+  <div class="api-section">
+    <h3>📡 API-Style URL</h3>
+    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:12px;">Use these URLs as avatar placeholders in your projects (front-end simulated)</p>
+    <div class="api-url" id="apiUrl" onclick="copyApiUrl()">
+      https://lifa-su.com/ai-lorem-faces/api?seed=abc123&amp;size=128&amp;style=mixed
+      <span class="copy-hint">click to copy</span>
+    </div>
+    <div class="api-params">
+      <div class="api-param"><code>seed</code> — unique identifier</div>
+      <div class="api-param"><code>size</code> — 64 / 128 / 256 / 512</div>
+      <div class="api-param"><code>style</code> — circles / blocks / triangles / rings / mixed</div>
+      <div class="api-param"><code>shape</code> — circle / square / rounded</div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Built with Canvas API &middot; <a href="https://github.com/Lifa-su/ai-lorem-faces" target="_blank">GitHub</a></p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== Seeded PRNG (mulberry32) =====
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+function hashSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  }
+  return h;
+}
+
+// ===== Palettes =====
+const PALETTES = {
+  'Vivid':    ['#7c5cfc','#e879f9','#4ade80','#f97316','#38bdf8'],
+  'Ocean':    ['#0ea5e9','#06b6d4','#2dd4bf','#a78bfa','#818cf8'],
+  'Sunset':   ['#f43f5e','#f97316','#facc15','#fb923c','#e11d48'],
+  'Forest':   ['#22c55e','#16a34a','#84cc16','#65a30d','#4ade80'],
+  'Neon':     ['#c084fc','#f472b6','#22d3ee','#a3e635','#fbbf24'],
+  'Pastel':   ['#c4b5fd','#fbcfe8','#a5f3fc','#bbf7d0','#fde68a'],
+  'Mono':     ['#e2e8f0','#94a3b8','#64748b','#475569','#334155'],
+  'Warm':     ['#ef4444','#f59e0b','#ec4899','#f97316','#eab308'],
+};
+let currentPalette = PALETTES['Vivid'];
+let avatarData = [];
+
+// ===== Init Palette Buttons =====
+function initPalettes() {
+  const container = document.getElementById('palettes');
+  Object.entries(PALETTES).forEach(([name, colors], idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'palette-btn' + (idx === 0 ? ' active' : '');
+    btn.title = name;
+    btn.onclick = () => {
+      document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPalette = colors;
+    };
+    colors.forEach(c => {
+      const dot = document.createElement('span');
+      dot.className = 'palette-dot';
+      dot.style.background = c;
+      btn.appendChild(dot);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function applyCustomColors() {
+  currentPalette = [1,2,3,4,5].map(i => document.getElementById('customColor'+i).value);
+  document.querySelectorAll('.palette-btn').forEach(b => b.classList.remove('active'));
+  showToast('Custom palette applied');
+}
+
+// ===== Drawing Functions =====
+function drawCircles(ctx, size, rng, colors) {
+  const count = 5 + Math.floor(rng() * 8);
+  for (let i = 0; i < count; i++) {
+    const x = rng() * size;
+    const y = rng() * size;
+    const r = size * 0.08 + rng() * size * 0.25;
+    const alpha = 0.4 + rng() * 0.6;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = colors[Math.floor(rng() * colors.length)];
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawBlocks(ctx, size, rng, colors) {
+  const grid = 4 + Math.floor(rng() * 4);
+  const cell = size / grid;
+  for (let r = 0; r < grid; r++) {
+    for (let c = 0; c < grid; c++) {
+      ctx.fillStyle = colors[Math.floor(rng() * colors.length)];
+      ctx.globalAlpha = 0.5 + rng() * 0.5;
+      ctx.fillRect(c * cell, r * cell, cell + 1, cell + 1);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawTriangles(ctx, size, rng, colors) {
+  const count = 6 + Math.floor(rng() * 8);
+  for (let i = 0; i < count; i++) {
+    const cx = rng() * size;
+    const cy = rng() * size;
+    const s = size * 0.15 + rng() * size * 0.3;
+    ctx.globalAlpha = 0.4 + rng() * 0.5;
+    ctx.fillStyle = colors[Math.floor(rng() * colors.length)];
+    ctx.beginPath();
+    for (let j = 0; j < 3; j++) {
+      const angle = (j / 3) * Math.PI * 2 + rng() * 0.5;
+      const px = cx + Math.cos(angle) * s;
+      const py = cy + Math.sin(angle) * s;
+      j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawRings(ctx, size, rng, colors) {
+  const cx = size / 2, cy = size / 2;
+  const rings = 3 + Math.floor(rng() * 4);
+  for (let i = rings; i >= 0; i--) {
+    const r = (size * 0.45) * ((i + 1) / (rings + 1));
+    const lw = size * 0.04 + rng() * size * 0.08;
+    const c1 = colors[Math.floor(rng() * colors.length)];
+    const c2 = colors[Math.floor(rng() * colors.length)];
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, r);
+    grad.addColorStop(0, c1);
+    grad.addColorStop(1, c2);
+    ctx.globalAlpha = 0.5 + rng() * 0.5;
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // center dot
+  ctx.globalAlpha = 0.8;
+  ctx.fillStyle = colors[Math.floor(rng() * colors.length)];
+  ctx.beginPath();
+  ctx.arc(cx, cy, size * 0.08 + rng() * size * 0.06, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function drawMixed(ctx, size, rng, colors) {
+  const fns = [drawCircles, drawBlocks, drawTriangles, drawRings];
+  // background layer
+  fns[Math.floor(rng() * fns.length)](ctx, size, rng, colors);
+  // overlay layer
+  ctx.globalAlpha = 0.6;
+  fns[Math.floor(rng() * fns.length)](ctx, size, rng, colors);
+  ctx.globalAlpha = 1;
+}
+
+const STYLE_MAP = { circles: drawCircles, blocks: drawBlocks, triangles: drawTriangles, rings: drawRings, mixed: drawMixed };
+
+function applyShape(canvas, ctx, size, shape) {
+  if (shape === 'circle') {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = tempCanvas.height = size;
+    const tctx = tempCanvas.getContext('2d');
+    tctx.beginPath();
+    tctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
+    tctx.clip();
+    tctx.drawImage(canvas, 0, 0);
+    ctx.clearRect(0, 0, size, size);
+    ctx.drawImage(tempCanvas, 0, 0);
+    canvas.style.borderRadius = '50%';
+  } else if (shape === 'rounded') {
+    canvas.style.borderRadius = '16%';
+  } else {
+    canvas.style.borderRadius = '0';
+  }
+}
+
+function generateAvatar(seed, size, style, shape, colors) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const rng = mulberry32(hashSeed(seed));
+
+  // background
+  const bgR = Math.floor(rng() * 40 + 20);
+  const bgG = Math.floor(rng() * 40 + 20);
+  const bgB = Math.floor(rng() * 50 + 30);
+  ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`;
+  ctx.fillRect(0, 0, size, size);
+
+  // draw style
+  const drawFn = STYLE_MAP[style] || drawMixed;
+  drawFn(ctx, size, rng, colors);
+
+  // apply shape
+  applyShape(canvas, ctx, size, shape);
+
+  return canvas;
+}
+
+// ===== Generate All =====
+function generateAll() {
+  const style = document.getElementById('styleSelect').value;
+  const size = parseInt(document.getElementById('sizeSelect').value);
+  const shape = document.getElementById('shapeSelect').value;
+  const count = parseInt(document.getElementById('countSelect').value);
+  const baseSeed = document.getElementById('seedInput').value.trim();
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  avatarData = [];
+
+  for (let i = 0; i < count; i++) {
+    const seed = baseSeed ? `${baseSeed}-${i}` : `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${i}`;
+    const canvas = generateAvatar(seed, size, style, shape, currentPalette);
+    const card = document.createElement('div');
+    card.className = 'avatar-card';
+    card.appendChild(canvas);
+
+    const seedText = document.createElement('div');
+    seedText.className = 'seed-text';
+    seedText.textContent = seed.length > 24 ? seed.slice(0, 24) + '…' : seed;
+    seedText.title = seed;
+    card.appendChild(seedText);
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'btn btn-secondary btn-sm';
+    dlBtn.textContent = '⬇ PNG';
+    dlBtn.onclick = () => downloadPng(canvas, seed);
+    actions.appendChild(dlBtn);
+
+    const urlBtn = document.createElement('button');
+    urlBtn.className = 'btn btn-secondary btn-sm';
+    urlBtn.textContent = '🔗 URL';
+    urlBtn.onclick = () => {
+      const url = buildApiUrl(seed, size, style, shape);
+      navigator.clipboard.writeText(url).then(() => showToast('URL copied!'));
+    };
+    actions.appendChild(urlBtn);
+
+    card.appendChild(actions);
+    grid.appendChild(card);
+    avatarData.push({ canvas, seed, size, style, shape });
+  }
+
+  updateApiUrl();
+}
+
+function buildApiUrl(seed, size, style, shape) {
+  return `https://lifa-su.com/ai-lorem-faces/api?seed=${encodeURIComponent(seed)}&size=${size}&style=${style}&shape=${shape}`;
+}
+
+function updateApiUrl() {
+  if (avatarData.length === 0) return;
+  const d = avatarData[0];
+  document.getElementById('apiUrl').innerHTML =
+    buildApiUrl(d.seed, d.size, d.style, d.shape) + '<span class="copy-hint">click to copy</span>';
+}
+
+function copyApiUrl() {
+  const url = document.getElementById('apiUrl').textContent.replace('click to copy', '').trim();
+  navigator.clipboard.writeText(url).then(() => showToast('API URL copied!'));
+}
+
+// ===== Downloads =====
+function downloadPng(canvas, seed) {
+  const a = document.createElement('a');
+  a.download = `avatar-${seed.slice(0,16)}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+async function downloadAllZip() {
+  if (avatarData.length === 0) { showToast('Generate avatars first'); return; }
+  showToast('Creating ZIP...');
+  const zip = new JSZip();
+  for (let i = 0; i < avatarData.length; i++) {
+    const { canvas, seed } = avatarData[i];
+    const dataUrl = canvas.toDataURL('image/png');
+    const base64 = dataUrl.split(',')[1];
+    zip.file(`avatar-${i+1}-${seed.slice(0,12)}.png`, base64, { base64: true });
+  }
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.download = `ai-lorem-faces-${avatarData.length}.zip`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('ZIP downloaded!');
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== URL Params (API simulation) =====
+function handleApiParams() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('seed')) {
+    const seed = params.get('seed') || 'default';
+    const size = parseInt(params.get('size')) || 128;
+    const style = params.get('style') || 'mixed';
+    const shape = params.get('shape') || 'rounded';
+    document.getElementById('seedInput').value = seed;
+    document.getElementById('sizeSelect').value = String(size);
+    document.getElementById('styleSelect').value = style;
+    document.getElementById('shapeSelect').value = shape;
+    setTimeout(generateAll, 100);
+  }
+}
+
+// ===== Init =====
+initPalettes();
+handleApiParams();
+if (!new URLSearchParams(window.location.search).has('seed')) {
+  generateAll();
+}
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

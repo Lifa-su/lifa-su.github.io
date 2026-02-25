@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Emoji Kitchen - Mix & Mashup Emojis</title>
+<meta name="description" content="Mix and mashup emojis with AI Emoji Kitchen! Select two emojis and see them combined into fun, unique creations using Google's Emoji Kitchen.">
+<meta name="keywords" content="emoji kitchen, emoji mixer, emoji mashup, emoji combiner, google emoji kitchen">
+<meta property="og:title" content="AI Emoji Kitchen - Mix & Mashup Emojis">
+<meta property="og:description" content="Mix and mashup emojis into fun, unique creations!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-emoji-kitchen/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Emoji Kitchen - Mix & Mashup Emojis">
+<meta name="twitter:description" content="Mix and mashup emojis into fun, unique creations!">
+<link rel="canonical" href="https://lifa-su.com/ai-emoji-kitchen/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧑‍🍳</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+header{text-align:center;padding:24px 16px 8px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--text2);font-size:.9rem;margin-top:4px}
+.app{width:100%;max-width:640px;padding:0 16px 80px}
+.slots{display:flex;align-items:center;justify-content:center;gap:12px;margin:20px 0}
+.slot{width:80px;height:80px;background:var(--surface);border:2px dashed var(--text2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:2.8rem;cursor:pointer;transition:.2s;position:relative}
+.slot:hover{border-color:var(--accent);transform:scale(1.05)}
+.slot.active{border-color:var(--accent);border-style:solid;box-shadow:0 0 12px rgba(233,69,96,.3)}
+.slot .clear{position:absolute;top:-6px;right:-6px;width:20px;height:20px;background:var(--accent);border:none;border-radius:50%;color:#fff;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+.slot:hover .clear{display:flex}
+.plus{font-size:1.5rem;color:var(--text2)}
+.mix-btn{display:block;margin:0 auto 20px;padding:12px 32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:.2s;opacity:.5;pointer-events:none}
+.mix-btn.ready{opacity:1;pointer-events:auto}
+.mix-btn.ready:hover{transform:scale(1.05);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.result-area{text-align:center;min-height:60px;margin-bottom:20px}
+.result-area img{max-width:200px;max-height:200px;border-radius:var(--radius);background:var(--surface);padding:8px}
+.result-area .loading{color:var(--text2);font-size:.9rem;padding:20px}
+.result-area .error{color:var(--accent);font-size:.9rem;padding:12px}
+.actions{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.actions button{padding:8px 16px;border:1px solid var(--surface2);background:var(--surface);color:var(--text);border-radius:8px;cursor:pointer;font-size:.85rem;transition:.2s;display:flex;align-items:center;gap:4px}
+.actions button:hover{background:var(--surface2);border-color:var(--accent)}
+.tabs{display:flex;gap:0;margin-bottom:12px;border-bottom:2px solid var(--surface)}
+.tab{flex:1;padding:10px;text-align:center;cursor:pointer;color:var(--text2);font-size:.9rem;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;max-height:280px;overflow-y:auto;padding:8px;background:var(--surface);border-radius:var(--radius);scrollbar-width:thin;scrollbar-color:var(--surface2) transparent}
+.emoji-grid::-webkit-scrollbar{width:6px}
+.emoji-grid::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px}
+.emoji-grid button{width:44px;height:44px;font-size:1.6rem;background:none;border:none;border-radius:8px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center}
+.emoji-grid button:hover{background:var(--surface2);transform:scale(1.15)}
+.fav-section{margin-top:24px}
+.fav-section h3{font-size:.95rem;color:var(--text2);margin-bottom:8px}
+.fav-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.fav-item{background:var(--surface);border-radius:var(--radius);padding:8px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.fav-item:hover{background:var(--surface2);transform:scale(1.03)}
+.fav-item img{width:60px;height:60px}
+.fav-item .lbl{font-size:.7rem;color:var(--text2);margin-top:4px}
+.fav-item .rm{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(233,69,96,.8);border:none;border-radius:50%;color:#fff;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center}
+.fav-item:hover .rm{display:flex}
+.empty{color:var(--text2);font-size:.85rem;text-align:center;padding:20px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface2);color:var(--text);padding:10px 20px;border-radius:8px;font-size:.85rem;transition:.3s;opacity:0;z-index:99}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;padding:16px;color:var(--text2);font-size:.75rem;margin-top:auto}
+@media(max-width:480px){header h1{font-size:1.4rem}.slot{width:64px;height:64px;font-size:2.2rem}.emoji-grid{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}.emoji-grid button{width:40px;height:40px;font-size:1.4rem}.result-area img{max-width:150px;max-height:150px}}
+.pro-section{position:relative;margin:24px 0;border-radius:var(--radius);overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.pro-blur{filter:blur(5px);pointer-events:none;padding:24px;background:var(--surface);opacity:.6}
+.pro-blur h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:12px}
+.pro-mock-hd{display:flex;gap:12px;margin-bottom:14px;align-items:center}
+.pro-mock-hd-preview{width:80px;height:80px;background:rgba(0,0,0,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.pro-mock-hd-opts{flex:1;display:flex;flex-direction:column;gap:6px}
+.pro-mock-hd-opt{padding:8px 12px;background:rgba(0,0,0,.2);border-radius:8px;font-size:.8rem;color:var(--text2);display:flex;justify-content:space-between}
+.pro-mock-batch{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.pro-mock-batch-item{aspect-ratio:1;background:rgba(0,0,0,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.pro-mock-sticker{display:flex;gap:8px}
+.pro-mock-sticker div{flex:1;padding:10px;background:rgba(0,0,0,.2);border-radius:8px;text-align:center;font-size:.8rem;color:var(--text2)}
+.pro-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;background:rgba(26,26,46,.4);transition:background .2s}
+.pro-lock-overlay:hover{background:rgba(26,26,46,.3)}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.pro-lock-text{font-size:.95rem;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:10px 24px;border-radius:24px;box-shadow:0 4px 15px rgba(233,69,96,.3);transition:transform .2s}
+.pro-lock-overlay:hover .pro-lock-text{transform:scale(1.05)}
+.pro-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.show{display:flex}
+.pro-modal{background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);animation:proPopIn .3s ease}
+@keyframes proPopIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h2{font-size:1.4rem;margin-bottom:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:var(--text2);margin-bottom:16px}
+.pro-features{list-style:none;text-align:left;margin:16px 0;padding:0}
+.pro-features li{padding:8px 0;font-size:.9rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pro-features li:last-child{border-bottom:none}
+.pro-features li span.pf-icon{font-size:1.1rem;flex-shrink:0}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;color:#fff;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:16px;text-align:center}
+.pro-upgrade-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:var(--text2);cursor:pointer;margin-top:12px;font-size:.9rem;padding:8px}
+.pro-later-btn:hover{color:#fff}
+</style>
+</head>
+<body>
+<header><h1>🧑‍🍳 AI Emoji Kitchen</h1><p>Select two emojis and mix them together!</p></header>
+<div class="app">
+<div class="slots">
+<div class="slot" id="slot0" onclick="pickSlot(0)"><span id="s0"></span><button class="clear" onclick="clrSlot(event,0)">×</button></div>
+<span class="plus">+</span>
+<div class="slot" id="slot1" onclick="pickSlot(1)"><span id="s1"></span><button class="clear" onclick="clrSlot(event,1)">×</button></div>
+<span class="plus">=</span>
+<div id="miniResult" style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--text2)">?</div>
+</div>
+<button class="mix-btn" id="mixBtn" onclick="doMix()">🔀 Mix Emojis</button>
+<div class="result-area" id="resultArea"></div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('emojis',this)">😀 Emojis</div>
+<div class="tab" onclick="switchTab('favs',this)">⭐ Favorites</div>
+</div>
+<div id="emojisPanel"><div class="emoji-grid" id="emojiGrid"></div></div>
+<div id="favsPanel" style="display:none"><div id="favContent"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<!-- Pro Section -->
+<div class="pro-section" onclick="openProModal()">
+<div class="pro-blur">
+<h3>🚀 Pro: HD Export, Batch Mix & Sticker Packs</h3>
+<div class="pro-mock-hd">
+<div class="pro-mock-hd-preview">😎🔥</div>
+<div class="pro-mock-hd-opts">
+<div class="pro-mock-hd-opt"><span>Resolution</span><span>512×512 HD</span></div>
+<div class="pro-mock-hd-opt"><span>Format</span><span>PNG / SVG / WebP</span></div>
+<div class="pro-mock-hd-opt"><span>Background</span><span>Transparent</span></div>
+</div>
+</div>
+<h3>Batch Mashup</h3>
+<div class="pro-mock-batch">
+<div class="pro-mock-batch-item">😀🎉</div>
+<div class="pro-mock-batch-item">😍🌈</div>
+<div class="pro-mock-batch-item">🤖⚡</div>
+<div class="pro-mock-batch-item">🐱🍕</div>
+<div class="pro-mock-batch-item">👻🎃</div>
+<div class="pro-mock-batch-item">🦄✨</div>
+<div class="pro-mock-batch-item">🐸☕</div>
+<div class="pro-mock-batch-item">🎨🖌</div>
+</div>
+<div class="pro-mock-sticker">
+<div>📦 Export Sticker Pack</div>
+<div>💬 WhatsApp Format</div>
+<div>📱 Telegram Format</div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Unlock Pro Features</div>
+</div>
+</div>
+<!-- Pro Modal -->
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)closeProModal()">
+<div class="pro-modal">
+<h2>🚀 Unlock Pro</h2>
+<p class="pro-price">One-time purchase · Lifetime access</p>
+<ul class="pro-features">
+<li><span class="pf-icon">🖼</span> HD export (512×512) with transparent background</li>
+<li><span class="pf-icon">🔄</span> Batch mashup — mix multiple pairs at once</li>
+<li><span class="pf-icon">📦</span> Sticker pack generator (WhatsApp & Telegram)</li>
+<li><span class="pf-icon">♾️</span> Lifetime updates & priority support</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="closeProModal()">Maybe later</button>
+</div>
+</div>
+<script>function openProModal(){document.getElementById('proModal').classList.add('show')}function closeProModal(){document.getElementById('proModal').classList.remove('show')}</script>
+<footer>AI Emoji Kitchen — Powered by Google Emoji Kitchen API</footer>
+<script>
+const EMOJIS=['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🫡','🤐','🤨','😐','😑','😶','🫥','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','🫤','😟','🙁','😮','😯','😲','😳','🥺','🥹','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾','💋','👋','🤚','🖐️','✋','🖖','🫱','🫲','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','💪','🦾','❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❤️‍🔥','💯','💢','💥','💫','💦','🔥','⭐','🌟','✨','🎉','🎊','🌈','☀️','🌤️','⛅','🌧️','❄️','🌊','🍎','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🌽','🥕','🧄','🧅','🥦','🍄','🌹','🌻','🌺','🌸','🌼','💐','🪻','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🦄','🐝','🦋','🐌','🐛','🐞'];
+let slots=[null,null],activeSlot=0,currentResult=null,favs=JSON.parse(localStorage.getItem('ek_favs')||'[]');
+
+function init(){
+  const g=document.getElementById('emojiGrid');
+  EMOJIS.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>selectEmoji(e);g.appendChild(b)});
+  updateSlots();renderFavs();
+  const p=new URLSearchParams(location.search);
+  if(p.get('e1')&&p.get('e2')){slots=[p.get('e1'),p.get('e2')];updateSlots();doMix()}
+}
+
+function pickSlot(i){activeSlot=i;document.querySelectorAll('.slot').forEach((s,j)=>s.classList.toggle('active',j===i))}
+function clrSlot(e,i){e.stopPropagation();slots[i]=null;updateSlots();document.getElementById('resultArea').innerHTML='';document.getElementById('miniResult').textContent='?';currentResult=null}
+
+function selectEmoji(e){
+  slots[activeSlot]=e;
+  updateSlots();
+  if(slots[0]&&slots[1])doMix();
+  else activeSlot=slots[0]?1:0;
+  pickSlot(activeSlot);
+}
+
+function updateSlots(){
+  document.getElementById('s0').textContent=slots[0]||'';
+  document.getElementById('s1').textContent=slots[1]||'';
+  document.getElementById('slot0').style.borderStyle=slots[0]?'solid':'dashed';
+  document.getElementById('slot1').style.borderStyle=slots[1]?'solid':'dashed';
+  document.getElementById('mixBtn').classList.toggle('ready',!!(slots[0]&&slots[1]));
+}
+
+function emojiToCodepoint(e){
+  const pts=[];
+  for(let i=0;i<e.length;i++){
+    const c=e.codePointAt(i);
+    if(c>0xFFFF)i++;
+    if(c!==0xFE0F)pts.push(c.toString(16));
+  }
+  return pts.join('-');
+}
+
+async function doMix(){
+  if(!slots[0]||!slots[1])return;
+  const ra=document.getElementById('resultArea'),mr=document.getElementById('miniResult');
+  ra.innerHTML='<div class="loading">🔄 Mixing emojis...</div>';mr.textContent='⏳';
+  const c1=emojiToCodepoint(slots[0]),c2=emojiToCodepoint(slots[1]);
+  const url=`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=faces&q=${encodeURIComponent(slots[0])}_${encodeURIComponent(slots[1])}&collection=emoji_kitchen_v6`;
+  try{
+    const r=await fetch(url);
+    if(!r.ok)throw new Error('API error');
+    const d=await r.json();
+    if(!d.results||!d.results.length){
+      // try reverse
+      const url2=`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=faces&q=${encodeURIComponent(slots[1])}_${encodeURIComponent(slots[0])}&collection=emoji_kitchen_v6`;
+      const r2=await fetch(url2);const d2=await r2.json();
+      if(!d2.results||!d2.results.length){ra.innerHTML='<div class="error">😕 No mashup found for this combo. Try different emojis!</div>';mr.textContent='❌';currentResult=null;return}
+      showResult(d2.results[0]);
+    }else{showResult(d.results[0])}
+  }catch(err){ra.innerHTML='<div class="error">⚠️ Failed to fetch. Check your connection and try again.</div>';mr.textContent='❌';currentResult=null}
+}
+
+function showResult(r){
+  const imgUrl=r.media_formats?.png_transparent?.url||r.url;
+  currentResult={url:imgUrl,emoji1:slots[0],emoji2:slots[1]};
+  const ra=document.getElementById('resultArea'),mr=document.getElementById('miniResult');
+  mr.innerHTML=`<img src="${imgUrl}" style="width:70px;height:70px;object-fit:contain">`;
+  const isFav=favs.some(f=>f.emoji1===slots[0]&&f.emoji2===slots[1]);
+  ra.innerHTML=`<img src="${imgUrl}" alt="Emoji mashup of ${slots[0]} and ${slots[1]}"><div class="actions"><button onclick="toggleFav()">${isFav?'💛 Saved':'⭐ Favorite'}</button><button onclick="downloadResult()">💾 Download</button><button onclick="shareResult()">🔗 Share</button></div>`;
+}
+
+function toggleFav(){
+  if(!currentResult)return;
+  const idx=favs.findIndex(f=>f.emoji1===currentResult.emoji1&&f.emoji2===currentResult.emoji2);
+  if(idx>=0){favs.splice(idx,1);showToast('Removed from favorites')}
+  else{favs.unshift({...currentResult});showToast('⭐ Added to favorites!')}
+  localStorage.setItem('ek_favs',JSON.stringify(favs));
+  showResult({media_formats:{png_transparent:{url:currentResult.url}}});renderFavs();
+}
+
+async function downloadResult(){
+  if(!currentResult)return;
+  try{const r=await fetch(currentResult.url);const b=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`emoji-mix-${currentResult.emoji1}${currentResult.emoji2}.png`;a.click();URL.revokeObjectURL(a.href);showToast('💾 Downloaded!')}
+  catch(e){showToast('Download failed — try right-click save')}
+}
+
+function shareResult(){
+  if(!currentResult)return;
+  const u=location.origin+location.pathname+'?e1='+encodeURIComponent(currentResult.emoji1)+'&e2='+encodeURIComponent(currentResult.emoji2);
+  navigator.clipboard.writeText(u).then(()=>showToast('🔗 Link copied!')).catch(()=>{
+    const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast('🔗 Link copied!')
+  });
+}
+
+function renderFavs(){
+  const c=document.getElementById('favContent');
+  if(!favs.length){c.innerHTML='<div class="empty">No favorites yet. Mix some emojis and save your favorites!</div>';return}
+  c.innerHTML='<div class="fav-grid">'+favs.map((f,i)=>`<div class="fav-item" onclick="loadFav(${i})"><button class="rm" onclick="rmFav(event,${i})">×</button><img src="${f.url}" alt="${f.emoji1}+${f.emoji2}"><div class="lbl">${f.emoji1}+${f.emoji2}</div></div>`).join('')+'</div>';
+}
+
+function loadFav(i){const f=favs[i];slots=[f.emoji1,f.emoji2];updateSlots();currentResult={...f};showResult({media_formats:{png_transparent:{url:f.url}}})}
+function rmFav(e,i){e.stopPropagation();favs.splice(i,1);localStorage.setItem('ek_favs',JSON.stringify(favs));renderFavs();showToast('Removed')}
+
+function switchTab(t,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');
+  document.getElementById('emojisPanel').style.display=t==='emojis'?'':'none';
+  document.getElementById('favsPanel').style.display=t==='favs'?'':'none';
+}
+
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+init();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

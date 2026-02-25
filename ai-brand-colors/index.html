@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI brand color palette generator. Create cohesive color systems for your brand with primary, secondary, and accent colors plus accessibility checks.">
+<link rel="canonical" href="https://lifa-su.com/ai-brand-colors/">
+<title>AI Brand Colors - 品牌配色系统生成器</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f8fafc;--bg2:#fff;--bg3:#f1f5f9;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--border:#e2e8f0;--radius:12px;--shadow:0 1px 3px rgba(0,0,0,.1);--primary:#6366f1;--primary-light:#818cf8;--primary-dark:#4f46e5;--accent:#f59e0b}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--primary);text-decoration:none}
+button{cursor:pointer;border:none;font:inherit}
+input,textarea,select{font:inherit;border:1px solid var(--border);border-radius:8px;padding:10px 14px;background:var(--bg2);color:var(--text);outline:none;transition:border .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--primary)}
+.app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);background:rgba(255,255,255,.85)}
+.app-header h1{font-size:1.2rem;display:flex;align-items:center;gap:8px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn{padding:8px 18px;border-radius:8px;font-weight:500;font-size:.875rem;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--bg3)}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn-icon{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-icon:hover{background:var(--bg3)}
+.main-container{max-width:1440px;margin:0 auto;padding:24px;display:grid;grid-template-columns:320px 1fr;gap:24px}
+@media(max-width:960px){.main-container{grid-template-columns:1fr}}
+.sidebar{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card h3{font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%}
+textarea{resize:vertical;min-height:60px}
+.style-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{padding:4px 12px;border-radius:20px;font-size:.78rem;border:1px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .2s}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}.chip:hover{border-color:var(--primary)}
+.generate-btn{width:100%;padding:14px;font-size:1rem;font-weight:600;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;transition:all .3s;position:relative;overflow:hidden}
+.generate-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(99,102,241,.4)}
+.generate-btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.generate-btn .spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.generate-btn.loading .spinner{display:inline-block}.generate-btn.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.tab{padding:10px 16px;font-size:.85rem;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}.tab:hover{color:var(--text)}
+.tab-content{display:none}.tab-content.active{display:block}
+.palette-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:10px;margin-bottom:20px}
+.palette-section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:8px;font-weight:600}
+.swatch-card{text-align:center}.swatch-card .swatch{width:100%;aspect-ratio:1;border-radius:10px;margin-bottom:4px;cursor:pointer;transition:all .2s;border:1px solid rgba(0,0,0,.06);position:relative}
+.swatch-card .swatch:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.swatch-card .label{font-size:.68rem;color:var(--text2)}.swatch-card .hex{font-size:.68rem;font-weight:600;font-family:'SF Mono',Monaco,monospace;cursor:pointer}
+.contrast-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;border-radius:4px;font-size:.62rem;font-weight:700;margin-left:4px}
+.contrast-badge.aaa{background:#dcfce7;color:#166534}.contrast-badge.aa{background:#fef9c3;color:#854d0e}.contrast-badge.fail{background:#fee2e2;color:#991b1b}
+.preview-mock{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
+.mock-nav{padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.mock-nav .nav-brand{font-weight:700;font-size:1rem}.mock-nav .nav-links{display:flex;gap:16px;font-size:.85rem}
+.mock-hero{padding:48px 32px;text-align:center}.mock-hero h2{font-size:1.8rem;margin-bottom:8px}.mock-hero p{font-size:1rem;margin-bottom:20px}
+.mock-btn{padding:10px 24px;border-radius:8px;font-weight:600;font-size:.9rem;border:none;cursor:default;display:inline-block;margin:4px}
+.mock-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px 32px}
+@media(max-width:700px){.mock-cards{grid-template-columns:1fr}}
+.mock-card{border-radius:10px;padding:20px;border:1px solid rgba(0,0,0,.08)}.mock-card h4{margin-bottom:6px;font-size:.95rem}.mock-card p{font-size:.8rem;line-height:1.5}
+.mock-form{padding:24px 32px;max-width:480px;margin:0 auto}
+.mock-form .form-row{margin-bottom:12px}.mock-form label{display:block;font-size:.8rem;font-weight:600;margin-bottom:4px}
+.mock-form input{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:.85rem}
+.mock-alerts{padding:16px 32px;display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.mock-alert{padding:10px 16px;border-radius:8px;font-size:.82rem;font-weight:500}
+.mock-footer{padding:16px 32px;text-align:center;font-size:.8rem}
+.export-panel{margin-bottom:16px}.export-panel h4{font-size:.85rem;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.export-panel pre{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:.78rem;overflow-x:auto;font-family:'SF Mono',Monaco,Consolas,monospace;line-height:1.5;max-height:300px;overflow-y:auto}
+.copy-btn{font-size:.72rem;padding:3px 10px;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer;border:none;transition:all .2s}
+.copy-btn:hover{background:var(--primary-dark)}
+.history-list{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto}
+.history-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s}
+.history-item:hover{background:var(--bg3);border-color:var(--primary)}
+.history-colors{display:flex;gap:3px}.history-colors span{width:20px;height:20px;border-radius:4px;border:1px solid rgba(0,0,0,.08)}
+.history-info{flex:1;min-width:0}.history-info .name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-info .date{font-size:.7rem;color:var(--text3)}
+.history-delete{color:var(--text3);padding:4px;border-radius:4px;background:none;border:none;cursor:pointer;font-size:.9rem}.history-delete:hover{color:#ef4444;background:#fee2e2}
+.contrast-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.contrast-table th,.contrast-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.contrast-table th{font-size:.72rem;text-transform:uppercase;color:var(--text2);font-weight:600}
+.contrast-sample{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:4px;font-weight:600;font-size:.78rem;min-width:60px}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:.9rem}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:.85rem;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.dark-toggle{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--text2);margin-bottom:12px}
+.dark-toggle input[type=checkbox]{width:auto}
+.switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch .slider{position:absolute;inset:0;background:var(--border);border-radius:24px;cursor:pointer;transition:.3s}
+.switch .slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.switch input:checked+.slider{background:var(--primary)}
+.switch input:checked+.slider::before{transform:translateX(20px)}
+.api-key-input{position:relative}
+.api-key-input input{padding-right:36px}
+.api-key-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:4px}
+.loading-skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--border) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:60px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.history-panel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);padding:20px;overflow-y:auto;transition:right .3s;z-index:200;box-shadow:-4px 0 20px rgba(0,0,0,.1)}
+.history-panel.open{right:0}
+.history-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:199;opacity:0;pointer-events:none;transition:opacity .3s}
+.history-overlay.open{opacity:1;pointer-events:auto}
+.history-item:hover{background:var(--bg3)}
+body.dark-mode{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#475569;--shadow:0 1px 3px rgba(0,0,0,.3)}
+body.dark-mode .app-header{background:rgba(30,41,59,.9)}
+body.dark-mode .preview-mock{background:#1e293b;border-color:#475569}
+body.dark-mode input,body.dark-mode textarea,body.dark-mode select{background:#334155;border-color:#475569;color:#f1f5f9}
+body.dark-mode .chip{background:#334155;border-color:#475569;color:#94a3b8}
+body.dark-mode .chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+</style>
+</head>
+<body>
+<header class="app-header">
+<h1><span>🎨</span> AI Brand Colors</h1>
+<div class="header-actions">
+<button class="btn btn-outline btn-sm" onclick="showTab('history')">📋 历史</button>
+<button class="btn btn-outline btn-sm" onclick="showTab('export')">📦 导出</button>
+</div>
+</header>
+<div class="main-container">
+<aside class="sidebar">
+<div class="card">
+<h3>🔑 API 设置</h3>
+<div class="form-group">
+<label>DeepSeek API Key</label>
+<div class="api-key-input">
+<input type="password" id="apiKey" placeholder="sk-..." />
+<button class="api-key-toggle" onclick="toggleApiKey()">👁</button>
+</div>
+</div>
+</div>
+<div class="card">
+<h3>✨ 品牌信息</h3>
+<div class="form-group"><label>品牌名称</label><input type="text" id="brandName" placeholder="例：TechFlow" /></div>
+<div class="form-group"><label>行业领域</label>
+<select id="industry">
+<option value="">选择行业...</option>
+<option value="科技/互联网">科技/互联网</option>
+<option value="金融/银行">金融/银行</option>
+<option value="医疗/健康">医疗/健康</option>
+<option value="教育/培训">教育/培训</option>
+<option value="电商/零售">电商/零售</option>
+<option value="餐饮/食品">餐饮/食品</option>
+<option value="旅游/酒店">旅游/酒店</option>
+<option value="时尚/美妆">时尚/美妆</option>
+<option value="游戏/娱乐">游戏/娱乐</option>
+<option value="环保/能源">环保/能源</option>
+<option value="房地产/建筑">房地产/建筑</option>
+<option value="法律/咨询">法律/咨询</option>
+<option value="其他">其他</option>
+</select></div>
+<div class="form-group"><label>品牌风格</label>
+<div class="style-chips" id="styleChips"></div></div>
+<div class="form-group"><label>补充描述（可选）</label><textarea id="brandDesc" placeholder="描述品牌调性、目标用户、偏好颜色等..."></textarea></div>
+<button class="generate-btn" id="generateBtn" onclick="generatePalette()">
+<span class="spinner"></span><span class="btn-text">🚀 生成品牌配色</span>
+</button>
+</div>
+</aside>
+<main class="content">
+<div class="tabs" id="mainTabs">
+<div class="tab active" data-tab="palette" onclick="showTab('palette')">🎨 配色方案</div>
+<div class="tab" data-tab="preview" onclick="showTab('preview')">👁 实时预览</div>
+<div class="tab" data-tab="contrast" onclick="showTab('contrast')">♿ 对比度</div>
+<div class="tab" data-tab="export" onclick="showTab('export')">📦 导出</div>
+<div class="tab" data-tab="history" onclick="showTab('history')">📋 历史</div>
+</div>
+<div class="tab-content active" id="tab-palette">
+<div id="paletteEmpty" class="empty-state"><div class="icon">🎨</div><p>输入品牌信息，点击生成按钮<br>AI 将为你创建完整的品牌配色系统</p></div>
+<div id="paletteContent" style="display:none">
+<div class="dark-toggle"><label class="switch"><input type="checkbox" id="darkModeToggle" onchange="toggleDarkPreview()"><span class="slider"></span></label><span>暗色模式预览</span></div>
+<div id="paletteDisplay"></div>
+</div>
+</div>
+<div class="tab-content" id="tab-preview">
+<div id="previewEmpty" class="empty-state"><div class="icon">👁</div><p>生成配色方案后，这里将展示模拟网站预览</p></div>
+<div id="previewContent" style="display:none">
+<div class="dark-toggle"><label class="switch"><input type="checkbox" id="previewDarkToggle" onchange="toggleDarkPreview()"><span class="slider"></span></label><span>暗色模式</span></div>
+<div id="previewDisplay"></div>
+</div>
+</div>
+<div class="tab-content" id="tab-contrast">
+<div id="contrastEmpty" class="empty-state"><div class="icon">♿</div><p>生成配色方案后查看无障碍对比度检查结果</p></div>
+<div id="contrastContent" style="display:none"></div>
+</div>
+<div class="tab-content" id="tab-export">
+<div id="exportEmpty" class="empty-state"><div class="icon">📦</div><p>生成配色方案后可导出多种格式</p></div>
+<div id="exportContent" style="display:none"></div>
+</div>
+<div class="tab-content" id="tab-history">
+<div id="historyList" class="history-list"></div>
+</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+.history-panel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);padding:20px;overflow-y:auto;transition:right .3s;z-index:200;box-shadow:-4px 0 20px rgba(0,0,0,.1)}
+.history-panel.open{right:0}
+.history-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:199;opacity:0;pointer-events:none;transition:opacity .3s}
+.history-overlay.open{opacity:1;pointer-events:auto}
+.history-item:hover{background:var(--bg3)}
+body.dark-mode{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;--border:#475569;--shadow:0 1px 3px rgba(0,0,0,.3)}
+body.dark-mode .app-header{background:rgba(30,41,59,.9)}
+body.dark-mode .preview-mock{background:#1e293b;border-color:#475569}
+body.dark-mode input,body.dark-mode textarea,body.dark-mode select{background:#334155;border-color:#475569;color:#f1f5f9}
+body.dark-mode .chip{background:#334155;border-color:#475569;color:#94a3b8}
+body.dark-mode .chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <h1><span>🎨</span> AI Brand Colors</h1>
+  <div class="header-actions">
+    <button class="btn-icon" onclick="toggleHistory()" title="历史记录">📋</button>
+    <button class="btn-icon" id="darkToggle" onclick="toggleAppDark()" title="暗色模式">🌙</button>
+  </div>
+</header>
+
+<div class="main-container">
+  <aside class="sidebar">
+    <div class="card">
+      <h3>🏢 品牌信息</h3>
+      <div class="form-group">
+        <label>品牌名称</label>
+        <input type="text" id="brandName" placeholder="例：TechFlow" />
+      </div>
+      <div class="form-group">
+        <label>行业领域</label>
+        <select id="industry">
+          <option value="">选择行业...</option>
+          <option value="科技/互联网">科技/互联网</option>
+          <option value="金融/银行">金融/银行</option>
+          <option value="医疗/健康">医疗/健康</option>
+          <option value="教育/培训">教育/培训</option>
+          <option value="电商/零售">电商/零售</option>
+          <option value="餐饮/食品">餐饮/食品</option>
+          <option value="旅游/酒店">旅游/酒店</option>
+          <option value="时尚/美妆">时尚/美妆</option>
+          <option value="游戏/娱乐">游戏/娱乐</option>
+          <option value="环保/能源">环保/能源</option>
+          <option value="房地产/建筑">房地产/建筑</option>
+          <option value="法律/咨询">法律/咨询</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>品牌风格</label>
+        <div class="style-chips" id="styleChips">
+          <span class="chip" data-v="现代简约">现代简约</span>
+          <span class="chip" data-v="专业商务">专业商务</span>
+          <span class="chip" data-v="活力年轻">活力年轻</span>
+          <span class="chip" data-v="优雅奢华">优雅奢华</span>
+          <span class="chip" data-v="自然清新">自然清新</span>
+          <span class="chip" data-v="科技未来">科技未来</span>
+          <span class="chip" data-v="温暖亲和">温暖亲和</span>
+          <span class="chip" data-v="极简主义">极简主义</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>补充描述（可选）</label>
+        <textarea id="extraDesc" placeholder="品牌理念、目标用户、偏好颜色等..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚙️ API 设置</h3>
+      <div class="form-group">
+        <label>DeepSeek API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-..." />
+      </div>
+      <p style="font-size:.72rem;color:var(--text3)">密钥仅存储在本地浏览器中</p>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generate()">
+      <span class="btn-text">✨ 生成品牌配色系统</span>
+      <span class="spinner"></span>
+    </button>
+  </aside>
+
+  <main class="content-area">
+    <div id="emptyState" class="empty-state">
+      <div style="font-size:3rem;margin-bottom:12px">🎨</div>
+      <h2 style="font-size:1.2rem;margin-bottom:8px">AI 品牌配色系统生成器</h2>
+      <p style="color:var(--text2);font-size:.9rem;max-width:400px;margin:0 auto">输入品牌信息，AI 将为你生成完整的品牌视觉配色系统，包含主色、辅色、强调色、中性色和语义色。</p>
+    </div>
+
+    <div id="resultArea" style="display:none">
+      <div class="tabs" id="mainTabs">
+        <div class="tab active" data-tab="palette">🎨 配色方案</div>
+        <div class="tab" data-tab="preview">👁 实时预览</div>
+        <div class="tab" data-tab="contrast">♿ 对比度检查</div>
+        <div class="tab" data-tab="export">📦 导出</div>
+      </div>
+
+      <div class="tab-content active" id="tab-palette"></div>
+      <div class="tab-content" id="tab-preview"></div>
+      <div class="tab-content" id="tab-contrast"></div>
+      <div class="tab-content" id="tab-export"></div>
+    </div>
+  </main>
+</div>
+
+<!-- History Panel -->
+<div class="history-panel" id="historyPanel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h3 style="font-size:1rem">📋 配色历史</h3>
+    <button class="btn-icon" onclick="toggleHistory()">✕</button>
+  </div>
+  <div id="historyList"></div>
+</div>
+<div class="history-overlay" id="historyOverlay" onclick="toggleHistory()"></div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1e293b;color:#fff;padding:10px 20px;border-radius:8px;font-size:.85rem;transition:transform .3s;z-index:1000"></div>
+<script>
+// ===== State =====
+let currentPalette = null;
+let selectedStyles = [];
+const STORAGE_KEY = 'ai-brand-colors-history';
+const API_KEY_STORE = 'ai-brand-colors-apikey';
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  const savedKey = localStorage.getItem(API_KEY_STORE);
+  if (savedKey) document.getElementById('apiKey').value = savedKey;
+  
+  document.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      c.classList.toggle('active');
+      const v = c.dataset.v;
+      if (selectedStyles.includes(v)) selectedStyles = selectedStyles.filter(s => s !== v);
+      else selectedStyles.push(v);
+    });
+  });
+  
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    });
+  });
+  
+  renderHistory();
+});
+
+// ===== Color Utilities =====
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const n = parseInt(hex, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x => Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')).join('');
+}
+
+function luminance(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function contrastRatio(hex1, hex2) {
+  const l1 = luminance(hex1), l2 = luminance(hex2);
+  const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function wcagLevel(ratio) {
+  if (ratio >= 7) return 'AAA';
+  if (ratio >= 4.5) return 'AA';
+  return 'Fail';
+}
+
+function textColorFor(bg) {
+  return luminance(bg) > 0.179 ? '#000000' : '#ffffff';
+}
+
+function adjustBrightness(hex, factor) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(r * factor, g * factor, b * factor);
+}
+
+function generateDarkVariant(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const hsl = rgbToHsl(r, g, b);
+  hsl.l = Math.max(0.15, hsl.l * 0.4);
+  hsl.s = Math.min(1, hsl.s * 1.1);
+  const rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
+}
+
+function generateDarkAccent(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const hsl = rgbToHsl(r, g, b);
+  hsl.l = Math.min(0.75, hsl.l * 1.2);
+  hsl.s = Math.min(1, hsl.s * 1.15);
+  const rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return { h, s, l };
+}
+
+function hslToRgb(h, s, l) {
+  let r, g, b;
+  if (s === 0) { r = g = b = l; }
+  else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1; if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+}
+
+// ===== Copy to clipboard =====
+function copyHex(hex) {
+  navigator.clipboard.writeText(hex).then(() => showToast('已复制 ' + hex));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(100px)'; }, 2000);
+}
+
+// ===== History =====
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+
+function saveToHistory(palette, meta) {
+  const history = getHistory();
+  history.unshift({ palette, meta, time: Date.now() });
+  if (history.length > 20) history.length = 20;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const history = getHistory();
+  if (!history.length) { list.innerHTML = '<p style="color:var(--text3);font-size:.85rem">暂无历史记录</p>'; return; }
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="loadHistory(${i})" style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:background .2s">
+      <div style="display:flex;gap:4px;margin-bottom:6px">
+        ${[h.palette.primary?.base, h.palette.secondary?.base, h.palette.accent?.base, h.palette.neutral?.base].filter(Boolean).map(c => `<div style="width:24px;height:24px;border-radius:6px;background:${c};border:1px solid rgba(0,0,0,.08)"></div>`).join('')}
+      </div>
+      <div style="font-size:.8rem;font-weight:600">${h.meta.brand || '未命名'}</div>
+      <div style="font-size:.7rem;color:var(--text3)">${new Date(h.time).toLocaleString('zh-CN')}</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(idx) {
+  const history = getHistory();
+  if (!history[idx]) return;
+  currentPalette = history[idx].palette;
+  renderAll();
+  toggleHistory();
+}
+
+function toggleHistory() {
+  const panel = document.getElementById('historyPanel');
+  const overlay = document.getElementById('historyOverlay');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+
+// ===== App Dark Mode =====
+function toggleAppDark() {
+  document.body.classList.toggle('dark-mode');
+  const btn = document.getElementById('darkToggle');
+  btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+}
+
+// ===== Generate =====
+async function generate() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { showToast('请输入 DeepSeek API Key'); return; }
+  localStorage.setItem(API_KEY_STORE, apiKey);
+  
+  const brand = document.getElementById('brandName').value.trim();
+  const industry = document.getElementById('industry').value;
+  const styles = selectedStyles.join('、');
+  const extra = document.getElementById('extraDesc').value.trim();
+  
+  if (!brand && !industry) { showToast('请至少输入品牌名或选择行业'); return; }
+  
+  const btn = document.getElementById('generateBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  
+  const prompt = `你是一位专业的品牌视觉设计师。请为以下品牌生成一套完整的配色系统。
+
+品牌信息：
+- 品牌名：${brand || '未指定'}
+- 行业：${industry || '未指定'}
+- 风格：${styles || '未指定'}
+- 补充：${extra || '无'}
+
+请严格按照以下JSON格式返回（不要包含任何其他文字，只返回JSON）：
+{
+  "primary": {
+    "base": "#hex",
+    "light": "#hex",
+    "dark": "#hex",
+    "50": "#hex", "100": "#hex", "200": "#hex", "300": "#hex",
+    "400": "#hex", "500": "#hex", "600": "#hex", "700": "#hex",
+    "800": "#hex", "900": "#hex"
+  },
+  "secondary": {
+    "base": "#hex",
+    "light": "#hex",
+    "dark": "#hex",
+    "50": "#hex", "100": "#hex", "200": "#hex", "300": "#hex",
+    "400": "#hex", "500": "#hex", "600": "#hex", "700": "#hex",
+    "800": "#hex", "900": "#hex"
+  },
+  "accent": {
+    "base": "#hex",
+    "light": "#hex",
+    "dark": "#hex"
+  },
+  "neutral": {
+    "base": "#hex",
+    "50": "#hex", "100": "#hex", "200": "#hex", "300": "#hex",
+    "400": "#hex", "500": "#hex", "600": "#hex", "700": "#hex",
+    "800": "#hex", "900": "#hex", "950": "#hex"
+  },
+  "semantic": {
+    "success": "#hex",
+    "successLight": "#hex",
+    "warning": "#hex",
+    "warningLight": "#hex",
+    "error": "#hex",
+    "errorLight": "#hex",
+    "info": "#hex",
+    "infoLight": "#hex"
+  },
+  "description": "简短描述配色理念（中文，50字以内）"
+}
+
+要求：
+1. 颜色要和谐、专业，符合品牌调性
+2. primary 和 secondary 要有明显区分
+3. 50-900 色阶要平滑过渡
+4. neutral 用于背景和文字
+5. semantic 语义色要直觉化
+6. 所有颜色值必须是有效的6位hex格式`;
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.8,
+        max_tokens: 2000
+      })
+    });
+    
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error('API 错误: ' + resp.status + ' ' + err);
+    }
+    
+    const data = await resp.json();
+    let text = data.choices[0].message.content.trim();
+    
+    // Extract JSON from possible markdown code block
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) text = jsonMatch[1].trim();
+    
+    // Try to find JSON object
+    const braceStart = text.indexOf('{');
+    const braceEnd = text.lastIndexOf('}');
+    if (braceStart !== -1 && braceEnd !== -1) {
+      text = text.substring(braceStart, braceEnd + 1);
+    }
+    
+    currentPalette = JSON.parse(text);
+    
+    saveToHistory(currentPalette, { brand, industry, styles });
+    renderAll();
+    showToast('✨ 配色系统生成成功！');
+    
+  } catch (e) {
+    console.error(e);
+    showToast('生成失败: ' + e.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// ===== Render All =====
+function renderAll() {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'block';
+  renderPalette();
+  renderPreview();
+  renderContrast();
+  renderExport();
+}
+
+// ===== Render Palette Tab =====
+function renderPalette() {
+  const p = currentPalette;
+  const el = document.getElementById('tab-palette');
+  
+  const swatchHTML = (color, label) => `
+    <div class="swatch-card">
+      <div class="swatch" style="background:${color}" onclick="copyHex('${color}')" title="${color}"></div>
+      <div class="label">${label}</div>
+      <div class="hex" onclick="copyHex('${color}')">${color}</div>
+    </div>`;
+  
+  const scaleHTML = (obj, name) => {
+    const scales = ['50','100','200','300','400','500','600','700','800','900','950'].filter(k => obj[k]);
+    return `
+      <div class="palette-section-title">${name}</div>
+      <div class="palette-row">
+        ${scales.map(k => swatchHTML(obj[k], k)).join('')}
+      </div>`;
+  };
+  
+  let html = '';
+  
+  if (p.description) {
+    html += `<div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,${p.primary?.base || '#6366f1'}11,${p.accent?.base || '#f59e0b'}11)">
+      <p style="font-size:.9rem;color:var(--text2)">💡 ${p.description}</p></div>`;
+  }
+  
+  // Core colors overview
+  html += `<div class="card" style="margin-bottom:16px"><h3>🎯 核心色彩</h3>
+    <div class="palette-row" style="grid-template-columns:repeat(auto-fill,minmax(90px,1fr))">
+      ${swatchHTML(p.primary?.base || '#6366f1', '主色 Primary')}
+      ${swatchHTML(p.secondary?.base || '#06b6d4', '辅色 Secondary')}
+      ${swatchHTML(p.accent?.base || '#f59e0b', '强调色 Accent')}
+      ${swatchHTML(p.neutral?.base || '#64748b', '中性色 Neutral')}
+    </div></div>`;
+  
+  // Scales
+  html += `<div class="card" style="margin-bottom:16px">`;
+  if (p.primary) html += scaleHTML(p.primary, '🔵 主色 Primary');
+  if (p.secondary) html += scaleHTML(p.secondary, '🟢 辅色 Secondary');
+  html += `</div>`;
+  
+  // Neutral
+  if (p.neutral) {
+    html += `<div class="card" style="margin-bottom:16px">${scaleHTML(p.neutral, '⚪ 中性色 Neutral')}</div>`;
+  }
+  
+  // Accent
+  if (p.accent) {
+    html += `<div class="card" style="margin-bottom:16px">
+      <div class="palette-section-title">⭐ 强调色 Accent</div>
+      <div class="palette-row">
+        ${swatchHTML(p.accent.light || adjustBrightness(p.accent.base, 1.3), 'Light')}
+        ${swatchHTML(p.accent.base, 'Base')}
+        ${swatchHTML(p.accent.dark || adjustBrightness(p.accent.base, 0.7), 'Dark')}
+      </div></div>`;
+  }
+  
+  // Semantic
+  if (p.semantic) {
+    html += `<div class="card" style="margin-bottom:16px">
+      <div class="palette-section-title">🚦 语义色 Semantic</div>
+      <div class="palette-row">
+        ${swatchHTML(p.semantic.success, '成功 Success')}
+        ${swatchHTML(p.semantic.successLight || p.semantic.success, 'Success Light')}
+        ${swatchHTML(p.semantic.warning, '警告 Warning')}
+        ${swatchHTML(p.semantic.warningLight || p.semantic.warning, 'Warning Light')}
+        ${swatchHTML(p.semantic.error, '错误 Error')}
+        ${swatchHTML(p.semantic.errorLight || p.semantic.error, 'Error Light')}
+        ${swatchHTML(p.semantic.info || p.primary?.base || '#3b82f6', '信息 Info')}
+        ${swatchHTML(p.semantic.infoLight || p.semantic.info || '#93c5fd', 'Info Light')}
+      </div></div>`;
+  }
+  
+  el.innerHTML = html;
+}
+
+// ===== Render Preview Tab =====
+function renderPreview() {
+  const p = currentPalette;
+  const pri = p.primary?.base || '#6366f1';
+  const priDark = p.primary?.dark || p.primary?.['700'] || '#4f46e5';
+  const priLight = p.primary?.light || p.primary?.['100'] || '#e0e7ff';
+  const sec = p.secondary?.base || '#06b6d4';
+  const acc = p.accent?.base || '#f59e0b';
+  const n50 = p.neutral?.['50'] || '#f8fafc';
+  const n100 = p.neutral?.['100'] || '#f1f5f9';
+  const n200 = p.neutral?.['200'] || '#e2e8f0';
+  const n600 = p.neutral?.['600'] || '#475569';
+  const n700 = p.neutral?.['700'] || '#334155';
+  const n800 = p.neutral?.['800'] || '#1e293b';
+  const n900 = p.neutral?.['900'] || '#0f172a';
+  const n950 = p.neutral?.['950'] || '#020617';
+  const succ = p.semantic?.success || '#22c55e';
+  const warn = p.semantic?.warning || '#f59e0b';
+  const err = p.semantic?.error || '#ef4444';
+  const brand = document.getElementById('brandName').value.trim() || 'BrandName';
+  
+  const el = document.getElementById('tab-preview');
+  
+  el.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-sm btn-outline preview-mode-btn active" onclick="switchPreviewMode(this,'light')">☀️ 亮色模式</button>
+      <button class="btn btn-sm btn-outline preview-mode-btn" onclick="switchPreviewMode(this,'dark')">🌙 暗色模式</button>
+    </div>
+    
+    <!-- Light Mode Preview -->
+    <div id="preview-light" class="preview-mock" style="margin-bottom:24px">
+      <div class="mock-nav" style="background:${pri};color:#fff">
+        <div class="nav-brand">${brand}</div>
+        <div class="nav-links" style="color:rgba(255,255,255,.85)">
+          <span>首页</span><span>产品</span><span>关于</span><span>联系</span>
+        </div>
+      </div>
+      <div class="mock-hero" style="background:linear-gradient(135deg,${pri}08,${sec}12)">
+        <h2 style="color:${n900}">欢迎来到 ${brand}</h2>
+        <p style="color:${n600}">打造卓越的数字体验，让品牌焕发新生</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="mock-btn" style="background:${pri};color:#fff">开始使用</button>
+          <button class="mock-btn" style="background:transparent;color:${pri};border:2px solid ${pri}">了解更多</button>
+        </div>
+      </div>
+      <div style="padding:24px;background:${n50}">
+        <div class="mock-cards">
+          <div class="mock-card" style="background:#fff;border:1px solid ${n200}">
+            <div style="height:8px;background:${pri};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n800}">功能特性</h4>
+            <p style="color:${n600};font-size:.85rem">强大的AI驱动配色系统，为您的品牌量身定制。</p>
+            <button class="mock-btn" style="background:${pri};color:#fff;font-size:.8rem;padding:6px 14px;margin-top:8px">查看详情</button>
+          </div>
+          <div class="mock-card" style="background:#fff;border:1px solid ${n200}">
+            <div style="height:8px;background:${sec};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n800}">数据分析</h4>
+            <p style="color:${n600};font-size:.85rem">实时追踪品牌色彩在不同场景下的表现。</p>
+            <button class="mock-btn" style="background:${sec};color:#fff;font-size:.8rem;padding:6px 14px;margin-top:8px">了解更多</button>
+          </div>
+          <div class="mock-card" style="background:#fff;border:1px solid ${n200}">
+            <div style="height:8px;background:${acc};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n800}">快速导出</h4>
+            <p style="color:${n600};font-size:.85rem">一键导出CSS、Tailwind、SCSS等多种格式。</p>
+            <button class="mock-btn" style="background:${acc};color:#fff;font-size:.8rem;padding:6px 14px;margin-top:8px">立即体验</button>
+          </div>
+        </div>
+        
+        <!-- Form Preview -->
+        <div style="margin-top:20px;background:#fff;border:1px solid ${n200};border-radius:10px;padding:20px">
+          <h4 style="color:${n800};margin-bottom:12px">📝 表单示例</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:.75rem;color:${n600};display:block;margin-bottom:4px">姓名</label>
+              <div style="border:1px solid ${n200};border-radius:6px;padding:8px 12px;color:${n600};font-size:.85rem;background:${n50}">张三</div>
+            </div>
+            <div>
+              <label style="font-size:.75rem;color:${n600};display:block;margin-bottom:4px">邮箱</label>
+              <div style="border:1px solid ${n200};border-radius:6px;padding:8px 12px;color:${n600};font-size:.85rem;background:${n50}">example@mail.com</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="mock-btn" style="background:${pri};color:#fff;font-size:.8rem;padding:8px 20px">提交</button>
+            <button class="mock-btn" style="background:${n100};color:${n700};font-size:.8rem;padding:8px 20px">取消</button>
+          </div>
+        </div>
+        
+        <!-- Semantic Colors Preview -->
+        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:${p.semantic?.successLight || '#dcfce7'};border:1px solid ${succ}44;border-radius:8px;padding:12px;display:flex;align-items:center;gap:8px">
+            <span style="color:${succ}">✓</span><span style="font-size:.85rem;color:${n800}">操作成功完成</span>
+          </div>
+          <div style="background:${p.semantic?.warningLight || '#fef9c3'};border:1px solid ${warn}44;border-radius:8px;padding:12px;display:flex;align-items:center;gap:8px">
+            <span style="color:${warn}">⚠</span><span style="font-size:.85rem;color:${n800}">请注意检查</span>
+          </div>
+          <div style="background:${p.semantic?.errorLight || '#fee2e2'};border:1px solid ${err}44;border-radius:8px;padding:12px;display:flex;align-items:center;gap:8px">
+            <span style="color:${err}">✕</span><span style="font-size:.85rem;color:${n800}">发生错误</span>
+          </div>
+          <div style="background:${p.semantic?.infoLight || '#dbeafe'};border:1px solid ${p.semantic?.info || '#3b82f6'}44;border-radius:8px;padding:12px;display:flex;align-items:center;gap:8px">
+            <span style="color:${p.semantic?.info || '#3b82f6'}">ℹ</span><span style="font-size:.85rem;color:${n800}">提示信息</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dark Mode Preview -->
+    <div id="preview-dark" class="preview-mock" style="display:none;margin-bottom:24px">
+      <div class="mock-nav" style="background:${n950};color:#fff;border-bottom:1px solid ${n800}">
+        <div class="nav-brand">${brand}</div>
+        <div class="nav-links" style="color:${p.neutral?.['400'] || '#94a3b8'}">
+          <span>首页</span><span>产品</span><span>关于</span><span>联系</span>
+        </div>
+      </div>
+      <div class="mock-hero" style="background:${n900}">
+        <h2 style="color:${n50}">欢迎来到 ${brand}</h2>
+        <p style="color:${p.neutral?.['400'] || '#94a3b8'}">打造卓越的数字体验，让品牌焕发新生</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="mock-btn" style="background:${p.primary?.['400'] || priLight};color:${n950}">开始使用</button>
+          <button class="mock-btn" style="background:transparent;color:${p.primary?.['400'] || priLight};border:2px solid ${p.primary?.['400'] || priLight}">了解更多</button>
+        </div>
+      </div>
+      <div style="padding:24px;background:${n900}">
+        <div class="mock-cards">
+          <div class="mock-card" style="background:${n800};border:1px solid ${n700}">
+            <div style="height:8px;background:${p.primary?.['400'] || pri};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n50}">功能特性</h4>
+            <p style="color:${p.neutral?.['400'] || '#94a3b8'};font-size:.85rem">强大的AI驱动配色系统。</p>
+            <button class="mock-btn" style="background:${p.primary?.['400'] || pri};color:${n950};font-size:.8rem;padding:6px 14px;margin-top:8px">查看详情</button>
+          </div>
+          <div class="mock-card" style="background:${n800};border:1px solid ${n700}">
+            <div style="height:8px;background:${p.secondary?.['400'] || sec};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n50}">数据分析</h4>
+            <p style="color:${p.neutral?.['400'] || '#94a3b8'};font-size:.85rem">实时追踪品牌色彩表现。</p>
+            <button class="mock-btn" style="background:${p.secondary?.['400'] || sec};color:${n950};font-size:.8rem;padding:6px 14px;margin-top:8px">了解更多</button>
+          </div>
+          <div class="mock-card" style="background:${n800};border:1px solid ${n700}">
+            <div style="height:8px;background:${acc};border-radius:4px 4px 0 0;margin:-16px -16px 12px"></div>
+            <h4 style="color:${n50}">快速导出</h4>
+            <p style="color:${p.neutral?.['400'] || '#94a3b8'};font-size:.85rem">一键导出多种格式。</p>
+            <button class="mock-btn" style="background:${acc};color:${n950};font-size:.8rem;padding:6px 14px;margin-top:8px">立即体验</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ===== Preview Mode Switch =====
+function switchPreviewMode(btn, mode) {
+  document.querySelectorAll('.preview-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('preview-light').style.display = mode === 'light' ? 'block' : 'none';
+  document.getElementById('preview-dark').style.display = mode === 'dark' ? 'block' : 'none';
+}
+
+// ===== Render Contrast Tab =====
+function renderContrast() {
+  const p = currentPalette;
+  const el = document.getElementById('tab-contrast');
+  
+  const pairs = [];
+  const addPair = (fg, bg, label) => {
+    if (fg && bg) {
+      const ratio = contrastRatio(fg, bg);
+      const level = wcagLevel(ratio);
+      pairs.push({ fg, bg, label, ratio: ratio.toFixed(2), level });
+    }
+  };
+  
+  const white = '#ffffff';
+  const black = '#000000';
+  const n50 = p.neutral?.['50'] || '#f8fafc';
+  const n900 = p.neutral?.['900'] || '#0f172a';
+  const n950 = p.neutral?.['950'] || '#020617';
+  
+  // Primary combinations
+  addPair(white, p.primary?.base, 'White on Primary');
+  addPair(p.primary?.base, white, 'Primary on White');
+  addPair(p.primary?.base, n50, 'Primary on Neutral-50');
+  addPair(white, p.primary?.dark || p.primary?.['700'], 'White on Primary Dark');
+  
+  // Secondary
+  addPair(white, p.secondary?.base, 'White on Secondary');
+  addPair(p.secondary?.base, white, 'Secondary on White');
+  
+  // Accent
+  addPair(black, p.accent?.base, 'Black on Accent');
+  addPair(p.accent?.base, white, 'Accent on White');
+  
+  // Neutral text
+  addPair(n900, white, 'Neutral-900 on White');
+  addPair(n900, n50, 'Neutral-900 on Neutral-50');
+  addPair(white, n900, 'White on Neutral-900');
+  addPair(white, n950, 'White on Neutral-950');
+  
+  // Semantic
+  addPair(white, p.semantic?.success, 'White on Success');
+  addPair(white, p.semantic?.warning, 'White on Warning');
+  addPair(white, p.semantic?.error, 'White on Error');
+  addPair(black, p.semantic?.success, 'Black on Success');
+  addPair(black, p.semantic?.warning, 'Black on Warning');
+  
+  const badgeClass = (level) => level === 'AAA' ? 'aaa' : level === 'AA' ? 'aa' : 'fail';
+  
+  const passAAA = pairs.filter(p => p.level === 'AAA').length;
+  const passAA = pairs.filter(p => p.level === 'AA').length;
+  const fail = pairs.filter(p => p.level === 'Fail').length;
+  
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <h3>♿ WCAG 无障碍对比度检查</h3>
+      <p style="font-size:.85rem;color:var(--text2);margin-bottom:16px">
+        检查配色方案中常见颜色组合的对比度是否符合 WCAG 2.1 标准。
+        AA 级要求 ≥ 4.5:1（正文）/ 3:1（大文字），AAA 级要求 ≥ 7:1。
+      </p>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="padding:8px 16px;background:#dcfce7;border-radius:8px;font-size:.85rem">
+          <strong style="color:#166534">${passAAA}</strong> <span style="color:#166534">AAA 通过</span>
+        </div>
+        <div style="padding:8px 16px;background:#fef9c3;border-radius:8px;font-size:.85rem">
+          <strong style="color:#854d0e">${passAA}</strong> <span style="color:#854d0e">AA 通过</span>
+        </div>
+        <div style="padding:8px 16px;background:#fee2e2;border-radius:8px;font-size:.85rem">
+          <strong style="color:#991b1b">${fail}</strong> <span style="color:#991b1b">未通过</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border)">
+            <th style="text-align:left;padding:8px;color:var(--text2);font-size:.75rem">预览</th>
+            <th style="text-align:left;padding:8px;color:var(--text2);font-size:.75rem">组合</th>
+            <th style="text-align:center;padding:8px;color:var(--text2);font-size:.75rem">对比度</th>
+            <th style="text-align:center;padding:8px;color:var(--text2);font-size:.75rem">等级</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pairs.map(p => `
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:8px">
+                <div style="width:80px;height:32px;background:${p.bg};border-radius:6px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,.08)">
+                  <span style="color:${p.fg};font-weight:700;font-size:.75rem">Aa 文字</span>
+                </div>
+              </td>
+              <td style="padding:8px">
+                <div style="font-size:.8rem">${p.label}</div>
+                <div style="font-size:.7rem;color:var(--text3);font-family:monospace">${p.fg} / ${p.bg}</div>
+              </td>
+              <td style="text-align:center;padding:8px;font-weight:600;font-family:monospace">${p.ratio}:1</td>
+              <td style="text-align:center;padding:8px">
+                <span class="contrast-badge ${badgeClass(p.level)}">${p.level === 'Fail' ? '✗ Fail' : '✓ ' + p.level}</span>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ===== Render Export Tab =====
+function renderExport() {
+  const p = currentPalette;
+  const el = document.getElementById('tab-export');
+  
+  // CSS Variables
+  const cssVars = generateCSSVars(p);
+  const tailwind = generateTailwind(p);
+  const scss = generateSCSS(p);
+  const tokens = generateTokens(p);
+  
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <h3>📦 导出配色系统</h3>
+      <p style="font-size:.85rem;color:var(--text2);margin-bottom:16px">选择你需要的格式，点击复制即可使用。</p>
+      
+      <div class="tabs" style="margin-bottom:12px">
+        <div class="tab active" onclick="switchExportTab(this,'css')">CSS 变量</div>
+        <div class="tab" onclick="switchExportTab(this,'tailwind')">Tailwind</div>
+        <div class="tab" onclick="switchExportTab(this,'scss')">SCSS</div>
+        <div class="tab" onclick="switchExportTab(this,'tokens')">Design Tokens</div>
+      </div>
+      
+      <div id="export-css" class="export-panel">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-sm btn-outline" onclick="copyExport('css')">📋 复制</button>
+        </div>
+        <pre class="code-block" id="code-css">${escapeHtml(cssVars)}</pre>
+      </div>
+      <div id="export-tailwind" class="export-panel" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-sm btn-outline" onclick="copyExport('tailwind')">📋 复制</button>
+        </div>
+        <pre class="code-block" id="code-tailwind">${escapeHtml(tailwind)}</pre>
+      </div>
+      <div id="export-scss" class="export-panel" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-sm btn-outline" onclick="copyExport('scss')">📋 复制</button>
+        </div>
+        <pre class="code-block" id="code-scss">${escapeHtml(scss)}</pre>
+      </div>
+      <div id="export-tokens" class="export-panel" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button class="btn btn-sm btn-outline" onclick="copyExport('tokens')">📋 复制</button>
+          <button class="btn btn-sm btn-primary" style="margin-left:8px" onclick="downloadTokens()">⬇ 下载 JSON</button>
+        </div>
+        <pre class="code-block" id="code-tokens">${escapeHtml(tokens)}</pre>
+      </div>
+    </div>`;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ===== Export Generators =====
+function generateCSSVars(p) {
+  let css = ':root {\n  /* Primary */\n';
+  if (p.primary) {
+    css += `  --color-primary: ${p.primary.base};\n`;
+    css += `  --color-primary-light: ${p.primary.light};\n`;
+    css += `  --color-primary-dark: ${p.primary.dark};\n`;
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.primary[k]) css += `  --color-primary-${k}: ${p.primary[k]};\n`;
+    });
+  }
+  css += '\n  /* Secondary */\n';
+  if (p.secondary) {
+    css += `  --color-secondary: ${p.secondary.base};\n`;
+    css += `  --color-secondary-light: ${p.secondary.light};\n`;
+    css += `  --color-secondary-dark: ${p.secondary.dark};\n`;
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.secondary[k]) css += `  --color-secondary-${k}: ${p.secondary[k]};\n`;
+    });
+  }
+  css += '\n  /* Accent */\n';
+  if (p.accent) {
+    css += `  --color-accent: ${p.accent.base};\n`;
+    css += `  --color-accent-light: ${p.accent.light};\n`;
+    css += `  --color-accent-dark: ${p.accent.dark};\n`;
+  }
+  css += '\n  /* Neutral */\n';
+  if (p.neutral) {
+    css += `  --color-neutral: ${p.neutral.base};\n`;
+    ['50','100','200','300','400','500','600','700','800','900','950'].forEach(k => {
+      if (p.neutral[k]) css += `  --color-neutral-${k}: ${p.neutral[k]};\n`;
+    });
+  }
+  css += '\n  /* Semantic */\n';
+  if (p.semantic) {
+    css += `  --color-success: ${p.semantic.success};\n`;
+    css += `  --color-success-light: ${p.semantic.successLight};\n`;
+    css += `  --color-warning: ${p.semantic.warning};\n`;
+    css += `  --color-warning-light: ${p.semantic.warningLight};\n`;
+    css += `  --color-error: ${p.semantic.error};\n`;
+    css += `  --color-error-light: ${p.semantic.errorLight};\n`;
+    css += `  --color-info: ${p.semantic.info};\n`;
+    css += `  --color-info-light: ${p.semantic.infoLight};\n`;
+  }
+  css += '}';
+  return css;
+}
+
+function generateTailwind(p) {
+  const scaleObj = (obj) => {
+    const o = {};
+    ['50','100','200','300','400','500','600','700','800','900','950'].forEach(k => {
+      if (obj[k]) o[k] = obj[k];
+    });
+    if (obj.base) o.DEFAULT = obj.base;
+    return o;
+  };
+  
+  const config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: p.primary ? scaleObj(p.primary) : {},
+          secondary: p.secondary ? scaleObj(p.secondary) : {},
+          accent: p.accent ? { DEFAULT: p.accent.base, light: p.accent.light, dark: p.accent.dark } : {},
+          neutral: p.neutral ? scaleObj(p.neutral) : {},
+          success: p.semantic?.success || '#22c55e',
+          warning: p.semantic?.warning || '#f59e0b',
+          error: p.semantic?.error || '#ef4444',
+          info: p.semantic?.info || '#3b82f6'
+        }
+      }
+    }
+  };
+  
+  return `// tailwind.config.js\nmodule.exports = ${JSON.stringify(config, null, 2)}`;
+}
+
+function generateSCSS(p) {
+  let scss = '// Brand Colors - SCSS Variables\n\n';
+  scss += '// Primary\n';
+  if (p.primary) {
+    scss += `$primary: ${p.primary.base};\n$primary-light: ${p.primary.light};\n$primary-dark: ${p.primary.dark};\n`;
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.primary[k]) scss += `$primary-${k}: ${p.primary[k]};\n`;
+    });
+  }
+  scss += '\n// Secondary\n';
+  if (p.secondary) {
+    scss += `$secondary: ${p.secondary.base};\n$secondary-light: ${p.secondary.light};\n$secondary-dark: ${p.secondary.dark};\n`;
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.secondary[k]) scss += `$secondary-${k}: ${p.secondary[k]};\n`;
+    });
+  }
+  scss += '\n// Accent\n';
+  if (p.accent) scss += `$accent: ${p.accent.base};\n$accent-light: ${p.accent.light};\n$accent-dark: ${p.accent.dark};\n`;
+  scss += '\n// Neutral\n';
+  if (p.neutral) {
+    scss += `$neutral: ${p.neutral.base};\n`;
+    ['50','100','200','300','400','500','600','700','800','900','950'].forEach(k => {
+      if (p.neutral[k]) scss += `$neutral-${k}: ${p.neutral[k]};\n`;
+    });
+  }
+  scss += '\n// Semantic\n';
+  if (p.semantic) {
+    scss += `$success: ${p.semantic.success};\n$success-light: ${p.semantic.successLight};\n`;
+    scss += `$warning: ${p.semantic.warning};\n$warning-light: ${p.semantic.warningLight};\n`;
+    scss += `$error: ${p.semantic.error};\n$error-light: ${p.semantic.errorLight};\n`;
+    scss += `$info: ${p.semantic.info};\n$info-light: ${p.semantic.infoLight};\n`;
+  }
+  return scss;
+}
+
+function generateTokens(p) {
+  const tokens = {
+    color: {
+      primary: {},
+      secondary: {},
+      accent: {},
+      neutral: {},
+      semantic: {}
+    }
+  };
+  
+  if (p.primary) {
+    tokens.color.primary.base = { value: p.primary.base, type: 'color' };
+    tokens.color.primary.light = { value: p.primary.light, type: 'color' };
+    tokens.color.primary.dark = { value: p.primary.dark, type: 'color' };
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.primary[k]) tokens.color.primary[k] = { value: p.primary[k], type: 'color' };
+    });
+  }
+  if (p.secondary) {
+    tokens.color.secondary.base = { value: p.secondary.base, type: 'color' };
+    tokens.color.secondary.light = { value: p.secondary.light, type: 'color' };
+    tokens.color.secondary.dark = { value: p.secondary.dark, type: 'color' };
+    ['50','100','200','300','400','500','600','700','800','900'].forEach(k => {
+      if (p.secondary[k]) tokens.color.secondary[k] = { value: p.secondary[k], type: 'color' };
+    });
+  }
+  if (p.accent) {
+    tokens.color.accent = {
+      base: { value: p.accent.base, type: 'color' },
+      light: { value: p.accent.light, type: 'color' },
+      dark: { value: p.accent.dark, type: 'color' }
+    };
+  }
+  if (p.neutral) {
+    tokens.color.neutral.base = { value: p.neutral.base, type: 'color' };
+    ['50','100','200','300','400','500','600','700','800','900','950'].forEach(k => {
+      if (p.neutral[k]) tokens.color.neutral[k] = { value: p.neutral[k], type: 'color' };
+    });
+  }
+  if (p.semantic) {
+    tokens.color.semantic = {
+      success: { value: p.semantic.success, type: 'color' },
+      successLight: { value: p.semantic.successLight, type: 'color' },
+      warning: { value: p.semantic.warning, type: 'color' },
+      warningLight: { value: p.semantic.warningLight, type: 'color' },
+      error: { value: p.semantic.error, type: 'color' },
+      errorLight: { value: p.semantic.errorLight, type: 'color' },
+      info: { value: p.semantic.info, type: 'color' },
+      infoLight: { value: p.semantic.infoLight, type: 'color' }
+    };
+  }
+  return JSON.stringify(tokens, null, 2);
+}
+
+function switchExportTab(btn, format) {
+  btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.export-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('export-' + format).style.display = 'block';
+}
+
+function copyExport(format) {
+  const code = document.getElementById('code-' + format).textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('已复制 ' + format.toUpperCase() + ' 代码'));
+}
+
+function downloadExport(format) {
+  const code = document.getElementById('code-' + format).textContent;
+  const exts = { css: 'css', tailwind: 'js', scss: 'scss', tokens: 'json' };
+  const names = { css: 'brand-colors.css', tailwind: 'tailwind.config.js', scss: '_brand-colors.scss', tokens: 'design-tokens.json' };
+  const blob = new Blob([code], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = names[format] || 'export.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('已下载 ' + a.download);
+}
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

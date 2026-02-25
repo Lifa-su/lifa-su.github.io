@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate JSON Schema from sample JSON data automatically. Validate JSON against schemas, edit schema properties, and export for API documentation.">
+<link rel="canonical" href="https://lifa-su.com/ai-json-schema/">
+<title>AI JSON Schema Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--sf:#161b22;--bd:#30363d;--tx:#e6edf3;--mt:#8b949e;--ac:#58a6ff;--gn:#3fb950;--rd:#f85149;--yl:#d29922;--mn:'SF Mono','Cascadia Code','Fira Code',monospace}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+header h1{font-size:18px;font-weight:600}
+header h1 em{color:var(--ac);font-style:normal}
+.hb{display:flex;gap:8px;flex-wrap:wrap}
+button{background:var(--sf);color:var(--tx);border:1px solid var(--bd);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+button:hover{background:var(--bd)}
+button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.pr:hover{background:#79c0ff}
+.main{display:flex;flex:1;overflow:hidden}
+.pn{flex:1;display:flex;flex-direction:column;min-width:0}
+.ph{padding:10px 16px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--mt)}
+.dv{width:1px;background:var(--bd);flex-shrink:0}
+textarea,.co{width:100%;height:100%;background:transparent;color:var(--tx);border:none;resize:none;padding:16px;font-family:var(--mn);font-size:13px;line-height:1.6;outline:none;tab-size:2}
+textarea::placeholder{color:var(--mt)}
+.co{overflow:auto}
+.vb{padding:8px 16px;border-top:1px solid var(--bd);font-size:12px;display:flex;align-items:center;gap:8px;background:var(--sf);min-height:36px;flex-wrap:wrap}
+.dt{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dt.g{background:var(--gn)}.dt.r{background:var(--rd)}.dt.y{background:var(--yl)}.dt.x{background:var(--mt)}
+.ed{color:var(--rd);font-family:var(--mn);font-size:11px}
+.tb{display:flex;background:var(--sf);border-bottom:1px solid var(--bd)}
+.tb button{border:none;border-radius:0;border-bottom:2px solid transparent;padding:8px 16px;font-size:12px;color:var(--mt)}
+.tb button.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(88,166,255,.08)}
+.se{flex:1;overflow:auto;padding:16px}
+.se::-webkit-scrollbar{width:8px}
+.se::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+.pi{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px}
+.pi .nm{font-family:var(--mn);font-size:13px;color:var(--ac);font-weight:600}
+.pi .tp{font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--mn);display:inline-block}
+.ts{background:#1f3a5f;color:#79c0ff}
+.tn,.ti{background:#3b2e1a;color:var(--yl)}
+.tb2{background:#1a3b2e;color:var(--gn)}
+.to{background:#2d1f4e;color:#d2a8ff}
+.ta{background:#3b1a2e;color:#ff7b72}
+.tl{background:#2d2d2d;color:var(--mt)}
+.pc{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.pc label{font-size:12px;color:var(--mt);display:flex;align-items:center;gap:4px;cursor:pointer}
+.pc input[type=checkbox]{accent-color:var(--ac)}
+.pc select{background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:2px 6px;border-radius:4px;font-size:11px}
+.pd{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:4px 8px;border-radius:4px;font-size:12px;margin-top:6px;outline:none}
+.pd:focus{border-color:var(--ac)}
+.ns{margin-left:16px;margin-top:8px;padding-left:12px;border-left:2px solid var(--bd)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--gn);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+.hd{display:none!important}
+@media(max-width:768px){.main{flex-direction:column}.dv{width:100%;height:1px}.pn{min-height:40vh}}
+</style>
+</head>
+<body>
+<header>
+<h1>&#129504; <em>AI JSON Schema</em> Generator</h1>
+<div class="hb">
+<button onclick="loadExample()">&#128203; Example</button>
+<button onclick="validateJson()" class="pr">&#9989; Validate</button>
+<button onclick="copySchema()">&#128203; Copy Schema</button>
+</div>
+</header>
+<div class="main">
+<div class="pn">
+<div class="ph"><span>JSON Input</span><span style="font-size:11px">Paste your JSON data</span></div>
+<div style="flex:1;overflow:hidden">
+<textarea id="ji" placeholder="Paste your JSON here..."></textarea>
+</div>
+<div class="vb" id="vbar"><span class="dt x"></span><span style="color:var(--mt)">Paste JSON to generate schema</span></div>
+</div>
+<div class="dv"></div>
+<div class="pn">
+<div class="tb">
+<button class="on" onclick="stab('vis',this)">Visual Editor</button>
+<button onclick="stab('raw',this)">Raw Schema</button>
+</div>
+<div id="vis" class="se"></div>
+<div id="raw" class="hd" style="flex:1;overflow:hidden">
+<textarea id="so" class="co" readonly></textarea>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.12.0/ajv7.min.js"></script>
+<script>
+let schema=null,currentTab='vis';
+const ji=document.getElementById('ji'),so=document.getElementById('so'),vis=document.getElementById('vis'),raw=document.getElementById('raw'),vbar=document.getElementById('vbar');
+
+const EXAMPLE={
+  "user":{"name":"Alice","age":28,"email":"alice@example.com","active":true},
+  "tags":["developer","designer"],
+  "address":{"street":"123 Main St","city":"Springfield","zip":"62701"},
+  "scores":[95,87,92],
+  "metadata":null
+};
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+function stab(id,btn){
+  document.querySelectorAll('.tb button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(id==='vis'){vis.classList.remove('hd');raw.classList.add('hd');currentTab='vis'}
+  else{raw.classList.remove('hd');vis.classList.add('hd');currentTab='raw'}
+}
+
+function loadExample(){ji.value=JSON.stringify(EXAMPLE,null,2);generate()}
+
+function copySchema(){
+  if(!schema)return toast('No schema to copy');
+  navigator.clipboard.writeText(JSON.stringify(schema,null,2)).then(()=>toast('Schema copied!')).catch(()=>toast('Copy failed'))
+}
+
+function inferType(v){
+  if(v===null)return'null';
+  if(Array.isArray(v))return'array';
+  if(typeof v==='number')return Number.isInteger(v)?'integer':'number';
+  return typeof v;
+}
+
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function inferSchema(val,name){
+  const t=inferType(val);
+  const s={type:t};
+  if(name){s.title=capitalize(name.replace(/([A-Z])/g,' $1').replace(/[_-]/g,' ').trim());s.description='The '+name+' property'}
+  if(t==='object'&&val!==null){
+    s.properties={};s.required=[];
+    for(const[k,v]of Object.entries(val)){
+      s.properties[k]=inferSchema(v,k);
+      s.required.push(k);
+    }
+    if(!s.required.length)delete s.required;
+  }else if(t==='array'){
+    if(val.length>0){
+      const types=[...new Set(val.map(inferType))];
+      if(types.length===1)s.items=inferSchema(val[0]);
+      else s.items={oneOf:types.map(tp=>({type:tp}))};
+    }else s.items={};
+  }
+  return s;
+}
+
+function generate(){
+  const v=ji.value.trim();
+  if(!v){schema=null;so.value='';vis.innerHTML='';setVbar('x','Paste JSON to generate schema');return}
+  try{
+    const d=JSON.parse(v);
+    schema={"$schema":"http://json-schema.org/draft-07/schema#",...inferSchema(d,'root')};
+    so.value=JSON.stringify(schema,null,2);
+    renderVisual(schema);
+    setVbar('g','Schema generated successfully');
+  }catch(e){
+    schema=null;so.value='';vis.innerHTML='';
+    setVbar('r','Invalid JSON: '+e.message);
+  }
+}
+
+function setVbar(dot,msg){
+  vbar.innerHTML='<span class="dt '+dot+'"></span><span'+(dot==='r'?' class="ed"':'')+'>'+msg+'</span>';
+}
+
+function renderVisual(s){
+  vis.innerHTML='';
+  if(!s||!s.properties){vis.innerHTML='<div style="color:var(--mt);padding:20px;text-align:center">No object properties to display</div>';return}
+  renderProps(s,vis,'');
+}
+
+function renderProps(s,container,path){
+  const props=s.properties||{};
+  const req=s.required||[];
+  for(const[k,ps]of Object.entries(props)){
+    const fp=path?path+'.'+k:k;
+    const div=document.createElement('div');div.className='pi';
+    const tc=typeClass(ps.type);
+    div.innerHTML='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<span class="nm">'+k+'</span>'+
+      '<span class="tp '+tc+'">'+ps.type+'</span>'+
+      '</div>'+
+      '<div class="pc">'+
+      '<label><input type="checkbox" data-path="'+fp+'" data-action="req" '+(req.includes(k)?'checked':'')+' onchange="toggleReq(this)"> required</label>'+
+      '<label>type: <select data-path="'+fp+'" onchange="changeType(this)">'+
+      ['string','number','integer','boolean','object','array','null'].map(t=>'<option'+(t===ps.type?' selected':'')+'>'+t+'</option>').join('')+
+      '</select></label>'+
+      '</div>'+
+      '<input class="pd" type="text" placeholder="Description..." value="'+(ps.description||'')+'" data-path="'+fp+'" oninput="changeDesc(this)">';
+    container.appendChild(div);
+    if(ps.type==='object'&&ps.properties){
+      const nest=document.createElement('div');nest.className='ns';
+      div.appendChild(nest);
+      renderProps(ps,nest,fp);
+    }
+    if(ps.type==='array'&&ps.items&&ps.items.type==='object'&&ps.items.properties){
+      const nest=document.createElement('div');nest.className='ns';
+      const lbl=document.createElement('div');lbl.style.cssText='font-size:11px;color:var(--mt);margin-bottom:4px';lbl.textContent='items (object):';
+      nest.appendChild(lbl);
+      div.appendChild(nest);
+      renderProps(ps.items,nest,fp+'.items');
+    }
+  }
+}
+
+function typeClass(t){
+  const m={string:'ts',number:'tn',integer:'ti',boolean:'tb2',object:'to',array:'ta',null:'tl'};
+  return m[t]||'';
+}
+
+function getByPath(obj,p){
+  const parts=p.split('.');let c=obj;
+  for(const k of parts){
+    if(c.properties&&c.properties[k])c=c.properties[k];
+    else if(k==='items'&&c.items)c=c.items;
+    else return null;
+  }
+  return c;
+}
+
+function getParent(obj,p){
+  const parts=p.split('.');
+  if(parts.length===1)return obj;
+  let c=obj;
+  for(let i=0;i<parts.length-1;i++){
+    const k=parts[i];
+    if(c.properties&&c.properties[k])c=c.properties[k];
+    else if(k==='items'&&c.items)c=c.items;
+    else return null;
+  }
+  return c;
+}
+
+function toggleReq(el){
+  if(!schema)return;
+  const p=el.dataset.path,parts=p.split('.'),key=parts[parts.length-1];
+  const parent=getParent(schema,p);
+  if(!parent)return;
+  if(!parent.required)parent.required=[];
+  if(el.checked){if(!parent.required.includes(key))parent.required.push(key)}
+  else{parent.required=parent.required.filter(r=>r!==key);if(!parent.required.length)delete parent.required}
+  so.value=JSON.stringify(schema,null,2);
+}
+
+function changeType(el){
+  if(!schema)return;
+  const node=getByPath(schema,el.dataset.path);
+  if(node){node.type=el.value;so.value=JSON.stringify(schema,null,2)}
+}
+
+function changeDesc(el){
+  if(!schema)return;
+  const node=getByPath(schema,el.dataset.path);
+  if(node){if(el.value)node.description=el.value;else delete node.description;so.value=JSON.stringify(schema,null,2)}
+}
+
+function validateJson(){
+  if(!schema){setVbar('y','Generate a schema first');return}
+  const v=ji.value.trim();
+  if(!v){setVbar('y','No JSON to validate');return}
+  let data;
+  try{data=JSON.parse(v)}catch(e){setVbar('r','Invalid JSON: '+e.message);return}
+  try{
+    const ajv=new window.ajv7({allErrors:true,strict:false});
+    const valid=ajv.validate(schema,data);
+    if(valid){setVbar('g','Validation passed!')}
+    else{
+      const errs=ajv.errors.map(e=>e.instancePath+' '+e.message).join('; ');
+      setVbar('r','Validation failed: '+errs);
+    }
+  }catch(e){setVbar('r','Validation error: '+e.message)}
+}
+
+ji.addEventListener('input',function(){clearTimeout(this._t);this._t=setTimeout(generate,300)});
+
+// init
+generate();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

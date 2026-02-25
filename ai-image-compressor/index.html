@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Image Compressor — Free Online PNG/JPG/WebP Compression Tool</title>
+<meta name="description" content="Compress PNG, JPG and WebP images for free. Privacy-first: all processing happens in your browser. Batch compress, resize, convert formats and download as ZIP.">
+<meta name="keywords" content="image compressor, compress png, compress jpg, compress webp, image optimizer, batch compress, resize images, convert webp">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-image-compressor/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Image Compressor — Free Online Image Compression">
+<meta property="og:description" content="Compress PNG, JPG and WebP images for free. Privacy-first, browser-based batch compression with format conversion and resize.">
+<meta property="og:url" content="https://lifa-su.com/ai-image-compressor/">
+<meta property="og:site_name" content="AI Image Compressor">
+<meta property="og:image" content="https://lifa-su.com/ai-image-compressor/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Image Compressor — Free Online Image Compression">
+<meta name="twitter:description" content="Compress PNG, JPG and WebP images for free in your browser. Batch processing, format conversion, resize and ZIP download.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-image-compressor/og-image.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Image Compressor","url":"https://lifa-su.com/ai-image-compressor/","description":"Free online image compression tool. Compress PNG, JPG and WebP images in your browser with batch processing, format conversion and resize.","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"FeiDev","url":"https://ko-fi.com/feidev"}}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f1a;--bg2:#161625;--card:#1c1c30;--card2:#24243d;--accent:#7c6aff;--accent-h:#6b58f0;--accent2:#ff6b8a;--text:#eaeaf2;--text2:#8e8ea8;--border:#2e2e4a;--success:#3dd9b6;--warn:#ffb347;--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.3)}
+[data-theme=light]{--bg:#f5f5fa;--bg2:#ebebf2;--card:#ffffff;--card2:#f0f0f8;--accent:#6c5ce7;--accent-h:#5a4bd6;--accent2:#e84393;--text:#1a1a2e;--text2:#6b6b8a;--border:#d8d8e8;--success:#00b894;--warn:#f39c12;--shadow:0 4px 24px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+.container{max-width:960px;margin:0 auto;padding:20px 16px}
+header{display:flex;align-items:center;justify-content:space-between;padding:28px 0 24px;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo h1{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-icon{font-size:1.6rem}
+.header-right{display:flex;align-items:center;gap:12px}
+.theme-toggle{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:1.1rem;color:var(--text);transition:all .2s;display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:500}
+.theme-toggle:hover{border-color:var(--accent);background:var(--card2)}
+.subtitle{text-align:center;color:var(--text2);font-size:.95rem;margin-bottom:24px}
+.drop-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:48px 20px;text-align:center;cursor:pointer;transition:all .3s;background:var(--card);margin-bottom:20px;position:relative}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(124,106,255,.06)}
+.drop-zone.dragover::after{content:'Drop images here';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(124,106,255,.12);border-radius:var(--radius);font-size:1.2rem;font-weight:600;color:var(--accent)}
+.dz-icon{font-size:2.8rem;margin-bottom:10px;opacity:.8}
+.dz-text{font-size:.95rem;color:var(--text2)}
+.dz-text b{color:var(--accent);cursor:pointer}
+.dz-hint{font-size:.78rem;color:var(--text2);opacity:.6;margin-top:6px}
+.drop-zone input{display:none}
+.panel{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:20px;display:none;border:1px solid var(--border)}
+.panel.show{display:block}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.panel-grid{grid-template-columns:1fr}}
+.field label{display:block;font-size:.8rem;color:var(--text2);margin-bottom:6px;font-weight:500}
+.field select,.field input[type=number]{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:.88rem;outline:none;transition:border .2s}
+.field select:focus,.field input[type=number]:focus{border-color:var(--accent)}
+.slider-row{display:flex;align-items:center;gap:14px}
+.slider-row label{font-size:.8rem;color:var(--text2);white-space:nowrap;font-weight:500}
+.slider-row input[type=range]{flex:1;min-width:120px;accent-color:var(--accent);height:6px}
+.quality-val{font-size:1rem;font-weight:700;color:var(--accent);min-width:44px;text-align:right}
+.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{padding:10px 20px;border:none;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-h)}
+.btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent)}
+.btn-danger{background:rgba(255,107,138,.15);color:var(--accent2);border:1px solid rgba(255,107,138,.2)}.btn-danger:hover{background:rgba(255,107,138,.25)}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn-sm{padding:7px 14px;font-size:.78rem;border-radius:8px}
+.stats-bar{background:var(--card);border-radius:var(--radius);padding:14px 20px;margin-bottom:20px;display:none;justify-content:center;gap:28px;flex-wrap:wrap;border:1px solid var(--border)}
+.stats-bar.show{display:flex}
+.stat{text-align:center}
+.stat .num{font-size:1.3rem;font-weight:700;color:var(--accent)}
+.stat .lbl{font-size:.72rem;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.results{display:grid;gap:14px;margin-bottom:24px}
+.result-card{background:var(--card);border-radius:var(--radius);padding:14px;display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;border:1px solid var(--border);transition:border .2s}
+.result-card:hover{border-color:var(--accent)}
+.thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;background:var(--card2)}
+.info{min-width:0}
+.info .name{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info .sizes{display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;font-size:.8rem;color:var(--text2)}
+.info .sizes .orig{text-decoration:line-through;opacity:.5}
+.info .sizes .comp{color:var(--success);font-weight:600}
+.info .sizes .dim{opacity:.5}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-weight:600;font-size:.72rem;margin-top:4px}
+.badge-good{background:rgba(61,217,182,.12);color:var(--success)}
+.badge-mid{background:rgba(124,106,255,.12);color:var(--accent)}
+.badge-warn{background:rgba(255,179,71,.12);color:var(--warn)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.compare-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9998;align-items:center;justify-content:center;padding:20px}
+.compare-modal-bg.show{display:flex}
+.compare-modal{background:var(--card);border-radius:20px;padding:24px;max-width:800px;width:100%;border:1px solid var(--border);position:relative;max-height:90vh;overflow:auto}
+.compare-modal h3{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.compare-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:1.3rem;cursor:pointer}
+.compare-container{position:relative;width:100%;overflow:hidden;border-radius:12px;background:var(--bg);aspect-ratio:16/10;max-height:60vh}
+.compare-container img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain}
+.compare-container .img-after{clip-path:inset(0 0 0 50%)}
+.compare-slider{position:absolute;top:0;bottom:0;width:3px;background:var(--accent);left:50%;cursor:ew-resize;z-index:10}
+.compare-slider::after{content:'⟨⟩';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--accent);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.compare-labels{display:flex;justify-content:space-between;margin-top:8px;font-size:.78rem;color:var(--text2)}
+.pro-section{margin:24px 0;position:relative;border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-section:hover{transform:translateY(-2px)}
+.pro-inner{filter:blur(4px);pointer-events:none;opacity:.6;padding:20px;background:var(--card);border-radius:var(--radius)}
+.pro-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:600px){.pro-grid{grid-template-columns:1fr}}
+.pro-item{background:var(--bg);border-radius:12px;padding:16px;text-align:center}
+.pro-item .pi-icon{font-size:1.6rem;margin-bottom:6px}
+.pro-item .pi-title{font-size:.82rem;font-weight:600;color:var(--text2);margin-bottom:6px}
+.pro-item .pi-bar{height:5px;background:var(--border);border-radius:3px;margin-top:6px;overflow:hidden}
+.pro-item .pi-bar span{display:block;height:100%;background:var(--accent);border-radius:3px}
+.pro-item .pi-code{text-align:left;font-family:'SF Mono',Monaco,monospace;font-size:.68rem;color:var(--text2);background:var(--card2);padding:8px;border-radius:8px;line-height:1.5;margin-top:6px}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(15,15,26,.5);border-radius:var(--radius);border:2px dashed rgba(124,106,255,.35)}
+.pro-lock{font-size:2.2rem;margin-bottom:6px}
+.pro-label{font-size:1.05rem;font-weight:700}
+.pro-sublabel{font-size:.82rem;color:var(--text2);margin-top:4px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--card);border-radius:20px;padding:28px;max-width:400px;width:100%;text-align:center;border:1px solid var(--border);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.modal h2{font-size:1.2rem;margin-bottom:4px}
+.modal .price{font-size:2rem;font-weight:800;color:var(--accent);margin:10px 0}
+.modal ul{list-style:none;text-align:left;margin:16px 0}
+.modal li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;display:flex;align-items:center;gap:8px}
+.modal li:last-child{border-bottom:none}
+.modal li .li-i{font-size:1rem;flex-shrink:0}
+.btn-cta{display:block;width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:16px;transition:background .2s;text-decoration:none;text-align:center}
+.btn-cta:hover{background:var(--accent-h)}
+.btn-later{display:block;width:100%;padding:8px;background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;margin-top:6px}
+.btn-later:hover{color:var(--text)}
+.shortcuts{background:var(--card);border-radius:var(--radius);padding:14px 20px;margin-bottom:20px;border:1px solid var(--border)}
+.shortcuts summary{font-size:.82rem;color:var(--text2);cursor:pointer;font-weight:500;list-style:none;display:flex;align-items:center;gap:6px}
+.shortcuts summary::-webkit-details-marker{display:none}
+.shortcuts .sc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px;margin-top:10px}
+@media(max-width:600px){.shortcuts .sc-grid{grid-template-columns:1fr}}
+.sc-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--text2)}
+.sc-item kbd{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:.72rem;font-family:inherit;color:var(--text);font-weight:500}
+footer{text-align:center;padding:32px 0 20px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.privacy-note{font-size:.72rem;opacity:.5;margin-top:6px}
+@media(max-width:600px){
+header{padding:20px 0 16px}
+.logo h1{font-size:1.2rem}
+.result-card{grid-template-columns:50px 1fr;gap:10px}
+.thumb{width:50px;height:50px}
+.actions{grid-column:1/-1}
+.btn-row{flex-direction:column}
+.btn-row .btn{width:100%;justify-content:center}
+.stats-bar{gap:16px;padding:12px 16px}
+.stat .num{font-size:1.1rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div class="logo"><span class="logo-icon">🖼️</span><h1>AI Image Compressor</h1></div>
+<div class="header-right">
+<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">🌙 Dark</button>
+</div>
+</header>
+<p class="subtitle">Compress PNG, JPG &amp; WebP images for free. 100% private — processed in your browser.</p>
+
+<div class="drop-zone" id="dropZone">
+<div class="dz-icon">📁</div>
+<div class="dz-text">Drag &amp; drop images here or <b id="browseBtn">browse files</b></div>
+<div class="dz-hint">Supports PNG, JPG, WebP • Multiple files OK</div>
+<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple>
+</div>
+
+<div class="panel" id="controls">
+<div class="slider-row" style="margin-bottom:14px">
+<label>Quality:</label>
+<input type="range" id="quality" min="1" max="100" value="80">
+<div class="quality-val" id="qualityVal">80%</div>
+</div>
+<div class="panel-grid">
+<div class="field">
+<label for="outputFmt">Output Format</label>
+<select id="outputFmt">
+<option value="auto">Keep Original</option>
+<option value="image/webp">Convert to WebP</option>
+<option value="image/jpeg">Convert to JPG</option>
+<option value="image/png">Convert to PNG</option>
+</select>
+</div>
+<div class="field">
+<label for="maxWidth">Max Width (px)</label>
+<input type="number" id="maxWidth" placeholder="No limit" min="1" max="10000">
+</div>
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" id="compressBtn" onclick="compressAll()">⚡ Compress All</button>
+<button class="btn btn-secondary" id="zipBtn" onclick="downloadZip()" style="display:none">📦 Download ZIP</button>
+<button class="btn btn-danger" onclick="clearAll()">🗑️ Clear</button>
+</div>
+</div>
+
+<div class="stats-bar" id="statsBar">
+<div class="stat"><div class="num" id="sCount">0</div><div class="lbl">Images</div></div>
+<div class="stat"><div class="num" id="sOrig">0</div><div class="lbl">Original</div></div>
+<div class="stat"><div class="num" id="sComp">0</div><div class="lbl">Compressed</div></div>
+<div class="stat"><div class="num" id="sSaved">0%</div><div class="lbl">Saved</div></div>
+</div>
+
+<div class="results" id="results"></div>
+
+<!-- Pro Section -->
+<div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
+<div class="pro-inner">
+<div class="pro-grid">
+<div class="pro-item"><div class="pi-icon">⚡</div><div class="pi-title">Batch API Access</div><div class="pi-code">POST /api/compress<br>{ "format": "webp" }</div></div>
+<div class="pro-item"><div class="pi-icon">🖼️</div><div class="pi-title">AVIF/HEIC Support</div><div class="pi-bar"><span style="width:70%"></span></div><div class="pi-bar" style="margin-top:4px"><span style="width:45%"></span></div></div>
+<div class="pro-item"><div class="pi-icon">🧠</div><div class="pi-title">Smart Compression AI</div><div class="pi-bar"><span style="width:85%"></span></div><div class="pi-bar" style="margin-top:4px"><span style="width:60%"></span></div></div>
+</div>
+</div>
+<div class="pro-overlay">
+<div class="pro-lock">🔒</div>
+<div class="pro-label">Pro Features</div>
+<div class="pro-sublabel">Batch API, AVIF/HEIC &amp; AI-powered compression</div>
+</div>
+</div>
+
+<!-- Pro Modal -->
+<div class="modal-bg" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="modal">
+<h2>🖼️ Image Compressor Pro</h2>
+<p style="color:var(--text2);font-size:.85rem">Professional image optimization toolkit</p>
+<div class="price">$14</div>
+<ul>
+<li><span class="li-i">⚡</span>Batch API — integrate compression into your workflow</li>
+<li><span class="li-i">🖼️</span>AVIF &amp; HEIC — next-gen format support</li>
+<li><span class="li-i">🧠</span>Smart AI — auto-optimize quality per image</li>
+<li><span class="li-i">📐</span>Advanced Resize — smart crop &amp; aspect ratio</li>
+<li><span class="li-i">♾️</span>Lifetime access — one-time payment</li>
+</ul>
+<a class="btn-cta" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Support on Ko-fi — $14</a>
+<button class="btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+
+<!-- Compare Modal -->
+<div class="compare-modal-bg" id="compareModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="compare-modal">
+<h3>🔍 Before / After</h3>
+<button class="compare-close" onclick="document.getElementById('compareModal').classList.remove('show')">&times;</button>
+<div class="compare-container" id="compareContainer">
+<img id="cmpBefore" src="" alt="Original">
+<img id="cmpAfter" src="" class="img-after" alt="Compressed">
+<div class="compare-slider" id="cmpSlider"></div>
+</div>
+<div class="compare-labels"><span id="cmpLabelBefore">Original</span><span id="cmpLabelAfter">Compressed</span></div>
+</div>
+</div>
+
+<details class="shortcuts">
+<summary>⌨️ Keyboard Shortcuts</summary>
+<div class="sc-grid">
+<div class="sc-item"><kbd>Ctrl/⌘</kbd>+<kbd>O</kbd> Open files</div>
+<div class="sc-item"><kbd>Ctrl/⌘</kbd>+<kbd>Enter</kbd> Compress all</div>
+<div class="sc-item"><kbd>Ctrl/⌘</kbd>+<kbd>S</kbd> Download ZIP</div>
+<div class="sc-item"><kbd>Ctrl/⌘</kbd>+<kbd>L</kbd> Clear all</div>
+</div>
+</details>
+</div>
+
+<footer>
+<div class="container">
+<p>Made with ❤️ by <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">FeiDev</a></p>
+<p class="privacy-note">All images are processed locally in your browser. Nothing is uploaded to any server.</p>
+</div>
+</footer>
+<script>
+// Theme
+function toggleTheme(){
+  const d=document.documentElement, btn=document.getElementById('themeBtn');
+  const isLight=d.getAttribute('data-theme')==='light';
+  if(isLight){d.removeAttribute('data-theme');btn.textContent='🌙 Dark';localStorage.setItem('theme','dark');}
+  else{d.setAttribute('data-theme','light');btn.textContent='☀️ Light';localStorage.setItem('theme','light');}
+}
+(function(){
+  const t=localStorage.getItem('theme');
+  if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('themeBtn').textContent='☀️ Light';}
+})();
+
+// State
+const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),controls=document.getElementById('controls'),qualitySlider=document.getElementById('quality'),qualityVal=document.getElementById('qualityVal'),resultsDiv=document.getElementById('results'),statsBar=document.getElementById('statsBar'),zipBtn=document.getElementById('zipBtn');
+let files=[],compressed=[],origUrls=[];
+
+function formatSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB';}
+
+qualitySlider.addEventListener('input',()=>{qualityVal.textContent=qualitySlider.value+'%';});
+
+// File handling
+document.getElementById('browseBtn').addEventListener('click',(e)=>{e.stopPropagation();fileInput.click();});
+dropZone.addEventListener('click',(e)=>{if(e.target.id!=='browseBtn')fileInput.click();});
+dropZone.addEventListener('dragover',(e)=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>{dropZone.classList.remove('dragover');});
+dropZone.addEventListener('drop',(e)=>{e.preventDefault();dropZone.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+fileInput.addEventListener('change',()=>{handleFiles(fileInput.files);fileInput.value='';});
+
+function handleFiles(fl){
+  const arr=[...fl].filter(f=>f.type.match(/^image\/(png|jpeg|webp)$/));
+  if(!arr.length)return;
+  arr.forEach(f=>{
+    const i=files.length;
+    files.push(f);compressed.push(null);origUrls.push(URL.createObjectURL(f));
+    const card=document.createElement('div');card.className='result-card';card.id='card-'+i;
+    const img=document.createElement('img');img.className='thumb';img.src=origUrls[i];img.alt=f.name;
+    const info=document.createElement('div');info.className='info';
+    const dims=document.createElement('span');dims.className='dim-info';dims.style.display='none';
+    info.innerHTML='<div class="name" title="'+f.name+'">'+f.name+'</div><div class="sizes"><span class="orig">'+formatSize(f.size)+'</span></div>';
+    info.appendChild(dims);
+    const acts=document.createElement('div');acts.className='actions';
+    acts.innerHTML='<span class="btn btn-sm btn-secondary" style="opacity:.5">Waiting...</span>';
+    card.appendChild(img);card.appendChild(info);card.appendChild(acts);
+    resultsDiv.appendChild(card);
+    // Get dimensions
+    const tmpImg=new Image();
+    tmpImg.onload=function(){dims.textContent=tmpImg.naturalWidth+'×'+tmpImg.naturalHeight;dims.style.display='inline';dims.style.cssText='display:block;font-size:.72rem;color:var(--text2);opacity:.5;margin-top:2px';};
+    tmpImg.src=origUrls[i];
+  });
+  controls.classList.add('show');
+  updateStats();
+}
+
+function compressAll(){
+  const q=qualitySlider.value/100;
+  const fmt=document.getElementById('outputFmt').value;
+  const maxW=parseInt(document.getElementById('maxWidth').value)||0;
+  const btn=document.getElementById('compressBtn');
+  btn.disabled=true;btn.textContent='⏳ Compressing...';
+  let done=0;
+  files.forEach((f,i)=>{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        const canvas=document.createElement('canvas');
+        let w=img.naturalWidth,h=img.naturalHeight;
+        if(maxW>0&&w>maxW){const r=maxW/w;w=maxW;h=Math.round(h*r);}
+        canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+        let outType=fmt==='auto'?f.type:fmt;
+        if(outType==='image/png'&&fmt==='auto'){outType='image/png';}
+        const useQ=(outType==='image/png')?undefined:q;
+        canvas.toBlob(function(blob){
+          const finalBlob=(blob&&blob.size<f.size)?blob:f;
+          const ext=outType==='image/png'?'.png':outType==='image/webp'?'.webp':'.jpg';
+          const newName=f.name.replace(/\.[^.]+$/,ext);
+          compressed[i]={blob:finalBlob,name:newName,url:URL.createObjectURL(finalBlob),w:w,h:h};
+          const card=document.getElementById('card-'+i);
+          if(!card){done++;return;}
+          const info=card.querySelector('.info');
+          const sizesDiv=info.querySelector('.sizes');
+          const ratio=((1-finalBlob.size/f.size)*100);
+          sizesDiv.innerHTML='<span class="orig">'+formatSize(f.size)+'</span><span class="comp">'+formatSize(finalBlob.size)+'</span>';
+          const oldBadge=info.querySelector('.badge');if(oldBadge)oldBadge.remove();
+          const badge=document.createElement('span');
+          badge.className='badge '+(ratio>30?'badge-good':ratio>0?'badge-mid':'badge-warn');
+          badge.textContent=(ratio>0?'-':'+')+Math.abs(ratio).toFixed(1)+'%';
+          info.appendChild(badge);
+          const acts=card.querySelector('.actions');
+          acts.innerHTML='<button class="btn btn-primary btn-sm" onclick="downloadOne('+i+')">⬇ Save</button><button class="btn btn-secondary btn-sm" onclick="showCompare('+i+')">🔍 Compare</button>';
+          done++;
+          if(done===files.length){btn.disabled=false;btn.textContent='⚡ Compress All';zipBtn.style.display='inline-flex';updateStats();}
+        },outType,useQ);
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function updateStats(){
+  const n=files.length;
+  const origTotal=files.reduce((a,f)=>a+f.size,0);
+  const compTotal=compressed.reduce((a,c)=>a+(c?c.blob.size:0),0);
+  document.getElementById('sCount').textContent=n;
+  document.getElementById('sOrig').textContent=formatSize(origTotal);
+  document.getElementById('sComp').textContent=compTotal?formatSize(compTotal):'-';
+  document.getElementById('sSaved').textContent=compTotal?((1-compTotal/origTotal)*100).toFixed(1)+'%':'-';
+  statsBar.classList.toggle('show',n>0);
+}
+
+function downloadOne(i){
+  const c=compressed[i];if(!c)return;
+  const a=document.createElement('a');a.href=c.url;a.download=c.name;a.click();
+}
+
+function downloadZip(){
+  const items=compressed.filter(Boolean);
+  if(!items.length)return;
+  const zip=new JSZip();
+  items.forEach(c=>zip.file(c.name,c.blob));
+  zip.generateAsync({type:'blob'}).then(b=>{
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='compressed-images.zip';a.click();
+  });
+}
+
+function clearAll(){
+  origUrls.forEach(u=>URL.revokeObjectURL(u));
+  compressed.forEach(c=>{if(c&&c.url)URL.revokeObjectURL(c.url);});
+  files=[];compressed=[];origUrls=[];
+  resultsDiv.innerHTML='';controls.classList.remove('show');statsBar.classList.remove('show');zipBtn.style.display='none';
+}
+
+// Compare slider
+function showCompare(i){
+  const c=compressed[i];if(!c)return;
+  const modal=document.getElementById('compareModal');
+  document.getElementById('cmpBefore').src=origUrls[i];
+  document.getElementById('cmpAfter').src=c.url;
+  document.getElementById('cmpLabelBefore').textContent='Original ('+formatSize(files[i].size)+')';
+  document.getElementById('cmpLabelAfter').textContent='Compressed ('+formatSize(c.blob.size)+')';
+  modal.classList.add('show');
+  initCompareSlider();
+}
+
+function initCompareSlider(){
+  const container=document.getElementById('compareContainer');
+  const slider=document.getElementById('cmpSlider');
+  const afterImg=document.getElementById('cmpAfter');
+  let dragging=false;
+  function setPos(x){
+    const rect=container.getBoundingClientRect();
+    let pct=Math.max(0,Math.min(1,(x-rect.left)/rect.width));
+    slider.style.left=pct*100+'%';
+    afterImg.style.clipPath='inset(0 0 0 '+pct*100+'%)';
+  }
+  function onDown(e){dragging=true;e.preventDefault();setPos(e.touches?e.touches[0].clientX:e.clientX);}
+  function onMove(e){if(!dragging)return;setPos(e.touches?e.touches[0].clientX:e.clientX);}
+  function onUp(){dragging=false;}
+  slider.onmousedown=onDown;slider.ontouchstart=onDown;
+  document.onmousemove=onMove;document.ontouchmove=onMove;
+  document.onmouseup=onUp;document.ontouchend=onUp;
+  // Reset position
+  slider.style.left='50%';afterImg.style.clipPath='inset(0 0 0 50%)';
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown',function(e){
+  const mod=e.metaKey||e.ctrlKey;
+  if(!mod)return;
+  if(e.key==='o'||e.key==='O'){e.preventDefault();fileInput.click();}
+  else if(e.key==='Enter'){e.preventDefault();if(files.length)compressAll();}
+  else if(e.key==='s'||e.key==='S'){e.preventDefault();if(compressed.filter(Boolean).length)downloadZip();}
+  else if(e.key==='l'||e.key==='L'){e.preventDefault();clearAll();}
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

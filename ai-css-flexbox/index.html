@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Flexbox Generator - Visual Flexbox Layout Builder & Code Generator</title>
+<meta name="description" content="Free online CSS Flexbox generator tool. Visually build flexbox layouts with real-time preview, customize container and item properties, and generate clean CSS code instantly.">
+<meta name="keywords" content="CSS flexbox generator, flexbox layout builder, CSS generator, flexbox playground, flexbox tool, CSS layout, flex container, flex items, web design tool">
+<meta name="author" content="AI CSS Flexbox Generator">
+<meta property="og:title" content="CSS Flexbox Generator - Visual Layout Builder">
+<meta property="og:description" content="Build flexbox layouts visually and generate CSS code instantly. Free online tool.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://lifa-su.com/ai-css-flexbox/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--radius:8px;--code-bg:#0d1117;--success:#4ade80;--warning:#fbbf24}
+html{font-size:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* Layout */
+.app{display:flex;flex-direction:column;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-size:1.3rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{font-size:.8rem;color:var(--text2)}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:320px;min-width:320px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:12px;flex-shrink:0}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.preview-area{flex:1;padding:20px;overflow:auto;display:flex;align-items:flex-start;justify-content:center}
+.code-panel{height:240px;min-height:120px;background:var(--code-bg);border-top:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;flex-shrink:0}
+
+/* Panels */
+.panel{margin-bottom:10px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.panel-header{background:var(--surface2);padding:8px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;font-weight:600;font-size:.85rem}
+.panel-header:hover{background:#1a4a7a}
+.panel-header .arrow{transition:transform .2s;font-size:.7rem}
+.panel-header.collapsed .arrow{transform:rotate(-90deg)}
+.panel-body{padding:10px 12px}
+.panel-body.hidden{display:none}
+
+/* Form Controls */
+.control-group{margin-bottom:8px}
+.control-group label{display:block;font-size:.75rem;color:var(--text2);margin-bottom:3px;font-weight:500}
+.control-row{display:flex;gap:6px;align-items:center}
+select,input[type="number"],input[type="text"]{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:5px 8px;border-radius:4px;font-size:.8rem;width:100%;outline:none;transition:border-color .2s}
+select:focus,input:focus{border-color:var(--accent)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aab' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
+.range-row{display:flex;align-items:center;gap:8px}
+.range-row input[type="range"]{flex:1}
+.range-val{font-size:.75rem;color:var(--accent);min-width:32px;text-align:right;font-weight:600}
+
+/* Buttons */
+.btn{padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#d63a52}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#1a4a7a}
+.btn-sm{padding:4px 8px;font-size:.72rem}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+
+/* Items Panel */
+.items-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.item-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px;margin-bottom:6px;position:relative}
+.item-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;cursor:pointer}
+.item-card-title{font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:6px}
+.item-color-dot{width:12px;height:12px;border-radius:50%;border:1px solid var(--border);flex-shrink:0}
+.item-card-body{display:none}
+.item-card.expanded .item-card-body{display:block}
+.item-props{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.item-props .control-group{margin-bottom:0}
+.color-input-wrap{display:flex;gap:4px;align-items:center}
+.color-input-wrap input[type="color"]{width:28px;height:24px;border:1px solid var(--border);border-radius:4px;padding:0;cursor:pointer;background:none}
+
+/* Preview */
+.preview-container{background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:16px;position:relative;resize:both;overflow:auto;min-width:200px;min-height:150px;width:90%;max-width:900px}
+.preview-container::after{content:'↘ resize';position:absolute;bottom:2px;right:8px;font-size:.6rem;color:var(--text2);pointer-events:none}
+.flex-container{display:flex;min-height:120px;width:100%;transition:all .15s}
+.flex-item{display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:.75rem;font-weight:700;color:#fff;min-width:30px;min-height:30px;position:relative;cursor:default;text-shadow:0 1px 2px rgba(0,0,0,.4);transition:all .15s;padding:8px}
+.flex-item .item-label{pointer-events:none}
+.flex-item .resize-handle{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:nwse-resize;opacity:0;transition:opacity .2s}
+.flex-item:hover .resize-handle{opacity:1}
+.flex-item .resize-handle::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-right:2px solid rgba(255,255,255,.5);border-bottom:2px solid rgba(255,255,255,.5)}
+
+/* Code Panel */
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.code-header h3{font-size:.85rem;font-weight:600}
+.code-body{flex:1;overflow:auto;padding:12px 16px;font-family:'SF Mono',Monaco,'Cascadia Code',Consolas,monospace;font-size:.78rem;line-height:1.6;white-space:pre;tab-size:2}
+.code-body .kw{color:#ff7b72}
+.code-body .prop{color:#79c0ff}
+.code-body .val{color:#a5d6ff}
+.code-body .sel{color:#7ee787}
+.code-body .punc{color:#8b949e}
+.code-body .cmt{color:#8b949e;font-style:italic}
+.copied-toast{position:fixed;top:20px;right:20px;background:var(--success);color:#000;padding:8px 16px;border-radius:var(--radius);font-size:.85rem;font-weight:600;z-index:999;opacity:0;transform:translateY(-10px);transition:all .3s}
+.copied-toast.show{opacity:1;transform:translateY(0)}
+
+/* Responsive */
+@media(max-width:900px){
+  .main{flex-direction:column}
+  .sidebar{width:100%;min-width:unset;max-height:45vh;border-right:none;border-bottom:1px solid var(--border)}
+  .preview-container{width:100%}
+  .code-panel{height:200px}
+}
+@media(max-width:500px){
+  header{padding:8px 12px}
+  header h1{font-size:1.1rem}
+  .sidebar{padding:8px}
+  .preview-area{padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>📐 CSS Flexbox Generator</h1>
+      <div class="subtitle">Visual Flexbox Layout Builder</div>
+    </div>
+    <a href="https://github.com/Lifa-su/ai-css-flexbox" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none">⭐ GitHub</a>
+  </header>
+  <div class="main">
+    <aside class="sidebar" id="sidebar">
+      <!-- Container Properties -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Container Properties <span class="arrow">▼</span>
+        </div>
+        <div class="panel-body">
+          <div class="control-group">
+            <label>flex-direction</label>
+            <select id="flexDirection" onchange="update()">
+              <option value="row">row</option>
+              <option value="row-reverse">row-reverse</option>
+              <option value="column">column</option>
+              <option value="column-reverse">column-reverse</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>flex-wrap</label>
+            <select id="flexWrap" onchange="update()">
+              <option value="nowrap">nowrap</option>
+              <option value="wrap">wrap</option>
+              <option value="wrap-reverse">wrap-reverse</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>justify-content</label>
+            <select id="justifyContent" onchange="update()">
+              <option value="flex-start">flex-start</option>
+              <option value="flex-end">flex-end</option>
+              <option value="center">center</option>
+              <option value="space-between">space-between</option>
+              <option value="space-around">space-around</option>
+              <option value="space-evenly">space-evenly</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>align-items</label>
+            <select id="alignItems" onchange="update()">
+              <option value="stretch">stretch</option>
+              <option value="flex-start">flex-start</option>
+              <option value="flex-end">flex-end</option>
+              <option value="center">center</option>
+              <option value="baseline">baseline</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>align-content</label>
+            <select id="alignContent" onchange="update()">
+              <option value="stretch">stretch</option>
+              <option value="flex-start">flex-start</option>
+              <option value="flex-end">flex-end</option>
+              <option value="center">center</option>
+              <option value="space-between">space-between</option>
+              <option value="space-around">space-around</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>row-gap</label>
+            <div class="range-row">
+              <input type="range" id="rowGap" min="0" max="60" value="10" oninput="update()">
+              <span class="range-val" id="rowGapVal">10px</span>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>column-gap</label>
+            <div class="range-row">
+              <input type="range" id="colGap" min="0" max="60" value="10" oninput="update()">
+              <span class="range-val" id="colGapVal">10px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flex Items -->
+      <div class="panel">
+        <div class="panel-header" onclick="togglePanel(this)">
+          Flex Items <span class="arrow">▼</span>
+        </div>
+        <div class="panel-body">
+          <div class="items-header">
+            <span style="font-size:.8rem;color:var(--text2)" id="itemCount">3 items</span>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-primary btn-sm" onclick="addItem()">+ Add</button>
+              <button class="btn btn-secondary btn-sm" onclick="resetItems()">Reset</button>
+            </div>
+          </div>
+          <div id="itemsList"></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="content">
+      <div class="preview-area">
+        <div class="preview-container" id="previewContainer">
+          <div class="flex-container" id="flexContainer"></div>
+        </div>
+      </div>
+      <div class="code-panel">
+        <div class="code-header">
+          <h3>Generated CSS</h3>
+          <button class="btn btn-primary btn-sm" onclick="copyCSS()">📋 Copy CSS</button>
+        </div>
+        <div class="code-body" id="codeOutput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="copied-toast" id="toast">Copied to clipboard!</div>
+
+<script>
+const COLORS = ['#e94560','#533483','#0f3460','#e9a545','#45e9a5','#a545e9','#4590e9','#e96045','#45e9e0','#8be945','#e945b8','#4545e9'];
+
+let items = [
+  {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[0],width:80,height:80},
+  {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[1],width:100,height:100},
+  {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[2],width:60,height:60},
+];
+
+function togglePanel(header) {
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+function addItem() {
+  if (items.length >= 12) return;
+  items.push({
+    order: 0, grow: 0, shrink: 1, basis: 'auto', alignSelf: 'auto',
+    color: COLORS[items.length % COLORS.length],
+    width: 60 + Math.floor(Math.random() * 40),
+    height: 60 + Math.floor(Math.random() * 40)
+  });
+  update();
+}
+
+function removeItem(i) {
+  if (items.length <= 1) return;
+  items.splice(i, 1);
+  update();
+}
+
+function resetItems() {
+  items = [
+    {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[0],width:80,height:80},
+    {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[1],width:100,height:100},
+    {order:0,grow:0,shrink:1,basis:'auto',alignSelf:'auto',color:COLORS[2],width:60,height:60},
+  ];
+  update();
+}
+
+function toggleItemCard(el) {
+  el.closest('.item-card').classList.toggle('expanded');
+}
+
+function updateItemProp(index, prop, value) {
+  if (prop === 'grow' || prop === 'shrink' || prop === 'order') value = parseInt(value) || 0;
+  items[index][prop] = value;
+  update();
+}
+
+function renderItemsList() {
+  const list = document.getElementById('itemsList');
+  document.getElementById('itemCount').textContent = items.length + ' item' + (items.length > 1 ? 's' : '');
+  list.innerHTML = items.map((item, i) => `
+    <div class="item-card" id="itemCard${i}">
+      <div class="item-card-header" onclick="toggleItemCard(this)">
+        <span class="item-card-title">
+          <span class="item-color-dot" style="background:${item.color}"></span>
+          Item ${i + 1}
+        </span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();removeItem(${i})" ${items.length<=1?'disabled':''}>✕</button>
+        </div>
+      </div>
+      <div class="item-card-body">
+        <div class="item-props">
+          <div class="control-group">
+            <label>order</label>
+            <input type="number" value="${item.order}" min="-10" max="10" onchange="updateItemProp(${i},'order',this.value)">
+          </div>
+          <div class="control-group">
+            <label>flex-grow</label>
+            <input type="number" value="${item.grow}" min="0" max="20" onchange="updateItemProp(${i},'grow',this.value)">
+          </div>
+          <div class="control-group">
+            <label>flex-shrink</label>
+            <input type="number" value="${item.shrink}" min="0" max="20" onchange="updateItemProp(${i},'shrink',this.value)">
+          </div>
+          <div class="control-group">
+            <label>flex-basis</label>
+            <input type="text" value="${item.basis}" onchange="updateItemProp(${i},'basis',this.value)" placeholder="auto, 100px, 50%">
+          </div>
+          <div class="control-group">
+            <label>align-self</label>
+            <select onchange="updateItemProp(${i},'alignSelf',this.value)">
+              ${['auto','flex-start','flex-end','center','baseline','stretch'].map(v=>`<option value="${v}"${item.alignSelf===v?' selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="control-group">
+            <label>color</label>
+            <div class="color-input-wrap">
+              <input type="color" value="${item.color}" onchange="updateItemProp(${i},'color',this.value)">
+              <span style="font-size:.72rem;color:var(--text2)">${item.color}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPreview() {
+  const c = document.getElementById('flexContainer');
+  const dir = document.getElementById('flexDirection').value;
+  const wrap = document.getElementById('flexWrap').value;
+  const jc = document.getElementById('justifyContent').value;
+  const ai = document.getElementById('alignItems').value;
+  const ac = document.getElementById('alignContent').value;
+  const rg = document.getElementById('rowGap').value;
+  const cg = document.getElementById('colGap').value;
+
+  c.style.flexDirection = dir;
+  c.style.flexWrap = wrap;
+  c.style.justifyContent = jc;
+  c.style.alignItems = ai;
+  c.style.alignContent = ac;
+  c.style.rowGap = rg + 'px';
+  c.style.columnGap = cg + 'px';
+
+  document.getElementById('rowGapVal').textContent = rg + 'px';
+  document.getElementById('colGapVal').textContent = cg + 'px';
+
+  c.innerHTML = items.map((item, i) => {
+    const basisStyle = item.basis === 'auto' ? '' : `flex-basis:${item.basis};`;
+    return `<div class="flex-item" style="
+      background:${item.color};
+      order:${item.order};
+      flex-grow:${item.grow};
+      flex-shrink:${item.shrink};
+      ${basisStyle}
+      align-self:${item.alignSelf};
+      width:${item.width}px;
+      height:${item.height}px;
+    " data-index="${i}">
+      <span class="item-label">${i + 1}</span>
+      <div class="resize-handle" onmousedown="startResize(event,${i})"></div>
+    </div>`;
+  }).join('');
+}
+
+function generateCSS() {
+  const dir = document.getElementById('flexDirection').value;
+  const wrap = document.getElementById('flexWrap').value;
+  const jc = document.getElementById('justifyContent').value;
+  const ai = document.getElementById('alignItems').value;
+  const ac = document.getElementById('alignContent').value;
+  const rg = document.getElementById('rowGap').value;
+  const cg = document.getElementById('colGap').value;
+
+  let css = `/* Flex Container */\n.container {\n  display: flex;\n`;
+  if (dir !== 'row') css += `  flex-direction: ${dir};\n`;
+  if (wrap !== 'nowrap') css += `  flex-wrap: ${wrap};\n`;
+  if (jc !== 'flex-start') css += `  justify-content: ${jc};\n`;
+  if (ai !== 'stretch') css += `  align-items: ${ai};\n`;
+  if (ac !== 'stretch') css += `  align-content: ${ac};\n`;
+  if (rg !== '0' || cg !== '0') {
+    if (rg === cg) css += `  gap: ${rg}px;\n`;
+    else css += `  row-gap: ${rg}px;\n  column-gap: ${cg}px;\n`;
+  }
+  css += `}\n`;
+
+  items.forEach((item, i) => {
+    const props = [];
+    if (item.order !== 0) props.push(`  order: ${item.order};`);
+    if (item.grow !== 0) props.push(`  flex-grow: ${item.grow};`);
+    if (item.shrink !== 1) props.push(`  flex-shrink: ${item.shrink};`);
+    if (item.basis !== 'auto') props.push(`  flex-basis: ${item.basis};`);
+    if (item.alignSelf !== 'auto') props.push(`  align-self: ${item.alignSelf};`);
+    if (props.length > 0) {
+      css += `\n/* Item ${i + 1} */\n.item-${i + 1} {\n${props.join('\n')}\n}\n`;
+    }
+  });
+
+  return css;
+}
+
+function highlightCSS(css) {
+  return css
+    .replace(/\/\*.*?\*\//g, m => `<span class="cmt">${m}</span>`)
+    .replace(/(\.[a-zA-Z0-9_-]+)/g, '<span class="sel">$1</span>')
+    .replace(/(display|flex-direction|flex-wrap|justify-content|align-items|align-content|gap|row-gap|column-gap|order|flex-grow|flex-shrink|flex-basis|align-self)(\s*:)/g, '<span class="prop">$1</span><span class="punc">$2</span>')
+    .replace(/:\s*([^;{}\n]+)/g, (m, v) => ': <span class="val">' + v + '</span>')
+    .replace(/[{}]/g, m => `<span class="punc">${m}</span>`);
+}
+
+function renderCode() {
+  const css = generateCSS();
+  document.getElementById('codeOutput').innerHTML = highlightCSS(css);
+}
+
+let rawCSS = '';
+function update() {
+  renderItemsList();
+  renderPreview();
+  renderCode();
+  rawCSS = generateCSS();
+}
+
+function copyCSS() {
+  navigator.clipboard.writeText(rawCSS).then(() => {
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  });
+}
+
+/* Resize items by dragging */
+let resizing = null;
+function startResize(e, index) {
+  e.preventDefault();
+  e.stopPropagation();
+  resizing = { index, startX: e.clientX, startY: e.clientY, startW: items[index].width, startH: items[index].height };
+  document.addEventListener('mousemove', onResize);
+  document.addEventListener('mouseup', stopResize);
+}
+function onResize(e) {
+  if (!resizing) return;
+  const dx = e.clientX - resizing.startX;
+  const dy = e.clientY - resizing.startY;
+  items[resizing.index].width = Math.max(30, resizing.startW + dx);
+  items[resizing.index].height = Math.max(30, resizing.startH + dy);
+  renderPreview();
+  renderCode();
+  rawCSS = generateCSS();
+}
+function stopResize() {
+  resizing = null;
+  document.removeEventListener('mousemove', onResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+
+/* Init */
+update();
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:960px;margin:30px auto;padding:0 20px}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-mock{padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;filter:blur(3px);-webkit-filter:blur(3px);opacity:.6;pointer-events:none;user-select:none}
+.pro-mock h3{font-size:1rem;margin-bottom:14px;color:#fff}
+.pro-mock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pro-mock-item{padding:14px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border)}
+.pro-mock-item .pm-title{font-size:.85rem;color:#ccc;margin-bottom:6px;font-weight:600}
+.pro-mock-item .pm-desc{font-size:.75rem;color:#666}
+.pro-lock-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px}
+.pro-lock-text{font-size:1.1rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-lock-sub{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:4px}
+.pro-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:420px;text-align:center;animation:proModalIn .3s ease}
+@keyframes proModalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h3{font-size:1.3rem;margin-bottom:4px;color:#fff}
+.pro-modal .pro-subtitle{font-size:.85rem;color:var(--text2);margin-bottom:8px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0 4px}
+.pro-modal .pro-price-note{font-size:.8rem;color:var(--text2);margin-bottom:16px}
+.pro-modal ul{list-style:none;text-align:left;margin:0 0 20px;padding:0}
+.pro-modal ul li{padding:10px 0;font-size:.9rem;color:#ddd;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✓';color:var(--accent);font-weight:700;font-size:1.1rem}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:opacity .2s}
+.pro-upgrade-btn:hover{opacity:.9}
+.pro-maybe-btn{background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-maybe-btn:hover{color:#fff}
+@media(max-width:700px){.pro-mock-grid{grid-template-columns:1fr}.pro-section{padding:0 12px}}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-mock">
+<h3>⚡ Pro Features</h3>
+<div class="pro-mock-grid">
+<div class="pro-mock-item"><div class="pm-title">📱 Responsive Breakpoints</div><div class="pm-desc">Preview and generate flexbox layouts for mobile, tablet, and desktop breakpoints</div></div>
+<div class="pro-mock-item"><div class="pm-title">📦 Component Library</div><div class="pm-desc">Save layouts as reusable components with categories and search</div></div>
+<div class="pro-mock-item"><div class="pm-title">⚛️ React/Vue Export</div><div class="pm-desc">Export layouts as React JSX or Vue SFC components with styled-components</div></div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>📐 CSS Flexbox Pro</h3>
+<div class="pro-subtitle">Production-ready flexbox workflow</div>
+<div class="pro-price">$14</div>
+<div class="pro-price-note">One-time payment · Lifetime access</div>
+<ul>
+<li>Responsive breakpoint previews</li>
+<li>Reusable component library</li>
+<li>React JSX & Vue SFC export</li>
+<li>Styled-components output</li>
+<li>Priority support & updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $14</a>
+<button class="pro-maybe-btn" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

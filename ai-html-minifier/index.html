@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI HTML Minifier - Compress HTML, CSS &amp; JavaScript Online</title>
+<meta name="description" content="Free online tool to minify HTML, CSS and JavaScript. Reduce file size instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-html-minifier/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column}
+.hd{text-align:center;padding:24px 16px 16px}.hd h1{font-size:1.8rem;color:#e94560;margin-bottom:6px}.hd p{color:#888;font-size:.95rem}
+.ct{max-width:1100px;width:100%;margin:0 auto;padding:0 16px 24px;flex:1}
+.tabs{display:flex;gap:8px;margin-bottom:16px;justify-content:center;flex-wrap:wrap}
+.tab{padding:10px 28px;border:2px solid #333;background:0 0;color:#aaa;border-radius:8px;cursor:pointer;font-size:.95rem;transition:all .2s}
+.tab:hover{border-color:#e94560;color:#e94560}.tab.active{background:#e94560;border-color:#e94560;color:#fff}
+.opts{display:flex;gap:16px;margin-bottom:16px;justify-content:center;flex-wrap:wrap;font-size:.9rem}
+.opts label{display:flex;align-items:center;gap:6px;cursor:pointer;color:#aaa}
+.opts input[type=checkbox]{accent-color:#e94560;width:16px;height:16px}
+.ew{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.eb{display:flex;flex-direction:column}
+.el{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.85rem;color:#888}
+.el span:last-child{color:#e94560;font-weight:600}
+textarea{width:100%;height:320px;background:#16213e;border:2px solid #333;border-radius:10px;color:#e0e0e0;padding:14px;font-family:'Fira Code',Consolas,monospace;font-size:.88rem;resize:vertical;outline:0;transition:border-color .2s;line-height:1.5}
+textarea:focus{border-color:#e94560}textarea::placeholder{color:#555}
+.acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.btn{padding:12px 32px;border:none;border-radius:8px;font-size:.95rem;cursor:pointer;font-weight:600;transition:all .2s}
+.bp{background:#e94560;color:#fff}.bp:hover{background:#c73652}
+.bs{background:#16213e;color:#e0e0e0;border:2px solid #333}.bs:hover{border-color:#e94560;color:#e94560}
+.stats{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.sc{background:#16213e;border:2px solid #333;border-radius:10px;padding:16px 24px;text-align:center;min-width:140px}
+.sc .lb{font-size:.8rem;color:#888;margin-bottom:4px}.sc .vl{font-size:1.3rem;font-weight:700;color:#e94560}.sc .vl.gr{color:#0f3}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#e94560;color:#fff;padding:12px 28px;border-radius:8px;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.ft{text-align:center;padding:16px;color:#555;font-size:.8rem}
+@media(max-width:700px){.ew{grid-template-columns:1fr}textarea{height:220px}.hd h1{font-size:1.4rem}.sc{min-width:100px;padding:12px 16px}.sc .vl{font-size:1.1rem}.btn{padding:10px 20px;font-size:.88rem}}
+</style>
+</head>
+<body>
+<div class="hd"><h1>&#9889; AI HTML Minifier</h1><p>Paste your code and get instant minification</p></div>
+<div class="ct">
+<div class="tabs">
+<button class="tab active" data-mode="html">HTML</button>
+<button class="tab" data-mode="css">CSS</button>
+<button class="tab" data-mode="js">JavaScript</button>
+</div>
+<div class="opts" id="optsArea"></div>
+<div class="ew">
+<div class="eb"><div class="el"><span>Input</span><span id="isz">0 bytes</span></div><textarea id="inp" placeholder="Paste your code here..." aria-label="Code input"></textarea></div>
+<div class="eb"><div class="el"><span>Output</span><span id="osz">0 bytes</span></div><textarea id="out" placeholder="Minified output appears here..." readonly aria-label="Minified output"></textarea></div>
+</div>
+<div class="stats">
+<div class="sc"><div class="lb">Original</div><div class="vl" id="s1">0 B</div></div>
+<div class="sc"><div class="lb">Minified</div><div class="vl" id="s2">0 B</div></div>
+<div class="sc"><div class="lb">Saved</div><div class="vl gr" id="s3">0%</div></div>
+</div>
+<div class="acts">
+<button class="btn bp" onclick="doMinify()">Minify</button>
+<button class="btn bs" onclick="doCopy()">Copy Output</button>
+<button class="btn bs" onclick="doClear()">Clear</button>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="ft">&copy; 2026 AI HTML Minifier</div>
+<script>
+var mode='html';
+function $(s){return document.querySelector(s)}
+function $$(s){return document.querySelectorAll(s)}
+function fmtSz(b){return b<1024?b+' B':(b/1024).toFixed(2)+' KB'}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+function gOpt(id){var e=$('#'+id);return e?e.checked:true}
+
+function buildOpts(){
+var a=$('#optsArea'),h='';
+if(mode==='html'){
+h='<label><input type="checkbox" id="opt-quotes" checked> Remove attribute quotes</label>';
+h+='<label><input type="checkbox" id="opt-comments" checked> Remove comments</label>';
+h+='<label><input type="checkbox" id="opt-ws" checked> Collapse whitespace</label>';
+}else if(mode==='css'){
+h='<label><input type="checkbox" id="opt-comments" checked> Remove comments</label>';
+h+='<label><input type="checkbox" id="opt-ws" checked> Remove whitespace</label>';
+h+='<label><input type="checkbox" id="opt-merge" checked> Merge shorthand</label>';
+}else{
+h='<label><input type="checkbox" id="opt-comments" checked> Remove comments</label>';
+h+='<label><input type="checkbox" id="opt-ws" checked> Remove whitespace</label>';
+h+='<label><input type="checkbox" id="opt-vars" checked> Shorten variables</label>';
+}
+a.innerHTML=h;
+$$('#optsArea input').forEach(function(c){c.addEventListener('change',doMinify)});
+}
+
+function minHTML(s){
+var o=s;
+if(gOpt('opt-comments'))o=o.replace(/<!--[\s\S]*?-->/g,'');
+if(gOpt('opt-ws')){o=o.replace(/\s+/g,' ');o=o.replace(/>\s+</g,'><');o=o.trim()}
+if(gOpt('opt-quotes'))o=o.replace(/(\s\w+)="([a-zA-Z0-9_\-\.]+)"/g,'$1=$2');
+return o;
+}
+
+function minCSS(s){
+var o=s;
+if(gOpt('opt-comments'))o=o.replace(/\/\*[\s\S]*?\*\//g,'');
+if(gOpt('opt-ws')){o=o.replace(/\s+/g,' ');o=o.replace(/\s*([{}:;,>~+])\s*/g,'$1');o=o.replace(/;}/g,'}');o=o.trim()}
+if(gOpt('opt-merge')){
+o=o.replace(/margin-top:([^;]+);margin-right:([^;]+);margin-bottom:([^;]+);margin-left:([^;]+)/g,'margin:$1 $2 $3 $4');
+o=o.replace(/padding-top:([^;]+);padding-right:([^;]+);padding-bottom:([^;]+);padding-left:([^;]+)/g,'padding:$1 $2 $3 $4');
+}
+return o;
+}
+
+function minJS(s){
+var o=s;
+if(gOpt('opt-comments')){o=o.replace(/\/\/[^\n]*/g,'');o=o.replace(/\/\*[\s\S]*?\*\//g,'')}
+if(gOpt('opt-ws')){
+var strs=[];var idx=0;
+o=o.replace(/(["'`])(?:(?!\1|\\).|\\.)*\1/g,function(m){var k='__S'+idx+'__';strs.push(m);idx++;return k});
+o=o.replace(/\s+/g,' ');o=o.replace(/\s*([{}();,=+\-*/<>!&|?:])\s*/g,'$1');
+for(var i=0;i<strs.length;i++)o=o.replace('__S'+i+'__',strs[i]);
+o=o.trim();
+}
+if(gOpt('opt-vars')){
+var vars=['_a','_b','_c','_d','_e','_f','_g','_h','_i','_j','_k','_l','_m'];
+var found={};var vi=0;
+var re=/\b(?:var|let|const)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;var m;
+while((m=re.exec(o))!==null){
+var vn=m[1];
+if(!found[vn]&&vn.length>2&&vi<vars.length){found[vn]=vars[vi];vi++}
+}
+for(var orig in found){
+o=o.replace(new RegExp('\\b'+orig+'\\b','g'),found[orig]);
+}
+}
+return o;
+}
+
+function doMinify(){
+var inp=$('#inp').value;
+if(!inp){$('#out').value='';updStats(0,0);return}
+var res='';
+if(mode==='html')res=minHTML(inp);
+else if(mode==='css')res=minCSS(inp);
+else res=minJS(inp);
+$('#out').value=res;
+updStats(new Blob([inp]).size,new Blob([res]).size);
+}
+
+function updStats(orig,mini){
+$('#isz').textContent=fmtSz(orig);
+$('#osz').textContent=fmtSz(mini);
+$('#s1').textContent=fmtSz(orig);
+$('#s2').textContent=fmtSz(mini);
+var pct=orig>0?((1-mini/orig)*100).toFixed(1):0;
+$('#s3').textContent=pct+'%';
+}
+
+function doCopy(){
+var o=$('#out').value;
+if(!o){toast('Nothing to copy');return}
+navigator.clipboard.writeText(o).then(function(){toast('Copied!')}).catch(function(){
+$('#out').select();document.execCommand('copy');toast('Copied!')});
+}
+
+function doClear(){$('#inp').value='';$('#out').value='';updStats(0,0)}
+
+$$('.tab').forEach(function(t){t.addEventListener('click',function(){
+$$('.tab').forEach(function(b){b.classList.remove('active')});
+t.classList.add('active');mode=t.dataset.mode;buildOpts();doMinify()})});
+
+$('#inp').addEventListener('input',doMinify);
+buildOpts();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

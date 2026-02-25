@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CSS writing-mode generator for vertical and horizontal text layouts. Preview text direction changes for CJK languages and creative typography designs.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-writing-mode/">
+<title>CSS Writing Mode Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+a{color:var(--ac)}
+.hd{text-align:center;padding:2.5rem 1rem 1.5rem;background:linear-gradient(135deg,var(--bg),var(--sf))}
+.hd h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
+.hd p{color:var(--tx2);font-size:.95rem}
+.ct{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start}
+@media(max-width:768px){.ct{grid-template-columns:1fr;padding:1rem}}
+.pn{background:var(--sf);border-radius:var(--r);padding:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06)}
+.pn h2{font-size:1.05rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.cg{margin-bottom:1.2rem}
+.cg>label{display:block;font-size:.85rem;color:var(--tx2);margin-bottom:.5rem;font-weight:500}
+.dc{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.di{cursor:pointer;padding:.7rem;border-radius:8px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);transition:all .2s;text-align:center}
+.di:hover{border-color:var(--ac);transform:translateY(-1px)}
+.di.on{border-color:var(--ac);background:rgba(233,69,96,.1);box-shadow:0 0 16px rgba(233,69,96,.12)}
+.di em{font-size:1.5rem;font-style:normal;display:block;margin-bottom:.2rem}
+.di small{font-size:.72rem;color:var(--tx2);display:block}
+.di.on small{color:var(--ac)}
+.rg{display:flex;flex-wrap:wrap;gap:.5rem}
+.rg span{cursor:pointer;padding:.4rem .75rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--tx);transition:all .2s}
+.rg span:hover{border-color:var(--ac)}
+.rg span.on{border-color:var(--ac);background:rgba(233,69,96,.12);color:var(--ac)}
+.cb{position:relative;background:#0d1117;border-radius:8px;padding:1rem;margin-top:.5rem;font-family:Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;color:#c9d1d9;overflow-x:auto;border:1px solid rgba(255,255,255,.06);white-space:pre}
+.cp{position:absolute;top:.5rem;right:.5rem;background:var(--ac);color:#fff;border:none;padding:.35rem .75rem;border-radius:6px;cursor:pointer;font-size:.75rem;opacity:.85}
+.cp:hover{opacity:1}
+.cp.ok{background:#2ea043}
+.tb{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
+.tb span{padding:.4rem .85rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:.8rem;color:var(--tx2);transition:all .2s}
+.tb span:hover{border-color:var(--ac)}
+.tb span.on{background:rgba(233,69,96,.12);border-color:var(--ac);color:var(--ac)}
+.pb{background:rgba(0,0,0,.2);border-radius:10px;padding:1.5rem;min-height:220px;border:1px dashed rgba(255,255,255,.1);overflow:auto;max-height:500px}
+.ft{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.8rem}
+@media(max-width:480px){.hd h1{font-size:1.4rem}.pb{min-height:160px;padding:1rem}}
+</style>
+</head>
+<body>
+<div class="hd"><h1>CSS Writing Mode Generator</h1><p>实时预览水平、垂直、混合书写方向</p></div>
+<div class="ct">
+<div class="pn">
+<h2>⚙️ Settings</h2>
+<div class="cg"><label>Writing Mode</label><div class="dc" id="mc"></div></div>
+<div class="cg"><label>Text Orientation</label><div class="rg" id="og"></div></div>
+<div class="cg"><label>Direction</label><div class="rg" id="dg"></div></div>
+<div class="cg"><label>Generated CSS</label><div style="position:relative"><div class="cb" id="code"></div><button class="cp" id="cpb" onclick="copyCSS()">📋 Copy</button></div></div>
+</div>
+<div class="pn">
+<h2>👁️ Preview</h2>
+<div class="tb" id="tabs"></div>
+<div class="pb"><div id="prev" style="font-size:1.1rem;line-height:1.8"></div></div>
+</div>
+</div>
+<div class="ft">CSS Writing Mode Generator © 2026</div>
+<script>
+var S={mode:'horizontal-tb',orient:'mixed',dir:'ltr',lang:'zh'};
+var MODES=[
+{v:'horizontal-tb',i:'→',n:'horizontal-tb',d:'水平（默认）'},
+{v:'vertical-rl',i:'↓',n:'vertical-rl',d:'垂直右到左'},
+{v:'vertical-lr',i:'↓',n:'vertical-lr',d:'垂直左到右'},
+{v:'sideways-rl',i:'⟲',n:'sideways-rl',d:'侧向右到左'}
+];
+var ORI=[{v:'mixed',n:'mixed 混合'},{v:'upright',n:'upright 直立'},{v:'sideways',n:'sideways 侧向'}];
+var DIR=[{v:'ltr',n:'LTR →'},{v:'rtl',n:'RTL ←'}];
+var LANG=[
+{id:'zh',n:'中文',t:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。寒来暑往，秋收冬藏。闰余成岁，律吕调阳。'},
+{id:'ja',n:'日本語',t:'吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。'},
+{id:'en',n:'English',t:'The quick brown fox jumps over the lazy dog. Typography is the art and technique of arranging type to make written language legible and appealing.'},
+{id:'ar',n:'العربية',t:'في البدء كانت الكلمة، والكلمة كانت عند الله. الخط العربي فن جميل وعريق له تاريخ طويل.'}
+];
+function $(id){return document.getElementById(id)}
+function render(){
+  var mc=$('mc');mc.innerHTML='';
+  MODES.forEach(function(m){
+    var d=document.createElement('div');
+    d.className='di'+(S.mode===m.v?' on':'');
+    d.innerHTML='<em>'+m.i+'</em><small>'+m.n+'<br>'+m.d+'</small>';
+    d.onclick=function(){S.mode=m.v;render()};
+    mc.appendChild(d);
+  });
+  var og=$('og');og.innerHTML='';
+  ORI.forEach(function(o){
+    var s=document.createElement('span');
+    s.className=S.orient===o.v?'on':'';
+    s.textContent=o.n;
+    s.onclick=function(){S.orient=o.v;render()};
+    og.appendChild(s);
+  });
+  var dg=$('dg');dg.innerHTML='';
+  DIR.forEach(function(d){
+    var s=document.createElement('span');
+    s.className=S.dir===d.v?'on':'';
+    s.textContent=d.n;
+    s.onclick=function(){S.dir=d.v;render()};
+    dg.appendChild(s);
+  });
+  var tb=$('tabs');tb.innerHTML='';
+  LANG.forEach(function(l){
+    var s=document.createElement('span');
+    s.className=S.lang===l.id?'on':'';
+    s.textContent=l.n;
+    s.onclick=function(){S.lang=l.id;render()};
+    tb.appendChild(s);
+  });
+  var css='writing-mode: '+S.mode+';\ntext-orientation: '+S.orient+';\ndirection: '+S.dir+';';
+  $('code').textContent=css;
+  var p=$('prev');
+  p.style.writingMode=S.mode;
+  p.style.textOrientation=S.orient;
+  p.style.direction=S.dir;
+  var txt=LANG.find(function(l){return l.id===S.lang});
+  p.textContent=txt?txt.t:'';
+}
+function copyCSS(){
+  var t=$('code').textContent;
+  navigator.clipboard.writeText(t).then(function(){
+    var b=$('cpb');b.textContent='✓ Copied';b.classList.add('ok');
+    setTimeout(function(){b.textContent='📋 Copy';b.classList.remove('ok')},1500);
+  });
+}
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

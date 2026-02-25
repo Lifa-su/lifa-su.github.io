@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive CSS text-overflow demo tool. Compare ellipsis, clip, and custom string overflow behaviors. Test with different container widths and white-space.">
+<link rel="canonical" href="https://lifa-su.com/ai-css-text-overflow/">
+<title>CSS Text Overflow 演示工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+.ct{max-width:960px;margin:0 auto;padding:20px 16px}
+header{text-align:center;padding:40px 0 24px}
+header h1{font-size:clamp(1.4rem,4vw,2rem);background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);margin-top:6px;font-size:.92rem}
+.panel{background:var(--sf);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.cg{margin-bottom:16px}.cg:last-child{margin-bottom:0}
+.cg>label{display:block;font-size:.82rem;color:var(--tx2);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{padding:7px 16px;border:2px solid var(--cd);background:transparent;color:var(--tx2);border-radius:6px;cursor:pointer;font-size:.88rem;transition:all .2s}
+.tabs button.on{border-color:var(--ac);color:var(--ac);background:rgba(233,69,96,.1)}
+.tabs button:hover{border-color:var(--ac);color:var(--tx)}
+.ntabs button{width:34px;height:34px;padding:0;font-size:.84rem}
+.sr{display:flex;align-items:center;gap:10px}
+.sr input[type=range]{flex:1;-webkit-appearance:none;height:5px;border-radius:3px;background:var(--cd);outline:none}
+.sr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ac);cursor:pointer}
+.sr input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--ac);cursor:pointer;border:none}
+.sv{min-width:48px;text-align:right;font-size:.88rem;color:var(--ac);font-weight:600}
+.ci{margin-top:8px;display:none}.ci.show{display:block}
+.ci input{padding:7px 10px;border:2px solid var(--cd);background:var(--bg);color:var(--tx);border-radius:6px;font-size:.88rem;outline:none;width:100%;max-width:280px}
+.ci input:focus{border-color:var(--ac)}
+textarea{width:100%;padding:8px 10px;border:2px solid var(--cd);background:var(--bg);color:var(--tx);border-radius:6px;font-size:.88rem;outline:none;resize:vertical;min-height:50px}
+textarea:focus{border-color:var(--ac)}
+.tg{display:flex;align-items:center;gap:10px}
+.sw{position:relative;width:42px;height:22px;cursor:pointer;display:inline-block}
+.sw input{opacity:0;width:0;height:0}
+.sw .sl{position:absolute;inset:0;background:var(--cd);border-radius:11px;transition:.3s}
+.sw .sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.sw input:checked+.sl{background:var(--ac)}
+.sw input:checked+.sl::before{transform:translateX(20px)}
+.tgl{font-size:.88rem}
+.pc{background:var(--sf);border-radius:var(--r);padding:18px;margin-bottom:12px;border:1px solid rgba(255,255,255,.04)}
+.pc h3{font-size:.82rem;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.pb{background:var(--bg);border-radius:6px;padding:14px;border:1px dashed rgba(255,255,255,.1);font-size:.95rem;color:var(--tx);transition:width .3s}
+.cs{position:relative}
+.cb{background:var(--bg);border-radius:6px;padding:14px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;overflow-x:auto;color:#c9d1d9;white-space:pre;tab-size:2}
+.cpb{position:absolute;top:14px;right:14px;padding:5px 12px;background:var(--ac);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s}
+.cpb:hover{background:#d63851}.cpb.ok{background:#2ecc71}
+h2{font-size:1rem;margin-bottom:14px;color:var(--tx2)}
+footer{text-align:center;padding:24px 0;color:var(--tx2);font-size:.78rem}
+@media(max-width:600px){.ct{padding:12px 10px}header{padding:24px 0 14px}.panel{padding:14px}.tabs button{padding:5px 10px;font-size:.8rem}.pc{padding:12px}.cb{font-size:.74rem;padding:10px}}
+</style>
+</head>
+<body>
+<div class="ct">
+<header><h1>CSS Text Overflow 演示工具</h1><p>ellipsis / clip / 自定义字符串 — 单行与多行截断实时预览</p></header>
+<div class="panel">
+  <div class="cg"><label>截断模式</label>
+    <div class="tabs" id="modeT"><button class="on" data-v="ellipsis">ellipsis</button><button data-v="clip">clip</button><button data-v="custom">自定义字符串</button></div>
+    <div class="ci" id="ciWrap"><input id="ciVal" type="text" value=" ▸▸" placeholder="自定义截断字符串"></div></div>
+  <div class="cg"><label>多行截断 (-webkit-line-clamp)</label>
+    <div class="tg"><label class="sw"><input type="checkbox" id="multiTg"><span class="sl"></span></label><span class="tgl" id="multiLbl">关闭（单行模式）</span></div>
+    <div id="clampWrap" style="margin-top:10px;display:none"><div class="tabs ntabs" id="clampT"></div></div></div>
+  <div class="cg"><label>容器宽度</label>
+    <div class="sr"><input type="range" id="widthR" min="100" max="900" value="400"><span class="sv" id="widthV">400px</span></div></div>
+  <div class="cg"><label>预览文本</label>
+    <textarea id="sampleTxt">这是一段用于演示CSS文本截断效果的示例文字。The quick brown fox jumps over the lazy dog. 通过调整控件可实时查看不同截断模式的效果。</textarea></div>
+</div>
+<h2>实时预览</h2><div id="previewArea"></div>
+<div class="panel cs" style="margin-top:20px"><h2>生成的 CSS 代码</h2><button class="cpb" id="copyBtn" onclick="copyCSS()">复制</button><div class="cb" id="codeOut"></div></div>
+<div class="panel" style="font-size:.88rem;color:var(--tx2);line-height:1.8">
+  <h2 style="color:var(--tx)">使用说明</h2>
+  <ul style="padding-left:18px;margin-top:6px">
+    <li><code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--ac)">ellipsis</code> — 省略号 (…) 表示截断</li>
+    <li><code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--ac)">clip</code> — 直接裁剪，无标记</li>
+    <li><code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--ac)">自定义字符串</code> — 用自定义文本替代省略号（仅 Firefox 支持）</li>
+    <li>开启多行截断后可选择 1-10 行的 <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:.8rem;color:var(--ac)">-webkit-line-clamp</code></li>
+    <li>拖动滑块调整容器宽度，实时观察截断变化</li>
+  </ul>
+</div>
+<footer><p>CSS Text Overflow Demo Tool — 在线交互式演示</p></footer>
+</div>
+<script>
+const modes=['ellipsis','clip','custom'];
+let curMode='ellipsis',multiLine=false,clampN=2,containerW=400;
+
+function $(s){return document.getElementById(s)}
+function qs(s){return document.querySelectorAll(s)}
+
+// Init clamp buttons
+(function(){const ct=$('clampT');for(let i=1;i<=10;i++){const b=document.createElement('button');b.textContent=i;b.dataset.v=i;if(i===2)b.classList.add('on');b.onclick=function(){ct.querySelectorAll('button').forEach(x=>x.classList.remove('on'));this.classList.add('on');clampN=+this.dataset.v;render()};ct.appendChild(b)}})();
+
+// Mode tabs
+$('modeT').addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON')return;
+  this.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  e.target.classList.add('on');
+  curMode=e.target.dataset.v;
+  $('ciWrap').className=curMode==='custom'?'ci show':'ci';
+  render();
+});
+
+// Multi-line toggle
+$('multiTg').addEventListener('change',function(){
+  multiLine=this.checked;
+  $('multiLbl').textContent=multiLine?'开启（多行模式）':'关闭（单行模式）';
+  $('clampWrap').style.display=multiLine?'block':'none';
+  render();
+});
+
+// Width slider
+$('widthR').addEventListener('input',function(){
+  containerW=+this.value;
+  $('widthV').textContent=containerW+'px';
+  render();
+});
+
+// Text & custom input
+$('sampleTxt').addEventListener('input',render);
+$('ciVal').addEventListener('input',render);
+
+function getOverflowVal(){
+  if(curMode==='ellipsis')return'ellipsis';
+  if(curMode==='clip')return'clip';
+  return'"'+$('ciVal').value.replace(/"/g,'\\"')+'"';
+}
+
+function genSingleCSS(mode){
+  const ov=mode==='ellipsis'?'ellipsis':mode==='clip'?'clip':'"'+$('ciVal').value.replace(/"/g,'\\"')+'"';
+  return`.text-truncate {
+  width: ${containerW}px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ${ov};
+}`;
+}
+
+function genMultiCSS(mode){
+  const ov=mode==='ellipsis'?'ellipsis':mode==='clip'?'clip':'"'+$('ciVal').value.replace(/"/g,'\\"')+'"';
+  return`.text-clamp {
+  width: ${containerW}px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${clampN};
+  text-overflow: ${ov};
+}`;
+}
+
+function applyStyle(el,mode){
+  const txt=$('sampleTxt').value;
+  el.textContent=txt;
+  el.style.width=containerW+'px';
+  el.style.maxWidth='100%';
+  el.style.overflow='hidden';
+  const ov=mode==='ellipsis'?'ellipsis':mode==='clip'?'clip':'"'+$('ciVal').value+'"';
+  el.style.textOverflow=ov;
+  if(!multiLine){
+    el.style.whiteSpace='nowrap';
+    el.style.display='block';
+    el.style.webkitLineClamp='';
+    el.style.webkitBoxOrient='';
+  }else{
+    el.style.whiteSpace='normal';
+    el.style.display='-webkit-box';
+    el.style.webkitBoxOrient='vertical';
+    el.style.webkitLineClamp=clampN;
+  }
+}
+
+function render(){
+  const area=$('previewArea');
+  area.innerHTML='';
+  const labels={ellipsis:'Ellipsis (…)',clip:'Clip',custom:'自定义: '+$('ciVal').value};
+  modes.forEach(function(m){
+    const card=document.createElement('div');card.className='pc';
+    const h=document.createElement('h3');h.textContent=labels[m];card.appendChild(h);
+    const box=document.createElement('div');box.className='pb';
+    applyStyle(box,m);
+    card.appendChild(box);area.appendChild(card);
+  });
+  // Code output
+  const code=modes.map(function(m){
+    return'/* '+labels[m]+' */\n'+(multiLine?genMultiCSS(m):genSingleCSS(m));
+  }).join('\n\n');
+  $('codeOut').textContent=code;
+}
+
+function copyCSS(){
+  const code=$('codeOut').textContent;
+  navigator.clipboard.writeText(code).then(function(){
+    const btn=$('copyBtn');btn.textContent='已复制!';btn.classList.add('ok');
+    setTimeout(function(){btn.textContent='复制';btn.classList.remove('ok')},1500);
+  });
+}
+
+render();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

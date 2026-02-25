@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://lifa-su.com/ai-summary-ext/popup.html">
+  <title>AI Summary</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- 设置面板 -->
+  <div id="settings-panel" class="hidden">
+    <div class="settings-header">
+      <h2>⚙️ 设置</h2>
+      <button id="close-settings" class="icon-btn" title="关闭">✕</button>
+    </div>
+    <div class="settings-body">
+      <label class="setting-label">DeepSeek API Key</label>
+      <div class="api-key-row">
+        <input type="password" id="api-key-input" placeholder="sk-..." spellcheck="false">
+        <button id="toggle-key-vis" class="icon-btn" title="显示/隐藏">👁</button>
+      </div>
+      <p class="hint">从 <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> 获取</p>
+      <label class="setting-label">默认摘要长度</label>
+      <select id="default-length">
+        <option value="short">简短 (~100字)</option>
+        <option value="medium" selected>标准 (~300字)</option>
+        <option value="long">详细 (~600字)</option>
+      </select>
+      <button id="save-settings" class="btn btn-primary btn-full">保存设置</button>
+    </div>
+  </div>
+
+  <!-- 历史面板 -->
+  <div id="history-panel" class="hidden">
+    <div class="settings-header">
+      <h2>📋 历史记录</h2>
+      <button id="close-history" class="icon-btn" title="关闭">✕</button>
+    </div>
+    <div id="history-list" class="history-list"></div>
+    <div id="history-empty" class="empty-state hidden">
+      <p>暂无摘要记录</p>
+    </div>
+    <button id="clear-history" class="btn btn-danger btn-full">清空历史</button>
+  </div>
+
+  <!-- 主面板 -->
+  <div id="main-panel">
+    <div class="header">
+      <div class="logo-row">
+        <span class="logo">📝</span>
+        <h1>AI Summary</h1>
+      </div>
+      <div class="header-actions">
+        <button id="btn-history" class="icon-btn" title="历史记录">📋</button>
+        <button id="btn-settings" class="icon-btn" title="设置">⚙️</button>
+      </div>
+    </div>
+
+    <!-- 使用次数 -->
+    <div id="usage-bar" class="usage-bar">
+      <span id="usage-text">今日剩余: 5/5 次</span>
+      <a href="#" id="upgrade-link" class="upgrade-link">升级 Pro ✨</a>
+    </div>
+
+    <!-- 摘要长度选择 -->
+    <div class="length-selector">
+      <button class="length-btn" data-length="short">简短</button>
+      <button class="length-btn active" data-length="medium">标准</button>
+      <button class="length-btn" data-length="long">详细</button>
+    </div>
+
+    <!-- 摘要按钮 -->
+    <button id="btn-summarize" class="btn btn-primary btn-full btn-summarize">
+      <span class="btn-text">✨ 一键摘要</span>
+      <span class="btn-loading hidden">
+        <span class="spinner"></span> 正在生成...
+      </span>
+    </button>
+
+    <!-- 结果区域 -->
+    <div id="result-area" class="result-area hidden">
+      <div id="page-title" class="page-title"></div>
+      <div id="summary-content" class="summary-content"></div>
+      <div class="result-actions">
+        <button id="btn-copy" class="btn btn-sm" title="复制">📋 复制</button>
+        <button id="btn-export" class="btn btn-sm" title="导出Markdown">📄 导出MD</button>
+        <button id="btn-retry" class="btn btn-sm" title="重新生成">🔄 重试</button>
+      </div>
+    </div>
+
+    <!-- 错误提示 -->
+    <div id="error-area" class="error-area hidden">
+      <p id="error-msg"></p>
+    </div>
+
+    <!-- 快捷键提示 -->
+    <div class="shortcut-hint">
+      <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> 快速摘要
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="popup.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

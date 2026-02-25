@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browser Support Checker - CSS & JS API Compatibility</title>
+<meta name="description" content="Check browser compatibility for CSS properties and JavaScript APIs.">
+<link rel="canonical" href="https://lifa-su.com/ai-browser-support/">
+<style>*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e6f0;--text2:#9498b0;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00b894;--yellow:#fdcb6e;--red:#e17055;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:1rem}
+.search-box{position:relative;margin:0 auto 30px;max-width:600px}
+.search-box input{width:100%;padding:16px 20px 16px 48px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:1.1rem;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box input::placeholder{color:var(--text2)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:1.2rem;pointer-events:none}
+.suggestions{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);max-height:300px;overflow-y:auto;z-index:10;display:none}
+.suggestions.show{display:block}
+.suggestions div{padding:10px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.suggestions div:hover,.suggestions div.active{background:var(--surface2)}
+.suggestions .tag{font-size:.75rem;padding:2px 8px;border-radius:4px;background:var(--accent);color:#fff;opacity:.8}
+.tag-js{background:var(--yellow)!important;color:#333!important}
+.categories{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.categories button{padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-size:.9rem;transition:all .2s}
+.categories button:hover,.categories button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.result-card h2{font-size:1.3rem;margin-bottom:4px;color:var(--accent2)}
+.result-card .type-badge{display:inline-block;font-size:.75rem;padding:2px 10px;border-radius:4px;margin-bottom:12px}
+.type-css{background:rgba(108,92,231,.2);color:var(--accent2)}
+.type-js{background:rgba(253,203,110,.2);color:var(--yellow)}
+.result-card .desc{color:var(--text2);margin-bottom:16px;font-size:.95rem}
+.browser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.browser-item{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;transition:transform .15s}
+.browser-item:hover{transform:translateY(-2px)}
+.browser-item .b-name{font-size:.85rem;color:var(--text2);margin-bottom:6px}
+.browser-item .b-status{font-size:1.4rem;margin-bottom:4px}
+.browser-item .b-version{font-size:.75rem;color:var(--text2)}
+.support-full{border-bottom:2px solid var(--green)}
+.support-partial{border-bottom:2px solid var(--yellow)}
+.support-none{border-bottom:2px solid var(--red)}
+.polyfill-box{background:var(--surface2);border-radius:8px;padding:16px;margin-top:12px}
+.polyfill-box h4{font-size:.9rem;color:var(--accent2);margin-bottom:8px}
+.polyfill-box p{font-size:.85rem;color:var(--text2)}
+.polyfill-box code{background:rgba(108,92,231,.15);padding:2px 6px;border-radius:4px;font-family:"SF Mono",Monaco,monospace;font-size:.85rem}
+.stats{display:flex;gap:20px;justify-content:center;margin:30px 0;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:1.8rem;font-weight:700;color:var(--accent2)}
+.stat .label{font-size:.8rem;color:var(--text2)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-state .icon{font-size:3rem;margin-bottom:16px}
+.empty-state p{font-size:1.1rem}
+.browse-all{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:30px}
+.browse-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .2s}
+.browse-item:hover{border-color:var(--accent);transform:translateY(-2px)}
+.browse-item .bi-name{font-weight:600;margin-bottom:4px}
+.browse-item .bi-type{font-size:.75rem;color:var(--text2)}
+.browse-item .bi-compat{margin-top:8px;font-size:1.1rem;letter-spacing:2px}
+.legend{display:flex;gap:16px;justify-content:center;margin:16px 0;font-size:.85rem;color:var(--text2);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+footer{text-align:center;padding:40px 0 20px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--accent2);text-decoration:none}
+@media(max-width:600px){header h1{font-size:1.5rem}.browser-grid{grid-template-columns:repeat(3,1fr)}.container{padding:12px}.browse-all{grid-template-columns:1fr}}</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>🌐 Browser Support Checker</h1>
+<p>Check CSS &amp; JavaScript API compatibility across browsers</p>
+</header>
+<div class="stats" id="stats"></div>
+<div class="legend">
+<span>✅ Full Support</span>
+<span>⚠️ Partial Support</span>
+<span>❌ No Support</span>
+</div>
+<div class="categories" id="categories">
+<button class="active" data-cat="all">All</button>
+<button data-cat="css">CSS</button>
+<button data-cat="js">JavaScript</button>
+</div>
+<div class="search-box">
+<span class="search-icon">🔍</span>
+<input type="text" id="search" placeholder="Search CSS property or JS API... (e.g. grid, fetch, flexbox)" autocomplete="off" aria-label="Search browser compatibility">
+<div class="suggestions" id="suggestions" role="listbox"></div>
+</div>
+<div id="results"></div>
+<div id="browse"></div>
+<div class="empty-state" id="empty" style="display:none">
+<div class="icon">🔍</div>
+<p>No results found. Try a different search term.</p>
+</div>
+</div>
+<footer>
+<p>Data based on caniuse.com &amp; MDN Web Docs. Last updated Feb 2025.</p>
+</footer>
+<script>
+const DB = [{"name": "CSS Grid", "type": "css", "desc": "Two-dimensional grid-based layout system", "browsers": {"Chrome": ["full", "57+"], "Firefox": ["full", "52+"], "Safari": ["full", "10.1+"], "Edge": ["full", "16+"], "Opera": ["full", "44+"], "IE": ["partial", "10+ (old spec)"]}, "polyfill": "Use Autoprefixer for IE10-11 old grid spec. Consider fallback with flexbox."}, {"name": "Flexbox", "type": "css", "desc": "One-dimensional flexible box layout", "browsers": {"Chrome": ["full", "29+"], "Firefox": ["full", "28+"], "Safari": ["full", "9+"], "Edge": ["full", "12+"], "Opera": ["full", "17+"], "IE": ["partial", "10-11 (prefix)"]}, "polyfill": "Use Autoprefixer. IE10-11 has many bugs - use flexbugs for known issues."}, {"name": "Container Queries", "type": "css", "desc": "Style elements based on container size instead of viewport", "browsers": {"Chrome": ["full", "105+"], "Firefox": ["full", "110+"], "Safari": ["full", "16+"], "Edge": ["full", "105+"], "Opera": ["full", "91+"], "IE": ["none", "-"]}, "polyfill": "Use container-query-polyfill from Google Chrome Labs."}, {"name": ":has() Selector", "type": "css", "desc": "Parent selector - select elements that contain specific children", "browsers": {"Chrome": ["full", "105+"], "Firefox": ["full", "121+"], "Safari": ["full", "15.4+"], "Edge": ["full", "105+"], "Opera": ["full", "91+"], "IE": ["none", "-"]}, "polyfill": "No reliable polyfill. Use JavaScript querySelector as fallback."}, {"name": "aspect-ratio", "type": "css", "desc": "Set preferred aspect ratio for an element", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "89+"], "Safari": ["full", "15+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "Use padding-top percentage hack: padding-top: 56.25% for 16:9."}, {"name": "backdrop-filter", "type": "css", "desc": "Apply filters to area behind an element", "browsers": {"Chrome": ["full", "76+"], "Firefox": ["full", "103+"], "Safari": ["full", "9+ (-webkit-)"], "Edge": ["full", "17+"], "Opera": ["full", "63+"], "IE": ["none", "-"]}, "polyfill": "Safari needs -webkit-backdrop-filter prefix. No IE fallback."}, {"name": "Scroll Snap", "type": "css", "desc": "Control scroll snapping behavior", "browsers": {"Chrome": ["full", "69+"], "Firefox": ["full", "68+"], "Safari": ["full", "11+"], "Edge": ["full", "79+"], "Opera": ["full", "56+"], "IE": ["partial", "10+ (old spec)"]}, "polyfill": "IE10+ supports old -ms-scroll-snap spec."}, {"name": "Subgrid", "type": "css", "desc": "Inherit parent grid tracks in nested grids", "browsers": {"Chrome": ["full", "117+"], "Firefox": ["full", "71+"], "Safari": ["full", "16+"], "Edge": ["full", "117+"], "Opera": ["full", "103+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Use named grid lines or explicit track sizes."}, {"name": "@layer", "type": "css", "desc": "Cascade layers for managing CSS specificity", "browsers": {"Chrome": ["full", "99+"], "Firefox": ["full", "97+"], "Safari": ["full", "15.4+"], "Edge": ["full", "99+"], "Opera": ["full", "85+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Use BEM or specificity management as fallback."}, {"name": "color-mix()", "type": "css", "desc": "Mix two colors in a given color space", "browsers": {"Chrome": ["full", "111+"], "Firefox": ["full", "113+"], "Safari": ["full", "16.2+"], "Edge": ["full", "111+"], "Opera": ["full", "97+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS plugin postcss-color-mix or pre-calculate colors."}, {"name": ":is() Selector", "type": "css", "desc": "Matches any element matching the selector list", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "78+"], "Safari": ["full", "14+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "Use :-webkit-any() / :-moz-any() as prefix fallbacks."}, {"name": ":where() Selector", "type": "css", "desc": "Like :is() but with zero specificity", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "78+"], "Safari": ["full", "14+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Write selectors with low specificity manually."}, {"name": "gap (flexbox)", "type": "css", "desc": "Gap property support in flexbox layouts", "browsers": {"Chrome": ["full", "84+"], "Firefox": ["full", "63+"], "Safari": ["full", "14.1+"], "Edge": ["full", "84+"], "Opera": ["full", "70+"], "IE": ["none", "-"]}, "polyfill": "Use margin on flex children as fallback."}, {"name": "overflow-wrap", "type": "css", "desc": "Control line breaking within words", "browsers": {"Chrome": ["full", "23+"], "Firefox": ["full", "49+"], "Safari": ["full", "7+"], "Edge": ["full", "18+"], "Opera": ["full", "12.1+"], "IE": ["full", "5.5+ (word-wrap)"]}, "polyfill": "Use word-wrap: break-word as fallback."}, {"name": "text-wrap: balance", "type": "css", "desc": "Balance text across multiple lines", "browsers": {"Chrome": ["full", "114+"], "Firefox": ["full", "121+"], "Safari": ["partial", "17.5+"], "Edge": ["full", "114+"], "Opera": ["full", "100+"], "IE": ["none", "-"]}, "polyfill": "Use JavaScript text-balancer library as polyfill."}, {"name": "View Transitions", "type": "css", "desc": "Animate transitions between DOM states", "browsers": {"Chrome": ["full", "111+"], "Firefox": ["full", "126+"], "Safari": ["partial", "18+"], "Edge": ["full", "111+"], "Opera": ["full", "97+"], "IE": ["none", "-"]}, "polyfill": "Use view-transitions-polyfill or custom FLIP animations."}, {"name": "Anchor Positioning", "type": "css", "desc": "Position elements relative to anchor elements", "browsers": {"Chrome": ["full", "125+"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["full", "125+"], "Opera": ["full", "111+"], "IE": ["none", "-"]}, "polyfill": "Use Floating UI/Popper.js for JavaScript-based positioning."}, {"name": "@scope", "type": "css", "desc": "Scoped styling with upper and lower boundaries", "browsers": {"Chrome": ["full", "118+"], "Firefox": ["none", "-"], "Safari": ["partial", "17.4+"], "Edge": ["full", "118+"], "Opera": ["full", "104+"], "IE": ["none", "-"]}, "polyfill": "Use BEM naming or CSS Modules for scoped styles."}, {"name": "CSS Nesting", "type": "css", "desc": "Native CSS nesting without preprocessors", "browsers": {"Chrome": ["full", "120+"], "Firefox": ["full", "117+"], "Safari": ["full", "17.2+"], "Edge": ["full", "120+"], "Opera": ["full", "106+"], "IE": ["none", "-"]}, "polyfill": "Use Sass, Less, or PostCSS nesting plugin."}, {"name": "clamp()", "type": "css", "desc": "Clamp a value between min and max", "browsers": {"Chrome": ["full", "79+"], "Firefox": ["full", "75+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "66+"], "IE": ["none", "-"]}, "polyfill": "Use calc() with min()/max() or set min/max separately."}, {"name": "CSS Variables", "type": "css", "desc": "Custom properties for reusable values", "browsers": {"Chrome": ["full", "49+"], "Firefox": ["full", "31+"], "Safari": ["full", "9.1+"], "Edge": ["full", "15+"], "Opera": ["full", "36+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS custom properties plugin or Sass variables."}, {"name": "position: sticky", "type": "css", "desc": "Element sticks during scroll within container", "browsers": {"Chrome": ["full", "56+"], "Firefox": ["full", "32+"], "Safari": ["full", "6.1+ (-webkit-)"], "Edge": ["full", "16+"], "Opera": ["full", "43+"], "IE": ["none", "-"]}, "polyfill": "Use stickyfill.js polyfill."}, {"name": "@supports", "type": "css", "desc": "Feature queries to test CSS support", "browsers": {"Chrome": ["full", "28+"], "Firefox": ["full", "22+"], "Safari": ["full", "9+"], "Edge": ["full", "12+"], "Opera": ["full", "12.1+"], "IE": ["none", "-"]}, "polyfill": "Use Modernizr for feature detection."}, {"name": "object-fit", "type": "css", "desc": "Control how replaced elements fit their container", "browsers": {"Chrome": ["full", "32+"], "Firefox": ["full", "36+"], "Safari": ["full", "10+"], "Edge": ["full", "16+"], "Opera": ["full", "19+"], "IE": ["none", "-"]}, "polyfill": "Use object-fit-images polyfill for IE."}, {"name": "mix-blend-mode", "type": "css", "desc": "Blend element with background", "browsers": {"Chrome": ["full", "41+"], "Firefox": ["full", "32+"], "Safari": ["full", "8+"], "Edge": ["full", "79+"], "Opera": ["full", "28+"], "IE": ["none", "-"]}, "polyfill": "No IE support. Use canvas-based blending or solid fallback."}, {"name": "clip-path", "type": "css", "desc": "Clip element to basic shape or SVG path", "browsers": {"Chrome": ["full", "55+"], "Firefox": ["full", "54+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "42+"], "IE": ["none", "-"]}, "polyfill": "Use SVG clipPath element for broader support."}, {"name": "CSS Logical Properties", "type": "css", "desc": "Direction-aware properties (inline/block)", "browsers": {"Chrome": ["full", "87+"], "Firefox": ["full", "66+"], "Safari": ["full", "15+"], "Edge": ["full", "87+"], "Opera": ["full", "73+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS Logical plugin for physical property fallbacks."}, {"name": "accent-color", "type": "css", "desc": "Customize form control accent colors", "browsers": {"Chrome": ["full", "93+"], "Firefox": ["full", "92+"], "Safari": ["full", "15.4+"], "Edge": ["full", "93+"], "Opera": ["full", "79+"], "IE": ["none", "-"]}, "polyfill": "Use custom-styled form controls as fallback."}, {"name": "color-scheme", "type": "css", "desc": "Indicate supported color schemes (light/dark)", "browsers": {"Chrome": ["full", "81+"], "Firefox": ["full", "96+"], "Safari": ["full", "13+"], "Edge": ["full", "81+"], "Opera": ["full", "68+"], "IE": ["none", "-"]}, "polyfill": "Use prefers-color-scheme media query with manual theme switching."}, {"name": "content-visibility", "type": "css", "desc": "Skip rendering of off-screen content", "browsers": {"Chrome": ["full", "85+"], "Firefox": ["full", "125+"], "Safari": ["partial", "18+"], "Edge": ["full", "85+"], "Opera": ["full", "71+"], "IE": ["none", "-"]}, "polyfill": "Use IntersectionObserver with lazy rendering as alternative."}, {"name": "@property", "type": "css", "desc": "Register custom properties with syntax and defaults", "browsers": {"Chrome": ["full", "85+"], "Firefox": ["full", "128+"], "Safari": ["full", "15.4+"], "Edge": ["full", "85+"], "Opera": ["full", "71+"], "IE": ["none", "-"]}, "polyfill": "Use CSS.registerProperty() JS API or Houdini polyfill."}, {"name": "scroll-timeline", "type": "css", "desc": "Animation timeline based on scroll progress", "browsers": {"Chrome": ["full", "115+"], "Firefox": ["full", "110+"], "Safari": ["none", "-"], "Edge": ["full", "115+"], "Opera": ["full", "101+"], "IE": ["none", "-"]}, "polyfill": "Use scroll-timeline-polyfill or GSAP ScrollTrigger."}, {"name": "text-decoration-thickness", "type": "css", "desc": "Control thickness of text decorations", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["full", "70+"], "Safari": ["full", "12.1+"], "Edge": ["full", "89+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Use border-bottom with padding-bottom as fallback."}, {"name": "overscroll-behavior", "type": "css", "desc": "Control scroll chaining and bounce effects", "browsers": {"Chrome": ["full", "63+"], "Firefox": ["full", "59+"], "Safari": ["full", "16+"], "Edge": ["full", "18+"], "Opera": ["full", "50+"], "IE": ["none", "-"]}, "polyfill": "Use JS to prevent scroll propagation as fallback."}, {"name": "@container style queries", "type": "css", "desc": "Query computed styles of container", "browsers": {"Chrome": ["partial", "111+"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["partial", "111+"], "Opera": ["partial", "97+"], "IE": ["none", "-"]}, "polyfill": "Very limited support. Use CSS custom properties with JS."}, {"name": "IntersectionObserver", "type": "js", "desc": "Observe element visibility in viewport", "browsers": {"Chrome": ["full", "51+"], "Firefox": ["full", "55+"], "Safari": ["full", "12.1+"], "Edge": ["full", "15+"], "Opera": ["full", "38+"], "IE": ["none", "-"]}, "polyfill": "Use intersection-observer polyfill from W3C."}, {"name": "ResizeObserver", "type": "js", "desc": "Observe element size changes", "browsers": {"Chrome": ["full", "64+"], "Firefox": ["full", "69+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "51+"], "IE": ["none", "-"]}, "polyfill": "Use resize-observer-polyfill or @juggle/resize-observer."}, {"name": "fetch API", "type": "js", "desc": "Modern HTTP request API replacing XMLHttpRequest", "browsers": {"Chrome": ["full", "42+"], "Firefox": ["full", "39+"], "Safari": ["full", "10.1+"], "Edge": ["full", "14+"], "Opera": ["full", "29+"], "IE": ["none", "-"]}, "polyfill": "Use whatwg-fetch or unfetch polyfill. Or use axios."}, {"name": "Promise", "type": "js", "desc": "Asynchronous operation handling", "browsers": {"Chrome": ["full", "32+"], "Firefox": ["full", "29+"], "Safari": ["full", "8+"], "Edge": ["full", "12+"], "Opera": ["full", "19+"], "IE": ["none", "-"]}, "polyfill": "Use es6-promise polyfill or bluebird for IE11."}, {"name": "async/await", "type": "js", "desc": "Syntactic sugar for Promises", "browsers": {"Chrome": ["full", "55+"], "Firefox": ["full", "52+"], "Safari": ["full", "10.1+"], "Edge": ["full", "15+"], "Opera": ["full", "42+"], "IE": ["none", "-"]}, "polyfill": "Use Babel to transpile to ES5 with regenerator-runtime."}, {"name": "Web Components", "type": "js", "desc": "Custom elements, Shadow DOM, templates", "browsers": {"Chrome": ["full", "67+"], "Firefox": ["full", "63+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "54+"], "IE": ["none", "-"]}, "polyfill": "Use @webcomponents/webcomponentsjs polyfill bundle."}, {"name": "Service Worker", "type": "js", "desc": "Background scripts for offline and caching", "browsers": {"Chrome": ["full", "40+"], "Firefox": ["full", "44+"], "Safari": ["full", "11.1+"], "Edge": ["full", "17+"], "Opera": ["full", "27+"], "IE": ["none", "-"]}, "polyfill": "No IE polyfill. Use AppCache (deprecated) as fallback."}, {"name": "WebSocket", "type": "js", "desc": "Full-duplex communication channel", "browsers": {"Chrome": ["full", "16+"], "Firefox": ["full", "11+"], "Safari": ["full", "7+"], "Edge": ["full", "12+"], "Opera": ["full", "12.1+"], "IE": ["full", "10+"]}, "polyfill": "Broadly supported. Use Socket.IO for fallback to polling."}, {"name": "Clipboard API", "type": "js", "desc": "Async clipboard read/write access", "browsers": {"Chrome": ["full", "66+"], "Firefox": ["full", "63+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "53+"], "IE": ["none", "-"]}, "polyfill": "Use clipboard-polyfill or document.execCommand('copy')."}, {"name": "Web Share API", "type": "js", "desc": "Native sharing dialog on supported platforms", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["none", "-"], "Safari": ["full", "12.1+"], "Edge": ["full", "93+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "No Firefox desktop. Provide custom share buttons as fallback."}, {"name": "Intl API", "type": "js", "desc": "Internationalization: number, date, collation formatting", "browsers": {"Chrome": ["full", "24+"], "Firefox": ["full", "29+"], "Safari": ["full", "10+"], "Edge": ["full", "12+"], "Opera": ["full", "15+"], "IE": ["partial", "11 (basic)"]}, "polyfill": "Use @formatjs/intl polyfills for older browsers."}, {"name": "structuredClone()", "type": "js", "desc": "Deep clone JavaScript objects", "browsers": {"Chrome": ["full", "98+"], "Firefox": ["full", "94+"], "Safari": ["full", "15.4+"], "Edge": ["full", "98+"], "Opera": ["full", "84+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or JSON.parse(JSON.stringify()) for simple objects."}, {"name": "Array.at()", "type": "js", "desc": "Access array elements with negative indexing", "browsers": {"Chrome": ["full", "92+"], "Firefox": ["full", "90+"], "Safari": ["full", "15.4+"], "Edge": ["full", "92+"], "Opera": ["full", "78+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or arr[arr.length - 1]."}, {"name": "Object.hasOwn()", "type": "js", "desc": "Check own property existence (replaces hasOwnProperty)", "browsers": {"Chrome": ["full", "93+"], "Firefox": ["full", "92+"], "Safari": ["full", "15.4+"], "Edge": ["full", "93+"], "Opera": ["full", "79+"], "IE": ["none", "-"]}, "polyfill": "Use Object.prototype.hasOwnProperty.call(obj, prop)."}, {"name": "crypto.randomUUID()", "type": "js", "desc": "Generate RFC 4122 v4 UUID", "browsers": {"Chrome": ["full", "92+"], "Firefox": ["full", "95+"], "Safari": ["full", "15.4+"], "Edge": ["full", "92+"], "Opera": ["full", "78+"], "IE": ["none", "-"]}, "polyfill": "Use uuid npm package or Math.random() based generator."}, {"name": "AbortController", "type": "js", "desc": "Cancel fetch requests and other async operations", "browsers": {"Chrome": ["full", "66+"], "Firefox": ["full", "57+"], "Safari": ["full", "12.1+"], "Edge": ["full", "16+"], "Opera": ["full", "53+"], "IE": ["none", "-"]}, "polyfill": "Use abortcontroller-polyfill for older browsers."}, {"name": "Proxy", "type": "js", "desc": "Intercept and customize object operations", "browsers": {"Chrome": ["full", "49+"], "Firefox": ["full", "18+"], "Safari": ["full", "10+"], "Edge": ["full", "12+"], "Opera": ["full", "36+"], "IE": ["none", "-"]}, "polyfill": "Use proxy-polyfill (limited). Cannot fully polyfill."}, {"name": "WeakRef", "type": "js", "desc": "Weak reference to an object", "browsers": {"Chrome": ["full", "84+"], "Firefox": ["full", "79+"], "Safari": ["full", "14.1+"], "Edge": ["full", "84+"], "Opera": ["full", "70+"], "IE": ["none", "-"]}, "polyfill": "No polyfill possible. Redesign to avoid weak references."}, {"name": "Top-level await", "type": "js", "desc": "Use await at module top level", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["full", "89+"], "Safari": ["full", "15+"], "Edge": ["full", "89+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Wrap in async IIFE: (async () => { await ... })()."}, {"name": "Array.findLast()", "type": "js", "desc": "Find last matching element in array", "browsers": {"Chrome": ["full", "97+"], "Firefox": ["full", "104+"], "Safari": ["full", "15.4+"], "Edge": ["full", "97+"], "Opera": ["full", "83+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or manual reverse iteration."}, {"name": "Navigator.share()", "type": "js", "desc": "Trigger native share dialog", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["none", "-"], "Safari": ["full", "12.1+"], "Edge": ["full", "93+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Feature-detect with navigator.share, fallback to custom UI."}, {"name": "Temporal API", "type": "js", "desc": "Modern date/time API replacing Date", "browsers": {"Chrome": ["none", "-"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["none", "-"], "Opera": ["none", "-"], "IE": ["none", "-"]}, "polyfill": "Use @js-temporal/polyfill. Still Stage 3 proposal."}, {"name": "import.meta", "type": "js", "desc": "Module metadata access", "browsers": {"Chrome": ["full", "64+"], "Firefox": ["full", "62+"], "Safari": ["full", "12+"], "Edge": ["full", "79+"], "Opera": ["full", "51+"], "IE": ["none", "-"]}, "polyfill": "Use bundler-specific alternatives like __dirname."}, {"name": "Optional Chaining (?.)", "type": "js", "desc": "Safe property access on nullish values", "browsers": {"Chrome": ["full", "80+"], "Firefox": ["full", "74+"], "Safari": ["full", "13.1+"], "Edge": ["full", "80+"], "Opera": ["full", "67+"], "IE": ["none", "-"]}, "polyfill": "Use Babel plugin @babel/plugin-proposal-optional-chaining."}, {"name": "Nullish Coalescing (??)", "type": "js", "desc": "Default value for null/undefined only", "browsers": {"Chrome": ["full", "80+"], "Firefox": ["full", "72+"], "Safari": ["full", "13.1+"], "Edge": ["full", "80+"], "Opera": ["full", "67+"], "IE": ["none", "-"]}, "polyfill": "Use Babel plugin @babel/plugin-proposal-nullish-coalescing-operator."}];
+const statusIcon = {full:'✅',partial:'⚠️',none:'❌'};
+const statusClass = {full:'support-full',partial:'support-partial',none:'support-none'};
+let currentFilter = 'all';
+let activeIdx = -1;
+
+const searchEl = document.getElementById('search');
+const suggestEl = document.getElementById('suggestions');
+const resultsEl = document.getElementById('results');
+const browseEl = document.getElementById('browse');
+const emptyEl = document.getElementById('empty');
+const statsEl = document.getElementById('stats');
+
+// Stats
+const cssCount = DB.filter(e=>e.t==='css').length;
+const jsCount = DB.filter(e=>e.t==='js').length;
+statsEl.innerHTML = `
+  <div class="stat"><div class="num">${DB.length}</div><div class="label">Total Features</div></div>
+  <div class="stat"><div class="num">${cssCount}</div><div class="label">CSS Properties</div></div>
+  <div class="stat"><div class="num">${jsCount}</div><div class="label">JS APIs</div></div>
+`;
+
+// Category filter
+document.getElementById('categories').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('.categories button').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentFilter = e.target.dataset.cat;
+  if (searchEl.value.trim()) doSearch(searchEl.value);
+  else showBrowse();
+});
+
+function getFiltered() {
+  return currentFilter === 'all' ? DB : DB.filter(e => e.t === currentFilter);
+}
+
+function quickCompat(item) {
+  const browsers = ['Chrome','Firefox','Safari','Edge','Opera','IE'];
+  return browsers.map(b => {
+    const s = item.b[b][0];
+    return statusIcon[s];
+  }).join('');
+}
+
+function renderCard(item) {
+  const browsers = ['Chrome','Firefox','Safari','Edge','Opera','IE'];
+  let grid = '';
+  browsers.forEach(b => {
+    const [s, v] = item.b[b];
+    grid += `<div class="browser-item ${statusClass[s]}">
+      <div class="b-name">${b}</div>
+      <div class="b-status">${statusIcon[s]}</div>
+      <div class="b-version">${v}</div>
+    </div>`;
+  });
+  let polyfill = '';
+  if (item.p) {
+    polyfill = `<div class="polyfill-box">
+      <h4>💡 Polyfill / Alternative</h4>
+      <p>${item.p}</p>
+    </div>`;
+  }
+  return `<div class="result-card">
+    <h2>${item.n}</h2>
+    <span class="type-badge type-${item.t}">${item.t === 'css' ? 'CSS' : 'JavaScript'}</span>
+    <p class="desc">${item.d}</p>
+    <div class="browser-grid">${grid}</div>
+    ${polyfill}
+  </div>`;
+}
+
+function showBrowse() {
+  const items = getFiltered();
+  let html = '<div class="browse-all">';
+  items.forEach(item => {
+    html += `<div class="browse-item" data-name="${item.n}">
+      <div class="bi-name">${item.n}</div>
+      <div class="bi-type">${item.t === 'css' ? 'CSS' : 'JavaScript'}</div>
+      <div class="bi-compat">${quickCompat(item)}</div>
+    </div>`;
+  });
+  html += '</div>';
+  browseEl.innerHTML = html;
+  resultsEl.innerHTML = '';
+  emptyEl.style.display = 'none';
+  // Click handler for browse items
+  browseEl.querySelectorAll('.browse-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const name = el.dataset.name;
+      searchEl.value = name;
+      doSearch(name);
+    });
+  });
+}
+
+function doSearch(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { showBrowse(); return; }
+  const items = getFiltered().filter(e =>
+    e.n.toLowerCase().includes(q) ||
+    e.d.toLowerCase().includes(q)
+  );
+  browseEl.innerHTML = '';
+  if (items.length === 0) {
+    resultsEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  resultsEl.innerHTML = items.map(renderCard).join('');
+}
+
+// Autocomplete suggestions
+function showSuggestions(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) { suggestEl.classList.remove('show'); return; }
+  const matches = getFiltered().filter(e =>
+    e.n.toLowerCase().includes(q) || e.d.toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (matches.length === 0) { suggestEl.classList.remove('show'); return; }
+  activeIdx = -1;
+  suggestEl.innerHTML = matches.map((m, i) =>
+    `<div role="option" data-idx="${i}" data-name="${m.n}">
+      <span>${m.n}</span>
+      <span class="tag ${m.t === 'js' ? 'tag-js' : ''}">${m.t === 'css' ? 'CSS' : 'JS'}</span>
+    </div>`
+  ).join('');
+  suggestEl.classList.add('show');
+  suggestEl.querySelectorAll('div').forEach(el => {
+    el.addEventListener('click', () => {
+      searchEl.value = el.dataset.name;
+      suggestEl.classList.remove('show');
+      doSearch(el.dataset.name);
+    });
+  });
+}
+
+searchEl.addEventListener('input', e => {
+  showSuggestions(e.target.value);
+  doSearch(e.target.value);
+});
+
+searchEl.addEventListener('keydown', e => {
+  const items = suggestEl.querySelectorAll('div');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIdx = Math.min(activeIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIdx = Math.max(activeIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeIdx >= 0 && items[activeIdx]) {
+      searchEl.value = items[activeIdx].dataset.name;
+      suggestEl.classList.remove('show');
+      doSearch(searchEl.value);
+    }
+  } else if (e.key === 'Escape') {
+    suggestEl.classList.remove('show');
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box')) suggestEl.classList.remove('show');
+});
+
+// Initial browse view
+showBrowse();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Tab Size 演示 - 可视化 tab-size 属性效果</title>
+<meta name="description" content="交互式CSS tab-size属性演示工具，支持多种编程语言预览，实时调整tab宽度，一键复制CSS代码。">
+<link rel="canonical" href="https://lifa-su.com/ai-css-tab-size/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--a2:#533483;--tx:#eee;--t2:#aab;--bd:#2a2a4e;--r:10px}
+body{font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+a{color:var(--ac)}
+.ctn{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--t2);font-size:.95rem}
+.ctrl{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:24px}
+.ctrl h2{font-size:1rem;color:var(--t2);margin-bottom:16px;font-weight:500}
+.tsz{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.tb{padding:10px 22px;border:2px solid var(--bd);border-radius:8px;background:0 0;color:var(--tx);font-size:1rem;cursor:pointer;transition:.2s;font-family:inherit}
+.tb:hover{border-color:var(--ac);color:var(--ac)}
+.tb.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.ci{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.ci label{color:var(--t2);font-size:.9rem;white-space:nowrap}
+.ci input[type=range]{flex:1;accent-color:var(--ac)}
+.ci .v{background:var(--cd);padding:4px 12px;border-radius:6px;min-width:40px;text-align:center;color:var(--ac)}
+.co{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.co code{color:var(--ac);font-size:.95rem;flex:1}
+.cp{padding:8px 18px;background:var(--ac);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:.85rem;font-family:inherit;transition:.2s;white-space:nowrap}
+.cp:hover{opacity:.85}.cp.ok{background:#2ecc71}
+.lt{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.lb{padding:6px 16px;border:1px solid var(--bd);border-radius:6px;background:0 0;color:var(--t2);cursor:pointer;font-size:.85rem;font-family:inherit;transition:.2s}
+.lb:hover{color:var(--tx);border-color:var(--a2)}
+.lb.on{background:var(--a2);border-color:var(--a2);color:#fff}
+.ps{margin-bottom:24px}
+.ps h2{font-size:1rem;color:var(--t2);margin-bottom:12px;font-weight:500}
+.cpv{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+.ch span{font-size:.8rem;color:var(--t2)}
+.dt{display:flex;gap:6px}
+.dt i{width:10px;height:10px;border-radius:50%;display:block}
+.dt i:nth-child(1){background:#ff5f57}.dt i:nth-child(2){background:#febc2e}.dt i:nth-child(3){background:#28c840}
+pre.cb{padding:20px;overflow-x:auto;font-size:.9rem;line-height:1.7;white-space:pre}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.cc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.cc .la{padding:10px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd);font-size:.8rem;color:var(--t2)}
+.cc pre{padding:16px;font-size:.85rem;line-height:1.7;white-space:pre;overflow-x:auto}
+.info{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:24px}
+.info h2{font-size:1.1rem;margin-bottom:12px}
+.info p{color:var(--t2);font-size:.9rem;margin-bottom:8px}
+.info table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem}
+.info th,.info td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--bd)}
+.info th{color:var(--ac);font-weight:500}.info td{color:var(--t2)}
+.info code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:.8rem;color:var(--ac)}
+footer{text-align:center;padding:30px 20px;color:var(--t2);font-size:.8rem;border-top:1px solid var(--bd)}
+@media(max-width:700px){.cmp{grid-template-columns:1fr}header h1{font-size:1.5rem}.tsz{gap:6px}.tb{padding:8px 16px;font-size:.9rem}}
+</style>
+</head>
+<body>
+<header><h1>CSS Tab Size 演示</h1><p>可视化 <code style="background:#16213e;padding:2px 8px;border-radius:4px">tab-size</code> 属性对代码缩进的影响</p></header>
+<div class="ctn">
+<section class="ctrl"><h2>选择 Tab 宽度</h2>
+<div class="tsz" id="btns"></div>
+<div class="ci"><label for="rng">自定义：</label><input type="range" id="rng" min="1" max="16" value="4"><span class="v" id="rv">4</span></div>
+<div class="co"><code id="css">tab-size: 4; -moz-tab-size: 4;</code><button class="cp" id="cpb" aria-label="复制CSS代码">复制 CSS</button></div>
+</section>
+<section class="ps"><h2>代码预览</h2>
+<div class="lt" id="langs"></div>
+<div class="cpv"><div class="ch"><div class="dt"><i></i><i></i><i></i></div><span id="fn">example.js</span></div><pre class="cb" id="code"></pre></div>
+</section>
+<section class="ps"><h2>对比：Tab Size 2 vs 8</h2>
+<div class="cmp"><div class="cc"><div class="la">tab-size: 2</div><pre id="c2"></pre></div><div class="cc"><div class="la">tab-size: 8</div><pre id="c8"></pre></div></div>
+</section>
+<section class="info"><h2>关于 tab-size</h2>
+<p><code>tab-size</code> CSS 属性控制制表符（U+0009）的显示宽度，默认值为 8。</p>
+<p>该属性仅对 <code>&lt;pre&gt;</code> 和 <code>white-space: pre</code> 元素中的实际 Tab 字符生效。</p>
+<table><thead><tr><th>值</th><th>说明</th><th>常见用途</th></tr></thead>
+<tbody>
+<tr><td><code>2</code></td><td>紧凑缩进</td><td>HTML/Ruby/YAML</td></tr>
+<tr><td><code>4</code></td><td>标准缩进（推荐）</td><td>JavaScript/Python/Java</td></tr>
+<tr><td><code>8</code></td><td>浏览器默认值</td><td>Linux 内核/Go/Makefile</td></tr>
+</tbody></table>
+</section>
+</div>
+<footer><p>CSS Tab Size 演示工具 · 使用纯 HTML/CSS/JS 构建</p></footer>
+<script>
+const S={
+js:{name:'JavaScript',file:'app.js',code:"function greet(name) {\n\tconst msg = `Hello, ${name}!`;\n\tif (name) {\n\t\tconsole.log(msg);\n\t\treturn {\n\t\t\tstatus: 'ok',\n\t\t\tmessage: msg\n\t\t};\n\t}\n\treturn null;\n}"},
+html:{name:'HTML',file:'index.html',code:"<div class=\"container\">\n\t<header>\n\t\t<h1>Hello World</h1>\n\t\t<nav>\n\t\t\t<ul>\n\t\t\t\t<li><a href=\"/\">Home</a></li>\n\t\t\t\t<li><a href=\"/about\">About</a></li>\n\t\t\t</ul>\n\t\t</nav>\n\t</header>\n</div>"},
+css:{name:'CSS',file:'style.css',code:".card {\n\tdisplay: flex;\n\tflex-direction: column;\n\tpadding: 1rem;\n}\n.card__title {\n\tfont-size: 1.5rem;\n\t&:hover {\n\t\tcolor: var(--accent);\n\t\ttransform: scale(1.02);\n\t}\n}"},
+py:{name:'Python',file:'main.py',code:"class DataProcessor:\n\tdef __init__(self, source):\n\t\tself.source = source\n\t\tself.cache = {}\n\n\tdef process(self, data):\n\t\tfor item in data:\n\t\t\tif item.valid:\n\t\t\t\tself.cache[item.id] = {\n\t\t\t\t\t'value': item.value,\n\t\t\t\t\t'ts': time.time()\n\t\t\t\t}\n\t\treturn self.cache"}
+};
+const presets=[2,4,6,8,12];
+let cur=4,lang='js';
+const $=s=>document.querySelector(s);
+const el={btns:$('#btns'),rng:$('#rng'),rv:$('#rv'),css:$('#css'),cpb:$('#cpb'),langs:$('#langs'),code:$('#code'),fn:$('#fn'),c2:$('#c2'),c8:$('#c8')};
+
+function init(){
+presets.forEach(n=>{const b=document.createElement('button');b.className='tb'+(n===4?' on':'');b.textContent=n;b.dataset.size=n;b.onclick=()=>set(n);el.btns.appendChild(b)});
+Object.keys(S).forEach(k=>{const b=document.createElement('button');b.className='lb'+(k==='js'?' on':'');b.textContent=S[k].name;b.onclick=()=>{lang=k;document.querySelectorAll('.lb').forEach(x=>x.classList.remove('on'));b.classList.add('on');render()};el.langs.appendChild(b)});
+el.rng.oninput=()=>set(+el.rng.value);
+el.cpb.onclick=copy;
+render();
+}
+
+function set(n){
+cur=Math.max(1,Math.min(16,n));
+el.rng.value=cur;
+el.rv.textContent=cur;
+document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on',+b.dataset.size===cur));
+render();
+}
+
+function render(){
+const d=S[lang];
+el.fn.textContent=d.file;
+el.code.textContent=d.code;
+el.code.style.tabSize=cur;el.code.style.MozTabSize=cur;
+el.css.textContent='tab-size: '+cur+'; -moz-tab-size: '+cur+';';
+el.c2.textContent=d.code;el.c2.style.tabSize=2;el.c2.style.MozTabSize=2;
+el.c8.textContent=d.code;el.c8.style.tabSize=8;el.c8.style.MozTabSize=8;
+}
+
+function copy(){
+navigator.clipboard.writeText('tab-size: '+cur+';\n-moz-tab-size: '+cur+';').then(()=>{
+el.cpb.textContent='已复制 ✓';el.cpb.classList.add('ok');
+setTimeout(()=>{el.cpb.textContent='复制 CSS';el.cpb.classList.remove('ok')},1500);
+});
+}
+init();
+</script>
+<script async src="https://cdn.jsdelivr.net/gh/nicegoodthings/nicegoodthings.github.io@main/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

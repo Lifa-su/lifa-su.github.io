@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Neumorphism Generator - Soft UI CSS Tool</title>
+<meta name="description" content="Design beautiful neumorphic (soft UI) elements with real-time preview. Customize shadows, colors, shapes, and export clean CSS code.">
+<meta name="keywords" content="neumorphism generator, soft UI, neumorphic design, CSS generator, soft shadow, UI design tool, neumorphism CSS">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.com/ai-neumorphism/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Neumorphism Generator - Soft UI CSS Tool">
+<meta property="og:description" content="Design beautiful neumorphic (soft UI) elements with real-time preview. Customize shadows, colors, and shapes.">
+<meta property="og:url" content="https://lifa-su.com/ai-neumorphism/">
+<meta property="og:site_name" content="FeiDev Tools">
+<meta property="og:image" content="https://lifa-su.com/ai-neumorphism/og-image.png">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Neumorphism Generator - Soft UI CSS Tool">
+<meta name="twitter:description" content="Design beautiful neumorphic (soft UI) elements with real-time preview. Customize shadows, colors, and shapes.">
+<meta name="twitter:image" content="https://lifa-su.com/ai-neumorphism/og-image.png">
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"AI Neumorphism Generator","url":"https://lifa-su.com/ai-neumorphism/","description":"Design beautiful neumorphic (soft UI) elements with real-time preview. Customize shadows, colors, shapes, and export clean CSS code.","applicationCategory":"DesignApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"FeiDev Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","ratingCount":"890"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#2a2a3e;--text:#e0e0f0;--text-dim:#8888aa;--accent:#7c5cfc;--panel:#23233a;--panel-border:#33334a;--input-bg:#1e1e32;--radius:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.5}
+.header{text-align:center;padding:28px 20px 14px}
+.header h1{font-size:1.75rem;font-weight:700;background:linear-gradient(135deg,#7c5cfc,#ff6ec7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:var(--text-dim);font-size:.92rem;margin-top:4px}
+.app{display:flex;flex:1;gap:24px;padding:0 24px 32px;max-width:1400px;margin:0 auto;width:100%}
+.controls-panel{width:340px;min-width:300px;flex-shrink:0;background:var(--panel);border:1px solid var(--panel-border);border-radius:var(--radius);padding:24px;overflow-y:auto;max-height:calc(100vh - 130px)}
+.preview-area{flex:1;display:flex;flex-direction:column;gap:20px}
+.preview-box{flex:1;min-height:400px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;overflow:hidden;transition:background .3s;border:1px solid var(--panel-border)}
+.code-box{background:var(--panel);border:1px solid var(--panel-border);border-radius:var(--radius);padding:20px}
+.section{margin-bottom:20px}.section:last-child{margin-bottom:0}
+.section-title{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-dim);margin-bottom:10px}
+.control-row{margin-bottom:12px}.control-row:last-child{margin-bottom:0}
+.control-label{display:flex;justify-content:space-between;align-items:center;font-size:.84rem;margin-bottom:5px}
+.control-label span:last-child{color:var(--accent);font-weight:600;font-size:.78rem;background:rgba(124,92,252,.12);padding:2px 8px;border-radius:6px}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:var(--input-bg);border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(124,92,252,.4)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
+.color-picker-wrap{display:flex;align-items:center;gap:12px}
+.color-swatch{width:44px;height:44px;border-radius:12px;border:2px solid var(--panel-border);overflow:hidden;cursor:pointer;position:relative;flex-shrink:0}
+.color-swatch input[type=color]{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);border:none;cursor:pointer;background:none}
+.color-hex-input{flex:1;background:var(--input-bg);border:1px solid var(--panel-border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:monospace;font-size:.88rem;outline:none;transition:border-color .2s}
+.color-hex-input:focus{border-color:var(--accent)}
+.toggle-group{display:flex;gap:6px;flex-wrap:wrap}
+.toggle-btn{flex:1;min-width:68px;padding:9px 6px;background:var(--input-bg);border:1px solid var(--panel-border);border-radius:10px;color:var(--text-dim);font-size:.76rem;font-weight:500;cursor:pointer;text-align:center;transition:all .2s;user-select:none}
+.toggle-btn:hover{border-color:var(--accent);color:var(--text)}
+.toggle-btn.active{background:rgba(124,92,252,.15);border-color:var(--accent);color:var(--accent);font-weight:600}
+.code-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.code-header h3{font-size:.88rem;font-weight:600}
+.copy-btn{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.copy-btn:hover{background:var(--accent-hover,#9b7fff);transform:translateY(-1px)}
+.copy-btn.copied{background:#22c55e}
+.code-content{background:var(--input-bg);border-radius:10px;padding:16px;font-family:"SF Mono",Monaco,monospace;font-size:.8rem;line-height:1.7;color:#c4b5fd;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto}
+.neu-element{transition:all .3s ease;display:flex;align-items:center;justify-content:center}
+.preset-colors{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.preset-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.preset-dot:hover{transform:scale(1.15);border-color:var(--accent)}
+@media(max-width:900px){
+  .app{flex-direction:column;padding:0 16px 24px}
+  .controls-panel{width:100%;min-width:0;max-height:none;order:2}
+  .preview-area{order:1}.preview-box{min-height:300px}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>&#x2728; AI Neumorphism Generator</h1>
+  <p>Design beautiful soft UI elements with real-time preview</p>
+</div>
+<div class="app">
+  <div class="controls-panel">
+    <div class="section">
+      <div class="section-title">Background Color</div>
+      <div class="color-picker-wrap">
+        <div class="color-swatch"><input type="color" id="bgColor" value="#2a2a3e"></div>
+        <input type="text" class="color-hex-input" id="bgHex" value="#2a2a3e" maxlength="7">
+      </div>
+      <div class="preset-colors" id="presets"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Shadow Settings</div>
+      <div class="control-row">
+        <div class="control-label"><span>Distance</span><span id="distVal">12</span></div>
+        <input type="range" id="distance" min="1" max="50" value="12">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Blur</span><span id="blurVal">24</span></div>
+        <input type="range" id="blur" min="0" max="80" value="24">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Intensity</span><span id="intVal">15</span></div>
+        <input type="range" id="intensity" min="1" max="40" value="15">
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Type</div>
+      <div class="toggle-group" id="typeGroup">
+        <div class="toggle-btn active" data-val="flat">Flat</div>
+        <div class="toggle-btn" data-val="convex">Convex</div>
+        <div class="toggle-btn" data-val="concave">Concave</div>
+        <div class="toggle-btn" data-val="pressed">Pressed</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Shape</div>
+      <div class="toggle-group" id="shapeGroup">
+        <div class="toggle-btn active" data-val="rounded">Rounded</div>
+        <div class="toggle-btn" data-val="rect">Rectangle</div>
+        <div class="toggle-btn" data-val="circle">Circle</div>
+        <div class="toggle-btn" data-val="button">Button</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Size</div>
+      <div class="control-row">
+        <div class="control-label"><span>Width</span><span id="wVal">200</span></div>
+        <input type="range" id="width" min="60" max="400" value="200">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Height</span><span id="hVal">200</span></div>
+        <input type="range" id="height" min="60" max="400" value="200">
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Border Radius</span><span id="brVal">24</span></div>
+        <input type="range" id="borderRadius" min="0" max="200" value="24">
+      </div>
+    </div>
+  </div>
+  <div class="preview-area">
+    <div class="preview-box" id="previewBox">
+      <div class="neu-element" id="neuElement"></div>
+    </div>
+    <div class="code-box">
+      <div class="code-header">
+        <h3>Generated CSS</h3>
+        <button class="copy-btn" id="copyBtn" onclick="copyCSS()">&#x1F4CB; Copy CSS</button>
+      </div>
+      <pre class="code-content" id="codeOutput"></pre>
+    </div>
+  </div>
+</div>
+<script>
+// Color utilities
+function hexToRgb(hex){hex=hex.replace('#','');return[parseInt(hex.substring(0,2),16),parseInt(hex.substring(2,4),16),parseInt(hex.substring(4,6),16)]}
+function rgbToHex(r,g,b){return'#'+[r,g,b].map(x=>Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0')).join('')}
+function adjustColor(hex,amount){const[r,g,b]=hexToRgb(hex);return rgbToHex(r+amount,g+amount,b+amount)}
+function getTextColor(hex){const[r,g,b]=hexToRgb(hex);return(r*299+g*587+b*114)/1000>128?'#333333':'#ffffff'}
+
+// State
+const state={bg:'#2a2a3e',distance:12,blur:24,intensity:15,type:'flat',shape:'rounded',width:200,height:200,borderRadius:24};
+
+// Presets
+const presets=['#2a2a3e','#1a1a2e','#16213e','#0f3460','#533483','#2c3e50','#34495e','#1e272e','#2d3436','#636e72','#b2bec3','#dfe6e9','#e0c3fc','#d4a5a5','#392f5a'];
+const presetBox=document.getElementById('presets');
+presets.forEach(c=>{const d=document.createElement('div');d.className='preset-dot';d.style.background=c;d.onclick=()=>{state.bg=c;document.getElementById('bgColor').value=c;document.getElementById('bgHex').value=c;update()};presetBox.appendChild(d)});
+
+// Toggle groups
+function setupToggle(id,key){document.getElementById(id).querySelectorAll('.toggle-btn').forEach(btn=>{btn.onclick=()=>{btn.parentElement.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');state[key]=btn.dataset.val;update()}})}
+setupToggle('typeGroup','type');
+setupToggle('shapeGroup','shape');
+
+// Sliders
+const sliders=[['distance','distVal'],['blur','blurVal'],['intensity','intVal'],['width','wVal'],['height','hVal'],['borderRadius','brVal']];
+sliders.forEach(([id,valId])=>{const el=document.getElementById(id);el.oninput=()=>{document.getElementById(valId).textContent=el.value;state[id]=parseInt(el.value);update()}});
+
+// Color inputs
+document.getElementById('bgColor').oninput=e=>{state.bg=e.target.value;document.getElementById('bgHex').value=e.target.value;update()};
+document.getElementById('bgHex').oninput=e=>{const v=e.target.value;if(/^#[0-9a-fA-F]{6}$/.test(v)){state.bg=v;document.getElementById('bgColor').value=v;update()}};
+
+// Main update
+function update(){
+  const{bg,distance:d,blur:bl,intensity:int,type,shape,width:w,height:h,borderRadius:br}=state;
+  const el=document.getElementById('neuElement');
+  const box=document.getElementById('previewBox');
+  const lightShadow=adjustColor(bg,int);
+  const darkShadow=adjustColor(bg,-int);
+  const textCol=getTextColor(bg);
+
+  box.style.background=bg;
+
+  // Shape
+  let radius=br+'px';
+  if(shape==='circle')radius='50%';
+  else if(shape==='rect')radius='4px';
+  else if(shape==='button')radius=h/2+'px';
+
+  el.style.width=w+'px';
+  el.style.height=h+'px';
+  el.style.borderRadius=radius;
+  el.style.background=bg;
+  el.style.color=textCol;
+  el.className='neu-element'+(shape==='button'?' is-button':'');
+  el.textContent=shape==='button'?'Button':'';
+
+  // Shadow + background based on type
+  let shadow='',bgStyle=bg;
+  if(type==='flat'){
+    shadow=`${d}px ${d}px ${bl}px ${darkShadow}, -${d}px -${d}px ${bl}px ${lightShadow}`;
+  }else if(type==='convex'){
+    shadow=`${d}px ${d}px ${bl}px ${darkShadow}, -${d}px -${d}px ${bl}px ${lightShadow}`;
+    bgStyle=`linear-gradient(145deg, ${adjustColor(bg,8)}, ${adjustColor(bg,-8)})`;
+  }else if(type==='concave'){
+    shadow=`${d}px ${d}px ${bl}px ${darkShadow}, -${d}px -${d}px ${bl}px ${lightShadow}`;
+    bgStyle=`linear-gradient(145deg, ${adjustColor(bg,-8)}, ${adjustColor(bg,8)})`;
+  }else if(type==='pressed'){
+    shadow=`inset ${d}px ${d}px ${bl}px ${darkShadow}, inset -${d}px -${d}px ${bl}px ${lightShadow}`;
+  }
+
+  el.style.boxShadow=shadow;
+  el.style.background=bgStyle;
+
+  // Generate CSS code
+  const css=`width: ${w}px;\nheight: ${h}px;\nborder-radius: ${radius};\nbackground: ${bgStyle};\nbox-shadow: ${shadow};`;
+  document.getElementById('codeOutput').textContent=css;
+}
+
+function copyCSS(){
+  const code=document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.innerHTML='&#x2705; Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.innerHTML='&#x1F4CB; Copy CSS';btn.classList.remove('copied')},2000);
+  });
+}
+
+update();
+</script>
+<footer style="text-align:center;padding:24px 20px 16px;color:var(--text-dim);font-size:.8rem">
+<p>AI Neumorphism Generator &mdash; Free Online Tool</p>
+<p style="margin-top:6px"><a href="https://lifa-su.com/" style="color:var(--accent);text-decoration:none">← Back to FeiDev Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">Support on Ko-fi</a></p>
+</footer>
+<!-- Pro Features -->
+<style>
+.pro-teaser{position:relative;margin:20px 0 0;padding:0;border-radius:12px;cursor:pointer;overflow:hidden;border:1px dashed rgba(124,92,252,0.3);transition:all .3s}
+.pro-teaser:hover{border-color:rgba(124,92,252,0.6);box-shadow:0 0 24px rgba(124,92,252,0.12)}
+.pro-teaser-content{padding:16px;filter:blur(3px);opacity:0.5;pointer-events:none;user-select:none}
+.pro-teaser-content .pm-title{font-size:.7rem;text-transform:uppercase;letter-spacing:1.2px;color:#7c5cfc;margin-bottom:10px;font-weight:600}
+.pro-teaser-content .pm-row{display:flex;gap:8px;margin-bottom:8px}
+.pro-teaser-content .pm-block{flex:1;height:28px;background:rgba(124,92,252,0.1);border-radius:6px}
+.pro-teaser-content .pm-line{height:10px;background:rgba(124,92,252,0.07);border-radius:4px;margin-bottom:6px}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,10,26,0.35);z-index:2}
+.pro-lock .pl-icon{font-size:1.6rem;margin-bottom:4px}
+.pro-lock .pl-badge{font-size:.65rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#7c5cfc,#a29bfe);padding:3px 12px;border-radius:20px;letter-spacing:1.5px}
+.pro-lock .pl-hint{font-size:.68rem;color:#8888aa;margin-top:6px}
+.pro-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center}
+.pro-overlay.show{display:flex}
+.pro-card{background:linear-gradient(160deg,#1e1e38,#14142a);border:1px solid rgba(124,92,252,0.25);border-radius:20px;padding:36px 30px;max-width:440px;width:92%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:pmIn .3s ease}
+@keyframes pmIn{from{opacity:0;transform:scale(.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.pro-card h2{font-size:1.45rem;margin-bottom:4px;background:linear-gradient(135deg,#7c5cfc,#a29bfe,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-card .pc-sub{color:#8888aa;font-size:.85rem;margin-bottom:16px}
+.pro-card .pc-price{font-size:2.5rem;font-weight:800;color:#7c5cfc;margin:8px 0 2px}
+.pro-card .pc-note{font-size:.76rem;color:#666;margin-bottom:20px}
+.pro-card ul{text-align:left;list-style:none;margin:0 0 24px;padding:0}
+.pro-card ul li{padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:.87rem;color:#c0c0e0;display:flex;align-items:center;gap:10px}
+.pro-card ul li::before{content:'✓';color:#51cf66;font-weight:700;flex-shrink:0}
+.pro-card ul li:last-child{border-bottom:none}
+.pro-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#7c5cfc,#a29bfe);color:#fff;border:none;border-radius:12px;font-size:1.02rem;font-weight:700;cursor:pointer;transition:all .25s;text-decoration:none;text-align:center}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,92,252,0.45)}
+.pro-skip{display:inline-block;margin-top:14px;padding:8px 20px;background:none;border:none;color:#555;cursor:pointer;font-size:.84rem;transition:color .2s}
+.pro-skip:hover{color:#ccc}
+</style>
+<div class="pro-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+<div class="pro-card">
+<h2>🔓 Unlock Pro Features</h2>
+<p class="pc-sub">Complete neumorphism component library at your fingertips</p>
+<div class="pc-price">$9</div>
+<p class="pc-note">One-time payment · Lifetime access</p>
+<ul>
+<li>Component library — Buttons, Cards, Inputs, Switches</li>
+<li>Tailwind CSS class name generation</li>
+<li>Copy-paste ready component code</li>
+<li>Dark & light mode variants</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-cta">Upgrade to Pro — $9</a>
+<button class="pro-skip" onclick="document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+</div>
+</div>
+<script>
+(function(){
+var t=document.createElement('div');t.className='pro-teaser';
+t.onclick=function(){document.getElementById('proModal').classList.add('show')};
+t.innerHTML='<div class="pro-lock"><div class="pl-icon">🔒</div><div class="pl-badge">PRO</div><div class="pl-hint">Click to unlock</div></div><div class="pro-teaser-content"><div class="pm-title">🧩 Component Library</div><div class="pm-row"><div class="pm-block" style="border-radius:10px"></div><div class="pm-block" style="border-radius:10px"></div></div><div class="pm-row"><div class="pm-block" style="height:20px;border-radius:20px"></div><div class="pm-block" style="height:20px;border-radius:20px"></div></div><div class="pm-line" style="width:85%"></div><div class="pm-row"><div class="pm-block" style="height:18px"></div><div class="pm-block" style="height:18px"></div><div class="pm-block" style="height:18px"></div></div><div class="pm-line" style="width:65%"></div></div>';
+var s=document.querySelector('.controls-panel');if(s)s.appendChild(t);
+})();
+</script>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

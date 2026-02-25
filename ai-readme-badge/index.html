@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Generate README badges for GitHub repositories. Create status, version, license, and custom shields.io badges with live preview and Markdown copy support.">
+<link rel="canonical" href="https://lifa-su.com/ai-readme-badge/">
+<title>AI README Badge Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--rd:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
+a{color:var(--ac)}
+.ct{max-width:960px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--tx2);font-size:1rem}
+.card{background:var(--sf);border-radius:var(--rd);padding:24px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05)}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.fg{grid-template-columns:1fr}}
+.fd{display:flex;flex-direction:column;gap:4px}
+.fd label{font-size:.78rem;color:var(--tx2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fd input,.fd select{background:var(--bg);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:10px 12px;color:var(--tx);font-size:.95rem;transition:border-color .2s}
+.fd input:focus,.fd select:focus{outline:none;border-color:var(--ac)}
+.fd select{cursor:pointer}
+.ff{grid-column:1/-1}
+.cr{display:flex;gap:8px;align-items:center}
+.cr input[type=color]{width:40px;height:38px;border:none;border-radius:6px;cursor:pointer;background:transparent}
+.cr input[type=text]{flex:1}
+.ps{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ps button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform .15s}
+.ps button:hover{transform:scale(1.2)}
+.ps button.on{border-color:#fff}
+.so{display:flex;gap:8px;flex-wrap:wrap}
+.so button{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:var(--bg);color:var(--tx2);cursor:pointer;font-size:.85rem;transition:all .2s}
+.so button:hover{border-color:var(--ac);color:var(--tx)}
+.so button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.pv{text-align:center;padding:30px 20px;min-height:90px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.pv img{max-width:100%;height:auto}
+.cb{position:relative;background:var(--bg);border-radius:8px;padding:14px 60px 14px 14px;margin-top:10px;border:1px solid rgba(255,255,255,.08)}
+.cb code{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;color:#7ec8e3;word-break:break-all;display:block;white-space:pre-wrap}
+.cp{position:absolute;top:8px;right:8px;background:var(--sf2);border:none;color:var(--tx2);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.cp:hover{background:var(--ac);color:#fff}
+.cp.ok{background:#2ecc71;color:#fff}
+.tabs{display:flex}
+.tabs button{flex:1;padding:10px;border:1px solid rgba(255,255,255,.08);border-bottom:none;background:var(--bg);color:var(--tx2);cursor:pointer;font-size:.85rem}
+.tabs button:first-child{border-radius:8px 0 0 0}
+.tabs button:last-child{border-radius:0 8px 0 0}
+.tabs button.on{color:var(--ac);background:var(--sf)}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:12px}
+.tp{padding:14px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:var(--bg);color:var(--tx);cursor:pointer;text-align:center;transition:all .2s;font-size:.85rem}
+.tp:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 4px 12px rgba(233,69,96,.15)}
+.tp .ti{font-size:1.5rem;display:block;margin-bottom:6px}
+.tp .tn{font-weight:600}
+.bi{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,.06);gap:10px;flex-wrap:wrap}
+.bi img{max-height:26px}
+.ba{display:flex;gap:6px}
+.ba button{background:var(--sf2);border:none;color:var(--tx2);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:.75rem;transition:all .2s}
+.ba button:hover{background:var(--ac);color:#fff}
+.bp{background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;color:#fff;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:.95rem;font-weight:600;transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:6px}
+.bp:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(233,69,96,.4)}
+.bsc{background:var(--sf2);border:1px solid rgba(255,255,255,.1);color:var(--tx);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.bsc:hover{border-color:var(--ac);color:var(--ac)}
+.ar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;justify-content:center}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:#2ecc71;color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:30px 20px;color:var(--tx2);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="ct">
+<header>
+<h1>&#127991; AI README Badge Generator</h1>
+<p>Create beautiful shields.io badges for your README files</p>
+</header>
+
+<div class="card">
+<h2>&#9889; Quick Templates</h2>
+<div class="tg" id="templates"></div>
+</div>
+
+<div class="card">
+<h2>&#128736;&#65039; Badge Builder</h2>
+<div class="fg">
+<div class="fd"><label>Label (left text)</label><input id="iLabel" placeholder="build" oninput="update()"></div>
+<div class="fd"><label>Message (right text)</label><input id="iMsg" placeholder="passing" oninput="update()"></div>
+<div class="fd"><label>Label Color</label>
+<div class="cr"><input type="color" id="cLabel" value="#555555" onchange="document.getElementById('tLabel').value=this.value.slice(1);update()"><input type="text" id="tLabel" value="555555" placeholder="555555" oninput="update()"></div>
+<div class="ps" id="pLabel"></div>
+</div>
+<div class="fd"><label>Message Color</label>
+<div class="cr"><input type="color" id="cMsg" value="#4c1" onchange="document.getElementById('tMsg').value=this.value.slice(1);update()"><input type="text" id="tMsg" value="4c1" placeholder="4c1" oninput="update()"></div>
+<div class="ps" id="pMsg"></div>
+</div>
+<div class="fd"><label>Style</label><div class="so" id="styleOpts"></div></div>
+<div class="fd"><label>Logo</label>
+<select id="iLogo" onchange="update()">
+<option value="">None</option>
+<option value="github">GitHub</option>
+<option value="npm">npm</option>
+<option value="docker">Docker</option>
+<option value="python">Python</option>
+<option value="javascript">JavaScript</option>
+<option value="typescript">TypeScript</option>
+<option value="react">React</option>
+<option value="vue.js">Vue.js</option>
+<option value="angular">Angular</option>
+<option value="node.js">Node.js</option>
+<option value="rust">Rust</option>
+<option value="go">Go</option>
+<option value="java">Java</option>
+<option value="swift">Swift</option>
+<option value="kotlin">Kotlin</option>
+<option value="flutter">Flutter</option>
+<option value="aws">AWS</option>
+<option value="googlecloud">Google Cloud</option>
+<option value="azure">Azure</option>
+<option value="linux">Linux</option>
+<option value="apple">Apple</option>
+<option value="windows">Windows</option>
+<option value="android">Android</option>
+<option value="ios">iOS</option>
+<option value="visualstudiocode">VS Code</option>
+<option value="git">Git</option>
+<option value="gitlab">GitLab</option>
+<option value="bitbucket">Bitbucket</option>
+<option value="stackoverflow">Stack Overflow</option>
+<option value="twitter">Twitter</option>
+<option value="discord">Discord</option>
+<option value="slack">Slack</option>
+<option value="telegram">Telegram</option>
+<option value="reddit">Reddit</option>
+<option value="youtube">YouTube</option>
+<option value="twitch">Twitch</option>
+</select>
+</div>
+<div class="fd ff"><label>Link URL (optional)</label><input id="iLink" placeholder="https://github.com/user/repo" oninput="update()"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>&#128064; Live Preview</h2>
+<div class="pv" id="preview"><span style="color:var(--tx2)">Configure your badge above to see a preview</span></div>
+<div class="tabs">
+<button class="on" onclick="showTab(this,'md')">Markdown</button>
+<button onclick="showTab(this,'html')">HTML</button>
+<button onclick="showTab(this,'url')">URL</button>
+</div>
+<div id="tabMd" class="cb"><code id="codeMd"></code><button class="cp" onclick="copyCode('codeMd',this)">Copy</button></div>
+<div id="tabHtml" class="cb" style="display:none"><code id="codeHtml"></code><button class="cp" onclick="copyCode('codeHtml',this)">Copy</button></div>
+<div id="tabUrl" class="cb" style="display:none"><code id="codeUrl"></code><button class="cp" onclick="copyCode('codeUrl',this)">Copy</button></div>
+<div class="ar">
+<button class="bp" onclick="addToCollection()">&#10133; Add to Collection</button>
+<button class="bsc" onclick="resetForm()">&#128260; Reset</button>
+</div>
+</div>
+
+<div class="card">
+<h2>&#128230; Badge Collection <span id="badgeCount" style="font-size:.8rem;color:var(--tx2);font-weight:400"></span></h2>
+<div id="collection"></div>
+<div class="ar" id="collActions" style="display:none">
+<button class="bp" onclick="exportAll('md')">&#128203; Copy All (Markdown)</button>
+<button class="bsc" onclick="exportAll('html')">Copy All (HTML)</button>
+<button class="bsc" onclick="clearCollection()">&#128465; Clear All</button>
+</div>
+</div>
+
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:960px;margin:30px auto 0;padding:0 20px}
+.pro-header{text-align:center;margin-bottom:18px}
+.pro-header h2{font-size:1.3rem;color:var(--ac2);display:flex;align-items:center;justify-content:center;gap:8px}
+.pro-header p{color:var(--tx2);font-size:.85rem;margin-top:4px}
+.pro-blur-wrap{position:relative;border-radius:var(--rd);overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.05);transition:border-color .3s}
+.pro-blur-wrap:hover{border-color:var(--ac)}
+.pro-mock{filter:blur(4px);pointer-events:none;user-select:none;padding:24px;background:var(--sf)}
+.pro-mock-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:600px){.pro-mock-row{grid-template-columns:1fr}}
+.pro-mock-card{background:var(--bg);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:16px}
+.pro-mock-card h4{font-size:.85rem;color:var(--ac);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pro-mock-label{font-size:.75rem;color:var(--tx2);margin-bottom:4px}
+.pro-mock-input{background:var(--sf);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:8px 10px;color:#555;font-size:.8rem;width:100%;margin-bottom:8px}
+.pro-mock-btn{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:.8rem;opacity:.7;width:100%;margin-top:8px}
+.pro-mock-tag{display:inline-block;background:rgba(233,69,96,.15);color:var(--ac);padding:2px 8px;border-radius:4px;font-size:.7rem;margin:2px}
+.pro-mock-svg{background:var(--sf);border:1px dashed rgba(255,255,255,.15);border-radius:8px;padding:20px;text-align:center;margin-bottom:8px}
+.pro-mock-svg-placeholder{width:200px;height:30px;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:4px;display:inline-block;opacity:.5}
+.pro-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.55);gap:8px}
+.pro-lock{font-size:2.5rem;filter:drop-shadow(0 0 20px rgba(233,69,96,.5))}
+.pro-overlay span:last-child{color:#ccc;font-size:.9rem;font-weight:500}
+.pro-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);padding:20px}
+.pro-modal{background:var(--sf);border:1px solid var(--ac);border-radius:16px;padding:32px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:proFadeIn .25s ease}
+@keyframes proFadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.pro-modal h3{font-size:1.4rem;margin-bottom:6px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-modal .pro-price{font-size:1.1rem;color:#888;margin-bottom:20px}
+.pro-modal ul{text-align:left;list-style:none;margin-bottom:24px;padding:0}
+.pro-modal ul li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);color:#ccc;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✅';font-size:.8rem}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border:none;border-radius:10px;font-size:1.05rem;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;margin-bottom:12px}
+.pro-upgrade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(233,69,96,.4)}
+.pro-later-btn{background:none;border:none;color:#666;cursor:pointer;font-size:.85rem;padding:8px;transition:color .2s}
+.pro-later-btn:hover{color:#aaa}
+</style>
+
+<div class="pro-section">
+<div class="pro-header">
+<h2>🔒 Pro Features</h2>
+<p>Custom designs, dynamic data & batch generation</p>
+</div>
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').style.display='flex'">
+<div class="pro-mock">
+<div class="pro-mock-row">
+<div class="pro-mock-card">
+<h4>🎨 Custom SVG Badge Designer</h4>
+<div class="pro-mock-svg">
+<div class="pro-mock-svg-placeholder"></div>
+</div>
+<div class="pro-mock-label">Custom Font</div>
+<div class="pro-mock-input">Inter, Roboto Mono, Fira Code...</div>
+<div style="display:flex;gap:8px">
+<div style="flex:1"><div class="pro-mock-label">Gradient Start</div><div class="pro-mock-input">#e94560</div></div>
+<div style="flex:1"><div class="pro-mock-label">Gradient End</div><div class="pro-mock-input">#533483</div></div>
+</div>
+<div class="pro-mock-btn">Generate Custom SVG</div>
+</div>
+<div class="pro-mock-card">
+<h4>📊 Dynamic Data Badges</h4>
+<div class="pro-mock-label">Data Source</div>
+<div class="pro-mock-input">GitHub API / npm / Custom URL</div>
+<div class="pro-mock-label">Metric</div>
+<div class="pro-mock-input">Stars / Downloads / Version / Uptime</div>
+<div class="pro-mock-label">Refresh Interval</div>
+<div class="pro-mock-input">Every 5 minutes</div>
+<div class="pro-mock-btn">Create Dynamic Badge</div>
+</div>
+</div>
+<div class="pro-mock-card" style="width:100%">
+<h4>⚡ Batch Generation</h4>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<span class="pro-mock-tag">build | passing | green</span>
+<span class="pro-mock-tag">coverage | 95% | brightgreen</span>
+<span class="pro-mock-tag">license | MIT | blue</span>
+<span class="pro-mock-tag">version | 2.1.0 | orange</span>
+<span class="pro-mock-tag">+ Add row</span>
+</div>
+<div class="pro-mock-btn">Generate All (4 badges) → Copy as Markdown</div>
+</div>
+</div>
+<div class="pro-overlay">
+<span class="pro-lock">🔒</span>
+<span>Click to unlock Pro features</span>
+</div>
+</div>
+</div>
+
+<div id="proModal" class="pro-modal-bg" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+<div class="pro-modal">
+<h3>🏷️ README Badge Pro</h3>
+<p class="pro-price">One-time purchase — $9</p>
+<ul>
+<li>Custom SVG badge designer — fonts, gradients, icons</li>
+<li>Dynamic data badges — live stats from GitHub, npm, APIs</li>
+<li>Batch generation — create dozens of badges at once</li>
+<li>Priority support & future updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $9</a>
+<button class="pro-later-btn" onclick="document.getElementById('proModal').style.display='none'">Maybe later</button>
+</div>
+</div>
+
+<footer>
+<p>Powered by <a href="https://shields.io" target="_blank">shields.io</a> &bull; Built with &#10084;&#65039;</p>
+</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const TEMPLATES=[
+{icon:'🔨',name:'Build',label:'build',msg:'passing',color:'brightgreen'},
+{icon:'📦',name:'Version',label:'version',msg:'1.0.0',color:'blue'},
+{icon:'📄',name:'License',label:'license',msg:'MIT',color:'green'},
+{icon:'⬇️',name:'Downloads',label:'downloads',msg:'1k/month',color:'brightgreen'},
+{icon:'⭐',name:'Stars',label:'stars',msg:'100',color:'yellow'},
+{icon:'🧪',name:'Tests',label:'tests',msg:'passing',color:'brightgreen'},
+{icon:'📊',name:'Coverage',label:'coverage',msg:'95%',color:'brightgreen'},
+{icon:'🐳',name:'Docker',label:'docker',msg:'latest',color:'blue',logo:'docker'},
+{icon:'📱',name:'Platform',label:'platform',msg:'iOS | Android',color:'lightgrey'},
+{icon:'💬',name:'Chat',label:'chat',msg:'on discord',color:'7289da',logo:'discord'},
+{icon:'☕',name:'Donate',label:'buy me',msg:'a coffee',color:'FFDD00',logo:'buymeacoffee'},
+{icon:'🔧',name:'PRs',label:'PRs',msg:'welcome',color:'brightgreen'}
+];
+const PRESETS=[
+{name:'brightgreen',hex:'#44cc11'},{name:'green',hex:'#97ca00'},{name:'yellow',hex:'#dfb317'},
+{name:'orange',hex:'#fe7d37'},{name:'red',hex:'#e05d44'},{name:'blue',hex:'#007ec6'},
+{name:'lightgrey',hex:'#9f9f9f'},{name:'blueviolet',hex:'#8a2be2'},{name:'ff69b4',hex:'#ff69b4'},
+{name:'9cf',hex:'#9cf'},{name:'informational',hex:'#0366d6'},{name:'critical',hex:'#b60205'}
+];
+const STYLES=['flat','flat-square','plastic','for-the-badge','social'];
+let style='flat',collection=[];
+
+function init(){
+  const tpl=document.getElementById('templates');
+  TEMPLATES.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='tp';
+    d.innerHTML='<span class="ti">'+t.icon+'</span><span class="tn">'+t.name+'</span>';
+    d.onclick=()=>applyTemplate(t);
+    tpl.appendChild(d);
+  });
+  const ps=document.getElementById('presetColors');
+  PRESETS.forEach(p=>{
+    const b=document.createElement('button');
+    b.style.background=p.hex;
+    b.title=p.name;
+    b.onclick=()=>{
+      document.getElementById('iColor').value=p.name;
+      document.getElementById('iColorPick').value=p.hex;
+      document.querySelectorAll('#presetColors button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      update();
+    };
+    ps.appendChild(b);
+  });
+  const so=document.getElementById('styleOptions');
+  STYLES.forEach(s=>{
+    const b=document.createElement('button');
+    b.textContent=s;
+    if(s===style)b.classList.add('on');
+    b.onclick=()=>{
+      style=s;
+      so.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      update();
+    };
+    so.appendChild(b);
+  });
+  loadCollection();
+  update();
+}
+
+function applyTemplate(t){
+  document.getElementById('iLabel').value=t.label||'';
+  document.getElementById('iMsg').value=t.msg||'';
+  document.getElementById('iColor').value=t.color||'';
+  document.getElementById('iLogo').value=t.logo||'';
+  document.querySelectorAll('#presetColors button').forEach(b=>{
+    b.classList.toggle('on',b.title===t.color);
+  });
+  const p=PRESETS.find(p=>p.name===t.color);
+  if(p)document.getElementById('iColorPick').value=p.hex;
+  update();
+  document.getElementById('preview').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function buildUrl(){
+  const label=document.getElementById('iLabel').value.trim();
+  const msg=document.getElementById('iMsg').value.trim();
+  const color=document.getElementById('iColor').value.trim()||'blue';
+  const logo=document.getElementById('iLogo').value;
+  const lc=document.getElementById('iLabelColor').value.trim();
+  if(!label&&!msg)return null;
+  let url='https://img.shields.io/badge/'+encodeURIComponent((label||'-').replace(/-/g,'--').replace(/_/g,'__'))+'-'+encodeURIComponent((msg||'').replace(/-/g,'--').replace(/_/g,'__'))+'-'+encodeURIComponent(color);
+  url+='?style='+style;
+  if(logo)url+='&logo='+encodeURIComponent(logo)+'&logoColor=white';
+  if(lc)url+='&labelColor='+encodeURIComponent(lc);
+  return url;
+}
+
+function update(){
+  const url=buildUrl();
+  const pv=document.getElementById('preview');
+  const link=document.getElementById('iLink').value.trim();
+  if(!url){
+    pv.innerHTML='<span style="color:var(--tx2)">Configure your badge above to see a preview</span>';
+    document.getElementById('codeMd').textContent='';
+    document.getElementById('codeHtml').textContent='';
+    document.getElementById('codeUrl').textContent='';
+    return;
+  }
+  pv.innerHTML='<img src="'+url+'" alt="badge" onerror="this.style.opacity=0.3">';
+  const alt=document.getElementById('iLabel').value||'badge';
+  let md='!['+alt+']('+url+')';
+  let ht='<img src="'+url+'" alt="'+alt+'">';
+  if(link){
+    md='[!['+alt+']('+url+')]('+link+')';
+    ht='<a href="'+link+'"><img src="'+url+'" alt="'+alt+'"></a>';
+  }
+  document.getElementById('codeMd').textContent=md;
+  document.getElementById('codeHtml').textContent=ht;
+  document.getElementById('codeUrl').textContent=url;
+}
+
+function showTab(btn,tab){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['tabMd','tabHtml','tabUrl'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+  const map={md:'tabMd',html:'tabHtml',url:'tabUrl'};
+  document.getElementById(map[tab]).style.display='block';
+}
+
+function copyCode(id,btn){
+  const text=document.getElementById(id).textContent;
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('ok');
+    btn.textContent='Copied!';
+    toast('Copied to clipboard!');
+    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='Copy';},2000);
+  });
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function addToCollection(){
+  const url=buildUrl();
+  if(!url){toast('Please configure a badge first');return;}
+  const label=document.getElementById('iLabel').value.trim()||'badge';
+  const msg=document.getElementById('iMsg').value.trim();
+  const link=document.getElementById('iLink').value.trim();
+  collection.push({url,label,msg,link});
+  saveCollection();
+  renderCollection();
+  toast('Badge added to collection!');
+}
+
+function renderCollection(){
+  const el=document.getElementById('collection');
+  const ca=document.getElementById('collActions');
+  const cnt=document.getElementById('badgeCount');
+  if(!collection.length){
+    el.innerHTML='<p style="color:var(--tx2);text-align:center;padding:20px;font-size:.9rem">No badges yet. Create one above and click "Add to Collection".</p>';
+    ca.style.display='none';
+    cnt.textContent='';
+    return;
+  }
+  cnt.textContent='('+collection.length+' badges)';
+  ca.style.display='flex';
+  el.innerHTML=collection.map((b,i)=>'<div class="bi"><img src="'+b.url+'" alt="'+b.label+'"><div class="ba"><button onclick="copyBadge('+i+',\'md\')">MD</button><button onclick="copyBadge('+i+',\'html\')">HTML</button><button onclick="removeBadge('+i+')">✕</button></div></div>').join('');
+}
+
+function copyBadge(i,fmt){
+  const b=collection[i];
+  let code;
+  if(fmt==='md'){
+    code=b.link?'[!['+b.label+']('+b.url+')]('+b.link+')':'!['+b.label+']('+b.url+')';
+  }else{
+    code=b.link?'<a href="'+b.link+'"><img src="'+b.url+'" alt="'+b.label+'"></a>':'<img src="'+b.url+'" alt="'+b.label+'">';
+  }
+  navigator.clipboard.writeText(code).then(()=>toast('Copied!'));
+}
+
+function removeBadge(i){
+  collection.splice(i,1);
+  saveCollection();
+  renderCollection();
+  toast('Badge removed');
+}
+
+function exportAll(fmt){
+  const codes=collection.map(b=>{
+    if(fmt==='md')return b.link?'[!['+b.label+']('+b.url+')]('+b.link+')':'!['+b.label+']('+b.url+')';
+    return b.link?'<a href="'+b.link+'"><img src="'+b.url+'" alt="'+b.label+'"></a>':'<img src="'+b.url+'" alt="'+b.label+'">';
+  });
+  navigator.clipboard.writeText(codes.join('\n')).then(()=>toast('All badges copied!'));
+}
+
+function clearCollection(){
+  if(!confirm('Clear all badges?'))return;
+  collection=[];
+  saveCollection();
+  renderCollection();
+  toast('Collection cleared');
+}
+
+function saveCollection(){
+  try{localStorage.setItem('badge-collection',JSON.stringify(collection));}catch(e){}
+}
+
+function loadCollection(){
+  try{const d=localStorage.getItem('badge-collection');if(d)collection=JSON.parse(d);}catch(e){}
+  renderCollection();
+}
+
+function resetForm(){
+  ['iLabel','iMsg','iColor','iLabelColor','iLink'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('iLogo').value='';
+  document.getElementById('iColorPick').value='#007ec6';
+  document.querySelectorAll('#presetColors button').forEach(b=>b.classList.remove('on'));
+  update();
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Table of Contents Generator</title>
+<meta name="description" content="Paste Markdown or HTML content and instantly generate a clean, linked Table of Contents.">
+<link rel="canonical" href="https://lifa-su.com/ai-table-of-contents/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--surface:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--border:#2a2a4a;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 20px 30px}
+header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+header p{color:var(--text2);font-size:1rem}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;align-items:center}
+.controls label{color:var(--text2);font-size:.85rem;display:flex;align-items:center;gap:6px}
+.controls select,.controls button{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:.9rem;cursor:pointer;transition:border-color .2s}
+.controls select:hover,.controls button:hover{border-color:var(--accent)}
+.btn-copy{position:relative}
+.btn-copy.copied::after{content:'Copied!';position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:#2d8;color:#000;padding:2px 10px;border-radius:4px;font-size:.75rem;white-space:nowrap;animation:fadeout 1.5s forwards}
+@keyframes fadeout{0%,70%{opacity:1}100%{opacity:0}}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.main-grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden}
+.panel-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.panel-header h2{font-size:.95rem;color:var(--text2)}
+.panel-body{padding:16px;flex:1;overflow:auto}
+textarea{width:100%;min-height:350px;background:transparent;border:none;color:var(--text);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.88rem;resize:vertical;outline:none;line-height:1.7}
+textarea::placeholder{color:#556}
+.output-code{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-word;min-height:100px;max-height:300px;overflow:auto;color:var(--text);line-height:1.6}
+.preview-area{min-height:200px}
+.preview-area ul,.preview-area ol{padding-left:24px;margin:4px 0}
+.preview-area li{margin:3px 0;color:var(--text)}
+.preview-area a{color:var(--accent)}
+.empty-state{color:#556;text-align:center;padding:60px 20px;font-size:.95rem}
+footer{text-align:center;padding:40px 20px 20px;color:#445;font-size:.8rem}
+.sample-btn{font-size:.8rem;color:var(--accent);cursor:pointer;background:none;border:none;padding:0}
+.sample-btn:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<header>
+<h1>AI Table of Contents Generator</h1>
+<p>Paste Markdown or HTML — get a clean, linked Table of Contents instantly</p>
+</header>
+<div class="container">
+<div class="controls">
+<label>Style:<select id="styleSelect"><option value="numbered">Numbered (1. 1.1)</option><option value="bullet">Bullet List</option></select></label>
+<label>Output:<select id="formatSelect"><option value="markdown">Markdown</option><option value="html">HTML</option></select></label>
+<button class="btn-copy" id="copyBtn">Copy TOC</button>
+<button class="sample-btn" id="sampleBtn">Load sample</button>
+</div>
+<div class="main-grid">
+<div class="panel">
+<div class="panel-header"><h2>Input (Markdown or HTML)</h2></div>
+<div class="panel-body"><textarea id="inputArea" placeholder="Paste your Markdown or HTML here...&#10;&#10;# Main Title&#10;## Section One&#10;### Subsection&#10;## Section Two"></textarea></div>
+</div>
+<div class="panel">
+<div class="panel-header"><h2>Generated TOC</h2><span id="headingCount" style="color:var(--text2);font-size:.8rem"></span></div>
+<div class="panel-body"><div class="output-code" id="outputCode"></div></div>
+</div>
+</div>
+<div class="panel" style="margin-top:20px">
+<div class="panel-header"><h2>Live Preview</h2></div>
+<div class="panel-body preview-area" id="previewArea"><div class="empty-state">Your TOC preview will appear here</div></div>
+</div>
+</div>
+<footer><p>AI Table of Contents Generator — Free, fast, no sign-up</p></footer>
+<script>
+(function(){
+var input=document.getElementById('inputArea');
+var output=document.getElementById('outputCode');
+var preview=document.getElementById('previewArea');
+var styleSel=document.getElementById('styleSelect');
+var fmtSel=document.getElementById('formatSelect');
+var countEl=document.getElementById('headingCount');
+var copyBtn=document.getElementById('copyBtn');
+var sampleBtn=document.getElementById('sampleBtn');
+
+function slugify(t){
+return t.toLowerCase().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+function extractHeadings(text){
+var headings=[];
+var lines=text.split('\n');
+for(var i=0;i<lines.length;i++){
+var line=lines[i].trim();
+var md=line.match(/^(#{1,6})\s+(.+)$/);
+if(md){headings.push({level:md[1].length,text:md[2].replace(/[#*_`\[\]]/g,'').trim()});continue;}
+var ht=line.match(/<h([1-6])[^>]*>(.*?)<\/h[1-6]>/i);
+if(ht){headings.push({level:parseInt(ht[1]),text:ht[2].replace(/<[^>]*>/g,'').trim()});}
+}
+return headings;
+}
+
+function buildNumbered(headings){
+var counters=[0,0,0,0,0,0];
+var result=[];
+if(headings.length===0)return result;
+var minLv=6;
+for(var i=0;i<headings.length;i++){if(headings[i].level<minLv)minLv=headings[i].level;}
+for(var i=0;i<headings.length;i++){
+var h=headings[i];
+var idx=h.level-minLv;
+if(idx<0)idx=0;
+if(idx>5)idx=5;
+counters[idx]++;
+for(var j=idx+1;j<6;j++)counters[j]=0;
+var num='';
+for(var j=0;j<=idx;j++){if(counters[j]>0)num+=(num?'.':'')+counters[j];}
+result.push({level:h.level,text:h.text,slug:slugify(h.text),num:num,depth:idx});
+}
+return result;
+}
+
+function generate(){
+var text=input.value;
+var headings=extractHeadings(text);
+countEl.textContent=headings.length?headings.length+' heading'+(headings.length>1?'s':''):'';
+if(headings.length===0){
+output.textContent='';
+preview.innerHTML='<div class="empty-state">Your TOC preview will appear here</div>';
+return;
+}
+var style=styleSel.value;
+var fmt=fmtSel.value;
+var items=buildNumbered(headings);
+var md='',html='',previewHtml='';
+if(fmt==='markdown'){
+for(var i=0;i<items.length;i++){
+var it=items[i];
+var indent='';for(var j=0;j<it.depth;j++)indent+='  ';
+if(style==='numbered'){md+=indent+it.num+'. ['+it.text+'](#'+it.slug+')\n';}
+else{md+=indent+'- ['+it.text+'](#'+it.slug+')\n';}
+}
+output.textContent=md;
+}else{
+var tag=style==='numbered'?'ol':'ul';
+html='<'+tag+'>\n';
+var prevDepth=0;
+for(var i=0;i<items.length;i++){
+var it=items[i];
+while(it.depth>prevDepth){html+='<'+tag+'>\n';prevDepth++;}
+while(it.depth<prevDepth){html+='</li>\n</'+tag+'>\n';prevDepth--;}
+if(i>0&&it.depth===prevDepth)html+='</li>\n';
+html+='<li><a href="#'+it.slug+'">'+it.text+'</a>';
+prevDepth=it.depth;
+}
+while(prevDepth>0){html+='</li>\n</'+tag+'>\n';prevDepth--;}
+html+='</li>\n</'+tag+'>';
+output.textContent=html;
+}
+var ptag=style==='numbered'?'ol':'ul';
+previewHtml='<'+ptag+'>';
+var pPrev=0;
+for(var i=0;i<items.length;i++){
+var it=items[i];
+while(it.depth>pPrev){previewHtml+='<'+ptag+'>';pPrev++;}
+while(it.depth<pPrev){previewHtml+='</li></'+ptag+'>';pPrev--;}
+if(i>0&&it.depth===pPrev)previewHtml+='</li>';
+var label=style==='numbered'?it.text:it.text;
+previewHtml+='<li><a href="#'+it.slug+'">'+label+'</a>';
+pPrev=it.depth;
+}
+while(pPrev>0){previewHtml+='</li></'+ptag+'>';pPrev--;}
+previewHtml+='</li></'+ptag+'>';
+preview.innerHTML=previewHtml;
+}
+
+copyBtn.addEventListener('click',function(){
+var text=output.textContent;
+if(!text)return;
+navigator.clipboard.writeText(text).then(function(){
+copyBtn.classList.add('copied');
+setTimeout(function(){copyBtn.classList.remove('copied');},1600);
+});
+});
+
+sampleBtn.addEventListener('click',function(){
+input.value='# Getting Started with JavaScript\n## Installation\n### Node.js Setup\n### Browser Environment\n## Basic Syntax\n### Variables\n### Functions\n### Control Flow\n## Advanced Topics\n### Closures\n### Promises and Async/Await\n### Modules\n## Best Practices\n### Code Style\n### Error Handling\n### Testing\n## Conclusion';
+generate();
+});
+
+var timer;
+input.addEventListener('input',function(){clearTimeout(timer);timer=setTimeout(generate,200);});
+styleSel.addEventListener('change',generate);
+fmtSel.addEventListener('change',generate);
+})();
+</script>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

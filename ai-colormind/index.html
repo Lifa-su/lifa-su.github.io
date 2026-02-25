@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-powered color palette generator. Describe your mood or theme in words and get a perfectly matched color scheme with hex codes and export options.">
+<link rel="canonical" href="https://lifa-su.com/ai-colormind/">
+<title>ColorMind — AI配色方案生成器</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a2e;--bg4:#252540;
+  --text:#e8e8f0;--text2:#a0a0b8;--text3:#6a6a80;
+  --accent:#6c5ce7;--accent2:#a29bfe;--accent-glow:rgba(108,92,231,0.3);
+  --success:#00b894;--warning:#fdcb6e;--danger:#e17055;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --shadow:0 4px 24px rgba(0,0,0,0.3);
+  --transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,textarea,select{font-family:inherit;outline:none}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* Layout */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* Header */
+header{padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.85)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:700}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#6c5ce7,#a29bfe,#fd79a8);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.header-actions{display:flex;align-items:center;gap:12px}
+.btn{padding:8px 18px;border-radius:var(--radius-sm);font-size:0.875rem;font-weight:500;transition:var(--transition);display:inline-flex;align-items:center;gap:6px}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid rgba(255,255,255,0.1)}
+.btn-ghost:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#a29bfe);color:#fff;box-shadow:0 2px 12px var(--accent-glow)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow)}
+.btn-primary:active{transform:translateY(0)}
+.btn-sm{padding:6px 12px;font-size:0.8rem}
+.btn-icon{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);color:var(--text2);transition:var(--transition)}
+.btn-icon:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+
+/* Hero */
+.hero{text-align:center;padding:60px 0 40px}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;background:linear-gradient(135deg,#fff 0%,#a29bfe 50%,#fd79a8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px;line-height:1.2}
+.hero p{color:var(--text2);font-size:1.1rem;max-width:600px;margin:0 auto}
+
+/* Generator */
+.generator{max-width:800px;margin:0 auto 40px;padding:32px;background:var(--bg2);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,0.06);box-shadow:var(--shadow)}
+.input-group{display:flex;gap:12px;margin-bottom:20px}
+.input-main{flex:1;padding:14px 18px;background:var(--bg);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius);color:var(--text);font-size:1rem;transition:var(--transition)}
+.input-main:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.input-main::placeholder{color:var(--text3)}
+.generate-btn{padding:14px 28px;background:linear-gradient(135deg,var(--accent),#a29bfe);color:#fff;border-radius:var(--radius);font-size:1rem;font-weight:600;transition:var(--transition);white-space:nowrap;min-width:140px}
+.generate-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow)}
+.generate-btn:active{transform:translateY(0)}
+.generate-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+.generate-btn .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Style Tags */
+.style-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.style-tag{padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;color:var(--text2);font-size:0.85rem;cursor:pointer;transition:var(--transition)}
+.style-tag:hover{background:rgba(108,92,231,0.15);border-color:var(--accent);color:var(--accent2)}
+.style-tag.active{background:rgba(108,92,231,0.2);border-color:var(--accent);color:var(--accent2)}
+
+/* Options Row */
+.options-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.option-select{padding:8px 14px;background:var(--bg);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);color:var(--text);font-size:0.85rem;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
+.option-select:focus{border-color:var(--accent)}
+
+/* API Key */
+.api-key-section{margin-bottom:20px;padding:16px;background:rgba(255,255,255,0.02);border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.05)}
+.api-key-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.api-key-header label{font-size:0.85rem;color:var(--text2);font-weight:500}
+.api-key-input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);color:var(--text);font-size:0.85rem;font-family:monospace}
+.api-key-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.api-key-hint{font-size:0.75rem;color:var(--text3);margin-top:6px}
+.api-key-hint a{color:var(--accent2);text-decoration:underline}
+
+/* Palette Display */
+.palette-section{margin-bottom:40px}
+.palette-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.palette-title{font-size:1.3rem;font-weight:700}
+.palette-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Color Cards */
+.palette-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.color-card{border-radius:var(--radius);overflow:hidden;background:var(--bg2);border:1px solid rgba(255,255,255,0.06);transition:var(--transition);cursor:pointer;position:relative}
+.color-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.color-swatch{height:120px;position:relative;display:flex;align-items:center;justify-content:center}
+.color-swatch .copy-hint{opacity:0;transition:var(--transition);font-size:0.85rem;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.5)}
+.color-card:hover .copy-hint{opacity:1}
+.color-info{padding:12px}
+.color-role{font-size:0.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.color-name{font-size:0.85rem;font-weight:600;margin-bottom:6px}
+.color-values{display:flex;flex-direction:column;gap:2px}
+.color-hex{font-family:monospace;font-size:0.85rem;color:var(--text)}
+.color-rgb{font-family:monospace;font-size:0.75rem;color:var(--text3)}
+
+/* Copy Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg3);color:var(--text);padding:12px 24px;border-radius:var(--radius);font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.4);z-index:1000;transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);border:1px solid rgba(255,255,255,0.1)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--success)}
+
+/* Preview Section */
+.preview-section{margin-bottom:40px}
+.preview-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--bg2);padding:4px;border-radius:var(--radius-sm);width:fit-content}
+.preview-tab{padding:8px 16px;border-radius:var(--radius-sm);font-size:0.85rem;color:var(--text2);background:transparent;transition:var(--transition)}
+.preview-tab:hover{color:var(--text)}
+.preview-tab.active{background:var(--bg4);color:var(--text)}
+
+/* UI Preview */
+.ui-preview{background:var(--bg2);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,0.06);overflow:hidden;padding:32px}
+.preview-card{border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.preview-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.preview-btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:0.9rem;font-weight:500;border:none;cursor:default}
+.preview-text-group{display:flex;flex-direction:column;gap:8px}
+.preview-heading{font-size:1.5rem;font-weight:700}
+.preview-body{font-size:0.95rem;line-height:1.6;max-width:500px}
+.preview-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:500}
+.preview-input{padding:10px 14px;border-radius:var(--radius-sm);border:2px solid;font-size:0.9rem;width:250px;max-width:100%;background:transparent}
+.preview-nav{display:flex;gap:16px;padding:16px 24px;border-radius:var(--radius);margin-bottom:16px;align-items:center}
+.preview-nav-item{font-size:0.9rem;font-weight:500;cursor:default}
+.preview-nav-logo{font-weight:700;font-size:1.1rem;margin-right:auto}
+
+/* Contrast Checker */
+.contrast-section{margin-bottom:40px}
+.contrast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.contrast-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.06)}
+.contrast-pair{display:flex;gap:4px}
+.contrast-dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.1)}
+.contrast-info{flex:1}
+.contrast-label{font-size:0.8rem;color:var(--text3);margin-bottom:2px}
+.contrast-ratio{font-size:0.95rem;font-weight:600;font-family:monospace}
+.contrast-badges{display:flex;gap:6px;margin-top:4px}
+.contrast-badge{font-size:0.7rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.contrast-badge.pass{background:rgba(0,184,148,0.15);color:var(--success)}
+.contrast-badge.fail{background:rgba(225,112,85,0.15);color:var(--danger)}
+
+/* Export Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,0.1);padding:32px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;transform:scale(0.95);transition:transform 0.3s}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:1.2rem;font-weight:700}
+.modal-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05);color:var(--text2);transition:var(--transition)}
+.modal-close:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+.export-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.export-tab{padding:6px 14px;border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text2);background:rgba(255,255,255,0.05);transition:var(--transition)}
+.export-tab:hover{color:var(--text)}
+.export-tab.active{background:var(--accent);color:#fff}
+.export-code{background:var(--bg);border-radius:var(--radius-sm);padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:0.85rem;line-height:1.6;color:var(--text);overflow-x:auto;white-space:pre;border:1px solid rgba(255,255,255,0.06);max-height:300px;overflow-y:auto}
+.export-copy-btn{margin-top:12px;width:100%}
+
+/* History */
+.history-section{margin-bottom:40px}
+.history-list{display:flex;flex-direction:column;gap:8px}
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.06);cursor:pointer;transition:var(--transition)}
+.history-item:hover{background:var(--bg3);border-color:rgba(255,255,255,0.1)}
+.history-colors{display:flex;gap:2px}
+.history-color-dot{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.1)}
+.history-prompt{flex:1;font-size:0.9rem;color:var(--text2)}
+.history-time{font-size:0.75rem;color:var(--text3)}
+
+/* Empty State */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:0.5}
+.empty-state p{font-size:1rem}
+
+/* Footer */
+footer{padding:24px 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;color:var(--text3);font-size:0.85rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero{padding:40px 0 24px}
+  .hero h1{font-size:1.8rem}
+  .generator{padding:20px;margin-bottom:24px}
+  .input-group{flex-direction:column}
+  .generate-btn{width:100%}
+  .palette-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+  .color-swatch{height:90px}
+  .ui-preview{padding:16px}
+  .contrast-grid{grid-template-columns:1fr}
+  .palette-header{flex-direction:column;align-items:flex-start}
+  .options-row{flex-direction:column;align-items:stretch}
+  .option-select{width:100%}
+}
+@media(max-width:480px){
+  .container{padding:0 16px}
+  .palette-grid{grid-template-columns:repeat(2,1fr)}
+  .header-actions .btn span{display:none}
+}
+
+/* Animations */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-in-up{animation:fadeInUp 0.5s ease forwards}
+.color-card{animation:fadeInUp 0.4s ease forwards;opacity:0}
+.color-card:nth-child(1){animation-delay:0.05s}
+.color-card:nth-child(2){animation-delay:0.1s}
+.color-card:nth-child(3){animation-delay:0.15s}
+.color-card:nth-child(4){animation-delay:0.2s}
+.color-card:nth-child(5){animation-delay:0.25s}
+.color-card:nth-child(6){animation-delay:0.3s}
+.color-card:nth-child(7){animation-delay:0.35s}
+
+/* Gradient bg */
+.bg-gradient{position:fixed;top:0;left:0;right:0;height:400px;background:radial-gradient(ellipse at 50% 0%,rgba(108,92,231,0.08) 0%,transparent 70%);pointer-events:none;z-index:-1}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+
+<!-- Header -->
+<header>
+<div class="container header-inner">
+  <div class="logo">
+    <div class="logo-icon">🎨</div>
+    <span>ColorMind</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="toggleHistory()">📋 <span>历史</span></button>
+    <button class="btn btn-ghost" onclick="showApiKeySection()">⚙️ <span>设置</span></button>
+  </div>
+</div>
+</header>
+
+<!-- Hero -->
+<section class="hero container">
+  <h1>用一句话，生成完美配色</h1>
+  <p>输入你的创意描述，AI 为你生成专业配色方案。支持预览、对比度检查、一键导出。</p>
+</section>
+
+<!-- Generator -->
+<section class="container">
+<div class="generator" id="generator">
+  <div class="api-key-section" id="apiKeySection">
+    <div class="api-key-header">
+      <label>🔑 DeepSeek API Key</label>
+      <button class="btn btn-sm btn-ghost" onclick="toggleApiKey()">
+        <span id="apiKeyToggle">显示</span>
+      </button>
+    </div>
+    <input type="password" class="api-key-input" id="apiKeyInput" placeholder="sk-..." oninput="saveApiKey()">
+    <div class="api-key-hint">在 <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek 平台</a> 获取 API Key，数据仅存储在本地浏览器中。</div>
+  </div>
+
+  <div class="input-group">
+    <input type="text" class="input-main" id="promptInput" placeholder="描述你想要的配色风格，如：赛博朋克科技感、温暖的咖啡店、清新自然森林..." autofocus>
+    <button class="generate-btn" id="generateBtn" onclick="generate()">
+      ✨ 生成配色
+    </button>
+  </div>
+
+  <div class="style-tags" id="styleTags">
+    <button class="style-tag" data-prompt="科技感深蓝紫配色">🔮 科技</button>
+    <button class="style-tag" data-prompt="清新自然森林绿配色">🌿 自然</button>
+    <button class="style-tag" data-prompt="专业商务蓝灰配色">💼 商务</button>
+    <button class="style-tag" data-prompt="活泼明亮彩色配色">🎉 活泼</button>
+    <button class="style-tag" data-prompt="极简黑白灰高级感">⬛ 极简</button>
+    <button class="style-tag" data-prompt="温暖复古咖啡色调">☕ 复古</button>
+    <button class="style-tag" data-prompt="赛博朋克霓虹配色">🌃 赛博朋克</button>
+    <button class="style-tag" data-prompt="日式和风淡雅配色">🌸 和风</button>
+    <button class="style-tag" data-prompt="海洋蓝绿清凉配色">🌊 海洋</button>
+    <button class="style-tag" data-prompt="落日暖橙渐变配色">🌅 落日</button>
+  </div>
+
+  <div class="options-row">
+    <select class="option-select" id="colorCount">
+      <option value="5">5 色方案</option>
+      <option value="6" selected>6 色方案</option>
+      <option value="7">7 色方案</option>
+    </select>
+    <select class="option-select" id="colorMode">
+      <option value="ui">UI / 网页设计</option>
+      <option value="brand">品牌设计</option>
+      <option value="illustration">插画 / 海报</option>
+      <option value="interior">室内设计</option>
+    </select>
+  </div>
+</div>
+</section>
+
+<!-- Palette Display -->
+<section class="container palette-section" id="paletteSection" style="display:none">
+  <div class="palette-header">
+    <div class="palette-title" id="paletteName">配色方案</div>
+    <div class="palette-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showExportModal()">📦 导出</button>
+      <button class="btn btn-ghost btn-sm" onclick="showContrastSection()">🔍 对比度</button>
+      <button class="btn btn-ghost btn-sm" onclick="randomize()">🎲 随机微调</button>
+    </div>
+  </div>
+  <div class="palette-grid" id="paletteGrid"></div>
+</section>
+
+<!-- Preview Section -->
+<section class="container preview-section" id="previewSection" style="display:none">
+  <div class="preview-tabs">
+    <button class="preview-tab active" onclick="switchPreview('ui',this)">UI 组件</button>
+    <button class="preview-tab" onclick="switchPreview('page',this)">页面预览</button>
+    <button class="preview-tab" onclick="switchPreview('gradient',this)">渐变</button>
+  </div>
+  <div class="ui-preview" id="previewContent"></div>
+</section>
+
+<!-- Contrast Section -->
+<section class="container contrast-section" id="contrastSection" style="display:none">
+  <h3 style="margin-bottom:16px;font-size:1.1rem">♿ WCAG 对比度检查</h3>
+  <div class="contrast-grid" id="contrastGrid"></div>
+</section>
+
+<!-- History Section -->
+<section class="container history-section" id="historySection" style="display:none">
+  <h3 style="margin-bottom:16px;font-size:1.1rem">📋 生成历史</h3>
+  <div class="history-list" id="historyList"></div>
+</section>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📦 导出配色方案</div>
+      <button class="modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+    <div class="export-tabs" id="exportTabs">
+      <button class="export-tab active" onclick="switchExport('css',this)">CSS 变量</button>
+      <button class="export-tab" onclick="switchExport('tailwind',this)">Tailwind</button>
+      <button class="export-tab" onclick="switchExport('scss',this)">SCSS</button>
+      <button class="export-tab" onclick="switchExport('json',this)">JSON</button>
+      <button class="export-tab" onclick="switchExport('hex',this)">HEX</button>
+    </div>
+    <pre class="export-code" id="exportCode"></pre>
+    <button class="btn btn-primary export-copy-btn" onclick="copyExport()">📋 复制代码</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    ColorMind — AI 配色方案生成器 · Powered by DeepSeek
+  </div>
+</footer>
+
+
+<script>
+// ============ State ============
+let currentPalette = null;
+let history = JSON.parse(localStorage.getItem('colormind_history') || '[]');
+let apiKey = localStorage.getItem('colormind_deepseek_key') || '';
+
+// ============ DOM refs ============
+const promptInput = document.getElementById('promptInput');
+const generateBtn = document.getElementById('generateBtn');
+const paletteResult = document.getElementById('paletteResult');
+const paletteGrid = document.getElementById('paletteGrid');
+const paletteName = document.getElementById('paletteName');
+const paletteDesc = document.getElementById('paletteDesc');
+const contrastGrid = document.getElementById('contrastGrid');
+const exportCode = document.getElementById('exportCode');
+const exportModal = document.getElementById('exportModal');
+const contrastModal = document.getElementById('contrastModal');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const historyList = document.getElementById('historyList');
+const toast = document.getElementById('toast');
+
+// ============ Init ============
+if (apiKey) {
+  apiKeyInput.value = apiKey;
+  document.querySelector('.api-key-section').style.display = 'none';
+}
+renderHistory();
+
+// ============ Style Tags ============
+document.querySelectorAll('.style-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    tag.classList.toggle('active');
+    const activeStyles = [...document.querySelectorAll('.style-tag.active')].map(t => t.dataset.style);
+    const current = promptInput.value.replace(/\s*[\[【].*?[\]】]\s*/g, '').trim();
+    if (activeStyles.length > 0) {
+      promptInput.value = current + ' 【' + activeStyles.join('、') + '风格】';
+    } else {
+      promptInput.value = current;
+    }
+  });
+});
+
+// ============ API Key ============
+function saveApiKey() {
+  apiKey = apiKeyInput.value.trim();
+  if (apiKey) {
+    localStorage.setItem('colormind_deepseek_key', apiKey);
+    showToast('API Key 已保存 ✓');
+    document.querySelector('.api-key-section').style.display = 'none';
+  }
+}
+
+function toggleApiKey() {
+  const section = document.querySelector('.api-key-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+// ============ Color Utilities ============
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const n = parseInt(hex, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function luminance(r, g, b) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+function contrastRatio(hex1, hex2) {
+  const c1 = hexToRgb(hex1), c2 = hexToRgb(hex2);
+  const l1 = luminance(c1.r, c1.g, c1.b);
+  const l2 = luminance(c2.r, c2.g, c2.b);
+  const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function textColorFor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  return luminance(r, g, b) > 0.179 ? '#1a1a2e' : '#ffffff';
+}
+
+// ============ Generate ============
+async function generate() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) { showToast('请输入配色主题描述', 'warning'); promptInput.focus(); return; }
+  if (!apiKey) { showToast('请先设置 DeepSeek API Key', 'warning'); toggleApiKey(); return; }
+
+  const colorCount = document.getElementById('colorCount').value;
+  const format = document.getElementById('colorFormat').value;
+
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<span class="spinner"></span> 生成中...';
+
+  try {
+    const systemPrompt = `你是一个专业的色彩设计师和配色专家。用户会描述他们想要的配色风格，你需要生成一个专业的配色方案。
+
+请严格按照以下JSON格式返回（不要包含任何其他文字或markdown标记）：
+{
+  "name": "方案名称（简短有创意）",
+  "description": "方案描述（一句话说明设计理念）",
+  "colors": [
+    {"hex": "#十六进制色值", "name": "颜色名称", "role": "角色(primary/secondary/accent/background/surface/text/muted)"}
+  ]
+}
+
+要求：
+1. 生成恰好${colorCount}个颜色
+2. 颜色之间要和谐搭配，符合色彩理论
+3. 必须包含适合做背景色和文字色的颜色
+4. 确保文字色和背景色之间有足够的对比度（WCAG AA标准）
+5. 每个颜色的role不要重复（如果颜色数>7则可以用extra1, extra2等）
+6. hex值必须是合法的6位十六进制颜色代码`;
+
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.8,
+        max_tokens: 1000,
+        response_format: { type: 'json_object' }
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API 请求失败 (${response.status})`);
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    const palette = JSON.parse(content);
+
+    if (!palette.colors || !Array.isArray(palette.colors)) throw new Error('返回格式错误');
+
+    // Validate hex codes
+    palette.colors = palette.colors.map(c => ({
+      ...c,
+      hex: c.hex.startsWith('#') ? c.hex : '#' + c.hex
+    }));
+
+    currentPalette = palette;
+    renderPalette(palette);
+    saveToHistory(prompt, palette);
+    paletteResult.style.display = 'block';
+    paletteResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    showToast('生成失败: ' + err.message, 'error');
+    console.error(err);
+  } finally {
+    generateBtn.disabled = false;
+    generateBtn.innerHTML = '✨ 生成配色';
+  }
+}
+
+// Enter key to generate
+promptInput.addEventListener('keydown', e => { if (e.key === 'Enter') generate(); });
+
+// ============ Render Palette ============
+function renderPalette(palette) {
+  paletteName.textContent = palette.name;
+  paletteDesc.textContent = palette.description;
+
+  paletteGrid.innerHTML = palette.colors.map((color, i) => {
+    const rgb = hexToRgb(color.hex);
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    const txtColor = textColorFor(color.hex);
+    return `
+      <div class="color-card" style="--delay:${i * 0.08}s" onclick="copyColor('${color.hex}')">
+        <div class="color-swatch" style="background:${color.hex};color:${txtColor}">
+          <span class="color-hex">${color.hex.toUpperCase()}</span>
+          <div class="color-actions">
+            <button class="btn-icon" onclick="event.stopPropagation();copyColor('${color.hex}')" title="复制HEX">📋</button>
+            <button class="btn-icon" onclick="event.stopPropagation();copyColor('rgb(${rgb.r},${rgb.g},${rgb.b})')" title="复制RGB">🎯</button>
+            <button class="btn-icon" onclick="event.stopPropagation();copyColor('hsl(${hsl.h},${hsl.s}%,${hsl.l}%)')" title="复制HSL">🌈</button>
+          </div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">${color.name}</div>
+          <div class="color-role">${color.role}</div>
+          <div class="color-values">
+            <span>RGB(${rgb.r},${rgb.g},${rgb.b})</span>
+            <span>HSL(${hsl.h},${hsl.s}%,${hsl.l}%)</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Render preview
+  renderPreview(palette);
+}
+
+// ============ Preview ============
+function renderPreview(palette) {
+  const preview = document.getElementById('previewArea');
+  const bg = palette.colors.find(c => c.role === 'background')?.hex || palette.colors[palette.colors.length - 1].hex;
+  const surface = palette.colors.find(c => c.role === 'surface')?.hex || palette.colors[Math.min(1, palette.colors.length - 1)].hex;
+  const primary = palette.colors.find(c => c.role === 'primary')?.hex || palette.colors[0].hex;
+  const secondary = palette.colors.find(c => c.role === 'secondary')?.hex || palette.colors[Math.min(1, palette.colors.length - 1)].hex;
+  const accent = palette.colors.find(c => c.role === 'accent')?.hex || palette.colors[Math.min(2, palette.colors.length - 1)].hex;
+  const text = palette.colors.find(c => c.role === 'text')?.hex || textColorFor(bg);
+  const muted = palette.colors.find(c => c.role === 'muted')?.hex || palette.colors[palette.colors.length - 1].hex;
+
+  preview.innerHTML = `
+    <div style="background:${bg};padding:24px;border-radius:12px;color:${text};font-family:inherit">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid ${surface}">
+        <div style="width:32px;height:32px;background:${primary};border-radius:8px"></div>
+        <span style="font-weight:700;font-size:1.1rem">AppName</span>
+        <div style="margin-left:auto;display:flex;gap:16px;font-size:0.9rem;color:${muted}">
+          <span>首页</span><span>产品</span><span>关于</span>
+        </div>
+      </div>
+      <h3 style="font-size:1.3rem;margin-bottom:8px;color:${text}">欢迎使用我们的产品</h3>
+      <p style="color:${muted};font-size:0.9rem;margin-bottom:16px">这是一个使用AI生成配色方案的预览效果展示</p>
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <button style="padding:8px 20px;background:${primary};color:${textColorFor(primary)};border:none;border-radius:8px;font-size:0.9rem;font-weight:500">主要按钮</button>
+        <button style="padding:8px 20px;background:transparent;color:${secondary};border:1px solid ${secondary};border-radius:8px;font-size:0.9rem">次要按钮</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:${surface};padding:16px;border-radius:8px">
+          <div style="width:24px;height:24px;background:${accent};border-radius:6px;margin-bottom:8px"></div>
+          <div style="font-weight:600;font-size:0.95rem;margin-bottom:4px;color:${text}">功能卡片</div>
+          <div style="font-size:0.8rem;color:${muted}">这里是描述文字</div>
+        </div>
+        <div style="background:${surface};padding:16px;border-radius:8px">
+          <div style="width:24px;height:24px;background:${secondary};border-radius:6px;margin-bottom:8px"></div>
+          <div style="font-weight:600;font-size:0.95rem;margin-bottom:4px;color:${text}">功能卡片</div>
+          <div style="font-size:0.8rem;color:${muted}">这里是描述文字</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ============ Copy ============
+function copyColor(value) {
+  navigator.clipboard.writeText(value).then(() => showToast(`已复制: ${value}`));
+}
+
+// ============ Export ============
+function showExport() {
+  if (!currentPalette) return;
+  exportModal.classList.add('active');
+  updateExport();
+}
+
+function closeExport() { exportModal.classList.remove('active'); }
+
+function updateExport() {
+  const format = document.getElementById('exportFormat').value;
+  const colors = currentPalette.colors;
+  let code = '';
+
+  switch (format) {
+    case 'css':
+      code = `:root {\n${colors.map(c => `  --color-${c.role}: ${c.hex};`).join('\n')}\n}`;
+      break;
+    case 'scss':
+      code = colors.map(c => `$color-${c.role}: ${c.hex};`).join('\n');
+      break;
+    case 'tailwind':
+      code = `// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n${colors.map(c => `        '${c.role}': '${c.hex}',`).join('\n')}\n      }\n    }\n  }\n}`;
+      break;
+    case 'json':
+      code = JSON.stringify(Object.fromEntries(colors.map(c => [c.role, { hex: c.hex, name: c.name }])), null, 2);
+      break;
+    case 'array':
+      code = JSON.stringify(colors.map(c => c.hex), null, 2);
+      break;
+  }
+  exportCode.textContent = code;
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(exportCode.textContent).then(() => showToast('代码已复制 ✓'));
+}
+
+// ============ Contrast Check ============
+function showContrast() {
+  if (!currentPalette) return;
+  contrastModal.classList.add('active');
+  const colors = currentPalette.colors;
+
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:0.8rem">';
+  html += '<tr><th style="padding:8px;text-align:left;border-bottom:1px solid var(--bg4)"></th>';
+  colors.forEach(c => {
+    html += `<th style="padding:8px;text-align:center;border-bottom:1px solid var(--bg4)"><div style="width:24px;height:24px;background:${c.hex};border-radius:4px;margin:0 auto" title="${c.name}"></div></th>`;
+  });
+  html += '</tr>';
+
+  colors.forEach((c1, i) => {
+    html += `<tr><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.03)"><div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:20px;background:${c1.hex};border-radius:4px;flex-shrink:0"></div><span>${c1.name}</span></div></td>`;
+    colors.forEach((c2, j) => {
+      if (i === j) {
+        html += '<td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)">—</td>';
+      } else {
+        const ratio = contrastRatio(c1.hex, c2.hex);
+        const ratioFixed = ratio.toFixed(1);
+        const aa = ratio >= 4.5;
+        const aaa = ratio >= 7;
+        let badge = '';
+        if (aaa) badge = '<span style="color:#00b894;font-weight:600">AAA</span>';
+        else if (aa) badge = '<span style="color:#fdcb6e;font-weight:600">AA</span>';
+        else badge = '<span style="color:#e17055;font-size:0.75rem">✗</span>';
+        html += `<td style="padding:8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.03)"><div>${ratioFixed}</div>${badge}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+  html += '</table>';
+  contrastGrid.innerHTML = html;
+}
+
+function closeContrast() { contrastModal.classList.remove('active'); }
+
+// ============ History ============
+function saveToHistory(prompt, palette) {
+  history.unshift({ prompt, palette, time: new Date().toISOString() });
+  if (history.length > 20) history = history.slice(0, 20);
+  localStorage.setItem('colormind_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  if (history.length === 0) {
+    historyList.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px;font-size:0.9rem">暂无历史记录</div>';
+    return;
+  }
+  historyList.innerHTML = history.map((item, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <div class="history-colors">
+        ${item.palette.colors.slice(0, 5).map(c => `<div class="history-color-dot" style="background:${c.hex}"></div>`).join('')}
+      </div>
+      <div class="history-info">
+        <div class="history-name">${item.palette.name}</div>
+        <div class="history-prompt">${item.prompt}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(index) {
+  const item = history[index];
+  currentPalette = item.palette;
+  promptInput.value = item.prompt;
+  renderPalette(item.palette);
+  paletteResult.style.display = 'block';
+  paletteResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearHistory() {
+  if (confirm('确定清空所有历史记录？')) {
+    history = [];
+    localStorage.removeItem('colormind_history');
+    renderHistory();
+    showToast('历史记录已清空');
+  }
+}
+
+// ============ Random Prompt ============
+function randomPrompt() {
+  const prompts = [
+    '赛博朋克风格的科技公司',
+    '温暖的咖啡店品牌',
+    '清新自然的环保主题',
+    '高端奢华的金融品牌',
+    '活泼可爱的儿童教育',
+    '极简主义的日式设计',
+    '复古怀旧的音乐平台',
+    '海洋主题的旅游网站',
+    '暗黑风格的游戏界面',
+    '春天花园的清新配色',
+    '北欧简约的家居品牌',
+    '热带水果的活力配色',
+    '星空宇宙的深邃配色',
+    '中国风的传统配色',
+    '蒸汽波美学的配色',
+  ];
+  promptInput.value = prompts[Math.floor(Math.random() * prompts.length)];
+  promptInput.focus();
+}
+
+// ============ Toast ============
+function showToast(msg, type = 'success') {
+  toast.textContent = msg;
+  toast.className = 'toast active ' + type;
+  setTimeout(() => toast.className = 'toast', 2500);
+}
+
+// ============ Close modals on backdrop click ============
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.classList.remove('active');
+  });
+});
+</script>
+<!-- MONETIZE:START -->
+<script src="monetize.js"></script>
+<!-- MONETIZE:END -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

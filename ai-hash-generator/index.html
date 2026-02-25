@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Hash Generator - MD5, SHA-1, SHA-256, SHA-512</title>
+<meta name="description" content="Free online hash generator. Calculate MD5, SHA-1, SHA-256, SHA-512 hashes for text and files instantly.">
+<link rel="canonical" href="https://lifa-su.com/ai-hash-generator/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
+.container{max-width:800px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin:20px 0 8px;color:#fff}
+.subtitle{text-align:center;color:#888;font-size:.95rem;margin-bottom:30px}
+.tabs{display:flex;margin-bottom:24px;border-radius:10px;overflow:hidden;border:1px solid #2a2a4a}
+.tab{flex:1;padding:12px;text-align:center;cursor:pointer;background:#16213e;color:#888;font-weight:600;transition:all .2s}
+.tab.active{background:#0f3460;color:#e94560}
+.tab:hover:not(.active){background:#1a2a4e;color:#aaa}
+.input-section label{display:block;font-weight:600;margin-bottom:8px;color:#ccc;font-size:.9rem}
+textarea{width:100%;height:140px;background:#16213e;border:1px solid #2a2a4a;border-radius:10px;padding:14px;color:#e0e0e0;font-size:.95rem;resize:vertical;font-family:inherit;transition:border-color .2s}
+textarea:focus{outline:none;border-color:#e94560}
+textarea::placeholder{color:#555}
+.drop-zone{border:2px dashed #2a2a4a;border-radius:10px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:#16213e}
+.drop-zone:hover,.drop-zone.dragover{border-color:#e94560;background:#1a2548}
+.drop-zone-icon{font-size:2.5rem;margin-bottom:10px}
+.drop-zone p{color:#888;font-size:.95rem}
+.drop-zone .browse{color:#e94560;text-decoration:underline}
+.file-info{margin-top:12px;padding:10px 14px;background:#0f3460;border-radius:8px;font-size:.85rem;display:none;word-break:break-all}
+.file-info .fname{color:#e94560;font-weight:600}
+.file-info .fsize{color:#888;margin-left:8px}
+#fileInput{display:none}
+.results{margin-top:8px}
+.result-card{background:#16213e;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .3s}
+.result-card.match{border-color:#2ecc71}
+.result-card.mismatch{border-color:#e74c3c}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.algo-name{font-weight:700;font-size:.85rem;color:#e94560;text-transform:uppercase;letter-spacing:.5px}
+.copy-btn{background:none;border:1px solid #2a2a4a;color:#888;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.8rem;transition:all .2s}
+.copy-btn:hover{border-color:#e94560;color:#e94560}
+.copy-btn.copied{border-color:#2ecc71;color:#2ecc71}
+.hash-value{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.82rem;color:#aaa;word-break:break-all;line-height:1.5;min-height:1.5em}
+.hash-value.empty{color:#555;font-style:italic}
+.verify-section{margin-top:24px;padding:18px;background:#16213e;border:1px solid #2a2a4a;border-radius:10px}
+.verify-section label{display:block;font-weight:600;margin-bottom:8px;color:#ccc;font-size:.9rem}
+.verify-input{width:100%;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:8px;padding:12px 14px;color:#e0e0e0;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;transition:border-color .2s}
+.verify-input:focus{outline:none;border-color:#e94560}
+.verify-input::placeholder{color:#444}
+.verify-result{margin-top:10px;font-size:.85rem;display:none;padding:8px 12px;border-radius:6px}
+.verify-result.match{display:block;background:rgba(46,204,113,.12);color:#2ecc71}
+.verify-result.no-match{display:block;background:rgba(231,76,60,.12);color:#e74c3c}
+footer{text-align:center;margin-top:40px;padding:20px 0;color:#444;font-size:.8rem;border-top:1px solid #2a2a4a}
+@media(max-width:600px){.container{padding:14px}h1{font-size:1.4rem}textarea{height:110px}.drop-zone{padding:28px 14px}.hash-value{font-size:.75rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#128274; Hash Generator</h1>
+<p class="subtitle">Calculate MD5, SHA-1, SHA-256, SHA-512 hashes instantly</p>
+<div class="tabs">
+<div class="tab active" onclick="switchMode('text')">&#128221; Text Input</div>
+<div class="tab" onclick="switchMode('file')">&#128193; File Upload</div>
+</div>
+<div id="textMode" class="input-section">
+<label for="textInput">Enter text to hash</label>
+<textarea id="textInput" placeholder="Type or paste your text here..."></textarea>
+</div>
+<div id="fileMode" class="input-section" style="display:none">
+<label>Upload a file to hash</label>
+<div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+<div class="drop-zone-icon">&#128194;</div>
+<p>Drag &amp; drop a file here or <span class="browse">browse</span></p>
+</div>
+<input type="file" id="fileInput">
+<div class="file-info" id="fileInfo"><span class="fname" id="fileName"></span><span class="fsize" id="fileSize"></span></div>
+</div>
+<div class="results" id="results"></div>
+<div class="verify-section">
+<label for="verifyInput">&#128269; Verify Hash</label>
+<input type="text" class="verify-input" id="verifyInput" placeholder="Paste a known hash to compare...">
+<div class="verify-result" id="verifyResult"></div>
+</div>
+</div>
+<footer><p>AI Hash Generator &mdash; All computation runs locally in your browser.</p></footer>
+<script src="https://aliyun.lifa.su/monetize.js"></script>
+<script>
+// MD5 (RFC 1321) - inline implementation
+function md5(input){
+  var isStr=typeof input==='string';
+  function toBytes(s){for(var b=[],i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<128)b.push(c);else if(c<2048){b.push(192|(c>>6));b.push(128|(c&63))}else if(c<65536){b.push(224|(c>>12));b.push(128|((c>>6)&63));b.push(128|(c&63))}else{b.push(240|(c>>18));b.push(128|((c>>12)&63));b.push(128|((c>>6)&63));b.push(128|(c&63))}}return b}
+  var bytes=isStr?toBytes(input):new Uint8Array(input);
+  var len=bytes.length;
+  var bitLen=len*8;
+  var padded=new Uint8Array(((len+8>>6)+1)*64);
+  for(var i=0;i<len;i++)padded[i]=bytes[i];
+  padded[len]=0x80;
+  padded[padded.length-8]=bitLen&0xff;
+  padded[padded.length-7]=(bitLen>>8)&0xff;
+  padded[padded.length-6]=(bitLen>>16)&0xff;
+  padded[padded.length-5]=(bitLen>>24)&0xff;
+  var a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+  var S=[7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+  var K=[0xd76aa478,0xe8c7b756,0x242070db,0xc1bdceee,0xf57c0faf,0x4787c62a,0xa8304613,0xfd469501,0x698098d8,0x8b44f7af,0xffff5bb1,0x895cd7be,0x6b901122,0xfd987193,0xa679438e,0x49b40821,0xf61e2562,0xc040b340,0x265e5a51,0xe9b6c7aa,0xd62f105d,0x02441453,0xd8a1e681,0xe7d3fbc8,0x21e1cde6,0xc33707d6,0xf4d50d87,0x455a14ed,0xa9e3e905,0xfcefa3f8,0x676f02d9,0x8d2a4c8a,0xfffa3942,0x8771f681,0x6d9d6122,0xfde5380c,0xa4beea44,0x4bdecfa9,0xf6bb4b60,0xbebfbc70,0x289b7ec6,0xeaa127fa,0xd4ef3085,0x04881d05,0xd9d4d039,0xe6db99e5,0x1fa27cf8,0xc4ac5665,0xf4292244,0x432aff97,0xab9423a7,0xfc93a039,0x655b59c3,0x8f0ccc92,0xffeff47d,0x85845dd1,0x6fa87e4f,0xfe2ce6e0,0xa3014314,0x4e0811a1,0xf7537e82,0xbd3af235,0x2ad7d2bb,0xeb86d391];
+  function add(a,b){return(a+b)|0}
+  function rot(v,n){return(v<<n)|(v>>>(32-n))}
+  for(var off=0;off<padded.length;off+=64){
+    var M=[];for(var j=0;j<16;j++)M[j]=padded[off+j*4]|(padded[off+j*4+1]<<8)|(padded[off+j*4+2]<<16)|(padded[off+j*4+3]<<24);
+    var A=a0,B=b0,C=c0,D=d0;
+    for(var i=0;i<64;i++){
+      var F,g;
+      if(i<16){F=(B&C)|((~B)&D);g=i}
+      else if(i<32){F=(D&B)|((~D)&C);g=(5*i+1)%16}
+      else if(i<48){F=B^C^D;g=(3*i+5)%16}
+      else{F=C^(B|(~D));g=(7*i)%16}
+      F=add(add(F,A),add(K[i],M[g]));
+      A=D;D=C;C=B;B=add(B,rot(F,S[i]));
+    }
+    a0=add(a0,A);b0=add(b0,B);c0=add(c0,C);d0=add(d0,D);
+  }
+  function toHex(n){var s='';for(var i=0;i<4;i++)s+=('0'+((n>>(i*8))&0xff).toString(16)).slice(-2);return s}
+  return toHex(a0)+toHex(b0)+toHex(c0)+toHex(d0);
+}
+
+// SHA via Web Crypto API
+async function shaHash(algo,data){
+  var buf;
+  if(typeof data==='string'){buf=new TextEncoder().encode(data)}
+  else{buf=data}
+  var hash=await crypto.subtle.digest(algo,buf);
+  return Array.from(new Uint8Array(hash)).map(function(b){return('0'+b.toString(16)).slice(-2)}).join('');
+}
+
+var algos=[
+  {name:'MD5',fn:function(d){return Promise.resolve(md5(d))}},
+  {name:'SHA-1',fn:function(d){return shaHash('SHA-1',d)}},
+  {name:'SHA-256',fn:function(d){return shaHash('SHA-256',d)}},
+  {name:'SHA-512',fn:function(d){return shaHash('SHA-512',d)}}
+];
+var currentHashes={};
+var currentMode='text';
+
+// Build result cards
+var resultsEl=document.getElementById('results');
+algos.forEach(function(a){
+  resultsEl.innerHTML+='<div class="result-card" id="card-'+a.name+'"><div class="result-header"><span class="algo-name">'+a.name+'</span><button class="copy-btn" onclick="copyHash(\''+a.name+'\')">Copy</button></div><div class="hash-value empty" id="hash-'+a.name+'">Waiting for input...</div></div>';
+});
+
+async function computeHashes(data){
+  currentHashes={};
+  for(var i=0;i<algos.length;i++){
+    var a=algos[i];
+    var el=document.getElementById('hash-'+a.name);
+    try{
+      var h=await a.fn(data);
+      currentHashes[a.name]=h;
+      el.textContent=h;
+      el.className='hash-value';
+    }catch(e){
+      el.textContent='Error computing hash';
+      el.className='hash-value empty';
+    }
+  }
+  doVerify();
+}
+
+function clearHashes(){
+  currentHashes={};
+  algos.forEach(function(a){
+    var el=document.getElementById('hash-'+a.name);
+    el.textContent='Waiting for input...';
+    el.className='hash-value empty';
+    var card=document.getElementById('card-'+a.name);
+    card.className='result-card';
+  });
+  document.getElementById('verifyResult').className='verify-result';
+  document.getElementById('verifyResult').style.display='none';
+}
+
+// Text mode
+var textInput=document.getElementById('textInput');
+var debounceTimer;
+textInput.addEventListener('input',function(){
+  clearTimeout(debounceTimer);
+  debounceTimer=setTimeout(function(){
+    if(textInput.value.length>0)computeHashes(textInput.value);
+    else clearHashes();
+  },150);
+});
+
+// File mode
+var dropZone=document.getElementById('dropZone');
+var fileInput=document.getElementById('fileInput');
+
+function handleFile(file){
+  if(!file)return;
+  document.getElementById('fileName').textContent=file.name;
+  var size=file.size;
+  var units=['B','KB','MB','GB'];
+  var u=0;
+  while(size>=1024&&u<3){size/=1024;u++}
+  document.getElementById('fileSize').textContent='('+size.toFixed(u?1:0)+' '+units[u]+')';
+  document.getElementById('fileInfo').style.display='block';
+  var reader=new FileReader();
+  reader.onload=function(e){computeHashes(e.target.result)};
+  reader.readAsArrayBuffer(file);
+}
+
+dropZone.addEventListener('dragover',function(e){e.preventDefault();dropZone.classList.add('dragover')});
+dropZone.addEventListener('dragleave',function(){dropZone.classList.remove('dragover')});
+dropZone.addEventListener('drop',function(e){e.preventDefault();dropZone.classList.remove('dragover');if(e.dataTransfer.files.length)handleFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',function(){if(fileInput.files.length)handleFile(fileInput.files[0])});
+
+// Mode switching
+function switchMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  if(mode==='text'){
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('textMode').style.display='';
+    document.getElementById('fileMode').style.display='none';
+    if(textInput.value.length>0)computeHashes(textInput.value);else clearHashes();
+  }else{
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('textMode').style.display='none';
+    document.getElementById('fileMode').style.display='';
+    clearHashes();
+  }
+}
+
+// Copy
+function copyHash(name){
+  var h=currentHashes[name];
+  if(!h)return;
+  navigator.clipboard.writeText(h).then(function(){
+    var btns=document.querySelectorAll('.copy-btn');
+    btns.forEach(function(b){
+      if(b.closest('.result-card').id==='card-'+name){
+        b.textContent='Copied!';b.classList.add('copied');
+        setTimeout(function(){b.textContent='Copy';b.classList.remove('copied')},1500);
+      }
+    });
+  });
+}
+
+// Verify
+var verifyInput=document.getElementById('verifyInput');
+verifyInput.addEventListener('input',doVerify);
+
+function doVerify(){
+  var v=verifyInput.value.trim().toLowerCase();
+  var vr=document.getElementById('verifyResult');
+  // Reset all cards
+  algos.forEach(function(a){document.getElementById('card-'+a.name).className='result-card'});
+  if(!v){vr.className='verify-result';vr.style.display='none';return}
+  var matched=false;
+  algos.forEach(function(a){
+    if(currentHashes[a.name]&&currentHashes[a.name]===v){
+      document.getElementById('card-'+a.name).classList.add('match');
+      matched=true;
+    }
+  });
+  if(matched){
+    vr.textContent='\u2705 Hash matches!';
+    vr.className='verify-result match';
+    vr.style.display='block';
+  }else if(Object.keys(currentHashes).length>0){
+    vr.textContent='\u274c No matching hash found.';
+    vr.className='verify-result no-match';
+    vr.style.display='block';
+  }
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

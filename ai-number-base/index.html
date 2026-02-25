@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Number Base - 进制转换器</title>
+<meta name="description" content="Free online number base converter. Convert between binary, octal, decimal, hexadecimal and any base from 2 to 36.">
+<link rel="canonical" href="https://lifa-su.com/ai-number-base/">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--sf:#16213e;--sf2:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--bd:#2a2a4e;--ok:#00d68f;--er:#ff6b6b;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.ct{width:100%;max-width:900px;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header p{color:var(--tx2);margin-top:6px;font-size:.95rem}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:10px 20px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);cursor:pointer;color:var(--tx2);transition:.2s;font-size:.9rem}
+.tab:hover{border-color:var(--ac)}.tab.active{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:16px}
+.card h2{font-size:1.1rem;margin-bottom:16px}
+.row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px}
+.field label{font-size:.82rem;color:var(--tx2);font-weight:500}
+input,select,textarea{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:var(--tx);font-size:.95rem;outline:none;transition:.2s;width:100%;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(233,69,96,.15)}
+input.err,textarea.err{border-color:var(--er);box-shadow:0 0 0 3px rgba(255,107,107,.15)}
+textarea{resize:vertical;min-height:80px;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.88rem}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aab'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.emsg{color:var(--er);font-size:.8rem;margin-top:2px;min-height:1.2em}
+.ri{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg);border-radius:8px;margin-bottom:8px;border:1px solid var(--bd)}
+.ri .lb{font-size:.82rem;color:var(--tx2);min-width:80px}
+.ri .vl{font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.95rem;word-break:break-all;flex:1;margin:0 12px}
+.cb{background:none;border:1px solid var(--bd);border-radius:6px;color:var(--tx2);cursor:pointer;padding:5px 10px;font-size:.78rem;transition:.2s;white-space:nowrap}
+.cb:hover{border-color:var(--ac);color:var(--ac)}.cb.ok{border-color:var(--ok);color:var(--ok)}
+.br{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:8px}
+.br .s{font-size:.82rem;color:var(--tx2);margin-bottom:6px}
+.br .d{font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.95rem;word-break:break-all}
+.br .de{color:var(--er);font-size:.85rem}
+.ca{display:inline-flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px;color:var(--tx);cursor:pointer;padding:8px 18px;font-size:.88rem;transition:.2s;margin-top:8px}
+.ca:hover{border-color:var(--ac);background:var(--ac);color:#fff}
+.sec{display:none}.sec.active{display:block}
+footer{text-align:center;padding:30px 0 20px;color:var(--tx2);font-size:.78rem}
+@media(max-width:600px){.ct{padding:14px}header h1{font-size:1.4rem}.row{flex-direction:column}.field{min-width:100%}.tab{padding:8px 14px;font-size:.82rem}.ri{flex-wrap:wrap;gap:6px}.ri .vl{margin:0;order:3;width:100%}}
+</style>
+</head>
+<body>
+<div class="ct">
+<header><h1>&#x1f522; AI Number Base Converter</h1><p>进制转换器 &mdash; 支持 2-36 进制、浮点数、批量转换</p></header>
+<div class="tabs" role="tablist">
+<div class="tab active" role="tab" data-tab="standard" tabindex="0">标准转换</div>
+<div class="tab" role="tab" data-tab="custom" tabindex="0">自定义进制</div>
+<div class="tab" role="tab" data-tab="batch" tabindex="0">批量转换</div>
+</div>
+
+<div class="sec active" id="sec-standard"><div class="card"><h2>快速进制转换</h2>
+<div class="row"><div class="field"><label for="si">输入数值</label>
+<input id="si" placeholder="例如: 255, 3.14, FF" autocomplete="off" spellcheck="false">
+<div class="emsg" id="se"></div></div>
+<div class="field" style="max-width:160px"><label for="sf">源进制</label>
+<select id="sf"><option value="2">二进制 (2)</option><option value="8">八进制 (8)</option><option value="10" selected>十进制 (10)</option><option value="16">十六进制 (16)</option></select>
+</div></div>
+<div id="sr"></div></div></div>
+
+<div class="sec" id="sec-custom"><div class="card"><h2>自定义进制转换</h2>
+<div class="row"><div class="field"><label for="ci">输入数值</label>
+<input id="ci" placeholder="输入数值" autocomplete="off" spellcheck="false">
+<div class="emsg" id="ce"></div></div>
+<div class="field" style="max-width:130px"><label for="cfr">源进制 (2-36)</label>
+<input id="cfr" type="number" min="2" max="36" value="10"></div>
+<div class="field" style="max-width:130px"><label for="cto">目标进制 (2-36)</label>
+<input id="cto" type="number" min="2" max="36" value="16"></div></div>
+<div id="cr"></div></div></div>
+
+<div class="sec" id="sec-batch"><div class="card"><h2>批量转换</h2>
+<div class="row">
+<div class="field" style="max-width:130px"><label for="bfr">源进制</label>
+<select id="bfr"><option value="2">二进制</option><option value="8">八进制</option><option value="10" selected>十进制</option><option value="16">十六进制</option></select></div>
+<div class="field" style="max-width:130px"><label for="bto">目标进制</label>
+<select id="bto"><option value="2" selected>二进制</option><option value="8">八进制</option><option value="10">十进制</option><option value="16">十六进制</option></select></div>
+</div>
+<div class="field"><label for="bi">输入数值（每行一个）</label>
+<textarea id="bi" placeholder="每行一个数值，例如：&#10;255&#10;128&#10;64" rows="5"></textarea></div>
+<div id="bres"></div></div></div>
+
+<footer>AI Number Base Converter &mdash; Free Online Tool</footer>
+</div>
+
+<script>
+const DIGITS='0123456789abcdefghijklmnopqrstuvwxyz';
+
+function validate(s,base){
+  s=s.trim().toLowerCase();
+  if(!s)return{ok:false,err:'请输入数值'};
+  let neg=false;
+  if(s[0]==='-'){neg=true;s=s.slice(1)}
+  if(!s)return{ok:false,err:'无效输入'};
+  const parts=s.split('.');
+  if(parts.length>2)return{ok:false,err:'多个小数点'};
+  const valid=DIGITS.slice(0,base);
+  for(const p of parts){
+    if(!p&&parts.length===1)return{ok:false,err:'无效输入'};
+    for(const c of p){
+      if(!valid.includes(c))return{ok:false,err:`字符 "${c}" 在 ${base} 进制中无效（允许: ${valid}）`};
+    }
+  }
+  return{ok:true,neg,int:parts[0]||'0',frac:parts[1]||'',raw:s};
+}
+
+function toDecimal(intPart,fracPart,base){
+  let result=0n;
+  const b=BigInt(base);
+  for(const c of intPart){
+    result=result*b+BigInt(DIGITS.indexOf(c));
+  }
+  let frac=0,fb=1;
+  for(const c of fracPart){
+    fb/=base;
+    frac+=DIGITS.indexOf(c)*fb;
+  }
+  return{int:result,frac};
+}
+
+function fromDecimal(intVal,fracVal,base,maxFrac){
+  maxFrac=maxFrac||20;
+  const b=BigInt(base);
+  let intStr='';
+  if(intVal===0n)intStr='0';
+  let v=intVal;
+  while(v>0n){
+    intStr=DIGITS[Number(v%b)]+intStr;
+    v=v/b;
+  }
+  if(!intStr)intStr='0';
+  let fracStr='';
+  if(fracVal>1e-15){
+    let f=fracVal;
+    const seen=new Set();
+    for(let i=0;i<maxFrac&&f>1e-15;i++){
+      f*=base;
+      const d=Math.floor(f);
+      fracStr+=DIGITS[d];
+      f-=d;
+      const key=f.toFixed(15);
+      if(seen.has(key))break;
+      seen.add(key);
+    }
+  }
+  return fracStr?intStr+'.'+fracStr:intStr;
+}
+
+function convert(input,fromBase,toBase){
+  const v=validate(input,fromBase);
+  if(!v.ok)return{err:v.err};
+  const dec=toDecimal(v.int,v.frac,fromBase);
+  const result=fromDecimal(dec.int,dec.frac,toBase);
+  return{val:(v.neg?'-':'')+result};
+}
+
+function resultHTML(label,value){
+  return `<div class="ri"><span class="lb">${label}</span><span class="vl">${value}</span><button class="cb" onclick="copyVal(this,'${value.replace(/'/g,"\\'")}')">复制</button></div>`;
+}
+
+function copyVal(btn,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='已复制';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='复制';btn.classList.remove('ok')},1500);
+  });
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('sec-'+t.dataset.tab).classList.add('active');
+  });
+  t.addEventListener('keydown',e=>{if(e.key==='Enter')t.click()});
+});
+
+// Standard conversion
+function doStd(){
+  const inp=document.getElementById('si').value.trim();
+  const from=parseInt(document.getElementById('sf').value);
+  const errEl=document.getElementById('se');
+  const resEl=document.getElementById('sr');
+  if(!inp){errEl.textContent='';resEl.innerHTML='';document.getElementById('si').classList.remove('err');return}
+  const v=validate(inp,from);
+  if(!v.ok){errEl.textContent=v.err;resEl.innerHTML='';document.getElementById('si').classList.add('err');return}
+  errEl.textContent='';document.getElementById('si').classList.remove('err');
+  const bases=[{b:2,n:'二进制'},{b:8,n:'八进制'},{b:10,n:'十进制'},{b:16,n:'十六进制'}];
+  let html='';
+  for(const t of bases){
+    if(t.b===from)continue;
+    const r=convert(inp,from,t.b);
+    html+=resultHTML(t.n+' ('+t.b+')',r.err||r.val);
+  }
+  resEl.innerHTML=html;
+}
+document.getElementById('si').addEventListener('input',doStd);
+document.getElementById('sf').addEventListener('change',doStd);
+
+// Custom conversion
+function doCust(){
+  const inp=document.getElementById('ci').value.trim();
+  const from=parseInt(document.getElementById('cfr').value)||10;
+  const to=parseInt(document.getElementById('cto').value)||16;
+  const errEl=document.getElementById('ce');
+  const resEl=document.getElementById('cr');
+  if(from<2||from>36||to<2||to>36){errEl.textContent='进制范围 2-36';resEl.innerHTML='';return}
+  if(!inp){errEl.textContent='';resEl.innerHTML='';document.getElementById('ci').classList.remove('err');return}
+  const r=convert(inp,from,to);
+  if(r.err){errEl.textContent=r.err;resEl.innerHTML='';document.getElementById('ci').classList.add('err');return}
+  errEl.textContent='';document.getElementById('ci').classList.remove('err');
+  resEl.innerHTML=resultHTML(to+'进制',r.val);
+}
+document.getElementById('ci').addEventListener('input',doCust);
+document.getElementById('cfr').addEventListener('input',doCust);
+document.getElementById('cto').addEventListener('input',doCust);
+
+// Batch conversion
+function doBatch(){
+  const inp=document.getElementById('bi').value;
+  const from=parseInt(document.getElementById('bfr').value);
+  const to=parseInt(document.getElementById('bto').value);
+  const resEl=document.getElementById('bres');
+  const lines=inp.split('\n').filter(l=>l.trim());
+  if(!lines.length){resEl.innerHTML='';return}
+  let html='',allVals=[];
+  for(const line of lines){
+    const r=convert(line.trim(),from,to);
+    if(r.err){
+      html+=`<div class="br"><div class="s">${line.trim()}</div><div class="de">${r.err}</div></div>`;
+    }else{
+      html+=`<div class="br"><div class="s">${line.trim()} (${from}进制)</div><div class="d">${r.val}</div></div>`;
+      allVals.push(r.val);
+    }
+  }
+  if(allVals.length>1){
+    html+=`<button class="ca" onclick="copyVal(this,'${allVals.join('\\n').replace(/'/g,"\\'")}')">复制全部结果</button>`;
+  }
+  resEl.innerHTML=html;
+}
+document.getElementById('bi').addEventListener('input',doBatch);
+document.getElementById('bfr').addEventListener('change',doBatch);
+document.getElementById('bto').addEventListener('change',doBatch);
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{max-width:900px;margin:40px auto 0;padding:0 20px 40px;position:relative}
+.pro-hd{text-align:center;margin-bottom:20px}
+.pro-hd h2{font-size:1.5rem;color:var(--ac);margin-bottom:4px}
+.pro-hd p{color:var(--tx2);font-size:.9rem}
+.pro-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden}
+.pro-blur{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;filter:blur(6px);opacity:.6;pointer-events:none;user-select:none}
+.pro-card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.pro-card h3{font-size:1rem;color:var(--ac);margin-bottom:8px}
+.pro-card p{color:var(--tx2);font-size:.85rem;line-height:1.5}
+.pro-card .mock-rows{margin-top:10px}
+.pro-card .mock-row{height:6px;background:var(--bd);border-radius:3px;margin-bottom:6px}
+.pro-card .mock-row:nth-child(1){width:90%}.pro-card .mock-row:nth-child(2){width:70%}.pro-card .mock-row:nth-child(3){width:50%}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);z-index:2}
+.pro-lock-icon{font-size:3rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.1rem;font-weight:600;color:var(--tx)}
+.pro-lock-sub{font-size:.85rem;color:var(--tx2);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:6px}
+.pro-modal .pro-price{font-size:2rem;font-weight:700;color:var(--ac);margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.95rem;border-bottom:1px solid var(--bd)}
+.pro-modal ul li::before{content:"✅ ";margin-right:6px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-btn-upgrade{display:inline-block;width:100%;padding:14px;background:var(--ac);color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:8px}
+.pro-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
+.pro-btn-later{background:none;border:none;color:var(--tx2);font-size:.9rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-btn-later:hover{color:#ccc}
+@media(max-width:600px){.pro-blur{grid-template-columns:1fr}}
+</style>
+<div class="pro-section">
+<div class="pro-hd"><h2>🔒 Pro Features</h2><p>Power up your number conversions</p></div>
+<div class="pro-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-blur">
+<div class="pro-card"><h3>📦 Batch Convert</h3><p>Convert thousands of numbers from CSV or text files. Drag & drop file support with instant results.</p><div class="mock-rows"><div class="mock-row"></div><div class="mock-row"></div><div class="mock-row"></div></div></div>
+<div class="pro-card"><h3>📂 File Processing</h3><p>Upload files, auto-detect number formats, and export converted results as CSV, JSON, or TXT.</p><div class="mock-rows"><div class="mock-row"></div><div class="mock-row"></div><div class="mock-row"></div></div></div>
+<div class="pro-card"><h3>🔌 API Access</h3><p>REST API for programmatic conversions. Integrate number base conversion into your workflow.</p><div class="mock-rows"><div class="mock-row"></div><div class="mock-row"></div><div class="mock-row"></div></div></div>
+</div>
+<div class="pro-lock"><div class="pro-lock-icon">🔒</div><div class="pro-lock-text">Pro Features Locked</div><div class="pro-lock-sub">Click to unlock</div></div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>Unlock Pro Features</h3>
+<div class="pro-price">$9</div>
+<ul>
+<li>Batch Convert — process thousands at once</li>
+<li>File Processing — CSV, JSON, TXT import/export</li>
+<li>API Access — REST API for integrations</li>
+<li>Priority updates & support</li>
+</ul>
+<a class="pro-btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $9</a>
+<br><button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

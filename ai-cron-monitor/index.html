@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Monitor and manage cron jobs with AI-powered insights. Track scheduled task execution, detect failures, and get smart alerting for your cron tasks.">
+<link rel="canonical" href="https://lifa-su.com/ai-cron-monitor/">
+<title>AI Cron Monitor - 智能定时任务监控</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1a2e;--bg2:#16213e;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--green:#00c853;--red:#ff1744;--yellow:#ffd600;--card:#16213e;--border:#253456;--input-bg:#0d1b36;--radius:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.container{max-width:960px;margin:0 auto;padding:20px}
+h1{text-align:center;font-size:1.8rem;margin:20px 0 8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:var(--text2);font-size:.9rem;margin-bottom:30px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:4px}
+input{width:100%;padding:10px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.95rem;outline:none;transition:border .2s}
+input:focus{border-color:var(--accent)}
+.cron-hint{font-size:.8rem;color:var(--accent);margin-top:4px;min-height:1.2em}
+.btn{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-sm{padding:6px 12px;font-size:.8rem}
+.btn-green{background:var(--green);color:#000}
+.btn-red{background:var(--red);color:#fff}
+.btn-yellow{background:var(--yellow);color:#000}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--text)}
+.actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.task-list{display:flex;flex-direction:column;gap:12px}
+.task-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border .2s}
+.task-card:hover{border-color:var(--accent)}
+.task-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.task-name{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.task-cron{font-family:monospace;font-size:.85rem;color:var(--accent);background:var(--input-bg);padding:2px 8px;border-radius:4px}
+.task-desc{font-size:.8rem;color:var(--text2);margin-top:2px}
+.task-url{font-size:.8rem;color:var(--text2);word-break:break-all;margin-top:4px;opacity:.7}
+.task-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:12px;font-size:.85rem}
+.meta-item{display:flex;align-items:center;gap:6px}
+.meta-label{color:var(--text2)}
+.task-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+.status-dot.green{background:var(--green);box-shadow:0 0 6px var(--green)}
+.status-dot.red{background:var(--red);box-shadow:0 0 6px var(--red)}
+.status-dot.yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.status-text{font-size:.85rem;font-weight:500}
+.status-text.green{color:var(--green)}
+.status-text.red{color:var(--red)}
+.status-text.yellow{color:var(--yellow)}
+.empty{text-align:center;padding:60px 20px;color:var(--text2)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:500px}
+.modal h3{margin-bottom:16px}
+.modal .actions{justify-content:flex-end}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 20px;border-radius:8px;font-size:.9rem;z-index:200;animation:toastIn .3s ease}
+.toast.success{background:var(--green);color:#000}
+.toast.error{background:var(--red);color:#fff}
+@keyframes toastIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+.header-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.task-count{font-size:.85rem;color:var(--text2)}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.container{padding:12px}h1{font-size:1.4rem}.task-meta{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>&#x23F0; AI Cron Monitor</h1>
+<p class="subtitle">智能定时任务监控面板</p>
+<div class="card">
+<h3 style="margin-bottom:14px;font-size:1rem">&#x2795; 添加新任务</h3>
+<div class="form-grid">
+<div><label>任务名称</label><input type="text" id="taskName" placeholder="如：每日数据备份"></div>
+<div><label>Cron 表达式</label><input type="text" id="taskCron" placeholder="如：0 3 * * *"><div class="cron-hint" id="cronHint"></div></div>
+<div class="full"><label>Webhook URL</label><input type="url" id="taskUrl" placeholder="https://example.com/webhook"></div>
+</div>
+<div class="actions"><button class="btn btn-primary" onclick="addTask()">添加任务</button></div>
+</div>
+<div class="header-actions"><span class="task-count" id="taskCount"></span></div>
+<div class="task-list" id="taskList"></div>
+</div>
+<div class="modal-overlay" id="editModal">
+<div class="modal">
+<h3>编辑任务</h3>
+<div class="form-grid">
+<div><label>任务名称</label><input type="text" id="editName"></div>
+<div><label>Cron 表达式</label><input type="text" id="editCron"><div class="cron-hint" id="editCronHint"></div></div>
+<div class="full"><label>Webhook URL</label><input type="url" id="editUrl"></div>
+</div>
+<input type="hidden" id="editId">
+<div class="actions">
+<button class="btn btn-outline" onclick="closeEdit()">取消</button>
+<button class="btn btn-primary" onclick="saveEdit()">保存</button>
+</div>
+</div>
+</div>
+<script>
+
+const STORAGE_KEY = 'ai_cron_tasks';
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+
+function toast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function parseCronField(field, min, max) {
+  const vals = new Set();
+  for (const part of field.split(',')) {
+    const stepMatch = part.match(/^(.+)\/(\d+)$/);
+    let range = stepMatch ? stepMatch[1] : part;
+    const step = stepMatch ? parseInt(stepMatch[2]) : 1;
+    if (range === '*') {
+      for (let i = min; i <= max; i += step) vals.add(i);
+    } else if (range.includes('-')) {
+      const [a, b] = range.split('-').map(Number);
+      if (isNaN(a) || isNaN(b) || a < min || b > max) return null;
+      for (let i = a; i <= b; i += step) vals.add(i);
+    } else {
+      const n = parseInt(range);
+      if (isNaN(n) || n < min || n > max) return null;
+      if (!stepMatch) vals.add(n);
+      else { for (let i = n; i <= max; i += step) vals.add(i); }
+    }
+  }
+  return vals.size > 0 ? vals : null;
+}
+
+function validateCron(expr) {
+  const parts = expr.trim().split(/\s+/);
+  if (parts.length !== 5) return null;
+  const ranges = [[0,59],[0,23],[1,31],[1,12],[0,6]];
+  const parsed = [];
+  for (let i = 0; i < 5; i++) {
+    const r = parseCronField(parts[i], ranges[i][0], ranges[i][1]);
+    if (!r) return null;
+    parsed.push(r);
+  }
+  return parsed;
+}
+
+function getNextRun(expr) {
+  const parsed = validateCron(expr);
+  if (!parsed) return null;
+  const [mins, hours, doms, months, dows] = parsed;
+  const now = new Date();
+  const d = new Date(now.getTime() + 60000);
+  d.setSeconds(0, 0);
+  for (let i = 0; i < 525960; i++) {
+    if (months.has(d.getMonth() + 1) && doms.has(d.getDate()) && dows.has(d.getDay()) && hours.has(d.getHours()) && mins.has(d.getMinutes())) {
+      return d;
+    }
+    d.setTime(d.getTime() + 60000);
+  }
+  return null;
+}
+
+function getPrevRun(expr) {
+  const parsed = validateCron(expr);
+  if (!parsed) return null;
+  const [mins, hours, doms, months, dows] = parsed;
+  const d = new Date();
+  d.setSeconds(0, 0);
+  d.setTime(d.getTime() - 60000);
+  for (let i = 0; i < 525960; i++) {
+    if (months.has(d.getMonth() + 1) && doms.has(d.getDate()) && dows.has(d.getDay()) && hours.has(d.getHours()) && mins.has(d.getMinutes())) {
+      return d;
+    }
+    d.setTime(d.getTime() - 60000);
+  }
+  return null;
+}
+
+function fmtDate(d) {
+  if (!d) return '未知';
+  const pad = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function cronToHuman(expr) {
+  const parts = expr.trim().split(/\s+/);
+  if (parts.length !== 5) return '无效表达式';
+  const [mi, hr, dom, mon, dow] = parts;
+  const dowNames = ['日','一','二','三','四','五','六'];
+  if (mi==='*' && hr==='*' && dom==='*' && mon==='*' && dow==='*') return '每分钟执行';
+  if (hr==='*' && dom==='*' && mon==='*' && dow==='*') {
+    if (mi.includes('/')) return '每' + mi.split('/')[1] + '分钟执行';
+    return '每小时第' + mi + '分钟执行';
+  }
+  let desc = '';
+  if (mon !== '*') desc += mon + '月 ';
+  if (dow !== '*') {
+    const ds = dow.split(',').map(d => '周' + (dowNames[parseInt(d)] || d));
+    desc += ds.join('、') + ' ';
+  }
+  if (dom !== '*') desc += dom + '日 ';
+  if (hr === '*') desc += '每小时';
+  else if (hr.includes('/')) desc += '每' + hr.split('/')[1] + '小时';
+  else desc += hr + '点';
+  if (mi === '0' || mi === '00') desc += '整';
+  else if (mi !== '*') desc += mi + '分';
+  else desc += '每分钟';
+  desc += '执行';
+  return desc;
+}
+
+function statusInfo(s) {
+  if (s === 'success') return { cls: 'green', label: '成功', icon: '&#x2705;' };
+  if (s === 'fail') return { cls: 'red', label: '失败', icon: '&#x274C;' };
+  return { cls: 'yellow', label: '待执行', icon: '&#x23F3;' };
+}
+
+function renderTasks() {
+  const el = document.getElementById('taskList');
+  const cnt = document.getElementById('taskCount');
+  cnt.textContent = tasks.length ? tasks.length + ' 个任务' : '';
+  if (!tasks.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">&#x1F4CB;</div><p>暂无任务，添加一个开始监控吧</p></div>';
+    return;
+  }
+  el.innerHTML = tasks.map(t => {
+    const si = statusInfo(t.status);
+    const next = fmtDate(getNextRun(t.cron));
+    const prev = fmtDate(getPrevRun(t.cron));
+    const desc = cronToHuman(t.cron);
+    return '<div class="task-card">' +
+      '<div class="task-header"><div>' +
+      '<div class="task-name"><span class="status-dot ' + si.cls + '"></span>' + esc(t.name) + '</div>' +
+      '<div class="task-desc"><span class="task-cron">' + esc(t.cron) + '</span> ' + esc(desc) + '</div>' +
+      (t.url ? '<div class="task-url">&#x1F517; ' + esc(t.url) + '</div>' : '') +
+      '</div><div><span class="status-text ' + si.cls + '">' + si.icon + ' ' + si.label + '</span></div></div>' +
+      '<div class="task-meta">' +
+      '<div class="meta-item"><span class="meta-label">上次执行:</span> ' + prev + '</div>' +
+      '<div class="meta-item"><span class="meta-label">下次执行:</span> ' + next + '</div>' +
+      '</div>' +
+      '<div class="task-actions">' +
+      '<button class="btn btn-sm btn-green" onclick="runTask(\'' + t.id + '\')">&#x25B6; 执行</button>' +
+      '<button class="btn btn-sm btn-outline" onclick="editTask(\'' + t.id + '\')">&#x270F;&#xFE0F; 编辑</button>' +
+      '<button class="btn btn-sm btn-red" onclick="deleteTask(\'' + t.id + '\')">&#x1F5D1; 删除</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function addTask() {
+  const name = document.getElementById('taskName').value.trim();
+  const cron = document.getElementById('taskCron').value.trim();
+  const url = document.getElementById('taskUrl').value.trim();
+  if (!name) { toast('请输入任务名称', 'error'); return; }
+  if (!validateCron(cron)) { toast('Cron 表达式无效', 'error'); return; }
+  tasks.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), name, cron, url, status: 'pending', lastRun: null });
+  save(); renderTasks();
+  document.getElementById('taskName').value = '';
+  document.getElementById('taskCron').value = '';
+  document.getElementById('taskUrl').value = '';
+  document.getElementById('cronHint').textContent = '';
+  toast('任务已添加', 'success');
+}
+
+function deleteTask(id) {
+  if (!confirm('确定删除此任务？')) return;
+  tasks = tasks.filter(t => t.id !== id);
+  save(); renderTasks();
+  toast('任务已删除', 'success');
+}
+
+function runTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.status = Math.random() > 0.3 ? 'success' : 'fail';
+  t.lastRun = new Date().toISOString();
+  save(); renderTasks();
+  toast(t.status === 'success' ? '执行成功' : '执行失败', t.status === 'success' ? 'success' : 'error');
+}
+
+function editTask(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  document.getElementById('editName').value = t.name;
+  document.getElementById('editCron').value = t.cron;
+  document.getElementById('editUrl').value = t.url || '';
+  document.getElementById('editId').value = t.id;
+  document.getElementById('editCronHint').textContent = cronToHuman(t.cron);
+  document.getElementById('editModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('active');
+}
+
+function saveEdit() {
+  const id = document.getElementById('editId').value;
+  const name = document.getElementById('editName').value.trim();
+  const cron = document.getElementById('editCron').value.trim();
+  const url = document.getElementById('editUrl').value.trim();
+  if (!name) { toast('请输入任务名称', 'error'); return; }
+  if (!validateCron(cron)) { toast('Cron 表达式无效', 'error'); return; }
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.name = name; t.cron = cron; t.url = url;
+  save(); renderTasks(); closeModal();
+  toast('任务已更新', 'success');
+}
+
+document.getElementById('taskCron').addEventListener('input', function() {
+  const h = document.getElementById('cronHint');
+  if (this.value.trim() && validateCron(this.value.trim())) {
+    h.textContent = cronToHuman(this.value.trim());
+    h.style.color = 'var(--accent)';
+  } else if (this.value.trim()) {
+    h.textContent = '表达式无效';
+    h.style.color = 'var(--red)';
+  } else { h.textContent = ''; }
+});
+
+document.getElementById('editCron').addEventListener('input', function() {
+  const h = document.getElementById('editCronHint');
+  if (this.value.trim() && validateCron(this.value.trim())) {
+    h.textContent = cronToHuman(this.value.trim());
+    h.style.color = 'var(--accent)';
+  } else if (this.value.trim()) {
+    h.textContent = '表达式无效';
+    h.style.color = 'var(--red)';
+  } else { h.textContent = ''; }
+});
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+renderTasks();
+
+</script>
+<!-- Pro Features Section -->
+<style>
+.pro-section{position:relative;max-width:960px;margin:30px auto;padding:0 20px}
+.pro-blur-wrap{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.pro-blur-wrap:hover{transform:translateY(-2px)}
+.pro-mock{padding:24px;background:var(--card);border:1px solid var(--border);border-radius:12px;filter:blur(3px);-webkit-filter:blur(3px);opacity:.6;pointer-events:none;user-select:none}
+.pro-mock h3{font-size:1rem;margin-bottom:14px;color:#fff}
+.pro-mock-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.pro-mock-item{padding:14px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border)}
+.pro-mock-item .pm-title{font-size:.85rem;color:#ccc;margin-bottom:6px;font-weight:600}
+.pro-mock-item .pm-desc{font-size:.75rem;color:#666}
+.pro-lock-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);border-radius:12px;z-index:2}
+.pro-lock-icon{font-size:2.5rem;margin-bottom:8px}
+.pro-lock-text{font-size:1.1rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.pro-lock-sub{font-size:.8rem;color:rgba(255,255,255,.7);margin-top:4px}
+.pro-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:420px;text-align:center;animation:proModalIn .3s ease}
+@keyframes proModalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.pro-modal h3{font-size:1.3rem;margin-bottom:4px;color:#fff}
+.pro-modal .pro-subtitle{font-size:.85rem;color:var(--text2);margin-bottom:8px}
+.pro-modal .pro-price{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0 4px}
+.pro-modal .pro-price-note{font-size:.8rem;color:var(--text2);margin-bottom:16px}
+.pro-modal ul{list-style:none;text-align:left;margin:0 0 20px;padding:0}
+.pro-modal ul li{padding:10px 0;font-size:.9rem;color:#ddd;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-modal ul li::before{content:'✓';color:var(--accent);font-weight:700;font-size:1.1rem}
+.pro-upgrade-btn{display:block;width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:opacity .2s}
+.pro-upgrade-btn:hover{opacity:.9}
+.pro-maybe-btn{background:none;border:none;color:var(--text2);font-size:.85rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-maybe-btn:hover{color:#fff}
+@media(max-width:600px){.pro-mock-grid{grid-template-columns:1fr}.pro-section{padding:0 12px}}
+</style>
+<div class="pro-section">
+<div class="pro-blur-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+<div class="pro-mock">
+<h3>⚡ Pro Features</h3>
+<div class="pro-mock-grid">
+<div class="pro-mock-item"><div class="pm-title">🔔 Webhook Notifications</div><div class="pm-desc">Get instant alerts via Slack, Discord, email when tasks fail or succeed</div></div>
+<div class="pro-mock-item"><div class="pm-title">👥 Team Collaboration</div><div class="pm-desc">Share dashboards, assign tasks to team members, role-based access control</div></div>
+<div class="pro-mock-item"><div class="pm-title">📋 Execution Logs</div><div class="pm-desc">Full execution history with response times, status codes, and error details</div></div>
+</div>
+</div>
+<div class="pro-lock-overlay">
+<div class="pro-lock-icon">🔒</div>
+<div class="pro-lock-text">Pro Features</div>
+<div class="pro-lock-sub">Click to unlock</div>
+</div>
+</div>
+</div>
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="pro-modal">
+<h3>⏰ Cron Monitor Pro</h3>
+<div class="pro-subtitle">Enterprise-grade cron monitoring</div>
+<div class="pro-price">$14</div>
+<div class="pro-price-note">One-time payment · Lifetime access</div>
+<ul>
+<li>Webhook notifications (Slack, Discord, Email)</li>
+<li>Team collaboration & shared dashboards</li>
+<li>Full execution logs & history</li>
+<li>Response time analytics</li>
+<li>Priority support & updates</li>
+</ul>
+<a href="https://ko-fi.com/feidev" target="_blank" class="pro-upgrade-btn">Upgrade to Pro — $14</a>
+<button class="pro-maybe-btn" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+</div>
+</div>
+<script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>Online Terminal Emulator - Practice CLI Commands in Browser</title>
+<meta name="description" content="Free online terminal emulator. Practice Linux/Unix CLI commands directly in your browser with a realistic shell experience. No installation needed.">
+<meta name="keywords" content="terminal emulator, online terminal, CLI simulator, bash simulator, linux terminal, command line practice, developer tools">
+<meta property="og:title" content="Online Terminal Emulator - Practice CLI Commands in Browser">
+<meta property="og:description" content="Free online terminal emulator. Practice Linux/Unix CLI commands directly in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-terminal-emulator/">
+<meta property="og:image" content="https://lifa-su.com/ai-terminal-emulator/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Online Terminal Emulator">
+<meta name="twitter:description" content="Practice CLI commands directly in your browser. No installation needed.">
+<link rel="canonical" href="https://lifa-su.com/ai-terminal-emulator/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Online Terminal Emulator","url":"https://lifa-su.com/ai-terminal-emulator/","description":"Free online terminal emulator for practicing CLI commands","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools","url":"https://lifa-su.com"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","ratingCount":"980","bestRating":"5"}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b12;--surface:#12121e;--surface2:#1a1a2c;--surface3:#222238;--border:#2a2a42;--border2:#363652;--text:#e8e8f4;--text2:#9898b4;--text3:#686884;--accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);--success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--radius:12px;--radius-sm:8px}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:none;transition:color .2s}a:hover{color:var(--accent2)}
+header{position:sticky;top:0;z-index:100;background:rgba(18,18,30,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+header .subtitle{color:var(--text3);font-size:13px}
+header .back-link{margin-left:auto;color:var(--text3);font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+header .back-link:hover{color:var(--accent)}
+.container{flex:1;max-width:960px;width:100%;margin:0 auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.terminal-window{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:500px}
+.terminal-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.terminal-bar .dots{display:flex;gap:6px}
+.terminal-bar .dots span{width:12px;height:12px;border-radius:50%}
+.terminal-bar .dots span:nth-child(1){background:#fc5c6c}
+.terminal-bar .dots span:nth-child(2){background:#fcb44c}
+.terminal-bar .dots span:nth-child(3){background:#4cda8a}
+.terminal-bar .title{flex:1;text-align:center;font-size:13px;color:var(--text3);font-family:'SF Mono',Consolas,monospace}
+.terminal-bar .btn-clear{padding:4px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text3);font-size:12px;cursor:pointer;transition:all .2s}
+.terminal-bar .btn-clear:hover{border-color:var(--accent);color:var(--accent)}
+.terminal-body{flex:1;padding:16px;overflow-y:auto;font-family:'SF Mono',Consolas,'Liberation Mono',monospace;font-size:14px;line-height:1.6}
+.terminal-body .line{white-space:pre-wrap;word-break:break-all}
+.terminal-body .line.cmd{color:var(--success)}
+.terminal-body .line.output{color:var(--text2)}
+.terminal-body .line.error{color:var(--danger)}
+.terminal-body .line.info{color:var(--accent2)}
+.input-line{display:flex;align-items:center;padding:0 16px 16px}
+.input-line .prompt{color:var(--success);font-family:'SF Mono',Consolas,monospace;font-size:14px;white-space:nowrap;margin-right:8px}
+.input-line input{flex:1;background:transparent;border:none;color:var(--text);font-family:'SF Mono',Consolas,monospace;font-size:14px;outline:none;caret-color:var(--accent)}
+.help-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.help-section h3{font-size:14px;color:var(--accent);margin-bottom:12px}
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.cmd-tag{padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'SF Mono',Consolas,monospace;color:var(--text2);cursor:pointer;transition:all .2s}
+.cmd-tag:hover{border-color:var(--accent);color:var(--accent)}
+.cmd-tag span{color:var(--text3);font-family:-apple-system,sans-serif;margin-left:4px}
+footer{text-align:center;padding:20px;color:var(--text3);font-size:13px;border-top:1px solid var(--border)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:var(--radius);font-size:14px;opacity:0;transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:768px){
+  .container{padding:16px}
+  .terminal-window{min-height:400px}
+  .cmd-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  header{padding:12px 16px}
+  header h1{font-size:17px}
+  .cmd-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>💻 Online Terminal Emulator</h1>
+<span class="subtitle">Practice CLI commands in your browser</span>
+<a href="https://lifa-su.com/" class="back-link">← All Tools</a>
+</header>
+
+<div class="container">
+<div class="terminal-window">
+<div class="terminal-bar">
+<div class="dots"><span></span><span></span><span></span></div>
+<span class="title">guest@lifa-tools: ~</span>
+<button class="btn-clear" onclick="clearTerminal()">Clear</button>
+</div>
+<div class="terminal-body" id="output"></div>
+<div class="input-line">
+<span class="prompt" id="promptText">guest@lifa ~ $</span>
+<input type="text" id="cmdInput" autofocus autocomplete="off" spellcheck="false" placeholder="Type a command...">
+</div>
+</div>
+
+<div class="help-section">
+<h3>📋 Available Commands</h3>
+<div class="cmd-grid">
+<div class="cmd-tag" onclick="runCmd('help')">help <span>list commands</span></div>
+<div class="cmd-tag" onclick="runCmd('ls')">ls <span>list files</span></div>
+<div class="cmd-tag" onclick="runCmd('ls -la')">ls -la <span>detailed list</span></div>
+<div class="cmd-tag" onclick="runCmd('pwd')">pwd <span>current dir</span></div>
+<div class="cmd-tag" onclick="runCmd('cd projects')">cd <span>change dir</span></div>
+<div class="cmd-tag" onclick="runCmd('cat readme.md')">cat <span>read file</span></div>
+<div class="cmd-tag" onclick="runCmd('mkdir new-folder')">mkdir <span>create dir</span></div>
+<div class="cmd-tag" onclick="runCmd('touch app.js')">touch <span>create file</span></div>
+<div class="cmd-tag" onclick="runCmd('echo Hello World')">echo <span>print text</span></div>
+<div class="cmd-tag" onclick="runCmd('whoami')">whoami <span>current user</span></div>
+<div class="cmd-tag" onclick="runCmd('date')">date <span>current date</span></div>
+<div class="cmd-tag" onclick="runCmd('uname -a')">uname <span>system info</span></div>
+<div class="cmd-tag" onclick="runCmd('history')">history <span>cmd history</span></div>
+<div class="cmd-tag" onclick="runCmd('clear')">clear <span>clear screen</span></div>
+<div class="cmd-tag" onclick="runCmd('rm readme.md')">rm <span>remove file</span></div>
+<div class="cmd-tag" onclick="runCmd('cp readme.md copy.md')">cp <span>copy file</span></div>
+</div>
+</div>
+</div>
+
+<footer><a href="https://lifa-su.com/">← Back to Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev" target="_blank">☕ Support on Ko-fi</a></footer>
+<div id="toast" class="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const input=$('cmdInput');
+const output=$('output');
+const promptEl=$('promptText');
+
+let cwd='/home/guest';
+let history=[];
+let histIdx=-1;
+
+// Virtual filesystem
+const fs={
+  '/home/guest':{type:'dir',children:{'projects':{type:'dir',children:{'web-app':{type:'dir',children:{'index.html':{type:'file',content:'<!DOCTYPE html>\n<html>\n<head><title>My App</title></head>\n<body><h1>Hello World</h1><script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>\n</html>'},'style.css':{type:'file',content:'body { margin: 0; font-family: sans-serif; }'},'app.js':{type:'file',content:'console.log("App started");\n\nfunction init() {\n  return fetch("/api/data");\n}'}}},'api-server':{type:'dir',children:{'server.js':{type:'file',content:'const express = require("express");\nconst app = express();\napp.listen(3000);'},'package.json':{type:'file',content:'{\n  "name": "api-server",\n  "version": "1.0.0",\n  "main": "server.js"\n}'}}}}},'readme.md':{type:'file',content:'# Welcome to Lifa Terminal\n\nThis is a simulated terminal environment.\nTry running some commands!\n\n## Quick Start\n- Type `help` to see available commands\n- Use `ls` to list files\n- Use `cd` to navigate directories'},'notes.txt':{type:'file',content:'TODO:\n- Finish the API\n- Write tests\n- Deploy to production'},'.bashrc':{type:'file',content:'# ~/.bashrc\nexport PATH=$PATH:/usr/local/bin\nalias ll="ls -la"\nalias gs="git status"'},'.gitconfig':{type:'file',content:'[user]\n  name = guest\n  email = guest@lifa-tools.com'}}}
+};
+
+function resolvePath(p){
+  if(p.startsWith('/')) return p;
+  if(p.startsWith('~')) return '/home/guest'+p.slice(1);
+  let parts=cwd.split('/').filter(Boolean);
+  p.split('/').forEach(s=>{
+    if(s==='..') parts.pop();
+    else if(s!=='.') parts.push(s);
+  });
+  return '/'+parts.join('/');
+}
+
+function getNode(path){
+  if(path==='/home/guest') return fs['/home/guest'];
+  const rel=path.replace('/home/guest/','').replace('/home/guest','');
+  if(!rel) return fs['/home/guest'];
+  let node=fs['/home/guest'];
+  const parts=rel.split('/').filter(Boolean);
+  for(const p of parts){
+    if(!node||node.type!=='dir'||!node.children[p]) return null;
+    node=node.children[p];
+  }
+  return node;
+}
+
+function getParentAndName(path){
+  const parts=path.split('/').filter(Boolean);
+  const name=parts.pop();
+  const parentPath='/'+parts.join('/');
+  return{parent:getNode(parentPath)||getNode('/home/guest'),name,parentPath};
+}
+
+function shortCwd(){
+  return cwd.replace('/home/guest','~')||'~';
+}
+
+function updatePrompt(){
+  promptEl.textContent=`guest@lifa ${shortCwd()} $`;
+}
+
+function addLine(text,cls='output'){
+  const div=document.createElement('div');
+  div.className='line '+cls;
+  div.textContent=text;
+  output.appendChild(div);
+}
+
+function addHTML(html,cls='output'){
+  const div=document.createElement('div');
+  div.className='line '+cls;
+  div.innerHTML=html;
+  output.appendChild(div);
+}
+
+const commands={
+  help(){
+    addLine('Available commands:','info');
+    const cmds=[
+      ['help','Show this help message'],['ls [-la]','List directory contents'],['cd <dir>','Change directory'],
+      ['pwd','Print working directory'],['cat <file>','Display file contents'],['echo <text>','Print text'],
+      ['mkdir <dir>','Create directory'],['touch <file>','Create empty file'],['rm <file>','Remove file/directory'],
+      ['cp <src> <dst>','Copy file'],['mv <src> <dst>','Move/rename file'],['whoami','Display current user'],
+      ['date','Display current date/time'],['uname [-a]','System information'],['history','Command history'],
+      ['clear','Clear terminal'],['tree','Show directory tree'],['wc <file>','Word/line count'],
+      ['head <file>','First 5 lines'],['grep <pattern> <file>','Search in file'],['env','Environment variables']
+    ];
+    cmds.forEach(([c,d])=>addLine(`  ${c.padEnd(22)} ${d}`));
+  },
+  ls(args){
+    const showAll=args.includes('-a')||args.includes('-la')||args.includes('-al');
+    const showLong=args.includes('-l')||args.includes('-la')||args.includes('-al');
+    const target=args.filter(a=>!a.startsWith('-'))[0];
+    const path=target?resolvePath(target):cwd;
+    const node=getNode(path);
+    if(!node||node.type!=='dir'){addLine(`ls: cannot access '${target}': No such file or directory`,'error');return;}
+    let entries=Object.keys(node.children);
+    if(showAll) entries=['.','..', ...entries];
+    else entries=entries.filter(e=>!e.startsWith('.'));
+    if(showLong){
+      entries.forEach(e=>{
+        if(e==='.'||e==='..'){addLine(`drwxr-xr-x  guest guest  4096  ${e}`);return;}
+        const n=node.children[e];
+        const perm=n.type==='dir'?'drwxr-xr-x':'-rw-r--r--';
+        const size=n.type==='dir'?'4096':String(n.content?.length||0).padStart(4);
+        addLine(`${perm}  guest guest  ${size}  ${e}`);
+      });
+    } else {
+      addLine(entries.map(e=>{
+        const n=node.children[e];
+        return(n&&n.type==='dir')?e+'/':e;
+      }).join('  '));
+    }
+  },
+  cd(args){
+    const target=args[0]||'~';
+    const path=resolvePath(target);
+    const node=getNode(path);
+    if(!node||node.type!=='dir'){addLine(`cd: no such directory: ${target}`,'error');return;}
+    cwd=path;
+    updatePrompt();
+  },
+  pwd(){addLine(cwd);},
+  cat(args){
+    if(!args[0]){addLine('cat: missing operand','error');return;}
+    const path=resolvePath(args[0]);
+    const node=getNode(path);
+    if(!node){addLine(`cat: ${args[0]}: No such file or directory`,'error');return;}
+    if(node.type==='dir'){addLine(`cat: ${args[0]}: Is a directory`,'error');return;}
+    addLine(node.content||'');
+  },
+  echo(args){addLine(args.join(' '));},
+  mkdir(args){
+    if(!args[0]){addLine('mkdir: missing operand','error');return;}
+    const path=resolvePath(args[0]);
+    const{parent,name}=getParentAndName(path);
+    if(!parent){addLine(`mkdir: cannot create directory '${args[0]}'`,'error');return;}
+    if(parent.children[name]){addLine(`mkdir: cannot create directory '${name}': File exists`,'error');return;}
+    parent.children[name]={type:'dir',children:{}};
+    addLine(`Directory '${name}' created`,'info');
+  },
+  touch(args){
+    if(!args[0]){addLine('touch: missing operand','error');return;}
+    const path=resolvePath(args[0]);
+    const{parent,name}=getParentAndName(path);
+    if(!parent){addLine(`touch: cannot touch '${args[0]}'`,'error');return;}
+    if(!parent.children[name]) parent.children[name]={type:'file',content:''};
+  },
+  rm(args){
+    const force=args.includes('-rf')||args.includes('-r');
+    const target=args.filter(a=>!a.startsWith('-'))[0];
+    if(!target){addLine('rm: missing operand','error');return;}
+    const path=resolvePath(target);
+    const{parent,name}=getParentAndName(path);
+    const node=parent?.children[name];
+    if(!node){addLine(`rm: cannot remove '${target}': No such file or directory`,'error');return;}
+    if(node.type==='dir'&&!force){addLine(`rm: cannot remove '${target}': Is a directory (use -rf)`,'error');return;}
+    delete parent.children[name];
+    addLine(`Removed '${name}'`,'info');
+  },
+  cp(args){
+    if(args.length<2){addLine('cp: missing operand','error');return;}
+    const srcPath=resolvePath(args[0]);
+    const srcNode=getNode(srcPath);
+    if(!srcNode||srcNode.type==='dir'){addLine(`cp: cannot copy '${args[0]}'`,'error');return;}
+    const dstPath=resolvePath(args[1]);
+    const{parent,name}=getParentAndName(dstPath);
+    if(!parent){addLine(`cp: cannot copy to '${args[1]}'`,'error');return;}
+    parent.children[name]={type:'file',content:srcNode.content};
+    addLine(`Copied '${args[0]}' → '${args[1]}'`,'info');
+  },
+  mv(args){
+    if(args.length<2){addLine('mv: missing operand','error');return;}
+    const srcPath=resolvePath(args[0]);
+    const{parent:srcParent,name:srcName}=getParentAndName(srcPath);
+    const srcNode=srcParent?.children[srcName];
+    if(!srcNode){addLine(`mv: cannot move '${args[0]}': No such file`,'error');return;}
+    const dstPath=resolvePath(args[1]);
+    const{parent:dstParent,name:dstName}=getParentAndName(dstPath);
+    if(!dstParent){addLine(`mv: cannot move to '${args[1]}'`,'error');return;}
+    dstParent.children[dstName]=srcNode;
+    delete srcParent.children[srcName];
+    addLine(`Moved '${args[0]}' → '${args[1]}'`,'info');
+  },
+  whoami(){addLine('guest');},
+  date(){addLine(new Date().toString());},
+  uname(args){
+    if(args.includes('-a')) addLine('Linux lifa-tools 5.15.0-generic #1 SMP x86_64 GNU/Linux');
+    else addLine('Linux');
+  },
+  history(){history.forEach((c,i)=>addLine(`  ${String(i+1).padStart(4)}  ${c}`));},
+  clear(){output.innerHTML='';},
+  tree(args){
+    const path=args[0]?resolvePath(args[0]):cwd;
+    const node=getNode(path);
+    if(!node||node.type!=='dir'){addLine(`tree: '${args[0]||'.'}' is not a directory`,'error');return;}
+    addLine(path===cwd?'.':args[0]);
+    let count={dirs:0,files:0};
+    function walk(n,prefix){
+      const keys=Object.keys(n.children).filter(k=>!k.startsWith('.'));
+      keys.forEach((k,i)=>{
+        const last=i===keys.length-1;
+        const connector=last?'└── ':'├── ';
+        const child=n.children[k];
+        addLine(prefix+connector+k+(child.type==='dir'?'/':''));
+        if(child.type==='dir'){count.dirs++;walk(child,prefix+(last?'    ':'│   '));}
+        else count.files++;
+      });
+    }
+    walk(node,'');
+    addLine(`\n${count.dirs} directories, ${count.files} files`,'info');
+  },
+  wc(args){
+    if(!args[0]){addLine('wc: missing operand','error');return;}
+    const path=resolvePath(args[0]);
+    const node=getNode(path);
+    if(!node||node.type==='dir'){addLine(`wc: ${args[0]}: No such file`,'error');return;}
+    const lines=(node.content||'').split('\n').length;
+    const words=(node.content||'').split(/\s+/).filter(Boolean).length;
+    const chars=(node.content||'').length;
+    addLine(`  ${lines}  ${words}  ${chars} ${args[0]}`);
+  },
+  head(args){
+    if(!args[0]){addLine('head: missing operand','error');return;}
+    const path=resolvePath(args[0]);
+    const node=getNode(path);
+    if(!node||node.type==='dir'){addLine(`head: ${args[0]}: No such file`,'error');return;}
+    (node.content||'').split('\n').slice(0,5).forEach(l=>addLine(l));
+  },
+  grep(args){
+    if(args.length<2){addLine('grep: missing operand','error');return;}
+    const pattern=args[0];
+    const path=resolvePath(args[1]);
+    const node=getNode(path);
+    if(!node||node.type==='dir'){addLine(`grep: ${args[1]}: No such file`,'error');return;}
+    const lines=(node.content||'').split('\n');
+    let found=false;
+    lines.forEach(l=>{if(l.toLowerCase().includes(pattern.toLowerCase())){addLine(l);found=true;}});
+    if(!found) addLine(`(no matches for '${pattern}')`,'info');
+  },
+  env(){
+    const vars=['USER=guest','HOME=/home/guest','SHELL=/bin/bash','PATH=/usr/local/bin:/usr/bin:/bin','LANG=en_US.UTF-8','TERM=xterm-256color','EDITOR=vim','NODE_VERSION=20.11.0','NPM_VERSION=10.2.4'];
+    vars.forEach(v=>addLine(v));
+  }
+};
+
+function execCmd(raw){
+  const trimmed=raw.trim();
+  if(!trimmed) return;
+  history.push(trimmed);
+  histIdx=history.length;
+  addLine(`${shortCwd()} $ ${trimmed}`,'cmd');
+  const parts=trimmed.split(/\s+/);
+  const cmd=parts[0];
+  const args=parts.slice(1);
+  if(commands[cmd]) commands[cmd](args);
+  else addLine(`${cmd}: command not found. Type 'help' for available commands.`,'error');
+  output.scrollTop=output.scrollHeight;
+}
+
+function runCmd(cmd){
+  input.value=cmd;
+  execCmd(cmd);
+  input.value='';
+  input.focus();
+}
+
+input.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){execCmd(input.value);input.value='';}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(histIdx>0){histIdx--;input.value=history[histIdx];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(histIdx<history.length-1){histIdx++;input.value=history[histIdx];}else{histIdx=history.length;input.value='';}}
+  else if(e.key==='Tab'){
+    e.preventDefault();
+    const val=input.value.trim();
+    const parts=val.split(/\s+/);
+    const partial=parts[parts.length-1];
+    if(!partial) return;
+    const node=getNode(cwd);
+    if(node&&node.type==='dir'){
+      const matches=Object.keys(node.children).filter(k=>k.startsWith(partial));
+      if(matches.length===1){parts[parts.length-1]=matches[0];input.value=parts.join(' ');}
+      else if(matches.length>1) addLine(matches.join('  '),'info');
+    }
+  }
+  else if(e.key==='l'&&e.ctrlKey){e.preventDefault();commands.clear();}
+});
+
+function clearTerminal(){commands.clear();input.focus();}
+
+document.addEventListener('click',e=>{if(!e.target.closest('.cmd-tag')&&!e.target.closest('button'))input.focus();});
+
+// Welcome message
+addLine('Welcome to Lifa Online Terminal v1.0.0','info');
+addLine('Type "help" to see available commands.\n','info');
+updatePrompt();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

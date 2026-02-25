@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Lorem Photos — Placeholder Photo Search Tool</title>
+<meta name="description" content="Search and generate placeholder photo URLs from Unsplash and Picsum.">
+<link rel="canonical" href="https://lifa-su.com/ai-lorem-photos/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#1a1a2e;--bg2:#16213e;--bg3:#0f3460;--sf:#1e2a4a;--sf2:#253456;--ac:#e94560;--ac2:#ff6b6b;--t:#eee;--t2:#aab;--t3:#778;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--t);min-height:100vh;line-height:1.6}
+a{color:var(--ac2)}
+.hd{text-align:center;padding:2.5rem 1rem 1.5rem;background:linear-gradient(135deg,var(--bg2),var(--bg3))}
+.hd h1{font-size:2rem;font-weight:700}.hd h1 span{color:var(--ac)}.hd p{color:var(--t2)}
+.ct{max-width:1100px;margin:0 auto;padding:1.5rem 1rem}
+.box{background:var(--sf);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:end}
+.f{display:flex;flex-direction:column;gap:.35rem;flex:1;min-width:180px}
+.f label{font-size:.8rem;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.f input,.f select{background:var(--bg);border:1.5px solid var(--sf2);color:var(--t);padding:.65rem .9rem;border-radius:8px;font-size:.95rem}
+.f input:focus,.f select:focus{outline:none;border-color:var(--ac)}
+.btn{padding:.65rem 1.4rem;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .2s}
+.bp{background:var(--ac);color:#fff}.bp:hover{background:var(--ac2);transform:translateY(-1px)}
+.bs{background:var(--sf2);color:var(--t)}.bs:hover{background:var(--bg3)}
+.bsm{padding:.4rem .8rem;font-size:.82rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+.chip{padding:.35rem .75rem;border-radius:20px;font-size:.8rem;cursor:pointer;border:1.5px solid var(--sf2);color:var(--t2);background:transparent;transition:all .2s}
+.chip:hover{border-color:var(--ac);color:var(--t)}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.uh3{font-size:.95rem;color:var(--t2);margin-bottom:.75rem;font-weight:600}
+.ur{display:flex;gap:.5rem;margin-bottom:.6rem;align-items:center}
+.ur .lb{font-size:.75rem;color:var(--t3);min-width:70px;font-weight:600;text-transform:uppercase}
+.ur code{flex:1;background:var(--bg);padding:.55rem .75rem;border-radius:6px;font-size:.85rem;color:var(--ac2);overflow-x:auto;white-space:nowrap;font-family:'SF Mono',Monaco,Consolas,monospace;border:1px solid var(--sf2)}
+.ur .btn{flex-shrink:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+.card{background:var(--sf);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .2s}
+.card:hover{transform:translateY(-3px)}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--bg2)}
+.cb{padding:1rem}.cb .meta{font-size:.8rem;color:var(--t3);margin-bottom:.6rem}
+.ca{display:flex;gap:.4rem;flex-wrap:wrap}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg3);color:#fff;padding:.75rem 1.2rem;border-radius:8px;font-size:.9rem;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+.empty{text-align:center;padding:4rem 1rem;color:var(--t3)}.empty .ic{font-size:3rem;margin-bottom:.75rem}
+.ft{text-align:center;padding:2rem 1rem;color:var(--t3);font-size:.8rem;margin-top:2rem;border-top:1px solid var(--sf2)}
+@media(max-width:640px){.hd h1{font-size:1.5rem}.row{flex-direction:column}.f{min-width:100%}.grid{grid-template-columns:1fr}.ur{flex-wrap:wrap}.ur code{width:100%}}
+</style>
+</head>
+<body>
+<div class="hd"><h1>📷 AI <span>Lorem Photos</span></h1><p>Search &amp; generate placeholder photo URLs for your projects</p></div>
+<div class="ct">
+<div class="box">
+<div class="row">
+<div class="f" style="flex:2"><label for="kw">Keyword</label><input type="text" id="kw" placeholder="e.g. nature, city, food..." value="nature"></div>
+<div class="f"><label for="src">Source</label><select id="src"><option value="both">Both</option><option value="unsplash">Unsplash</option><option value="picsum">Picsum</option></select></div>
+<div class="f" style="flex:0"><label>&nbsp;</label><button class="btn bp" onclick="search()">🔍 Search</button></div>
+</div>
+<div class="chips" id="chips"></div>
+</div>
+<div class="box">
+<h3 class="uh3">📋 Generated URLs</h3>
+<div class="ur"><span class="lb">Unsplash</span><code id="u1"></code><button class="btn bs bsm" onclick="copy('u1')">📋 Copy</button></div>
+<div class="ur"><span class="lb">Picsum</span><code id="u2"></code><button class="btn bs bsm" onclick="copy('u2')">📋 Copy</button></div>
+</div>
+<div id="results">
+<div class="empty"><div class="ic">🖼️</div><p>Enter a keyword and click Search to find placeholder photos</p></div>
+</div>
+</div>
+<div class="ft">AI Lorem Photos — Free placeholder photo URLs for developers &amp; designers<br>Powered by <a href="https://unsplash.com" target="_blank">Unsplash</a> &amp; <a href="https://picsum.photos" target="_blank">Picsum</a></div>
+<div class="toast" id="toast"></div>
+<script>
+const sizes=[['150x150','150','150'],['300x200','300','200'],['400x300','400','300'],['640x480','640','480'],['800x600','800','600'],['1024x768','1024','768'],['1280x720','1280','720'],['1920x1080','1920','1080']];
+let cw='800',ch='600',ci=4;
+function init(){
+  const c=document.getElementById('chips');
+  sizes.forEach((s,i)=>{
+    const b=document.createElement('button');
+    b.className='chip'+(i===ci?' on':'');
+    b.textContent=s[0];
+    b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));b.classList.add('on');ci=i;cw=s[1];ch=s[2];updateUrls();};
+    c.appendChild(b);
+  });
+  updateUrls();
+  document.getElementById('kw').addEventListener('keydown',e=>{if(e.key==='Enter')search();});
+}
+function updateUrls(){
+  const kw=document.getElementById('kw').value.trim()||'nature';
+  document.getElementById('u1').textContent='https://source.unsplash.com/'+cw+'x'+ch+'/?'+encodeURIComponent(kw);
+  document.getElementById('u2').textContent='https://picsum.photos/'+cw+'/'+ch;
+}
+function copy(id){
+  const t=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(()=>toast('Copied!')).catch(()=>{
+    const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('Copied!');
+  });
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function search(){
+  const kw=document.getElementById('kw').value.trim();
+  if(!kw)return toast('Please enter a keyword');
+  const src=document.getElementById('src').value;
+  updateUrls();
+  const r=document.getElementById('results');
+  r.innerHTML='<div class="empty"><div class="ic">⏳</div><p>Loading photos...</p></div>';
+  const cards=[];
+  const total=6;
+  for(let i=0;i<total;i++){
+    const seed=Date.now()+i;
+    const unsplashUrl='https://source.unsplash.com/'+cw+'x'+ch+'/?'+encodeURIComponent(kw)+'&sig='+seed;
+    const picsumUrl='https://picsum.photos/'+cw+'/'+ch+'?random='+seed;
+    if(src==='unsplash'||src==='both'){
+      cards.push({img:unsplashUrl,type:'Unsplash',size:cw+'x'+ch,url:unsplashUrl,kw:kw});
+    }
+    if(src==='picsum'||src==='both'){
+      cards.push({img:picsumUrl,type:'Picsum',size:cw+'x'+ch,url:picsumUrl,kw:kw});
+    }
+  }
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><h2>Results for "'+esc(kw)+'"</h2><span style="color:var(--t3);font-size:.85rem">'+cards.length+' photos</span></div><div class="grid">';
+  cards.forEach((c,i)=>{
+    html+='<div class="card"><img src="'+esc(c.img)+'" alt="'+esc(c.kw)+'" loading="lazy" onerror="this.style.display=\'none\'"><div class="cb"><div class="meta">'+esc(c.type)+' · '+esc(c.size)+'</div><div class="ca">';
+    html+='<button class="btn bs bsm" onclick="copy_url(\''+esc(c.url)+'\')">📋 Copy URL</button>';
+    html+='<button class="btn bs bsm" onclick="dl(\''+esc(c.url)+'\',\''+esc(c.kw)+'-'+i+'\')">⬇ Download</button>';
+    html+='<a class="btn bs bsm" href="'+esc(c.url)+'" target="_blank">🔗 Open</a>';
+    html+='</div></div></div>';
+  });
+  html+='</div>';
+  r.innerHTML=html;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function copy_url(u){navigator.clipboard.writeText(u).then(()=>toast('URL copied!')).catch(()=>toast('Copy failed'));}
+function dl(url,name){
+  fetch(url).then(r=>r.blob()).then(b=>{
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name+'.jpg';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);toast('Downloading...');
+  }).catch(()=>{window.open(url,'_blank');toast('Opened in new tab');});
+}
+init();
+</script>
+<script src="https://aliyun.feifei.im/monetize.js"></script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
