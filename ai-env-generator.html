@@ -1,286 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Environment Config Generator — Generate .env Templates Instantly | Lifa AI Tools</title>
+<meta name="description" content="Generate .env configuration files for any project type. Supports Node.js, Python, Docker, databases, cloud services and more. Free client-side tool.">
+<meta name="keywords" content="env generator, environment variables, dotenv, config generator, .env template, docker env, node env">
+<link rel="canonical" href="https://lifa-su.com/ai-env-generator.html">
+<meta property="og:title" content="AI Environment Config Generator — Generate .env Templates | Lifa AI Tools">
+<meta property="og:description" content="Generate .env configuration files for any project type. Supports Node.js, Python, Docker, databases and more.">
+<meta property="og:url" content="https://lifa-su.com/ai-env-generator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Environment Config Generator — Lifa AI Tools">
+<meta name="twitter:description" content="Generate .env configuration files for any project type. Free client-side tool.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Environment Config Generator","description":"Generate .env configuration files for any project type instantly.","url":"https://lifa-su.com/ai-env-generator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--danger:#e74c3c;--warning:#f39c12;--success:#27ae60}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+.nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,10,15,0.88);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-brand:hover{color:var(--accent)}
+.container{max-width:960px;margin:0 auto;padding:24px 16px 60px}
+.hero{text-align:center;padding:40px 0 32px}
+.hero h1{font-size:1.8rem;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1rem;max-width:560px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;transition:border-color .2s}
+.card:hover{border-color:var(--border-hover)}
+.card-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+label{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+textarea,input[type="text"],select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:inherit;font-size:.95rem;transition:border-color .2s,box-shadow .2s;outline:none}
+textarea:focus,input[type="text"]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+textarea{resize:vertical;min-height:120px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.85rem;line-height:1.6}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5a4bd6;transform:translateY(-1px);box-shadow:0 4px 15px var(--glow)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--border-hover);background:var(--card)}
+.btn-sm{padding:6px 12px;font-size:.8rem;border-radius:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.stack-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.stack-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--text);font-size:.85rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;font-family:inherit}
+.stack-btn:hover{border-color:var(--border-hover);background:var(--card)}
+.stack-btn.active{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+.stack-btn .icon{font-size:1.1rem}
+.output-area{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:var(--text);min-height:200px;max-height:500px;overflow-y:auto;position:relative}
+.output-area .comment{color:var(--muted)}
+.output-area .key{color:var(--accent2)}
+.output-area .value{color:var(--accent)}
+.output-area .section{color:var(--warning);font-weight:700}
+.mode-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--surface);border-radius:10px;padding:4px;border:1px solid var(--border)}
+.mode-tab{flex:1;padding:8px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;text-align:center}
+.mode-tab.active{background:var(--accent);color:#fff}
+.custom-var-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.custom-var-row input{flex:1}
+.custom-var-row .remove-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.2rem;padding:4px 8px;border-radius:4px;transition:background .2s}
+.custom-var-row .remove-btn:hover{background:rgba(231,76,60,.15)}
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+.stat{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.stat .num{color:var(--accent2);font-weight:700}
+.footer{text-align:center;padding:32px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+.footer a{color:var(--accent)}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:200;pointer-events:none}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr}.hero h1{font-size:1.4rem}.container{padding:16px 12px 40px}.stack-btn{padding:6px 12px;font-size:.8rem}}
+</style>
+</head>
+<body>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+<a href="index.html" class="nav-brand" aria-label="Lifa AI Tools Home">🛠️ Lifa AI Tools</a>
+</nav>
+
+<main class="container">
+<div class="hero">
+<h1>⚙️ AI Environment Config Generator</h1>
+<p>Select your tech stack and generate production-ready .env configuration files instantly</p>
+</div>
+
+<div class="card">
+<div class="card-title">📦 Select Your Stack</div>
+<div class="stack-grid" id="stack-grid"></div>
+</div>
+
+<div class="card">
+<div class="card-title">🔧 Custom Variables</div>
+<div id="custom-vars"></div>
+<button class="btn btn-secondary btn-sm" onclick="addCustomVar()" style="margin-top:8px">+ Add Variable</button>
+</div>
+
+<div class="card">
+<div class="card-title">📝 Options</div>
+<div class="grid-2">
+<div>
+<label for="app-name">App Name</label>
+<input type="text" id="app-name" placeholder="my-awesome-app" value="my-app">
+</div>
+<div>
+<label for="env-mode">Environment</label>
+<select id="env-mode">
+<option value="development">Development</option>
+<option value="staging">Staging</option>
+<option value="production">Production</option>
+</select>
+</div>
+</div>
+<div style="margin-top:12px">
+<label for="port">Default Port</label>
+<input type="text" id="port" placeholder="3000" value="3000">
+</div>
+</div>
+
+<div class="btn-group">
+<button class="btn btn-primary" onclick="generate()">⚡ Generate .env</button>
+<button class="btn btn-secondary" onclick="copyOutput()">📋 Copy</button>
+<button class="btn btn-secondary" onclick="downloadEnv()">💾 Download</button>
+<button class="btn btn-secondary" onclick="clearAll()">🗑️ Clear</button>
+</div>
+
+<div class="card" style="margin-top:20px">
+<div class="card-title">📄 Output</div>
+<div class="mode-tabs">
+<button class="mode-tab active" onclick="setMode('env')" id="tab-env">.env</button>
+<button class="mode-tab" onclick="setMode('docker')" id="tab-docker">Docker Compose</button>
+<button class="mode-tab" onclick="setMode('json')" id="tab-json">JSON</button>
+</div>
+<div class="output-area" id="output">Select stacks above and click Generate...</div>
+<div class="stats" id="stats"></div>
+</div>
+</main>
+
+<footer class="footer">
+<p>Part of <a href="index.html">AI Toolbox</a></p>
+<p style="margin-top:6px">&copy; 2025 Lifa AI Tools</p>
+</footer>
+
+<div class="copy-toast" id="toast">Copied to clipboard!</div>
+
+<script>
+const STACKS = {
+  node: { icon:'🟢', label:'Node.js', vars:{NODE_ENV:'{env}',PORT:'{port}',HOST:'0.0.0.0',LOG_LEVEL:'debug'}},
+  express: { icon:'🚂', label:'Express', vars:{SESSION_SECRET:'change-me-{rand}',CORS_ORIGIN:'http://localhost:{port}',TRUST_PROXY:'false',RATE_LIMIT_MAX:'100'}},
+  nextjs: { icon:'▲', label:'Next.js', vars:{NEXT_PUBLIC_APP_URL:'http://localhost:{port}',NEXT_PUBLIC_API_URL:'http://localhost:{port}/api',NEXTAUTH_SECRET:'change-me-{rand}',NEXTAUTH_URL:'http://localhost:{port}'}},
+  react: { icon:'⚛️', label:'React', vars:{REACT_APP_API_URL:'http://localhost:{port}/api',REACT_APP_NAME:'{name}',GENERATE_SOURCEMAP:'true',REACT_APP_VERSION:'1.0.0'}},
+  python: { icon:'🐍', label:'Python/Flask', vars:{FLASK_APP:'app.py',FLASK_ENV:'{env}',SECRET_KEY:'change-me-{rand}',DEBUG:'true',PYTHONDONTWRITEBYTECODE:'1'}},
+  django: { icon:'🎸', label:'Django', vars:{DJANGO_SECRET_KEY:'change-me-{rand}',DJANGO_DEBUG:'True',DJANGO_ALLOWED_HOSTS:'localhost,127.0.0.1',DJANGO_SETTINGS_MODULE:'{name}.settings'}},
+  postgres: { icon:'🐘', label:'PostgreSQL', vars:{DATABASE_URL:'postgresql://user:password@localhost:5432/{name}_db',DB_HOST:'localhost',DB_PORT:'5432',DB_USER:'user',DB_PASSWORD:'password',DB_NAME:'{name}_db'}},
+  mysql: { icon:'🐬', label:'MySQL', vars:{DATABASE_URL:'mysql://user:password@localhost:3306/{name}_db',MYSQL_HOST:'localhost',MYSQL_PORT:'3306',MYSQL_USER:'user',MYSQL_PASSWORD:'password',MYSQL_DATABASE:'{name}_db'}},
+  mongodb: { icon:'🍃', label:'MongoDB', vars:{MONGODB_URI:'mongodb://localhost:27017/{name}_db',MONGO_INITDB_ROOT_USERNAME:'admin',MONGO_INITDB_ROOT_PASSWORD:'password'}},
+  redis: { icon:'🔴', label:'Redis', vars:{REDIS_URL:'redis://localhost:6379',REDIS_HOST:'localhost',REDIS_PORT:'6379',REDIS_PASSWORD:''}},
+  aws: { icon:'☁️', label:'AWS', vars:{AWS_ACCESS_KEY_ID:'your-access-key',AWS_SECRET_ACCESS_KEY:'your-secret-key',AWS_REGION:'us-east-1',AWS_S3_BUCKET:'{name}-bucket'}},
+  firebase: { icon:'🔥', label:'Firebase', vars:{FIREBASE_API_KEY:'your-api-key',FIREBASE_AUTH_DOMAIN:'{name}.firebaseapp.com',FIREBASE_PROJECT_ID:'{name}',FIREBASE_STORAGE_BUCKET:'{name}.appspot.com'}},
+  stripe: { icon:'💳', label:'Stripe', vars:{STRIPE_SECRET_KEY:'sk_test_...',STRIPE_PUBLISHABLE_KEY:'pk_test_...',STRIPE_WEBHOOK_SECRET:'whsec_...'}},
+  auth: { icon:'🔐', label:'Auth/JWT', vars:{JWT_SECRET:'change-me-{rand}',JWT_EXPIRES_IN:'7d',BCRYPT_ROUNDS:'12',REFRESH_TOKEN_SECRET:'change-me-{rand}'}},
+  email: { icon:'📧', label:'Email/SMTP', vars:{SMTP_HOST:'smtp.gmail.com',SMTP_PORT:'587',SMTP_USER:'your-email@gmail.com',SMTP_PASSWORD:'your-app-password',EMAIL_FROM:'{name} <noreply@example.com>'}},
+  docker: { icon:'🐳', label:'Docker', vars:{COMPOSE_PROJECT_NAME:'{name}',DOCKER_BUILDKIT:'1',COMPOSE_DOCKER_CLI_BUILD:'1'}},
+  sentry: { icon:'🛡️', label:'Sentry', vars:{SENTRY_DSN:'https://examplePublicKey@o0.ingest.sentry.io/0',SENTRY_ENVIRONMENT:'{env}',SENTRY_TRACES_SAMPLE_RATE:'0.1'}},
+  openai: { icon:'🤖', label:'OpenAI', vars:{OPENAI_API_KEY:'sk-...',OPENAI_ORG_ID:'org-...',OPENAI_MODEL:'gpt-4'}},
+  supabase: { icon:'⚡', label:'Supabase', vars:{SUPABASE_URL:'https://your-project.supabase.co',SUPABASE_ANON_KEY:'your-anon-key',SUPABASE_SERVICE_ROLE_KEY:'your-service-role-key'}},
+  vercel: { icon:'▲', label:'Vercel', vars:{VERCEL_URL:'https://{name}.vercel.app',VERCEL_ENV:'{env}',VERCEL_GIT_COMMIT_SHA:''}}
+};
 
 let selectedStacks = new Set();
 let customVars = [];
 let currentMode = 'env';
 let generatedVars = [];
 
+function init() {
+  const grid = document.getElementById('stack-grid');
+  Object.entries(STACKS).forEach(([key, s]) => {
+    const btn = document.createElement('button');
+    btn.className = 'stack-btn';
+    btn.dataset.stack = key;
+    btn.setAttribute('role','button');
+    btn.setAttribute('aria-pressed','false');
+    btn.innerHTML = `<span class="icon">${s.icon}</span>${s.label}`;
+    btn.onclick = () => toggleStack(btn);
+    btn.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleStack(btn);} };
+    grid.appendChild(btn);
+  });
+}
+
 function toggleStack(el) {
   const s = el.dataset.stack;
   if (selectedStacks.has(s)) {
     selectedStacks.delete(s);
     el.classList.remove('active');
-    el.setAttribute('aria-pressed', 'false');
+    el.setAttribute('aria-pressed','false');
   } else {
     selectedStacks.add(s);
     el.classList.add('active');
-    el.setAttribute('aria-pressed', 'true');
+    el.setAttribute('aria-pressed','true');
   }
+}
+
+function addCustomVar() {
+  const id = Date.now();
+  customVars.push({id, key:'', value:''});
+  renderCustomVars();
+}
+
+function removeCustomVar(id) {
+  customVars = customVars.filter(v => v.id !== id);
+  renderCustomVars();
+}
+
+function renderCustomVars() {
+  const container = document.getElementById('custom-vars');
+  container.innerHTML = customVars.map(v => `
+    <div class="custom-var-row">
+      <input type="text" placeholder="KEY_NAME" value="${esc(v.key)}" oninput="updateCustomVar(${v.id},'key',this.value)" aria-label="Variable name">
+      <input type="text" placeholder="value" value="${esc(v.value)}" oninput="updateCustomVar(${v.id},'value',this.value)" aria-label="Variable value">
+      <button class="remove-btn" onclick="removeCustomVar(${v.id})" aria-label="Remove variable">&times;</button>
+    </div>
+  `).join('');
+}
+
+function updateCustomVar(id, field, val) {
+  const v = customVars.find(x => x.id === id);
+  if (v) v[field] = val;
+}
+
+function esc(s) { return s.replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function randStr() { return Math.random().toString(36).substring(2,14); }
+
+function resolveValue(val, name, env, port) {
+  return val.replace(/\{name\}/g, name).replace(/\{env\}/g, env).replace(/\{port\}/g, port).replace(/\{rand\}/g, randStr());
+}
+
+function generate() {
+  const name = document.getElementById('app-name').value.trim() || 'my-app';
+  const env = document.getElementById('env-mode').value;
+  const port = document.getElementById('port').value.trim() || '3000';
+
+  generatedVars = [];
+  const sections = [];
+
+  selectedStacks.forEach(stackKey => {
+    const stack = STACKS[stackKey];
+    const vars = [];
+    Object.entries(stack.vars).forEach(([k, v]) => {
+      const resolved = resolveValue(v, name, env, port);
+      vars.push({key: k, value: resolved});
+      generatedVars.push({key: k, value: resolved, section: stack.label});
+    });
+    sections.push({label: stack.label, icon: stack.icon, vars});
+  });
+
+  if (customVars.some(v => v.key.trim())) {
+    const vars = customVars.filter(v => v.key.trim()).map(v => ({key: v.key.trim().toUpperCase(), value: v.value}));
+    vars.forEach(v => generatedVars.push({...v, section:'Custom'}));
+    sections.push({label:'Custom', icon:'✏️', vars});
+  }
+
+  if (generatedVars.length === 0) {
+    document.getElementById('output').innerHTML = '<span class="comment">Select at least one stack to generate...</span>';
+    document.getElementById('stats').innerHTML = '';
+    return;
+  }
+
+  renderOutput(sections);
+  document.getElementById('stats').innerHTML = `
+    <span class="stat">Variables: <span class="num">${generatedVars.length}</span></span>
+    <span class="stat">Stacks: <span class="num">${selectedStacks.size}</span></span>
+    <span class="stat">Mode: <span class="num">${currentMode.toUpperCase()}</span></span>
+  `;
+}
+
+function renderOutput(sections) {
+  const el = document.getElementById('output');
+  if (currentMode === 'env') {
+    el.innerHTML = sections.map(s => {
+      const header = `<span class="section"># ═══════════════════════════════════════\n# ${s.icon} ${s.label}\n# ═══════════════════════════════════════</span>`;
+      const vars = s.vars.map(v => `<span class="key">${esc(v.key)}</span>=<span class="value">${esc(v.value)}</span>`).join('\n');
+      return header + '\n' + vars;
+    }).join('\n\n');
+  } else if (currentMode === 'docker') {
+    const lines = ['<span class="comment"># docker-compose.yml environment section</span>','<span class="key">environment:</span>'];
+    sections.forEach(s => {
+      lines.push(`  <span class="comment"># ${s.icon} ${s.label}</span>`);
+      s.vars.forEach(v => lines.push(`  - <span class="key">${esc(v.key)}</span>=<span class="value">${esc(v.value)}</span>`));
+    });
+    el.innerHTML = lines.join('\n');
+  } else {
+    const obj = {};
+    sections.forEach(s => s.vars.forEach(v => obj[v.key] = v.value));
+    el.innerHTML = `<span class="value">${esc(JSON.stringify(obj, null, 2))}</span>`;
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + mode).classList.add('active');
+  if (generatedVars.length > 0) generate();
+}
+
+function getRawOutput() {
+  if (generatedVars.length === 0) return '';
+  if (currentMode === 'env') {
+    const sections = [];
+    let currentSection = null;
+    generatedVars.forEach(v => {
+      if (v.section !== currentSection) {
+        currentSection = v.section;
+        sections.push(`\n# ${v.section}`);
+      }
+      sections.push(`${v.key}=${v.value}`);
+    });
+    return sections.join('\n').trim();
+  } else if (currentMode === 'docker') {
+    let out = 'environment:\n';
+    generatedVars.forEach(v => out += `  - ${v.key}=${v.value}\n`);
+    return out.trim();
+  } else {
+    const obj = {};
+    generatedVars.forEach(v => obj[v.key] = v.value);
+    return JSON.stringify(obj, null, 2);
+  }
+}
+
+function copyOutput() {
+  const text = getRawOutput();
+  if (!text) return showToast('Nothing to copy!');
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+}
+
+function downloadEnv() {
+  const text = getRawOutput();
+  if (!text) return showToast('Nothing to download!');
+  const ext = currentMode === 'json' ? '.json' : currentMode === 'docker' ? '.yml' : '.env';
+  const name = (document.getElementById('app-name').value.trim() || 'config') + ext;
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded ' + name);
 }
 
 function clearAll() {
   selectedStacks.clear();
   customVars = [];
-  document.querySelectorAll('.stack-btn').forEach(b => {
-    b.classList.remove('active');
-    b.setAttribute('aria-pressed', 'false');
-  });
-  document.getElementById('output-card').style.display = 'none';
-  document.getElementById('customList').innerHTML = '';
-}
-
-function generateEnv() {
-  if (selectedStacks.size === 0 && customVars.length === 0) {
-    showToast('Please select at least one stack or add custom variables');
-    return;
-  }
   generatedVars = [];
-  const added = new Set();
-  selectedStacks.forEach(stack => {
-    const vars = ENV_DB[stack];
-    if (!vars) return;
-    vars.forEach(v => {
-      const key = v[0];
-      if (key.startsWith('# ')) {
-        generatedVars.push({ type: 'section', text: v[2] });
-      } else if (!added.has(key)) {
-        added.add(key);
-        generatedVars.push({ type: 'var', key: key, value: v[1], comment: v[2] });
-      }
-    });
-    generatedVars.push({ type: 'blank' });
-  });
-  customVars.forEach(cv => {
-    if (!added.has(cv.key)) {
-      added.add(cv.key);
-      generatedVars.push({ type: 'var', key: cv.key, value: cv.value, comment: cv.comment });
-    }
-  });
-  renderOutput();
-  validateOutput();
-  document.getElementById('output-card').style.display = 'block';
-  document.getElementById('output-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function renderOutput() {
-  const content = document.getElementById('envContent');
-  const lineNums = document.getElementById('lineNums');
-  let html = '';
-  let plain = '';
-  let lineCount = 0;
-  const isExample = currentMode === 'example';
-
-  generatedVars.forEach(v => {
-    if (v.type === 'section') {
-      lineCount++;
-      html += '<span class="sc"># ==========================================</span>\n';
-      lineCount++;
-      html += '<span class="sc"># ' + escHtml(v.text) + '</span>\n';
-      lineCount++;
-      html += '<span class="sc"># ==========================================</span>\n';
-      plain += '# ==========================================\n# ' + v.text + '\n# ==========================================\n';
-    } else if (v.type === 'blank') {
-      lineCount++;
-      html += '\n';
-      plain += '\n';
-    } else if (v.type === 'var') {
-      if (v.comment) {
-        lineCount++;
-        html += '<span class="cm"># ' + escHtml(v.comment) + '</span>\n';
-        plain += '# ' + v.comment + '\n';
-      }
-      lineCount++;
-      const val = isExample ? '' : v.value;
-      const displayVal = needsQuotes(val) ? '"' + val + '"' : val;
-      html += '<span class="ky">' + escHtml(v.key) + '</span><span class="eq">=</span><span class="vl">' + escHtml(displayVal) + '</span>\n';
-      plain += v.key + '=' + displayVal + '\n';
-    }
-  });
-
-  content.innerHTML = html;
-  content.dataset.plain = plain;
-  let nums = '';
-  for (let i = 1; i <= lineCount; i++) nums += i + '\n';
-  lineNums.textContent = nums;
-}
-
-function needsQuotes(val) {
-  if (!val) return false;
-  return val.includes(' ') || val.includes('#') || val.includes('"') || val.includes("'");
-}
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function setMode(mode, btn) {
-  currentMode = mode;
-  document.querySelectorAll('.toggle-group button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (generatedVars.length > 0) renderOutput();
-}
-
-function getPlainText() {
-  return document.getElementById('envContent').dataset.plain || '';
-}
-
-function getExampleText() {
-  let text = '';
-  generatedVars.forEach(v => {
-    if (v.type === 'section') {
-      text += '# ==========================================\n# ' + v.text + '\n# ==========================================\n';
-    } else if (v.type === 'blank') {
-      text += '\n';
-    } else if (v.type === 'var') {
-      if (v.comment) text += '# ' + v.comment + '\n';
-      text += v.key + '=\n';
-    }
-  });
-  return text;
-}
-
-function copyEnv() {
-  const text = currentMode === 'example' ? getExampleText() : getPlainText();
-  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('Copied to clipboard!');
-  });
-}
-
-function downloadFile(filename) {
-  const text = filename === '.env.example' ? getExampleText() : getPlainText();
-  const blob = new Blob([text], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast('Downloaded ' + filename);
-}
-
-function copyGitignore() {
-  const text = document.getElementById('gitignoreContent').textContent;
-  navigator.clipboard.writeText(text).then(() => showToast('Copied .gitignore entries!')).catch(() => showToast('Failed to copy'));
-}
-
-function addCustomVar() {
-  const keyEl = document.getElementById('customKey');
-  const valEl = document.getElementById('customVal');
-  const comEl = document.getElementById('customComment');
-  const key = keyEl.value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
-  const value = valEl.value.trim();
-  const comment = comEl.value.trim();
-  if (!key) { showToast('Please enter a variable name'); return; }
-  if (customVars.find(v => v.key === key)) { showToast('Variable ' + key + ' already exists'); return; }
-  customVars.push({ key, value, comment });
-  keyEl.value = ''; valEl.value = ''; comEl.value = '';
-  renderCustomList();
-  showToast('Added ' + key);
-}
-
-function removeCustomVar(idx) {
-  customVars.splice(idx, 1);
-  renderCustomList();
-}
-
-function renderCustomList() {
-  const el = document.getElementById('customList');
-  if (customVars.length === 0) { el.innerHTML = ''; return; }
-  let html = '<div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Custom variables (' + customVars.length + '):</div>';
-  customVars.forEach((v, i) => {
-    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:.85rem">';
-    html += '<span style="color:var(--accent2);font-family:monospace">' + escHtml(v.key) + '</span>';
-    html += '<span style="color:var(--muted)">=</span>';
-    html += '<span style="color:var(--warning);font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(v.value) + '</span>';
-    if (v.comment) html += '<span style="color:var(--muted);font-size:.75rem">' + escHtml(v.comment) + '</span>';
-    html += '<button onclick="removeCustomVar(' + i + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;padding:0 4px" aria-label="Remove variable">&times;</button>';
-    html += '</div>';
-  });
-  el.innerHTML = html;
-}
-
-function importEnv() {
-  const text = document.getElementById('importArea').value.trim();
-  if (!text) { showToast('Please paste .env content first'); return; }
-  const lines = text.split('\n');
-  let imported = 0;
-  const existingKeys = new Set(customVars.map(v => v.key));
-  let lastComment = '';
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (!trimmed) { lastComment = ''; return; }
-    if (trimmed.startsWith('#')) {
-      lastComment = trimmed.replace(/^#+\s*/, '');
-      return;
-    }
-    const eqIdx = trimmed.indexOf('=');
-    if (eqIdx === -1) return;
-    const key = trimmed.substring(0, eqIdx).trim();
-    let value = trimmed.substring(eqIdx + 1).trim();
-    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1);
-    }
-    if (key && !existingKeys.has(key)) {
-      customVars.push({ key, value, comment: lastComment });
-      existingKeys.add(key);
-      imported++;
-    }
-    lastComment = '';
-  });
-  renderCustomList();
-  showToast('Imported ' + imported + ' variables');
-}
-
-function validateOutput() {
-  const results = document.getElementById('validationResults');
-  if (generatedVars.length === 0) { results.innerHTML = ''; return; }
-  let items = [];
-  const sensitivePatterns = [/password/i, /secret/i, /private.?key/i, /token/i, /api.?key/i, /access.?key/i];
-  const urlPattern = /^https?:\/\//;
-  let varCount = 0, warnCount = 0;
-
-  generatedVars.forEach(v => {
-    if (v.type !== 'var') return;
-    varCount++;
-    if (v.key.includes(' ') || v.key !== v.key.trim()) {
-      items.push({ cls: 'vl-err', icon: '❌', msg: v.key + ': Key contains spaces' });
-    }
-    if (v.value && v.value.includes(' ') && !v.value.startsWith('"') && !v.value.startsWith("'")) {
-      const needsQ = v.value.includes(' ');
-      if (needsQ) items.push({ cls: 'vl-warn', icon: '⚠️', msg: v.key + ': Value contains spaces — consider wrapping in quotes' });
-    }
-    if (sensitivePatterns.some(p => p.test(v.key))) {
-      if (v.value && v.value.length > 0 && !v.value.includes('xxx') && !v.value.includes('your-') && !v.value.includes('change-me') && !v.value.includes('EXAMPLE')) {
-        items.push({ cls: 'vl-warn', icon: '🔐', msg: v.key + ': Contains sensitive value — never commit to git' });
-        warnCount++;
-      }
-    }
-    if (v.key.toLowerCase().includes('port') && v.value) {
-      const port = parseInt(v.value);
-      if (isNaN(port) || port < 1 || port > 65535) {
-        items.push({ cls: 'vl-err', icon: '❌', msg: v.key + ': Invalid port number' });
-      }
-    }
-    if (v.key.toLowerCase().includes('url') && v.value && !urlPattern.test(v.value) && !v.value.includes('xxx') && !v.value.startsWith('redis://') && !v.value.startsWith('postgresql://') && !v.value.startsWith('mongodb') && !v.value.startsWith('mysql://') && !v.value.startsWith('smtp://') && !v.value.startsWith('ws://') && !v.value.startsWith('wss://') && v.value !== '') {
-      items.push({ cls: 'vl-warn', icon: '⚠️', msg: v.key + ': Value may not be a valid URL' });
-    }
-  });
-
-  items.unshift({ cls: 'vl-ok', icon: '✅', msg: varCount + ' variables generated' + (warnCount > 0 ? ', ' + warnCount + ' security warnings' : '') });
-
-  let html = '<ul class="validation-list" style="margin-top:16px">';
-  items.forEach(it => {
-    html += '<li class="' + it.cls + '">' + it.icon + ' ' + escHtml(it.msg) + '</li>';
-  });
-  html += '</ul>';
-  results.innerHTML = html;
-}
-
-function toggleCollapse(header) {
-  header.classList.toggle('open');
-  const body = header.nextElementSibling;
-  body.classList.toggle('open');
+  document.querySelectorAll('.stack-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+  document.getElementById('custom-vars').innerHTML = '';
+  document.getElementById('output').innerHTML = '<span class="comment">Select stacks above and click Generate...</span>';
+  document.getElementById('stats').innerHTML = '';
 }
 
 function showToast(msg) {
@@ -290,12 +372,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// Keyboard support for stack buttons
-document.querySelectorAll('.stack-btn').forEach(btn => {
-  btn.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleStack(btn); }
-  });
-});
+init();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
