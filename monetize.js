@@ -14,7 +14,7 @@
  * 配置（可选）：
  * <script>
  *   window.MONETIZE_CONFIG = {
- *     gumroadUrl: 'https://lifa-su.gumroad.com/',
+ *     gumroadUrl: 'https://ko-fi.com/feidev',
  *     toolName: 'AI Toolbox',
  *     showSupport: true,
  *     showCrossPromo: true,
@@ -29,8 +29,8 @@
 
   // ─── Config ───────────────────────────────────────────────────
   const DEFAULT_CONFIG = {
-    gumroadUrl: 'https://lifa-su.gumroad.com/',
-    gumroadProUrl: 'https://lifa-su.gumroad.com/',
+    gumroadUrl: 'https://ko-fi.com/feidev',
+    gumroadProUrl: 'https://ko-fi.com/feidev',
     toolName: document.title || 'AI Tool',
     showSupport: true,
     showCrossPromo: true,
