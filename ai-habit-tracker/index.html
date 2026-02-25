@@ -306,3 +306,207 @@ function getDateStr(d){return d.toISOString().slice(0,10)}
 function getDayOfWeek(d){return(d.getDay()+6)%7}
 function showProModal(){document.getElementById('proModalOverlay').classList.add('show')}
 function closeProModal(){document.getElementById('proModalOverlay').classList.remove('show')}
+
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function openModal(id){document.getElementById(id).classList.add('show')}
+
+function renderEmojiGrid(){
+var g=document.getElementById('emojiGrid');g.innerHTML='';
+EMOJIS.forEach(function(e){
+var s=document.createElement('span');s.textContent=e;s.className='emoji-item'+(selectedEmoji===e?' selected':'');
+s.onclick=function(){selectedEmoji=e;renderEmojiGrid()};g.appendChild(s);
+});
+}
+
+function renderColorPicker(){
+var g=document.getElementById('colorPicker');g.innerHTML='';
+COLORS.forEach(function(c){
+var s=document.createElement('span');s.className='color-item'+(selectedColor===c?' selected':'');
+s.style.background=c;s.onclick=function(){selectedColor=c;renderColorPicker()};g.appendChild(s);
+});
+}
+
+function renderTemplates(){
+var g=document.getElementById('templateGrid');g.innerHTML='';
+TEMPLATES.forEach(function(t){
+var d=document.createElement('div');d.className='template-item';
+d.innerHTML='<span class="icon">'+t.icon+'</span><span class="name">'+t.name+'</span><span class="desc">'+t.desc+'</span>';
+d.onclick=function(){
+habits.push({id:Date.now(),name:t.name,icon:t.icon,color:t.color,freq:t.freq,desc:t.desc,created:today()});
+saveData();render();closeModal('templateModal');
+};g.appendChild(d);
+});
+}
+
+function saveData(){
+localStorage.setItem('habits',JSON.stringify(habits));
+localStorage.setItem('checkins',JSON.stringify(checkins));
+}
+
+function checkin(id){
+var key=today()+'_'+id;
+if(checkins[key]){delete checkins[key]}else{checkins[key]=true}
+saveData();render();
+}
+
+function getStreak(id){
+var streak=0;var d=new Date();
+for(var i=0;i<365;i++){
+var key=getDateStr(d)+'_'+id;
+if(checkins[key]){streak++}else{break}
+d.setDate(d.getDate()-1);
+}
+return streak;
+}
+
+function getCompletionRate(id,days){
+var count=0;var d=new Date();
+for(var i=0;i<days;i++){
+if(checkins[getDateStr(d)+'_'+id])count++;
+d.setDate(d.getDate()-1);
+}
+return days>0?Math.round(count/days*100):0;
+}
+
+function render(){
+var list=document.getElementById('habitList');
+if(!list)return;
+list.innerHTML='';
+if(habits.length===0){
+list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:2rem;margin-bottom:12px">🌱</div><p>还没有习惯，点击上方按钮添加一个吧！</p></div>';
+renderAISuggestions();return;
+}
+habits.forEach(function(h){
+var checked=checkins[today()+'_'+h.id];
+var streak=getStreak(h.id);
+var rate=getCompletionRate(h.id,30);
+var card=document.createElement('div');card.className='habit-card'+(checked?' checked':'');
+card.innerHTML='<div class="habit-header" style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="checkin('+h.id+')">'
++'<div class="habit-icon" style="font-size:1.5rem;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:'+(checked?h.color+'22':'var(--surface2)')+';border:2px solid '+(checked?h.color:'var(--border)')+';border-radius:10px">'+h.icon+'</div>'
++'<div style="flex:1"><div class="habit-name" style="font-weight:600;font-size:0.95rem">'+h.name+'</div>'
++'<div style="font-size:0.75rem;color:var(--text2)">'+(h.freq==='daily'?'每日':'每周')+(h.desc?' · '+h.desc:'')+'</div></div>'
++'<div style="text-align:right"><div style="font-size:0.85rem;font-weight:600;color:'+h.color+'">🔥 '+streak+'</div>'
++'<div style="font-size:0.7rem;color:var(--text2)">'+rate+'% (30天)</div></div>'
++'<div class="habit-actions" style="display:flex;gap:4px">'
++'<button onclick="event.stopPropagation();editHabit('+h.id+')" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:4px">✏️</button>'
++'<button onclick="event.stopPropagation();deleteHabit('+h.id+')" style="background:none;border:none;cursor:pointer;font-size:1rem;padding:4px">🗑️</button>'
++'</div></div>';
+list.appendChild(card);
+});
+renderHeatmap();
+renderStats();
+renderAISuggestions();
+}
+
+function renderHeatmap(){
+var hm=document.getElementById('heatmap');if(!hm)return;hm.innerHTML='';
+var d=new Date();d.setDate(d.getDate()-83);
+for(var i=0;i<84;i++){
+var ds=getDateStr(d);
+var count=0;habits.forEach(function(h){if(checkins[ds+'_'+h.id])count++});
+var level=habits.length>0?Math.min(4,Math.round(count/habits.length*4)):0;
+var cell=document.createElement('div');cell.className='heatmap-cell level-'+level;
+cell.title=ds+': '+count+'/'+habits.length;
+hm.appendChild(cell);d.setDate(d.getDate()+1);
+}
+}
+
+function renderStats(){
+var el=document.getElementById('statsContent');if(!el)return;
+var totalCheckins=0;var todayCount=0;var bestStreak=0;
+habits.forEach(function(h){
+if(checkins[today()+'_'+h.id])todayCount++;
+var s=getStreak(h.id);if(s>bestStreak)bestStreak=s;
+Object.keys(checkins).forEach(function(k){if(k.endsWith('_'+h.id))totalCheckins++});
+});
+el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">'
++'<div class="stat-item" style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:1.5rem;font-weight:700;color:var(--accent)">'+todayCount+'/'+habits.length+'</div><div style="font-size:0.75rem;color:var(--text2)">今日完成</div></div>'
++'<div class="stat-item" style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:1.5rem;font-weight:700;color:var(--accent)">🔥 '+bestStreak+'</div><div style="font-size:0.75rem;color:var(--text2)">最长连续</div></div>'
++'<div class="stat-item" style="text-align:center;padding:12px;background:var(--surface2);border-radius:8px"><div style="font-size:1.5rem;font-weight:700;color:var(--accent)">'+totalCheckins+'</div><div style="font-size:0.75rem;color:var(--text2)">总打卡次数</div></div>'
++'</div>';
+}
+
+function renderAISuggestions(){
+var el=document.getElementById('aiSuggestions');if(!el)return;
+if(habits.length===0){el.innerHTML='<p style="color:var(--text2);font-size:0.85rem">添加习惯后，AI 将为你提供个性化建议。</p>';return}
+var suggestions=[];
+habits.forEach(function(h){
+var rate=getCompletionRate(h.id,7);var streak=getStreak(h.id);
+if(rate<30)suggestions.push('💡 <b>'+h.name+'</b> 最近完成率较低('+rate+'%)，试试设定更小的目标开始');
+if(streak>=7)suggestions.push('🎉 <b>'+h.name+'</b> 已连续'+streak+'天，太棒了！保持下去');
+if(streak===0&&rate>50)suggestions.push('⚡ <b>'+h.name+'</b> 今天还没打卡，别断了好习惯');
+});
+if(suggestions.length===0)suggestions.push('✨ 你的习惯保持得不错，继续加油！');
+el.innerHTML=suggestions.map(function(s){return '<div style="padding:8px 0;font-size:0.85rem;border-bottom:1px solid var(--border)">'+s+'</div>'}).join('');
+}
+
+function saveHabit(){
+var name=document.getElementById('habitName').value.trim();
+if(!name)return;
+var freq=document.getElementById('habitFreq').value;
+var desc=document.getElementById('habitDesc').value.trim();
+if(editingId){
+habits=habits.map(function(h){
+if(h.id===editingId){h.name=name;h.freq=freq;h.icon=selectedEmoji;h.color=selectedColor;h.desc=desc}return h;
+});editingId=null;
+}else{
+habits.push({id:Date.now(),name:name,icon:selectedEmoji,color:selectedColor,freq:freq,desc:desc,created:today()});
+}
+saveData();render();closeModal('habitModal');
+document.getElementById('habitName').value='';document.getElementById('habitDesc').value='';
+}
+
+function editHabit(id){
+var h=habits.find(function(x){return x.id===id});if(!h)return;
+editingId=id;selectedEmoji=h.icon;selectedColor=h.color;
+document.getElementById('modalTitle').textContent='✏️ 编辑习惯';
+document.getElementById('habitName').value=h.name;
+document.getElementById('habitFreq').value=h.freq;
+document.getElementById('habitDesc').value=h.desc||'';
+renderEmojiGrid();renderColorPicker();openModal('habitModal');
+}
+
+function deleteHabit(id){
+if(!confirm('确定要删除这个习惯吗？'))return;
+habits=habits.filter(function(h){return h.id!==id});
+Object.keys(checkins).forEach(function(k){if(k.endsWith('_'+id))delete checkins[k]});
+saveData();render();
+}
+
+function showAddModal(){
+editingId=null;selectedEmoji='🏃';selectedColor=COLORS[0];
+document.getElementById('modalTitle').textContent='➕ 添加新习惯';
+document.getElementById('habitName').value='';document.getElementById('habitDesc').value='';
+document.getElementById('habitFreq').value='daily';
+renderEmojiGrid();renderColorPicker();openModal('habitModal');
+}
+
+function exportData(){
+var data=JSON.stringify({habits:habits,checkins:checkins},null,2);
+var blob=new Blob([data],{type:'application/json'});
+var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='habit-tracker-backup.json';a.click();
+}
+
+function importData(e){
+var file=e.target.files[0];if(!file)return;
+var reader=new FileReader();
+reader.onload=function(ev){
+try{
+var data=JSON.parse(ev.target.result);
+if(data.habits)habits=data.habits;
+if(data.checkins)checkins=data.checkins;
+saveData();render();closeModal('importExportModal');
+alert('导入成功！');
+}catch(err){alert('导入失败：文件格式不正确')}
+};reader.readAsText(file);
+}
+
+// Init
+renderEmojiGrid();renderColorPicker();renderTemplates();render();
+</script>
+<footer style="text-align:center;padding:24px;color:var(--text2);font-size:0.8rem;border-top:1px solid var(--border);margin-top:24px">AI Habit Tracker — 智能习惯追踪器 | <a href="../index.html" style="color:var(--accent)">Lifa AI Tools</a></footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -22,3 +22,308 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"AI API Tester","url":"https://lifa-su.com/ai-api-tester.html","description":"Free browser-based REST API testing tool","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--success:#00b894;--error:#d63031;--warn:#fdcb6e}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 24px;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+.hero{text-align:center;padding:40px 20px 24px}
+.hero h1{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem;max-width:560px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.card h2{font-size:1.1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+select,input[type="text"],input[type="url"],textarea{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:14px;transition:border-color .2s}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+textarea{width:100%;resize:vertical;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:13px}
+select{cursor:pointer}
+.method-select{width:110px;font-weight:600}
+.method-select option{font-weight:600}
+.url-input{flex:1;min-width:200px}
+.btn{border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px var(--glow)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border);padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.tab{background:var(--surface);color:var(--muted);border:1px solid var(--border);padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;transition:all .15s}
+.tab:hover{border-color:var(--accent);color:var(--accent)}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.kv-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.kv-row input{flex:1}
+.kv-row button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px}
+.kv-row button:hover{color:var(--error)}
+.response-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.status-badge{padding:4px 12px;border-radius:12px;font-size:13px;font-weight:600}
+.status-2xx{background:rgba(0,184,148,.15);color:var(--success)}
+.status-3xx{background:rgba(253,203,110,.15);color:var(--warn)}
+.status-4xx,.status-5xx{background:rgba(214,48,49,.15);color:var(--error)}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:"SF Mono",Monaco,Consolas,monospace;font-size:13px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;color:var(--text);line-height:1.6;max-height:400px;overflow-y:auto}
+.timer{font-size:12px;color:var(--muted)}
+.history-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13px;transition:border-color .2s}
+.history-item:hover{border-color:var(--accent)}
+.history-method{font-weight:700;width:50px;font-size:11px}
+.m-GET{color:var(--success)}.m-POST{color:var(--accent)}.m-PUT{color:var(--warn)}.m-DELETE{color:var(--error)}.m-PATCH{color:#a29bfe}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:768px){.split{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
+footer{text-align:center;padding:32px 20px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);margin-top:32px}
+</style>
+</head>
+<body>
+<nav><a href="index.html" style="color:var(--text);font-weight:600;font-size:15px">&larr; Lifa AI Tools</a></nav>
+<div class="container">
+<section class="hero">
+<h1>AI API Tester</h1>
+<p>Test REST APIs directly in your browser. Send requests, inspect responses, and generate code snippets.</p>
+</section>
+
+<section class="card">
+<h2>&#128640; Request</h2>
+<div class="row">
+<select class="method-select" id="method">
+<option value="GET">GET</option>
+<option value="POST">POST</option>
+<option value="PUT">PUT</option>
+<option value="PATCH">PATCH</option>
+<option value="DELETE">DELETE</option>
+<option value="HEAD">HEAD</option>
+<option value="OPTIONS">OPTIONS</option>
+</select>
+<input type="url" class="url-input" id="urlInput" placeholder="https://api.example.com/endpoint" value="https://jsonplaceholder.typicode.com/posts/1">
+<button class="btn btn-primary" id="sendBtn" onclick="sendRequest()">&#9889; Send</button>
+</div>
+
+<div class="tabs" id="reqTabs">
+<button class="tab active" onclick="switchReqTab(this,'headers')">Headers</button>
+<button class="tab" onclick="switchReqTab(this,'body')">Body</button>
+<button class="tab" onclick="switchReqTab(this,'auth')">Auth</button>
+</div>
+
+<div id="headersTab">
+<div id="headerRows"></div>
+<button class="btn-outline btn-sm" onclick="addHeaderRow()">+ Add Header</button>
+</div>
+
+<div id="bodyTab" style="display:none">
+<div class="tabs" style="margin-bottom:8px">
+<button class="tab active" onclick="setBodyType(this,'json')">JSON</button>
+<button class="tab" onclick="setBodyType(this,'form')">Form Data</button>
+<button class="tab" onclick="setBodyType(this,'raw')">Raw</button>
+</div>
+<textarea id="reqBody" rows="6" placeholder='{"key": "value"}'></textarea>
+</div>
+
+<div id="authTab" style="display:none">
+<div class="row">
+<select id="authType" onchange="toggleAuth()" style="width:160px">
+<option value="none">No Auth</option>
+<option value="bearer">Bearer Token</option>
+<option value="basic">Basic Auth</option>
+<option value="apikey">API Key</option>
+</select>
+</div>
+<div id="authFields"></div>
+</div>
+</section>
+
+<div class="split">
+<section class="card" id="responseCard" style="display:none">
+<h2>&#128229; Response</h2>
+<div class="response-header">
+<span class="status-badge" id="statusBadge"></span>
+<span class="timer" id="timer"></span>
+</div>
+<div class="tabs" id="resTabs">
+<button class="tab active" onclick="switchResTab(this,'resBody')">Body</button>
+<button class="tab" onclick="switchResTab(this,'resHeaders')">Headers</button>
+</div>
+<div id="resBody"><pre class="code-block" id="responseBody"></pre></div>
+<div id="resHeaders" style="display:none"><pre class="code-block" id="responseHeaders"></pre></div>
+<div style="margin-top:8px;display:flex;gap:8px">
+<button class="btn-outline btn-sm" onclick="copyResponse()">&#128203; Copy</button>
+<button class="btn-outline btn-sm" onclick="formatJSON()">&#127912; Format</button>
+</div>
+</section>
+
+<section class="card">
+<h2>&#128187; Code Snippet</h2>
+<div class="tabs" id="codeTabs">
+<button class="tab active" onclick="switchCodeTab(this,'curl')">cURL</button>
+<button class="tab" onclick="switchCodeTab(this,'js')">JavaScript</button>
+<button class="tab" onclick="switchCodeTab(this,'python')">Python</button>
+<button class="tab" onclick="switchCodeTab(this,'php')">PHP</button>
+</div>
+<pre class="code-block" id="codeSnippet">Send a request to generate code snippets</pre>
+<button class="btn-outline btn-sm" style="margin-top:8px" onclick="copyCode()">&#128203; Copy</button>
+</section>
+</div>
+
+<section class="card">
+<h2>&#128214; History</h2>
+<div id="historyList"><p style="color:var(--muted);font-size:13px">No requests yet. Send a request to see it here.</p></div>
+<button class="btn-outline btn-sm" onclick="clearHistory()" style="margin-top:8px">&#128465; Clear</button>
+</section>
+</div>
+
+<footer>AI API Tester — Free browser-based REST API tool | <a href="index.html">Lifa AI Tools</a></footer>
+
+<script>
+let history=[];let currentLang='curl';let bodyType='json';
+
+function addHeaderRow(k,v){
+var c=document.getElementById('headerRows');var d=document.createElement('div');d.className='kv-row';
+d.innerHTML='<input type="text" placeholder="Key" value="'+(k||'')+'"><input type="text" placeholder="Value" value="'+(v||'')+'"><button onclick="this.parentElement.remove();genCode()">&times;</button>';
+c.appendChild(d);
+}
+
+function switchReqTab(el,tab){
+document.querySelectorAll('#reqTabs .tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');
+['headersTab','bodyTab','authTab'].forEach(function(t){document.getElementById(t).style.display='none'});
+document.getElementById(tab+'Tab').style.display='block';
+}
+
+function switchResTab(el,tab){
+document.querySelectorAll('#resTabs .tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');
+['resBody','resHeaders'].forEach(function(t){document.getElementById(t).style.display='none'});
+document.getElementById(tab).style.display='block';
+}
+
+function switchCodeTab(el,lang){
+document.querySelectorAll('#codeTabs .tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');
+currentLang=lang;genCode();
+}
+
+function setBodyType(el,type){
+bodyType=type;el.parentElement.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');
+}
+
+function toggleAuth(){
+var type=document.getElementById('authType').value;var f=document.getElementById('authFields');
+if(type==='bearer')f.innerHTML='<input type="text" id="authToken" placeholder="Enter token" style="width:100%;margin-top:8px">';
+else if(type==='basic')f.innerHTML='<div class="row" style="margin-top:8px"><input type="text" id="authUser" placeholder="Username"><input type="text" id="authPass" placeholder="Password"></div>';
+else if(type==='apikey')f.innerHTML='<div class="row" style="margin-top:8px"><input type="text" id="authKeyName" placeholder="Header name" value="X-API-Key"><input type="text" id="authKeyVal" placeholder="API key"></div>';
+else f.innerHTML='';
+}
+
+function getHeaders(){
+var headers={};document.querySelectorAll('#headerRows .kv-row').forEach(function(r){
+var inputs=r.querySelectorAll('input');var k=inputs[0].value.trim(),v=inputs[1].value.trim();
+if(k)headers[k]=v;
+});
+var authType=document.getElementById('authType').value;
+if(authType==='bearer'){var t=document.getElementById('authToken');if(t&&t.value)headers['Authorization']='Bearer '+t.value}
+else if(authType==='basic'){var u=document.getElementById('authUser'),p=document.getElementById('authPass');if(u&&u.value)headers['Authorization']='Basic '+btoa(u.value+':'+(p?p.value:''))}
+else if(authType==='apikey'){var n=document.getElementById('authKeyName'),v=document.getElementById('authKeyVal');if(n&&n.value&&v&&v.value)headers[n.value]=v.value}
+return headers;
+}
+
+function sendRequest(){
+var method=document.getElementById('method').value;
+var url=document.getElementById('urlInput').value.trim();
+if(!url){alert('Please enter a URL');return}
+var headers=getHeaders();var body=null;
+if(['POST','PUT','PATCH'].includes(method)){
+body=document.getElementById('reqBody').value;
+if(bodyType==='json'&&body)headers['Content-Type']=headers['Content-Type']||'application/json';
+}
+var btn=document.getElementById('sendBtn');btn.textContent='Sending...';btn.disabled=true;
+var start=performance.now();
+fetch(url,{method:method,headers:headers,body:body}).then(function(res){
+var elapsed=Math.round(performance.now()-start);
+var status=res.status;var statusText=res.statusText;
+var resHeaders='';res.headers.forEach(function(v,k){resHeaders+=k+': '+v+'\n'});
+document.getElementById('responseHeaders').textContent=resHeaders;
+var cls=status<300?'status-2xx':status<400?'status-3xx':status<500?'status-4xx':'status-5xx';
+document.getElementById('statusBadge').className='status-badge '+cls;
+document.getElementById('statusBadge').textContent=status+' '+statusText;
+document.getElementById('timer').textContent=elapsed+'ms';
+document.getElementById('responseCard').style.display='block';
+return res.text().then(function(text){
+try{var j=JSON.parse(text);document.getElementById('responseBody').textContent=JSON.stringify(j,null,2)}
+catch(e){document.getElementById('responseBody').textContent=text}
+addHistory(method,url,status,elapsed);genCode();
+});
+}).catch(function(err){
+document.getElementById('responseCard').style.display='block';
+document.getElementById('statusBadge').className='status-badge status-5xx';
+document.getElementById('statusBadge').textContent='Error';
+document.getElementById('responseBody').textContent=err.message;
+document.getElementById('timer').textContent='';
+}).finally(function(){btn.textContent='⚡ Send';btn.disabled=false});
+}
+
+function addHistory(method,url,status,time){
+history.unshift({method:method,url:url,status:status,time:time,ts:new Date().toLocaleTimeString()});
+if(history.length>20)history.pop();renderHistory();
+}
+
+function renderHistory(){
+var el=document.getElementById('historyList');el.innerHTML='';
+if(history.length===0){el.innerHTML='<p style="color:var(--muted);font-size:13px">No requests yet.</p>';return}
+history.forEach(function(h,i){
+var d=document.createElement('div');d.className='history-item';
+d.innerHTML='<span class="history-method m-'+h.method+'">'+h.method+'</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+h.url+'</span><span class="status-badge '+(h.status<300?'status-2xx':h.status<400?'status-3xx':'status-4xx')+'" style="font-size:11px">'+h.status+'</span><span class="timer">'+h.time+'ms</span>';
+d.onclick=function(){document.getElementById('method').value=h.method;document.getElementById('urlInput').value=h.url};
+el.appendChild(d);
+});
+}
+
+function clearHistory(){history=[];renderHistory()}
+
+function genCode(){
+var method=document.getElementById('method').value;
+var url=document.getElementById('urlInput').value.trim();
+var headers=getHeaders();var body=document.getElementById('reqBody').value;
+var hasBody=['POST','PUT','PATCH'].includes(method)&&body;
+var code='';
+if(currentLang==='curl'){
+code='curl -X '+method+' "'+url+'"';
+Object.keys(headers).forEach(function(k){code+=" \\\n  -H '"+k+': '+headers[k]+"'"});
+if(hasBody)code+=" \\\n  -d '"+body+"'";
+}else if(currentLang==='js'){
+code='const response = await fetch("'+url+'", {\n  method: "'+method+'"';
+if(Object.keys(headers).length)code+=',\n  headers: '+JSON.stringify(headers,null,4);
+if(hasBody)code+=',\n  body: JSON.stringify('+body+')';
+code+='\n});\nconst data = await response.json();\nconsole.log(data);';
+}else if(currentLang==='python'){
+code='import requests\n\nresponse = requests.'+method.toLowerCase()+'(\n    "'+url+'"';
+if(Object.keys(headers).length)code+=',\n    headers='+JSON.stringify(headers).replace(/"/g,"'");
+if(hasBody)code+=',\n    json='+body;
+code+='\n)\nprint(response.json())';
+}else if(currentLang==='php'){
+code="$ch = curl_init();\ncurl_setopt($ch, CURLOPT_URL, '"+url+"');\ncurl_setopt($ch, CURLOPT_RETURNTRANSFER, true);\ncurl_setopt($ch, CURLOPT_CUSTOMREQUEST, '"+method+"');";
+if(Object.keys(headers).length){code+='\ncurl_setopt($ch, CURLOPT_HTTPHEADER, [';Object.keys(headers).forEach(function(k){code+="\n    '"+k+': '+headers[k]+"',"});code+='\n]);'}
+if(hasBody)code+="\ncurl_setopt($ch, CURLOPT_POSTFIELDS, '"+body+"');";
+code+='\n$response = curl_exec($ch);\ncurl_close($ch);\necho $response;';
+}
+document.getElementById('codeSnippet').textContent=code;
+}
+
+function copyResponse(){
+var t=document.getElementById('responseBody').textContent;
+navigator.clipboard.writeText(t).then(function(){});
+}
+
+function copyCode(){
+var t=document.getElementById('codeSnippet').textContent;
+navigator.clipboard.writeText(t).then(function(){});
+}
+
+function formatJSON(){
+try{
+var t=document.getElementById('responseBody').textContent;
+var j=JSON.parse(t);
+document.getElementById('responseBody').textContent=JSON.stringify(j,null,2);
+}catch(e){}
+}
+
+addHeaderRow('Content-Type','application/json');
+addHeaderRow('Accept','application/json');
+genCode();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

@@ -106,4 +106,214 @@ footer{text-align:center;padding:32px 20px;color:var(--muted);font-size:13px;bor
 <span class="ft" data-flag="u" onclick="tF(this)">u <small>unicode</small></span>
 </div>
 <div class="rd"><code id="regexCode">Your regex will appear here...</code><button class="cb" onclick="copyR()">&#128203; Copy</button></div>
+<div style="margin-top:12px;text-align:center">
+<button class="btn-primary" onclick="generate()" id="genBtn">&#9889; Generate Regex</button>
+</div>
 </section>
+
+<section class="card" id="tester">
+<h2><span>&#128269;</span> Test &amp; Match</h2>
+<label for="regexInput" style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Regex pattern</label>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<input type="text" id="regexInput" placeholder="/your-regex-here/g" style="flex:1">
+<button class="btn-outline" onclick="testRegex()">Test</button>
+</div>
+<label for="testInput" style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">Test string</label>
+<textarea id="testInput" rows="4" placeholder="Paste your test text here..."></textarea>
+<div id="matchResult" style="margin-top:12px;display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<span style="font-size:13px;color:var(--muted)">Matches: <span id="matchCount" class="mc">0</span></span>
+</div>
+<div id="matchOutput" class="tst" style="min-height:60px"></div>
+<div id="matchList" class="mr" style="margin-top:12px"></div>
+</div>
+</section>
+
+<section class="card" id="explainer">
+<h2><span>&#128218;</span> Explanation</h2>
+<div id="explanation" style="color:var(--muted);font-size:14px;line-height:1.8">Generate a regex above to see a detailed explanation here.</div>
+</section>
+
+<section class="card" id="codeExport">
+<h2><span>&#128187;</span> Code Snippets</h2>
+<div class="tabs" id="langTabs">
+<button class="tab active" data-lang="js" onclick="switchLang(this)">JavaScript</button>
+<button class="tab" data-lang="python" onclick="switchLang(this)">Python</button>
+<button class="tab" data-lang="java" onclick="switchLang(this)">Java</button>
+<button class="tab" data-lang="php" onclick="switchLang(this)">PHP</button>
+<button class="tab" data-lang="go" onclick="switchLang(this)">Go</button>
+<button class="tab" data-lang="rust" onclick="switchLang(this)">Rust</button>
+</div>
+<div class="cbl" id="codeOutput">// Generate a regex to see code snippets</div>
+<button class="btn-outline" style="margin-top:8px" onclick="copyCode()">&#128203; Copy Code</button>
+</section>
+
+<section class="card">
+<h2><span>&#128161;</span> Quick Reference</h2>
+<div id="refContent">
+<div class="rs"><button class="rt" onclick="this.parentElement.classList.toggle('open')">Character Classes <span>&#9660;</span></button><div class="rct" style="display:none"><table class="rtb"><tr><td>.</td><td>Any character except newline</td></tr><tr><td>\d</td><td>Digit [0-9]</td></tr><tr><td>\D</td><td>Not a digit</td></tr><tr><td>\w</td><td>Word character [a-zA-Z0-9_]</td></tr><tr><td>\W</td><td>Not a word character</td></tr><tr><td>\s</td><td>Whitespace</td></tr><tr><td>\S</td><td>Not whitespace</td></tr></table></div></div>
+<div class="rs"><button class="rt" onclick="this.parentElement.classList.toggle('open')">Quantifiers <span>&#9660;</span></button><div class="rct" style="display:none"><table class="rtb"><tr><td>*</td><td>0 or more</td></tr><tr><td>+</td><td>1 or more</td></tr><tr><td>?</td><td>0 or 1</td></tr><tr><td>{n}</td><td>Exactly n</td></tr><tr><td>{n,}</td><td>n or more</td></tr><tr><td>{n,m}</td><td>Between n and m</td></tr></table></div></div>
+<div class="rs"><button class="rt" onclick="this.parentElement.classList.toggle('open')">Anchors <span>&#9660;</span></button><div class="rct" style="display:none"><table class="rtb"><tr><td>^</td><td>Start of string</td></tr><tr><td>$</td><td>End of string</td></tr><tr><td>\b</td><td>Word boundary</td></tr><tr><td>\B</td><td>Not a word boundary</td></tr></table></div></div>
+<div class="rs"><button class="rt" onclick="this.parentElement.classList.toggle('open')">Groups &amp; Lookaround <span>&#9660;</span></button><div class="rct" style="display:none"><table class="rtb"><tr><td>(abc)</td><td>Capturing group</td></tr><tr><td>(?:abc)</td><td>Non-capturing group</td></tr><tr><td>(?=abc)</td><td>Positive lookahead</td></tr><tr><td>(?!abc)</td><td>Negative lookahead</td></tr><tr><td>(?&lt;=abc)</td><td>Positive lookbehind</td></tr><tr><td>(?&lt;!abc)</td><td>Negative lookbehind</td></tr></table></div></div>
+</div>
+</section>
+
+</div>
+<footer>AI Regex Generator &amp; Tester — Free online regex tool | <a href="index.html">Lifa AI Tools</a></footer>
+
+<script>
+const PATTERNS={
+email:['[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}','Matches email addresses'],
+url:['https?:\\/\\/[\\w\\-]+(\\.[\\w\\-]+)+[\\/\\w\\-.,@?^=%&:~+#]*','Matches HTTP/HTTPS URLs'],
+phone:['\\+?\\d{1,3}[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}','Matches phone numbers'],
+ip:['\\b(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\b','Matches IPv4 addresses'],
+date:['\\b\\d{4}[-/](?:0[1-9]|1[0-2])[-/](?:0[1-9]|[12]\\d|3[01])\\b','Matches dates (YYYY-MM-DD)'],
+creditcard:['\\b(?:4\\d{3}|5[1-5]\\d{2}|3[47]\\d{2}|6(?:011|5\\d{2}))[-\\s]?\\d{4}[-\\s]?\\d{4}[-\\s]?\\d{4}\\b','Matches credit card numbers'],
+hexcolor:['#(?:[0-9a-fA-F]{3}){1,2}\\b','Matches hex color codes'],
+username:['[a-zA-Z][a-zA-Z0-9_-]{2,15}','Matches usernames (3-16 chars, starts with letter)'],
+password:['(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}','Validates strong passwords'],
+zipcode:['\\b\\d{5}(?:-\\d{4})?\\b','Matches US ZIP codes'],
+htmltag:['<\\/?[a-zA-Z][a-zA-Z0-9]*(?:\\s[^>]*)?\\/?>','Matches HTML tags'],
+ipv6:['(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}','Matches IPv6 addresses']
+};
+
+let currentRegex='',currentFlags='g';
+
+function tF(el){el.classList.toggle('active');updateFlags();}
+function updateFlags(){currentFlags='';document.querySelectorAll('.ft.active').forEach(e=>{currentFlags+=e.dataset.flag;});}
+
+function generate(){
+var input=document.getElementById('nlInput').value.trim();
+if(!input)return;
+var lower=input.toLowerCase();
+var found=null;
+for(var k in PATTERNS){if(lower.includes(k)){found=k;break;}}
+if(!found){
+for(var k in PATTERNS){
+var words=k.split('');
+if(words.some(function(w){return lower.includes(w);})){found=k;break;}
+}
+}
+if(found){
+currentRegex=PATTERNS[found][0];
+document.getElementById('regexCode').textContent='/'+currentRegex+'/'+currentFlags;
+document.getElementById('regexInput').value='/'+currentRegex+'/'+currentFlags;
+explain(found);
+updateCode();
+}else{
+document.getElementById('regexCode').textContent='// Could not auto-generate. Try a quick button above or enter a pattern manually.';
+}
+}
+
+document.querySelectorAll('.qb button').forEach(function(btn){
+btn.addEventListener('click',function(){
+var p=this.dataset.p;
+if(PATTERNS[p]){
+currentRegex=PATTERNS[p][0];
+document.getElementById('nlInput').value=PATTERNS[p][1];
+document.getElementById('regexCode').textContent='/'+currentRegex+'/'+currentFlags;
+document.getElementById('regexInput').value='/'+currentRegex+'/'+currentFlags;
+explain(p);
+updateCode();
+}
+});
+});
+
+function testRegex(){
+var raw=document.getElementById('regexInput').value.trim();
+var text=document.getElementById('testInput').value;
+if(!raw||!text){return;}
+var m=raw.match(/^\/(.+)\/([gimsuy]*)$/);
+var pattern,flags;
+if(m){pattern=m[1];flags=m[2];}else{pattern=raw;flags=currentFlags;}
+try{
+var re=new RegExp(pattern,flags);
+var matches=[],match;
+if(flags.includes('g')){while((match=re.exec(text))!==null){matches.push({val:match[0],idx:match.index});if(!match[0])re.lastIndex++;}}
+else{match=re.exec(text);if(match)matches.push({val:match[0],idx:match.index});}
+document.getElementById('matchCount').textContent=matches.length;
+var hl=text,offset=0;
+matches.forEach(function(m){
+var before=hl.substring(0,m.idx+offset);
+var after=hl.substring(m.idx+offset+m.val.length);
+var tag='<span class="mhl">'+m.val.replace(/</g,'&lt;')+'</span>';
+hl=before+tag+after;
+offset+=tag.length-m.val.length;
+});
+document.getElementById('matchOutput').innerHTML=hl;
+var listHtml='<div class="mhd"><span>Match</span><span>Index</span></div>';
+matches.forEach(function(m,i){listHtml+='<div class="mi"><span class="mc">'+m.val.replace(/</g,'&lt;')+'</span> <span style="color:var(--muted);float:right">@'+m.idx+'</span></div>';});
+document.getElementById('matchList').innerHTML=listHtml;
+document.getElementById('matchResult').style.display='block';
+}catch(e){
+document.getElementById('matchOutput').textContent='Error: '+e.message;
+document.getElementById('matchResult').style.display='block';
+}
+}
+
+function explain(key){
+var explanations={
+email:'Matches standard email format: local-part@domain.tld. Allows letters, digits, dots, underscores, percent, plus, and hyphens in the local part.',
+url:'Matches HTTP and HTTPS URLs with optional path, query parameters, and fragments.',
+phone:'Matches international phone numbers with optional country code, area code in parentheses, and various separators.',
+ip:'Matches valid IPv4 addresses (0.0.0.0 to 255.255.255.255) with word boundaries.',
+date:'Matches dates in YYYY-MM-DD or YYYY/MM/DD format with valid month (01-12) and day (01-31) ranges.',
+creditcard:'Matches Visa, MasterCard, Amex, and Discover card numbers with optional separators.',
+hexcolor:'Matches 3-digit and 6-digit hex color codes preceded by #.',
+username:'Matches usernames: starts with a letter, 3-16 characters, allows letters, digits, underscores, and hyphens.',
+password:'Validates strong passwords: minimum 8 characters with at least one uppercase, one lowercase, one digit, and one special character.',
+zipcode:'Matches US ZIP codes in 5-digit or ZIP+4 format.',
+htmltag:'Matches opening and closing HTML tags with optional attributes.',
+ipv6:'Matches full IPv6 addresses in colon-separated hexadecimal notation.'
+};
+document.getElementById('explanation').innerHTML='<strong>Pattern:</strong> <code>/'+currentRegex+'/'+currentFlags+'</code><br><br>'+(explanations[key]||'Custom pattern.');
+}
+
+function updateCode(){
+var p=currentRegex,f=currentFlags;
+document.querySelectorAll('.tab').forEach(function(t){if(t.classList.contains('active'))switchLang(t);});
+}
+
+function switchLang(el){
+document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+el.classList.add('active');
+var lang=el.dataset.lang,p=currentRegex,f=currentFlags;
+if(!p){document.getElementById('codeOutput').textContent='// Generate a regex first';return;}
+var code='';
+if(lang==='js')code='const regex = /'+p+'/'+f+';\nconst text = "your test string";\nconst matches = text.match(regex);\nconsole.log(matches);';
+else if(lang==='python')code='import re\n\npattern = r\''+p+'\'\ntext = "your test string"\nmatches = re.findall(pattern, text)\nprint(matches)';
+else if(lang==='java')code='import java.util.regex.*;\n\nPattern pattern = Pattern.compile("'+p.replace(/\\/g,'\\\\')+'");\nMatcher matcher = pattern.matcher("your test string");\nwhile (matcher.find()) {\n    System.out.println(matcher.group());\n}';
+else if(lang==='php')code='<?php\n$pattern = \'/'+p+'/'+f+'\';\n$text = "your test string";\npreg_match_all($pattern, $text, $matches);\nprint_r($matches[0]);';
+else if(lang==='go')code='package main\n\nimport (\n\t"fmt"\n\t"regexp"\n)\n\nfunc main() {\n\tre := regexp.MustCompile(`'+p+'`)\n\tmatches := re.FindAllString("your test string", -1)\n\tfmt.Println(matches)\n}';
+else if(lang==='rust')code='use regex::Regex;\n\nfn main() {\n    let re = Regex::new(r"'+p+'").unwrap();\n    for mat in re.find_iter("your test string") {\n        println!("{}", mat.as_str());\n    }\n}';
+document.getElementById('codeOutput').textContent=code;
+}
+
+function copyR(){
+var t=document.getElementById('regexCode').textContent;
+navigator.clipboard.writeText(t);
+}
+
+function copyCode(){
+var t=document.getElementById('codeOutput').textContent;
+navigator.clipboard.writeText(t);
+}
+
+document.querySelectorAll('.rs .rt').forEach(function(btn){
+btn.addEventListener('click',function(){
+var content=this.nextElementSibling;
+content.style.display=content.style.display==='none'?'block':'none';
+});
+});
+
+document.getElementById('testInput').addEventListener('input',function(){
+if(document.getElementById('regexInput').value)testRegex();
+});
+document.getElementById('regexInput').addEventListener('input',function(){
+if(document.getElementById('testInput').value)testRegex();
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
