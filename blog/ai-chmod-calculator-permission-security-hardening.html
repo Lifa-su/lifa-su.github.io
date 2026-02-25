@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Chmod Calculator — Harden Your Server with Proper File Permissions | Lifa AI Tools Blog</title>
@@ -9,20 +13,20 @@
 <meta property="og:description" content="Secure Linux servers with proper chmod permissions. AI-powered calculator for web servers, Docker, and cloud deployments.">
 <meta property="og:type" content="article">
 <meta name="keywords" content="chmod calculator, linux file permissions, server security, chmod hardening, file permission security, chmod docker, chmod web server, permission calculator, linux security">
-<link rel="canonical" href="https://lifa-su.github.io/blog/ai-chmod-calculator-permission-security-hardening.html">
+<link rel="canonical" href="https://lifa-su.com/blog/ai-chmod-calculator-permission-security-hardening.html">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}nav .links a:hover{color:var(--accent2)}.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}.article p{margin-bottom:16px;font-size:1rem}.article ul,.article ol{margin:0 0 16px 24px}.article li{margin-bottom:8px}.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem}.article pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;overflow-x:auto;margin:16px 0}.article pre code{background:none;padding:0}.tip{background:rgba(0,206,201,0.08);border:1px solid rgba(0,206,201,0.3);border-radius:8px;padding:16px;margin:16px 0}.tip strong{color:var(--accent2)}.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}.cta-box a:hover{background:#5a4bd1;text-decoration:none}footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}}
 </style>
 </head>
 <body>
-<nav><a class="logo" href="https://lifa-su.github.io/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.github.io/">Home</a><a href="https://lifa-su.github.io/blog/">Blog</a><a href="https://lifa-su.github.io/about.html">About</a></div></nav>
+<nav><a class="logo" href="https://lifa-su.com/">&#9889; Lifa AI Tools</a><div class="links"><a href="https://lifa-su.com/">Home</a><a href="https://lifa-su.com/blog/">Blog</a><a href="https://lifa-su.com/about.html">About</a></div></nav>
 <article class="article">
 <h1>AI Chmod Calculator &mdash; Harden Your Server with Proper File Permissions</h1>
 <div class="meta">Published February 23, 2026 &middot; 9 min read &middot; Security</div>
 
 <p>A penetration tester just found that your web application's config file containing database credentials is world-readable. The fix takes five seconds: <code>chmod 600 .env</code>. But the damage from not knowing that could cost your company millions. File permissions are the most overlooked layer of server security, and getting them wrong is one of the easiest ways to get breached.</p>
 
-<p>If you already understand <a href="https://lifa-su.github.io/blog/ai-chmod-calculator-unix-permissions.html">basic Unix permissions</a>, this guide goes deeper. We focus on real-world security hardening &mdash; the permission patterns that protect web servers, Docker containers, CI/CD pipelines, and cloud deployments from common attack vectors.</p>
+<p>If you already understand <a href="https://lifa-su.com/blog/ai-chmod-calculator-unix-permissions.html">basic Unix permissions</a>, this guide goes deeper. We focus on real-world security hardening &mdash; the permission patterns that protect web servers, Docker containers, CI/CD pipelines, and cloud deployments from common attack vectors.</p>
 
 <h2>The Principle of Least Privilege</h2>
 
@@ -63,7 +67,7 @@ chmod 600 /var/www/myapp/config/database.yml</code></pre>
 <p>Notice the pattern: <code>750</code> for directories and <code>640</code> for files instead of the commonly recommended <code>755</code> and <code>644</code>. The difference is that others (users not in the group) get zero access. On a shared hosting environment, this prevents other users from reading your source code.</p>
 
 <div class="tip">
-<strong>&#128161; Pro Tip:</strong> Never set web-accessible directories to <code>777</code>. If your application needs write access, create a specific writable directory with <code>770</code> and ensure only the web server group can write to it. Use <a href="https://lifa-su.github.io/ai-chmod-calculator/">the AI Chmod Calculator</a> to verify your permission scheme before applying it.
+<strong>&#128161; Pro Tip:</strong> Never set web-accessible directories to <code>777</code>. If your application needs write access, create a specific writable directory with <code>770</code> and ensure only the web server group can write to it. Use <a href="https://lifa-su.com/ai-chmod-calculator/">the AI Chmod Calculator</a> to verify your permission scheme before applying it.
 </div>
 
 <h3>PHP and CGI Script Permissions</h3>
@@ -128,7 +132,7 @@ CMD ["node", "server.js"]</code></pre>
 
 <div class="cta-box">
 <p>&#128208; Calculate exact chmod values for your deployment scenario &mdash; web servers, Docker, CI/CD.</p>
-<a href="https://lifa-su.github.io/ai-chmod-calculator/">Open AI Chmod Calculator &rarr;</a>
+<a href="https://lifa-su.com/ai-chmod-calculator/">Open AI Chmod Calculator &rarr;</a>
 </div>
 
 <h2>CI/CD Pipeline Permission Security</h2>
@@ -229,7 +233,7 @@ find / -nouser -o -nogroup 2>/dev/null
 # Check sensitive file permissions
 stat -c '%a %U:%G %n' /etc/shadow /etc/passwd /etc/ssh/sshd_config</code></pre>
 
-<p>Run these commands regularly. Better yet, automate them with a cron job that alerts you when unexpected world-writable files appear. For a deeper understanding of the permission model behind these commands, see our <a href="https://lifa-su.github.io/blog/ai-chmod-calculator-linux-file-security.html">Linux file security guide</a>.</p>
+<p>Run these commands regularly. Better yet, automate them with a cron job that alerts you when unexpected world-writable files appear. For a deeper understanding of the permission model behind these commands, see our <a href="https://lifa-su.com/blog/ai-chmod-calculator-linux-file-security.html">Linux file security guide</a>.</p>
 
 <div class="tip">
 <strong>&#9888;&#65039; Security Note:</strong> World-writable files in web-accessible directories are the number one cause of web server compromises. A single writable PHP file in your document root can give an attacker full control of your server.
@@ -237,26 +241,28 @@ stat -c '%a %U:%G %n' /etc/shadow /etc/passwd /etc/ssh/sshd_config</code></pre>
 
 <h2>How the AI Chmod Calculator Helps with Security</h2>
 
-<p>The <a href="https://lifa-su.github.io/ai-chmod-calculator/">Lifa AI Chmod Calculator</a> does more than convert between numeric and symbolic notation. Describe your scenario &mdash; "Nginx serving a Laravel app with file uploads" &mdash; and it generates a complete permission scheme with explanations for each setting. It flags common security mistakes like world-writable directories and suggests the least-privilege alternative.</p>
+<p>The <a href="https://lifa-su.com/ai-chmod-calculator/">Lifa AI Chmod Calculator</a> does more than convert between numeric and symbolic notation. Describe your scenario &mdash; "Nginx serving a Laravel app with file uploads" &mdash; and it generates a complete permission scheme with explanations for each setting. It flags common security mistakes like world-writable directories and suggests the least-privilege alternative.</p>
 
 <p>The calculator handles special bits (setuid, setgid, sticky), generates the exact <code>find</code> commands for recursive permission changes, and warns you about patterns that could lead to security vulnerabilities. Everything runs in your browser with no data sent to any server.</p>
 
 <div class="cta-box">
 <p>&#128736;&#65039; Generate secure permission schemes for any deployment &mdash; free and instant.</p>
-<a href="https://lifa-su.github.io/ai-chmod-calculator/">Try the AI Chmod Calculator &rarr;</a>
+<a href="https://lifa-su.com/ai-chmod-calculator/">Try the AI Chmod Calculator &rarr;</a>
 </div>
 
 <h2>Related Tools and Guides</h2>
 
 <ul>
-<li><a href="https://lifa-su.github.io/ai-chmod-calculator/">AI Chmod Calculator</a> &mdash; visual permission calculator with security recommendations</li>
-<li><a href="https://lifa-su.github.io/blog/ai-chmod-calculator-unix-permissions.html">Unix Permissions Explained</a> &mdash; fundamentals of the chmod permission model</li>
-<li><a href="https://lifa-su.github.io/blog/ai-chmod-calculator-linux-file-security.html">Linux File Security Guide</a> &mdash; comprehensive guide to file-level security on Linux</li>
-<li><a href="https://lifa-su.github.io/ai-hash-generator/">AI Hash Generator</a> &mdash; verify file integrity with MD5, SHA-256, and other hashes</li>
-<li><a href="https://lifa-su.github.io/ai-password-generator/">AI Password Generator</a> &mdash; create strong passwords for server accounts and services</li>
+<li><a href="https://lifa-su.com/ai-chmod-calculator/">AI Chmod Calculator</a> &mdash; visual permission calculator with security recommendations</li>
+<li><a href="https://lifa-su.com/blog/ai-chmod-calculator-unix-permissions.html">Unix Permissions Explained</a> &mdash; fundamentals of the chmod permission model</li>
+<li><a href="https://lifa-su.com/blog/ai-chmod-calculator-linux-file-security.html">Linux File Security Guide</a> &mdash; comprehensive guide to file-level security on Linux</li>
+<li><a href="https://lifa-su.com/ai-hash-generator/">AI Hash Generator</a> &mdash; verify file integrity with MD5, SHA-256, and other hashes</li>
+<li><a href="https://lifa-su.com/ai-password-generator/">AI Password Generator</a> &mdash; create strong passwords for server accounts and services</li>
 </ul>
 
 </article>
-<footer>&copy; 2026 Lifa AI Tools. Built with &hearts; for the developer community. <a href="https://lifa-su.github.io/about.html">About</a> &middot; <a href="https://lifa-su.github.io/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.github.io/terms.html">Terms</a> &middot; <a href="https://lifa-su.github.io/contact.html">Contact</a></footer>
+<footer>&copy; 2026 Lifa AI Tools. Built with &hearts; for the developer community. <a href="https://lifa-su.com/about.html">About</a> &middot; <a href="https://lifa-su.com/privacy.html">Privacy</a> &middot; <a href="https://lifa-su.com/terms.html">Terms</a> &middot; <a href="https://lifa-su.com/contact.html">Contact</a></footer>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
