@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Markdown Editor - Free Online Markdown Editor with Live Preview</title>
+<meta name="description" content="Free AI-powered Markdown editor with live preview, toolbar formatting, word count, export to HTML/MD, and auto-save. Write beautiful markdown effortlessly.">
+<meta name="keywords" content="markdown editor,online markdown,live preview,markdown to html,free markdown editor,AI markdown,writing tool">
+<link rel="canonical" href="https://lifa-su.com/ai-markdown-editor.html">
+<meta property="og:title" content="AI Markdown Editor - Free Online Markdown Editor">
+<meta property="og:description" content="Free AI-powered Markdown editor with live preview, toolbar formatting, export options, and auto-save.">
+<meta property="og:url" content="https://lifa-su.com/ai-markdown-editor.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Markdown Editor - Free Online Markdown Editor">
+<meta name="twitter:description" content="Free AI-powered Markdown editor with live preview, toolbar formatting, export options, and auto-save.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Markdown Editor","url":"https://lifa-su.com/ai-markdown-editor.html","description":"Free AI-powered Markdown editor with live preview, toolbar formatting, word count, export to HTML/MD, and auto-save.","applicationCategory":"Productivity","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(10,10,15,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+nav a.brand{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+nav a.brand:hover{color:var(--accent)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);margin-top:8px;font-size:15px}
+.editor-wrap{flex:1;display:flex;flex-direction:column;padding:0 16px 16px;gap:10px;min-height:0}
+.toolbar-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:14px}
+.toolbar-row button{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;transition:all .2s;min-width:32px}
+.toolbar-row button:hover{border-color:var(--border-hover);background:var(--border);transform:translateY(-1px)}
+.toolbar-row .sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+.actions-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
+.actions-left,.actions-right{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 15px var(--glow)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:13px;transition:all .2s}
+.btn-secondary:hover{border-color:var(--border-hover);transform:translateY(-1px)}
+.stats{color:var(--muted);font-size:12px;display:flex;gap:12px;align-items:center;padding:0 4px}
+.panes{flex:1;display:flex;gap:10px;min-height:400px}
+.pane{flex:1;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;min-width:0}
+.pane-header{padding:8px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px}
+#md-input{flex:1;width:100%;background:transparent;color:var(--text);border:none;resize:none;padding:14px;font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:14px;line-height:1.7;outline:none;tab-size:2}
+#md-input:focus{box-shadow:inset 0 0 0 1px var(--accent),0 0 20px var(--glow)}
+#preview{flex:1;padding:14px;overflow-y:auto;font-size:15px;line-height:1.7}
+#preview h1{font-size:1.8em;margin:16px 0 8px;color:var(--text)}
+#preview h2{font-size:1.5em;margin:14px 0 6px;color:var(--text)}
+#preview h3{font-size:1.25em;margin:12px 0 6px;color:var(--text)}
+#preview p{margin:8px 0}
+#preview a{color:var(--accent2)}
+#preview strong{color:#fff}
+#preview code{background:var(--surface);padding:2px 6px;border-radius:4px;font-size:0.9em;font-family:'SF Mono',Monaco,Consolas,monospace}
+#preview pre{background:var(--surface);padding:14px;border-radius:8px;overflow-x:auto;margin:12px 0}
+#preview pre code{background:none;padding:0}
+#preview blockquote{border-left:3px solid var(--accent);padding:8px 16px;margin:12px 0;color:var(--muted);background:var(--surface);border-radius:0 8px 8px 0}
+#preview img{max-width:100%;border-radius:8px}
+#preview table{border-collapse:collapse;width:100%;margin:12px 0}
+#preview th,#preview td{border:1px solid var(--border);padding:8px 12px;text-align:left}
+#preview th{background:var(--surface)}
+#preview hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+#preview ul,#preview ol{padding-left:24px;margin:8px 0}
+#preview li{margin:4px 0}
+#preview del{color:var(--muted)}
+.pro-section{margin:0 16px 16px;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:14px}
+.pro-section h3{font-size:16px;margin-bottom:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:16px}
+.pro-item{padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted)}
+.btn-kofi{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;text-decoration:none;padding:10px 24px;border-radius:10px;font-weight:600;font-size:14px;transition:all .2s}
+.btn-kofi:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--glow)}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.hidden{display:none!important}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:600px){
+.hero h1{font-size:1.5rem}
+.panes{flex-direction:column;min-height:300px}
+.toolbar-row{padding:8px;gap:4px}
+.toolbar-row button{padding:5px 8px;font-size:12px}
+.actions-row{flex-direction:column;align-items:stretch}
+.actions-left,.actions-right{justify-content:center}
+.pro-features{grid-template-columns:1fr}
+nav{padding:0 12px}
+.editor-wrap{padding:0 10px 10px}
+}
+</style>
+</head>
+<body>
+<nav>
+<a href="index.html" class="brand">← Lifa AI Tools</a>
+<div class="stats">
+<span id="wc">0 words</span>
+<span id="cc">0 chars</span>
+<span id="rt">0 min read</span>
+</div>
+</nav>
+<section class="hero">
+<h1>AI Markdown Editor</h1>
+<p>Write, preview, and export beautiful Markdown — instantly in your browser</p>
+</section>
+<div class="editor-wrap">
+<div class="toolbar-row">
+<button onclick="ins('**','**')" title="Bold (Ctrl+B)"><b>B</b></button>
+<button onclick="ins('*','*')" title="Italic (Ctrl+I)"><i>I</i></button>
+<button onclick="ins('~~','~~')" title="Strikethrough"><s>S</s></button>
+<div class="sep"></div>
+<button onclick="inl('# ')" title="Heading 1">H1</button>
+<button onclick="inl('## ')" title="Heading 2">H2</button>
+<button onclick="inl('### ')" title="Heading 3">H3</button>
+<div class="sep"></div>
+<button onclick="inl('- ')" title="Unordered List">• List</button>
+<button onclick="inl('1. ')" title="Ordered List">1. List</button>
+<div class="sep"></div>
+<button onclick="ins('`','`')" title="Inline Code">&lt;/&gt;</button>
+<button onclick="insBlock('```\n','\n```')" title="Code Block">{ }</button>
+<div class="sep"></div>
+<button onclick="insLink()" title="Link">🔗</button>
+<button onclick="insImg()" title="Image">🖼️</button>
+<button onclick="insBlock('> ','')" title="Blockquote">❝</button>
+<button onclick="insBlock('---\n','')" title="Horizontal Rule">―</button>
+<button onclick="insTable()" title="Table">⊞</button>
+</div>
+<div class="actions-row">
+<div class="actions-left">
+<button class="btn-primary" onclick="dlMd()">↓ .md</button>
+<button class="btn-primary" onclick="dlHtml()">↓ .html</button>
+<button class="btn-secondary" onclick="cpMd()">Copy MD</button>
+<button class="btn-secondary" onclick="cpHtml()">Copy HTML</button>
+</div>
+<div class="actions-right">
+<button class="btn-secondary" onclick="setView('split')" id="v-split">Split</button>
+<button class="btn-secondary" onclick="setView('editor')" id="v-editor">Editor</button>
+<button class="btn-secondary" onclick="setView('preview')" id="v-preview">Preview</button>
+</div>
+</div>
+<div class="panes">
+<div class="pane" id="editor-pane">
+<div class="pane-header">Markdown</div>
+<textarea id="md-input" spellcheck="false" placeholder="Start writing markdown..."></textarea>
+</div>
+<div class="pane" id="preview-pane">
+<div class="pane-header">Preview</div>
+<div id="preview"></div>
+</div>
+</div>
+</div>
+<div class="pro-section">
+<h3>✨ Pro Features</h3>
+<div class="pro-features">
+<div class="pro-item">🔒 Pro: AI writing assistant (grammar, style suggestions)</div>
+<div class="pro-item">🔒 Pro: Custom CSS themes for preview</div>
+<div class="pro-item">🔒 Pro: Export as PDF</div>
+<div class="pro-item">🔒 Pro: Vim/Emacs keybindings</div>
+</div>
+<a href="https://ko-fi.com/feidev" target="_blank" class="btn-kofi">☕ Unlock Pro Features</a>
+</div>
+<footer>
+<p>Part of <a href="index.html">AI Toolbox</a> &mdash; &copy; 2025 Lifa AI Tools</p>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+const ta=document.getElementById('md-input');
+const pv=document.getElementById('preview');
+const wcEl=document.getElementById('wc');
+const ccEl=document.getElementById('cc');
+const rtEl=document.getElementById('rt');
+
+// Markdown parser
+function parseMd(md){
+  // Store code blocks to protect them
+  let codeBlocks=[];
+  md=md.replace(/```(\w*)\n([\s\S]*?)```/g,(_,lang,code)=>{
+    codeBlocks.push('<pre><code class="lang-'+lang+'">'+esc(code.trimEnd())+'</code></pre>');
+    return '\x00CB'+(codeBlocks.length-1)+'\x00';
+  });
+  let inlineCodes=[];
+  md=md.replace(/`([^`\n]+)`/g,(_,code)=>{
+    inlineCodes.push('<code>'+esc(code)+'</code>');
+    return '\x00IC'+(inlineCodes.length-1)+'\x00';
+  });
+
+  let lines=md.split('\n');
+  let html='';
+  let inUl=false,inOl=false,inBq=false,inTable=false;
+  let tableRows=[];
+
+  function closeList(){
+    if(inUl){html+='</ul>\n';inUl=false;}
+    if(inOl){html+='</ol>\n';inOl=false;}
+  }
+  function closeBq(){
+    if(inBq){html+='</blockquote>\n';inBq=false;}
+  }
+  function closeTable(){
+    if(inTable){
+      let hdr=tableRows[0];
+      let body=tableRows.slice(2);
+      html+='<table><thead><tr>';
+      hdr.forEach(c=>html+='<th>'+inlineFormat(c.trim())+'</th>');
+      html+='</tr></thead><tbody>';
+      body.forEach(r=>{html+='<tr>';r.forEach(c=>html+='<td>'+inlineFormat(c.trim())+'</td>');html+='</tr>';});
+      html+='</tbody></table>\n';
+      inTable=false;tableRows=[];
+    }
+  }
+
+  for(let i=0;i<lines.length;i++){
+    let line=lines[i];
+
+    // Table detection
+    if(line.match(/^\|(.+\|)+\s*$/)){
+      if(!inTable){closeList();closeBq();inTable=true;tableRows=[];}
+      let cells=line.split('|').filter((_,j,a)=>j>0&&j<a.length-1);
+      tableRows.push(cells);
+      continue;
+    } else if(inTable){closeTable();}
+
+    // Horizontal rule
+    if(line.match(/^(-{3,}|\*{3,}|_{3,})\s*$/)){
+      closeList();closeBq();
+      html+='<hr>\n';continue;
+    }
+    // Headings
+    let hm=line.match(/^(#{1,6})\s+(.+)$/);
+    if(hm){closeList();closeBq();let lv=hm[1].length;html+='<h'+lv+'>'+inlineFormat(hm[2])+'</h'+lv+'>\n';continue;}
+    // Blockquote
+    if(line.match(/^>\s?/)){
+      closeList();
+      let content=line.replace(/^>\s?/,'');
+      if(!inBq){html+='<blockquote>';inBq=true;}
+      html+=inlineFormat(content)+' ';continue;
+    } else if(inBq){closeBq();}
+    // Unordered list
+    if(line.match(/^[\-\*\+]\s+/)){
+      closeBq();if(inOl){html+='</ol>\n';inOl=false;}
+      if(!inUl){html+='<ul>';inUl=true;}
+      html+='<li>'+inlineFormat(line.replace(/^[\-\*\+]\s+/,''))+'</li>\n';continue;
+    }
+    // Ordered list
+    let olm=line.match(/^\d+\.\s+(.+)/);
+    if(olm){
+      closeBq();if(inUl){html+='</ul>\n';inUl=false;}
+      if(!inOl){html+='<ol>';inOl=true;}
+      html+='<li>'+inlineFormat(olm[1])+'</li>\n';continue;
+    }
+    // Close lists if not list item
+    closeList();
+    // Empty line
+    if(line.trim()===''){closeBq();html+='\n';continue;}
+    // Paragraph
+    html+='<p>'+inlineFormat(line)+'</p>\n';
+  }
+  closeList();closeBq();closeTable();
+
+  // Restore code blocks
+  html=html.replace(/\x00CB(\d+)\x00/g,(_,i)=>codeBlocks[+i]);
+  html=html.replace(/\x00IC(\d+)\x00/g,(_,i)=>inlineCodes[+i]);
+  return html;
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function inlineFormat(s){
+  // Images before links
+  s=s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,'<img src="$2" alt="$1">');
+  // Links
+  s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>');
+  // Bold+Italic
+  s=s.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+  // Bold
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/__(.+?)__/g,'<strong>$1</strong>');
+  // Italic
+  s=s.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  s=s.replace(/_(.+?)_/g,'<em>$1</em>');
+  // Strikethrough
+  s=s.replace(/~~(.+?)~~/g,'<del>$1</del>');
+  return s;
+}
+
+// Toolbar insert functions
+function ins(before,after){
+  ta.focus();
+  let s=ta.selectionStart,e=ta.selectionEnd;
+  let sel=ta.value.substring(s,e)||'text';
+  let nv=ta.value.substring(0,s)+before+sel+after+ta.value.substring(e);
+  ta.value=nv;
+  ta.selectionStart=s+before.length;
+  ta.selectionEnd=s+before.length+sel.length;
+  update();
+}
+function inl(prefix){
+  ta.focus();
+  let s=ta.selectionStart;
+  let lineStart=ta.value.lastIndexOf('\n',s-1)+1;
+  let nv=ta.value.substring(0,lineStart)+prefix+ta.value.substring(lineStart);
+  ta.value=nv;
+  ta.selectionStart=ta.selectionEnd=s+prefix.length;
+  update();
+}
+function insBlock(before,after){
+  ta.focus();
+  let s=ta.selectionStart,e=ta.selectionEnd;
+  let sel=ta.value.substring(s,e);
+  let pre=s>0&&ta.value[s-1]!=='\n'?'\n':'';
+  let post=e<ta.value.length&&ta.value[e]!=='\n'?'\n':'';
+  let nv=ta.value.substring(0,s)+pre+before+sel+after+post+ta.value.substring(e);
+  ta.value=nv;
+  let cur=s+pre.length+before.length;
+  ta.selectionStart=cur;
+  ta.selectionEnd=cur+sel.length;
+  update();
+}
+function insLink(){
+  let url=prompt('Enter URL:','https://');
+  if(!url)return;
+  let text=prompt('Link text:','link');
+  ins('['+text+']('+url+')','');
+}
+function insImg(){
+  let url=prompt('Image URL:','https://');
+  if(!url)return;
+  let alt=prompt('Alt text:','image');
+  ins('!['+alt+']('+url+')','');
+}
+function insTable(){
+  let tpl='\n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n';
+  ta.focus();
+  let s=ta.selectionStart;
+  ta.value=ta.value.substring(0,s)+tpl+ta.value.substring(s);
+  ta.selectionStart=ta.selectionEnd=s+tpl.length;
+  update();
+}
+
+// Update preview and stats
+function update(){
+  let md=ta.value;
+  pv.innerHTML=parseMd(md);
+  let text=md.trim();
+  let words=text?text.split(/\s+/).length:0;
+  let chars=md.length;
+  let mins=Math.max(1,Math.ceil(words/200));
+  wcEl.textContent=words+' words';
+  ccEl.textContent=chars+' chars';
+  rtEl.textContent=mins+' min read';
+}
+
+// View toggle
+let currentView='split';
+function setView(v){
+  currentView=v;
+  let ep=document.getElementById('editor-pane');
+  let pp=document.getElementById('preview-pane');
+  ep.classList.remove('hidden');
+  pp.classList.remove('hidden');
+  document.getElementById('v-split').style.borderColor='';
+  document.getElementById('v-editor').style.borderColor='';
+  document.getElementById('v-preview').style.borderColor='';
+  if(v==='editor'){pp.classList.add('hidden');}
+  else if(v==='preview'){ep.classList.add('hidden');}
+  document.getElementById('v-'+v).style.borderColor='var(--accent)';
+}
+
+// Toast notification
+function toast(msg){
+  let t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// Download as .md
+function dlMd(){
+  let blob=new Blob([ta.value],{type:'text/markdown'});
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='document.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Downloaded .md file');
+}
+
+// Download as .html
+function dlHtml(){
+  let styled='<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Document</title><style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;color:#222;line-height:1.7}code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-size:.9em}pre{background:#f4f4f4;padding:16px;border-radius:8px;overflow-x:auto}pre code{background:none;padding:0}blockquote{border-left:3px solid #6c5ce7;padding:8px 16px;margin:12px 0;color:#666}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px 12px}th{background:#f4f4f4}img{max-width:100%}hr{border:none;border-top:1px solid #ddd;margin:20px 0}a{color:#6c5ce7}</style></head><body>'+parseMd(ta.value)+'<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body></html>';
+  let blob=new Blob([styled],{type:'text/html'});
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='document.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Downloaded .html file');
+}
+
+// Copy functions
+function cpMd(){
+  navigator.clipboard.writeText(ta.value).then(()=>toast('Markdown copied!'));
+}
+function cpHtml(){
+  navigator.clipboard.writeText(parseMd(ta.value)).then(()=>toast('HTML copied!'));
+}

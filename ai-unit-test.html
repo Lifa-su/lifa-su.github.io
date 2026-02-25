@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Unit Test Generator — Auto-Generate Tests for Any Language | Lifa AI Tools</title>
+<meta name="description" content="Generate comprehensive unit tests from your source code instantly. Supports JavaScript, TypeScript, Python, Java, Go, Rust, C# with popular testing frameworks.">
+<meta name="keywords" content="unit test generator, AI testing, Jest, pytest, JUnit, Vitest, Mocha, test automation">
+<meta name="author" content="Lifa AI Tools">
+<link rel="canonical" href="https://lifa-su.com/ai-unit-test.html">
+<meta property="og:title" content="AI Unit Test Generator — Auto-Generate Tests for Any Language">
+<meta property="og:description" content="Generate comprehensive unit tests from your source code instantly. Supports 7 languages and 12+ testing frameworks.">
+<meta property="og:url" content="https://lifa-su.com/ai-unit-test.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Unit Test Generator — Auto-Generate Tests for Any Language">
+<meta name="twitter:description" content="Generate comprehensive unit tests from your source code instantly.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Unit Test Generator","url":"https://lifa-su.com/ai-unit-test.html","description":"Generate comprehensive unit tests from your source code instantly.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--danger:#e74c3c;--warning:#f39c12;--success:#27ae60}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}a:hover{color:var(--accent2)}
+nav{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 24px;background:rgba(10,10,15,0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--text)}
+.container{max-width:960px;margin:0 auto;padding:0 20px}
+.hero{text-align:center;padding:48px 0 32px}
+.hero h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.card:hover{border-color:var(--border-hover)}
+.card h2{font-size:1.2rem;margin-bottom:16px}
+.form-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.form-group{flex:1;min-width:140px}
+.form-group label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+select,textarea{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:.95rem;transition:border-color .2s}
+select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+textarea{resize:vertical;font-family:SF Mono,Monaco,Consolas,Courier New,monospace;font-size:.875rem;line-height:1.5;tab-size:2}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#5b4bd6;transform:translateY(-1px);box-shadow:0 4px 16px var(--glow)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:.875rem;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--border-hover);background:var(--card)}
+.btn-sm{padding:6px 14px;font-size:.8rem;border-radius:6px}
+.options-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.option-toggle{display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--muted);cursor:pointer;user-select:none}
+.option-toggle input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+.output-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.output-actions{display:flex;gap:8px}
+.output-code{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;overflow-x:auto;font-family:SF Mono,Monaco,Consolas,Courier New,monospace;font-size:.84rem;line-height:1.6;white-space:pre;max-height:500px;overflow-y:auto;color:var(--text)}
+.coverage-hints{margin-top:16px;padding:16px;background:var(--surface);border-radius:10px;border:1px solid var(--border)}
+.coverage-hints h3{font-size:.95rem;margin-bottom:10px;color:var(--accent2)}
+.cov-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.85rem}
+.cov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cov-dot.covered{background:var(--success)}
+.cov-dot.partial{background:var(--warning)}
+.cov-dot.missing{background:var(--danger)}
+.examples-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.example-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
+.example-card:hover{border-color:var(--accent);background:var(--card)}
+.example-card h4{font-size:.9rem;margin-bottom:4px;color:var(--accent2)}
+.example-card p{font-size:.8rem;color:var(--muted)}
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.pro-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;opacity:.7}
+.pro-item .lock{font-size:1.4rem;margin-bottom:6px}
+.pro-item h4{font-size:.9rem;margin-bottom:4px}
+.pro-item p{font-size:.78rem;color:var(--muted)}
+.btn-kofi{display:inline-flex;align-items:center;gap:8px;background:#ff5e5b;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-kofi:hover{background:#e54e4b;transform:translateY(-1px);color:#fff}
+footer{text-align:center;padding:32px 20px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px}
+.hidden{display:none}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:12px 20px;border-radius:8px;font-size:.9rem;z-index:200;animation:fadeInUp .3s}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.kw{color:#c792ea}.fn{color:#82aaff}.st{color:#c3e88d}.cm{color:#546e7a}.nu{color:#f78c6c}.op{color:#89ddff}.ty{color:#ffcb6b}
+@media(max-width:600px){.hero h1{font-size:1.6rem}.form-row{flex-direction:column}.options-grid{grid-template-columns:1fr}.pro-grid{grid-template-columns:1fr}.examples-grid{grid-template-columns:1fr}.container{padding:0 14px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<nav><a href="index.html" class="nav-brand">⚡ Lifa AI Tools</a></nav>
+<div class="container">
+<section class="hero"><h1>AI Unit Test Generator</h1>
+<p>Paste your code, pick a framework, and get comprehensive unit tests instantly. Supports 7 languages and 12+ frameworks.</p></section>
+<div class="card"><h2>📝 Source Code</h2>
+<div class="form-row">
+<div class="form-group"><label for="lang">Language</label>
+<select id="lang"><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="python">Python</option><option value="java">Java</option><option value="go">Go</option><option value="rust">Rust</option><option value="csharp">C#</option></select></div>
+<div class="form-group"><label for="framework">Test Framework</label>
+<select id="framework"></select></div></div>
+<textarea id="codeInput" rows="14" placeholder="Paste your function or class code here..." spellcheck="false"></textarea></div>
+<div class="card"><h2>⚙️ Options</h2>
+<div class="options-grid">
+<label class="option-toggle"><input type="checkbox" id="optEdge" checked> Include edge cases</label>
+<label class="option-toggle"><input type="checkbox" id="optError" checked> Include error handling tests</label>
+<label class="option-toggle"><input type="checkbox" id="optPerf"> Include performance tests</label>
+<label class="option-toggle"><input type="checkbox" id="optVerbose"> Verbose comments</label>
+</div>
+<button class="btn-primary" id="generateBtn" onclick="generateTests()">🚀 Generate Unit Tests</button></div>
+<div class="card hidden" id="outputCard">
+<div class="output-header"><h2>✅ Generated Tests</h2>
+<div class="output-actions">
+<button class="btn-secondary btn-sm" onclick="copyOutput()">📋 Copy</button>
+<button class="btn-secondary btn-sm" onclick="downloadOutput()">💾 Download</button>
+</div></div>
+<div class="output-code" id="outputCode"></div>
+<div class="coverage-hints" id="coverageHints"></div></div>
+<div class="card"><h2>💡 Try an Example</h2>
+<div class="examples-grid" id="examplesGrid"></div></div>
+<div class="card"><h2>🔒 Pro Features</h2>
+<div class="pro-grid">
+<div class="pro-item"><div class="lock">🤖</div><h4>AI-Powered Deep Analysis</h4><p>Advanced AI analyzes code paths and generates smarter tests</p></div>
+<div class="pro-item"><div class="lock">🔗</div><h4>Integration Test Generation</h4><p>Generate tests for API endpoints and service interactions</p></div>
+<div class="pro-item"><div class="lock">📊</div><h4>Test Coverage Report</h4><p>Visual coverage report with branch analysis</p></div>
+<div class="pro-item"><div class="lock">📄</div><h4>Custom Test Templates</h4><p>Create and save your own test templates</p></div>
+</div>
+<div style="text-align:center">
+<p style="color:var(--muted);margin-bottom:14px;font-size:.9rem">Unlock all Pro features to supercharge your testing workflow</p>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener"><button class="btn-kofi">☕ Support on Ko-fi to Unlock</button></a>
+</div></div>
+</div>
+<footer><a href="index.html">Part of AI Toolbox</a> · © 2026 Lifa AI Tools</footer>
+<script>
+var FRAMEWORKS={javascript:['Jest','Mocha','Vitest'],typescript:['Jest','Mocha','Vitest'],python:['pytest','unittest'],java:['JUnit 5','TestNG'],go:['testing (built-in)'],rust:['built-in #[test]'],csharp:['xUnit','NUnit']};
+var FILE_EXT={javascript:'.test.js',typescript:'.test.ts',python:'_test.py',java:'Test.java',go:'_test.go',rust:'_test.rs',csharp:'Tests.cs'};
+var EXAMPLES=[
+{title:'JavaScript — Add Function',lang:'javascript',desc:'Simple arithmetic with edge cases',code:"function add(a, b) {\n  if (typeof a !== \"number\" || typeof b !== \"number\") {\n    throw new TypeError(\"Arguments must be numbers\");\n  }\n  return a + b;\n}"},
+{title:'Python — Fibonacci',lang:'python',desc:'Recursive fibonacci with validation',code:"def fibonacci(n):\n    if not isinstance(n, int):\n        raise TypeError(\"Input must be an integer\")\n    if n < 0:\n        raise ValueError(\"Input must be non-negative\")\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)"},
+{title:'TypeScript — Filter Users',lang:'typescript',desc:'Array filtering with type safety',code:"interface User {\n  name: string;\n  age: number;\n  active: boolean;\n}\n\nfunction filterActiveAdults(users: User[]): User[] {\n  if (!Array.isArray(users)) {\n    throw new Error(\"Input must be an array\");\n  }\n  return users.filter(u => u.active && u.age >= 18);\n}"},
+{title:'Java — String Reverser',lang:'java',desc:'String manipulation with null checks',code:"public class StringUtils {\n    public static String reverse(String input) {\n        if (input == null) {\n            throw new IllegalArgumentException(\"Input cannot be null\");\n        }\n        return new StringBuilder(input).reverse().toString();\n    }\n}"},
+{title:'Go — Max in Slice',lang:'go',desc:'Find maximum value in integer slice',code:"func Max(nums []int) (int, error) {\n\tif len(nums) == 0 {\n\t\treturn 0, fmt.Errorf(\"empty slice\")\n\t}\n\tmax := nums[0]\n\tfor _, n := range nums[1:] {\n\t\tif n > max {\n\t\t\tmax = n\n\t\t}\n\t}\n\treturn max, nil\n}"},
+{title:'Rust — Parse Config',lang:'rust',desc:'Parse key-value config string',code:"fn parse_config(input: &str) -> Result<HashMap<String, String>, String> {\n    if input.is_empty() {\n        return Err(\"Empty input\".to_string());\n    }\n    let mut map = HashMap::new();\n    for line in input.lines() {\n        let parts: Vec<&str> = line.splitn(2, '=').collect();\n        if parts.len() != 2 {\n            return Err(format!(\"Invalid line: {}\", line));\n        }\n        map.insert(parts[0].trim().to_string(), parts[1].trim().to_string());\n    }\n    Ok(map)\n}"}
+];
+var langEl=document.getElementById('lang'),fwEl=document.getElementById('framework'),codeEl=document.getElementById('codeInput'),outputCard=document.getElementById('outputCard'),outputCode=document.getElementById('outputCode'),coverageEl=document.getElementById('coverageHints');
+function updateFrameworks(){var fw=FRAMEWORKS[langEl.value];fwEl.innerHTML=fw.map(function(f){return'<option value="'+f+'">'+f+'</option>';}).join('');}
+langEl.addEventListener('change',updateFrameworks);updateFrameworks();
+function renderExamples(){document.getElementById('examplesGrid').innerHTML=EXAMPLES.map(function(ex,i){return'<div class="example-card" onclick="loadExample('+i+')"><h4>'+ex.title+'</h4><p>'+ex.desc+'</p></div>';}).join('');}
+renderExamples();
+function loadExample(i){var ex=EXAMPLES[i];langEl.value=ex.lang;updateFrameworks();codeEl.value=ex.code;codeEl.scrollIntoView({behavior:'smooth',block:'center'});}
+function showToast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}
+function copyOutput(){var text=outputCode.textContent;navigator.clipboard.writeText(text).then(function(){showToast('Copied to clipboard!');}).catch(function(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();showToast('Copied!');});}
+function downloadOutput(){var text=outputCode.textContent;var lang=langEl.value;var ext=FILE_EXT[lang]||'.test.txt';var info=parseFunctionInfo(codeEl.value,lang);var fname=(info.name||'generated')+ext;var blob=new Blob([text],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();URL.revokeObjectURL(a.href);showToast('Downloaded '+fname);}
+function parseFunctionInfo(code,lang){
+  var info={name:'',params:[],returnType:'',className:'',isAsync:false,throws:[]};
+  if(!code.trim())return info;
+  var m,cm,rm;
+  if(lang==='python'){
+    m=code.match(/def\s+(\w+)\s*\(([^)]*)\)/);
+    if(m){info.name=m[1];info.params=m[2].split(',').map(function(p){return p.trim().split(':')[0].split('=')[0].trim();}).filter(Boolean);}
+    if(info.params[0]==='self')info.params.shift();
+    cm=code.match(/class\s+(\w+)/);if(cm)info.className=cm[1];
+    rm=code.match(/->\s*(\w+)/);if(rm)info.returnType=rm[1];
+    var pyT=code.match(/raise\s+(\w+)/g)||[];
+    info.throws=pyT.map(function(t){var x=t.match(/raise\s+(\w+)/);return x?x[1]:'Exception';}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  }else if(lang==='java'||lang==='csharp'){
+    cm=code.match(/class\s+(\w+)/);if(cm)info.className=cm[1];
+    m=code.match(/(?:public|private|protected|static|\s)+(\w+(?:<[^>]+>)?)\s+(\w+)\s*\(([^)]*)\)/);
+    if(m){info.returnType=m[1];info.name=m[2];info.params=m[3].split(',').map(function(p){var parts=p.trim().split(/\s+/);return parts.length>=2?parts[parts.length-1]:parts[0];}).filter(Boolean);}
+    var jT=code.match(/throw\s+new\s+(\w+)/g)||[];
+    info.throws=jT.map(function(t){var x=t.match(/throw\s+new\s+(\w+)/);return x?x[1]:'Exception';}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  }else if(lang==='go'){
+    m=code.match(/func\s+(?:\(\w+\s+\*?\w+\)\s+)?(\w+)\s*\(([^)]*)\)\s*(?:\(([^)]*)\)|(\w+))?/);
+    if(m){info.name=m[1];info.params=m[2].split(',').map(function(p){return p.trim().split(/\s+/)[0];}).filter(Boolean);info.returnType=m[3]||m[4]||'';}
+    if(code.indexOf('error')!==-1)info.throws=['error'];
+  }else if(lang==='rust'){
+    m=code.match(/fn\s+(\w+)\s*(?:<[^>]*>)?\s*\(([^)]*)\)\s*(?:->\s*(.+?)\s*\{)?/);
+    if(m){info.name=m[1];info.params=m[2].split(',').map(function(p){return p.trim().split(':')[0].replace(/&/g,'').replace(/mut\s+/,'').trim();}).filter(function(p){return p&&p!=='self';});info.returnType=m[3]||'';}
+    if(code.indexOf('Result<')!==-1)info.throws=['Err'];
+  }else{
+    info.isAsync=/async\s/.test(code);
+    m=code.match(/(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/);
+    if(!m)m=code.match(/(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\(?([^)=]*)\)?\s*=>/);
+    if(!m)m=code.match(/(\w+)\s*\(([^)]*)\)\s*(?::\s*\w+)?\s*\{/);
+    if(m){info.name=m[1];info.params=m[2].split(',').map(function(p){return p.trim().split(':')[0].split('=')[0].trim();}).filter(Boolean);}
+    var jsT=code.match(/throw\s+new\s+(\w+)/g)||[];
+    info.throws=jsT.map(function(t){var x=t.match(/throw\s+new\s+(\w+)/);return x?x[1]:'Error';}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  }
+  return info;
+}
+function sampleVal(p,lang){
+  if(/num|count|age|size|n|x|y|a|b|index/i.test(p))return '5';
+  if(/str|text|name|input|s|msg|key|val/i.test(p)){if(lang==='go')return '"test"';return '"test"';}
+  if(/arr|list|items|nums|data|elements|users/i.test(p)){if(lang==='go')return '[]int{1, 2, 3}';if(lang==='rust')return 'vec![1, 2, 3]';return '[1, 2, 3]';}
+  if(/bool|flag|active|enabled/i.test(p)){if(lang==='python')return 'True';return 'true';}
+  return '"test"';
+}
+function genJSTests(info,fw,opts){
+  var fn=info.name||'myFunction',ps=info.params,v=opts.verbose;
+  var aw=info.isAsync?'async ':'',awc=info.isAsync?'await ':'';
+  var args=ps.map(function(p){return sampleVal(p,'javascript');}).join(', ');
+  var nullArgs=ps.map(function(){return 'null';}).join(', ');
+  var isMocha=fw==='Mocha';
+  var L=[];
+  if(v)L.push('// Unit tests for '+fn+' using '+fw);
+  if(fw==='Vitest')L.push("import { describe, it, expect } from 'vitest';");
+  if(isMocha)L.push("const { expect } = require('chai');");
+  L.push('');
+  L.push('describe("'+fn+'", () => {');
+  if(v)L.push('  // Happy path tests');
+  L.push('  it("should return correct result with valid input", '+aw+'() => {');
+  L.push('    const result = '+awc+fn+'('+args+');');
+  L.push(isMocha?'    expect(result).to.not.be.undefined;':'    expect(result).toBeDefined();');
+  L.push('  });');
+  L.push('');
+  L.push('  it("should handle typical use case", '+aw+'() => {');
+  L.push('    const result = '+awc+fn+'('+args+');');
+  L.push(isMocha?'    expect(result).to.exist;':'    expect(result).not.toBeUndefined();');
+  L.push('  });');
+  if(opts.edge&&ps.length>0){
+    L.push('');if(v)L.push('  // Edge case tests');
+    L.push('  it("should handle null input", () => {');
+    L.push(isMocha?'    expect(() => '+fn+'('+nullArgs+')).to.throw();':'    expect(() => '+fn+'('+nullArgs+')).toThrow();');
+    L.push('  });');
+    L.push('');
+    L.push('  it("should handle undefined input", () => {');
+    var undefArgs=ps.map(function(){return 'undefined';}).join(', ');
+    L.push(isMocha?'    expect(() => '+fn+'('+undefArgs+')).to.throw();':'    expect(() => '+fn+'('+undefArgs+')).toThrow();');
+    L.push('  });');
+    if(ps.some(function(p){return /num|a|b|n|x|y|count|size/i.test(p);})){
+      L.push('');
+      L.push('  it("should handle zero value", '+aw+'() => {');
+      var zeros=ps.map(function(){return '0';}).join(', ');
+      L.push('    const result = '+awc+fn+'('+zeros+');');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+      L.push('');
+      L.push('  it("should handle negative numbers", '+aw+'() => {');
+      var negs=ps.map(function(){return '-1';}).join(', ');
+      L.push('    const result = '+awc+fn+'('+negs+');');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+      L.push('');
+      L.push('  it("should handle very large numbers", '+aw+'() => {');
+      L.push('    const result = '+awc+fn+'(Number.MAX_SAFE_INTEGER'+(ps.length>1?', 1':'')+');');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+    }
+    if(ps.some(function(p){return /str|text|name|input|s|msg/i.test(p);})){
+      L.push('');
+      L.push('  it("should handle empty string", '+aw+'() => {');
+      var empties=ps.map(function(){return '""';}).join(', ');
+      L.push('    const result = '+awc+fn+'('+empties+');');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+      L.push('');
+      L.push('  it("should handle special characters", '+aw+'() => {');
+      L.push('    const result = '+awc+fn+'("!@#$%^&*()");');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+    }
+    if(ps.some(function(p){return /arr|list|items|users|nums|data/i.test(p);})){
+      L.push('');
+      L.push('  it("should handle empty array", '+aw+'() => {');
+      L.push('    const result = '+awc+fn+'([]);');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+      L.push('');
+      L.push('  it("should handle single element array", '+aw+'() => {');
+      L.push('    const result = '+awc+fn+'([1]);');
+      L.push(isMocha?'    expect(result).to.exist;':'    expect(result).toBeDefined();');
+      L.push('  });');
+    }
+  }
+  if(opts.error){
+    L.push('');if(v)L.push('  // Error handling tests');
+    if(info.throws.length>0){
+      info.throws.forEach(function(t){
+        L.push('  it("should throw '+t+' for invalid input", () => {');
+        L.push(isMocha?'    expect(() => '+fn+'('+nullArgs+')).to.throw('+t+');':'    expect(() => '+fn+'('+nullArgs+')).toThrow('+t+');');
+        L.push('  });');L.push('');
+      });
+    }else{
+      L.push('  it("should throw on invalid arguments", () => {');
+      L.push(isMocha?'    expect(() => '+fn+'('+nullArgs+')).to.throw();':'    expect(() => '+fn+'('+nullArgs+')).toThrow();');
+      L.push('  });');
+    }
+  }
+  if(opts.perf){
+    L.push('');if(v)L.push('  // Performance test');
+    L.push('  it("should complete within acceptable time", () => {');
+    L.push('    const start = performance.now();');
+    L.push('    for (let i = 0; i < 10000; i++) '+fn+'('+args+');');
+    L.push('    expect(performance.now() - start).toBeLessThan(1000);');
+    L.push('  });');
+  }
+  L.push('});');
+  return L.join('\n');
+}
+function genPyTests(info,fw,opts){
+  var fn=info.name||'my_function',ps=info.params,v=opts.verbose,cls=info.className;
+  var args=ps.map(function(p){return sampleVal(p,'python');}).join(', ');
+  var L=[];
+  if(fw==='pytest'){
+    if(v)L.push('# Unit tests for '+fn+' using pytest');
+    if(cls)L.push('from module import '+cls);
+    else L.push('from module import '+fn);
+    L.push('import pytest');L.push('');
+    if(v)L.push('# Happy path tests');
+    L.push('def test_'+fn+'_valid_input():');
+    if(cls)L.push('    obj = '+cls+'()');
+    L.push('    result = '+(cls?'obj.':'')+fn+'('+args+')');
+    L.push('    assert result is not None');L.push('');
+    L.push('def test_'+fn+'_typical_case():');
+    L.push('    result = '+(cls?cls+'().':'')+fn+'('+args+')');
+    L.push('    assert result is not None');L.push('');
+    if(opts.edge&&ps.length>0){
+      if(v)L.push('# Edge case tests');
+      L.push('def test_'+fn+'_none_input():');
+      L.push('    with pytest.raises(Exception):');
+      var noneArgs=ps.map(function(){return 'None';}).join(', ');
+      L.push('        '+(cls?cls+'().':'')+fn+'('+noneArgs+')');L.push('');
+      if(ps.some(function(p){return /num|n|x|y|a|b|count|size/i.test(p);})){
+        L.push('def test_'+fn+'_zero():');
+        var zeros=ps.map(function(){return '0';}).join(', ');
+        L.push('    result = '+(cls?cls+'().':'')+fn+'('+zeros+')');
+        L.push('    assert result is not None');L.push('');
+        L.push('def test_'+fn+'_negative():');
+        var negs=ps.map(function(){return '-1';}).join(', ');
+        L.push('    result = '+(cls?cls+'().':'')+fn+'('+negs+')');
+        L.push('    assert result is not None');L.push('');
+      }
+      if(ps.some(function(p){return /str|text|name|input|s|msg/i.test(p);})){
+        L.push('def test_'+fn+'_empty_string():');
+        var empties=ps.map(function(){return '""';}).join(', ');
+        L.push('    result = '+(cls?cls+'().':'')+fn+'('+empties+')');
+        L.push('    assert result is not None');L.push('');
+      }
+      if(ps.some(function(p){return /arr|list|items|nums|data/i.test(p);})){
+        L.push('def test_'+fn+'_empty_list():');
+        L.push('    result = '+(cls?cls+'().':'')+fn+'([])');
+        L.push('    assert result is not None');L.push('');
+      }
+    }
+    if(opts.error&&info.throws.length>0){
+      if(v)L.push('# Error handling tests');
+      info.throws.forEach(function(t){
+        L.push('def test_'+fn+'_raises_'+t.toLowerCase()+'():');
+        L.push('    with pytest.raises('+t+'):');
+        L.push('        '+(cls?cls+'().':'')+fn+'(None)');L.push('');
+      });
+    }
+    if(opts.perf){
+      if(v)L.push('# Performance test');
+      L.push('def test_'+fn+'_performance(benchmark):');
+      L.push('    benchmark('+(cls?cls+'().':'')+fn+', '+args+')');
+    }
+  }else{
+    if(v)L.push('# Unit tests for '+fn+' using unittest');
+    L.push('import unittest');
+    if(cls)L.push('from module import '+cls);
+    else L.push('from module import '+fn);
+    L.push('');
+    L.push('class Test'+fn.charAt(0).toUpperCase()+fn.slice(1)+'(unittest.TestCase):');L.push('');
+    L.push('    def test_valid_input(self):');
+    L.push('        result = '+(cls?cls+'().':'')+fn+'('+args+')');
+    L.push('        self.assertIsNotNone(result)');L.push('');
+    L.push('    def test_typical_case(self):');
+    L.push('        result = '+(cls?cls+'().':'')+fn+'('+args+')');
+    L.push('        self.assertIsNotNone(result)');L.push('');
+    if(opts.edge&&ps.length>0){
+      if(v)L.push('    # Edge case tests');
+      L.push('    def test_none_input(self):');
+      L.push('        with self.assertRaises(Exception):');
+      var noneArgs2=ps.map(function(){return 'None';}).join(', ');
+      L.push('            '+(cls?cls+'().':'')+fn+'('+noneArgs2+')');L.push('');
+      if(ps.some(function(p){return /num|n|x|y|a|b/i.test(p);})){
+        L.push('    def test_zero(self):');
+        L.push('        result = '+(cls?cls+'().':'')+fn+'('+ps.map(function(){return '0';}).join(', ')+')');
+        L.push('        self.assertIsNotNone(result)');L.push('');
+        L.push('    def test_negative(self):');
+        L.push('        result = '+(cls?cls+'().':'')+fn+'('+ps.map(function(){return '-1';}).join(', ')+')');
+        L.push('        self.assertIsNotNone(result)');L.push('');
+      }
+    }
+    if(opts.error&&info.throws.length>0){
+      if(v)L.push('    # Error handling tests');
+      info.throws.forEach(function(t){
+        L.push('    def test_raises_'+t.toLowerCase()+'(self):');
+        L.push('        with self.assertRaises('+t+'):');
+        L.push('            '+(cls?cls+'().':'')+fn+'(None)');L.push('');
+      });
+    }
+    L.push("if __name__ == '__main__':");
+    L.push('    unittest.main()');
+  }
+  return L.join('\n');
+}
+function genJavaTests(info,fw,opts){
+  var fn=info.name||'myMethod',cls=info.className||'MyClass',ps=info.params,v=opts.verbose;
+  var args=ps.map(function(p){return sampleVal(p,'java');}).join(', ');
+  var nullArgs=ps.map(function(){return 'null';}).join(', ');
+  var L=[];
+  if(fw==='JUnit 5'){
+    if(v)L.push('// Unit tests for '+cls+'.'+fn+' using JUnit 5');
+    L.push('import org.junit.jupiter.api.Test;');
+    L.push('import org.junit.jupiter.api.DisplayName;');
+    L.push('import static org.junit.jupiter.api.Assertions.*;');L.push('');
+    L.push('class '+cls+'Test {');L.push('');
+    L.push('    @Test');
+    L.push('    @DisplayName("should return correct result with valid input")');
+    L.push('    void testValidInput() {');
+    L.push('        var result = '+cls+'.'+fn+'('+args+');');
+    L.push('        assertNotNull(result);');
+    L.push('    }');L.push('');
+    if(opts.edge&&ps.length>0){
+      if(v)L.push('    // Edge case tests');
+      L.push('    @Test');
+      L.push('    @DisplayName("should handle null input")');
+      L.push('    void testNullInput() {');
+      L.push('        assertThrows(Exception.class, () -> '+cls+'.'+fn+'('+nullArgs+'));');
+      L.push('    }');L.push('');
+      if(ps.some(function(p){return /str|text|name|input|s/i.test(p);})){
+        L.push('    @Test');
+        L.push('    @DisplayName("should handle empty string")');
+        L.push('    void testEmptyString() {');
+        L.push('        var result = '+cls+'.'+fn+'("");');
+        L.push('        assertNotNull(result);');
+        L.push('    }');L.push('');
+      }
+    }
+    if(opts.error&&info.throws.length>0){
+      if(v)L.push('    // Error handling tests');
+      info.throws.forEach(function(t){
+        L.push('    @Test');
+        L.push('    @DisplayName("should throw '+t+' for invalid input")');
+        L.push('    void testThrows'+t+'() {');
+        L.push('        assertThrows('+t+'.class, () -> '+cls+'.'+fn+'('+nullArgs+'));');
+        L.push('    }');L.push('');
+      });
+    }
+    if(opts.perf){
+      L.push('    @Test');
+      L.push('    @DisplayName("should complete within acceptable time")');
+      L.push('    void testPerformance() {');
+      L.push('        long start = System.nanoTime();');
+      L.push('        for (int i = 0; i < 10000; i++) '+cls+'.'+fn+'('+args+');');
+      L.push('        long elapsed = (System.nanoTime() - start) / 1_000_000;');
+      L.push('        assertTrue(elapsed < 1000, "Should complete in under 1s");');
+      L.push('    }');
+    }
+    L.push('}');
+  }else{
+    if(v)L.push('// Unit tests for '+cls+'.'+fn+' using TestNG');
+    L.push('import org.testng.annotations.Test;');
+    L.push('import static org.testng.Assert.*;');L.push('');
+    L.push('public class '+cls+'Test {');L.push('');
+    L.push('    @Test');
+    L.push('    public void testValidInput() {');
+    L.push('        var result = '+cls+'.'+fn+'('+args+');');
+    L.push('        assertNotNull(result);');
+    L.push('    }');L.push('');
+    if(opts.edge&&ps.length>0){
+      L.push('    @Test(expectedExceptions = Exception.class)');
+      L.push('    public void testNullInput() {');
+      L.push('        '+cls+'.'+fn+'('+nullArgs+');');
+      L.push('    }');L.push('');
+    }
+    if(opts.error&&info.throws.length>0){
+      info.throws.forEach(function(t){
+        L.push('    @Test(expectedExceptions = '+t+'.class)');
+        L.push('    public void testThrows'+t+'() {');
+        L.push('        '+cls+'.'+fn+'('+nullArgs+');');
+        L.push('    }');L.push('');
+      });
+    }
+    L.push('}');
+  }
+  return L.join('\n');
+}
+function genCSharpTests(info,fw,opts){
+  var fn=info.name||'MyMethod',cls=info.className||'MyClass',ps=info.params,v=opts.verbose;
+  var args=ps.map(function(p){return sampleVal(p,'csharp');}).join(', ');
+  var nullArgs=ps.map(function(){return 'null';}).join(', ');
+  var L=[];
+  if(fw==='xUnit'){
+    if(v)L.push('// Unit tests for '+cls+'.'+fn+' using xUnit');
+    L.push('using Xunit;');L.push('');
+    L.push('public class '+cls+'Tests {');L.push('');
+    L.push('    [Fact]');
+    L.push('    public void '+fn+'_ValidInput_ReturnsResult() {');
+    L.push('        var result = '+cls+'.'+fn+'('+args+');');
+    L.push('        Assert.NotNull(result);');
+    L.push('    }');L.push('');
+    if(opts.edge&&ps.length>0){
+      L.push('    [Fact]');
+      L.push('    public void '+fn+'_NullInput_ThrowsException() {');
+      L.push('        Assert.Throws<Exception>(() => '+cls+'.'+fn+'('+nullArgs+'));');
+      L.push('    }');L.push('');
+    }
+    if(opts.error&&info.throws.length>0){
+      info.throws.forEach(function(t){
+        L.push('    [Fact]');
+        L.push('    public void '+fn+'_InvalidInput_Throws'+t+'() {');
+        L.push('        Assert.Throws<'+t+'>(() => '+cls+'.'+fn+'('+nullArgs+'));');
+        L.push('    }');L.push('');
+      });
+    }
+    L.push('}');
+  }else{
+    if(v)L.push('// Unit tests for '+cls+'.'+fn+' using NUnit');
+    L.push('using NUnit.Framework;');L.push('');
+    L.push('[TestFixture]');
+    L.push('public class '+cls+'Tests {');L.push('');
+    L.push('    [Test]');
+    L.push('    public void '+fn+'_ValidInput_ReturnsResult() {');
+    L.push('        var result = '+cls+'.'+fn+'('+args+');');
+    L.push('        Assert.That(result, Is.Not.Null);');
+    L.push('    }');L.push('');
+    if(opts.edge&&ps.length>0){
+      L.push('    [Test]');
+      L.push('    public void '+fn+'_NullInput_ThrowsException() {');
+      L.push('        Assert.Throws<Exception>(() => '+cls+'.'+fn+'('+nullArgs+'));');
+      L.push('    }');L.push('');
+    }
+    if(opts.error&&info.throws.length>0){
+      info.throws.forEach(function(t){
+        L.push('    [Test]');
+        L.push('    public void '+fn+'_InvalidInput_Throws'+t+'() {');
+        L.push('        Assert.Throws<'+t+'>(() => '+cls+'.'+fn+'('+nullArgs+'));');
+        L.push('    }');L.push('');
+      });
+    }
+    L.push('}');
+  }
+  return L.join('\n');
+}
+function genGoTests(info,opts){
+  var fn=info.name||'MyFunc',ps=info.params,v=opts.verbose;
+  var args=ps.map(function(p){return sampleVal(p,'go');}).join(', ');
+  var L=[];
+  if(v)L.push('// Unit tests for '+fn);
+  L.push('package main');L.push('');
+  L.push('import (');
+  L.push('\t"testing"');
+  if(info.throws.length>0)L.push('\t"errors"');
+  L.push(')');L.push('');
+  L.push('func Test'+fn+'_ValidInput(t *testing.T) {');
+  if(info.throws.length>0){
+    L.push('\tresult, err := '+fn+'('+args+')');
+    L.push('\tif err != nil {');
+    L.push('\t\tt.Fatalf("unexpected error: %v", err)');
+    L.push('\t}');
+    L.push('\t_ = result');
+  }else{
+    L.push('\tresult := '+fn+'('+args+')');
+    L.push('\t_ = result');
+  }
+  L.push('}');L.push('');
+  L.push('func Test'+fn+'_TypicalCase(t *testing.T) {');
+  if(info.throws.length>0){
+    L.push('\tresult, err := '+fn+'('+args+')');
+    L.push('\tif err != nil {');
+    L.push('\t\tt.Errorf("expected no error, got %v", err)');
+    L.push('\t}');
+    L.push('\t_ = result');
+  }else{
+    L.push('\tresult := '+fn+'('+args+')');
+    L.push('\t_ = result');
+  }
+  L.push('}');L.push('');
+  if(opts.edge&&ps.length>0){
+    if(v)L.push('// Edge case tests');
+    if(ps.some(function(p){return /arr|list|nums|data|slice/i.test(p);})){
+      L.push('func Test'+fn+'_EmptySlice(t *testing.T) {');
+      if(info.throws.length>0){
+        L.push('\t_, err := '+fn+'([]int{})');
+        L.push('\tif err == nil {');
+        L.push('\t\tt.Error("expected error for empty slice")');
+        L.push('\t}');
+      }else{
+        L.push('\tresult := '+fn+'([]int{})');
+        L.push('\t_ = result');
+      }
+      L.push('}');L.push('');
+      L.push('func Test'+fn+'_SingleElement(t *testing.T) {');
+      if(info.throws.length>0){
+        L.push('\tresult, err := '+fn+'([]int{42})');
+        L.push('\tif err != nil {');
+        L.push('\t\tt.Fatalf("unexpected error: %v", err)');
+        L.push('\t}');
+        L.push('\t_ = result');
+      }else{
+        L.push('\tresult := '+fn+'([]int{42})');
+        L.push('\t_ = result');
+      }
+      L.push('}');L.push('');
+    }
+    if(ps.some(function(p){return /num|n|x|y|a|b|count/i.test(p);})){
+      L.push('func Test'+fn+'_Zero(t *testing.T) {');
+      L.push('\tresult'+(info.throws.length>0?', _':'')+' := '+fn+'(0)');
+      L.push('\t_ = result');
+      L.push('}');L.push('');
+      L.push('func Test'+fn+'_Negative(t *testing.T) {');
+      L.push('\tresult'+(info.throws.length>0?', _':'')+' := '+fn+'(-1)');
+      L.push('\t_ = result');
+      L.push('}');L.push('');
+    }
+  }
+  if(opts.error&&info.throws.length>0){
+    if(v)L.push('// Error handling tests');
+    L.push('func Test'+fn+'_ErrorCase(t *testing.T) {');
+    L.push('\t_, err := '+fn+'('+ps.map(function(){return 'nil';}).join(', ')+')');
+    L.push('\tif err == nil {');
+    L.push('\t\tt.Error("expected error for invalid input")');
+    L.push('\t}');
+    L.push('}');L.push('');
+  }
+  if(opts.perf){
+    if(v)L.push('// Benchmark test');
+    L.push('func Benchmark'+fn+'(b *testing.B) {');
+    L.push('\tfor i := 0; i < b.N; i++ {');
+    L.push('\t\t'+fn+'('+args+')');
+    L.push('\t}');
+    L.push('}');
+  }
+  return L.join('\n');
+}
+function genRustTests(info,opts){
+  var fn=info.name||'my_function',ps=info.params,v=opts.verbose;
+  var args=ps.map(function(p){return sampleVal(p,'rust');}).join(', ');
+  var hasResult=info.returnType&&info.returnType.indexOf('Result')!==-1;
+  var L=[];
+  L.push('#[cfg(test)]');
+  L.push('mod tests {');
+  L.push('    use super::*;');L.push('');
+  if(v)L.push('    // Happy path tests');
+  L.push('    #[test]');
+  L.push('    fn test_'+fn+'_valid_input() {');
+  if(hasResult){
+    L.push('        let result = '+fn+'('+args+');');
+    L.push('        assert!(result.is_ok());');
+  }else{
+    L.push('        let result = '+fn+'('+args+');');
+    L.push('        assert!(!format!("{:?}", result).is_empty());');
+  }
+  L.push('    }');L.push('');
+  if(opts.edge&&ps.length>0){
+    if(v)L.push('    // Edge case tests');
+    if(ps.some(function(p){return /str|text|input|s|msg/i.test(p);})){
+      L.push('    #[test]');
+      L.push('    fn test_'+fn+'_empty_input() {');
+      if(hasResult){
+        L.push('        let result = '+fn+'("");');
+        L.push('        assert!(result.is_err());');
+      }else{
+        L.push('        let result = '+fn+'("");');
+        L.push('        assert!(!format!("{:?}", result).is_empty());');
+      }
+      L.push('    }');L.push('');
+    }
+    if(ps.some(function(p){return /num|n|x|y|a|b/i.test(p);})){
+      L.push('    #[test]');
+      L.push('    fn test_'+fn+'_zero() {');
+      L.push('        let result = '+fn+'(0);');
+      if(hasResult)L.push('        assert!(result.is_ok());');
+      L.push('    }');L.push('');
+      L.push('    #[test]');
+      L.push('    fn test_'+fn+'_negative() {');
+      L.push('        let result = '+fn+'(-1);');
+      L.push('    }');L.push('');
+    }
+    if(ps.some(function(p){return /vec|arr|list|slice/i.test(p);})){
+      L.push('    #[test]');
+      L.push('    fn test_'+fn+'_empty_vec() {');
+      L.push('        let result = '+fn+'(vec![]);');
+      L.push('    }');L.push('');
+    }
+  }
+  if(opts.error&&hasResult){
+    if(v)L.push('    // Error handling tests');
+    L.push('    #[test]');
+    L.push('    fn test_'+fn+'_error_case() {');
+    if(ps.some(function(p){return /str|input/i.test(p);})){
+      L.push('        let result = '+fn+'("");');
+    }else{
+      L.push('        let result = '+fn+'('+args+');');
+    }
+    L.push('        assert!(result.is_err());');
+    L.push('    }');L.push('');
+  }
+  L.push('}');
+  return L.join('\n');
+}
+function generateTests(){
+  var code=codeEl.value.trim();
+  if(!code){showToast('Please paste some code first!');return;}
+  var lang=langEl.value,fw=fwEl.value;
+  var opts={edge:document.getElementById('optEdge').checked,error:document.getElementById('optError').checked,perf:document.getElementById('optPerf').checked,verbose:document.getElementById('optVerbose').checked};
+  var info=parseFunctionInfo(code,lang);
+  var testCode='';
+  if(lang==='javascript'||lang==='typescript')testCode=genJSTests(info,fw,opts);
+  else if(lang==='python')testCode=genPyTests(info,fw,opts);
+  else if(lang==='java')testCode=genJavaTests(info,fw,opts);
+  else if(lang==='csharp')testCode=genCSharpTests(info,fw,opts);
+  else if(lang==='go')testCode=genGoTests(info,opts);
+  else if(lang==='rust')testCode=genRustTests(info,opts);
+  outputCode.innerHTML=highlightSyntax(testCode,lang);
+  outputCard.classList.remove('hidden');
+  renderCoverage(info,opts);
+  outputCard.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function highlightSyntax(code,lang){
+  var s=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/(\/\/.*$|#.*$)/gm,'<span class="cm">$1</span>');
+  s=s.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g,'<span class="st">$1</span>');
+  s=s.replace(/\b(\d+(?:\.\d+)?)\b/g,'<span class="nu">$1</span>');
+  if(lang==='python'){
+    s=s.replace(/\b(def|class|import|from|return|if|else|elif|for|while|with|as|raise|assert|not|and|or|is|in|True|False|None|self|pytest)\b/g,'<span class="kw">$1</span>');
+  }else if(lang==='go'){
+    s=s.replace(/\b(func|package|import|return|if|else|for|range|var|err|nil|type|struct|interface|defer|go|chan|select|switch|case|break|continue|map|string|int|bool|error|testing)\b/g,'<span class="kw">$1</span>');
+  }else if(lang==='rust'){
+    s=s.replace(/\b(fn|let|mut|use|mod|pub|struct|impl|trait|enum|match|if|else|for|while|loop|return|self|super|crate|where|type|const|static|unsafe|async|await|move|ref|Ok|Err|Some|None|assert|cfg|test|Result|Option|String|Vec|HashMap)\b/g,'<span class="kw">$1</span>');
+  }else if(lang==='java'){
+    s=s.replace(/\b(public|private|protected|static|void|class|interface|extends|implements|import|return|if|else|for|while|new|throw|throws|try|catch|finally|var|null|true|false|int|long|double|boolean|String|Test|DisplayName|assertNotNull|assertThrows|assertTrue|assertEquals)\b/g,'<span class="kw">$1</span>');
+  }else if(lang==='csharp'){
+    s=s.replace(/\b(public|private|protected|static|void|class|interface|using|return|if|else|for|while|new|throw|try|catch|finally|var|null|true|false|int|string|bool|double|Test|Fact|TestFixture|Assert|Throws|NotNull|That|Is)\b/g,'<span class="kw">$1</span>');
+  }else{
+    s=s.replace(/\b(const|let|var|function|return|if|else|for|while|new|throw|try|catch|class|import|from|export|async|await|typeof|instanceof|null|undefined|true|false|describe|it|expect|test|beforeEach|afterEach|jest|vi)\b/g,'<span class="kw">$1</span>');
+  }
+  s=s.replace(/\b([A-Z]\w+)\b/g,function(m,p1){if(/<\/span>/.test(m))return m;return '<span class="ty">'+p1+'</span>';});
+  return s;
+}
+function renderCoverage(info,opts){
+  var items=[];
+  items.push({label:'Happy path (valid input)',status:'covered'});
+  items.push({label:'Typical use case',status:'covered'});
+  if(opts.edge){
+    if(info.params.length>0){
+      items.push({label:'Null/undefined handling',status:'covered'});
+      if(info.params.some(function(p){return /num|a|b|n|x|y|count/i.test(p);})){
+        items.push({label:'Boundary values (zero, negative, large)',status:'covered'});
+      }
+      if(info.params.some(function(p){return /str|text|name|input|s|msg/i.test(p);})){
+        items.push({label:'Empty string / special chars',status:'covered'});
+      }
+      if(info.params.some(function(p){return /arr|list|items|nums|data/i.test(p);})){
+        items.push({label:'Empty / single element collection',status:'covered'});
+      }
+    }
+  }else{
+    items.push({label:'Edge cases',status:'missing'});
+  }
+  if(opts.error){
+    if(info.throws.length>0)items.push({label:'Error handling ('+info.throws.join(', ')+')',status:'covered'});
+    else items.push({label:'Error handling (generic)',status:'partial'});
+  }else{
+    items.push({label:'Error handling',status:'missing'});
+  }
+  if(opts.perf)items.push({label:'Performance benchmark',status:'covered'});
+  else items.push({label:'Performance benchmark',status:'missing'});
+  items.push({label:'Integration tests',status:'missing'});
+  items.push({label:'Mock/stub dependencies',status:'missing'});
+  var html='<h3>📊 Coverage Hints</h3>';
+  items.forEach(function(item){
+    html+='<div class="cov-item"><span class="cov-dot '+item.status+'"></span><span>'+item.label+'</span></div>';
+  });
+  var covCount=items.filter(function(i){return i.status==='covered';}).length;
+  var total=items.length;
+  html+='<div style="margin-top:12px;font-size:.85rem;color:var(--muted)">Estimated coverage: <strong style="color:var(--accent2)">'+Math.round(covCount/total*100)+'%</strong> of common test paths</div>';
+  coverageEl.innerHTML=html;
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

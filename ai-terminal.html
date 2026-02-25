@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Terminal Command Assistant - Generate Shell Commands from Natural Language</title>
+<meta name="description" content="Free AI-powered terminal command generator. Describe what you want in plain English and get the exact shell command for Linux, macOS, or Windows.">
+<meta name="keywords" content="terminal command generator,shell command assistant,bash commands,powershell,linux commands,macos terminal">
+<meta name="author" content="Lifa Su">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://lifa-su.com/ai-terminal.html">
+<meta property="og:title" content="AI Terminal Command Assistant">
+<meta property="og:description" content="Generate shell commands from natural language. Supports Linux, macOS, and Windows.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-terminal.html">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Terminal Command Assistant">
+<meta name="twitter:description" content="Generate shell commands from natural language descriptions.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"AI Terminal Command Assistant","description":"Generate shell commands from natural language.","url":"https://lifa-su.com/ai-terminal.html","applicationCategory":"DeveloperApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Lifa Su"}}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--accent:#6c5ce7;--accent2:#00cec9;--text:#e2e2e8;--muted:#8888a0;--danger:#ff6b6b;--success:#00b894;--warning:#fdcb6e}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent2);text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 24px}
+nav a{color:var(--text);font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;width:fit-content}nav a:hover{color:var(--accent2);text-decoration:none}
+.container{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.subtitle{color:var(--muted);font-size:1.05rem;margin-bottom:32px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;transition:border-color .3s,box-shadow .3s}
+.card:hover{border-color:rgba(108,92,231,.3);box-shadow:0 0 20px rgba(108,92,231,.06)}
+.card h2{font-size:1.15rem;margin-bottom:14px}.card h3{font-size:1rem;margin-bottom:10px;color:var(--accent2)}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:14px;font-size:1rem;resize:vertical;min-height:80px;font-family:inherit;transition:border-color .3s}textarea:focus{outline:none;border-color:var(--accent)}
+.row{display:flex;gap:12px;margin:14px 0;flex-wrap:wrap}
+select{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 14px;font-size:.95rem;cursor:pointer;flex:1;min-width:140px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888a0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}select:focus{outline:none;border-color:var(--accent)}select option{background:var(--card);color:var(--text)}
+.btn{padding:12px 28px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#7c6cf0);color:#fff}.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(108,92,231,.35)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);transform:translateY(-1px)}
+.btn-copy{background:var(--surface);color:var(--accent2);border:1px solid var(--border);padding:8px 18px;font-size:.85rem;border-radius:8px}.btn-copy:hover{border-color:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,206,201,.15)}
+.btn-sm{padding:6px 14px;font-size:.82rem;border-radius:8px}
+.output-area{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:16px;display:none}
+.output-area.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.output-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(20,20,30,.5)}.output-header span{font-size:.85rem;color:var(--muted);font-weight:500}
+.terminal{font-family:"SF Mono",Monaco,"Cascadia Code","Fira Code",Consolas,monospace;padding:20px;font-size:.95rem;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.terminal .cmd{color:#a29bfe}.terminal .flag{color:#fd79a8}.terminal .str{color:#fdcb6e}.terminal .pipe{color:#00cec9;font-weight:700}.terminal .comment{color:#636e72;font-style:italic}.terminal .num{color:#55efc4}.terminal .var{color:#fab1a0}
+.explanation{padding:16px 20px;border-top:1px solid var(--border);font-size:.9rem;color:var(--muted);line-height:1.8}
+.explanation strong{color:var(--text);font-family:"SF Mono",Monaco,Consolas,monospace;font-size:.85rem;background:rgba(108,92,231,.15);padding:2px 6px;border-radius:4px}
+.warning{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.25);border-radius:10px;padding:14px 18px;margin:12px 20px;display:flex;align-items:flex-start;gap:10px;font-size:.9rem;color:var(--danger)}.warning svg{flex-shrink:0;margin-top:2px}
+.examples-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:14px}
+.example-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;text-align:left;transition:all .2s;color:var(--text);font-size:.88rem}.example-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 16px rgba(108,92,231,.1)}
+.example-btn .cat{font-size:.75rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:.88rem;cursor:pointer;transition:background .2s}.history-item:hover{background:rgba(108,92,231,.06)}.history-item:last-child{border-bottom:none}
+.history-cmd{font-family:"SF Mono",Monaco,Consolas,monospace;color:var(--accent2);font-size:.82rem;margin-top:4px}
+.history-query{color:var(--text)}.history-meta{color:var(--muted);font-size:.75rem}
+.history-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 8px;font-size:.8rem;border-radius:6px}.history-del:hover{color:var(--danger);background:rgba(255,107,107,.1)}
+.pro-card{position:relative;overflow:hidden}.pro-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.pro-badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;margin-left:8px}
+.pro-features{opacity:.6;pointer-events:none;filter:blur(1px);user-select:none}
+.pro-overlay{text-align:center;padding:20px}.pro-overlay .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:12px 32px;font-size:1rem;text-decoration:none;display:inline-block}.pro-overlay .btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(108,92,231,.4)}.pro-overlay p{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+.tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border);overflow-x:auto}.tab{padding:10px 18px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;font-weight:500;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}.tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}.tab:hover{color:var(--text)}
+.tab-content{display:none}.tab-content.active{display:block}
+.empty-state{text-align:center;padding:30px;color:var(--muted);font-size:.9rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);border:1px solid var(--accent2);color:var(--accent2);padding:10px 24px;border-radius:10px;font-size:.9rem;font-weight:500;z-index:200;transition:transform .3s ease;pointer-events:none}.toast.show{transform:translateX(-50%) translateY(0)}
+footer{text-align:center;padding:30px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;margin-top:40px}footer a{color:var(--accent2)}
+@media(max-width:600px){.container{padding:16px 12px 40px}.card{padding:16px}.row{flex-direction:column}.examples-grid{grid-template-columns:1fr}.btn{width:100%;text-align:center}select{width:100%}.tabs{gap:0}.tab{padding:8px 12px;font-size:.8rem}}
+</style>
+</head>
+
+<body>
+<nav class="nav">
+<a href="index.html" class="nav-brand">⚡ Lifa AI Tools</a>
+<div class="nav-links"><a href="index.html">Home</a><a href="index.html#tools">All Tools</a></div>
+</nav>
+<section class="hero">
+<h1>AI Terminal Command Assistant</h1>
+<p>Describe what you want to do in plain English — get the exact shell command for your OS instantly.</p>
+</section>
+<div class="container">
+<div class="history-section" id="historySection" style="display:none">
+<div class="selector-label">Recent Searches</div>
+<div class="history-chips" id="historyChips"></div>
+</div>
+<div class="card">
+<div class="selector-label">Operating System</div>
+<div class="tabs" id="osTabs">
+<div class="tab active" data-os="linux">&#x1f427; Linux</div>
+<div class="tab" data-os="macos">&#x1f34e; macOS</div>
+<div class="tab" data-os="windows">&#x1fa9f; Windows</div>
+</div>
+<div class="selector-label">Shell</div>
+<div class="tabs" id="shellTabs">
+<div class="tab active" data-shell="bash">bash</div>
+<div class="tab" data-shell="zsh">zsh</div>
+<div class="tab" data-shell="powershell">PowerShell</div>
+<div class="tab" data-shell="cmd">cmd</div>
+</div>
+<div class="input-group">
+<input type="text" id="queryInput" placeholder='e.g. "find all .js files larger than 1MB"' autocomplete="off">
+<button class="btn-primary" id="searchBtn" onclick="generateCommand()">Find Command</button>
+</div>
+<div class="warning-box" id="warningBox">
+<span class="warn-icon">&#x26a0;&#xfe0f;</span>
+<div><strong>Dangerous Command!</strong> This command can cause irreversible damage to your system. Double-check before running and make sure you understand what it does.</div>
+</div>
+<div class="output-area" id="outputArea">
+<div class="command-block" id="commandBlock">
+<button class="copy-btn" onclick="copyCommand()">&#x1f4cb; Copy</button>
+<div id="commandText"></div>
+</div>
+<div class="explanation" id="explanationBlock">
+<h4>Explanation</h4>
+<ul id="explanationList"></ul>
+</div>
+</div>
+<div style="margin-top:12px">
+<div class="selector-label">Try these examples</div>
+<div class="history-chips" style="margin-top:6px">
+<span class="chip" onclick="tryExample(this)">find all .log files larger than 10MB</span>
+<span class="chip" onclick="tryExample(this)">list all running processes sorted by memory</span>
+<span class="chip" onclick="tryExample(this)">compress a folder into tar.gz</span>
+<span class="chip" onclick="tryExample(this)">show my public IP address</span>
+<span class="chip" onclick="tryExample(this)">search for text in all files recursively</span>
+<span class="chip" onclick="tryExample(this)">kill process by name</span>
+</div>
+</div>
+</div>
+<div class="pro-section">
+<h2 style="font-size:1.2rem;margin-bottom:4px">&#x1f680; Pro Features</h2>
+<p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Unlock advanced terminal productivity tools</p>
+<div class="pro-grid">
+<div class="pro-card">
+<div class="pro-lock">&#x1f512; Pro Feature</div>
+<h3>&#x26d3;&#xfe0f; Command Chaining Assistant</h3>
+<p>Build complex piped commands visually. Chain grep, awk, sed, sort and more with a drag-and-drop interface.</p>
+<a href="https://ko-fi.com/feidev" target="_blank" class="kofi-btn">&#x2615; Unlock on Ko-fi</a>
+</div>
+<div class="pro-card">
+<div class="pro-lock">&#x1f512; Pro Feature</div>
+<h3>&#x26a1; Custom Aliases Generator</h3>
+<p>Generate a personalized .bashrc/.zshrc aliases file based on your most-used commands and workflows.</p>
+<a href="https://ko-fi.com/feidev" target="_blank" class="kofi-btn">&#x2615; Unlock on Ko-fi</a>
+</div>
+<div class="pro-card">
+<div class="pro-lock">&#x1f512; Pro Feature</div>
+<h3>&#x1f4dc; Shell Script Builder</h3>
+<p>Describe a workflow in plain English and get a complete, production-ready shell script with error handling.</p>
+<a href="https://ko-fi.com/feidev" target="_blank" class="kofi-btn">&#x2615; Unlock on Ko-fi</a>
+</div>
+</div>
+</div>
+<div class="quick-ref">
+<h2>&#x1f4d6; Quick Reference</h2>
+<div id="refSections"></div>
+</div>
+</div>
+<footer>
+<a href="index.html">Part of AI Toolbox</a> &middot; &copy; 2026 Lifa AI Tools
+</footer>
+<body>
+<nav><a href="index.html">← Lifa AI Tools</a></nav>
+<div class="container">
+<h1>⚡ AI Terminal Command Assistant</h1>
+<p class="subtitle">Describe what you want to do in plain English — get the exact shell command instantly.</p>
+<div class="card">
+<h2>💬 Describe Your Task</h2>
+<label for="query">What do you want to do?</label>
+<textarea id="query" placeholder="e.g. find all .js files larger than 1MB, compress a folder, kill process on port 3000..." rows="3"></textarea>
+<div class="row">
+<div style="flex:1;min-width:140px"><label for="os-select">Operating System</label>
+<select id="os-select"><option value="linux">Linux</option><option value="macos">macOS</option><option value="windows">Windows</option></select></div>
+<div style="flex:1;min-width:140px"><label for="shell-select">Shell</label>
+<select id="shell-select"><option value="bash">Bash</option><option value="zsh">Zsh</option><option value="powershell">PowerShell</option><option value="cmd">CMD</option></select></div>
+</div>
+<button class="btn btn-primary" onclick="generateCommand()" style="margin-top:10px">🚀 Generate Command</button>
+</div>
+<div id="output" class="output-area">
+<div class="output-header"><span id="output-label">Generated Command</span><button class="btn-copy" onclick="copyCommand()">📋 Copy</button></div>
+<div class="terminal" id="terminal-output"></div>
+<div class="explanation" id="explanation"></div>
+<div id="warning-box"></div>
+</div>
+<script>
+
+let currentOS='linux',currentShell='bash';
+const HISTORY_KEY='ai_terminal_history',MAX_HISTORY=12;
+
+const DB=[
+// FILE OPS
+{kw:['find','search','locate','file','files'],pats:[
+{m:['find','name','named','called','extension','ext','type'],g:(q,os,sh)=>{let e=q.match(/\.(\w+)/)?.[1]||'txt',d=q.match(/in\s+(\/\S+|~\S*)/)?.[1]||'.';if(os==='windows'&&sh==='cmd')return{c:'dir /s /b '+d+'\\*.'+e,f:[['dir /s /b','Search recursively, bare paths'],['*.'+e,'File pattern']]};if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem -Path '+d+' -Recurse -Filter *.'+e,f:[['Get-ChildItem','List files'],['Recurse','Search subdirs'],['Filter','Pattern']]};return{c:'find '+d+' -name "*.'+e+'"',f:[['find','Search for files'],[d,'Start directory'],['-name "*.'+e+'"','Match files ending .'+e]]}}},
+{m:['find','size','larger','bigger','greater','over','above','mb','gb','kb'],g:(q,os,sh)=>{let s=q.match(/(\d+)\s*(mb|gb|kb|m|g|k)/i),sz=s?s[1]:'100',u=s?s[2][0].toUpperCase():'M';if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem -Recurse | Where-Object { $_.Length -gt '+sz+u+'B }',f:[['Get-ChildItem -Recurse','List all files'],['Where-Object','Filter'],['$_.Length -gt','Size greater than']]};return{c:'find . -type f -size +'+sz+u,f:[['find .','Search current dir'],['-type f','Regular files only'],['-size +'+sz+u,'Size greater than '+sz+u+'B']]}}},
+{m:['find','modified','changed','recent','today','yesterday','days','hours','ago'],g:(q,os,sh)=>{let d=q.match(/(\d+)\s*day/)?.[1]||'7';if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem -Recurse | Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-'+d+') }',f:[['Get-ChildItem','List files'],['LastWriteTime','Modification time'],['AddDays(-'+d+')','Within last '+d+' days']]};return{c:'find . -type f -mtime -'+d,f:[['find .','Search current dir'],['-type f','Regular files'],['-mtime -'+d,'Modified within '+d+' days']]}}},
+{m:['find','empty','zero','blank'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem -Recurse | Where-Object { $_.Length -eq 0 }',f:[['Get-ChildItem','List files'],['$_.Length -eq 0','Zero size']]};return{c:'find . -type f -empty',f:[['find .','Search current dir'],['-type f','Files only'],['-empty','Zero-size files']]}}}
+]},
+{kw:['copy','cp','duplicate'],pats:[
+{m:['copy','file','files','directory','dir','folder','recursive'],g:(q,os,sh)=>{let r=q.match(/director|folder|recursive|all/i);if(os==='windows'&&sh==='cmd')return r?{c:'xcopy /E /I source dest',f:[['xcopy','Extended copy'],['/E','Copy subdirs'],['/I','Assume dest is dir']]}:{c:'copy source.txt dest.txt',f:[['copy','Copy file']]};if(os==='windows'&&sh==='powershell')return{c:r?'Copy-Item -Path source -Destination dest -Recurse':'Copy-Item source.txt dest.txt',f:[['Copy-Item','Copy files'],['-Recurse','Include subdirs']]};return{c:r?'cp -r source/ dest/':'cp source.txt dest.txt',f:[['cp','Copy files'],['-r','Recursive']]}}}
+]},
+{kw:['move','mv','rename'],pats:[
+{m:['move','rename','mv'],g:(q,os,sh)=>{if(os==='windows'&&sh==='cmd')return{c:'move oldname.txt newname.txt',f:[['move','Move/rename files']]};if(os==='windows'&&sh==='powershell')return{c:'Move-Item oldname.txt newname.txt',f:[['Move-Item','Move/rename']]};return{c:'mv oldname.txt newname.txt',f:[['mv','Move/rename files']]}}}
+]},
+{kw:['delete','remove','rm','erase'],pats:[
+{m:['delete','remove','rm','erase','file','files','directory','folder'],g:(q,os,sh)=>{let d=q.match(/director|folder|recursive/i);if(os==='windows'&&sh==='cmd')return d?{c:'rmdir /S /Q foldername',f:[['rmdir','Remove directory'],['/S','All contents'],['/Q','Quiet']]}:{c:'del filename.txt',f:[['del','Delete file']]};if(os==='windows'&&sh==='powershell')return{c:d?'Remove-Item foldername -Recurse -Force':'Remove-Item filename.txt',f:[['Remove-Item','Delete'],['-Recurse','Subdirs'],['-Force','No confirm']]};return{c:d?'rm -rf foldername/':'rm filename.txt',f:[['rm','Remove'],['-r','Recursive'],['-f','Force']]}}}
+]},
+{kw:['permission','chmod','chown','owner','permissions','executable'],pats:[
+{m:['permission','chmod','executable','read','write','owner','chown'],g:(q,os,sh)=>{if(q.match(/execut/i))return{c:'chmod +x script.sh',f:[['chmod','Change permissions'],['+x','Add execute']]};if(q.match(/owner|chown/i))return{c:'chown user:group file.txt',f:[['chown','Change owner'],['user:group','New owner']]};return{c:'chmod 755 file.txt',f:[['chmod','Change permissions'],['755','rwxr-xr-x']]}}}
+]},
+{kw:['symlink','link','symbolic','ln'],pats:[
+{m:['symlink','link','symbolic','ln'],g:(q,os,sh)=>{if(os==='windows'&&sh==='cmd')return{c:'mklink /D link target',f:[['mklink','Create link'],['/D','Directory link']]};if(os==='windows'&&sh==='powershell')return{c:'New-Item -ItemType SymbolicLink -Path link -Target target',f:[['New-Item','Create item'],['SymbolicLink','Link type']]};return{c:'ln -s target linkname',f:[['ln','Create link'],['-s','Symbolic link']]}}}
+]},
+<div class="card">
+<h2>💡 Quick Examples</h2>
+<div class="tabs" role="tablist">
+<button class="tab active" onclick="switchTab(this,'tab-files')" role="tab">Files</button>
+<button class="tab" onclick="switchTab(this,'tab-network')" role="tab">Network</button>
+<button class="tab" onclick="switchTab(this,'tab-process')" role="tab">Process</button>
+<button class="tab" onclick="switchTab(this,'tab-text')" role="tab">Text</button>
+<button class="tab" onclick="switchTab(this,'tab-git')" role="tab">Git</button>
+<button class="tab" onclick="switchTab(this,'tab-docker')" role="tab">Docker</button>
+<button class="tab" onclick="switchTab(this,'tab-system')" role="tab">System</button>
+<button class="tab" onclick="switchTab(this,'tab-permissions')" role="tab">Permissions</button>
+</div>
+<div id="tab-files" class="tab-content active"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('find all .log files in current directory')"><div class="cat">files</div>Find files by extension</button>
+<button class="example-btn" onclick="useExample('find files larger than 100MB')"><div class="cat">files</div>Find large files</button>
+<button class="example-btn" onclick="useExample('delete files older than 30 days')"><div class="cat">files</div>Delete old files</button>
+<button class="example-btn" onclick="useExample('count number of files in a directory')"><div class="cat">files</div>Count files</button>
+<button class="example-btn" onclick="useExample('compress a folder to tar.gz')"><div class="cat">files</div>Compress folder</button>
+<button class="example-btn" onclick="useExample('extract a zip file')"><div class="cat">files</div>Extract archive</button>
+</div></div>
+<div id="tab-network" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('check if port 8080 is in use')"><div class="cat">network</div>Check port</button>
+<button class="example-btn" onclick="useExample('download a file from URL')"><div class="cat">network</div>Download file</button>
+<button class="example-btn" onclick="useExample('show my public IP address')"><div class="cat">network</div>Show IP address</button>
+<button class="example-btn" onclick="useExample('lookup DNS records for a domain')"><div class="cat">network</div>DNS lookup</button>
+<button class="example-btn" onclick="useExample('ping a server')"><div class="cat">network</div>Test connectivity</button>
+<button class="example-btn" onclick="useExample('show all active network connections')"><div class="cat">network</div>Show connections</button>
+</div></div>
+<div id="tab-process" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('kill process running on port 3000')"><div class="cat">process</div>Kill by port</button>
+<button class="example-btn" onclick="useExample('list all running processes')"><div class="cat">process</div>List processes</button>
+<button class="example-btn" onclick="useExample('find process by name')"><div class="cat">process</div>Find process</button>
+<button class="example-btn" onclick="useExample('show top processes by memory usage')"><div class="cat">process</div>Memory usage</button>
+<button class="example-btn" onclick="useExample('run a command in background')"><div class="cat">process</div>Background job</button>
+<button class="example-btn" onclick="useExample('watch process CPU usage')"><div class="cat">process</div>Monitor process</button>
+</div></div>
+<div id="tab-text" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('search for a string in all files recursively')"><div class="cat">text</div>Search in files</button>
+<button class="example-btn" onclick="useExample('replace text in multiple files')"><div class="cat">text</div>Replace text</button>
+<button class="example-btn" onclick="useExample('count lines in a file')"><div class="cat">text</div>Count lines</button>
+<button class="example-btn" onclick="useExample('sort a file alphabetically')"><div class="cat">text</div>Sort file</button>
+<button class="example-btn" onclick="useExample('remove duplicate lines from file')"><div class="cat">text</div>Remove duplicates</button>
+<button class="example-btn" onclick="useExample('extract second column from CSV')"><div class="cat">text</div>Extract column</button>
+</div></div>
+<div id="tab-git" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('undo the last git commit but keep changes')"><div class="cat">git</div>Undo last commit</button>
+<button class="example-btn" onclick="useExample('squash last 3 commits into one')"><div class="cat">git</div>Squash commits</button>
+<button class="example-btn" onclick="useExample('search git history for a string')"><div class="cat">git</div>Find in history</button>
+<button class="example-btn" onclick="useExample('delete merged branches')"><div class="cat">git</div>Clean branches</button>
+<button class="example-btn" onclick="useExample('show files changed in last commit')"><div class="cat">git</div>Show changes</button>
+<button class="example-btn" onclick="useExample('stash current changes with a message')"><div class="cat">git</div>Stash changes</button>
+</div></div>
+<div id="tab-docker" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('remove all stopped containers')"><div class="cat">docker</div>Remove containers</button>
+<button class="example-btn" onclick="useExample('show logs for a container')"><div class="cat">docker</div>Show logs</button>
+<button class="example-btn" onclick="useExample('show docker disk usage')"><div class="cat">docker</div>Disk usage</button>
+<button class="example-btn" onclick="useExample('open shell in running container')"><div class="cat">docker</div>Enter container</button>
+<button class="example-btn" onclick="useExample('list all docker images sorted by size')"><div class="cat">docker</div>List images</button>
+<button class="example-btn" onclick="useExample('clean up unused docker resources')"><div class="cat">docker</div>Prune system</button>
+</div></div>
+<div id="tab-system" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('show disk space usage')"><div class="cat">system</div>Disk space</button>
+<button class="example-btn" onclick="useExample('show system information')"><div class="cat">system</div>System info</button>
+<button class="example-btn" onclick="useExample('show system uptime')"><div class="cat">system</div>Uptime</button>
+<button class="example-btn" onclick="useExample('list all environment variables')"><div class="cat">system</div>Environment vars</button>
+<button class="example-btn" onclick="useExample('list all cron jobs')"><div class="cat">system</div>Cron jobs</button>
+<button class="example-btn" onclick="useExample('show last boot time')"><div class="cat">system</div>Boot time</button>
+</div></div>
+<div id="tab-permissions" class="tab-content"><div class="examples-grid">
+<button class="example-btn" onclick="useExample('make a file executable')"><div class="cat">permissions</div>Make executable</button>
+<button class="example-btn" onclick="useExample('change file owner recursively')"><div class="cat">permissions</div>Change owner</button>
+<button class="example-btn" onclick="useExample('find world-writable files')"><div class="cat">permissions</div>Find writable</button>
+<button class="example-btn" onclick="useExample('set directory permissions to 755')"><div class="cat">permissions</div>Set permissions</button>
+<button class="example-btn" onclick="useExample('show detailed file permissions')"><div class="cat">permissions</div>Show permissions</button>
+<button class="example-btn" onclick="useExample('fix permissions for web directory')"><div class="cat">permissions</div>Fix permissions</button>
+</div></div>
+</div>
+<div class="card">
+<h2>🕒 Command History</h2>
+<div id="history-list"><div class="empty-state">No commands generated yet. Try describing a task above!</div></div>
+<button class="btn btn-secondary btn-sm" onclick="clearHistory()" style="margin-top:12px" id="clear-history-btn" hidden>Clear History</button>
+</div>
+<div class="card pro-card">
+<h2>⭐ Pro Features <span class="pro-badge">PRO</span></h2>
+<div class="pro-features"><div class="examples-grid">
+<div class="example-btn" style="cursor:default"><div class="cat">pro</div><strong>🔗 Pipeline Builder</strong><p style="color:var(--muted);font-size:.82rem;margin-top:6px">Chain multiple commands with pipes, redirects, and conditionals.</p></div>
+<div class="example-btn" style="cursor:default"><div class="cat">pro</div><strong>⚙️ Custom Aliases</strong><p style="color:var(--muted);font-size:.82rem;margin-top:6px">Save frequently used commands as short aliases. Sync across devices.</p></div>
+<div class="example-btn" style="cursor:default"><div class="cat">pro</div><strong>📦 Cheat Sheets Export</strong><p style="color:var(--muted);font-size:.82rem;margin-top:6px">Export categorized command cheat sheets as PDF or Markdown.</p></div>
+</div></div>
+<div class="pro-overlay">
+<p>🔒 Unlock all Pro features to supercharge your terminal workflow</p>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn">🚀 Upgrade to Pro</a>
+</div></div>
+</div>
+<footer><p>Part of <a href="index.html">AI Toolbox</a> &mdash; &copy; 2025 Lifa Su</p></footer>
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+// PROCESS
+{kw:['process','ps','kill','top','htop','running','pid','cpu','memory','monitor'],pats:[
+{m:['list','process','running','show','all','ps'],g:(q,os,sh)=>{if(os==='windows'&&sh==='cmd')return{c:'tasklist',f:[['tasklist','List running processes']]};if(os==='windows'&&sh==='powershell')return{c:'Get-Process | Sort-Object CPU -Descending | Select-Object -First 20',f:[['Get-Process','List processes'],['Sort-Object CPU','Sort by CPU']]};return{c:'ps aux --sort=-%cpu | head -20',f:[['ps aux','All processes, user format'],['--sort=-%cpu','Sort by CPU desc'],['head -20','Top 20']]}}},
+{m:['kill','stop','terminate','end','process','pid'],g:(q,os,sh)=>{let n=q.match(/(?:kill|stop|terminate|end)\s+(\w+)/i)?.[1]||'process_name';if(os==='windows'&&sh==='cmd')return{c:'taskkill /IM '+n+'.exe /F',f:[['taskkill','Kill process'],['/IM','By image name'],['/F','Force']]};if(os==='windows'&&sh==='powershell')return{c:'Stop-Process -Name '+n+' -Force',f:[['Stop-Process','Kill process'],['-Force','Force stop']]};return{c:'pkill -f '+n,f:[['pkill','Kill by name'],['-f','Match full command line']]}}},
+{m:['monitor','top','htop','cpu','memory','usage','resource'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 10 Name,CPU,@{N="Mem(MB)";E={[math]::Round($_.WorkingSet64/1MB,1)}}',f:[['Get-Process','List processes'],['Sort WorkingSet64','Sort by memory'],['First 10','Top 10']]};if(os==='macos')return{c:'top -l 1 -s 0 | head -20',f:[['top','System monitor'],['-l 1','One sample'],['-s 0','No delay']]};return{c:'htop',f:[['htop','Interactive process viewer']]}}},
+{m:['port','listen','listening','socket','open port'],g:(q,os,sh)=>{let p=q.match(/port\s*(\d+)/)?.[1];if(os==='windows'&&sh==='cmd')return{c:p?'netstat -ano | findstr :'+p:'netstat -ano | findstr LISTENING',f:[['netstat -ano','Connections with PIDs'],['findstr','Filter']]};if(os==='windows'&&sh==='powershell')return{c:p?'Get-NetTCPConnection -LocalPort '+p:'Get-NetTCPConnection -State Listen',f:[['Get-NetTCPConnection','TCP connections']]};if(os==='macos')return{c:p?'lsof -i :'+p:'lsof -i -P -n | grep LISTEN',f:[['lsof','List open files/connections'],['-i','Network'],['-P','Port numbers'],['-n','No DNS']]};return{c:p?'ss -tlnp | grep :'+p:'ss -tlnp',f:[['ss','Socket stats'],['-t','TCP'],['-l','Listening'],['-n','Numeric'],['-p','Show process']]}}}
+]},
+// NETWORK
+{kw:['curl','wget','download','http','request','api','fetch','url','ping','network','ip','ifconfig','netstat','dns','speed'],pats:[
+{m:['download','wget','curl','fetch','url','http','get'],g:(q,os,sh)=>{let u=q.match(/(https?:\/\/\S+)/)?.[1]||'https://example.com/file.zip';if(os==='windows'&&sh==='powershell')return{c:'Invoke-WebRequest -Uri "'+u+'" -OutFile file.zip',f:[['Invoke-WebRequest','Download'],['Uri','URL'],['OutFile','Save to file']]};return{c:'curl -O "'+u+'"',f:[['curl','Transfer data'],['-O','Save with remote filename']]}}},
+{m:['ping','reachable','alive','connectivity'],g:(q,os,sh)=>{let h=q.match(/ping\s+(\S+)/)?.[1]||'google.com';if(os==='windows')return{c:'ping -n 4 '+h,f:[['ping','ICMP echo'],['-n 4','4 packets']]};return{c:'ping -c 4 '+h,f:[['ping','ICMP echo'],['-c 4','4 packets']]}}},
+{m:['ip','address','my ip','network','interface','ifconfig'],g:(q,os,sh)=>{if(q.match(/public|external|my ip/i)){if(os==='windows'&&sh==='powershell')return{c:'(Invoke-WebRequest -Uri "https://api.ipify.org").Content',f:[['Invoke-WebRequest','Fetch URL'],['api.ipify.org','Public IP service']]};return{c:'curl -s https://api.ipify.org && echo',f:[['curl -s','Fetch silently'],['api.ipify.org','Returns public IP']]}}if(os==='windows'&&sh==='cmd')return{c:'ipconfig',f:[['ipconfig','Network config']]};if(os==='windows'&&sh==='powershell')return{c:'Get-NetIPAddress | Where-Object AddressFamily -eq IPv4',f:[['Get-NetIPAddress','Show IPs']]};if(os==='macos')return{c:'ifconfig | grep "inet "',f:[['ifconfig','Network interfaces'],['grep inet','Filter IPv4']]};return{c:'ip addr show',f:[['ip addr show','All interfaces and addresses']]}}},
+{m:['dns','nslookup','dig','resolve','domain'],g:(q,os,sh)=>{let d=q.match(/(?:for|of|lookup)\s+(\S+)/)?.[1]||'example.com';if(os==='windows')return{c:'nslookup '+d,f:[['nslookup','DNS query']]};return{c:'dig '+d,f:[['dig','DNS lookup']]}}},
+{m:['api','post','json','request','header','rest'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Invoke-RestMethod -Uri "https://api.example.com/data" -Method Post -ContentType "application/json" -Body \'{"key":"value"}\'',f:[['Invoke-RestMethod','HTTP request'],['Method Post','POST'],['Body','Request body']]};return{c:'curl -X POST "https://api.example.com/data" -H "Content-Type: application/json" -d \'{"key":"value"}\'',f:[['curl','Transfer data'],['-X POST','POST method'],['-H','Set header'],['-d','Request body']]}}},
+{m:['speed','bandwidth','test','internet'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Invoke-WebRequest "https://speed.cloudflare.com/__down?bytes=10000000" -OutFile NUL | Measure-Command',f:[['Invoke-WebRequest','Download test file'],['Measure-Command','Time the operation']]};return{c:'curl -o /dev/null -w "Speed: %{speed_download} bytes/sec\\nTime: %{time_total}s\\n" https://speed.cloudflare.com/__down?bytes=10000000',f:[['curl','Download test'],['-o /dev/null','Discard output'],['-w','Show stats']]}}}
+]},
+// DISK
+{kw:['disk','space','storage','df','du','mount','usage','free'],pats:[
+{m:['disk','space','free','usage','storage','df'],g:(q,os,sh)=>{if(os==='windows'&&sh==='cmd')return{c:'wmic logicaldisk get size,freespace,caption',f:[['wmic logicaldisk','Disk info']]};if(os==='windows'&&sh==='powershell')return{c:'Get-PSDrive -PSProvider FileSystem | Select-Object Name,@{N="Used(GB)";E={[math]::Round($_.Used/1GB,2)}},@{N="Free(GB)";E={[math]::Round($_.Free/1GB,2)}}',f:[['Get-PSDrive','List drives']]};return{c:'df -h',f:[['df','Disk space usage'],['-h','Human-readable']]}}},
+{m:['folder','directory','size','large','biggest','du','heavy'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem -Directory | ForEach-Object { [PSCustomObject]@{Name=$_.Name;"Size(MB)"=[math]::Round((Get-ChildItem $_.FullName -Recurse -File | Measure-Object Length -Sum).Sum/1MB,2)} } | Sort-Object "Size(MB)" -Desc',f:[['Get-ChildItem','List dirs'],['Measure-Object','Calc size']]};return{c:'du -sh */ | sort -rh | head -10',f:[['du','Disk usage'],['-s','Summary'],['-h','Human-readable'],['sort -rh','Sort by size desc'],['head -10','Top 10']]}}}
+]},
+<script>
+const DB=[
+{p:[/find\b.*\.(\w+)\b.*files?/i,/find.*files?.*\.(\w+)/i,/search.*\.(\w+)\b.*files?/i,/list.*\.(\w+)\b.*files?/i],
+g:(m,o,s)=>{const e=m[1];if(s==='powershell')return{c:`Get-ChildItem -Recurse -Filter *.${e}`,x:[['Get-ChildItem','Lists files/directories'],['-Recurse','Search subdirectories'],[`-Filter *.${e}`,`Match .${e} files`]]};if(s==='cmd')return{c:`dir /s /b *.${e}`,x:[['dir','List contents'],['/s /b','Subdirectories, bare format']]};return{c:`find . -name "*.${e}" -type f`,x:[['find .','Search from current dir'],[`-name "*.${e}"`,`Match .${e} files`],['-type f','Only regular files']]}}},
+{p:[/find.*files?.*(?:larger|bigger|over|above|>)\s*(?:than\s*)?([\d.]+)\s*(kb|mb|gb|[kmg])/i,/files?.*(?:larger|bigger|over)\s*(?:than\s*)?([\d.]+)\s*(kb|mb|gb|[kmg])/i],
+g:(m,o,s)=>{let sz=parseFloat(m[1]),u=m[2].toLowerCase();if(u.length===1)u+='b';const ml={kb:1024,mb:1048576,gb:1073741824},b=Math.round(sz*(ml[u]||1048576));if(s==='powershell')return{c:`Get-ChildItem -Recurse | Where-Object { $_.Length -gt ${b} } | Sort-Object Length -Descending`,x:[['Get-ChildItem -Recurse','List all files'],['Where-Object','Filter by size'],['Sort-Object','Sort largest first']]};if(s==='cmd')return{c:`forfiles /s /c "cmd /c if @fsize GEQ ${b} echo @path @fsize"`,x:[['forfiles /s','Iterate files recursively'],[`@fsize GEQ ${b}`,`Size >= ${sz}${u.toUpperCase()}`]]};return{c:`find . -type f -size +${sz}${u[0].toUpperCase()} -exec ls -lh {} +`,x:[['find .','Search current dir'],[`-size +${sz}${u[0].toUpperCase()}`,`Larger than ${sz}${u.toUpperCase()}`],['-exec ls -lh','Show details']]}}},
+{p:[/delete.*files?.*older.*?(\d+)\s*days?/i,/remove.*files?.*older.*?(\d+)\s*days?/i,/clean.*old.*files?.*?(\d+)\s*days?/i],
+g:(m,o,s)=>{const d=m[1];if(s==='powershell')return{c:`Get-ChildItem -Recurse | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-${d}) } | Remove-Item -WhatIf`,x:[['Get-ChildItem','List files'],[`AddDays(-${d})`,`Older than ${d} days`],['-WhatIf','Preview only (remove to delete)']],w:1};if(s==='cmd')return{c:`forfiles /s /d -${d} /c "cmd /c del @path"`,x:[['forfiles',`Files older than ${d} days`],['/c "cmd /c del"','Delete each']],w:1};return{c:`find . -type f -mtime +${d} -delete`,x:[['find .','Search current dir'],[`-mtime +${d}`,`Modified ${d}+ days ago`],['-delete','Remove matches']],w:1}}},
+{p:[/count.*(?:number|num)?.*files?/i,/how many files/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'(Get-ChildItem -Recurse -File).Count',x:[['Get-ChildItem -Recurse -File','List all files'],['.Count','Return total']]};if(s==='cmd')return{c:'dir /s /b /a-d | find /c /v ""',x:[['dir /s /b /a-d','List all files'],['find /c /v ""','Count lines']]};return{c:'find . -type f | wc -l',x:[['find . -type f','Find all files'],['wc -l','Count lines']]}}},
+{p:[/compress.*(?:folder|dir)/i,/(?:tar|zip|archive).*(?:folder|dir)/i,/create.*(?:tar|archive|zip)/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Compress-Archive -Path ./folder -DestinationPath archive.zip',x:[['Compress-Archive','Create zip'],['-Path','Source folder'],['-DestinationPath','Output file']]};return{c:'tar -czf archive.tar.gz folder/',x:[['tar','Archive utility'],['-czf','Create, gzip, filename'],['archive.tar.gz','Output'],['folder/','Source']]}}},
+{p:[/extract.*(?:zip|tar|archive|gz)/i,/unzip/i,/decompress/i,/untar/i,/unpack/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Expand-Archive -Path archive.zip -DestinationPath ./output',x:[['Expand-Archive','Extract zip'],['-Path','Source archive'],['-DestinationPath','Output directory']]};if(s==='cmd')return{c:'tar -xzf archive.tar.gz -C ./output',x:[['tar -xzf','Extract gzipped tar'],['-C','Target directory']]};return{c:'tar -xzf archive.tar.gz',x:[['tar','Archive utility'],['-xzf','Extract (x), gunzip (z), filename (f)']]}}},
+
+// TEXT PROCESSING
+{kw:['grep','search','text','find text','sed','awk','replace','sort','count','wc','unique','uniq','filter','pattern','tail','head','log'],pats:[
+{m:['grep','search','find','text','string','content','inside','contain'],g:(q,os,sh)=>{let t=q.match(/(?:for|find|search|grep|containing|with)\s+"([^"]+)"/)?.[1]||q.match(/(?:for|find|search|grep|containing|with)\s+(\S+)/)?.[1]||'search_term';if(os==='windows'&&sh==='cmd')return{c:'findstr /S /I "'+t+'" *.*',f:[['findstr','Search strings'],['/S','Subdirs'],['/I','Case-insensitive']]};if(os==='windows'&&sh==='powershell')return{c:'Select-String -Path *.* -Pattern "'+t+'" -Recurse',f:[['Select-String','Search text (grep)'],['-Recurse','Subdirs']]};return{c:'grep -rn "'+t+'" .',f:[['grep','Search text'],['-r','Recursive'],['-n','Line numbers'],['.',' Current dir']]}}},
+{m:['replace','substitute','sed','swap','change text'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'(Get-Content file.txt) -replace "old","new" | Set-Content file.txt',f:[['Get-Content','Read file'],['-replace','Regex replace'],['Set-Content','Write back']]};if(os==='macos')return{c:'sed -i "" "s/old/new/g" file.txt',f:[['sed','Stream editor'],['-i ""','In-place (macOS)'],['s/old/new/g','Substitute globally']]};return{c:'sed -i "s/old/new/g" file.txt',f:[['sed','Stream editor'],['-i','In-place'],['s/old/new/g','Substitute globally']]}}},
+{m:['count','lines','words','characters','wc'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-Content file.txt | Measure-Object -Line -Word -Character',f:[['Get-Content','Read file'],['Measure-Object','Count lines/words/chars']]};return{c:'wc -lwc file.txt',f:[['wc','Word/line/byte count'],['-l','Lines'],['-w','Words'],['-c','Bytes']]}}},
+{m:['sort','order','arrange','unique','uniq','duplicate','dedup'],g:(q,os,sh)=>{if(q.match(/unique|uniq|duplicate|dedup/i)){if(os==='windows'&&sh==='powershell')return{c:'Get-Content file.txt | Sort-Object -Unique',f:[['Sort-Object -Unique','Sort and deduplicate']]};return{c:'sort file.txt | uniq',f:[['sort','Sort lines'],['uniq','Remove duplicates']]}}if(os==='windows'&&sh==='powershell')return{c:'Get-Content file.txt | Sort-Object',f:[['Sort-Object','Sort lines']]};return{c:'sort file.txt',f:[['sort','Sort lines alphabetically']]}}},
+{m:['awk','column','field','extract','print','cut'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Import-Csv file.csv | Select-Object Column1,Column2',f:[['Import-Csv','Parse CSV'],['Select-Object','Choose columns']]};return{c:"awk '{print $1, $3}' file.txt",f:[['awk','Pattern processing'],["'{print $1, $3}'",'Print 1st and 3rd columns']]}}},
+{m:['tail','follow','watch','log','last','end'],g:(q,os,sh)=>{let n=q.match(/(\d+)\s*lines?/)?.[1]||'20';if(q.match(/follow|watch|live|real.?time/i)){if(os==='windows'&&sh==='powershell')return{c:'Get-Content log.txt -Wait -Tail '+n,f:[['Get-Content','Read file'],['-Wait','Follow new lines'],['-Tail','Last N lines']]};return{c:'tail -f log.txt',f:[['tail','Show end of file'],['-f','Follow new output']]};}if(os==='windows'&&sh==='powershell')return{c:'Get-Content log.txt -Tail '+n,f:[['Get-Content','Read file'],['-Tail','Last N lines']]};return{c:'tail -n '+n+' file.txt',f:[['tail','Show end of file'],['-n '+n,'Last '+n+' lines']]}}},
+{m:['head','first','beginning','top','start'],g:(q,os,sh)=>{let n=q.match(/(\d+)\s*lines?/)?.[1]||'20';if(os==='windows'&&sh==='powershell')return{c:'Get-Content file.txt -TotalCount '+n,f:[['Get-Content','Read file'],['-TotalCount','First N lines']]};return{c:'head -n '+n+' file.txt',f:[['head','Show start of file'],['-n '+n,'First '+n+' lines']]}}}
+]},
+{p:[/(?:check|show|find).*port\s*(\d+)/i,/port\s*(\d+).*(?:in use|open|listening)/i,/what.*(?:using|on|running).*port\s*(\d+)/i],
+g:(m,o,s)=>{const p=m[1]||m[2];if(s==='powershell')return{c:`Get-NetTCPConnection -LocalPort ${p} | Select-Object OwningProcess,State`,x:[['Get-NetTCPConnection',`Check port ${p}`],['Select-Object','Show PID and state']]};if(s==='cmd')return{c:`netstat -ano | findstr :${p}`,x:[['netstat -ano','All connections with PIDs'],[`findstr :${p}`,`Filter port ${p}`]]};if(o==='macos')return{c:`lsof -i :${p}`,x:[['lsof','List open files/connections'],[`-i :${p}`,`Filter port ${p}`]]};return{c:`ss -tlnp | grep :${p}`,x:[['ss -tlnp','TCP listening with process'],[`grep :${p}`,`Filter port ${p}`]]}}},
+{p:[/download.*(?:file|url)/i,/wget/i,/curl.*download/i,/fetch.*file/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Invoke-WebRequest -Uri "https://example.com/file.zip" -OutFile "file.zip"',x:[['Invoke-WebRequest','Download content'],['-Uri','URL'],['-OutFile','Save as']]};return{c:'curl -L -O "https://example.com/file.zip"',x:[['curl','Transfer data'],['-L','Follow redirects'],['-O','Save with original name']]}}},
+{p:[/(?:show|get|find|what).*(?:my|public|external).*ip/i,/public.*ip/i,/my.*ip/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'(Invoke-WebRequest -Uri "https://api.ipify.org").Content',x:[['Invoke-WebRequest','HTTP request'],['api.ipify.org','IP lookup service']]};return{c:'curl -s https://api.ipify.org && echo',x:[['curl -s','Silent HTTP request'],['api.ipify.org','IP lookup'],['&& echo','Add newline']]}}},
+{p:[/dns.*(?:lookup|record|query)/i,/(?:lookup|query|check).*dns/i,/nslookup/i,/dig.*domain/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Resolve-DnsName -Name example.com -Type A',x:[['Resolve-DnsName','DNS lookup'],['-Type A','Record type']]};if(s==='cmd')return{c:'nslookup example.com',x:[['nslookup','DNS lookup']]};return{c:'dig example.com +short',x:[['dig','DNS lookup'],['+short','Concise output']]}}},
+{p:[/ping/i,/test.*connect/i,/check.*(?:server|host).*(?:up|alive|reachable)/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Test-Connection -ComputerName example.com -Count 4',x:[['Test-Connection','ICMP ping'],['-Count 4','Send 4 packets']]};if(s==='cmd')return{c:'ping -n 4 example.com',x:[['ping -n 4','Send 4 packets']]};return{c:'ping -c 4 example.com',x:[['ping -c 4','Send 4 packets']]}}},
+{p:[/(?:show|list).*(?:active|all|open)?.*connections?/i,/netstat/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Get-NetTCPConnection | Where-Object State -eq Established | Sort-Object RemotePort',x:[['Get-NetTCPConnection','List TCP connections'],['Where-Object','Filter established']]};if(s==='cmd')return{c:'netstat -an | findstr ESTABLISHED',x:[['netstat -an','All connections'],['findstr ESTABLISHED','Active only']]};return{c:'ss -tunap | grep ESTAB',x:[['ss -tunap','Socket stats, all protocols'],['grep ESTAB','Established only']]}}},
+{p:[/kill.*(?:process|proc).*(?:on\s+)?port\s*(\d+)/i,/stop.*(?:process|proc).*port\s*(\d+)/i,/(?:free|release).*port\s*(\d+)/i],
+g:(m,o,s)=>{const p=m[1]||m[2];if(s==='powershell')return{c:`Get-NetTCPConnection -LocalPort ${p} | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }`,x:[['Get-NetTCPConnection',`Find process on port ${p}`],['Stop-Process -Force','Kill it']],w:1};if(s==='cmd')return{c:`for /f "tokens=5" %a in ('netstat -ano ^| findstr :${p}') do taskkill /PID %a /F`,x:[['netstat -ano',`Find PID on port ${p}`],['taskkill /F','Force kill']],w:1};if(o==='macos')return{c:`lsof -ti :${p} | xargs kill -9`,x:[['lsof -ti',`Get PID on port ${p}`],['xargs kill -9','Force kill']],w:1};return{c:`fuser -k ${p}/tcp`,x:[['fuser -k',`Kill process on port ${p}`]],w:1}}},
+{p:[/(?:list|show).*(?:all\s+)?(?:running\s+)?process/i,/ps\s+aux/i,/task\s*(?:list|manager)/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Get-Process | Sort-Object CPU -Descending | Select-Object -First 20 Name,CPU,WorkingSet',x:[['Get-Process','List processes'],['Sort-Object CPU','Sort by CPU'],['Select-Object -First 20','Top 20']]};if(s==='cmd')return{c:'tasklist /v | sort /r',x:[['tasklist /v','Verbose process list'],['sort /r','Reverse sort']]};return{c:'ps aux --sort=-%cpu | head -20',x:[['ps aux','All processes with details'],['--sort=-%cpu','Sort by CPU desc'],['head -20','Top 20']]}}},
+{p:[/find.*process.*(?:by\s+)?name/i,/(?:search|grep).*process/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Get-Process | Where-Object Name -like "*name*"',x:[['Get-Process','List processes'],['Where-Object','Filter by name pattern']]};if(s==='cmd')return{c:'tasklist | findstr /i "name"',x:[['tasklist','List processes'],['findstr /i','Case-insensitive search']]};return{c:'ps aux | grep -i "name"',x:[['ps aux','All processes'],['grep -i','Case-insensitive search']]}}},
+{p:[/(?:show|top).*(?:process|proc).*(?:by\s+)?memory/i,/memory.*(?:usage|hog)/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First 10 Name,@{N="MB";E={[math]::Round($_.WorkingSet64/1MB)}}',x:[['Get-Process','List processes'],['Sort by WorkingSet64','Sort by memory'],['Select-Object -First 10','Top 10']]};return{c:'ps aux --sort=-%mem | head -10',x:[['ps aux','All processes'],['--sort=-%mem','Sort by memory desc'],['head -10','Top 10']]}}},
+{p:[/(?:run|execute).*(?:in\s+)?background/i,/background.*(?:job|command|process)/i,/nohup/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'Start-Job -ScriptBlock { your_command }',x:[['Start-Job','Run in background'],['-ScriptBlock','Command to run']]};return{c:'nohup your_command > output.log 2>&1 &',x:[['nohup','Ignore hangup signal'],['> output.log','Redirect stdout'],['2>&1','Redirect stderr'],['&','Run in background']]}}},
+{p:[/(?:watch|monitor).*(?:process|proc).*cpu/i],
+g:(m,o,s)=>{if(s==='powershell')return{c:'while($true){Get-Process | Sort-Object CPU -Desc | Select -First 5 Name,CPU; Start-Sleep 2; Clear-Host}',x:[['Loop','Refresh every 2 seconds'],['Sort by CPU','Show top consumers']]};return{c:'top -o %CPU',x:[['top','Interactive process monitor'],['-o %CPU','Sort by CPU usage']]}}},
+
+// ARCHIVE
+{kw:['tar','zip','unzip','compress','extract','archive','gzip','gz'],pats:[
+{m:['create','compress','tar','zip','archive','pack'],g:(q,os,sh)=>{if(q.match(/zip/i)&&!q.match(/tar|gz/i)){if(os==='windows'&&sh==='powershell')return{c:'Compress-Archive -Path folder/ -DestinationPath archive.zip',f:[['Compress-Archive','Create zip']]};return{c:'zip -r archive.zip folder/',f:[['zip','Create zip'],['-r','Recursive']]};}if(os==='windows'&&sh==='powershell')return{c:'Compress-Archive -Path folder/ -DestinationPath archive.zip',f:[['Compress-Archive','Create archive']]};return{c:'tar -czf archive.tar.gz folder/',f:[['tar','Archive utility'],['-c','Create'],['-z','Gzip compress'],['-f','Filename']]}}},
+{m:['extract','uncompress','unzip','untar','unpack','decompress'],g:(q,os,sh)=>{if(q.match(/zip/i)&&!q.match(/tar|gz/i)){if(os==='windows'&&sh==='powershell')return{c:'Expand-Archive -Path archive.zip -DestinationPath folder/',f:[['Expand-Archive','Extract zip']]};return{c:'unzip archive.zip -d folder/',f:[['unzip','Extract zip'],['-d','Destination dir']]};}if(os==='windows'&&sh==='powershell')return{c:'Expand-Archive -Path archive.zip -DestinationPath folder/',f:[['Expand-Archive','Extract']]};return{c:'tar -xzf archive.tar.gz',f:[['tar','Archive utility'],['-x','Extract'],['-z','Gzip'],['-f','Filename']]}}}
+]},
+// GIT
+{kw:['git','commit','push','pull','branch','merge','clone','stash','log','diff','rebase','checkout','status','remote','reset','revert','tag'],pats:[
+{m:['clone','download','repo','repository'],g:()=>({c:'git clone https://github.com/user/repo.git',f:[['git clone','Download repository']]})},
+{m:['status','changed','modified','staged'],g:()=>({c:'git status',f:[['git status','Show working tree status']]})},
+{m:['commit','save','snapshot'],g:(q)=>{let m=q.match(/message\s+"([^"]+)"/)?.[1]||'your commit message';return{c:'git add -A && git commit -m "'+m+'"',f:[['git add -A','Stage all changes'],['git commit -m','Commit with message']]}}},
+{m:['push','upload','remote','origin'],g:()=>({c:'git push origin main',f:[['git push','Upload commits'],['origin main','Remote and branch']]})},
+{m:['pull','fetch','update','sync'],g:()=>({c:'git pull origin main',f:[['git pull','Fetch and merge'],['origin main','Remote and branch']]})},
+{m:['branch','create branch','new branch','switch','checkout'],g:(q)=>{if(q.match(/create|new/i)){let n=q.match(/(?:branch|called|named)\s+(\S+)/)?.[1]||'feature-branch';return{c:'git checkout -b '+n,f:[['git checkout -b','Create and switch branch']]};}if(q.match(/list|show|all/i))return{c:'git branch -a',f:[['git branch -a','List all branches']]};return{c:'git checkout branch-name',f:[['git checkout','Switch branch']]}}},
+{m:['merge','combine'],g:()=>({c:'git merge feature-branch',f:[['git merge','Merge branch into current']]})},
+{m:['log','history','commits'],g:()=>({c:'git log --oneline --graph -20',f:[['git log','Commit history'],['--oneline','One line each'],['--graph','ASCII graph'],['-20','Last 20']]})},
+{m:['stash','save work','temporary','shelve'],g:(q)=>{if(q.match(/pop|apply|restore/i))return{c:'git stash pop',f:[['git stash pop','Restore stashed changes']]};return{c:'git stash',f:[['git stash','Save uncommitted changes temporarily']]}}},
+{m:['diff','changes','compare','difference'],g:()=>({c:'git diff',f:[['git diff','Show unstaged changes']]})},
+{m:['reset','undo','unstage'],g:(q)=>{if(q.match(/hard|discard|throw/i))return{c:'git reset --hard HEAD~1',f:[['git reset --hard','Discard commits+changes'],['HEAD~1','Go back 1 commit']]};return{c:'git reset HEAD~1',f:[['git reset','Undo commit, keep changes']]}}},
+{m:['tag','version','release'],g:()=>({c:'git tag -a v1.0.0 -m "Release v1.0.0"',f:[['git tag -a','Create annotated tag'],['-m','Tag message']]})}
+]},
+// DOCKER
+{kw:['docker','container','image','compose','volume','build','dockerfile'],pats:[
+{m:['list','show','running','containers','ps'],g:()=>({c:'docker ps -a',f:[['docker ps','List containers'],['-a','Include stopped']]})},
+{m:['run','start','create','container','launch'],g:(q)=>{let i=q.match(/(?:run|start|launch)\s+(\S+)/)?.[1]||'nginx';return{c:'docker run -d -p 8080:80 --name my-'+i+' '+i,f:[['docker run','Create+start container'],['-d','Detached'],['-p 8080:80','Port mapping'],['--name','Container name']]}}},
+{m:['stop','kill','terminate'],g:()=>({c:'docker stop container_name',f:[['docker stop','Stop container']]})},
+{m:['remove','delete','rm','clean','prune'],g:(q)=>{if(q.match(/all|prune|clean|unused/i))return{c:'docker system prune -af',f:[['docker system prune','Remove unused data'],['-a','All unused images'],['-f','Force']]};return{c:'docker rm container_name',f:[['docker rm','Remove container']]}}},
+{m:['build','image','dockerfile'],g:()=>({c:'docker build -t myapp:latest .',f:[['docker build','Build from Dockerfile'],['-t','Tag image'],['.','Build context']]})},
+{m:['logs','output','debug'],g:()=>({c:'docker logs -f container_name',f:[['docker logs','View container logs'],['-f','Follow output']]})},
+{m:['exec','shell','bash','inside','enter','attach'],g:()=>({c:'docker exec -it container_name bash',f:[['docker exec','Run command in container'],['-it','Interactive terminal'],['bash','Shell']]})},
+{m:['compose','up','services','stack'],g:(q)=>{if(q.match(/down|stop/i))return{c:'docker-compose down',f:[['docker-compose down','Stop and remove containers']]};return{c:'docker-compose up -d',f:[['docker-compose up','Start services'],['-d','Detached']]}}}
+]},
+
+// SYSTEM INFO
+{kw:['system','info','hostname','uptime','os','version','kernel','uname','whoami','date','time','user','env','environment','memory','ram'],pats:[
+{m:['system','info','os','version','kernel','uname','about'],g:(q,os,sh)=>{if(os==='windows'&&sh==='cmd')return{c:'systeminfo',f:[['systeminfo','System configuration']]};if(os==='windows'&&sh==='powershell')return{c:'Get-ComputerInfo | Select-Object OsName,OsVersion,CsProcessors',f:[['Get-ComputerInfo','System info']]};return{c:'uname -a',f:[['uname -a','All system info']]}}},
+{m:['uptime','how long','running since','boot'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime',f:[['LastBootUpTime','Last boot time']]};return{c:'uptime',f:[['uptime','System uptime']]}}},
+{m:['whoami','user','current user','username'],g:(q,os,sh)=>{if(os==='windows')return{c:'whoami',f:[['whoami','Current username']]};return{c:'whoami && id',f:[['whoami','Username'],['id','User/group IDs']]}}},
+{m:['date','time','current','now','today','clock'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-Date -Format "yyyy-MM-dd HH:mm:ss"',f:[['Get-Date','Current date/time']]};return{c:'date "+%Y-%m-%d %H:%M:%S"',f:[['date','Current date/time']]}}},
+{m:['env','environment','variable','path','export'],g:(q,os,sh)=>{if(q.match(/set|export|create/i)){if(os==='windows'&&sh==='cmd')return{c:'set MY_VAR=value',f:[['set','Set env variable']]};if(os==='windows'&&sh==='powershell')return{c:'$env:MY_VAR = "value"',f:[['$env:','Set env variable']]};return{c:'export MY_VAR="value"',f:[['export','Set env variable']]};}if(os==='windows'&&sh==='powershell')return{c:'Get-ChildItem Env:',f:[['Get-ChildItem Env:','List env variables']]};return{c:'env | sort',f:[['env','Print env variables'],['sort','Alphabetical']]}}},
+{m:['memory','ram','free','swap'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Get-CimInstance Win32_OperatingSystem | Select-Object @{N="Total(GB)";E={[math]::Round($_.TotalVisibleMemorySize/1MB,2)}},@{N="Free(GB)";E={[math]::Round($_.FreePhysicalMemory/1MB,2)}}',f:[['Get-CimInstance','System info']]};if(os==='macos')return{c:'vm_stat | head -5 && sysctl hw.memsize',f:[['vm_stat','Memory stats'],['sysctl hw.memsize','Total RAM']]};return{c:'free -h',f:[['free -h','Memory usage, human-readable']]}}}
+]},
+// PACKAGE MANAGEMENT
+{kw:['install','package','apt','brew','choco','npm','pip','update','upgrade','uninstall'],pats:[
+{m:['install','add','get','setup'],g:(q,os,sh)=>{let p=q.match(/install\s+(\S+)/i)?.[1]||'package_name';if(os==='windows')return{c:'choco install '+p+' -y',f:[['choco install','Install via Chocolatey'],['-y','Auto-confirm']]};if(os==='macos')return{c:'brew install '+p,f:[['brew install','Install via Homebrew']]};return{c:'sudo apt install -y '+p,f:[['sudo','Run as root'],['apt install','Install package'],['-y','Auto-confirm']]}}},
+{m:['update','upgrade','refresh','latest'],g:(q,os,sh)=>{if(os==='windows')return{c:'choco upgrade all -y',f:[['choco upgrade all','Upgrade all packages']]};if(os==='macos')return{c:'brew update && brew upgrade',f:[['brew update','Refresh package list'],['brew upgrade','Upgrade packages']]};return{c:'sudo apt update && sudo apt upgrade -y',f:[['apt update','Refresh index'],['apt upgrade','Upgrade packages']]}}},
+{m:['uninstall','remove','delete','purge'],g:(q,os,sh)=>{let p=q.match(/(?:uninstall|remove)\s+(\S+)/i)?.[1]||'package_name';if(os==='windows')return{c:'choco uninstall '+p,f:[['choco uninstall','Remove package']]};if(os==='macos')return{c:'brew uninstall '+p,f:[['brew uninstall','Remove package']]};return{c:'sudo apt remove '+p,f:[['apt remove','Remove package']]}}},
+{m:['list','installed','packages','show'],g:(q,os,sh)=>{if(os==='windows')return{c:'choco list --local-only',f:[['choco list','Installed packages']]};if(os==='macos')return{c:'brew list',f:[['brew list','Installed packages']]};return{c:'apt list --installed',f:[['apt list --installed','All installed packages']]}}}
+]},
+// SSH & REMOTE
+{kw:['ssh','remote','scp','rsync','tunnel','connect','server'],pats:[
+{m:['ssh','connect','remote','login','server'],g:(q)=>{let h=q.match(/(?:to|into|at)\s+(\S+)/)?.[1]||'user@server.com';return{c:'ssh '+h,f:[['ssh','Secure Shell connection']]}}},
+{m:['scp','copy','transfer','upload','remote file'],g:()=>({c:'scp file.txt user@server.com:/path/to/dest/',f:[['scp','Secure copy over SSH']]})},
+{m:['tunnel','forward','port forward','proxy'],g:()=>({c:'ssh -L 8080:localhost:3000 user@server.com',f:[['ssh -L','Local port forwarding'],['8080:localhost:3000','Local:remote mapping']]})}
+]},
+// CRON & SCHEDULING
+{kw:['cron','schedule','crontab','task','timer','job','periodic','every'],pats:[
+{m:['cron','schedule','crontab','task','timer','job','periodic','every'],g:(q,os,sh)=>{if(os==='windows'&&sh==='powershell')return{c:'Register-ScheduledTask -TaskName "MyTask" -Trigger (New-ScheduledTaskTrigger -Daily -At 9am) -Action (New-ScheduledTaskAction -Execute "script.bat")',f:[['Register-ScheduledTask','Create scheduled task']]};if(q.match(/list|show|view/i))return{c:'crontab -l',f:[['crontab -l','List cron jobs']]};if(q.match(/edit|add|new/i))return{c:'crontab -e',f:[['crontab -e','Edit cron jobs']]};return{c:'# Cron format: min hour day month weekday command\n# Example: run every day at 3am\n0 3 * * * /path/to/script.sh',f:[['min hour day month weekday','Cron schedule fields'],['0 3 * * *','Every day at 3:00 AM'],['*','Wildcard = every value']]}}}
+]},
+// SCREEN/TMUX
+{kw:['screen','tmux','session','terminal','multiplexer','detach','background'],pats:[
+{m:['screen','tmux','session','terminal','multiplexer','detach'],g:(q,os,sh)=>{if(q.match(/tmux/i)){if(q.match(/list|show/i))return{c:'tmux ls',f:[['tmux ls','List sessions']]};if(q.match(/attach|resume|connect/i))return{c:'tmux attach -t session_name',f:[['tmux attach','Reconnect to session']]};return{c:'tmux new -s mysession',f:[['tmux new','Create session'],['-s','Session name']]};}return{c:'screen -S mysession',f:[['screen','Terminal multiplexer'],['-s','Session name']]}}}
+]},
+]; // end DB
+
+
+// Dangerous command patterns
+const dangerPats=[/rm\s+(-rf|-fr)\s*[\/~\*]/i,/\brm\s+-rf\s+\/\s*$/i,/\bdd\s+if=/i,/\bmkfs\b/i,/\bchmod\s+777\b/i,/\bchmod\s+-R\s+777\b/i,/:()\{\s*:\|:&\s*\};:/,/>\s*\/dev\/sd/i,/\bformat\s+[a-z]:/i,/del\s+\/[sf]\s+/i,/\bsudo\s+rm\s+-rf\s+\/\s*$/i,/rmdir\s+\/S.*[A-Z]:\\/i];
+function isDangerous(cmd){return dangerPats.some(p=>p.test(cmd))}
+
+// Syntax highlighting
+function hl(cmd){
+  let h=cmd.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  h=h.replace(/(#[^\n]*)/g,'<span class="syn-comment">$1</span>');
+  h=h.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g,'<span class="syn-str">$1</span>');
+  h=h.replace(/(\|{1,2}|&amp;&amp;|;|&gt;{1,2}|&lt;)/g,'<span class="syn-pipe">$1</span>');
+  h=h.replace(/(\s)(-{1,2}[\w-]+)/g,'$1<span class="syn-flag">$2</span>');
+  h=h.replace(/(\$\w+|\$\{[^}]+\})/g,'<span class="syn-var">$1</span>');
+  return h;
+}
+
+// Score match
+function scoreMatch(q,mWords){
+  let words=q.toLowerCase().split(/\s+/),score=0;
+  for(let mw of mWords)for(let w of words){if(w===mw)score+=3;else if(w.includes(mw)||mw.includes(w))score+=1;}
+  return score;
+}
+
+// Main generation
+function generateCommand(){
+  let q=document.getElementById('queryInput').value.trim();
+  if(!q)return;
+  addToHistory(q);
+  let bestResult=null,bestScore=0;
+  for(let cat of DB){
+    let catScore=0,qL=q.toLowerCase();
+    for(let kw of cat.kw)if(qL.includes(kw))catScore+=2;
+    if(catScore===0)continue;
+    for(let pat of cat.pats){
+      let pScore=catScore+scoreMatch(q,pat.m);
+      if(pScore>bestScore){bestScore=pScore;bestResult=pat;}
+    }
+  }
+  let outputArea=document.getElementById('outputArea'),warningBox=document.getElementById('warningBox');
+  let commandText=document.getElementById('commandText'),explanationList=document.getElementById('explanationList');
+  if(!bestResult||bestScore<2){
+    let fb=currentOS==='windows'?(currentShell==='powershell'?'Get-Help *keyword*':'help'):'man -k "'+q.split(/\s+/)[0]+'"';
+    commandText.innerHTML=hl(fb);
+    explanationList.innerHTML='<li>No exact match found. Try rephrasing or use the command above to search the manual.</li>';
+    warningBox.style.display='none';outputArea.style.display='block';return;
+  }
+  let result=bestResult.g(q,currentOS,currentShell);
+  commandText.innerHTML=hl(result.c);
+  explanationList.innerHTML='';
+  for(let[flag,desc]of result.f){
+    let li=document.createElement('li');
+    li.innerHTML='<code>'+flag.replace(/</g,'&lt;')+'</code> &mdash; '+desc;
+    explanationList.appendChild(li);
+  }
+  warningBox.style.display=isDangerous(result.c)?'flex':'none';
+  outputArea.style.display='block';
+  outputArea.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// Copy
+function copyCommand(){
+  let t=document.getElementById('commandText').innerText;
+  navigator.clipboard.writeText(t).then(()=>{
+    let b=document.querySelector('.copy-btn');b.textContent='\u2705 Copied!';
+    setTimeout(()=>b.textContent='\ud83d\udccb Copy',1500);
+  });
+}
+
+// Try example
+function tryExample(el){document.getElementById('queryInput').value=el.textContent;generateCommand();}
+
+// Tab switching
+document.getElementById('osTabs').addEventListener('click',function(e){
+  let tab=e.target.closest('.tab');if(!tab)return;
+  this.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');currentOS=tab.dataset.os;
+  let st=document.getElementById('shellTabs');
+  if(currentOS==='windows'){st.innerHTML='<div class="tab active" data-shell="powershell">PowerShell</div><div class="tab" data-shell="cmd">cmd</div>';currentShell='powershell';}
+  else{st.innerHTML='<div class="tab active" data-shell="bash">bash</div><div class="tab" data-shell="zsh">zsh</div>';currentShell='bash';}
+  bindShellTabs();
+});
+function bindShellTabs(){document.getElementById('shellTabs').addEventListener('click',function(e){let tab=e.target.closest('.tab');if(!tab)return;this.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');currentShell=tab.dataset.shell;});}
+bindShellTabs();
+
+// Enter key
+document.getElementById('queryInput').addEventListener('keydown',function(e){if(e.key==='Enter')generateCommand();});
+
+// History
+function getHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||[];}catch(e){return[];}}
+function addToHistory(q){let h=getHistory();h=h.filter(x=>x!==q);h.unshift(q);if(h.length>MAX_HISTORY)h=h.slice(0,MAX_HISTORY);localStorage.setItem(HISTORY_KEY,JSON.stringify(h));renderHistory();}
+function removeFromHistory(q){let h=getHistory().filter(x=>x!==q);localStorage.setItem(HISTORY_KEY,JSON.stringify(h));renderHistory();}
+function renderHistory(){
+  let h=getHistory(),sec=document.getElementById('historySection'),chips=document.getElementById('historyChips');
+  if(!h.length){sec.style.display='none';return;}
+  sec.style.display='block';chips.innerHTML='';
+  h.forEach(item=>{
+    let chip=document.createElement('span');chip.className='chip';
+    chip.innerHTML=item+' <span class="chip-x" onclick="event.stopPropagation();removeFromHistory(\''+item.replace(/'/g,"\\'")+'\')">&times;</span>';
+    chip.onclick=function(){document.getElementById('queryInput').value=item;generateCommand();};
+    chips.appendChild(chip);
+  });
+}
+renderHistory();
+
+// Quick Reference
+const refData=[
+{t:'\ud83d\udcc1 File Operations',r:[['ls -la','List all files with details'],['cd /path','Change directory'],['mkdir -p dir/sub','Create nested dirs'],['cp -r src/ dest/','Copy recursively'],['mv old new','Move/rename'],['rm -i file','Delete with confirm'],['chmod 755 file','Set permissions'],['chown user:group file','Change owner'],['ln -s target link','Symbolic link'],['find . -name "*.txt"','Find by name']]},
+{t:'\ud83d\udcca Process & System',r:[['ps aux','List all processes'],['top / htop','Monitor resources'],['kill -9 PID','Force kill'],['bg / fg','Background/foreground'],['nohup cmd &','Run immune to hangups'],['uptime','System uptime'],['whoami','Current user'],['uname -a','System info'],['free -h','Memory usage'],['df -h','Disk space']]},
+{t:'\ud83c\udf10 Network',r:[['curl -O url','Download file'],['wget url','Download file'],['ping -c 4 host','Test connectivity'],['ss -tlnp','Listening ports'],['ip addr show','IP addresses'],['dig domain','DNS lookup'],['traceroute host','Trace route'],['netstat -an','Connections'],['scp file user@host:path','Secure copy'],['ssh user@host','Remote login']]},
+{t:'\ud83d\udcdd Text Processing',r:[['grep -rn "text" .','Search recursively'],['sed "s/old/new/g" file','Find & replace'],["awk '{print $1}' file",'Print column'],['sort file | uniq','Sort & deduplicate'],['wc -l file','Count lines'],['head -20 file','First 20 lines'],['tail -f file','Follow file'],['cut -d"," -f1 file','Extract CSV column'],['tr "a-z" "A-Z"','Transform chars'],['diff file1 file2','Compare files']]},
+{t:'\ud83d\udce6 Archive',r:[['tar -czf a.tar.gz dir/','Create tar.gz'],['tar -xzf a.tar.gz','Extract tar.gz'],['zip -r a.zip dir/','Create zip'],['unzip a.zip','Extract zip'],['gzip file','Compress'],['gunzip file.gz','Decompress']]},
+{t:'\ud83d\udc19 Git',r:[['git init','Init repo'],['git clone url','Clone repo'],['git status','Check status'],['git add -A','Stage all'],['git commit -m "msg"','Commit'],['git push origin main','Push'],['git pull','Pull changes'],['git branch -a','List branches'],['git checkout -b name','New branch'],['git log --oneline -10','Recent history'],['git stash / pop','Stash changes'],['git diff','Show changes']]},
+{t:'\ud83d\udc33 Docker',r:[['docker ps -a','List containers'],['docker images','List images'],['docker run -d -p 80:80 img','Run container'],['docker stop name','Stop'],['docker rm name','Remove container'],['docker rmi image','Remove image'],['docker logs -f name','Follow logs'],['docker exec -it name bash','Shell into container'],['docker-compose up -d','Start services'],['docker system prune -af','Clean unused']]}
+];
+
+function renderQuickRef(){
+  let c=document.getElementById('refSections');
+  refData.forEach(s=>{
+    let g=document.createElement('div');g.className='ref-group';
+    let h=document.createElement('div');h.className='ref-header';
+    h.innerHTML='<h3>'+s.t+'</h3><span class="arrow">\u25bc</span>';
+    h.onclick=function(){this.classList.toggle('open');this.nextElementSibling.classList.toggle('open');};
+    let b=document.createElement('div');b.className='ref-body';
+    let tbl='<table>';
+    s.r.forEach(r=>{tbl+='<tr><td>'+r[0].replace(/</g,'&lt;')+'</td><td>'+r[1]+'</td></tr>';});
+    tbl+='</table>';b.innerHTML=tbl;
+    g.appendChild(h);g.appendChild(b);c.appendChild(g);
+  });
+}
+renderQuickRef();
+document.getElementById('queryInput').focus();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

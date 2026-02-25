@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AI LinkedIn profile optimizer. Generate compelling headlines, summaries, and experience descriptions. Boost your LinkedIn visibility with keyword-rich content.">
+<link rel="canonical" href="https://lifa-su.com/linkedin-optimizer/">
+<title>AI LinkedIn Profile Optimizer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a2e;--pri:#7c5cfc;--sec:#0077b5;--txt:#e0e0e0;--txt2:#999;--brd:#2a2a3e;--r:10px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);display:flex;min-height:100vh}
+a{color:var(--pri)}
+.sb{width:240px;background:var(--bg2);border-right:1px solid var(--brd);padding:20px 0;display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100}
+.sb .logo{padding:0 20px 20px;border-bottom:1px solid var(--brd);margin-bottom:10px}
+.sb .logo h2{font-size:17px;color:#fff}
+.sb .logo span{font-size:12px;color:var(--pri)}
+.ni{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;transition:.2s;color:var(--txt2);font-size:14px;border-left:3px solid transparent}
+.ni:hover{background:var(--bg3);color:#fff}
+.ni.act{background:var(--bg3);color:var(--pri);border-left-color:var(--pri)}
+.ni .ic{font-size:18px;width:24px;text-align:center}
+.pb{margin:10px 20px;padding:10px;background:linear-gradient(135deg,var(--pri),var(--sec));border:none;border-radius:var(--r);color:#fff;font-weight:600;cursor:pointer;font-size:14px;text-align:center;text-decoration:none;display:block}
+.mn{margin-left:240px;flex:1;padding:30px;max-width:900px;width:calc(100% - 240px)}
+.ts{display:none}.ts.act{display:block}
+.ts h1{font-size:26px;margin-bottom:6px;color:#fff}
+.ts .desc{color:var(--txt2);margin-bottom:24px;font-size:15px}
+label{display:block;font-size:13px;color:var(--txt2);margin-bottom:6px;margin-top:16px}
+input,textarea,select{width:100%;padding:12px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--pri)}
+textarea{resize:vertical;min-height:100px}
+select option{background:var(--bg2)}
+.btn{padding:12px 28px;background:var(--pri);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:15px;font-weight:600;margin-top:20px;transition:.2s;display:inline-block}
+.btn:hover{opacity:.85}.btn-s{background:var(--sec)}
+.ob{margin-top:24px;padding:20px;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);line-height:1.7;font-size:14px;display:none}
+.ob.show{display:block}
+.ob h3{color:var(--pri);margin-bottom:12px;font-size:16px}
+.ri{background:var(--bg3);padding:14px;border-radius:8px;margin-bottom:10px;position:relative;white-space:pre-wrap}
+.ri .cb{position:absolute;top:10px;right:10px;background:var(--brd);border:none;color:var(--txt2);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px}
+.ri .cb:hover{background:var(--pri);color:#fff}
+.tag{display:inline-block;padding:4px 12px;background:var(--bg3);border:1px solid var(--brd);border-radius:20px;font-size:12px;margin:3px;cursor:pointer;transition:.2s}
+.tag:hover,.tag.sel{background:var(--pri);border-color:var(--pri);color:#fff}
+.sc{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:20px auto;background:var(--bg3)}
+.tip{padding:10px 14px;background:var(--bg3);border-left:3px solid var(--pri);border-radius:0 8px 8px 0;margin-bottom:8px;font-size:14px}
+.tip.w{border-left-color:#f59e0b}.tip.g{border-left-color:#10b981}
+.row{display:flex;gap:16px}.row>*{flex:1}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center}
+.mo.show{display:flex}
+.mod{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:36px;max-width:420px;width:90%;text-align:center;position:relative}
+.mod h2{font-size:22px;margin-bottom:10px;color:#fff}
+.mod p{color:var(--txt2);margin-bottom:20px;font-size:14px;line-height:1.6}
+.mod .pl{display:inline-block;padding:14px 36px;background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;text-decoration:none;border-radius:var(--r);font-weight:700;font-size:16px}
+.mod .cm{background:none;border:none;color:var(--txt2);cursor:pointer;font-size:24px;position:absolute;top:12px;right:16px}
+.hb{display:none;position:fixed;top:14px;left:14px;z-index:200;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:8px 12px;cursor:pointer;color:#fff;font-size:20px}
+footer{text-align:center;padding:40px 0 20px;color:var(--txt2);font-size:13px}
+.badge{font-size:10px;background:linear-gradient(135deg,var(--pri),var(--sec));padding:2px 6px;border-radius:4px;color:#fff;margin-left:6px}
+@media(max-width:768px){
+.sb{transform:translateX(-100%);transition:.3s}.sb.open{transform:translateX(0)}
+.mn{margin-left:0;width:100%;padding:20px;padding-top:60px}
+.hb{display:block}.row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="hb" onclick="document.querySelector('.sb').classList.toggle('open')">☰</div>
+<nav class="sb">
+<div class="logo"><h2>🔗 LinkedIn Optimizer</h2><span>AI-Powered Profile Tools</span></div>
+<div style="flex:1;overflow-y:auto">
+<div class="ni act" onclick="showTool(0,this)"><span class="ic">✨</span>Headline Generator</div>
+<div class="ni" onclick="showTool(1,this)"><span class="ic">📝</span>About Section Writer</div>
+<div class="ni" onclick="showTool(2,this)"><span class="ic">🎯</span>Experience Bullets</div>
+<div class="ni" onclick="showTool(3,this)"><span class="ic">💡</span>Skills Recommender</div>
+<div class="ni" onclick="showTool(4,this)"><span class="ic">📊</span>Profile Score</div>
+</div>
+<a class="pb" href="#" onclick="showModal();return false">⚡ Upgrade to Pro</a>
+</nav>
+<main class="mn">
+
+<!-- Tool 1: Headline Generator -->
+<section class="ts act" id="t0">
+<h1>✨ Headline Generator</h1>
+<p class="desc">Create compelling LinkedIn headlines that get you noticed by recruiters.</p>
+<div class="row"><div><label>Your Role / Job Title</label><input id="h-role" placeholder="e.g. Software Engineer"></div>
+<div><label>Industry</label><input id="h-ind" placeholder="e.g. FinTech, Healthcare"></div></div>
+<label>Key Skills (comma separated)</label>
+<input id="h-skills" placeholder="e.g. Python, Machine Learning, Leadership">
+<label>Tone</label>
+<select id="h-tone"><option>Professional</option><option>Creative</option><option>Bold</option><option>Minimal</option></select>
+<button class="btn" onclick="genHeadlines()">Generate Headlines</button>
+<button class="btn btn-s" onclick="showModal()">🔒 Advanced Styles <span class="badge">PRO</span></button>
+<div class="ob" id="h-out"></div>
+</section>
+
+<!-- Tool 2: About Section Writer -->
+<section class="ts" id="t1">
+<h1>📝 About Section Writer</h1>
+<p class="desc">Write a professional summary that highlights your value and includes the right keywords.</p>
+<div class="row"><div><label>Your Role</label><input id="a-role" placeholder="e.g. Product Manager"></div>
+<div><label>Years of Experience</label><input id="a-yrs" type="number" placeholder="e.g. 8" min="0"></div></div>
+<label>Industry / Domain</label><input id="a-ind" placeholder="e.g. SaaS, E-commerce">
+<label>Key Achievements (one per line)</label>
+<textarea id="a-ach" placeholder="Led a team of 12 engineers&#10;Increased revenue by 40%&#10;Launched 3 products from 0 to 1"></textarea>
+<label>Keywords to Include (comma separated)</label>
+<input id="a-kw" placeholder="e.g. agile, cross-functional, data-driven">
+<label>Tone</label>
+<select id="a-tone"><option>Professional</option><option>Conversational</option><option>Visionary</option></select>
+<button class="btn" onclick="genAbout()">Write About Section</button>
+<button class="btn btn-s" onclick="showModal()">🔒 Multiple Versions <span class="badge">PRO</span></button>
+<div class="ob" id="a-out"></div>
+</section>
+
+<!-- Tool 3: Experience Bullet Points -->
+<section class="ts" id="t2">
+<h1>🎯 Experience Bullet Points</h1>
+<p class="desc">Transform plain job descriptions into powerful achievement-focused bullet points.</p>
+<label>Job Title</label><input id="e-title" placeholder="e.g. Senior Marketing Manager">
+<label>Company (optional)</label><input id="e-co" placeholder="e.g. Google">
+<label>Describe what you did (plain text, one task per line)</label>
+<textarea id="e-desc" rows="6" placeholder="Managed social media accounts&#10;Ran email campaigns&#10;Worked with design team on branding&#10;Handled customer feedback"></textarea>
+<label>Style</label>
+<select id="e-style"><option>Achievement-focused (XYZ formula)</option><option>Impact-driven</option><option>Metric-heavy</option></select>
+<button class="btn" onclick="genBullets()">Transform to Bullets</button>
+<button class="btn btn-s" onclick="showModal()">🔒 Bulk Transform <span class="badge">PRO</span></button>
+<div class="ob" id="e-out"></div>
+</section>
+
+<!-- Tool 4: Skills Recommender -->
+<section class="ts" id="t3">
+<h1>💡 Skills Recommender</h1>
+<p class="desc">Discover trending and in-demand skills for your industry to boost profile visibility.</p>
+<label>Select Your Industry</label>
+<select id="s-ind" onchange="showSkills()">
+<option value="">-- Choose Industry --</option>
+<option>Software Engineering</option><option>Data Science</option><option>Product Management</option>
+<option>Marketing</option><option>Design</option><option>Finance</option>
+<option>Sales</option><option>Human Resources</option><option>Healthcare</option><option>Consulting</option>
+</select>
+<div class="ob" id="s-out"></div>
+</section>
+
+<!-- Tool 5: Profile Score Checker -->
+<section class="ts" id="t4">
+<h1>📊 Profile Score Checker</h1>
+<p class="desc">Analyze your LinkedIn profile completeness and get actionable tips to improve.</p>
+<label>Profile Headline</label><input id="p-head" placeholder="Your current headline">
+<label>About Section</label><textarea id="p-about" rows="3" placeholder="Paste your about section"></textarea>
+<label>Number of Experience Entries</label><input id="p-exp" type="number" placeholder="e.g. 4" min="0">
+<label>Number of Skills Listed</label><input id="p-skills" type="number" placeholder="e.g. 15" min="0">
+<label>Do you have a custom profile photo?</label>
+<select id="p-photo"><option value="1">Yes</option><option value="0">No</option></select>
+<label>Do you have a custom banner image?</label>
+<select id="p-banner"><option value="1">Yes</option><option value="0">No</option></select>
+<label>Number of Recommendations Received</label><input id="p-rec" type="number" placeholder="e.g. 3" min="0">
+<label>Custom Profile URL? (e.g. linkedin.com/in/yourname)</label>
+<select id="p-url"><option value="1">Yes</option><option value="0">No</option></select>
+<button class="btn" onclick="checkScore()">Analyze Profile</button>
+<button class="btn btn-s" onclick="showModal()">🔒 Detailed Report <span class="badge">PRO</span></button>
+<div class="ob" id="p-out"></div>
+</section>
+
+<footer>Made with ❤️ by <a href="https://ko-fi.com/feidev" target="_blank">FeiDev</a></footer>
+</main>
+
+<!-- Pro Modal -->
+<div class="mo" id="proModal" onclick="if(event.target===this)hideModal()">
+<div class="mod">
+<button class="cm" onclick="hideModal()">✕</button>
+<h2>⚡ Unlock Pro Features</h2>
+<p>Get advanced headline styles, multiple about section versions, bulk experience transforms, full skill gap analysis, and detailed profile reports — all for a one-time payment.</p>
+<a class="pl" href="https://ko-fi.com/s/41d7ec67e7" target="_blank">Get Pro — $7</a>
+<p style="margin-top:14px;font-size:12px;color:var(--txt2)">One-time payment · Instant access · No subscription</p>
+</div>
+</div>
+
+<footer>Made with ❤️ by <a href="https://ko-fi.com/feidev" target="_blank">FeiDev</a></footer>
+</main>
+
+<script>
+function showTool(i,el){
+document.querySelectorAll('.ts').forEach(s=>s.classList.remove('act'));
+document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+document.getElementById('t'+i).classList.add('act');
+if(el)el.classList.add('act');
+document.querySelector('.sb').classList.remove('open');
+}
+function showModal(){document.getElementById('proModal').classList.add('show')}
+function closeModal(){document.getElementById('proModal').classList.remove('show')}
+document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+function copyText(btn){
+var t=btn.parentElement.innerText.replace('Copy','').trim();
+navigator.clipboard.writeText(t).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',1500)});
+}
+
+function genHeadlines(){
+var role=document.getElementById('h-role').value.trim();
+var ind=document.getElementById('h-ind').value.trim();
+var skills=document.getElementById('h-skills').value.trim();
+var tone=document.getElementById('h-tone').value;
+if(!role){alert('Please enter your role');return}
+var sk=skills?skills.split(',').map(s=>s.trim()).filter(Boolean):[];
+var results=[];
+var templates={
+'Professional':[
+'{role} | {skill1} Expert | Helping {ind} Companies Thrive',
+'{role} with {n}+ Years Driving Results in {ind}',
+'{skill1} & {skill2} Specialist | {role} | {ind}',
+'Experienced {role} | {skill1} | Passionate About {ind} Innovation',
+'{role} → Turning {skill1} into Business Impact for {ind}'
+],
+'Creative':[
+'🚀 {role} Who Turns {skill1} into Magic | {ind}',
+'{ind} Enthusiast × {role} × {skill1} Nerd',
+'Building the Future of {ind} | {role} | {skill1} + {skill2}',
+'Not Your Average {role} — {skill1} Meets {ind} Innovation',
+'{role} by Day, {skill1} Evangelist Always 🎯'
+],
+'Bold':[
+'Top {role} in {ind} | {skill1} | Results That Speak',
+'{role} | I Help {ind} Teams 10x Their {skill1} Output',
+'Award-Worthy {role} | {skill1} & {skill2} | {ind} Leader',
+'{ind} Disruptor | {role} | {skill1}-Driven Growth',
+'The {role} {ind} Companies Call When They Need {skill1}'
+],
+'Minimal':[
+'{role} · {skill1} · {ind}',
+'{role} | {ind}',
+'{skill1} → {role}',
+'{role} — {skill1}, {skill2}',
+'{ind} · {role}'
+]
+};
+var tpls=templates[tone]||templates['Professional'];
+var s1=sk[0]||'Strategy',s2=sk[1]||sk[0]||'Innovation';
+tpls.forEach(function(t){
+var h=t.replace(/{role}/g,role).replace(/{ind}/g,ind||'Tech').replace(/{skill1}/g,s1).replace(/{skill2}/g,s2).replace(/{n}/g,String(5+Math.floor(Math.random()*10)));
+results.push(h);
+});
+var html='<h3>Generated Headlines ('+tone+')</h3>';
+results.forEach(function(r){html+='<div class="ri">'+r+'<button class="cb" onclick="copyText(this)">Copy</button></div>'});
+var out=document.getElementById('h-out');out.innerHTML=html;out.classList.add('show');
+}
+
+function genAbout(){
+var role=document.getElementById('a-role').value.trim();
+var yrs=document.getElementById('a-yrs').value||'several';
+var ind=document.getElementById('a-ind').value.trim()||'the industry';
+var ach=document.getElementById('a-ach').value.trim().split('\n').filter(Boolean);
+var kw=document.getElementById('a-kw').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+var tone=document.getElementById('a-tone').value;
+if(!role){alert('Please enter your role');return}
+var openers={
+'Professional':['With '+yrs+' years of experience in '+ind+', I am a dedicated '+role+' passionate about delivering measurable results.','As a seasoned '+role+' in the '+ind+' space, I bring '+yrs+' years of expertise in driving strategic initiatives and delivering impact.'],
+'Conversational':['Hi there! I\'m a '+role+' with '+yrs+' years in '+ind+'. I love turning complex challenges into elegant solutions.','Hey! I\'ve spent '+yrs+' years as a '+role+' in '+ind+', and I still get excited about solving tough problems every single day.'],
+'Visionary':['I believe the future of '+ind+' lies at the intersection of innovation and human-centered thinking. As a '+role+' with '+yrs+' years of experience, I\'m on a mission to make that future a reality.','The '+ind+' landscape is evolving fast. With '+yrs+' years as a '+role+', I\'m at the forefront of shaping what comes next.']
+};
+var opener=openers[tone][Math.floor(Math.random()*2)];
+var mid='';
+if(ach.length>0){
+mid='\n\nKey highlights of my journey:\n';
+ach.forEach(function(a){mid+='✅ '+a.trim()+'\n'});
+}
+var kwStr='';
+if(kw.length>0)kwStr='\n\nCore competencies: '+kw.join(' · ')+'.';
+var cta='\n\n📩 Open to connecting with fellow professionals in '+ind+'. Let\'s chat about how we can create impact together.';
+var about=opener+mid+kwStr+cta;
+var html='<h3>Your About Section</h3><div class="ri">'+about.replace(/\n/g,'<br>')+'<button class="cb" onclick="copyText(this)">Copy</button></div>';
+var out=document.getElementById('a-out');out.innerHTML=html;out.classList.add('show');
+}
+
+function genBullets(){
+var title=document.getElementById('e-title').value.trim();
+var co=document.getElementById('e-co').value.trim();
+var desc=document.getElementById('e-desc').value.trim().split('\n').filter(Boolean);
+var style=document.getElementById('e-style').value;
+if(!desc.length){alert('Please enter at least one task description');return}
+var verbs=['Spearheaded','Orchestrated','Drove','Championed','Accelerated','Streamlined','Pioneered','Elevated','Transformed','Optimized','Architected','Delivered'];
+var metrics=['increasing efficiency by 35%','boosting engagement by 50%','reducing costs by 25%','growing revenue by 40%','improving retention by 30%','cutting turnaround time by 45%','expanding reach by 60%','enhancing productivity by 28%'];
+var results=[];
+desc.forEach(function(d,i){
+var v=verbs[i%verbs.length];
+var m=metrics[i%metrics.length];
+var clean=d.trim().replace(/^(I |We |My )/i,'').replace(/^\w/,c=>c.toLowerCase());
+if(style.indexOf('XYZ')>-1){
+results.push(v+' '+clean+(co?' at '+co:'')+', '+m+'.');
+}else if(style.indexOf('Impact')>-1){
+results.push(v+' '+clean+', resulting in measurable impact: '+m+'.');
+}else{
+results.push(v+' '+clean+' → '+m.replace(/by /,'').toUpperCase()+'.');
+}
+});
+var html='<h3>Transformed Bullet Points</h3>';
+results.forEach(function(r){html+='<div class="ri">• '+r+'<button class="cb" onclick="copyText(this)">Copy</button></div>'});
+var out=document.getElementById('e-out');out.innerHTML=html;out.classList.add('show');
+}
+
+var skillsDB={
+'Software Engineering':{
+trending:['Rust','Go','Kubernetes','Terraform','GraphQL','WebAssembly','AI/ML Integration','Platform Engineering'],
+core:['JavaScript','Python','Java','TypeScript','React','Node.js','SQL','Git','Docker','AWS'],
+soft:['System Design','Code Review','Technical Leadership','Agile','Cross-functional Collaboration']
+},
+'Data Science':{
+trending:['LLM Fine-tuning','MLOps','dbt','Feature Stores','Generative AI','Vector Databases','Causal Inference','Real-time ML'],
+core:['Python','SQL','TensorFlow','PyTorch','Pandas','Scikit-learn','Statistics','Data Visualization','R','Spark'],
+soft:['Storytelling with Data','Stakeholder Management','Experiment Design','Business Acumen']
+},
+'Product Management':{
+trending:['AI Product Strategy','Product-Led Growth','Outcome-Driven Roadmaps','Platform Thinking','Product Analytics'],
+core:['Roadmapping','User Research','A/B Testing','Jira','SQL','PRD Writing','Competitive Analysis','Prioritization'],
+soft:['Stakeholder Alignment','Cross-functional Leadership','Strategic Thinking','Customer Empathy']
+},
+'Marketing':{
+trending:['AI Content Generation','Short-form Video','Community-Led Growth','First-party Data Strategy','Influencer Marketing'],
+core:['SEO','Google Analytics','Content Marketing','Email Marketing','Social Media','PPC','HubSpot','Copywriting'],
+soft:['Brand Strategy','Creative Direction','Data-Driven Decision Making','Audience Segmentation']
+},
+'Design':{
+trending:['AI-Assisted Design','Design Systems','Spatial UI (AR/VR)','Motion Design','Accessibility-First Design'],
+core:['Figma','User Research','Wireframing','Prototyping','UI Design','UX Design','Design Thinking','Sketch'],
+soft:['Visual Storytelling','Cross-functional Collaboration','User Empathy','Design Critique']
+},
+'Finance':{
+trending:['AI in Finance','ESG Analysis','Blockchain/DeFi','Real-time Risk Modeling','Embedded Finance'],
+core:['Financial Modeling','Excel','Bloomberg Terminal','Valuation','FP&A','Risk Management','SQL','Python'],
+soft:['Analytical Thinking','Attention to Detail','Regulatory Awareness','Stakeholder Reporting']
+},
+'Sales':{
+trending:['AI Sales Tools','Product-Led Sales','Revenue Operations','Social Selling','Intent Data'],
+core:['Salesforce','CRM Management','Pipeline Management','Cold Outreach','Negotiation','Account Management'],
+soft:['Relationship Building','Active Listening','Objection Handling','Consultative Selling']
+},
+'Human Resources':{
+trending:['People Analytics','AI Recruiting','Employee Experience Platforms','Skills-Based Hiring','DEI Strategy'],
+core:['Recruiting','HRIS','Compensation & Benefits','Employee Relations','Onboarding','Performance Management'],
+soft:['Empathy','Conflict Resolution','Change Management','Organizational Development']
+},
+'Healthcare':{
+trending:['Telehealth','AI Diagnostics','Digital Therapeutics','Health Data Interoperability','Precision Medicine'],
+core:['EHR Systems','Clinical Research','HIPAA Compliance','Patient Care','Medical Terminology','Data Analysis'],
+soft:['Patient Communication','Interdisciplinary Collaboration','Critical Thinking','Ethical Decision Making']
+},
+'Consulting':{
+trending:['AI Transformation','Digital Strategy','Sustainability Consulting','Agile at Scale','Data-Driven Advisory'],
+core:['Strategy','Business Analysis','PowerPoint','Excel','Project Management','Stakeholder Management','Research'],
+soft:['Problem Solving','Client Relationship','Structured Thinking','Executive Communication']
+}
+};
+
+function showSkills(){
+var ind=document.getElementById('s-ind').value;
+if(!ind){document.getElementById('s-out').classList.remove('show');return}
+var data=skillsDB[ind];
+if(!data)return;
+var html='<h3>Recommended Skills for '+ind+'</h3>';
+html+='<div style="margin-bottom:16px"><strong style="color:#f59e0b">🔥 Trending (Add These First)</strong><div style="margin-top:8px">';
+data.trending.forEach(function(s){html+='<span class="tag sel">'+s+'</span>'});
+html+='</div></div>';
+html+='<div style="margin-bottom:16px"><strong style="color:var(--pri)">💼 Core Skills</strong><div style="margin-top:8px">';
+data.core.forEach(function(s){html+='<span class="tag">'+s+'</span>'});
+html+='</div></div>';
+html+='<div style="margin-bottom:16px"><strong style="color:#10b981">🤝 Soft Skills</strong><div style="margin-top:8px">';
+data.soft.forEach(function(s){html+='<span class="tag">'+s+'</span>'});
+html+='</div></div>';
+html+='<div class="tip" style="margin-top:16px">💡 Tip: LinkedIn allows up to 50 skills. Aim for at least 20, with trending skills at the top for maximum visibility.</div>';
+var out=document.getElementById('s-out');out.innerHTML=html;out.classList.add('show');
+}
+
+function checkScore(){
+var head=document.getElementById('p-head').value.trim();
+var about=document.getElementById('p-about').value.trim();
+var exp=parseInt(document.getElementById('p-exp').value)||0;
+var skills=parseInt(document.getElementById('p-skills').value)||0;
+var photo=document.getElementById('p-photo').value==='1';
+var banner=document.getElementById('p-banner').value==='1';
+var rec=parseInt(document.getElementById('p-rec').value)||0;
+var url=document.getElementById('p-url').value==='1';
+
+var score=0;var tips=[];var max=100;
+
+// Headline (20 pts)
+if(head.length>10&&head.length<=120){
+var hl=head.length>40?20:head.length>20?15:10;
+if(head.includes('|')||head.includes('·')||head.includes('—'))hl=Math.min(hl+2,20);
+score+=hl;
+if(hl<20)tips.push({t:'Your headline could be stronger. Aim for 40-120 characters with keywords and separators (|, ·).',c:'w'});
+else tips.push({t:'Great headline length and structure!',c:'g'});
+}else if(head.length>0){
+score+=5;tips.push({t:'Headline is too '+(head.length<=10?'short':'long')+'. Aim for 40-120 characters with your role, skills, and value prop.',c:'w'});
+}else{tips.push({t:'Missing headline! This is the #1 thing recruiters see. Add your role + key skills + value.',c:'w'})}
+
+// About (25 pts)
+if(about.length>300){
+score+=25;tips.push({t:'Solid about section length!',c:'g'});
+}else if(about.length>100){
+score+=15;tips.push({t:'About section could be longer. Aim for 300+ characters with achievements and keywords.',c:'w'});
+}else if(about.length>0){
+score+=5;tips.push({t:'About section is too short. Write 3-5 paragraphs covering your story, achievements, and what you\'re looking for.',c:'w'});
+}else{tips.push({t:'Missing about section! This is prime real estate for keywords and your professional story.',c:'w'})}
+
+// Experience (20 pts)
+if(exp>=3){score+=20;tips.push({t:'Good number of experience entries!',c:'g'})}
+else if(exp>=1){score+=10;tips.push({t:'Add more experience entries. Include volunteer work, freelance, or side projects.',c:'w'})}
+else{tips.push({t:'No experience listed! Add at least 3 positions with bullet points describing achievements.',c:'w'})}
+
+// Skills (15 pts)
+if(skills>=15){score+=15;tips.push({t:'Excellent skill coverage!',c:'g'})}
+else if(skills>=5){score+=8;tips.push({t:'Add more skills (aim for 15-50). More skills = more search appearances.',c:'w'})}
+else{score+=skills;tips.push({t:'Very few skills listed. Add at least 15 relevant skills to boost discoverability.',c:'w'})}
+
+// Photo (8 pts)
+if(photo){score+=8;tips.push({t:'Profile photo ✓',c:'g'})}
+else{tips.push({t:'Add a professional profile photo. Profiles with photos get 21x more views!',c:'w'})}
+
+// Banner (5 pts)
+if(banner){score+=5;tips.push({t:'Custom banner ✓',c:'g'})}
+else{tips.push({t:'Add a custom banner image. It\'s free branding space — use it!',c:'w'})}
+
+// Recommendations (5 pts)
+if(rec>=3){score+=5;tips.push({t:'Great social proof with '+rec+' recommendations!',c:'g'})}
+else if(rec>=1){score+=2;tips.push({t:'Ask for more recommendations. Aim for 3+ from colleagues or managers.',c:'w'})}
+else{tips.push({t:'No recommendations yet. Ask 3 colleagues to write you one — it builds massive credibility.',c:'w'})}
+
+// Custom URL (2 pts)
+if(url){score+=2;tips.push({t:'Custom URL ✓',c:'g'})}
+else{tips.push({t:'Customize your profile URL (Settings → Edit public profile URL). Looks more professional.',c:'w'})}
+
+score=Math.min(score,100);
+var color=score>=80?'#10b981':score>=50?'#f59e0b':'#ef4444';
+var grade=score>=90?'All-Star':score>=75?'Expert':score>=50?'Intermediate':score>=25?'Beginner':'Needs Work';
+
+var html='<h3>Your Profile Score</h3>';
+html+='<div class="sc" style="border:4px solid '+color+';color:'+color+'"><span>'+score+'</span></div>';
+html+='<div style="text-align:center;margin-bottom:20px"><strong style="color:'+color+';font-size:18px">'+grade+'</strong><br><span style="color:var(--txt2)">'+score+' / 100 points</span></div>';
+html+='<h3 style="margin-bottom:12px">Actionable Tips</h3>';
+tips.forEach(function(t){html+='<div class="tip '+t.c+'">'+(t.c==='g'?'✅ ':'⚠️ ')+t.t+'</div>'});
+var out=document.getElementById('p-out');out.innerHTML=html;out.classList.add('show');
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

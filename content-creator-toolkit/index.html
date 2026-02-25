@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Creator Toolkit - AI-Powered Tools for Creators</title>
+<meta name="description" content="Free AI-powered content creator toolkit. Generate blog posts, social media captions, YouTube titles, content calendars, and hashtags.">
+<link rel="canonical" href="https://lifa-su.com/content-creator-toolkit/">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--surface:#12121e;--surface2:#1a1a2e;--surface3:#222238;
+  --border:#2a2a40;--border2:#3a3a55;--text:#e8e8f0;--text2:#9898b0;--text3:#686880;
+  --accent:#7c5cfc;--accent2:#5c8cfc;--accent-glow:rgba(124,92,252,0.15);
+  --success:#4cda8a;--warn:#fcb44c;--danger:#fc5c6c;--pro-gold:#f0c040;
+  --radius:12px;--radius-sm:8px;--sidebar-w:260px;
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:6px;border-radius:var(--radius-sm)}
+.hamburger:hover{background:var(--surface2)}
+.brand{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pro-badge-btn{background:linear-gradient(135deg,#f0c040,#f09040);color:#1a1a2e;border:none;padding:6px 14px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.pro-badge-btn:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(240,192,64,0.3)}
+.app-layout{display:flex;min-height:calc(100vh - 60px)}
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);padding:16px 12px;position:fixed;top:60px;left:0;bottom:0;overflow-y:auto;z-index:90;transition:transform .3s ease}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;border:1px solid transparent;background:none;color:var(--text2);font-size:14px;font-family:inherit;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent);border-color:rgba(124,92,252,0.25)}
+.nav-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.nav-label{font-weight:500}
+.nav-item .pro-tag{font-size:10px;background:linear-gradient(135deg,#f0c040,#f09040);color:#1a1a2e;padding:2px 6px;border-radius:10px;font-weight:700;margin-left:auto}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:85}
+.main-content{margin-left:var(--sidebar-w);flex:1;padding:32px;max-width:900px}
+.tool-panel{display:none}
+.tool-panel.active{display:block}
+.panel-header{margin-bottom:28px}
+.panel-title{font-size:26px;font-weight:700;margin-bottom:6px}
+.panel-desc{color:var(--text2);font-size:15px;line-height:1.5}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-input,.form-select,.form-textarea{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;transition:border-color .2s,box-shadow .2s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.form-textarea{resize:vertical;min-height:80px}
+.form-select{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239898b0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-select option{background:var(--surface2);color:var(--text)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;border:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--accent-glow)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3);border-color:var(--border2)}
+.btn-sm{padding:8px 14px;font-size:13px}
+.btn-block{width:100%}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.output-area{margin-top:28px;display:none}
+.output-area.visible{display:block}
+.output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.output-title{font-size:16px;font-weight:600;color:var(--text)}
+.copy-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;gap:4px}
+.copy-btn:hover{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.output-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;line-height:1.7;white-space:pre-wrap;font-size:14px;max-height:600px;overflow-y:auto}
+.calendar-grid{display:grid;gap:12px}
+.calendar-grid.week-view{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.calendar-grid.month-view{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.cal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:border-color .2s}
+.cal-card:hover{border-color:var(--border2)}
+.cal-day{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.cal-topic{font-size:14px;font-weight:600;margin-bottom:6px}
+.cal-meta{font-size:12px;color:var(--text3);display:flex;flex-direction:column;gap:3px}
+.cal-platform{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text2);margin-right:4px}
+.hashtag-group{margin-bottom:20px}
+.hashtag-group-title{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.hashtag-pills{display:flex;flex-wrap:wrap;gap:8px}
+.hashtag-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--accent);cursor:pointer;transition:all .2s}
+.hashtag-pill:hover{background:var(--accent-glow);border-color:var(--accent)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.visible{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:480px;width:90%;overflow:hidden;animation:modalIn .3s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-header{background:linear-gradient(135deg,#f0c040,#f09040);padding:24px;text-align:center}
+.modal-header h2{color:#1a1a2e;font-size:22px;margin-bottom:4px}
+.modal-header p{color:rgba(26,26,46,0.7);font-size:14px}
+.modal-body{padding:24px}
+.modal-benefits{list-style:none;margin-bottom:24px}
+.modal-benefits li{padding:10px 0;border-bottom:1px solid var(--border);color:var(--text2);font-size:14px;display:flex;align-items:center;gap:10px}
+.modal-benefits li:last-child{border-bottom:none}
+.modal-benefits li::before{content:"\2713";color:var(--success);font-weight:700;font-size:16px}
+.modal-cta{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#f0c040,#f09040);color:#1a1a2e;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .2s,box-shadow .2s;text-align:center;text-decoration:none}
+.modal-cta:hover{transform:translateY(-2px);box-shadow:0 4px 24px rgba(240,192,64,0.3);text-decoration:none;color:#1a1a2e}
+.modal-close{display:block;width:100%;padding:12px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;transition:all .2s}
+.modal-close:hover{background:var(--surface2);color:var(--text2)}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 20px;font-size:14px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:toastIn .3s ease;display:flex;align-items:center;gap:8px}
+.toast.success{border-color:var(--success)}
+.toast.success::before{content:"\2713";color:var(--success);font-weight:700}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+.footer{text-align:center;padding:32px;color:var(--text3);font-size:13px;margin-left:var(--sidebar-w)}
+@media(max-width:768px){
+  .hamburger{display:block}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main-content{margin-left:0;padding:20px}
+  .footer{margin-left:0}
+  .form-row{grid-template-columns:1fr}
+  .calendar-grid.week-view,.calendar-grid.month-view{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="header-left">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">&#9776;</button>
+    <span class="brand">&#10024; Content Creator Toolkit</span>
+  </div>
+  <button class="pro-badge-btn" onclick="showProModal()">&#9733; PRO</button>
+</header>
+
+<div class="app-layout">
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-panel="blog" onclick="switchPanel('blog',this)">
+        <span class="nav-icon">&#9997;</span><span class="nav-label">Blog Post Generator</span>
+      </button>
+      <button class="nav-item" data-panel="social" onclick="switchPanel('social',this)">
+        <span class="nav-icon">&#128172;</span><span class="nav-label">Social Captions</span>
+      </button>
+      <button class="nav-item" data-panel="youtube" onclick="switchPanel('youtube',this)">
+        <span class="nav-icon">&#127909;</span><span class="nav-label">YouTube Optimizer</span>
+      </button>
+      <button class="nav-item" data-panel="calendar" onclick="switchPanel('calendar',this)">
+        <span class="nav-icon">&#128197;</span><span class="nav-label">Content Calendar</span>
+      </button>
+      <button class="nav-item" data-panel="hashtag" onclick="switchPanel('hashtag',this)">
+        <span class="nav-icon">&#128278;</span><span class="nav-label">Hashtag Generator</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Blog Post Generator -->
+    <div class="tool-panel active" id="panel-blog">
+      <div class="panel-header">
+        <h1 class="panel-title">&#9997; Blog Post Generator</h1>
+        <p class="panel-desc">Generate full blog posts with titles, intros, sections, and conclusions. Short posts are free; medium and long posts require Pro.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="blog-topic">Topic</label>
+        <input class="form-input" id="blog-topic" type="text" placeholder="e.g. How to grow your Instagram following in 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="blog-keywords">Keywords (comma separated)</label>
+        <input class="form-input" id="blog-keywords" type="text" placeholder="e.g. social media, growth, engagement">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="blog-tone">Tone</label>
+          <select class="form-select" id="blog-tone">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual</option>
+            <option value="humorous">Humorous</option>
+            <option value="educational">Educational</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="blog-length">Length</label>
+          <select class="form-select" id="blog-length">
+            <option value="short">Short (Free)</option>
+            <option value="medium">Medium (Pro)</option>
+            <option value="long">Long (Pro)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" id="blog-generate" onclick="generateBlog()">Generate Blog Post</button>
+      <div class="output-area" id="blog-output">
+        <div class="output-header">
+          <span class="output-title">Generated Blog Post</span>
+          <button class="copy-btn" onclick="copyOutput('blog-output-box')">&#128203; Copy</button>
+        </div>
+        <div class="output-box" id="blog-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Social Media Caption Generator -->
+    <div class="tool-panel" id="panel-social">
+      <div class="panel-header">
+        <h1 class="panel-title">&#128172; Social Media Caption Generator</h1>
+        <p class="panel-desc">Create platform-optimized captions with emojis and formatting. One caption is free; 3+ or bulk export requires Pro.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="social-topic">Topic / Description</label>
+        <textarea class="form-textarea" id="social-topic" placeholder="e.g. Launching our new eco-friendly product line made from recycled materials"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="social-platform">Platform</label>
+          <select class="form-select" id="social-platform">
+            <option value="instagram">Instagram</option>
+            <option value="twitter">Twitter / X</option>
+            <option value="linkedin">LinkedIn</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="social-tone">Tone</label>
+          <select class="form-select" id="social-tone">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual</option>
+            <option value="humorous">Humorous</option>
+            <option value="educational">Educational</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="social-count">Number of Captions</label>
+          <select class="form-select" id="social-count">
+            <option value="1">1 Caption (Free)</option>
+            <option value="3">3 Captions (Pro)</option>
+            <option value="5">5 Captions (Pro)</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="generateCaptions()">Generate Captions</button>
+      <div class="output-area" id="social-output">
+        <div class="output-header">
+          <span class="output-title">Generated Captions</span>
+          <button class="copy-btn" onclick="copyOutput('social-output-box')">&#128203; Copy</button>
+        </div>
+        <div class="output-box" id="social-output-box"></div>
+      </div>
+    </div>
+
+    <!-- YouTube Title & Description Optimizer -->
+    <div class="tool-panel" id="panel-youtube">
+      <div class="panel-header">
+        <h1 class="panel-title">&#127909; YouTube Title &amp; Description Optimizer</h1>
+        <p class="panel-desc">Generate SEO-optimized titles and full descriptions with timestamps. Titles are free; full descriptions require Pro.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="yt-topic">Video Topic</label>
+        <input class="form-input" id="yt-topic" type="text" placeholder="e.g. Beginner's guide to meal prepping for the week">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="yt-keywords">Target Keywords (comma separated)</label>
+        <input class="form-input" id="yt-keywords" type="text" placeholder="e.g. meal prep, healthy eating, budget meals">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="generateYouTube()">Generate Titles &amp; Description</button>
+      <div class="output-area" id="yt-output">
+        <div class="output-header">
+          <span class="output-title">Generated Titles</span>
+          <button class="copy-btn" onclick="copyOutput('yt-output-box')">&#128203; Copy</button>
+        </div>
+        <div class="output-box" id="yt-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Content Calendar Planner -->
+    <div class="tool-panel" id="panel-calendar">
+      <div class="panel-header">
+        <h1 class="panel-title">&#128197; Content Calendar Planner</h1>
+        <p class="panel-desc">Plan your content with AI-generated post ideas, best posting times, and platform suggestions. Weekly view is free; monthly is Pro.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cal-niche">Niche / Topic Area</label>
+        <input class="form-input" id="cal-niche" type="text" placeholder="e.g. Fitness and wellness for busy professionals">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="cal-view">View</label>
+          <select class="form-select" id="cal-view">
+            <option value="week">Weekly (Free)</option>
+            <option value="month">Monthly (Pro)</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="generateCalendar()">Generate Calendar</button>
+      <div class="output-area" id="cal-output">
+        <div class="output-header">
+          <span class="output-title">Content Calendar</span>
+          <button class="copy-btn" onclick="copyOutput('cal-output-box')">&#128203; Copy</button>
+        </div>
+        <div id="cal-output-box"></div>
+      </div>
+    </div>
+
+    <!-- Hashtag Generator -->
+    <div class="tool-panel" id="panel-hashtag">
+      <div class="panel-header">
+        <h1 class="panel-title">&#128278; Hashtag Generator</h1>
+        <p class="panel-desc">Get categorized hashtags for maximum reach. 10 hashtags free; 30+ requires Pro.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="hash-topic">Topic / Keyword</label>
+        <input class="form-input" id="hash-topic" type="text" placeholder="e.g. sustainable fashion">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="hash-count">Number of Hashtags</label>
+          <select class="form-select" id="hash-count">
+            <option value="10">10 Hashtags (Free)</option>
+            <option value="30">30 Hashtags (Pro)</option>
+            <option value="50">50 Hashtags (Pro)</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="generateHashtags()">Generate Hashtags</button>
+      <div class="output-area" id="hash-output">
+        <div class="output-header">
+          <span class="output-title">Generated Hashtags</span>
+          <button class="copy-btn" onclick="copyOutput('hash-output-text')">&#128203; Copy All</button>
+        </div>
+        <div id="hash-output-box"></div>
+        <textarea class="form-textarea" id="hash-output-text" style="display:none" readonly></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer class="footer">Made with &#10084;&#65039; by FeiDev</footer>
+
+<!-- Pro Modal -->
+<div class="modal-overlay" id="proModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>&#128274; Unlock Pro Features</h2>
+      <p>Take your content creation to the next level</p>
+    </div>
+    <div class="modal-body">
+      <ul class="modal-benefits">
+        <li>Generate medium and long-form blog posts</li>
+        <li>Bulk social media captions (3-5 at once)</li>
+        <li>Full YouTube descriptions with timestamps</li>
+        <li>Monthly content calendar planning</li>
+        <li>30+ categorized hashtags per generation</li>
+        <li>Priority access to new tools and updates</li>
+      </ul>
+      <a class="modal-cta" href="https://ko-fi.com/s/41d7ec67e7" target="_blank" rel="noopener">Get Pro on Ko-fi</a>
+      <button class="modal-close" onclick="hideProModal()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* === Utility Functions === */
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function pickN(arr,n){const s=[...arr];for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]]}return s.slice(0,n)}
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function showToast(msg,type='success'){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(()=>{t.style.animation='toastOut .3s ease forwards';setTimeout(()=>t.remove(),300)},2500);
+}
+function copyOutput(id){
+  const el=document.getElementById(id);
+  const text=el.innerText||el.textContent||el.value;
+  navigator.clipboard.writeText(text).then(()=>showToast('Copied to clipboard!')).catch(()=>showToast('Copy failed',''));
+}
+function simulateLoading(btn,cb){
+  const orig=btn.innerHTML;btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Generating...';
+  setTimeout(()=>{btn.innerHTML=orig;btn.disabled=false;cb()},800+Math.random()*700);
+}
+
+/* === Sidebar & Navigation === */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function switchPanel(id,navBtn){
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  navBtn.classList.add('active');
+  if(window.innerWidth<=768)toggleSidebar();
+}
+
+/* === Pro Modal === */
+function showProModal(){document.getElementById('proModal').classList.add('visible')}
+function hideProModal(){document.getElementById('proModal').classList.remove('visible')}
+document.getElementById('proModal').addEventListener('click',function(e){if(e.target===this)hideProModal()});
+
+/* === Blog Post Generator === */
+const blogIntros={
+  professional:[
+    "In today's rapidly evolving digital landscape, understanding TOPIC has become essential for professionals and businesses alike.",
+    "The importance of TOPIC cannot be overstated in the current market environment. Industry leaders are increasingly recognizing its value.",
+    "As we navigate the complexities of the modern business world, TOPIC stands out as a critical area of focus for forward-thinking organizations.",
+    "Recent developments in TOPIC have transformed how professionals approach their work, creating new opportunities for growth and innovation."
+  ],
+  casual:[
+    "Let's be real - TOPIC is something we all need to talk about more. Whether you're just starting out or you've been at it for years, there's always something new to learn.",
+    "So you want to know about TOPIC? You've come to the right place. Grab your coffee and let's dive in.",
+    "Here's the thing about TOPIC - it's not as complicated as people make it seem. Let me break it down for you.",
+    "If you've been sleeping on TOPIC, it's time to wake up. This is the stuff that actually moves the needle."
+  ],
+  humorous:[
+    "Ah, TOPIC. The thing your competitor figured out while you were still debating which font to use on your website.",
+    "Welcome to the ultimate guide on TOPIC - or as I like to call it, 'the thing I wish someone had explained to me before I learned it the hard way.'",
+    "Let's talk about TOPIC. And no, I promise this won't be as boring as that last webinar you sat through.",
+    "TOPIC: two words (okay, maybe more) that strike fear into the hearts of beginners and excitement into the hearts of nerds like me."
+  ],
+  educational:[
+    "Understanding TOPIC is fundamental to success in this field. In this comprehensive guide, we'll explore the key concepts, strategies, and best practices you need to know.",
+    "TOPIC represents one of the most important areas of study for anyone looking to develop their skills. Let's examine the core principles step by step.",
+    "This guide provides a thorough exploration of TOPIC, designed to take you from foundational knowledge to practical application.",
+    "Whether you're a beginner or looking to deepen your expertise, this analysis of TOPIC will provide valuable insights and actionable strategies."
+  ]
+};
+const blogSectionTitles=[
+  "Understanding the Fundamentals","Why This Matters Now","Key Strategies to Implement",
+  "Common Mistakes to Avoid","Best Practices for Success","The Role of Technology",
+  "Building a Strong Foundation","Advanced Techniques","Measuring Your Results",
+  "What the Experts Say","Getting Started Today","Future Trends to Watch"
+];
+const blogSectionBodies={
+  professional:[
+    "When it comes to KEYWORD, the data speaks for itself. Organizations that prioritize this area consistently outperform their competitors by significant margins. The key lies in developing a systematic approach that aligns with your broader strategic objectives.",
+    "Industry research indicates that KEYWORD is becoming increasingly important. Professionals who invest time in mastering these concepts position themselves for long-term career growth and organizational impact.",
+    "The most successful implementations of KEYWORD share several common characteristics: clear goal-setting, consistent execution, and a willingness to adapt based on measurable outcomes.",
+    "Stakeholders across industries are recognizing that KEYWORD requires both strategic thinking and tactical execution. The organizations that get this balance right are the ones seeing the strongest results."
+  ],
+  casual:[
+    "Here's what most people get wrong about KEYWORD - they overthink it. The truth is, you just need to start doing it and learn as you go. Perfect is the enemy of good, right?",
+    "I've seen so many people struggle with KEYWORD, and it usually comes down to one thing: they're not being consistent. Show up every day, put in the work, and the results will follow.",
+    "The cool thing about KEYWORD is that anyone can get good at it. You don't need a fancy degree or years of experience. You just need curiosity and a willingness to experiment.",
+    "Let me share something that changed my perspective on KEYWORD completely: it's not about doing everything at once. Pick one thing, nail it, then move on to the next."
+  ],
+  humorous:[
+    "KEYWORD is kind of like going to the gym - everyone knows they should do it, most people talk about doing it, and a select few actually follow through. Don't be the person who just talks about it.",
+    "I once tried to master KEYWORD in a weekend. Spoiler alert: that didn't work. But what I did learn is that small, consistent steps beat heroic one-time efforts every single time.",
+    "If KEYWORD were easy, everyone would be doing it. Wait, everyone IS trying to do it. The difference is that most people are doing it wrong. Let's fix that.",
+    "The internet is full of 'gurus' who claim to have cracked the code on KEYWORD. Most of them are selling courses from their mom's basement. Here's what actually works."
+  ],
+  educational:[
+    "To fully grasp KEYWORD, we need to examine its underlying principles. At its core, this concept revolves around creating value through systematic and repeatable processes that can be measured and optimized over time.",
+    "Research in this field has identified several critical factors that influence success with KEYWORD. Understanding these factors allows practitioners to make informed decisions and allocate resources effectively.",
+    "The theoretical framework behind KEYWORD draws from multiple disciplines, including psychology, data analysis, and strategic planning. This interdisciplinary approach is what makes it so powerful when applied correctly.",
+    "Studies have consistently shown that mastery of KEYWORD follows a predictable learning curve. Initial progress may seem slow, but compound effects lead to exponential growth over time."
+  ]
+};
+const blogConclusions={
+  professional:[
+    "In conclusion, TOPIC represents a significant opportunity for those willing to invest the time and resources necessary to do it well. By implementing the strategies outlined above, you can position yourself and your organization for sustained success.",
+    "The path forward with TOPIC is clear: focus on fundamentals, measure your progress, and continuously refine your approach. Those who do will find themselves well ahead of the competition."
+  ],
+  casual:[
+    "So there you have it - everything you need to know to get started with TOPIC. Remember, done is better than perfect. Just start, keep going, and you'll be amazed at where you end up.",
+    "That's a wrap on TOPIC! The most important thing is to take action today. Even one small step puts you ahead of everyone who's still just thinking about it."
+  ],
+  humorous:[
+    "And that, my friends, is TOPIC in a nutshell. Now go forth and conquer - or at least go forth and not embarrass yourself. Baby steps.",
+    "If you've made it this far, congratulations - you now know more about TOPIC than 90% of people who claim to be experts on LinkedIn. Use this power wisely."
+  ],
+  educational:[
+    "This exploration of TOPIC has covered the essential concepts, strategies, and considerations you need to move forward with confidence. Continue building on this foundation through practice and ongoing learning.",
+    "As you apply these principles of TOPIC in your own work, remember that mastery is a journey, not a destination. Stay curious, remain adaptable, and let the evidence guide your decisions."
+  ]
+};
+
+function generateBlog(){
+  const topic=document.getElementById('blog-topic').value.trim();
+  const keywords=document.getElementById('blog-keywords').value.trim();
+  const tone=document.getElementById('blog-tone').value;
+  const length=document.getElementById('blog-length').value;
+  if(!topic){showToast('Please enter a topic','');return}
+  if(length!=='short'){showProModal();return}
+  const btn=document.getElementById('blog-generate');
+  simulateLoading(btn,()=>{
+    const kw=keywords?keywords.split(',').map(k=>k.trim()).filter(Boolean):['this topic'];
+    const intro=pick(blogIntros[tone]).replace(/TOPIC/g,topic);
+    const numSections=3;
+    const titles=pickN(blogSectionTitles,numSections);
+    let sections='';
+    for(let i=0;i<numSections;i++){
+      const body=pick(blogSectionBodies[tone]).replace(/KEYWORD/g,pick(kw));
+      sections+='\n\n## '+titles[i]+'\n\n'+body;
+    }
+    const conclusion=pick(blogConclusions[tone]).replace(/TOPIC/g,topic);
+    const titleOptions=[
+      topic,
+      'The Ultimate Guide to '+topic,
+      'How to Master '+topic+' in '+new Date().getFullYear(),
+      pick(kw).charAt(0).toUpperCase()+pick(kw).slice(1)+': Everything You Need to Know'
+    ];
+    const postTitle=pick(titleOptions);
+    const output='# '+postTitle+'\n\n'+intro+sections+'\n\n## Conclusion\n\n'+conclusion;
+    document.getElementById('blog-output-box').textContent=output;
+    document.getElementById('blog-output').classList.add('visible');
+  });
+}
+
+/* === Social Media Caption Generator === */
+const captionTemplates={
+  instagram:{
+    professional:[
+      "TOPIC\n\nIn a world that moves fast, staying ahead means staying informed. Here's what you need to know.\n\n{POINTS}\n\nDouble tap if this resonates. Save for later.\n\n{HASHTAGS}",
+      "Let's talk about TOPIC.\n\nThe brands that win are the ones that pay attention to the details.\n\n{POINTS}\n\nWhat's your take? Drop a comment below.\n\n{HASHTAGS}",
+      "TOPIC - and why it matters more than ever.\n\n{POINTS}\n\nFollow for more insights like this.\n\n{HASHTAGS}"
+    ],
+    casual:[
+      "okay but can we talk about TOPIC for a sec??\n\n{POINTS}\n\nwho else feels this way? tell me in the comments!\n\n{HASHTAGS}",
+      "POV: you just discovered TOPIC and your mind is blown\n\n{POINTS}\n\ntag someone who needs to see this!\n\n{HASHTAGS}",
+      "not me spending 3 hours researching TOPIC... anyway here's what I learned:\n\n{POINTS}\n\nsave this for later, trust me\n\n{HASHTAGS}"
+    ],
+    humorous:[
+      "Me: I should learn about TOPIC\nAlso me: *scrolls for 4 more hours*\n\nBut seriously though:\n\n{POINTS}\n\nDrop a comment if you feel attacked\n\n{HASHTAGS}",
+      "Nobody:\nAbsolutely nobody:\nMe at 2am: let me research TOPIC\n\n{POINTS}\n\nYou're welcome. Now go touch grass.\n\n{HASHTAGS}",
+      "Hot take about TOPIC incoming:\n\n{POINTS}\n\nFight me in the comments (respectfully)\n\n{HASHTAGS}"
+    ],
+    educational:[
+      "Here's your quick guide to TOPIC:\n\n{POINTS}\n\nSave this post and share it with someone who needs it.\n\n{HASHTAGS}",
+      "TOPIC explained simply:\n\n{POINTS}\n\nFollow for more educational content like this.\n\n{HASHTAGS}",
+      "Everything you need to know about TOPIC in one post:\n\n{POINTS}\n\nBookmark this for reference!\n\n{HASHTAGS}"
+    ]
+  },
+  twitter:{
+    professional:[
+      "TOPIC is changing the game.\n\nHere's what smart people are paying attention to:\n\n{POINTS}\n\nRepost if you agree.",
+      "Unpopular opinion: TOPIC is the most underrated skill right now.\n\n{POINTS}\n\nThoughts?",
+      "The future belongs to those who understand TOPIC.\n\n{POINTS}\n\nFollow for more insights."
+    ],
+    casual:[
+      "TOPIC is honestly so underrated\n\n{POINTS}\n\nwho's with me on this??",
+      "just learned something wild about TOPIC\n\n{POINTS}\n\nthe more you know",
+      "friendly reminder that TOPIC exists and it's actually amazing\n\n{POINTS}"
+    ],
+    humorous:[
+      "TOPIC speedrun any%\n\n{POINTS}\n\nnew world record",
+      "me explaining TOPIC to my friends who didn't ask:\n\n{POINTS}\n\nthey love me",
+      "TOPIC but make it make sense:\n\n{POINTS}\n\nyou're welcome, internet"
+    ],
+    educational:[
+      "Thread: TOPIC explained\n\n{POINTS}\n\nRepost to help others learn.",
+      "Quick breakdown of TOPIC:\n\n{POINTS}\n\nFollow for more threads like this.",
+      "What everyone gets wrong about TOPIC:\n\n{POINTS}\n\nNow you know better."
+    ]
+  },
+  linkedin:{
+    professional:[
+      "I've been thinking a lot about TOPIC lately.\n\nHere's what I've observed:\n\n{POINTS}\n\nWhat patterns are you seeing in your industry? I'd love to hear your perspective.\n\n#TOPIC #ProfessionalDevelopment #Leadership",
+      "TOPIC is reshaping how we work.\n\nAfter years in this space, here are my key takeaways:\n\n{POINTS}\n\nAgree? Disagree? Let's discuss.\n\n#TOPIC #Innovation #Business",
+      "3 things I wish I knew earlier about TOPIC:\n\n{POINTS}\n\nThe best time to start was yesterday. The second best time is now.\n\n#TOPIC #CareerGrowth #Insights"
+    ],
+    casual:[
+      "Real talk about TOPIC.\n\nI used to overcomplicate this. Here's what actually works:\n\n{POINTS}\n\nHit follow if you want more no-BS content like this.\n\n#TOPIC #RealTalk",
+      "Hot take on TOPIC:\n\n{POINTS}\n\nI know this might ruffle some feathers, but someone had to say it.\n\nThoughts?\n\n#TOPIC #HotTake",
+      "TOPIC doesn't have to be complicated.\n\n{POINTS}\n\nSimple wins. Every time.\n\n#TOPIC #KeepItSimple"
+    ],
+    humorous:[
+      "My LinkedIn feed: inspirational quotes about TOPIC\nReality: *frantically Googling TOPIC at 11pm*\n\nBut here's what I actually learned:\n\n{POINTS}\n\nLike if you've been there too.\n\n#TOPIC #Honesty",
+      "Day 1 of TOPIC: This is easy!\nDay 30: Why did nobody warn me?\nDay 365: Okay, here's what I know now:\n\n{POINTS}\n\nThe journey is worth it. Trust the process (and caffeine).\n\n#TOPIC #Lessons",
+      "Recruiter: Do you know about TOPIC?\nMe: *sweating* Of course!\nAlso me: *reads this post*\n\n{POINTS}\n\nYou're welcome. Now go ace that interview.\n\n#TOPIC #CareerTips"
+    ],
+    educational:[
+      "TOPIC: A framework for success\n\nAfter extensive research and hands-on experience, here's what works:\n\n{POINTS}\n\nSave this post for reference and share with your network.\n\n#TOPIC #Education #Framework",
+      "The complete guide to TOPIC:\n\n{POINTS}\n\nKnowledge is power, but applied knowledge is a superpower.\n\nFollow for more educational content.\n\n#TOPIC #Learning #Growth",
+      "Understanding TOPIC is no longer optional.\n\nHere's your roadmap:\n\n{POINTS}\n\nWhich step are you currently on? Let me know in the comments.\n\n#TOPIC #Roadmap #Skills"
+    ]
+  }
+};
+const captionPoints=[
+  "It saves time and energy in the long run",
+  "The ROI speaks for itself when done right",
+  "Consistency is the secret ingredient most people miss",
+  "Start small, iterate fast, and scale what works",
+  "The best results come from genuine effort",
+  "Data-driven decisions always outperform gut feelings",
+  "Community building is the ultimate growth hack",
+  "Quality over quantity - every single time",
+  "Authenticity resonates more than perfection",
+  "The learning curve is steep but worth climbing",
+  "Collaboration beats competition in the long game",
+  "Small daily improvements lead to massive results",
+  "Your audience can tell when you're being real",
+  "Invest in skills that compound over time",
+  "The best strategy is the one you actually execute"
+];
+const captionEmojis=["🚀","💡","🔥","✨","💪","🎯","📈","🌟","💎","⚡","🏆","👀","🙌","❤️","📌"];
+
+function generateCaptions(){
+  const topic=document.getElementById('social-topic').value.trim();
+  if(!topic){showToast('Please enter a topic','');return}
+  const platform=document.getElementById('social-platform').value;
+  const tone=document.getElementById('social-tone').value;
+  const count=parseInt(document.getElementById('social-count').value);
+  if(count>1){showProModal();return}
+  const btn=document.querySelector('#panel-social .btn-primary');
+  simulateLoading(btn,function(){
+    const templates=captionTemplates[platform][tone];
+    let result='';
+    for(let c=0;c<count;c++){
+      if(c>0)result+='\n\n---\n\n';
+      let tmpl=pick(templates);
+      const points=pickN(captionPoints,3+Math.floor(Math.random()*2));
+      let pointStr='';
+      if(platform==='twitter'){
+        pointStr=points.map(p=>pick(captionEmojis)+' '+p).join('\n');
+      }else{
+        pointStr=points.map(p=>pick(captionEmojis)+' '+p).join('\n\n');
+      }
+      const hashArr=topic.toLowerCase().split(/\s+/).filter(w=>w.length>2);
+      const hashtags=hashArr.map(w=>'#'+w).join(' ');
+      tmpl=tmpl.replace(/TOPIC/g,topic).replace('{POINTS}',pointStr).replace('{HASHTAGS}',hashtags);
+      result+=tmpl;
+    }
+    document.getElementById('social-output-box').textContent=result;
+    document.getElementById('social-output').classList.add('visible');
+  });
+}
+
+/* === YouTube Title & Description Optimizer === */
+const ytTitlePatterns=[
+  "How to TOPIC (Complete Guide YEAR)",
+  "TOPIC - KEYWORD Tips You Need to Know",
+  "I Tried TOPIC for 30 Days (Here's What Happened)",
+  "TOPIC: The Ultimate Beginner's Guide",
+  "Stop Making These TOPIC Mistakes!",
+  "KEYWORD: TOPIC Explained in 10 Minutes",
+  "The Truth About TOPIC Nobody Tells You",
+  "TOPIC Tutorial - From Zero to Pro",
+  "Why TOPIC is a Game Changer in YEAR",
+  "TOPIC Masterclass: Everything You Need",
+  "Top 10 KEYWORD Secrets for TOPIC",
+  "TOPIC Made Simple (Step by Step)",
+  "What I Wish I Knew About TOPIC Sooner",
+  "TOPIC vs The Competition - Honest Review",
+  "The #1 Mistake People Make With TOPIC"
+];
+const ytDescParts={
+  intro:[
+    "In this video, I break down everything you need to know about TOPIC.",
+    "Welcome back to the channel! Today we're diving deep into TOPIC.",
+    "TOPIC is one of the most requested topics on this channel, so let's get into it.",
+    "If you've been wanting to learn about TOPIC, this is the video for you."
+  ],
+  cta:[
+    "If you found this helpful, smash that like button and subscribe for more content like this!",
+    "Don't forget to like, subscribe, and hit the bell so you never miss an upload!",
+    "Subscribe and turn on notifications to stay updated with our latest videos!",
+    "Like this video if you learned something new, and subscribe for weekly content!"
+  ],
+  timestamps:[
+    "0:00 - Introduction\n0:45 - What is TOPIC?\n2:30 - Why TOPIC Matters\n5:15 - Getting Started with TOPIC\n8:00 - Common Mistakes\n10:30 - Pro Tips\n12:45 - Final Thoughts",
+    "0:00 - Intro\n1:00 - TOPIC Overview\n3:15 - Step-by-Step Guide\n6:30 - Key Strategies\n9:00 - Advanced Techniques\n11:15 - Results & Takeaways\n13:00 - Wrap Up",
+    "0:00 - Welcome\n0:30 - Why You Should Care About TOPIC\n2:45 - The Basics Explained\n5:00 - Hands-On Demo\n8:30 - Tips & Tricks\n11:00 - Q&A\n12:30 - Outro"
+  ]
+};
+
+function generateYouTube(){
+  const topic=document.getElementById('yt-topic').value.trim();
+  const kwRaw=document.getElementById('yt-keywords').value.trim();
+  if(!topic){showToast('Please enter a video topic','');return}
+  const kw=kwRaw?kwRaw.split(',').map(k=>k.trim()).filter(Boolean):['tips','guide','tutorial'];
+  const btn=document.querySelector('#panel-youtube .btn-primary');
+  simulateLoading(btn,function(){
+    const year=new Date().getFullYear();
+    const titles=pickN(ytTitlePatterns,5).map((t,i)=>{
+      return(i+1)+'. '+t.replace(/TOPIC/g,topic).replace(/KEYWORD/g,capitalize(pick(kw))).replace(/YEAR/g,year);
+    });
+    let output='SEO-OPTIMIZED TITLE OPTIONS:\n\n'+titles.join('\n')+'\n\n';
+    output+='---\n\n';
+    output+='FULL DESCRIPTION (Pro Feature):\n\n';
+    const intro=pick(ytDescParts.intro).replace(/TOPIC/g,topic);
+    const cta=pick(ytDescParts.cta);
+    const ts=pick(ytDescParts.timestamps).replace(/TOPIC/g,topic);
+    const kwTags=kw.map(k=>'#'+k.replace(/\s+/g,'')).join(' ');
+    const desc=intro+'\n\n'+cta+'\n\nTIMESTAMPS:\n'+ts+'\n\nKEYWORDS: '+kw.join(', ')+'\n\n'+kwTags+' #'+topic.replace(/\s+/g,'');
+    output+=desc;
+    document.getElementById('yt-output-box').textContent=output;
+    document.getElementById('yt-output').classList.add('visible');
+  });
+}
+
+/* === Content Calendar Planner === */
+const calPostTypes=['Blog Post','Instagram Reel','Twitter Thread','LinkedIn Article','YouTube Short','Carousel Post','Story Series','Live Q&A','Tutorial Video','Infographic','Podcast Episode','Newsletter'];
+const calTopicTemplates=[
+  "5 Tips for Better NICHE Results",
+  "Behind the Scenes: My NICHE Process",
+  "Common NICHE Myths Debunked",
+  "How I Got Started with NICHE",
+  "NICHE Trends to Watch This Year",
+  "Beginner's Guide to NICHE",
+  "Day in the Life: NICHE Edition",
+  "NICHE Tools I Can't Live Without",
+  "Q&A: Your NICHE Questions Answered",
+  "NICHE Challenge: 7 Days of Growth",
+  "What Nobody Tells You About NICHE",
+  "NICHE Mistakes I Made (So You Don't Have To)",
+  "The Future of NICHE",
+  "NICHE on a Budget: Free Resources",
+  "My Top NICHE Recommendations",
+  "NICHE Case Study: Real Results",
+  "Weekly NICHE Roundup",
+  "NICHE Inspiration and Motivation",
+  "How to Stay Consistent with NICHE",
+  "NICHE for Beginners vs Advanced"
+];
+const calTimes=['9:00 AM','10:00 AM','11:30 AM','12:00 PM','1:00 PM','3:00 PM','5:00 PM','6:30 PM','7:00 PM','8:00 PM'];
+const calPlatforms=['Instagram','Twitter/X','LinkedIn','YouTube','TikTok','Blog'];
+const calDays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+function generateCalendar(){
+  const niche=document.getElementById('cal-niche').value.trim();
+  const view=document.getElementById('cal-view').value;
+  if(!niche){showToast('Please enter a niche or topic area','');return}
+  if(view==='month'){showProModal();return}
+  const btn=document.querySelector('#panel-calendar .btn-primary');
+  simulateLoading(btn,function(){
+    const box=document.getElementById('cal-output-box');
+    box.innerHTML='';
+    const grid=document.createElement('div');
+    grid.className='calendar-grid week-view';
+    for(let i=0;i<7;i++){
+      const card=document.createElement('div');
+      card.className='cal-card';
+      const topicIdea=pick(calTopicTemplates).replace(/NICHE/g,niche);
+      const postType=pick(calPostTypes);
+      const time=pick(calTimes);
+      const platforms=pickN(calPlatforms,1+Math.floor(Math.random()*2));
+      card.innerHTML='<div class="cal-day">'+calDays[i]+'</div>'
+        +'<div class="cal-topic">'+topicIdea+'</div>'
+        +'<div class="cal-meta">'
+        +'<span>'+pick(['📝','🎬','📸','🎙️','📊'])+' '+postType+'</span>'
+        +'<span>⏰ Best time: '+time+'</span>'
+        +'<span>'+platforms.map(p=>'<span class="cal-platform">'+p+'</span>').join('')+'</span>'
+        +'</div>';
+      grid.appendChild(card);
+    }
+    box.appendChild(grid);
+    document.getElementById('cal-output').classList.add('visible');
+  });
+}
+
+/* === Hashtag Generator === */
+const hashCategories={
+  trending:['viral','trending','fyp','explore','foryou','trend','hot','now','today','discover','reels','shorts','newpost','instagood','photooftheday'],
+  niche:[],
+  broad:['love','life','inspiration','motivation','goals','success','mindset','lifestyle','community','growth','learning','tips','howto','diy','creative'],
+  engagement:['follow','like','share','comment','save','doubletap','tagafriend','giveaway','challenge','question','poll','askme','lmk','thoughts','discuss']
+};
+
+function generateNicheHashtags(topic){
+  const words=topic.toLowerCase().replace(/[^a-z0-9\s]/g,'').split(/\s+/).filter(w=>w.length>2);
+  const results=[];
+  words.forEach(w=>{results.push(w);results.push(w+'tips');results.push(w+'life');results.push(w+'community')});
+  const combos=[];
+  if(words.length>=2){
+    combos.push(words.join(''));
+    combos.push(words[0]+words[1]);
+    combos.push(words.slice(0,2).join('')+'tips');
+    combos.push('best'+words[0]);
+    combos.push(words[0]+'guide');
+    combos.push(words[0]+'hacks');
+    combos.push(words[0]+'inspo');
+    combos.push(words[0]+'goals');
+    combos.push('daily'+words[0]);
+    combos.push(words[0]+'lover');
+    combos.push(words[0]+'101');
+    combos.push(words[0]+'expert');
+  }else if(words.length===1){
+    combos.push(words[0]+'tips',words[0]+'hacks',words[0]+'inspo',words[0]+'goals');
+    combos.push('best'+words[0],'daily'+words[0],words[0]+'lover',words[0]+'101');
+    combos.push(words[0]+'expert',words[0]+'life',words[0]+'community',words[0]+'guide');
+  }
+  return[...new Set([...results,...combos])];
+}
+
+function generateHashtags(){
+  const topic=document.getElementById('hash-topic').value.trim();
+  const count=parseInt(document.getElementById('hash-count').value);
+  if(!topic){showToast('Please enter a topic or keyword','');return}
+  if(count>10){showProModal();return}
+  const btn=document.querySelector('#panel-hashtag .btn-primary');
+  simulateLoading(btn,function(){
+    const nicheHashes=generateNicheHashtags(topic);
+    const groups={
+      'Trending':pickN(hashCategories.trending,3).map(h=>'#'+h),
+      'Niche':pickN(nicheHashes,Math.min(4,nicheHashes.length)).map(h=>'#'+h),
+      'Broad Reach':pickN(hashCategories.broad,2).map(h=>'#'+h),
+      'Engagement':pickN(hashCategories.engagement,1).map(h=>'#'+h)
+    };
+    const box=document.getElementById('hash-output-box');
+    box.innerHTML='';
+    let allTags=[];
+    Object.keys(groups).forEach(function(cat){
+      const div=document.createElement('div');
+      div.className='hashtag-group';
+      div.innerHTML='<div class="hashtag-group-title">'+cat+'</div>';
+      const pills=document.createElement('div');
+      pills.className='hashtag-pills';
+      groups[cat].forEach(function(tag){
+        const pill=document.createElement('span');
+        pill.className='hashtag-pill';
+        pill.textContent=tag;
+        pill.onclick=function(){navigator.clipboard.writeText(tag);showToast('Copied: '+tag)};
+        pills.appendChild(pill);
+        allTags.push(tag);
+      });
+      div.appendChild(pills);
+      box.appendChild(div);
+    });
+    const textArea=document.getElementById('hash-output-text');
+    textArea.value=allTags.join(' ');
+    textArea.style.display='block';
+    textArea.style.marginTop='16px';
+    document.getElementById('hash-output').classList.add('visible');
+  });
+}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

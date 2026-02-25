@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Commit Message Generator — Write Better Git Commits | Lifa AI Tools</title>
+<meta name="description" content="Generate professional git commit messages instantly. Supports Conventional Commits, Angular, Emoji conventions. Free client-side tool with smart diff analysis.">
+<meta name="keywords" content="git commit message generator, conventional commits, commit message tool, git diff analyzer">
+<link rel="canonical" href="https://lifa-su.com/ai-commit-generator.html">
+<meta property="og:title" content="AI Commit Message Generator — Write Better Git Commits | Lifa AI Tools">
+<meta property="og:description" content="Generate professional git commit messages instantly. Supports Conventional Commits, Angular, Emoji conventions.">
+<meta property="og:url" content="https://lifa-su.com/ai-commit-generator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Commit Message Generator — Write Better Git Commits">
+<meta name="twitter:description" content="Generate professional git commit messages instantly. Free client-side tool with smart diff analysis.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Commit Message Generator","description":"Generate professional git commit messages with smart diff analysis","url":"https://lifa-su.com/ai-commit-generator.html","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--danger:#e74c3c;--warning:#f39c12;--success:#27ae60}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,10,15,0.88);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 24px}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-brand:hover{color:var(--accent)}
+
+/* Layout */
+.container{max-width:960px;margin:0 auto;padding:24px 16px 60px}
+.hero{text-align:center;padding:40px 0 32px}
+.hero h1{font-size:1.8rem;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1rem;max-width:560px;margin:0 auto}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;transition:border-color .2s}
+.card:hover{border-color:var(--border-hover)}
+.card-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* Form elements */
+label{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+textarea,input[type="text"],select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:inherit;font-size:.95rem;transition:border-color .2s,box-shadow .2s;outline:none}
+textarea:focus,input[type="text"]:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+textarea{resize:vertical;min-height:160px;line-height:1.5}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#5a4bd6;transform:translateY(-1px);box-shadow:0 4px 15px var(--glow)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--border-hover);background:var(--card)}
+.btn-sm{padding:6px 12px;font-size:.8rem;border-radius:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;gap:10px;margin:12px 0}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;bottom:2px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--accent);border-color:var(--accent)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:#fff}
+.toggle-label{font-size:.9rem;color:var(--text)}
+
+/* Grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+
+/* Results */
+.results-area{display:none}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;position:relative;transition:border-color .2s}
+.result-card:hover{border-color:var(--border-hover)}
+.result-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.result-num{font-size:.8rem;font-weight:700;color:var(--accent);background:var(--glow);padding:2px 8px;border-radius:4px}
+.result-subject{font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.9rem;color:var(--accent2);margin-bottom:4px;word-break:break-all}
+.result-body{font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.82rem;color:var(--muted);white-space:pre-wrap;margin:8px 0;line-height:1.5;background:var(--bg);padding:10px;border-radius:6px;border:1px solid var(--border);overflow-x:auto}
+.result-footer{font-family:'SF Mono',Monaco,'Cascadia Code',monospace;font-size:.8rem;color:var(--accent);margin-top:8px}
+.quality-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+.quality-good{background:rgba(39,174,96,.15);color:#27ae60}
+.quality-warn{background:rgba(243,156,18,.15);color:#f39c12}
+.quality-poor{background:rgba(231,76,60,.15);color:#e74c3c}
+.quality-issues{margin-top:10px}
+.quality-issue{font-size:.82rem;color:var(--muted);padding:3px 0}
+.char-count{font-size:.75rem;color:var(--muted)}
+.char-count.warn{color:var(--warning)}
+.char-count.ok{color:var(--success)}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--accent);color:#fff;padding:10px 24px;border-radius:8px;font-size:.9rem;font-weight:600;opacity:0;transition:all .3s;z-index:200;pointer-events:none}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Quality Checker */
+.quality-card{padding:16px;border-radius:10px;margin-top:12px}
+
+/* Templates */
+.template-grid{display:flex;flex-wrap:wrap;gap:8px}
+.template-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--text);font-size:.82rem;cursor:pointer;transition:all .2s;font-family:inherit}
+.template-btn:hover{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+
+/* History */
+.history-item{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.history-item:hover{border-color:var(--border-hover)}
+.history-msg{font-family:'SF Mono',Monaco,monospace;font-size:.82rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:10px}
+.history-meta{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.history-time{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.history-actions{display:flex;gap:4px;margin-left:8px}
+
+/* Pro */
+.pro-card{background:linear-gradient(135deg,rgba(108,92,231,.08),rgba(0,206,201,.06));border:1px solid rgba(108,92,231,.25);border-radius:14px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.pro-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+.pro-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+@media(max-width:600px){.pro-features{grid-template-columns:1fr}}
+.pro-feature{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);padding:8px 12px;background:rgba(10,10,15,.4);border-radius:8px;position:relative}
+.pro-feature .lock{opacity:.6}
+.btn-upgrade{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;padding:12px 28px;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 25px var(--glow)}
+
+/* Footer */
+.footer{text-align:center;padding:32px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+.footer a{color:var(--accent)}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-hover)}
+
+/* Empty state */
+.empty-state{text-align:center;padding:32px;color:var(--muted)}
+.empty-state .icon{font-size:2rem;margin-bottom:8px}
+</style>
+</head>
+<body>
+<nav class="nav" role="navigation" aria-label="Main navigation">
+<a href="index.html" class="nav-brand" aria-label="Lifa AI Tools Home">🛠️ Lifa AI Tools</a>
+</nav>
+
+<main class="container" role="main">
+<div class="hero">
+<h1>AI Commit Message Generator</h1>
+<p>Generate professional, well-structured git commit messages from your diff or description. Client-side, private, and free.</p>
+</div>
+
+<!-- Input Section -->
+<div class="card fade-in">
+<div class="card-title">📝 Describe Your Changes</div>
+<label for="diff-input">Paste your git diff or describe what changed</label>
+<textarea id="diff-input" placeholder="Paste your git diff here, or describe your changes in plain text...&#10;&#10;Examples:&#10;- git diff output&#10;- 'Added user authentication with JWT tokens'&#10;- 'Fixed null pointer exception in payment processing'" aria-describedby="diff-hint"></textarea>
+<small id="diff-hint" style="color:var(--muted);font-size:.78rem;margin-top:4px;display:block">Tip: The more detail you provide, the better the generated commit messages.</small>
+</div>
+
+<!-- Options Section -->
+<div class="card fade-in">
+<div class="card-title">⚙️ Options</div>
+<div class="grid-2">
+<div>
+<label for="convention">Commit Convention</label>
+<select id="convention" aria-label="Select commit convention">
+<option value="conventional">Conventional Commits</option>
+<option value="angular">Angular Convention</option>
+<option value="emoji">Emoji Convention</option>
+<option value="custom">Custom Prefix</option>
+</select>
+</div>
+<div>
+<label for="scope">Scope (optional)</label>
+<input type="text" id="scope" placeholder="e.g., auth, api, ui" aria-label="Commit scope">
+</div>
+</div>
+<div id="custom-prefix-wrap" style="display:none;margin-top:12px">
+<label for="custom-prefix">Custom Prefix</label>
+<input type="text" id="custom-prefix" placeholder="e.g., JIRA-123, [hotfix]" aria-label="Custom prefix">
+</div>
+<div class="toggle-wrap">
+<label class="toggle" aria-label="Breaking change toggle">
+<input type="checkbox" id="breaking-toggle">
+<span class="toggle-slider"></span>
+</label>
+<span class="toggle-label">⚠️ Breaking Change</span>
+</div>
+<div class="btn-group">
+<button class="btn btn-primary" id="generate-btn" onclick="generate()">
+<span id="gen-text">✨ Generate Commit Messages</span>
+</button>
+<button class="btn btn-secondary" id="regen-btn" onclick="regenerate()" style="display:none">
+🔄 Regenerate
+</button>
+</div>
+</div>
+
+<!-- Results Section -->
+<div class="results-area" id="results-section">
+<div class="card fade-in">
+<div class="card-title">💡 Generated Commit Messages</div>
+<div id="results-container"></div>
+</div>
+</div>
+
+<!-- Quality Checker -->
+<div class="card fade-in">
+<div class="card-title">✅ Commit Message Quality Checker</div>
+<label for="quality-input">Paste or type a commit message to check</label>
+<textarea id="quality-input" style="min-height:80px" placeholder="feat(auth): add JWT token validation" oninput="standaloneQualityCheck()"></textarea>
+<div id="quality-results"></div>
+</div>
+
+<!-- Quick Templates -->
+<div class="card fade-in">
+<div class="card-title">⚡ Quick Templates</div>
+<div class="template-grid" id="template-grid" role="list" aria-label="Quick commit message templates"></div>
+</div>
+
+<!-- Pro Features -->
+<div class="pro-card fade-in">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+<span style="font-size:1.2rem;font-weight:800">🚀 Unlock Pro Features</span>
+<span class="pro-badge">PRO</span>
+</div>
+<p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Take your commit workflow to the next level with advanced features.</p>
+<div class="pro-features">
+<div class="pro-feature"><span class="lock">🔒</span> AI-powered diff analysis</div>
+<div class="pro-feature"><span class="lock">🔒</span> Multi-language messages</div>
+<div class="pro-feature"><span class="lock">🔒</span> Team conventions</div>
+<div class="pro-feature"><span class="lock">🔒</span> Git hook integration</div>
+<div class="pro-feature"><span class="lock">🔒</span> Bulk generation</div>
+<div class="pro-feature"><span class="lock">🔒</span> Custom templates</div>
+</div>
+<a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="btn-upgrade" aria-label="Upgrade to Pro on Ko-fi">☕ Upgrade to Pro on Ko-fi</a>
+</div>
+
+<!-- History -->
+<div class="card fade-in">
+<div class="card-title" style="justify-content:space-between">
+<span>📋 History</span>
+<button class="btn btn-sm btn-secondary" onclick="clearHistory()" aria-label="Clear history">Clear</button>
+</div>
+<div id="history-container">
+<div class="empty-state"><div class="icon">📭</div><p>No history yet. Generate some commits!</p></div>
+</div>
+</div>
+</main>
+
+<footer class="footer">
+<p>Part of <a href="index.html">AI Toolbox</a></p>
+<p style="margin-top:6px">&copy; 2025 Lifa AI Tools</p>
+</footer>
+
+<div class="copy-toast" id="copy-toast">Copied to clipboard!</div>
+
+<script>
+// State
+let currentResults = [];
+let variationSeed = 0;
+const HISTORY_KEY = 'commit-gen-history';
+const MAX_HISTORY = 20;
+
+// Convention data
+const CONV_PREFIXES = {
+  conventional: ['feat','fix','docs','style','refactor','test','chore','perf','ci','build'],
+  angular: ['feat','fix','docs','style','refactor','test','chore','perf','ci','build'],
+  emoji: ['✨','🐛','📝','🎨','♻️','✅','🔧','⚡','👷','📦'],
+  custom: []
+};
+const EMOJI_MAP = {feat:'✨',fix:'🐛',docs:'📝',style:'🎨',refactor:'♻️',test:'✅',chore:'🔧',perf:'⚡',ci:'👷',build:'📦',breaking:'💥',init:'🎉',deps:'⬆️',remove:'🔥',move:'🚚',security:'🔒',config:'🔧',typo:'✏️'};
+
+// Heuristic keyword patterns
+const PATTERNS = [
+  {re:/\btest[s]?\b|\.test\.|\.spec\.|__tests__|jest|mocha|cypress/i, type:'test', desc:'test changes'},
+  {re:/readme|\.md$|docs?\/|documentation|jsdoc|typedoc/i, type:'docs', desc:'documentation updates'},
+  {re:/\.css$|\.scss$|\.sass$|\.less$|\.styl$|styled|tailwind|style/i, type:'style', desc:'style changes'},
+  {re:/package\.json|yarn\.lock|package-lock|pnpm-lock|Gemfile|requirements\.txt|go\.mod|Cargo\.toml/i, type:'chore', desc:'dependency updates'},
+  {re:/\.github\/|\.gitlab-ci|Jenkinsfile|\.circleci|\.travis|workflow/i, type:'ci', desc:'CI/CD changes'},
+  {re:/Dockerfile|docker-compose|\.dockerignore|k8s|kubernetes|helm/i, type:'build', desc:'build/infra changes'},
+  {re:/webpack|vite|rollup|esbuild|babel|tsconfig|\.config\./i, type:'build', desc:'build config changes'},
+  {re:/refactor|restructur|reorganiz|simplif|clean.?up|extract|move/i, type:'refactor', desc:'code refactoring'},
+  {re:/fix|bug|patch|issue|error|crash|resolve|hotfix|repair/i, type:'fix', desc:'bug fix'},
+  {re:/perf|optimi[zs]|speed|fast|cache|lazy|memo/i, type:'perf', desc:'performance improvement'},
+  {re:/feat|feature|add|new|implement|introduc|creat|support/i, type:'feat', desc:'new feature'},
+  {re:/remov|delet|deprecat|drop/i, type:'chore', desc:'removal'},
+  {re:/updat|upgrad|bump|migrat/i, type:'chore', desc:'updates'},
+  {re:/secur|auth|token|password|encrypt|ssl|cors|xss|csrf/i, type:'fix', desc:'security fix'},
+  {re:/typo|spell|grammar|wording/i, type:'docs', desc:'typo fix'}
+];
+
+function analyzeDiff(text) {
+  if (!text.trim()) return null;
+  const lines = text.split('\n');
+  const result = {files:[],added:0,removed:0,modified:0,keywords:[],detectedTypes:[],isRawDiff:false,summary:''};
+
+  // Check if it looks like a git diff
+  const diffFileRe = /^(?:diff --git a\/|---|\+\+\+|\+{3}|@@|index )/;
+  const hasDiffLines = lines.some(l => diffFileRe.test(l));
+  result.isRawDiff = hasDiffLines;
+
+  if (hasDiffLines) {
+    // Parse diff
+    const fileRe = /^diff --git a\/(.+?) b\/(.+)/;
+    const addRe = /^\+[^+]/;
+    const removeRe = /^-[^-]/;
+    for (const line of lines) {
+      const fm = line.match(fileRe);
+      if (fm) { result.files.push(fm[2]); continue; }
+      if (addRe.test(line)) result.added++;
+      if (removeRe.test(line)) result.removed++;
+    }
+    result.modified = result.files.length;
+  }
+
+  // Detect patterns
+  const fullText = text.toLowerCase();
+  const seen = new Set();
+  for (const p of PATTERNS) {
+    if (p.re.test(fullText) && !seen.has(p.type)) {
+      result.detectedTypes.push({type:p.type, desc:p.desc});
+      seen.add(p.type);
+    }
+  }
+  if (result.detectedTypes.length === 0) {
+    result.detectedTypes.push({type:'chore', desc:'general changes'});
+  }
+
+  // Build summary
+  if (result.isRawDiff) {
+    result.summary = `${result.files.length} file(s) changed, +${result.added} -${result.removed}`;
+  } else {
+    result.summary = text.trim().split('\n')[0].substring(0, 100);
+  }
+  return result;
+}
+
+function getConvention() {
+  return document.getElementById('convention').value;
+}
+function getScope() {
+  return document.getElementById('scope').value.trim();
+}
+function isBreaking() {
+  return document.getElementById('breaking-toggle').checked;
+}
+function getCustomPrefix() {
+  return document.getElementById('custom-prefix').value.trim();
+}
+
+function formatPrefix(type, convention) {
+  const scope = getScope();
+  const breaking = isBreaking();
+  const scopeStr = scope ? `(${scope})` : '';
+  const bangStr = breaking ? '!' : '';
+
+  if (convention === 'emoji') {
+    const emoji = EMOJI_MAP[type] || '🔧';
+    return `${emoji} ${scopeStr ? scopeStr + ' ' : ''}`;
+  }
+  if (convention === 'custom') {
+    const cp = getCustomPrefix() || type;
+    return `${cp}${scopeStr}${bangStr}: `;
+  }
+  return `${type}${scopeStr}${bangStr}: `;
+}
+
+function wrapText(text, maxLen) {
+  if (!text) return '';
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  for (const w of words) {
+    if (current && (current.length + 1 + w.length) > maxLen) {
+      lines.push(current);
+      current = w;
+    } else {
+      current = current ? current + ' ' + w : w;
+    }
+  }
+  if (current) lines.push(current);
+  return lines.join('\n');
+}
+
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Verb pools for variation
+const FEAT_VERBS = [['add','implement','introduce','create'],['support','enable','integrate','set up'],['build','develop','establish','provide']];
+const FIX_VERBS = [['fix','resolve','patch','correct'],['address','handle','repair','remedy'],['debug','troubleshoot','rectify','mend']];
+const REFACTOR_VERBS = [['refactor','restructure','reorganize','simplify'],['clean up','streamline','improve','rework'],['optimize','revise','overhaul','modernize']];
+const DOCS_VERBS = [['update','add','improve','revise'],['document','clarify','expand','enhance'],['rewrite','refresh','extend','detail']];
+const GENERAL_VERBS = [['update','modify','change','adjust'],['improve','enhance','revise','tweak'],['maintain','manage','handle','process']];
+
+function pickVerb(type, idx) {
+  const pool = type === 'feat' ? FEAT_VERBS : type === 'fix' ? FIX_VERBS : type === 'refactor' ? REFACTOR_VERBS : type === 'docs' ? DOCS_VERBS : GENERAL_VERBS;
+  const set = pool[idx % pool.length];
+  return set[(variationSeed + idx) % set.length];
+}
+
+function generateSubject(analysis, type, convention, idx) {
+  const verb = pickVerb(type.type, idx);
+  const prefix = formatPrefix(type.type, convention);
+  let subject = '';
+
+  if (analysis.isRawDiff && analysis.files.length > 0) {
+    const mainFile = analysis.files[0].split('/').pop().replace(/\.[^.]+$/, '');
+    if (analysis.files.length === 1) {
+      subject = `${verb} ${type.desc} in ${mainFile}`;
+    } else {
+      subject = `${verb} ${type.desc} across ${analysis.files.length} files`;
+    }
+  } else {
+    const desc = analysis.summary.toLowerCase().replace(/[.!]$/, '');
+    if (desc.length < 40) {
+      subject = `${verb} ${desc}`;
+    } else {
+      subject = `${verb} ${type.desc}`;
+    }
+  }
+
+  subject = capitalize(subject.trim());
+  const full = prefix + subject;
+  return full.length > 72 ? full.substring(0, 69) + '...' : full;
+}
+
+function generateBody(analysis, type, idx) {
+  const parts = [];
+  if (analysis.isRawDiff) {
+    parts.push(`${capitalize(type.desc)} affecting ${analysis.files.length} file(s).`);
+    if (analysis.added || analysis.removed) {
+      parts.push(`Changes: +${analysis.added} additions, -${analysis.removed} deletions.`);
+    }
+    if (analysis.files.length <= 4) {
+      parts.push('Files: ' + analysis.files.join(', '));
+    }
+  } else {
+    const lines = analysis.summary.split('\n').filter(l => l.trim());
+    if (lines.length > 0) {
+      parts.push(capitalize(lines[0]));
+    }
+    if (lines.length > 1) {
+      parts.push(lines.slice(1, 3).join('. '));
+    }
+  }
+
+  const bodyVariations = [
+    'This change improves the overall codebase quality.',
+    'This update addresses the identified requirements.',
+    'Applied targeted modifications to meet specifications.'
+  ];
+  if (parts.length < 2) {
+    parts.push(bodyVariations[(idx + variationSeed) % bodyVariations.length]);
+  }
+
+  return wrapText(parts.join('\n\n'), 72);
+}
+
+function generateFooter(analysis, type) {
+  const parts = [];
+  if (isBreaking()) {
+    parts.push('BREAKING CHANGE: This commit introduces breaking changes.');
+  }
+  if (analysis.files && analysis.files.length > 4) {
+    parts.push('Affects: ' + analysis.files.slice(0, 6).join(', ') + (analysis.files.length > 6 ? '...' : ''));
+  }
+  return parts.join('\n');
+}
+
+function generate() {
+  const input = document.getElementById('diff-input').value;
+  if (!input.trim()) {
+    showToast('Please enter a diff or description first');
+    return;
+  }
+  const analysis = analyzeDiff(input);
+  if (!analysis) return;
+
+  const convention = getConvention();
+  const results = [];
+
+  // Generate 3 variations using different detected types
+  for (let i = 0; i < 3; i++) {
+    const typeInfo = analysis.detectedTypes[i % analysis.detectedTypes.length];
+    const subject = generateSubject(analysis, typeInfo, convention, i);
+    const body = generateBody(analysis, typeInfo, i);
+    const footer = generateFooter(analysis, typeInfo);
+    const full = [subject, '', body, footer ? '\n' + footer : ''].filter(Boolean).join('\n').trim();
+    const quality = checkQuality(subject, body);
+    results.push({subject, body, footer, full, quality});
+  }
+
+  currentResults = results;
+  renderResults(results);
+  saveToHistory(results[0]);
+  document.getElementById('regen-btn').style.display = 'inline-flex';
+  document.getElementById('results-section').style.display = 'block';
+  document.getElementById('results-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function regenerate() {
+  variationSeed++;
+  generate();
+}
+
+function checkQuality(subject, body) {
+  const issues = [];
+  let score = 100;
+
+  // Extract the actual subject text (after prefix)
+  const colonIdx = subject.indexOf(': ');
+  const subjectText = colonIdx > -1 ? subject.substring(colonIdx + 2) : subject;
+
+  if (subject.length > 50) {
+    issues.push({type:'warn', msg:`Subject is ${subject.length} chars (recommended: ≤50)`});
+    score -= subject.length > 72 ? 30 : 15;
+  }
+  if (body) {
+    const longLines = body.split('\n').filter(l => l.length > 72);
+    if (longLines.length > 0) {
+      issues.push({type:'warn', msg:`${longLines.length} body line(s) exceed 72 chars`});
+      score -= 10;
+    }
+  }
+  if (subjectText && subjectText[0] !== subjectText[0].toUpperCase()) {
+    issues.push({type:'info', msg:'Subject should start with a capital letter'});
+    score -= 10;
+  }
+  if (subject.endsWith('.')) {
+    issues.push({type:'info', msg:'Subject should not end with a period'});
+    score -= 10;
+  }
+  if (!body || body.trim().length < 10) {
+    issues.push({type:'info', msg:'Consider adding a descriptive body'});
+    score -= 5;
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  let rating, ratingClass;
+  if (score >= 80) { rating = 'Good'; ratingClass = 'quality-good'; }
+  else if (score >= 50) { rating = 'Needs Improvement'; ratingClass = 'quality-warn'; }
+  else { rating = 'Poor'; ratingClass = 'quality-poor'; }
+
+  return {score, rating, ratingClass, issues};
+}
+
+function renderResults(results) {
+  const container = document.getElementById('results-container');
+  if (!results.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">✨</div><p>Your generated commit messages will appear here</p></div>';
+    document.getElementById('results-section').style.display = 'none';
+    return;
+  }
+  document.getElementById('results-section').style.display = 'block';
+
+  container.innerHTML = results.map((r, i) => `
+    <div class="result-card fade-in" style="animation-delay:${i * 0.1}s">
+      <div class="result-header">
+        <span class="result-num">#${i + 1}</span>
+        <span class="quality-badge ${r.quality.ratingClass}">${r.quality.rating} (${r.quality.score}%)</span>
+        <button class="btn btn-sm btn-secondary" onclick="copyCommit(${i})" aria-label="Copy commit message">📋 Copy</button>
+      </div>
+      <div class="result-subject">${escapeHtml(r.subject)}</div>
+      <pre class="result-body">${escapeHtml(r.body)}</pre>
+      ${r.footer ? `<div class="result-footer">${escapeHtml(r.footer)}</div>` : ''}
+      ${r.quality.issues.length ? `<div class="quality-issues">${r.quality.issues.map(iss => `<div class="quality-issue quality-issue-${iss.type}">⚠ ${escapeHtml(iss.msg)}</div>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function copyCommit(idx) {
+  const r = currentResults[idx];
+  if (!r) return;
+  navigator.clipboard.writeText(r.full).then(() => showToast('Copied to clipboard!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = r.full;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard!');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('copy-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Templates
+function useTemplate(text) {
+  document.getElementById('diff-input').value = text;
+  document.getElementById('diff-input').focus();
+  generate();
+}
+
+// History
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveToHistory(result) {
+  const history = loadHistory();
+  history.unshift({subject: result.subject, full: result.full, time: Date.now()});
+  if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-container');
+  const history = loadHistory();
+  if (!history.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No history yet. Generate some commits!</p></div>';
+    return;
+  }
+  container.innerHTML = history.map((h, i) => `
+    <div class="history-item">
+      <div class="history-msg">${escapeHtml(h.subject)}</div>
+      <div class="history-meta">
+        <span>${timeAgo(h.time)}</span>
+        <button class="btn btn-sm btn-secondary" onclick="copyHistoryItem(${i})" aria-label="Copy">📋</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyHistoryItem(idx) {
+  const history = loadHistory();
+  if (history[idx]) {
+    navigator.clipboard.writeText(history[idx].full).then(() => showToast('Copied!')).catch(() => showToast('Copy failed'));
+  }
+}
+
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+// Standalone quality checker
+function standaloneQualityCheck() {
+  const input = document.getElementById('quality-input').value.trim();
+  const container = document.getElementById('quality-results');
+  if (!input) { container.innerHTML = ''; return; }
+  const lines = input.split('\n');
+  const subject = lines[0] || '';
+  const body = lines.slice(2).join('\n');
+  const q = checkQuality(subject, body);
+  container.innerHTML = '<div class="quality-card" style="background:var(--surface);border:1px solid var(--border);margin-top:12px;padding:16px;border-radius:10px">' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+    '<span class="quality-badge ' + q.ratingClass + '">' + q.rating + ' (' + q.score + '%)</span></div>' +
+    (q.issues.length ? '<div class="quality-issues">' + q.issues.map(function(iss) {
+      return '<div class="quality-issue quality-issue-' + iss.type + '" style="font-size:.85rem;color:var(--muted);padding:4px 0">⚠ ' + escapeHtml(iss.msg) + '</div>';
+    }).join('') + '</div>' : '<div style="color:var(--success);font-size:.85rem">✅ Looks good!</div>') +
+    '</div>';
+}
+
+// Templates
+const TEMPLATES = [
+  {label:'Initial commit', msg:'Initial commit'},
+  {label:'Fix typo', msg:'Fix typo in source code'},
+  {label:'Update dependencies', msg:'Update project dependencies'},
+  {label:'Add unit tests', msg:'Add unit tests for core modules'},
+  {label:'Refactor code', msg:'Refactor code for better readability'},
+  {label:'Fix bug in [component]', msg:'Fix bug in [component]'},
+  {label:'Add feature [name]', msg:'Add feature [name]'},
+  {label:'Update documentation', msg:'Update documentation'}
+];
+
+function renderTemplates() {
+  const grid = document.getElementById('template-grid');
+  grid.innerHTML = TEMPLATES.map(function(t) {
+    return '<button class="template-btn" role="listitem" onclick="useTemplate(\'' + t.msg.replace(/'/g, "\\'") + '\')">' + escapeHtml(t.label) + '</button>';
+  }).join('');
+}
+
+// Convention change handler
+function onConventionChange() {
+  const v = document.getElementById('convention').value;
+  document.getElementById('custom-prefix-wrap').style.display = v === 'custom' ? 'block' : 'none';
+  if (currentResults.length) generate();
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+  renderHistory();
+  renderTemplates();
+  document.getElementById('convention').addEventListener('change', onConventionChange);
+  document.getElementById('results-section').style.display = 'none';
+
+  // Fade-in observer
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, {threshold: 0.1});
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

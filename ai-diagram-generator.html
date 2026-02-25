@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Diagram Generator — Free Mermaid Diagram Tool | Lifa AI Tools</title>
+<meta name="description" content="Create beautiful diagrams for free with our AI-powered Mermaid diagram generator. Flowcharts, sequence diagrams, ER diagrams, mind maps and more. No signup required.">
+<meta name="keywords" content="diagram generator, mermaid diagram, flowchart maker, sequence diagram, ER diagram, mind map, free diagram tool, AI diagram">
+<link rel="canonical" href="https://lifa-su.com/ai-diagram-generator.html">
+<meta property="og:title" content="AI Diagram Generator — Free Mermaid Diagram Tool">
+<meta property="og:description" content="Create beautiful diagrams for free with our AI-powered Mermaid diagram generator. Flowcharts, sequence diagrams, ER diagrams and more.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-diagram-generator.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Diagram Generator — Free Mermaid Diagram Tool">
+<meta name="twitter:description" content="Create beautiful diagrams for free with our AI-powered Mermaid diagram generator.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Diagram Generator","url":"https://lifa-su.com/ai-diagram-generator.html","description":"Free AI-powered Mermaid diagram generator. Create flowcharts, sequence diagrams, ER diagrams, mind maps and more.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--radius-card:14px;--radius-input:10px;--radius-btn:8px}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+button{cursor:pointer;font-family:inherit;border:none;outline:none;transition:all .2s}
+textarea,select,input{font-family:inherit;border:none;outline:none}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:1000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,10,15,0.88);height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-brand:hover{color:var(--accent)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.nav-link{color:var(--muted);font-size:.9rem;transition:color .2s}
+.nav-link:hover{color:var(--text)}
+
+/* MAIN LAYOUT */
+.app-container{max-width:1600px;margin:0 auto;padding:16px}
+.describe-section{margin-bottom:16px}
+.describe-section label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.describe-row{display:flex;gap:10px;align-items:flex-start}
+.describe-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-input);color:var(--text);padding:12px 16px;font-size:.95rem;resize:vertical;min-height:48px;max-height:120px;transition:border-color .2s}
+.describe-input:focus{border-color:var(--accent)}
+.describe-input::placeholder{color:var(--muted)}
+.btn{padding:10px 20px;border-radius:var(--radius-btn);font-size:.9rem;font-weight:600;transition:all .2s}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:#7c6cf7;box-shadow:0 0 20px var(--glow)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-btn);background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:1rem}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.toolbar select{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-btn);color:var(--text);padding:8px 12px;font-size:.85rem;transition:border-color .2s}
+.toolbar select:focus{border-color:var(--accent)}
+.toolbar-group{display:flex;align-items:center;gap:4px}
+.toolbar-sep{width:1px;height:24px;background:var(--border);margin:0 6px}
+.badge-pro{background:linear-gradient(135deg,var(--accent),#a855f7);color:#fff;font-size:.65rem;padding:2px 6px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+
+/* SPLIT PANEL */
+.split-container{display:flex;height:calc(100vh - 260px);min-height:400px;border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--border)}
+.editor-panel{flex:1;display:flex;flex-direction:column;background:var(--card);min-width:200px}
+.editor-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.85rem;color:var(--muted)}
+.editor-textarea{flex:1;background:var(--card);color:#c8d6e5;padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;font-size:.88rem;line-height:1.7;resize:none;border:none;outline:none;tab-size:2}
+.editor-textarea::placeholder{color:#555}
+
+/* RESIZE HANDLE */
+.resize-handle{width:6px;background:var(--border);cursor:col-resize;transition:background .2s;flex-shrink:0;position:relative}
+.resize-handle:hover,.resize-handle.active{background:var(--accent)}
+.resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:40px;background:var(--muted);border-radius:2px;opacity:.5}
+.resize-handle:hover::after{background:var(--accent);opacity:1}
+
+/* PREVIEW PANEL */
+.preview-panel{flex:1;display:flex;flex-direction:column;background:var(--surface);min-width:200px;position:relative}
+.preview-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.85rem;color:var(--muted)}
+.preview-controls{display:flex;align-items:center;gap:4px}
+.preview-area{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+.preview-area svg{max-width:100%;height:auto}
+.preview-zoom{transition:transform .2s}
+.error-msg{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius-btn);padding:10px 14px;font-size:.82rem;color:#e74c3c;display:none;backdrop-filter:blur(10px)}
+.error-msg.show{display:block}
+
+/* FULLSCREEN */
+.fullscreen-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:var(--bg);display:none;flex-direction:column}
+.fullscreen-overlay.show{display:flex}
+.fullscreen-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border)}
+.fullscreen-preview{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:40px}
+
+/* EXPORT BAR */
+.export-bar{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* PRO CARD */
+.pro-card{background:linear-gradient(135deg,rgba(108,92,231,0.1),rgba(168,85,247,0.1));border:1px solid rgba(108,92,231,0.3);border-radius:var(--radius-card);padding:24px;margin-top:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.pro-card-text{flex:1;min-width:200px}
+.pro-card-text h3{font-size:1.1rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.pro-card-text p{color:var(--muted);font-size:.88rem}
+.pro-features-list{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.pro-feature-tag{background:rgba(108,92,231,0.15);border:1px solid rgba(108,92,231,0.2);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--accent);display:flex;align-items:center;gap:4px}
+.btn-kofi{background:linear-gradient(135deg,#6c5ce7,#a855f7);color:#fff;padding:12px 28px;border-radius:var(--radius-btn);font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:all .3s}
+.btn-kofi:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.4);color:#fff}
+
+/* FOOTER */
+.footer{text-align:center;padding:32px 24px;margin-top:40px;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem}
+.footer a{color:var(--accent)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-btn);padding:12px 20px;font-size:.88rem;color:var(--text);z-index:10000;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--accent2)}
+
+/* MOBILE */
+@media(max-width:768px){
+  .app-container{padding:10px}
+  .describe-row{flex-direction:column}
+  .split-container{flex-direction:column;height:auto;min-height:0}
+  .editor-panel{min-height:250px}
+  .resize-handle{width:100%;height:6px;cursor:row-resize}
+  .resize-handle::after{width:40px;height:2px}
+  .preview-panel{min-height:300px}
+  .toolbar{gap:6px}
+  .pro-card{flex-direction:column;text-align:center}
+  .export-bar{justify-content:center}
+  .nav{padding:0 14px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-brand">🛠️ Lifa AI Tools</a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">All Tools</a>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn btn-accent btn-sm">☕ Support</a>
+  </div>
+</nav>
+
+<div class="app-container">
+  <!-- DESCRIBE SECTION -->
+  <div class="describe-section">
+    <label for="describeInput">✨ Describe your diagram in plain English</label>
+    <div class="describe-row">
+      <textarea id="describeInput" class="describe-input" placeholder="e.g. &quot;login flow with email verification&quot; or &quot;database schema for a blog with users, posts, and comments&quot;" rows="2"></textarea>
+      <button class="btn btn-accent" onclick="generateFromDescription()" title="Generate diagram from description">🪄 Generate</button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <select id="diagramType" onchange="loadTemplate()">
+      <option value="flowchart">Flowchart</option>
+      <option value="sequence">Sequence Diagram</option>
+      <option value="class">Class Diagram</option>
+      <option value="state">State Diagram</option>
+      <option value="er">Entity Relationship</option>
+      <option value="gantt">Gantt Chart</option>
+      <option value="pie">Pie Chart</option>
+      <option value="mindmap">Mind Map</option>
+      <option value="gitgraph">Git Graph</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="renderDiagram()" title="Render diagram">▶ Render</button>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-group">
+      <button class="btn-icon" onclick="zoomIn()" title="Zoom in">+</button>
+      <button class="btn-icon" onclick="zoomOut()" title="Zoom out">−</button>
+      <button class="btn-icon" onclick="zoomFit()" title="Fit to screen">⊡</button>
+      <button class="btn-icon" onclick="toggleFullscreen()" title="Fullscreen preview" id="fullscreenBtn">⛶</button>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="export-bar" style="display:flex;gap:4px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="copySvg()" title="Copy SVG to clipboard">📋 Copy SVG</button>
+      <button class="btn btn-outline btn-sm" onclick="downloadSvg()" title="Download as SVG">⬇ SVG</button>
+      <button class="btn btn-outline btn-sm" onclick="downloadPng()" title="Download as PNG">⬇ PNG</button>
+      <button class="btn btn-outline btn-sm" style="opacity:0.5;position:relative" title="Pro feature">
+        ⬇ PDF <span class="badge-pro">PRO</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SPLIT PANEL -->
+  <div class="split-container" id="splitContainer">
+    <div class="editor-panel" id="editorPanel">
+      <div class="editor-header">
+        <span>📝 Mermaid Editor</span>
+        <span id="charCount">0 chars</span>
+      </div>
+      <textarea id="editor" class="editor-textarea" spellcheck="false" placeholder="Enter Mermaid.js code here..."></textarea>
+    </div>
+    <div class="resize-handle" id="resizeHandle"></div>
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-header">
+        <span>👁 Preview</span>
+        <button class="btn-icon" onclick="toggleFullscreen()" title="Fullscreen" style="width:28px;height:28px;font-size:.8rem">⛶</button>
+      </div>
+      <div class="preview-content" id="previewContent">
+        <div id="mermaidOutput"></div>
+      </div>
+      <div class="error-display" id="errorDisplay"></div>
+    </div>
+  </div>
+
+  <!-- PRO CARD -->
+  <div class="pro-card">
+    <div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:4px">🚀 Upgrade to Pro <span class="badge-pro">PRO</span></div>
+      <div style="color:var(--muted);font-size:.9rem">Unlock AI-powered generation, PDF export, custom themes, and collaboration features.</div>
+    </div>
+    <div class="pro-features">
+      <div class="pro-feature"><span class="pro-lock">🔒</span> AI Text-to-Diagram</div>
+      <div class="pro-feature"><span class="pro-lock">🔒</span> Export to PDF</div>
+      <div class="pro-feature"><span class="pro-lock">🔒</span> Custom Themes</div>
+      <div class="pro-feature"><span class="pro-lock">🔒</span> Collaboration</div>
+    </div>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn btn-accent" style="white-space:nowrap">☕ Upgrade on Ko-fi</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>Part of <a href="index.html">AI Toolbox</a></div>
+  <div>&copy; 2025 Lifa AI Tools</div>
+</footer>
+
+<!-- FULLSCREEN OVERLAY -->
+<div class="fullscreen-overlay" id="fullscreenOverlay">
+  <div class="fullscreen-toolbar">
+    <span style="font-weight:600">Preview — Fullscreen</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn-icon" onclick="zoomIn()">+</button>
+      <button class="btn-icon" onclick="zoomOut()">−</button>
+      <button class="btn-icon" onclick="zoomFit()">⊡</button>
+      <button class="btn btn-outline btn-sm" onclick="toggleFullscreen()">✕ Close</button>
+    </div>
+  </div>
+  <div class="fullscreen-content" id="fullscreenContent"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+// ===== TEMPLATES =====
+const templates = {
+  flowchart: `flowchart TD
+    A[Start] --> B{Is it working?}
+    B -->|Yes| C[Great!]
+    B -->|No| D[Debug]
+    D --> E[Check logs]
+    E --> F[Fix the issue]
+    F --> B
+    C --> G[Deploy]
+    G --> H[Monitor]
+    H --> I[End]`,
+  sequence: `sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant S as Server
+    participant DB as Database
+    U->>C: Click Login
+    C->>S: POST /auth/login
+    S->>DB: Query user
+    DB-->>S: User data
+    S-->>C: JWT Token
+    C-->>U: Welcome!
+    U->>C: Request Data
+    C->>S: GET /api/data (with JWT)
+    S->>DB: Fetch records
+    DB-->>S: Records
+    S-->>C: JSON response
+    C-->>U: Display data`,
+  class: `classDiagram
+    class Animal {
+        +String name
+        +int age
+        +makeSound() void
+    }
+    class Dog {
+        +String breed
+        +fetch() void
+        +makeSound() void
+    }
+    class Cat {
+        +bool isIndoor
+        +purr() void
+        +makeSound() void
+    }
+    class Shelter {
+        +String location
+        +List~Animal~ animals
+        +adopt(Animal) bool
+        +register(Animal) void
+    }
+    Animal <|-- Dog
+    Animal <|-- Cat
+    Shelter "1" --> "*" Animal : houses`,
+  state: `stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing : Submit
+    Processing --> Validating : Parse input
+    Validating --> Processing : Invalid
+    Validating --> Approved : Valid
+    Approved --> Shipping : Payment OK
+    Shipping --> Delivered : Shipped
+    Delivered --> [*]
+    Processing --> Failed : Error
+    Failed --> Idle : Retry`,
+  er: `erDiagram
+    USER {
+        int id PK
+        string username
+        string email
+        datetime created_at
+    }
+    POST {
+        int id PK
+        string title
+        text content
+        datetime published_at
+        int author_id FK
+    }
+    COMMENT {
+        int id PK
+        text body
+        datetime created_at
+        int post_id FK
+        int user_id FK
+    }
+    TAG {
+        int id PK
+        string name
+    }
+    USER ||--o{ POST : writes
+    USER ||--o{ COMMENT : writes
+    POST ||--o{ COMMENT : has
+    POST }o--o{ TAG : tagged`,
+  gantt: `gantt
+    title Project Development Timeline
+    dateFormat  YYYY-MM-DD
+    section Planning
+        Requirements     :a1, 2025-01-01, 14d
+        Design           :a2, after a1, 10d
+    section Development
+        Frontend         :b1, after a2, 21d
+        Backend          :b2, after a2, 28d
+        API Integration  :b3, after b1, 7d
+    section Testing
+        Unit Tests       :c1, after b2, 7d
+        QA Testing       :c2, after c1, 10d
+    section Launch
+        Deployment       :d1, after c2, 3d
+        Monitoring       :d2, after d1, 7d`,
+  pie: `pie title Monthly Expenses
+    "Rent" : 1200
+    "Food" : 450
+    "Transport" : 200
+    "Utilities" : 150
+    "Entertainment" : 100
+    "Savings" : 300
+    "Other" : 100`,
+  mindmap: `mindmap
+  root((Web Development))
+    Frontend
+      HTML
+      CSS
+        Flexbox
+        Grid
+      JavaScript
+        React
+        Vue
+        Angular
+    Backend
+      Node.js
+      Python
+      Go
+    Database
+      SQL
+        PostgreSQL
+        MySQL
+      NoSQL
+        MongoDB
+        Redis
+    DevOps
+      Docker
+      CI/CD
+      Cloud`,
+  gitgraph: `gitGraph
+    commit id: "init"
+    commit id: "add readme"
+    branch develop
+    checkout develop
+    commit id: "feature setup"
+    branch feature-auth
+    checkout feature-auth
+    commit id: "add login"
+    commit id: "add signup"
+    checkout develop
+    merge feature-auth id: "merge auth"
+    branch feature-api
+    checkout feature-api
+    commit id: "add endpoints"
+    commit id: "add middleware"
+    checkout develop
+    merge feature-api id: "merge api"
+    checkout main
+    merge develop id: "release v1.0" tag: "v1.0"`
+};
+
+// ===== STATE =====
+let currentZoom = 1;
+let isFullscreen = false;
+let debounceTimer = null;
+let renderCounter = 0;
+
+// ===== INIT =====
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  themeVariables: {
+    darkMode: true,
+    background: '#14141e',
+    primaryColor: '#6c5ce7',
+    primaryTextColor: '#e2e2e8',
+    primaryBorderColor: '#2e2e4e',
+    secondaryColor: '#1e1e2e',
+    tertiaryColor: '#111118',
+    lineColor: '#8888a0',
+    textColor: '#e2e2e8',
+    mainBkg: '#14141e',
+    nodeBorder: '#6c5ce7',
+    clusterBkg: '#1e1e2e',
+    titleColor: '#e2e2e8',
+    edgeLabelBackground: '#14141e'
+  },
+  flowchart: { curve: 'basis', padding: 20 },
+  sequence: { mirrorActors: false },
+  fontFamily: '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif'
+});
+
+const editor = document.getElementById('editor');
+const charCount = document.getElementById('charCount');
+const previewContent = document.getElementById('previewContent');
+const errorDisplay = document.getElementById('errorDisplay');
+const mermaidOutput = document.getElementById('mermaidOutput');
+
+// Load default template
+editor.value = templates.flowchart;
+updateCharCount();
+renderDiagram();
+
+// Auto-render on change with debounce
+editor.addEventListener('input', () => {
+  updateCharCount();
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(renderDiagram, 500);
+});
+
+function updateCharCount() {
+  charCount.textContent = editor.value.length + ' chars';
+}
+</script>
+<script>
+// ===== RENDER =====
+async function renderDiagram() {
+  const code = editor.value.trim();
+  if (!code) {
+    mermaidOutput.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px">Enter Mermaid code to see a preview</div>';
+    errorDisplay.style.display = 'none';
+    return;
+  }
+  try {
+    renderCounter++;
+    const id = 'mermaid-' + renderCounter;
+    const { svg } = await mermaid.render(id, code);
+    mermaidOutput.innerHTML = svg;
+    mermaidOutput.querySelector('svg').style.maxWidth = '100%';
+    mermaidOutput.querySelector('svg').style.height = 'auto';
+    applyZoom();
+    errorDisplay.style.display = 'none';
+    if (isFullscreen) {
+      document.getElementById('fullscreenContent').innerHTML = svg;
+    }
+  } catch (err) {
+    const msg = err.message || String(err);
+    errorDisplay.innerHTML = '⚠️ Syntax Error: ' + msg.replace(/</g,'&lt;').substring(0, 300);
+    errorDisplay.style.display = 'block';
+    // Clean up any leftover error elements mermaid might have added
+    const errEl = document.getElementById('d' + 'mermaid-' + renderCounter);
+    if (errEl) errEl.remove();
+  }
+}
+
+// ===== TEMPLATE LOADING =====
+function loadTemplate() {
+  const type = document.getElementById('diagramType').value;
+  editor.value = templates[type] || '';
+  updateCharCount();
+  currentZoom = 1;
+  renderDiagram();
+}
+
+// ===== ZOOM =====
+function applyZoom() {
+  const svg = mermaidOutput.querySelector('svg');
+  if (svg) {
+    svg.style.transform = 'scale(' + currentZoom + ')';
+    svg.style.transformOrigin = 'top left';
+  }
+}
+function zoomIn() {
+  currentZoom = Math.min(currentZoom + 0.2, 3);
+  applyZoom();
+}
+function zoomOut() {
+  currentZoom = Math.max(currentZoom - 0.2, 0.2);
+  applyZoom();
+}
+function zoomFit() {
+  currentZoom = 1;
+  applyZoom();
+}
+
+// ===== FULLSCREEN =====
+function toggleFullscreen() {
+  isFullscreen = !isFullscreen;
+  const overlay = document.getElementById('fullscreenOverlay');
+  if (isFullscreen) {
+    overlay.classList.add('active');
+    document.getElementById('fullscreenContent').innerHTML = mermaidOutput.innerHTML;
+    document.body.style.overflow = 'hidden';
+  } else {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && isFullscreen) toggleFullscreen();
+});
+
+// ===== EXPORT =====
+function getSvgString() {
+  const svg = mermaidOutput.querySelector('svg');
+  if (!svg) { showToast('No diagram to export', true); return null; }
+  const clone = svg.cloneNode(true);
+  clone.style.transform = '';
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  return new XMLSerializer().serializeToString(clone);
+}
+
+function copySvg() {
+  const svgStr = getSvgString();
+  if (!svgStr) return;
+  navigator.clipboard.writeText(svgStr).then(() => {
+    showToast('SVG copied to clipboard!');
+  }).catch(() => {
+    showToast('Failed to copy', true);
+  });
+}
+
+function downloadSvg() {
+  const svgStr = getSvgString();
+  if (!svgStr) return;
+  const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+  downloadBlob(blob, 'diagram.svg');
+  showToast('SVG downloaded!');
+}
+
+function downloadPng() {
+  const svg = mermaidOutput.querySelector('svg');
+  if (!svg) { showToast('No diagram to export', true); return; }
+  const clone = svg.cloneNode(true);
+  clone.style.transform = '';
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const svgStr = new XMLSerializer().serializeToString(clone);
+  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  img.onload = () => {
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth * scale;
+    canvas.height = img.naturalHeight * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#14141e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    canvas.toBlob((blob) => {
+      downloadBlob(blob, 'diagram.png');
+      showToast('PNG downloaded!');
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+  img.onerror = () => { showToast('Failed to generate PNG', true); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+
+function downloadBlob(blob, filename) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 100);
+}
+
+// ===== TOAST =====
+function showToast(msg, isError) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.background = isError ? '#e74c3c' : 'var(--accent)';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+<script>
+// ===== AI DESCRIPTION GENERATOR =====
+function generateFromDescription() {
+  const desc = document.getElementById('describeInput').value.trim().toLowerCase();
+  if (!desc) { showToast('Please describe your diagram first', true); return; }
+
+  let code = '';
+  let type = 'flowchart';
+
+  // ER Diagram patterns
+  if (/\b(database|schema|table|entity|relation|er diagram|erd|foreign key|primary key)\b/.test(desc)) {
+    type = 'er';
+    const entities = extractEntities(desc);
+    code = generateERDiagram(desc, entities);
+  }
+  // Sequence diagram patterns
+  else if (/\b(sequence|request|response|api call|message|communication|interaction|protocol|handshake)\b/.test(desc)) {
+    type = 'sequence';
+    code = generateSequenceDiagram(desc);
+  }
+  // State diagram patterns
+  else if (/\b(state|status|lifecycle|phase|transition|workflow state)\b/.test(desc)) {
+    type = 'state';
+    code = generateStateDiagram(desc);
+  }
+  // Gantt chart patterns
+  else if (/\b(timeline|schedule|gantt|project plan|milestone|deadline|sprint)\b/.test(desc)) {
+    type = 'gantt';
+    code = generateGanttChart(desc);
+  }
+  // Pie chart patterns
+  else if (/\b(pie|percentage|distribution|breakdown|proportion|share|ratio)\b/.test(desc)) {
+    type = 'pie';
+    code = generatePieChart(desc);
+  }
+  // Mind map patterns
+  else if (/\b(mind ?map|brainstorm|ideas|topics|overview|concept map|hierarchy)\b/.test(desc)) {
+    type = 'mindmap';
+    code = generateMindMap(desc);
+  }
+  // Class diagram patterns
+  else if (/\b(class|object|inheritance|interface|abstract|oop|method|property|extends|implements)\b/.test(desc)) {
+    type = 'class';
+    code = generateClassDiagram(desc);
+  }
+  // Git graph patterns
+  else if (/\b(git|branch|merge|commit|release|version|deploy)\b/.test(desc)) {
+    type = 'gitgraph';
+    code = generateGitGraph(desc);
+  }
+  // Default: flowchart
+  else {
+    type = 'flowchart';
+    code = generateFlowchart(desc);
+  }
+
+  document.getElementById('diagramType').value = type;
+  editor.value = code;
+  updateCharCount();
+  renderDiagram();
+  showToast('Diagram generated from description!');
+}
+
+function extractEntities(desc) {
+  const common = ['user','users','product','products','order','orders','item','items','post','posts',
+    'comment','comments','category','categories','tag','tags','blog','customer','customers',
+    'payment','payments','invoice','invoices','employee','employees','department','departments',
+    'student','students','course','courses','teacher','teachers','book','books','author','authors',
+    'movie','movies','actor','actors','review','reviews','message','messages','chat','room','rooms',
+    'ticket','tickets','event','events','role','roles','permission','permissions','address','addresses',
+    'account','accounts','transaction','transactions','notification','notifications','file','files',
+    'project','projects','task','tasks','team','teams','member','members'];
+  const found = [];
+  for (const e of common) {
+    if (desc.includes(e)) {
+      const singular = e.endsWith('s') && !e.endsWith('ss') ? e.slice(0,-1) : e;
+      if (!found.includes(singular.toUpperCase())) found.push(singular.toUpperCase());
+    }
+  }
+  return found.length > 0 ? found : ['USER','ITEM','ORDER'];
+}
+
+function generateERDiagram(desc, entities) {
+  const fields = {
+    USER: '        int id PK\n        string username\n        string email\n        string password_hash\n        datetime created_at',
+    POST: '        int id PK\n        string title\n        text content\n        datetime published_at\n        int author_id FK',
+    COMMENT: '        int id PK\n        text body\n        datetime created_at\n        int post_id FK\n        int user_id FK',
+    ORDER: '        int id PK\n        datetime order_date\n        float total\n        string status\n        int customer_id FK',
+    PRODUCT: '        int id PK\n        string name\n        text description\n        float price\n        int stock',
+    ITEM: '        int id PK\n        string name\n        text description\n        float price\n        int quantity',
+    CATEGORY: '        int id PK\n        string name\n        string slug',
+    TAG: '        int id PK\n        string name',
+    CUSTOMER: '        int id PK\n        string name\n        string email\n        string phone',
+    PAYMENT: '        int id PK\n        float amount\n        string method\n        datetime paid_at\n        int order_id FK',
+    INVOICE: '        int id PK\n        string number\n        float total\n        datetime issued_at',
+    EMPLOYEE: '        int id PK\n        string name\n        string position\n        float salary\n        int dept_id FK',
+    DEPARTMENT: '        int id PK\n        string name\n        string location',
+    STUDENT: '        int id PK\n        string name\n        string email\n        datetime enrolled_at',
+    COURSE: '        int id PK\n        string title\n        int credits\n        int teacher_id FK',
+    TEACHER: '        int id PK\n        string name\n        string subject',
+    TASK: '        int id PK\n        string title\n        string status\n        datetime due_date\n        int project_id FK',
+    PROJECT: '        int id PK\n        string name\n        datetime start_date\n        datetime end_date',
+    TEAM: '        int id PK\n        string name\n        datetime created_at',
+    MEMBER: '        int id PK\n        string name\n        string role\n        int team_id FK',
+    ACCOUNT: '        int id PK\n        string type\n        float balance\n        int user_id FK',
+    TRANSACTION: '        int id PK\n        float amount\n        string type\n        datetime created_at\n        int account_id FK',
+    REVIEW: '        int id PK\n        int rating\n        text content\n        datetime created_at',
+    MESSAGE: '        int id PK\n        text content\n        datetime sent_at\n        int sender_id FK',
+    NOTIFICATION: '        int id PK\n        string type\n        text content\n        bool read\n        datetime created_at',
+    EVENT: '        int id PK\n        string title\n        datetime start_time\n        datetime end_time\n        string location',
+    BOOK: '        int id PK\n        string title\n        string isbn\n        int author_id FK',
+    AUTHOR: '        int id PK\n        string name\n        string bio',
+    TICKET: '        int id PK\n        string subject\n        string priority\n        string status\n        int user_id FK',
+    ROLE: '        int id PK\n        string name\n        string description',
+    PERMISSION: '        int id PK\n        string name\n        string resource',
+    FILE: '        int id PK\n        string name\n        string path\n        int size\n        datetime uploaded_at',
+    ROOM: '        int id PK\n        string name\n        int capacity',
+    CHAT: '        int id PK\n        string name\n        datetime created_at',
+    ADDRESS: '        int id PK\n        string street\n        string city\n        string country\n        string zip',
+    MOVIE: '        int id PK\n        string title\n        int year\n        string genre',
+    ACTOR: '        int id PK\n        string name\n        datetime birth_date'
+  };
+  const defaultFields = '        int id PK\n        string name\n        datetime created_at';
+  const rels = [
+    ['USER','POST','writes','||--o{'],['USER','COMMENT','writes','||--o{'],['POST','COMMENT','has','||--o{'],
+    ['USER','ORDER','places','||--o{'],['ORDER','ITEM','contains','||--o{'],['ORDER','PRODUCT','contains','||--o{'],
+    ['ORDER','PAYMENT','has','||--||'],['CUSTOMER','ORDER','places','||--o{'],['USER','ACCOUNT','owns','||--o{'],
+    ['ACCOUNT','TRANSACTION','has','||--o{'],['USER','MESSAGE','sends','||--o{'],['USER','NOTIFICATION','receives','||--o{'],
+    ['USER','REVIEW','writes','||--o{'],['PRODUCT','REVIEW','has','||--o{'],['PRODUCT','CATEGORY','belongs to','}o--||'],
+    ['POST','TAG','tagged','}o--o{'],['EMPLOYEE','DEPARTMENT','works in','}o--||'],['STUDENT','COURSE','enrolls','}o--o{'],
+    ['TEACHER','COURSE','teaches','||--o{'],['PROJECT','TASK','has','||--o{'],['TEAM','MEMBER','has','||--o{'],
+    ['USER','TICKET','creates','||--o{'],['USER','ROLE','has','}o--o{'],['ROLE','PERMISSION','has','}o--o{'],
+    ['BOOK','AUTHOR','written by','}o--||'],['MOVIE','ACTOR','features','}o--o{'],['EVENT','ROOM','held in','}o--||'],
+    ['USER','ADDRESS','has','||--o{'],['USER','FILE','uploads','||--o{']
+  ];
+  let lines = ['erDiagram'];
+  for (const e of entities) {
+    lines.push('    ' + e + ' {');
+    lines.push(fields[e] || defaultFields);
+    lines.push('    }');
+  }
+  for (const [a,b,label,rel] of rels) {
+    if (entities.includes(a) && entities.includes(b)) {
+      lines.push('    ' + a + ' ' + rel + ' ' + b + ' : ' + label);
+    }
+  }
+  return lines.join('\n');
+}
+
+function generateSequenceDiagram(desc) {
+  let lines = ['sequenceDiagram'];
+  if (/login|auth|sign.?in/.test(desc)) {
+    lines.push('    participant U as User','    participant C as Client','    participant S as Server','    participant DB as Database');
+    lines.push('    U->>C: Enter credentials','    C->>S: POST /auth/login','    S->>DB: Validate user','    DB-->>S: User found');
+    if (/verif|email|otp|2fa|two.?factor/.test(desc)) {
+      lines.push('    S->>U: Send verification code','    U->>C: Enter code','    C->>S: POST /auth/verify','    S-->>C: Verified');
+    }
+    lines.push('    S-->>C: JWT Token','    C-->>U: Login successful');
+  } else if (/payment|checkout|purchase|buy/.test(desc)) {
+    lines.push('    participant U as User','    participant App as Application','    participant Pay as Payment Gateway','    participant DB as Database');
+    lines.push('    U->>App: Checkout','    App->>Pay: Create payment intent','    Pay-->>App: Client secret','    App-->>U: Show payment form');
+    lines.push('    U->>App: Submit payment','    App->>Pay: Confirm payment','    Pay-->>App: Payment success','    App->>DB: Update order status','    DB-->>App: Confirmed','    App-->>U: Order confirmed');
+  } else if (/register|sign.?up|create account/.test(desc)) {
+    lines.push('    participant U as User','    participant C as Client','    participant S as Server','    participant DB as Database','    participant E as Email Service');
+    lines.push('    U->>C: Fill registration form','    C->>S: POST /auth/register','    S->>DB: Check if user exists','    DB-->>S: Not found');
+    lines.push('    S->>DB: Create user','    DB-->>S: User created','    S->>E: Send welcome email','    E-->>S: Sent','    S-->>C: Registration successful','    C-->>U: Welcome!');
+  } else {
+    lines.push('    participant A as Client','    participant B as Server','    participant C as Service');
+    lines.push('    A->>B: Request','    B->>C: Process','    C-->>B: Response','    B-->>A: Result');
+  }
+  return lines.join('\n');
+}
+
+function generateStateDiagram(desc) {
+  let lines = ['stateDiagram-v2'];
+  if (/order|purchase|shop/.test(desc)) {
+    lines.push('    [*] --> Pending','    Pending --> Confirmed : Payment received','    Confirmed --> Processing : Start fulfillment');
+    lines.push('    Processing --> Shipped : Dispatched','    Shipped --> Delivered : Received','    Delivered --> [*]');
+    lines.push('    Pending --> Cancelled : Cancel order','    Processing --> Refunded : Issue refund','    Cancelled --> [*]','    Refunded --> [*]');
+  } else if (/task|issue|bug|ticket/.test(desc)) {
+    lines.push('    [*] --> Open','    Open --> InProgress : Assign','    InProgress --> Review : Submit for review');
+    lines.push('    Review --> InProgress : Changes requested','    Review --> Done : Approved','    InProgress --> Blocked : Dependency');
+    lines.push('    Blocked --> InProgress : Unblocked','    Done --> [*]','    Open --> Closed : Won\\'t fix','    Closed --> [*]');
+  } else {
+    lines.push('    [*] --> Idle','    Idle --> Active : Start','    Active --> Paused : Pause','    Paused --> Active : Resume');
+    lines.push('    Active --> Complete : Finish','    Complete --> [*]','    Active --> Error : Failure','    Error --> Idle : Reset');
+  }
+  return lines.join('\n');
+}
+
+function generateGanttChart(desc) {
+  let lines = ['gantt','    dateFormat  YYYY-MM-DD'];
+  if (/sprint|agile|scrum/.test(desc)) {
+    lines.push('    title Sprint Plan','    section Sprint 1','        User Stories     :a1, 2025-01-06, 5d','        Development      :a2, after a1, 8d','        Testing          :a3, after a2, 2d');
+    lines.push('    section Sprint 2','        User Stories     :b1, after a3, 3d','        Development      :b2, after b1, 8d','        Testing          :b3, after b2, 2d','        Release          :b4, after b3, 1d');
+  } else {
+    lines.push('    title Project Timeline','    section Phase 1','        Research         :a1, 2025-01-01, 7d','        Planning         :a2, after a1, 5d');
+    lines.push('    section Phase 2','        Development      :b1, after a2, 14d','        Testing          :b2, after b1, 7d');
+    lines.push('    section Phase 3','        Deployment       :c1, after b2, 3d','        Launch           :milestone, after c1, 0d');
+  }
+  return lines.join('\n');
+}
+
+function generatePieChart(desc) {
+  if (/budget|expense|spend|cost/.test(desc)) {
+    return 'pie title Budget Breakdown\n    "Engineering" : 40\n    "Marketing" : 25\n    "Operations" : 15\n    "Sales" : 12\n    "Admin" : 8';
+  } else if (/traffic|visitor|source/.test(desc)) {
+    return 'pie title Traffic Sources\n    "Organic Search" : 45\n    "Direct" : 20\n    "Social Media" : 18\n    "Referral" : 12\n    "Email" : 5';
+  }
+  return 'pie title Distribution\n    "Category A" : 35\n    "Category B" : 25\n    "Category C" : 20\n    "Category D" : 12\n    "Other" : 8';
+}
+
+function generateMindMap(desc) {
+  if (/market|business|startup|strategy/.test(desc)) {
+    return 'mindmap\n  root((Business Strategy))\n    Marketing\n      SEO\n      Social Media\n      Content\n      Ads\n    Product\n      Features\n      UX Design\n      Roadmap\n    Engineering\n      Frontend\n      Backend\n      DevOps\n    Finance\n      Revenue\n      Costs\n      Funding';
+  } else if (/learn|study|education|course/.test(desc)) {
+    return 'mindmap\n  root((Learning Path))\n    Fundamentals\n      Theory\n      Practice\n      Projects\n    Resources\n      Books\n      Online Courses\n      Tutorials\n    Skills\n      Technical\n      Soft Skills\n      Problem Solving\n    Goals\n      Short Term\n      Long Term\n      Career';
+  }
+  const words = desc.split(/\s+/).filter(w => w.length > 3 && !['with','from','that','this','about','what','your','have'].includes(w));
+  const topic = words[0] ? words[0].charAt(0).toUpperCase() + words[0].slice(1) : 'Topic';
+  return 'mindmap\n  root((' + topic + '))\n    Aspect 1\n      Detail A\n      Detail B\n    Aspect 2\n      Detail C\n      Detail D\n    Aspect 3\n      Detail E\n      Detail F';
+}
+
+function generateClassDiagram(desc) {
+  if (/animal|pet|zoo/.test(desc)) {
+    return templates.class;
+  }
+  let lines = ['classDiagram'];
+  if (/user|account|auth/.test(desc)) {
+    lines.push('    class User {\n        +int id\n        +String name\n        +String email\n        +login() bool\n        +logout() void\n    }');
+    lines.push('    class Admin {\n        +String role\n        +manageUsers() void\n    }');
+    lines.push('    User <|-- Admin');
+  }
+  if (/product|shop|store|ecommerce/.test(desc)) {
+    lines.push('    class Product {\n        +int id\n        +String name\n        +float price\n        +getDetails() String\n    }');
+    lines.push('    class Cart {\n        +List~Product~ items\n        +addItem(Product) void\n        +getTotal() float\n    }');
+    if (lines.some(l => l.includes('class User'))) lines.push('    User "1" --> "1" Cart : has');
+    lines.push('    Cart "1" --> "*" Product : contains');
+  }
+  if (lines.length <= 1) {
+    lines.push('    class BaseClass {\n        +int id\n        +create() void\n        +delete() void\n    }');
+    lines.push('    class ChildA {\n        +String name\n        +process() void\n    }');
+    lines.push('    class ChildB {\n        +String type\n        +execute() void\n    }');
+    lines.push('    BaseClass <|-- ChildA','    BaseClass <|-- ChildB');
+  }
+  return lines.join('\n');
+}
+
+function generateGitGraph(desc) {
+  let lines = ['gitGraph'];
+  if (/release|version/.test(desc)) {
+    lines.push('    commit id: "init"','    commit id: "setup"','    branch develop','    checkout develop','    commit id: "feature-1"','    commit id: "feature-2"');
+    lines.push('    branch release/v1','    checkout release/v1','    commit id: "bump version"','    checkout main','    merge release/v1 id: "v1.0" tag: "v1.0"');
+    lines.push('    checkout develop','    commit id: "feature-3"','    commit id: "feature-4"','    branch release/v2','    checkout release/v2');
+    lines.push('    commit id: "bump v2"','    checkout main','    merge release/v2 id: "v2.0" tag: "v2.0"');
+  } else {
+    lines.push('    commit id: "init"','    branch feature','    checkout feature','    commit id: "add feature"','    commit id: "tests"');
+    lines.push('    checkout main','    merge feature id: "merge feature"','    commit id: "hotfix" tag: "v1.0"');
+  }
+  return lines.join('\n');
+}
+
+function generateFlowchart(desc) {
+  let lines = ['flowchart TD'];
+  if (/login|auth|sign.?in/.test(desc)) {
+    lines.push('    A[Start] --> B[Show Login Page]','    B --> C[Enter Credentials]','    C --> D{Valid?}');
+    lines.push('    D -->|Yes| E{2FA Enabled?}','    D -->|No| F[Show Error]','    F --> C');
+    lines.push('    E -->|Yes| G[Send OTP]','    G --> H[Enter OTP]','    H --> I{OTP Valid?}','    I -->|Yes| J[Login Success]','    I -->|No| G');
+    lines.push('    E -->|No| J','    J --> K[Dashboard]');
+  } else if (/register|sign.?up/.test(desc)) {
+    lines.push('    A[Start] --> B[Registration Form]','    B --> C[Enter Details]','    C --> D{Valid Input?}');
+    lines.push('    D -->|No| E[Show Errors]','    E --> C','    D -->|Yes| F{Email Exists?}');
+    lines.push('    F -->|Yes| G[Show Duplicate Error]','    G --> C','    F -->|No| H[Create Account]');
+    lines.push('    H --> I[Send Verification Email]','    I --> J[Verify Email]','    J --> K[Account Active]');
+  } else if (/checkout|payment|purchase|buy/.test(desc)) {
+    lines.push('    A[Cart] --> B[Checkout]','    B --> C[Enter Shipping Info]','    C --> D[Select Payment Method]');
+    lines.push('    D --> E{Process Payment}','    E -->|Success| F[Order Confirmed]','    E -->|Failed| G[Payment Error]');
+    lines.push('    G --> D','    F --> H[Send Confirmation Email]','    H --> I[Ship Order]');
+  } else if (/ci.?cd|deploy|pipeline|build/.test(desc)) {
+    lines.push('    A[Push Code] --> B[Run Linter]','    B --> C[Run Tests]','    C --> D{Tests Pass?}');
+    lines.push('    D -->|No| E[Notify Developer]','    E --> A','    D -->|Yes| F[Build]');
+    lines.push('    F --> G[Deploy to Staging]','    G --> H{QA Approved?}','    H -->|No| E','    H -->|Yes| I[Deploy to Production]','    I --> J[Monitor]');
+  } else {
+    const words = desc.split(/\s+/).filter(w => w.length > 2);
+    const topic = words.slice(0, 3).join(' ');
+    lines.push('    A[Start: ' + topic + '] --> B[Step 1: Gather Input]','    B --> C[Step 2: Process]','    C --> D{Decision Point}');
+    lines.push('    D -->|Option A| E[Handle A]','    D -->|Option B| F[Handle B]','    E --> G[Review]','    F --> G','    G --> H[Complete]');
+  }
+  return lines.join('\n');
+}
+</script>
+<script>
+// ===== RESIZE HANDLE =====
+(function() {
+  const handle = document.getElementById('resizeHandle');
+  const container = document.getElementById('splitContainer');
+  const editorPanel = document.getElementById('editorPanel');
+  const previewPanel = document.getElementById('previewPanel');
+  let isResizing = false;
+
+  handle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  handle.addEventListener('touchstart', (e) => {
+    isResizing = true;
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  }, { passive: false });
+
+  function onMove(clientX) {
+    if (!isResizing) return;
+    const rect = container.getBoundingClientRect();
+    const offset = clientX - rect.left;
+    const total = rect.width;
+    const pct = Math.max(15, Math.min(85, (offset / total) * 100));
+    editorPanel.style.flex = 'none';
+    editorPanel.style.width = pct + '%';
+    previewPanel.style.flex = 'none';
+    previewPanel.style.width = (100 - pct) + '%';
+  }
+
+  document.addEventListener('mousemove', (e) => onMove(e.clientX));
+  document.addEventListener('touchmove', (e) => {
+    if (isResizing && e.touches.length) onMove(e.touches[0].clientX);
+  }, { passive: true });
+
+  function stopResize() {
+    if (isResizing) {
+      isResizing = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  }
+  document.addEventListener('mouseup', stopResize);
+  document.addEventListener('touchend', stopResize);
+
+  // Handle responsive: reset widths on small screens
+  const mq = window.matchMedia('(max-width: 768px)');
+  function handleMQ(e) {
+    if (e.matches) {
+      editorPanel.style.flex = '';
+      editorPanel.style.width = '';
+      previewPanel.style.flex = '';
+      previewPanel.style.width = '';
+    }
+  }
+  mq.addEventListener('change', handleMQ);
+})();
+
+// ===== TAB KEY SUPPORT IN EDITOR =====
+editor.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+    editor.selectionStart = editor.selectionEnd = start + 4;
+    updateCharCount();
+  }
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

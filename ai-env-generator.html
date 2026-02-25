@@ -1,0 +1,303 @@
+
+let selectedStacks = new Set();
+let customVars = [];
+let currentMode = 'env';
+let generatedVars = [];
+
+function toggleStack(el) {
+  const s = el.dataset.stack;
+  if (selectedStacks.has(s)) {
+    selectedStacks.delete(s);
+    el.classList.remove('active');
+    el.setAttribute('aria-pressed', 'false');
+  } else {
+    selectedStacks.add(s);
+    el.classList.add('active');
+    el.setAttribute('aria-pressed', 'true');
+  }
+}
+
+function clearAll() {
+  selectedStacks.clear();
+  customVars = [];
+  document.querySelectorAll('.stack-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
+  document.getElementById('output-card').style.display = 'none';
+  document.getElementById('customList').innerHTML = '';
+}
+
+function generateEnv() {
+  if (selectedStacks.size === 0 && customVars.length === 0) {
+    showToast('Please select at least one stack or add custom variables');
+    return;
+  }
+  generatedVars = [];
+  const added = new Set();
+  selectedStacks.forEach(stack => {
+    const vars = ENV_DB[stack];
+    if (!vars) return;
+    vars.forEach(v => {
+      const key = v[0];
+      if (key.startsWith('# ')) {
+        generatedVars.push({ type: 'section', text: v[2] });
+      } else if (!added.has(key)) {
+        added.add(key);
+        generatedVars.push({ type: 'var', key: key, value: v[1], comment: v[2] });
+      }
+    });
+    generatedVars.push({ type: 'blank' });
+  });
+  customVars.forEach(cv => {
+    if (!added.has(cv.key)) {
+      added.add(cv.key);
+      generatedVars.push({ type: 'var', key: cv.key, value: cv.value, comment: cv.comment });
+    }
+  });
+  renderOutput();
+  validateOutput();
+  document.getElementById('output-card').style.display = 'block';
+  document.getElementById('output-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderOutput() {
+  const content = document.getElementById('envContent');
+  const lineNums = document.getElementById('lineNums');
+  let html = '';
+  let plain = '';
+  let lineCount = 0;
+  const isExample = currentMode === 'example';
+
+  generatedVars.forEach(v => {
+    if (v.type === 'section') {
+      lineCount++;
+      html += '<span class="sc"># ==========================================</span>\n';
+      lineCount++;
+      html += '<span class="sc"># ' + escHtml(v.text) + '</span>\n';
+      lineCount++;
+      html += '<span class="sc"># ==========================================</span>\n';
+      plain += '# ==========================================\n# ' + v.text + '\n# ==========================================\n';
+    } else if (v.type === 'blank') {
+      lineCount++;
+      html += '\n';
+      plain += '\n';
+    } else if (v.type === 'var') {
+      if (v.comment) {
+        lineCount++;
+        html += '<span class="cm"># ' + escHtml(v.comment) + '</span>\n';
+        plain += '# ' + v.comment + '\n';
+      }
+      lineCount++;
+      const val = isExample ? '' : v.value;
+      const displayVal = needsQuotes(val) ? '"' + val + '"' : val;
+      html += '<span class="ky">' + escHtml(v.key) + '</span><span class="eq">=</span><span class="vl">' + escHtml(displayVal) + '</span>\n';
+      plain += v.key + '=' + displayVal + '\n';
+    }
+  });
+
+  content.innerHTML = html;
+  content.dataset.plain = plain;
+  let nums = '';
+  for (let i = 1; i <= lineCount; i++) nums += i + '\n';
+  lineNums.textContent = nums;
+}
+
+function needsQuotes(val) {
+  if (!val) return false;
+  return val.includes(' ') || val.includes('#') || val.includes('"') || val.includes("'");
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.toggle-group button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (generatedVars.length > 0) renderOutput();
+}
+
+function getPlainText() {
+  return document.getElementById('envContent').dataset.plain || '';
+}
+
+function getExampleText() {
+  let text = '';
+  generatedVars.forEach(v => {
+    if (v.type === 'section') {
+      text += '# ==========================================\n# ' + v.text + '\n# ==========================================\n';
+    } else if (v.type === 'blank') {
+      text += '\n';
+    } else if (v.type === 'var') {
+      if (v.comment) text += '# ' + v.comment + '\n';
+      text += v.key + '=\n';
+    }
+  });
+  return text;
+}
+
+function copyEnv() {
+  const text = currentMode === 'example' ? getExampleText() : getPlainText();
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Copied to clipboard!');
+  });
+}
+
+function downloadFile(filename) {
+  const text = filename === '.env.example' ? getExampleText() : getPlainText();
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded ' + filename);
+}
+
+function copyGitignore() {
+  const text = document.getElementById('gitignoreContent').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied .gitignore entries!')).catch(() => showToast('Failed to copy'));
+}
+
+function addCustomVar() {
+  const keyEl = document.getElementById('customKey');
+  const valEl = document.getElementById('customVal');
+  const comEl = document.getElementById('customComment');
+  const key = keyEl.value.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+  const value = valEl.value.trim();
+  const comment = comEl.value.trim();
+  if (!key) { showToast('Please enter a variable name'); return; }
+  if (customVars.find(v => v.key === key)) { showToast('Variable ' + key + ' already exists'); return; }
+  customVars.push({ key, value, comment });
+  keyEl.value = ''; valEl.value = ''; comEl.value = '';
+  renderCustomList();
+  showToast('Added ' + key);
+}
+
+function removeCustomVar(idx) {
+  customVars.splice(idx, 1);
+  renderCustomList();
+}
+
+function renderCustomList() {
+  const el = document.getElementById('customList');
+  if (customVars.length === 0) { el.innerHTML = ''; return; }
+  let html = '<div style="font-size:.8rem;color:var(--muted);margin-bottom:8px">Custom variables (' + customVars.length + '):</div>';
+  customVars.forEach((v, i) => {
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:.85rem">';
+    html += '<span style="color:var(--accent2);font-family:monospace">' + escHtml(v.key) + '</span>';
+    html += '<span style="color:var(--muted)">=</span>';
+    html += '<span style="color:var(--warning);font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escHtml(v.value) + '</span>';
+    if (v.comment) html += '<span style="color:var(--muted);font-size:.75rem">' + escHtml(v.comment) + '</span>';
+    html += '<button onclick="removeCustomVar(' + i + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;padding:0 4px" aria-label="Remove variable">&times;</button>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+function importEnv() {
+  const text = document.getElementById('importArea').value.trim();
+  if (!text) { showToast('Please paste .env content first'); return; }
+  const lines = text.split('\n');
+  let imported = 0;
+  const existingKeys = new Set(customVars.map(v => v.key));
+  let lastComment = '';
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) { lastComment = ''; return; }
+    if (trimmed.startsWith('#')) {
+      lastComment = trimmed.replace(/^#+\s*/, '');
+      return;
+    }
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) return;
+    const key = trimmed.substring(0, eqIdx).trim();
+    let value = trimmed.substring(eqIdx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (key && !existingKeys.has(key)) {
+      customVars.push({ key, value, comment: lastComment });
+      existingKeys.add(key);
+      imported++;
+    }
+    lastComment = '';
+  });
+  renderCustomList();
+  showToast('Imported ' + imported + ' variables');
+}
+
+function validateOutput() {
+  const results = document.getElementById('validationResults');
+  if (generatedVars.length === 0) { results.innerHTML = ''; return; }
+  let items = [];
+  const sensitivePatterns = [/password/i, /secret/i, /private.?key/i, /token/i, /api.?key/i, /access.?key/i];
+  const urlPattern = /^https?:\/\//;
+  let varCount = 0, warnCount = 0;
+
+  generatedVars.forEach(v => {
+    if (v.type !== 'var') return;
+    varCount++;
+    if (v.key.includes(' ') || v.key !== v.key.trim()) {
+      items.push({ cls: 'vl-err', icon: '❌', msg: v.key + ': Key contains spaces' });
+    }
+    if (v.value && v.value.includes(' ') && !v.value.startsWith('"') && !v.value.startsWith("'")) {
+      const needsQ = v.value.includes(' ');
+      if (needsQ) items.push({ cls: 'vl-warn', icon: '⚠️', msg: v.key + ': Value contains spaces — consider wrapping in quotes' });
+    }
+    if (sensitivePatterns.some(p => p.test(v.key))) {
+      if (v.value && v.value.length > 0 && !v.value.includes('xxx') && !v.value.includes('your-') && !v.value.includes('change-me') && !v.value.includes('EXAMPLE')) {
+        items.push({ cls: 'vl-warn', icon: '🔐', msg: v.key + ': Contains sensitive value — never commit to git' });
+        warnCount++;
+      }
+    }
+    if (v.key.toLowerCase().includes('port') && v.value) {
+      const port = parseInt(v.value);
+      if (isNaN(port) || port < 1 || port > 65535) {
+        items.push({ cls: 'vl-err', icon: '❌', msg: v.key + ': Invalid port number' });
+      }
+    }
+    if (v.key.toLowerCase().includes('url') && v.value && !urlPattern.test(v.value) && !v.value.includes('xxx') && !v.value.startsWith('redis://') && !v.value.startsWith('postgresql://') && !v.value.startsWith('mongodb') && !v.value.startsWith('mysql://') && !v.value.startsWith('smtp://') && !v.value.startsWith('ws://') && !v.value.startsWith('wss://') && v.value !== '') {
+      items.push({ cls: 'vl-warn', icon: '⚠️', msg: v.key + ': Value may not be a valid URL' });
+    }
+  });
+
+  items.unshift({ cls: 'vl-ok', icon: '✅', msg: varCount + ' variables generated' + (warnCount > 0 ? ', ' + warnCount + ' security warnings' : '') });
+
+  let html = '<ul class="validation-list" style="margin-top:16px">';
+  items.forEach(it => {
+    html += '<li class="' + it.cls + '">' + it.icon + ' ' + escHtml(it.msg) + '</li>';
+  });
+  html += '</ul>';
+  results.innerHTML = html;
+}
+
+function toggleCollapse(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Keyboard support for stack buttons
+document.querySelectorAll('.stack-btn').forEach(btn => {
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleStack(btn); }
+  });
+});
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

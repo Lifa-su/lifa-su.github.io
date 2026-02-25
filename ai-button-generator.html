@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Button Generator — Design Custom CSS Buttons | Lifa AI Tools</title>
+<meta name="description" content="Design beautiful custom CSS buttons with live preview. Customize colors, gradients, shadows, borders, hover effects and more. Free online button generator.">
+<meta name="keywords" content="button generator, CSS button maker, custom button design, CSS gradient button, button hover effects, UI button creator">
+<meta property="og:title" content="AI Button Generator — Design Custom CSS Buttons | Lifa AI Tools">
+<meta property="og:description" content="Design beautiful custom CSS buttons with live preview. Customize colors, gradients, shadows, borders, hover effects and more.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-button-generator.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Button Generator — Design Custom CSS Buttons">
+<meta name="twitter:description" content="Free online CSS button generator with live preview. Customize everything.">
+<link rel="canonical" href="https://lifa-su.com/ai-button-generator.html">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Button Generator",
+  "description": "Design beautiful custom CSS buttons with live preview. Customize colors, gradients, shadows, borders, hover effects and more.",
+  "url": "https://lifa-su.com/ai-button-generator.html",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script><style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{font-size:1.1rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-brand:hover{text-decoration:none}
+.nav-links a{color:var(--muted);font-size:0.85rem;margin-left:24px;transition:color .2s}
+.nav-links a:hover{color:var(--accent2);text-decoration:none}
+
+.hero{text-align:center;padding:60px 20px 40px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(108,92,231,0.06) 0%,transparent 50%);pointer-events:none}
+.hero h1{font-size:2.6rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+.hero p{font-size:1.05rem;color:var(--muted);max-width:600px;margin:0 auto}
+
+.app-container{max-width:1200px;margin:0 auto;padding:24px 20px 48px;display:grid;grid-template-columns:340px 1fr;gap:24px}
+
+/* Sidebar Controls */
+.sidebar{display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 180px);overflow-y:auto;padding-right:8px}
+.sidebar::-webkit-scrollbar{width:5px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;transition:border-color .2s}
+.panel:hover{border-color:var(--border-hover)}
+.panel-title{font-size:.85rem;font-weight:600;color:var(--accent2);margin-bottom:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.panel-title::after{content:'▾';font-size:.75rem;transition:transform .2s}
+.panel.collapsed .panel-title::after{transform:rotate(-90deg)}
+.panel-body{overflow:hidden;transition:max-height .3s ease,opacity .3s;max-height:600px;opacity:1}
+.panel.collapsed .panel-body{max-height:0;opacity:0}
+
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ctrl-row label{font-size:.78rem;color:var(--muted);min-width:72px;flex-shrink:0}
+.ctrl-row input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+.ctrl-row input[type=color]{width:34px;height:28px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:transparent;padding:1px}
+.ctrl-row input[type=text],.ctrl-row input[type=number]{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:.82rem;outline:none;transition:border-color .2s}
+.ctrl-row input[type=text]:focus,.ctrl-row input[type=number]:focus{border-color:var(--accent)}
+.ctrl-row select{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-size:.82rem;outline:none;cursor:pointer}
+.ctrl-row .val{font-size:.75rem;color:var(--accent2);min-width:32px;text-align:right}
+.ctrl-row .checkbox-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.8rem;color:var(--text)}
+.ctrl-row .checkbox-wrap input{accent-color:var(--accent)}
+
+/* Preview Area */
+.main-area{display:flex;flex-direction:column;gap:20px}
+.preview-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px 24px;display:flex;align-items:center;justify-content:center;min-height:260px;position:relative}
+.preview-card .checkerboard{position:absolute;inset:0;border-radius:14px;opacity:.03;background-image:linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+
+/* Presets */
+.presets-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.preset-btn{padding:8px 6px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:.72rem;cursor:pointer;transition:all .2s;text-align:center;font-weight:500}
+.preset-btn:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 12px var(--glow)}
+
+/* Code Output */
+.code-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.code-header span{font-size:.82rem;font-weight:600;color:var(--text)}
+.code-btns{display:flex;gap:8px}
+.copy-btn{padding:5px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--accent2);font-size:.75rem;cursor:pointer;transition:all .2s;font-weight:500}
+.copy-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.copy-btn.copied{background:#00b894;border-color:#00b894;color:#fff}
+.code-block{padding:16px;overflow-x:auto;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.8rem;line-height:1.7;white-space:pre;color:var(--text);max-height:300px;overflow-y:auto}
+.code-block::-webkit-scrollbar{width:5px;height:5px}
+.code-block::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* Syntax highlighting */
+.hl-tag{color:#e06c75}.hl-attr{color:#d19a66}.hl-str{color:#98c379}.hl-prop{color:#61afef}.hl-val{color:#d19a66}.hl-sel{color:#e5c07b}.hl-punc{color:#abb2bf}.hl-com{color:#5c6370;font-style:italic}
+
+/* Pro Section */
+.pro-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.pro-section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.pro-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.72rem;font-weight:700;margin-bottom:14px}
+.pro-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.pro-item{padding:14px;border-radius:10px;background:var(--surface);border:1px solid var(--border);text-align:center;opacity:.65}
+.pro-item .pi{font-size:1.4rem;display:block;margin-bottom:6px}
+.pro-item h4{font-size:.82rem;color:var(--text);margin-bottom:3px}
+.pro-item p{font-size:.72rem;color:var(--muted)}
+.pro-cta{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.9rem;font-weight:600;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
+.pro-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--glow);text-decoration:none}
+
+footer{border-top:1px solid var(--border);padding:32px 20px;text-align:center;margin-top:48px}
+.footer-links{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:12px}
+.footer-links a{color:var(--muted);font-size:0.85rem}
+.footer-links a:hover{color:var(--accent2)}
+.footer-copy{font-size:0.8rem;color:var(--muted)}
+
+@media(max-width:900px){
+  .app-container{grid-template-columns:1fr}
+  .sidebar{max-height:none}
+  .hero h1{font-size:2rem}
+  .presets-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:480px){
+  .hero h1{font-size:1.6rem}
+  .hero{padding:48px 16px 28px}
+  .presets-grid{grid-template-columns:repeat(2,1fr)}
+  .pro-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .code-btns{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">🛠️ Lifa AI Tools</a>
+    <div class="nav-links">
+      <a href="index.html">All Tools</a>
+      <a href="about.html">About</a>
+      <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Ko-fi ☕</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>AI Button Generator</h1>
+  <p>Design custom CSS buttons with live preview. Tweak every detail, pick a preset, and grab the code.</p>
+</div>
+
+<!-- Presets -->
+<div style="max-width:1200px;margin:0 auto;padding:0 20px 16px">
+  <div class="presets-grid" id="presets">
+    <button class="preset-btn" data-preset="primary">🔵 Primary</button>
+    <button class="preset-btn" data-preset="secondary">⚫ Secondary</button>
+    <button class="preset-btn" data-preset="outline">⭕ Outline</button>
+    <button class="preset-btn" data-preset="ghost">👻 Ghost</button>
+    <button class="preset-btn" data-preset="gradient">🌈 Gradient</button>
+    <button class="preset-btn" data-preset="pill">💊 Pill</button>
+    <button class="preset-btn" data-preset="threed">🧊 3D</button>
+    <button class="preset-btn" data-preset="neon">✨ Neon Glow</button>
+  </div>
+</div>
+
+<div class="app-container">
+  <!-- Sidebar Controls -->
+  <div class="sidebar">
+
+    <!-- Text & Typography -->
+    <div class="panel" id="panelText">
+      <div class="panel-title" onclick="togglePanel('panelText')">Text & Typography</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>Text</label><input type="text" id="btnText" value="Click Me"></div>
+        <div class="ctrl-row"><label>Font Size</label><input type="range" id="fontSize" min="12" max="32" value="16"><span class="val" id="fontSizeVal">16px</span></div>
+        <div class="ctrl-row"><label>Font Weight</label>
+          <select id="fontWeight"><option value="400">Normal (400)</option><option value="500">Medium (500)</option><option value="600" selected>Semi-Bold (600)</option><option value="700">Bold (700)</option><option value="800">Extra-Bold (800)</option><option value="900">Black (900)</option><option value="300">Light (300)</option><option value="100">Thin (100)</option></select>
+        </div>
+        <div class="ctrl-row"><label>Transform</label>
+          <select id="textTransform"><option value="none">None</option><option value="uppercase">UPPERCASE</option><option value="lowercase">lowercase</option><option value="capitalize">Capitalize</option></select>
+        </div>
+        <div class="ctrl-row"><label>Text Color</label><input type="color" id="textColor" value="#ffffff"></div>
+      </div>
+    </div>
+
+    <!-- Background -->
+    <div class="panel" id="panelBg">
+      <div class="panel-title" onclick="togglePanel('panelBg')">Background</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>Color</label><input type="color" id="bgColor" value="#6c5ce7"></div>
+        <div class="ctrl-row"><label></label><label class="checkbox-wrap"><input type="checkbox" id="useGradient"> Use Gradient</label></div>
+        <div id="gradientControls" style="display:none">
+          <div class="ctrl-row"><label>Color 2</label><input type="color" id="bgColor2" value="#00cec9"></div>
+          <div class="ctrl-row"><label>Angle</label><input type="range" id="gradAngle" min="0" max="360" value="135"><span class="val" id="gradAngleVal">135°</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Padding & Size -->
+    <div class="panel" id="panelSize">
+      <div class="panel-title" onclick="togglePanel('panelSize')">Padding & Size</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>Vertical</label><input type="range" id="padV" min="4" max="32" value="14"><span class="val" id="padVVal">14px</span></div>
+        <div class="ctrl-row"><label>Horizontal</label><input type="range" id="padH" min="8" max="64" value="32"><span class="val" id="padHVal">32px</span></div>
+        <div class="ctrl-row"><label>Width</label>
+          <select id="widthMode"><option value="auto">Auto</option><option value="full">Full Width</option><option value="custom">Custom</option></select>
+        </div>
+        <div id="customWidthWrap" style="display:none">
+          <div class="ctrl-row"><label>Width (px)</label><input type="number" id="customWidth" value="200" min="60" max="600"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border -->
+    <div class="panel" id="panelBorder">
+      <div class="panel-title" onclick="togglePanel('panelBorder')">Border</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>Width</label><input type="range" id="borderW" min="0" max="6" value="0"><span class="val" id="borderWVal">0px</span></div>
+        <div class="ctrl-row"><label>Style</label>
+          <select id="borderStyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="none">None</option></select>
+        </div>
+        <div class="ctrl-row"><label>Color</label><input type="color" id="borderColor" value="#6c5ce7"></div>
+        <div class="ctrl-row"><label>Radius</label><input type="range" id="borderR" min="0" max="50" value="12"><span class="val" id="borderRVal">12px</span></div>
+        <div class="ctrl-row"><label></label><label class="checkbox-wrap"><input type="checkbox" id="individualRadius"> Individual Corners</label></div>
+        <div id="cornerControls" style="display:none">
+          <div class="ctrl-row"><label>Top-Left</label><input type="range" id="rTL" min="0" max="50" value="12"><span class="val" id="rTLVal">12</span></div>
+          <div class="ctrl-row"><label>Top-Right</label><input type="range" id="rTR" min="0" max="50" value="12"><span class="val" id="rTRVal">12</span></div>
+          <div class="ctrl-row"><label>Bot-Right</label><input type="range" id="rBR" min="0" max="50" value="12"><span class="val" id="rBRVal">12</span></div>
+          <div class="ctrl-row"><label>Bot-Left</label><input type="range" id="rBL" min="0" max="50" value="12"><span class="val" id="rBLVal">12</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Box Shadow -->
+    <div class="panel" id="panelShadow">
+      <div class="panel-title" onclick="togglePanel('panelShadow')">Box Shadow</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>X Offset</label><input type="range" id="shadowX" min="-20" max="20" value="0"><span class="val" id="shadowXVal">0</span></div>
+        <div class="ctrl-row"><label>Y Offset</label><input type="range" id="shadowY" min="-20" max="20" value="4"><span class="val" id="shadowYVal">4</span></div>
+        <div class="ctrl-row"><label>Blur</label><input type="range" id="shadowBlur" min="0" max="40" value="12"><span class="val" id="shadowBlurVal">12</span></div>
+        <div class="ctrl-row"><label>Spread</label><input type="range" id="shadowSpread" min="-10" max="20" value="0"><span class="val" id="shadowSpreadVal">0</span></div>
+        <div class="ctrl-row"><label>Color</label><input type="color" id="shadowColor" value="#6c5ce7"></div>
+        <div class="ctrl-row"><label>Opacity</label><input type="range" id="shadowOpacity" min="0" max="100" value="30"><span class="val" id="shadowOpacityVal">30%</span></div>
+      </div>
+    </div>
+
+    <!-- Hover State -->
+    <div class="panel" id="panelHover">
+      <div class="panel-title" onclick="togglePanel('panelHover')">Hover State</div>
+      <div class="panel-body">
+        <div class="ctrl-row"><label>BG Color</label><input type="color" id="hoverBg" value="#5a4bd1"></div>
+        <div class="ctrl-row"><label></label><label class="checkbox-wrap"><input type="checkbox" id="hoverGradient"> Use Gradient</label></div>
+        <div id="hoverGradControls" style="display:none">
+          <div class="ctrl-row"><label>Color 2</label><input type="color" id="hoverBg2" value="#00b894"></div>
+        </div>
+        <div class="ctrl-row"><label>Scale</label><input type="range" id="hoverScale" min="95" max="115" value="102"><span class="val" id="hoverScaleVal">1.02</span></div>
+        <div class="ctrl-row"><label>Move Y</label><input type="range" id="hoverY" min="-10" max="10" value="-2"><span class="val" id="hoverYVal">-2px</span></div>
+        <div class="ctrl-row"><label>Shadow Blur</label><input type="range" id="hoverShadowBlur" min="0" max="50" value="20"><span class="val" id="hoverShadowBlurVal">20</span></div>
+        <div class="ctrl-row"><label>Shadow Color</label><input type="color" id="hoverShadowColor" value="#6c5ce7"></div>
+        <div class="ctrl-row"><label>Transition</label><input type="range" id="transitionMs" min="0" max="800" step="50" value="200"><span class="val" id="transitionMsVal">0.2s</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main Area: Preview + Code -->
+  <div class="main-area">
+    <div class="preview-card">
+      <div class="checkerboard"></div>
+      <button id="previewBtn" style="cursor:pointer;outline:none;font-family:inherit">Click Me</button>
+      <style id="previewStyle"></style>
+    </div>
+
+    <!-- Code Output -->
+    <div class="code-card">
+      <div class="code-header">
+        <span>Generated Code</span>
+        <div class="code-btns">
+          <button class="copy-btn" onclick="copyCode('html')">Copy HTML</button>
+          <button class="copy-btn" onclick="copyCode('css')">Copy CSS</button>
+        </div>
+      </div>
+      <div class="code-block" id="codeOutput"></div>
+    </div>
+
+    <!-- Pro Features -->
+    <div class="pro-card">
+      <div class="pro-badge">✨ PRO</div>
+      <h3>Unlock Pro Features</h3>
+      <p>Take your buttons to the next level with advanced customization options.</p>
+      <div class="pro-features-grid">
+        <div class="pro-feature"><span>🎯</span> Icon Integration<br><small>Prepend or append icons</small></div>
+        <div class="pro-feature"><span>⏳</span> Loading Animation<br><small>Spinner & progress states</small></div>
+        <div class="pro-feature"><span>📐</span> Button Groups<br><small>Generate button sets</small></div>
+        <div class="pro-feature"><span>💧</span> Ripple Effect<br><small>Material Design ripple</small></div>
+        <div class="pro-feature"><span>♿</span> A11y Checker<br><small>Contrast & ARIA audit</small></div>
+      </div>
+      <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener" class="pro-cta">☕ Upgrade on Ko-fi</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="index.html">Part of AI Toolbox</a>
+    <a href="about.html">About</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Support ☕</a>
+  </div>
+  <div class="footer-copy">© 2025 Lifa AI Tools. Free forever.</div>
+</footer>
+
+<script>
+// Panel toggle
+function togglePanel(id){document.getElementById(id).classList.toggle('collapsed')}
+
+// Gradient toggle
+document.getElementById('useGradient').addEventListener('change',function(){
+  document.getElementById('gradientControls').style.display=this.checked?'block':'none';update()
+});
+
+// Individual radius toggle
+document.getElementById('individualRadius').addEventListener('change',function(){
+  document.getElementById('cornerControls').style.display=this.checked?'block':'none';update()
+});
+
+// Width mode toggle
+document.getElementById('widthMode').addEventListener('change',function(){
+  document.getElementById('customWidthWrap').style.display=this.value==='custom'?'block':'none';update()
+});
+
+// Value display helpers
+const sliders=[
+  ['fontSize','fontSizeVal','px'],['padV','padVVal','px'],['padH','padHVal','px'],
+  ['borderW','borderWVal','px'],['borderR','borderRVal','px'],
+  ['rTL','rTLVal',''],['rTR','rTRVal',''],['rBR','rBRVal',''],['rBL','rBLVal',''],
+  ['shadowX','shadowXVal',''],['shadowY','shadowYVal',''],
+  ['shadowBlur','shadowBlurVal',''],['shadowSpread','shadowSpreadVal',''],
+  ['gradAngle','gradAngleVal','°'],
+  ['hoverScale','hoverScaleVal',''],['hoverY','hoverYVal','px'],
+  ['hoverTransition','hoverTransitionVal','s'],
+  ['hoverShadowX','hoverShadowXVal',''],['hoverShadowY','hoverShadowYVal',''],
+  ['hoverShadowBlur','hoverShadowBlurVal',''],['hoverShadowSpread','hoverShadowSpreadVal','']
+];
+sliders.forEach(([id,valId,suffix])=>{
+  const el=document.getElementById(id);
+  if(el){el.addEventListener('input',()=>{
+    const v=el.value;
+    document.getElementById(valId).textContent=v+suffix;
+    update();
+  })}
+});
+
+// All inputs trigger update
+document.querySelectorAll('.sidebar input,.sidebar select').forEach(el=>{
+  el.addEventListener('input',update);
+  el.addEventListener('change',update);
+});
+
+// Get current settings
+function getSettings(){
+  const g=id=>document.getElementById(id);
+  const v=id=>g(id).value;
+  const n=id=>parseFloat(v(id));
+  const c=id=>g(id).checked;
+  return{
+    text:v('btnText')||'Click Me',
+    fontSize:n('fontSize'),fontWeight:v('fontWeight'),textTransform:v('textTransform'),
+    textColor:v('textColor'),
+    bgColor:v('bgColor'),useGradient:c('useGradient'),bgColor2:v('bgColor2'),gradAngle:n('gradAngle'),
+    padV:n('padV'),padH:n('padH'),
+    widthMode:v('widthMode'),customWidth:n('customWidth'),
+    borderW:n('borderW'),borderStyle:v('borderStyle'),borderColor:v('borderColor'),
+    borderR:n('borderR'),individualRadius:c('individualRadius'),
+    rTL:n('rTL'),rTR:n('rTR'),rBR:n('rBR'),rBL:n('rBL'),
+    shadowX:n('shadowX'),shadowY:n('shadowY'),shadowBlur:n('shadowBlur'),
+    shadowSpread:n('shadowSpread'),shadowColor:v('shadowColor'),
+    hoverBg:v('hoverBg'),hoverScale:n('hoverScale'),hoverY:n('hoverY'),
+    hoverTransition:n('hoverTransition'),
+    hoverShadowX:n('hoverShadowX'),hoverShadowY:n('hoverShadowY'),
+    hoverShadowBlur:n('hoverShadowBlur'),hoverShadowSpread:n('hoverShadowSpread'),
+    hoverShadowColor:v('hoverShadowColor')
+  }
+}
+
+// Build CSS from settings
+function buildCSS(s){
+  let css=[];
+  css.push('display: inline-flex');
+  css.push('align-items: center');
+  css.push('justify-content: center');
+  css.push('cursor: pointer');
+  css.push('border: none');
+  css.push('outline: none');
+  css.push('font-family: inherit');
+  css.push(`font-size: ${s.fontSize}px`);
+  css.push(`font-weight: ${s.fontWeight}`);
+  if(s.textTransform!=='none') css.push(`text-transform: ${s.textTransform}`);
+  css.push(`color: ${s.textColor}`);
+  if(s.useGradient){
+    css.push(`background: linear-gradient(${s.gradAngle}deg, ${s.bgColor}, ${s.bgColor2})`);
+  }else{
+    css.push(`background: ${s.bgColor}`);
+  }
+  css.push(`padding: ${s.padV}px ${s.padH}px`);
+  if(s.widthMode==='full') css.push('width: 100%');
+  else if(s.widthMode==='custom') css.push(`width: ${s.customWidth}px`);
+  if(s.borderW>0&&s.borderStyle!=='none'){
+    css.push(`border: ${s.borderW}px ${s.borderStyle} ${s.borderColor}`);
+  }
+  if(s.individualRadius){
+    css.push(`border-radius: ${s.rTL}px ${s.rTR}px ${s.rBR}px ${s.rBL}px`);
+  }else{
+    css.push(`border-radius: ${s.borderR}px`);
+  }
+  if(s.shadowX||s.shadowY||s.shadowBlur||s.shadowSpread){
+    css.push(`box-shadow: ${s.shadowX}px ${s.shadowY}px ${s.shadowBlur}px ${s.shadowSpread}px ${s.shadowColor}`);
+  }
+  css.push(`transition: all ${s.hoverTransition}s ease`);
+  return css;
+}
+
+function buildHoverCSS(s){
+  let css=[];
+  if(s.hoverBg){
+    if(s.useGradient) css.push(`background: ${s.hoverBg}`);
+    else css.push(`background: ${s.hoverBg}`);
+  }
+  let transforms=[];
+  if(s.hoverScale!==1) transforms.push(`scale(${s.hoverScale})`);
+  if(s.hoverY!==0) transforms.push(`translateY(${s.hoverY}px)`);
+  if(transforms.length) css.push(`transform: ${transforms.join(' ')}`);
+  if(s.hoverShadowX||s.hoverShadowY||s.hoverShadowBlur||s.hoverShadowSpread){
+    css.push(`box-shadow: ${s.hoverShadowX}px ${s.hoverShadowY}px ${s.hoverShadowBlur}px ${s.hoverShadowSpread}px ${s.hoverShadowColor}`);
+  }
+  return css;
+}
+
+// Update preview and code
+function update(){
+  const s=getSettings();
+  const btn=document.getElementById('previewBtn');
+  const css=buildCSS(s);
+  const hoverCSS=buildHoverCSS(s);
+
+  // Apply styles to preview button
+  btn.textContent=s.text;
+  btn.style.cssText=css.map(c=>c).join(';');
+
+  // Inject hover style
+  let hoverStyle=document.getElementById('hoverStyle');
+  if(!hoverStyle){hoverStyle=document.createElement('style');hoverStyle.id='hoverStyle';document.head.appendChild(hoverStyle)}
+  hoverStyle.textContent=hoverCSS.length?`#previewBtn:hover{${hoverCSS.join(';')}}`:''
+
+  // Generate code output
+  const className='custom-btn';
+  const htmlCode=`<button class="${className}">${escHtml(s.text)}</button>`;
+  const cssLines=`.${className} {\n${css.map(c=>'  '+c+';').join('\n')}\n}\n\n.${className}:hover {\n${hoverCSS.map(c=>'  '+c+';').join('\n')}\n}`;
+
+  document.getElementById('htmlOutput').innerHTML=highlightHTML(htmlCode);
+  document.getElementById('cssOutput').innerHTML=highlightCSS(cssLines);
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// Syntax highlighting
+function highlightHTML(code){
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(&lt;\/?)([\w-]+)/g,'$1<span style="color:#6c5ce7">$2</span>')
+    .replace(/(class)(=)(&quot;)(.*?)(&quot;)/g,'<span style="color:#00cec9">$1</span>$2<span style="color:#ffeaa7">$3$4$5</span>')
+}
+
+function highlightCSS(code){
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(\.[\w-]+)/g,'<span style="color:#6c5ce7">$1</span>')
+    .replace(/([\w-]+)(\s*:\s*)/g,'<span style="color:#00cec9">$1</span>$2')
+    .replace(/(:hover)/g,'<span style="color:#fdcb6e">$1</span>')
+    .replace(/(#[0-9a-fA-F]{3,8})/g,'<span style="color:#ffeaa7">$1</span>')
+    .replace(/(\d+)(px|deg|%|s)/g,'<span style="color:#fd79a8">$1$2</span>')
+}
+
+// Copy buttons
+function copyCode(type){
+  const s=getSettings();
+  const css=buildCSS(s);
+  const hoverCSS=buildHoverCSS(s);
+  let text='';
+  if(type==='html'){
+    text=`<button class="custom-btn">${s.text}</button>`;
+  }else{
+    text=`.custom-btn {\n${css.map(c=>'  '+c+';').join('\n')}\n}\n\n.custom-btn:hover {\n${hoverCSS.map(c=>'  '+c+';').join('\n')}\n}`;
+  }
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=event.target;
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=type==='html'?'Copy HTML':'Copy CSS';btn.classList.remove('copied')},1500);
+  });
+}
+
+// Presets
+const presets={
+  primary:{bgColor:'#6c5ce7',textColor:'#ffffff',fontSize:16,fontWeight:'600',padV:14,padH:32,borderR:12,borderW:0,useGradient:false,shadowX:0,shadowY:4,shadowBlur:15,shadowSpread:0,shadowColor:'rgba(108,92,231,0.4)',hoverBg:'#5a4bd1',hoverScale:1.02,hoverY:-2,hoverTransition:0.2,textTransform:'none',widthMode:'auto',borderStyle:'solid',borderColor:'#6c5ce7',hoverShadowX:0,hoverShadowY:6,hoverShadowBlur:20,hoverShadowSpread:0,hoverShadowColor:'rgba(108,92,231,0.5)'},
+  secondary:{bgColor:'#2d3436',textColor:'#dfe6e9',fontSize:16,fontWeight:'500',padV:12,padH:28,borderR:10,borderW:0,useGradient:false,shadowX:0,shadowY:2,shadowBlur:8,shadowSpread:0,shadowColor:'rgba(0,0,0,0.3)',hoverBg:'#3d4446',hoverScale:1,hoverY:-1,hoverTransition:0.2,textTransform:'none',widthMode:'auto',borderStyle:'solid',borderColor:'#2d3436',hoverShadowX:0,hoverShadowY:4,hoverShadowBlur:12,hoverShadowSpread:0,hoverShadowColor:'rgba(0,0,0,0.4)'},
+  outline:{bgColor:'transparent',textColor:'#6c5ce7',fontSize:16,fontWeight:'600',padV:12,padH:28,borderR:12,borderW:2,useGradient:false,shadowX:0,shadowY:0,shadowBlur:0,shadowSpread:0,shadowColor:'rgba(0,0,0,0)',hoverBg:'#6c5ce7',hoverScale:1,hoverY:0,hoverTransition:0.2,textTransform:'none',widthMode:'auto',borderStyle:'solid',borderColor:'#6c5ce7',hoverShadowX:0,hoverShadowY:4,hoverShadowBlur:15,hoverShadowSpread:0,hoverShadowColor:'rgba(108,92,231,0.3)'},
+  ghost:{bgColor:'transparent',textColor:'#b2bec3',fontSize:15,fontWeight:'500',padV:10,padH:24,borderR:8,borderW:0,useGradient:false,shadowX:0,shadowY:0,shadowBlur:0,shadowSpread:0,shadowColor:'rgba(0,0,0,0)',hoverBg:'rgba(255,255,255,0.08)',hoverScale:1,hoverY:0,hoverTransition:0.15,textTransform:'none',widthMode:'auto',borderStyle:'none',borderColor:'transparent',hoverShadowX:0,hoverShadowY:0,hoverShadowBlur:0,hoverShadowSpread:0,hoverShadowColor:'rgba(0,0,0,0)'},
+  gradient:{bgColor:'#6c5ce7',bgColor2:'#00cec9',textColor:'#ffffff',fontSize:16,fontWeight:'700',padV:14,padH:36,borderR:12,borderW:0,useGradient:true,gradAngle:135,shadowX:0,shadowY:4,shadowBlur:20,shadowSpread:0,shadowColor:'rgba(108,92,231,0.35)',hoverBg:'#5a4bd1',hoverScale:1.05,hoverY:-2,hoverTransition:0.25,textTransform:'none',widthMode:'auto',borderStyle:'solid',borderColor:'#6c5ce7',hoverShadowX:0,hoverShadowY:8,hoverShadowBlur:30,hoverShadowSpread:0,hoverShadowColor:'rgba(108,92,231,0.5)'},
+  pill:{bgColor:'#00cec9',textColor:'#ffffff',fontSize:14,fontWeight:'600',padV:12,padH:32,borderR:50,borderW:0,useGradient:false,shadowX:0,shadowY:2,shadowBlur:10,shadowSpread:0,shadowColor:'rgba(0,206,201,0.3)',hoverBg:'#00b5b0',hoverScale:1.03,hoverY:-1,hoverTransition:0.2,textTransform:'uppercase',widthMode:'auto',borderStyle:'solid',borderColor:'#00cec9',hoverShadowX:0,hoverShadowY:4,hoverShadowBlur:15,hoverShadowSpread:0,hoverShadowColor:'rgba(0,206,201,0.4)'},
+  threed:{bgColor:'#e17055',textColor:'#ffffff',fontSize:16,fontWeight:'700',padV:14,padH:32,borderR:10,borderW:0,useGradient:false,shadowX:0,shadowY:6,shadowBlur:0,shadowSpread:0,shadowColor:'#c0392b',hoverBg:'#e17055',hoverScale:1,hoverY:2,hoverTransition:0.1,textTransform:'uppercase',widthMode:'auto',borderStyle:'solid',borderColor:'#e17055',hoverShadowX:0,hoverShadowY:2,hoverShadowBlur:0,hoverShadowSpread:0,hoverShadowColor:'#c0392b'},
+  neon:{bgColor:'transparent',textColor:'#00ff88',fontSize:16,fontWeight:'600',padV:14,padH:32,borderR:8,borderW:2,useGradient:false,shadowX:0,shadowY:0,shadowBlur:15,shadowSpread:3,shadowColor:'rgba(0,255,136,0.4)',hoverBg:'rgba(0,255,136,0.1)',hoverScale:1.05,hoverY:0,hoverTransition:0.3,textTransform:'uppercase',widthMode:'auto',borderStyle:'solid',borderColor:'#00ff88',hoverShadowX:0,hoverShadowY:0,hoverShadowBlur:25,hoverShadowSpread:6,hoverShadowColor:'rgba(0,255,136,0.6)'}
+};
+
+function applyPreset(name){
+  const p=presets[name];if(!p)return;
+  const g=id=>document.getElementById(id);
+  const set=(id,val)=>{const el=g(id);if(el){el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}))}};
+
+  set('btnText',g('btnText').value||'Click Me');
+  set('bgColor',p.bgColor);set('textColor',p.textColor);
+  set('fontSize',p.fontSize);set('fontWeight',p.fontWeight);
+  set('padV',p.padV);set('padH',p.padH);
+  set('borderR',p.borderR);set('borderW',p.borderW);
+  set('borderStyle',p.borderStyle);set('borderColor',p.borderColor);
+  set('shadowX',p.shadowX);set('shadowY',p.shadowY);
+  set('shadowBlur',p.shadowBlur);set('shadowSpread',p.shadowSpread);
+  set('shadowColor',p.shadowColor);
+  set('hoverBg',p.hoverBg);set('hoverScale',p.hoverScale);
+  set('hoverY',p.hoverY);set('hoverTransition',p.hoverTransition);
+  set('hoverShadowX',p.hoverShadowX);set('hoverShadowY',p.hoverShadowY);
+  set('hoverShadowBlur',p.hoverShadowBlur);set('hoverShadowSpread',p.hoverShadowSpread);
+  set('hoverShadowColor',p.hoverShadowColor);
+  set('textTransform',p.textTransform);set('widthMode',p.widthMode);
+
+  // Handle gradient
+  const gc=g('useGradient');
+  gc.checked=!!p.useGradient;
+  g('gradientControls').style.display=p.useGradient?'block':'none';
+  if(p.useGradient){set('bgColor2',p.bgColor2);set('gradAngle',p.gradAngle||135)}
+
+  // Handle individual radius
+  g('individualRadius').checked=false;
+  g('cornerControls').style.display='none';
+
+  // Handle width
+  g('customWidthWrap').style.display=p.widthMode==='custom'?'block':'none';
+
+  // Update all value displays
+  sliders.forEach(([id,valId,suffix])=>{
+    const el=g(id);if(el)g(valId).textContent=el.value+suffix;
+  });
+
+  update();
+}
+
+// Preset click handlers
+document.querySelectorAll('[data-preset]').forEach(btn=>{
+  btn.addEventListener('click',()=>applyPreset(btn.dataset.preset));
+});
+
+// Handle outline preset hover text color
+const previewBtn=document.getElementById('previewBtn');
+// For outline preset, change text color on hover
+previewBtn.addEventListener('mouseenter',function(){
+  const s=getSettings();
+  if(s.bgColor==='transparent'||s.bgColor==='#00000000'){
+    if(s.hoverBg&&s.hoverBg!=='transparent'){
+      this.style.color='#ffffff';
+    }
+  }
+});
+previewBtn.addEventListener('mouseleave',function(){
+  const s=getSettings();
+  this.style.color=s.textColor;
+});
+
+// Initial render
+update();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>

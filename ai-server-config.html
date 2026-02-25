@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Server Config Generator — Nginx, Apache &amp; Caddy Configs | Lifa AI Tools</title>
+<meta name="description" content="Generate production-ready server configurations for Nginx, Apache, and Caddy. SSL, reverse proxy, PHP-FPM, security headers and more. Free online tool.">
+<meta name="keywords" content="nginx config generator, apache config, caddy config, reverse proxy, SSL configuration, server config tool, web server setup">
+<link rel="canonical" href="https://lifa-su.com/ai-server-config.html">
+<meta property="og:title" content="AI Server Config Generator — Nginx, Apache &amp; Caddy Configs">
+<meta property="og:description" content="Generate production-ready server configurations for Nginx, Apache, and Caddy. Free online tool.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-server-config.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Server Config Generator — Nginx, Apache &amp; Caddy Configs">
+<meta name="twitter:description" content="Generate production-ready server configurations for Nginx, Apache, and Caddy.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Server Config Generator","url":"https://lifa-su.com/ai-server-config.html","description":"Generate production-ready server configurations for Nginx, Apache, and Caddy. SSL, reverse proxy, PHP-FPM, security headers and more.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Lifa AI Tools"}}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--card:#14141e;--border:#1e1e2e;--border-hover:#2e2e4e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15);--radius-card:14px;--radius-input:10px;--radius-btn:8px}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+button{cursor:pointer;font-family:inherit;border:none;outline:none;transition:all .2s}
+select,input{font-family:inherit;border:none;outline:none}
+
+.nav{position:sticky;top:0;z-index:1000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,10,15,0.88);height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px}
+.nav-brand{font-size:1.1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-brand:hover{color:var(--accent)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.nav-link{color:var(--muted);font-size:.9rem;transition:color .2s}
+.nav-link:hover{color:var(--text)}
+
+.hero{text-align:center;padding:48px 24px 32px}
+.hero h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:600px;margin:0 auto}
+
+.app-container{max-width:1200px;margin:0 auto;padding:0 24px 24px}
+
+.config-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--border);font-size:.88rem;font-weight:600}
+.panel-body{padding:18px}
+
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-input);color:var(--text);padding:10px 14px;font-size:.9rem;transition:border-color .2s}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:#555}
+select.form-input{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+
+.server-tabs{display:flex;gap:0;margin-bottom:18px;border-radius:var(--radius-btn);overflow:hidden;border:1px solid var(--border)}
+.server-tab{flex:1;padding:10px 0;text-align:center;font-size:.85rem;font-weight:600;background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;border:none}
+.server-tab:hover{color:var(--text)}
+.server-tab.active{background:var(--accent);color:#fff}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:.88rem;color:var(--text)}
+.toggle-desc{font-size:.75rem;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:12px;transition:.2s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--accent)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+
+.output-area{position:relative;min-height:400px}
+.output-pre{background:var(--surface);border-radius:var(--radius-input);padding:16px;font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;font-size:.84rem;line-height:1.7;color:#c8d6e5;overflow-x:auto;white-space:pre;min-height:360px;tab-size:2;border:1px solid var(--border)}
+.output-actions{display:flex;gap:8px;position:absolute;top:12px;right:12px}
+
+.btn{padding:10px 20px;border-radius:var(--radius-btn);font-size:.9rem;font-weight:600;transition:all .2s}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:#7c6cf7;box-shadow:0 0 20px var(--glow)}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-btn);background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:.9rem}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent)}
+
+.syn-k{color:#c678dd}
+.syn-s{color:#98c379}
+.syn-n{color:#e5c07b}
+.syn-c{color:#5c6370;font-style:italic}
+.syn-v{color:#61afef}
+.syn-d{color:#56b6c2}
+.syn-p{color:#abb2bf}
+
+.pro-card{background:linear-gradient(135deg,rgba(108,92,231,0.1),rgba(168,85,247,0.1));border:1px solid rgba(108,92,231,0.3);border-radius:var(--radius-card);padding:28px;margin-top:32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.pro-card-text{flex:1;min-width:200px}
+.pro-card-text h3{font-size:1.15rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pro-card-text p{color:var(--muted);font-size:.88rem}
+.pro-features-list{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pro-feature-tag{background:rgba(108,92,231,0.15);border:1px solid rgba(108,92,231,0.2);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--accent);display:flex;align-items:center;gap:4px}
+.badge-pro{background:linear-gradient(135deg,var(--accent),#a855f7);color:#fff;font-size:.65rem;padding:2px 6px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.btn-kofi{background:linear-gradient(135deg,#6c5ce7,#a855f7);color:#fff;padding:12px 28px;border-radius:var(--radius-btn);font-weight:700;font-size:.95rem;display:inline-flex;align-items:center;gap:8px;transition:all .3s;flex-shrink:0}
+.btn-kofi:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.4);color:#fff}
+
+.footer{text-align:center;padding:32px 24px;margin-top:40px;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem}
+.footer a{color:var(--accent)}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-btn);padding:12px 20px;font-size:.88rem;color:var(--text);z-index:10000;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--accent2)}
+
+.conditional{display:none}
+.conditional.show{display:block}
+
+@media(max-width:768px){
+  .hero h1{font-size:1.6rem}
+  .config-grid{grid-template-columns:1fr}
+  .app-container{padding:0 12px 12px}
+  .pro-card{flex-direction:column;text-align:center}
+  .nav{padding:0 14px}
+  .output-pre{font-size:.78rem}
+}
+</style>
+</head>
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-brand">&#x1f6e0;&#xfe0f; Lifa AI Tools</a>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">All Tools</a>
+    <a href="https://ko-fi.com/feidev" class="nav-link" target="_blank">&#9734; Support</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>AI Server Config Generator</h1>
+  <p>Generate production-ready configurations for Nginx, Apache, and Caddy. SSL, reverse proxy, compression, security headers and more.</p>
+</section>
+
+<div class="app-container">
+  <div class="config-grid">
+    <div class="settings-col">
+      <div class="panel">
+        <div class="panel-header"><span>Server Type</span></div>
+        <div class="panel-body" style="padding:12px 18px">
+          <div class="server-tabs">
+            <button class="server-tab active" data-server="nginx">Nginx</button>
+            <button class="server-tab" data-server="apache">Apache</button>
+            <button class="server-tab" data-server="caddy">Caddy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-header"><span>Basic Settings</span></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="domain">Domain Name</label>
+            <input type="text" id="domain" class="form-input" placeholder="example.com" value="example.com">
+          </div>
+          <div class="form-group">
+            <label for="port">Listen Port</label>
+            <input type="number" id="port" class="form-input" placeholder="80" value="80">
+          </div>
+          <div class="form-group">
+            <label for="docroot">Document Root</label>
+            <input type="text" id="docroot" class="form-input" placeholder="/var/www/html" value="/var/www/html">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label for="upstream">Upstream / Proxy URL</label>
+            <input type="text" id="upstream" class="form-input" placeholder="http://127.0.0.1:3000" value="http://127.0.0.1:3000">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-header"><span>SSL / TLS</span></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label for="ssl_cert">Certificate Path</label>
+            <input type="text" id="ssl_cert" class="form-input" placeholder="/etc/ssl/certs/cert.pem" value="/etc/ssl/certs/cert.pem">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label for="ssl_key">Private Key Path</label>
+            <input type="text" id="ssl_key" class="form-input" placeholder="/etc/ssl/private/key.pem" value="/etc/ssl/private/key.pem">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-header"><span>Features</span></div>
+        <div class="panel-body" style="padding:8px 18px">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Static File Server</div><div class="toggle-desc">Serve static files from document root</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-static" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Reverse Proxy</div><div class="toggle-desc">Proxy requests to upstream server</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-proxy"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">SSL / TLS</div><div class="toggle-desc">Enable HTTPS with certificates</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-ssl"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">PHP-FPM</div><div class="toggle-desc">Process PHP files via FastCGI</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-php"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Redirects</div><div class="toggle-desc">HTTP&#x2192;HTTPS, www&#x2192;non-www</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-redirect"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Gzip Compression</div><div class="toggle-desc">Compress responses for faster delivery</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-gzip"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Security Headers</div><div class="toggle-desc">HSTS, CSP, X-Frame-Options</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-security"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Rate Limiting</div><div class="toggle-desc">Limit request rate per IP</div></div>
+            <label class="toggle"><input type="checkbox" id="feat-ratelimit"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="output-col">
+      <div class="panel">
+        <div class="panel-header">
+          <span id="output-title">nginx.conf</span>
+          <div class="output-actions" style="position:static;display:flex;gap:8px">
+            <button class="btn btn-sm btn-outline" onclick="copyConfig()" title="Copy to clipboard">&#x1f4cb; Copy</button>
+            <button class="btn btn-sm btn-accent" onclick="downloadConfig()" title="Download config file">&#x2b07; Download</button>
+          </div>
+        </div>
+        <div class="panel-body output-area" style="padding:0">
+          <pre class="output-pre" id="config-output"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pro-card">
+    <div class="pro-card-text">
+      <h3><span class="badge-pro">PRO</span> Unlock Advanced Server Configs</h3>
+      <p>Get access to load balancing, WebSocket proxy, multi-domain virtual hosts, advanced caching rules, and custom error pages.</p>
+      <div class="pro-features-list">
+        <span class="pro-feature-tag">&#x1f504; Load Balancer</span>
+        <span class="pro-feature-tag">&#x1f50c; WebSocket Proxy</span>
+        <span class="pro-feature-tag">&#x1f310; Multi-Domain Hosts</span>
+        <span class="pro-feature-tag">&#x26a1; Advanced Caching</span>
+        <span class="pro-feature-tag">&#x1f4c4; Custom Error Pages</span>
+      </div>
+    </div>
+    <a href="https://ko-fi.com/feidev" target="_blank" class="btn-kofi">&#x2615; Upgrade on Ko-fi</a>
+  </div>
+</div>
+
+<footer class="footer">
+  Part of <a href="index.html">AI Toolbox</a> &mdash; Built with care by Lifa
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+let serverType = 'nginx';
+const outputEl = $('#config-output');
+const titleEl = $('#output-title');
+
+// Server tab switching
+$$('.server-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.server-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    serverType = tab.dataset.server;
+    const names = {nginx:'nginx.conf',apache:'httpd.conf / .htaccess',caddy:'Caddyfile'};
+    titleEl.textContent = names[serverType];
+    // Hide PHP-FPM for Caddy
+    const phpRow = $('#feat-php').closest('.toggle-row');
+    if(serverType==='caddy'){phpRow.style.display='none';$('#feat-php').checked=false;}
+    else{phpRow.style.display='';}
+    generate();
+  });
+});
+
+// Live update on any input change
+$$('.form-input, .toggle input').forEach(el => {
+  el.addEventListener('input', generate);
+  el.addEventListener('change', generate);
+});
+
+function v(id){return $('#'+id).value.trim();}
+function on(id){return $('#feat-'+id).checked;}
+
+function generate(){
+  const domain = v('domain')||'example.com';
+  const port = v('port')||'80';
+  const docroot = v('docroot')||'/var/www/html';
+  const upstream = v('upstream')||'http://127.0.0.1:3000';
+  const sslCert = v('ssl_cert')||'/etc/ssl/certs/cert.pem';
+  const sslKey = v('ssl_key')||'/etc/ssl/private/key.pem';
+
+  const feat = {
+    static: on('static'),
+    proxy: on('proxy'),
+    ssl: on('ssl'),
+    php: on('php'),
+    redirect: on('redirect'),
+    gzip: on('gzip'),
+    security: on('security'),
+    ratelimit: on('ratelimit')
+  };
+
+  let config = '';
+  if(serverType==='nginx') config = genNginx(domain,port,docroot,upstream,sslCert,sslKey,feat);
+  else if(serverType==='apache') config = genApache(domain,port,docroot,upstream,sslCert,sslKey,feat);
+  else config = genCaddy(domain,port,docroot,upstream,sslCert,sslKey,feat);
+
+  outputEl.innerHTML = highlight(config, serverType);
+}
+
+// ===== NGINX =====
+function genNginx(domain,port,docroot,upstream,cert,key,f){
+  let lines = [];
+  lines.push('# Nginx configuration for ' + domain);
+  lines.push('# Generated by Lifa AI Server Config Generator\n');
+
+  if(f.ratelimit){
+    lines.push('limit_req_zone $binary_remote_addr zone=ratelimit:10m rate=10r/s;\n');
+  }
+
+  if(f.redirect && f.ssl){
+    lines.push('server {');
+    lines.push('    listen 80;');
+    lines.push('    listen [::]:80;');
+    lines.push('    server_name ' + domain + ' www.' + domain + ';');
+    lines.push('    return 301 https://' + domain + '$request_uri;');
+    lines.push('}\n');
+  }
+
+  if(f.redirect){
+    lines.push('server {');
+    lines.push('    listen ' + (f.ssl?'443 ssl http2':'80') + ';');
+    lines.push('    listen [::]:' + (f.ssl?'443 ssl http2':'80') + ';');
+    lines.push('    server_name www.' + domain + ';');
+    if(f.ssl){
+      lines.push('    ssl_certificate ' + cert + ';');
+      lines.push('    ssl_certificate_key ' + key + ';');
+    }
+    lines.push('    return 301 ' + (f.ssl?'https://':'http://') + domain + '$request_uri;');
+    lines.push('}\n');
+  }
+
+  lines.push('server {');
+  let listenPort = f.ssl ? '443 ssl http2' : port;
+  lines.push('    listen ' + listenPort + ';');
+  lines.push('    listen [::]:' + listenPort + ';');
+  lines.push('    server_name ' + domain + ';\n');
+
+  if(f.ssl){
+    lines.push('    # SSL Configuration');
+    lines.push('    ssl_certificate ' + cert + ';');
+    lines.push('    ssl_certificate_key ' + key + ';');
+    lines.push('    ssl_protocols TLSv1.2 TLSv1.3;');
+    lines.push('    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;');
+    lines.push('    ssl_prefer_server_ciphers off;');
+    lines.push('    ssl_session_cache shared:SSL:10m;');
+    lines.push('    ssl_session_timeout 1d;');
+    lines.push('    ssl_session_tickets off;\n');
+  }
+
+  if(f.static){
+    lines.push('    root ' + docroot + ';');
+    lines.push('    index index.html index.htm;\n');
+  }
+
+  if(f.gzip){
+    lines.push('    # Gzip Compression');
+    lines.push('    gzip on;');
+    lines.push('    gzip_vary on;');
+    lines.push('    gzip_proxied any;');
+    lines.push('    gzip_comp_level 6;');
+    lines.push('    gzip_min_length 256;');
+    lines.push('    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;\n');
+  }
+
+  if(f.security){
+    lines.push('    # Security Headers');
+    lines.push('    add_header X-Frame-Options "SAMEORIGIN" always;');
+    lines.push('    add_header X-Content-Type-Options "nosniff" always;');
+    lines.push('    add_header X-XSS-Protection "1; mode=block" always;');
+    lines.push('    add_header Referrer-Policy "strict-origin-when-cross-origin" always;');
+    if(f.ssl) lines.push('    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;');
+    lines.push('    add_header Content-Security-Policy "default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\';" always;\n');
+  }
+
+  if(f.ratelimit){
+    lines.push('    # Rate Limiting');
+    lines.push('    limit_req zone=ratelimit burst=20 nodelay;\n');
+  }
+
+  if(f.proxy){
+    lines.push('    location / {');
+    lines.push('        proxy_pass ' + upstream + ';');
+    lines.push('        proxy_http_version 1.1;');
+    lines.push('        proxy_set_header Host $host;');
+    lines.push('        proxy_set_header X-Real-IP $remote_addr;');
+    lines.push('        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;');
+    lines.push('        proxy_set_header X-Forwarded-Proto $scheme;');
+    lines.push('        proxy_set_header Upgrade $http_upgrade;');
+    lines.push('        proxy_set_header Connection "upgrade";');
+    lines.push('    }\n');
+  } else if(f.static){
+    lines.push('    location / {');
+    lines.push('        try_files $uri $uri/ =404;');
+    lines.push('    }\n');
+  }
+
+  if(f.php){
+    lines.push('    # PHP-FPM Configuration');
+    lines.push('    location ~ \\.php$ {');
+    lines.push('        fastcgi_pass unix:/var/run/php/php-fpm.sock;');
+    lines.push('        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;');
+    lines.push('        include fastcgi_params;');
+    lines.push('        fastcgi_intercept_errors on;');
+    lines.push('        fastcgi_buffer_size 16k;');
+    lines.push('        fastcgi_buffers 4 16k;');
+    lines.push('    }\n');
+  }
+
+  if(f.static){
+    lines.push('    # Static asset caching');
+    lines.push('    location ~* \\.(jpg|jpeg|png|gif|ico|css|js|woff2?)$ {');
+    lines.push('        expires 30d;');
+    lines.push('        add_header Cache-Control "public, immutable";');
+    lines.push('    }');
+  }
+
+  lines.push('}');
+  return lines.join('\n');
+}
+
+// ===== APACHE =====
+function genApache(domain,port,docroot,upstream,cert,key,f){
+  let lines = [];
+  lines.push('# Apache configuration for ' + domain);
+  lines.push('# Generated by Lifa AI Server Config Generator\n');
+
+  if(f.redirect && f.ssl){
+    lines.push('<VirtualHost *:80>');
+    lines.push('    ServerName ' + domain);
+    lines.push('    ServerAlias www.' + domain);
+    lines.push('    RewriteEngine On');
+    lines.push('    RewriteRule ^(.*)$ https://' + domain + '$1 [R=301,L]');
+    lines.push('</VirtualHost>\n');
+  }
+
+  if(f.redirect){
+    lines.push('<VirtualHost *:' + (f.ssl?'443':'80') + '>');
+    lines.push('    ServerName www.' + domain);
+    lines.push('    RewriteEngine On');
+    lines.push('    RewriteRule ^(.*)$ ' + (f.ssl?'https://':'http://') + domain + '$1 [R=301,L]');
+    if(f.ssl){
+      lines.push('    SSLEngine on');
+      lines.push('    SSLCertificateFile ' + cert);
+      lines.push('    SSLCertificateKeyFile ' + key);
+    }
+    lines.push('</VirtualHost>\n');
+  }
+
+  lines.push('<VirtualHost *:' + (f.ssl?'443':port) + '>');
+  lines.push('    ServerName ' + domain);
+  lines.push('    ServerAdmin webmaster@' + domain + '\n');
+
+  if(f.static){
+    lines.push('    DocumentRoot ' + docroot);
+    lines.push('    DirectoryIndex index.html index.htm index.php\n');
+    lines.push('    <Directory ' + docroot + '>');
+    lines.push('        Options -Indexes +FollowSymLinks');
+    lines.push('        AllowOverride All');
+    lines.push('        Require all granted');
+    lines.push('    </Directory>\n');
+  }
+
+  if(f.ssl){
+    lines.push('    # SSL Configuration');
+    lines.push('    SSLEngine on');
+    lines.push('    SSLCertificateFile ' + cert);
+    lines.push('    SSLCertificateKeyFile ' + key);
+    lines.push('    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1');
+    lines.push('    SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384');
+    lines.push('    SSLHonorCipherOrder off\n');
+  }
+
+  if(f.gzip){
+    lines.push('    # Gzip Compression');
+    lines.push('    <IfModule mod_deflate.c>');
+    lines.push('        AddOutputFilterByType DEFLATE text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml');
+    lines.push('        DeflateCompressionLevel 6');
+    lines.push('    </IfModule>\n');
+  }
+
+  if(f.security){
+    lines.push('    # Security Headers');
+    lines.push('    Header always set X-Frame-Options "SAMEORIGIN"');
+    lines.push('    Header always set X-Content-Type-Options "nosniff"');
+    lines.push('    Header always set X-XSS-Protection "1; mode=block"');
+    lines.push('    Header always set Referrer-Policy "strict-origin-when-cross-origin"');
+    if(f.ssl) lines.push('    Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"');
+    lines.push('    Header always set Content-Security-Policy "default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\';"\n');
+  }
+
+  if(f.ratelimit){
+    lines.push('    # Rate Limiting (requires mod_ratelimit)');
+    lines.push('    <IfModule mod_ratelimit.c>');
+    lines.push('        SetOutputFilter RATE_LIMIT');
+    lines.push('        SetEnv rate-limit 400');
+    lines.push('    </IfModule>\n');
+  }
+
+  if(f.proxy){
+    lines.push('    # Reverse Proxy');
+    lines.push('    ProxyPreserveHost On');
+    lines.push('    ProxyPass / ' + upstream + '/');
+    lines.push('    ProxyPassReverse / ' + upstream + '/');
+    lines.push('    RequestHeader set X-Forwarded-Proto "' + (f.ssl?'https':'http') + '"\n');
+  }
+
+  if(f.php){
+    lines.push('    # PHP-FPM Configuration');
+    lines.push('    <FilesMatch \\.php$>');
+    lines.push('        SetHandler "proxy:unix:/var/run/php/php-fpm.sock|fcgi://localhost"');
+    lines.push('    </FilesMatch>\n');
+  }
+
+  if(f.static){
+    lines.push('    # Static asset caching');
+    lines.push('    <IfModule mod_expires.c>');
+    lines.push('        ExpiresActive On');
+    lines.push('        ExpiresByType image/jpeg "access plus 30 days"');
+    lines.push('        ExpiresByType image/png "access plus 30 days"');
+    lines.push('        ExpiresByType text/css "access plus 7 days"');
+    lines.push('        ExpiresByType application/javascript "access plus 7 days"');
+    lines.push('    </IfModule>\n');
+  }
+
+  lines.push('    # Logging');
+  lines.push('    ErrorLog ${APACHE_LOG_DIR}/' + domain + '-error.log');
+  lines.push('    CustomLog ${APACHE_LOG_DIR}/' + domain + '-access.log combined');
+  lines.push('</VirtualHost>');
+  return lines.join('\n');
+}
+
+// ===== CADDY =====
+function genCaddy(domain,port,docroot,upstream,cert,key,f){
+  let lines = [];
+  lines.push('# Caddyfile for ' + domain);
+  lines.push('# Generated by Lifa AI Server Config Generator\n');
+
+  let addr = domain;
+  if(!f.ssl) addr = 'http://' + domain + (port!=='80'?':'+port:'');
+  lines.push(addr + ' {');
+
+  if(f.ssl && cert && key){
+    lines.push('    tls ' + cert + ' ' + key);
+    lines.push('');
+  }
+
+  if(f.static){
+    lines.push('    root * ' + docroot);
+    lines.push('    file_server');
+    lines.push('    try_files {path} {path}/ /index.html');
+    lines.push('');
+  }
+
+  if(f.proxy){
+    lines.push('    reverse_proxy ' + upstream + ' {');
+    lines.push('        header_up Host {host}');
+    lines.push('        header_up X-Real-IP {remote_host}');
+    lines.push('        header_up X-Forwarded-For {remote_host}');
+    lines.push('        header_up X-Forwarded-Proto {scheme}');
+    lines.push('    }');
+    lines.push('');
+  }
+
+  if(f.gzip){
+    lines.push('    encode gzip zstd');
+    lines.push('');
+  }
+
+  if(f.security){
+    lines.push('    header {');
+    lines.push('        X-Frame-Options "SAMEORIGIN"');
+    lines.push('        X-Content-Type-Options "nosniff"');
+    lines.push('        X-XSS-Protection "1; mode=block"');
+    lines.push('        Referrer-Policy "strict-origin-when-cross-origin"');
+    if(f.ssl) lines.push('        Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"');
+    lines.push('        Content-Security-Policy "default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\';"');
+    lines.push('    }');
+    lines.push('');
+  }
+
+  if(f.ratelimit){
+    lines.push('    rate_limit {');
+    lines.push('        zone dynamic {');
+    lines.push('            key {remote_host}');
+    lines.push('            events 10');
+    lines.push('            window 1s');
+    lines.push('        }');
+    lines.push('    }');
+    lines.push('');
+  }
+
+  if(f.redirect){
+    lines.push('    @www host www.' + domain);
+    lines.push('    redir @www ' + (f.ssl?'https://':'http://') + domain + '{uri} permanent');
+    lines.push('');
+  }
+
+  if(f.static){
+    lines.push('    @static path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.woff2');
+    lines.push('    header @static Cache-Control "public, max-age=2592000, immutable"');
+    lines.push('');
+  }
+
+  lines.push('    log {');
+  lines.push('        output file /var/log/caddy/' + domain + '.log');
+  lines.push('    }');
+  lines.push('}');
+
+  if(f.redirect){
+    lines.push('\nwww.' + domain + ' {');
+    lines.push('    redir ' + (f.ssl?'https://':'http://') + domain + '{uri} permanent');
+    lines.push('}');
+  }
+
+  return lines.join('\n');
+}
+
+// ===== SYNTAX HIGHLIGHTING =====
+function highlight(text, type){
+  const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let result = esc;
+
+  // Comments
+  result = result.replace(/(#[^\n]*)/g, '<span class="syn-c">$1</span>');
+
+  if(type === 'nginx'){
+    // Directives
+    const directives = ['server','listen','server_name','root','index','location','proxy_pass','proxy_http_version','proxy_set_header','fastcgi_pass','fastcgi_param','include','gzip','gzip_vary','gzip_proxied','gzip_comp_level','gzip_min_length','gzip_types','add_header','ssl_certificate','ssl_certificate_key','ssl_protocols','ssl_ciphers','ssl_prefer_server_ciphers','ssl_session_cache','ssl_session_timeout','ssl_session_tickets','try_files','expires','return','limit_req_zone','limit_req','fastcgi_intercept_errors','fastcgi_buffer_size','fastcgi_buffers','rewrite'];
+    directives.forEach(d => {
+      const re = new RegExp('(^|\\n)(\\s*)(' + d.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')\\b', 'g');
+      result = result.replace(re, '$1$2<span class="syn-k">$3</span>');
+    });
+  } else if(type === 'apache'){
+    // Tags
+    result = result.replace(/(&lt;\/?[A-Za-z][^&]*?&gt;)/g, '<span class="syn-k">$1</span>');
+    // Directives
+    const directives = ['ServerName','ServerAlias','ServerAdmin','DocumentRoot','DirectoryIndex','Options','AllowOverride','Require','SSLEngine','SSLCertificateFile','SSLCertificateKeyFile','SSLProtocol','SSLCipherSuite','SSLHonorCipherOrder','ProxyPreserveHost','ProxyPass','ProxyPassReverse','RequestHeader','Header','RewriteEngine','RewriteRule','AddOutputFilterByType','DeflateCompressionLevel','ExpiresActive','ExpiresByType','SetHandler','ErrorLog','CustomLog','SetOutputFilter','SetEnv'];
+    directives.forEach(d => {
+      const re = new RegExp('(^|\\n)(\\s*)(' + d + ')\\b', 'g');
+      result = result.replace(re, '$1$2<span class="syn-d">$3</span>');
+    });
+  } else {
+    // Caddy
+    const directives = ['tls','root','file_server','try_files','reverse_proxy','encode','header','header_up','redir','log','output','rate_limit','zone','key','events','window','host','path'];
+    directives.forEach(d => {
+      const re = new RegExp('(^|\\n)(\\s*)(' + d.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')\\b', 'g');
+      result = result.replace(re, '$1$2<span class="syn-k">$3</span>');
+    });
+  }
+
+  // Strings in quotes
+  result = result.replace(/"([^"]*?)"/g, '"<span class="syn-s">$1</span>"');
+
+  // Numbers
+  result = result.replace(/\b(\d+)\b/g, '<span class="syn-n">$1</span>');
+
+  // Variables
+  result = result.replace(/(\$[a-z_]+)/g, '<span class="syn-v">$1</span>');
+  result = result.replace(/(\{[a-z_]+\})/g, '<span class="syn-v">$1</span>');
+
+  return result;
+}
+
+// ===== COPY & DOWNLOAD =====
+function copyConfig(){
+  const text = outputEl.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast('Copied to clipboard!');
+  });
+}
+window.copyConfig = copyConfig;
+
+function downloadConfig(){
+  const text = outputEl.textContent;
+  const names = {nginx:'nginx.conf',apache:'vhost.conf',caddy:'Caddyfile'};
+  const blob = new Blob([text],{type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = names[serverType];
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded ' + names[serverType]);
+}
+window.downloadConfig = downloadConfig;
+
+function showToast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show','success');
+  setTimeout(()=>t.classList.remove('show','success'), 2500);
+}
+
+// Initial generation
+generate();
+})();
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
