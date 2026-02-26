@@ -2,8 +2,917 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Portfolio Generator - Create Stunning Developer Portfolios | Lifa AI Tools</title>
+<meta name="description" content="Generate beautiful, responsive portfolio websites instantly. Choose from Developer, Designer, or Minimal templates. Export as standalone HTML. Free online tool.">
+<meta property="og:title" content="AI Portfolio Generator - Create Stunning Developer Portfolios | Lifa AI Tools">
+<meta property="og:description" content="Generate beautiful, responsive portfolio websites instantly. Choose from 3 professional templates and export as standalone HTML.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.github.io/ai-portfolio-generator.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Portfolio Generator | Lifa AI Tools">
+<meta name="twitter:description" content="Generate beautiful portfolio websites instantly. 3 templates, live preview, one-click export.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://lifa-su.github.io/ai-portfolio-generator.html">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--card:#1a1a1a;--primary:#6366f1;--primary-hover:#818cf8;--text:#e5e5e5;--text-muted:#a3a3a3;--border:#2a2a2a;--success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--primary);text-decoration:none;transition:color .2s}
+a:hover{color:var(--primary-hover)}
+.nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--primary)}
+.nav-links{display:flex;gap:20px;align-items:center}
+.nav-links a{color:var(--text-muted);font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--primary)}
+.nav-hamburger{display:none;background:none;border:none;color:var(--text);font-size:24px;cursor:pointer}
+.hero{text-align:center;padding:48px 24px 32px;max-width:800px;margin:0 auto}
+.hero h1{font-size:36px;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,var(--primary),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text-muted);font-size:16px;max-width:600px;margin:0 auto}
+.toolbar{display:flex;justify-content:center;gap:12px;padding:0 24px 24px;flex-wrap:wrap;align-items:center}
+.template-btn{padding:10px 24px;border-radius:var(--radius);border:2px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
+.template-btn:hover{border-color:var(--primary);color:var(--text)}
+.template-btn.active{border-color:var(--primary);background:var(--primary);color:#fff}
+.action-btn{padding:10px 24px;border-radius:var(--radius);border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.action-btn.export{background:var(--success);color:#fff}
+.action-btn.export:hover{background:#16a34a}
+.action-btn.copy{background:var(--primary);color:#fff}
+.action-btn.copy:hover{background:var(--primary-hover)}
+.main-container{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:0 24px 48px;max-width:1400px;margin:0 auto}
+.form-panel{display:flex;flex-direction:column;gap:16px}
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color .2s}
+.form-section:focus-within{border-color:var(--primary)}
+.form-section h3{font-size:16px;font-weight:700;margin-bottom:12px;color:var(--primary);display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:4px}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border-radius:6px;border:1px solid var(--border);background:#111;color:var(--text);font-size:14px;font-family:inherit;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--primary)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.project-card{background:#111;border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px;position:relative}
+.project-card .remove-btn{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--danger);cursor:pointer;font-size:18px;line-height:1;padding:4px}
+.project-card .remove-btn:hover{color:#f87171}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:6px;border:1px dashed var(--border);background:transparent;color:var(--primary);cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;width:100%}
+.add-btn:hover{border-color:var(--primary);background:rgba(99,102,241,.1)}
+.skills-input-area{display:flex;gap:8px;margin-bottom:8px}
+.skills-input-area input{flex:1}
+.skills-input-area button{padding:8px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+.skill-tags{display:flex;flex-wrap:wrap;gap:6px}
+.skill-tag{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:rgba(99,102,241,.15);color:var(--primary);font-size:13px;font-weight:500}
+.skill-tag button{background:none;border:none;color:var(--primary);cursor:pointer;font-size:14px;line-height:1}
+.contact-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preview-panel{position:sticky;top:72px;height:calc(100vh - 88px);overflow:hidden;background:#fff;border-radius:var(--radius);box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.preview-frame{width:100%;height:100%;border:none;border-radius:var(--radius)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success);color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s ease}
+.toast.show{transform:translateY(0);opacity:1}
+.char-count{font-size:11px;color:var(--text-muted);text-align:right;margin-top:2px}
+.section-collapse{cursor:pointer;user-select:none}
+.section-collapse::after{content:"\25B2";float:right;font-size:12px;color:var(--text-muted);transition:transform .2s}
+.section-collapse.collapsed::after{transform:rotate(180deg)}
+.section-body{overflow:hidden;transition:max-height .3s ease}
+.section-body.hidden{max-height:0!important;padding:0;margin:0}
+.preview-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--border);border-radius:var(--radius) var(--radius) 0 0}
+.preview-toolbar .preview-label{font-size:13px;font-weight:600;color:var(--text-muted)}
+.preview-toolbar .preview-actions{display:flex;gap:8px}
+.preview-toolbar .preview-actions button{padding:4px 12px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;font-size:12px;transition:all .2s}
+.preview-toolbar .preview-actions button:hover{border-color:var(--primary);color:var(--primary)}
+.preview-toolbar .preview-actions button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+.tech-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tech-tag-input{display:flex;gap:8px;margin-bottom:6px}
+.tech-tag-input input{flex:1}
+.tech-tag-input button{padding:6px 12px;border-radius:4px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-size:12px;white-space:nowrap}
+.tech-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;background:rgba(99,102,241,.12);color:var(--primary);font-size:12px}
+.tech-tag button{background:none;border:none;color:var(--primary);cursor:pointer;font-size:12px;line-height:1;padding:0}
+@media(max-width:768px){
+.nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:var(--card);border-bottom:1px solid var(--border);flex-direction:column;padding:16px 24px;gap:12px}
+.nav-links.open{display:flex}
+.nav-hamburger{display:block}
+.hero h1{font-size:28px}
+.toolbar{flex-direction:column;align-items:stretch}
+.template-btn,.action-btn{width:100%;justify-content:center;text-align:center}
+.main-container{grid-template-columns:1fr}
+.preview-panel{position:relative;top:0;height:500px}
+.form-row,.contact-row{grid-template-columns:1fr}
+}
+</style>
 </head>
 <body>
-<h1>Test</h1>
+<nav class="nav" role="navigation" aria-label="Main navigation">
+<a href="/" class="nav-logo">&#x1F680; Lifa <span>AI Tools</span></a>
+<button class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">&#9776;</button>
+<div class="nav-links">
+<a href="/">Home</a>
+<a href="/ai-resume-builder.html">Resume Builder</a>
+<a href="/ai-readme-generator.html">README Gen</a>
+<a href="/ai-css-generator.html">CSS Generator</a>
+<a href="/about.html">About</a>
+</div>
+</nav>
+
+<section class="hero">
+<h1>&#x1F3A8; AI Portfolio Generator</h1>
+<p>Create a stunning portfolio website in minutes. Fill in your details, choose a template, preview in real-time, and export as a standalone HTML file.</p>
+</section>
+
+<div class="toolbar">
+<button class="template-btn active" onclick="setTemplate('developer')" data-template="developer">&#x1F4BB; Developer</button>
+<button class="template-btn" onclick="setTemplate('designer')" data-template="designer">&#x1F3A8; Designer</button>
+<button class="template-btn" onclick="setTemplate('minimal')" data-template="minimal">&#x2728; Minimal</button>
+<button class="action-btn export" onclick="exportHTML()">&#x1F4E5; Export HTML</button>
+<button class="action-btn copy" onclick="copyHTML()">&#x1F4CB; Copy Code</button>
+</div>
+
+<div class="main-container">
+<div class="form-panel">
+
+<!-- Personal Info Section -->
+<div class="form-section">
+<h3 class="section-collapse" onclick="toggleSection(this)">&#x1F464; Personal Information</h3>
+<div class="section-body">
+<div class="form-group">
+<label for="fullName">Full Name *</label>
+<input type="text" id="fullName" placeholder="e.g. Jane Smith" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="jobTitle">Job Title / Role *</label>
+<input type="text" id="jobTitle" placeholder="e.g. Full Stack Developer" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="bio">Bio / About Me</label>
+<textarea id="bio" rows="4" placeholder="Write a brief introduction about yourself, your experience, and what you&#39;re passionate about..." oninput="updatePreview();updateCharCount(this,'bioCount',500)"></textarea>
+<div class="char-count" id="bioCount">0 / 500</div>
+</div>
+<div class="form-group">
+<label for="avatarUrl">Avatar / Photo URL</label>
+<input type="url" id="avatarUrl" placeholder="https://example.com/your-photo.jpg" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="tagline">Tagline (optional)</label>
+<input type="text" id="tagline" placeholder="e.g. Building the future, one line of code at a time" oninput="updatePreview()">
+</div>
+</div>
+</div>
+
+<!-- Skills Section -->
+<div class="form-section">
+<h3 class="section-collapse" onclick="toggleSection(this)">&#x1F6E0;&#xFE0F; Skills</h3>
+<div class="section-body">
+<div class="skills-input-area">
+<input type="text" id="skillInput" placeholder="Type a skill and press Add (e.g. React, Python)" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkill()}">
+<button onclick="addSkill()">+ Add</button>
+</div>
+<div class="skill-tags" id="skillTags"></div>
+<p style="font-size:12px;color:var(--text-muted);margin-top:8px">Suggested: JavaScript, TypeScript, React, Node.js, Python, AWS, Docker, Git</p>
+</div>
+</div>
+
+<!-- Contact Section -->
+<div class="form-section">
+<h3 class="section-collapse" onclick="toggleSection(this)">&#x1F4EC; Contact Information</h3>
+<div class="section-body">
+<div class="contact-row">
+<div class="form-group">
+<label for="email">Email</label>
+<input type="email" id="email" placeholder="you@example.com" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="website">Website</label>
+<input type="url" id="website" placeholder="https://yoursite.com" oninput="updatePreview()">
+</div>
+</div>
+<div class="contact-row">
+<div class="form-group">
+<label for="github">GitHub</label>
+<input type="text" id="github" placeholder="github.com/username" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="linkedin">LinkedIn</label>
+<input type="text" id="linkedin" placeholder="linkedin.com/in/username" oninput="updatePreview()">
+</div>
+</div>
+<div class="contact-row">
+<div class="form-group">
+<label for="twitter">Twitter / X</label>
+<input type="text" id="twitter" placeholder="@username" oninput="updatePreview()">
+</div>
+<div class="form-group">
+<label for="location">Location</label>
+<input type="text" id="location" placeholder="e.g. San Francisco, CA" oninput="updatePreview()">
+</div>
+</div>
+</div>
+</div>
+
+<!-- Projects Section -->
+<div class="form-section">
+<h3 class="section-collapse" onclick="toggleSection(this)">&#x1F4C2; Projects</h3>
+<div class="section-body">
+<div id="projectsList"></div>
+<button class="add-btn" onclick="addProject()">+ Add Project</button>
+</div>
+</div>
+
+</div>
+
+<!-- Preview Panel -->
+<div class="preview-panel" id="previewPanel">
+<div class="preview-toolbar">
+<span class="preview-label">&#x1F441;&#xFE0F; Live Preview</span>
+<div class="preview-actions">
+<button class="active" onclick="setPreviewSize(this,'100%')" title="Desktop">&#x1F5A5;&#xFE0F;</button>
+<button onclick="setPreviewSize(this,'768px')" title="Tablet">&#x1F4F1;</button>
+<button onclick="setPreviewSize(this,'375px')" title="Mobile">&#x1F4F2;</button>
+</div>
+</div>
+<iframe class="preview-frame" id="previewFrame" title="Portfolio Preview" sandbox="allow-same-origin"></iframe>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// State
+let currentTemplate = 'developer';
+let skills = [];
+let projects = [];
+let projectIdCounter = 0;
+let previewTimeout = null;
+
+// Toggle section collapse
+function toggleSection(el) {
+  el.classList.toggle('collapsed');
+  const body = el.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+// Character count
+function updateCharCount(el, countId, max) {
+  const count = el.value.length;
+  document.getElementById(countId).textContent = count + ' / ' + max;
+  if (count > max) el.value = el.value.substring(0, max);
+}
+
+// Template selection
+function setTemplate(template) {
+  currentTemplate = template;
+  document.querySelectorAll('.template-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.template === template);
+  });
+  updatePreview();
+}
+
+// Preview size
+function setPreviewSize(btn, width) {
+  const frame = document.getElementById('previewFrame');
+  frame.style.maxWidth = width;
+  frame.style.margin = width === '100%' ? '0' : '0 auto';
+  document.querySelectorAll('.preview-actions button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Skills management
+function addSkill() {
+  const input = document.getElementById('skillInput');
+  const val = input.value.trim();
+  if (val && !skills.includes(val)) {
+    skills.push(val);
+    renderSkills();
+    updatePreview();
+  }
+  input.value = '';
+  input.focus();
+}
+
+function removeSkill(index) {
+  skills.splice(index, 1);
+  renderSkills();
+  updatePreview();
+}
+
+function renderSkills() {
+  const container = document.getElementById('skillTags');
+  container.innerHTML = skills.map((s, i) =>
+    '<span class="skill-tag">' + escapeHtml(s) + '<button onclick="removeSkill(' + i + ')" aria-label="Remove ' + escapeHtml(s) + '">&times;</button></span>'
+  ).join('');
+}
+
+// Project management
+function addProject() {
+  const id = projectIdCounter++;
+  projects.push({ id, name: '', description: '', techStack: [], link: '', image: '' });
+  renderProjects();
+  updatePreview();
+}
+
+function removeProject(id) {
+  projects = projects.filter(p => p.id !== id);
+  renderProjects();
+  updatePreview();
+}
+
+function updateProject(id, field, value) {
+  const proj = projects.find(p => p.id === id);
+  if (proj) {
+    proj[field] = value;
+    updatePreview();
+  }
+}
+
+function addTechToProject(id) {
+  const input = document.getElementById('techInput_' + id);
+  const val = input.value.trim();
+  const proj = projects.find(p => p.id === id);
+  if (val && proj && !proj.techStack.includes(val)) {
+    proj.techStack.push(val);
+    renderProjects();
+    updatePreview();
+  }
+}
+
+function removeTechFromProject(id, index) {
+  const proj = projects.find(p => p.id === id);
+  if (proj) {
+    proj.techStack.splice(index, 1);
+    renderProjects();
+    updatePreview();
+  }
+}
+
+function renderProjects() {
+  const container = document.getElementById('projectsList');
+  if (projects.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4C1;</div><p>No projects yet. Click "Add Project" to get started.</p></div>';
+    return;
+  }
+  container.innerHTML = projects.map(p => {
+    const techTags = p.techStack.map((t, i) =>
+      '<span class="tech-tag">' + escapeHtml(t) + '<button onclick="removeTechFromProject(' + p.id + ',' + i + ')">&times;</button></span>'
+    ).join('');
+    return '<div class="project-card">' +
+      '<button class="remove-btn" onclick="removeProject(' + p.id + ')" aria-label="Remove project">&times;</button>' +
+      '<div class="form-group"><label>Project Name *</label>' +
+      '<input type="text" value="' + escapeAttr(p.name) + '" placeholder="e.g. E-commerce Platform" oninput="updateProject(' + p.id + ',\'name\',this.value)"></div>' +
+      '<div class="form-group"><label>Description</label>' +
+      '<textarea rows="3" placeholder="Describe what this project does, your role, and key achievements..." oninput="updateProject(' + p.id + ',\'description\',this.value)">' + escapeHtml(p.description) + '</textarea></div>' +
+      '<div class="form-group"><label>Tech Stack</label>' +
+      '<div class="tech-tag-input"><input type="text" id="techInput_' + p.id + '" placeholder="e.g. React" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addTechToProject(' + p.id + ')}">' +
+      '<button onclick="addTechToProject(' + p.id + ')">+ Add</button></div>' +
+      '<div class="tech-tags">' + techTags + '</div></div>' +
+      '<div class="form-row">' +
+      '<div class="form-group"><label>Project URL</label>' +
+      '<input type="url" value="' + escapeAttr(p.link) + '" placeholder="https://project-url.com" oninput="updateProject(' + p.id + ',\'link\',this.value)"></div>' +
+      '<div class="form-group"><label>Image URL</label>' +
+      '<input type="url" value="' + escapeAttr(p.image) + '" placeholder="https://example.com/screenshot.png" oninput="updateProject(' + p.id + ',\'image\',this.value)"></div>' +
+      '</div></div>';
+  }).join('');
+}
+
+// Escape helpers
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function escapeAttr(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Toast notification
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// Gather form data
+function getFormData() {
+  return {
+    name: document.getElementById('fullName').value.trim(),
+    title: document.getElementById('jobTitle').value.trim(),
+    bio: document.getElementById('bio').value.trim(),
+    avatar: document.getElementById('avatarUrl').value.trim(),
+    tagline: document.getElementById('tagline').value.trim(),
+    skills: [...skills],
+    email: document.getElementById('email').value.trim(),
+    website: document.getElementById('website').value.trim(),
+    github: document.getElementById('github').value.trim(),
+    linkedin: document.getElementById('linkedin').value.trim(),
+    twitter: document.getElementById('twitter').value.trim(),
+    location: document.getElementById('location').value.trim(),
+    projects: projects.map(p => ({...p}))
+  };
+}
+
+// Debounced preview update
+function updatePreview() {
+  clearTimeout(previewTimeout);
+  previewTimeout = setTimeout(() => {
+    const data = getFormData();
+    const html = generatePortfolioHTML(data, currentTemplate);
+    const frame = document.getElementById('previewFrame');
+    frame.srcdoc = html;
+  }, 300);
+}
+
+// Export HTML file
+function exportHTML() {
+  const data = getFormData();
+  if (!data.name) { showToast('Please enter your name first'); return; }
+  const html = generatePortfolioHTML(data, currentTemplate);
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (data.name.replace(/\s+/g, '-').toLowerCase() || 'portfolio') + '-portfolio.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Portfolio exported successfully!');
+}
+
+// Copy HTML code
+function copyHTML() {
+  const data = getFormData();
+  if (!data.name) { showToast('Please enter your name first'); return; }
+  const html = generatePortfolioHTML(data, currentTemplate);
+  navigator.clipboard.writeText(html).then(() => {
+    showToast('HTML code copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = html;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('HTML code copied to clipboard!');
+  });
+}
+
+// ============================================
+// TEMPLATE: Developer (Code-style)
+// ============================================
+function generateDeveloperTemplate(d) {
+  const skillsHtml = d.skills.map(s => '<span class="dev-skill">' + escapeHtml(s) + '</span>').join('');
+  const projectsHtml = d.projects.map(p => {
+    const techHtml = p.techStack.map(t => '<span class="dev-tech">' + escapeHtml(t) + '</span>').join('');
+    const imgHtml = p.image ? '<div class="dev-project-img"><img src="' + escapeAttr(p.image) + '" alt="' + escapeAttr(p.name) + '" loading="lazy"></div>' : '';
+    const linkHtml = p.link ? '<a href="' + escapeAttr(p.link) + '" target="_blank" rel="noopener" class="dev-project-link">&#x1F517; View Project</a>' : '';
+    return '<div class="dev-project">' + imgHtml +
+      '<div class="dev-project-info">' +
+      '<h3><span class="dev-comment">// </span>' + escapeHtml(p.name) + '</h3>' +
+      '<p>' + escapeHtml(p.description) + '</p>' +
+      '<div class="dev-tech-list">' + techHtml + '</div>' +
+      linkHtml + '</div></div>';
+  }).join('');
+  const contactLinks = [];
+  if (d.email) contactLinks.push('<a href="mailto:' + escapeAttr(d.email) + '">&#x1F4E7; ' + escapeHtml(d.email) + '</a>');
+  if (d.github) contactLinks.push('<a href="https://' + escapeAttr(d.github.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">&#x1F4BB; GitHub</a>');
+  if (d.linkedin) contactLinks.push('<a href="https://' + escapeAttr(d.linkedin.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">&#x1F4BC; LinkedIn</a>');
+  if (d.twitter) contactLinks.push('<a href="https://twitter.com/' + escapeAttr(d.twitter.replace('@', '')) + '" target="_blank" rel="noopener">&#x1F426; Twitter</a>');
+  if (d.website) contactLinks.push('<a href="' + escapeAttr(d.website) + '" target="_blank" rel="noopener">&#x1F310; Website</a>');
+  const avatarHtml = d.avatar ? '<img src="' + escapeAttr(d.avatar) + '" alt="' + escapeAttr(d.name) + '" class="dev-avatar">' : '<div class="dev-avatar-placeholder">' + (d.name ? d.name.charAt(0).toUpperCase() : '?') + '</div>';
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">' +
+    '<title>' + escapeHtml(d.name) + ' - Portfolio</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:"Fira Code","Cascadia Code","JetBrains Mono",monospace;background:#0d1117;color:#c9d1d9;line-height:1.7;min-height:100vh}' +
+    '.dev-container{max-width:900px;margin:0 auto;padding:40px 24px}' +
+    '.dev-header{text-align:center;margin-bottom:48px;padding:40px;background:#161b22;border:1px solid #30363d;border-radius:12px;position:relative;overflow:hidden}' +
+    '.dev-header::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#6366f1,#a78bfa,#6366f1)}' +
+    '.dev-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #6366f1;margin-bottom:16px}' +
+    '.dev-avatar-placeholder{width:100px;height:100px;border-radius:50%;background:#6366f1;display:inline-flex;align-items:center;justify-content:center;font-size:40px;color:#fff;margin-bottom:16px}' +
+    '.dev-header h1{font-size:28px;color:#f0f6fc;margin-bottom:4px}' +
+    '.dev-header .title{color:#6366f1;font-size:16px;margin-bottom:8px}' +
+    '.dev-header .tagline{color:#8b949e;font-size:14px;font-style:italic;margin-bottom:4px}' +
+    '.dev-header .location{color:#8b949e;font-size:13px}' +
+    '.dev-section{margin-bottom:36px}' +
+    '.dev-section-title{font-size:18px;color:#6366f1;margin-bottom:16px;padding-bottom:8px;border-bottom:1px dashed #30363d;display:flex;align-items:center;gap:8px}' +
+    '.dev-comment{color:#6366f1;opacity:.6}' +
+    '.dev-bio{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:20px;font-size:14px;color:#c9d1d9;line-height:1.8}' +
+    '.dev-bio::before{content:"/**";display:block;color:#6366f1;opacity:.5;margin-bottom:4px}' +
+    '.dev-bio::after{content:" */";display:block;color:#6366f1;opacity:.5;margin-top:4px}' +
+    '.dev-skills{display:flex;flex-wrap:wrap;gap:8px}' +
+    '.dev-skill{padding:6px 14px;background:#161b22;border:1px solid #30363d;border-radius:6px;font-size:13px;color:#c9d1d9;transition:all .2s}' +
+    '.dev-skill:hover{border-color:#6366f1;color:#6366f1}' +
+    '.dev-project{background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden;margin-bottom:16px;transition:border-color .2s}' +
+    '.dev-project:hover{border-color:#6366f1}' +
+    '.dev-project-img{width:100%;height:200px;overflow:hidden}' +
+    '.dev-project-img img{width:100%;height:100%;object-fit:cover}' +
+    '.dev-project-info{padding:20px}' +
+    '.dev-project-info h3{font-size:16px;color:#f0f6fc;margin-bottom:8px}' +
+    '.dev-project-info p{font-size:13px;color:#8b949e;margin-bottom:12px;line-height:1.6}' +
+    '.dev-tech-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}' +
+    '.dev-tech{padding:3px 10px;background:rgba(99,102,241,.15);border-radius:12px;font-size:11px;color:#a78bfa}' +
+    '.dev-project-link{display:inline-flex;align-items:center;gap:4px;color:#6366f1;font-size:13px;text-decoration:none}' +
+    '.dev-project-link:hover{text-decoration:underline}' +
+    '.dev-contact{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}' +
+    '.dev-contact a{padding:8px 16px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;text-decoration:none;font-size:13px;transition:all .2s}' +
+    '.dev-contact a:hover{border-color:#6366f1;color:#6366f1}' +
+    '.dev-footer{text-align:center;padding:24px;color:#484f58;font-size:12px;margin-top:24px;border-top:1px solid #30363d}' +
+    '@media(max-width:600px){.dev-container{padding:20px 16px}.dev-header{padding:24px 16px}.dev-header h1{font-size:22px}.dev-contact{flex-direction:column;align-items:center}}' +
+    '</style></head><body>' +
+    '<div class="dev-container">' +
+    '<header class="dev-header">' + avatarHtml +
+    '<h1>' + escapeHtml(d.name || 'Your Name') + '</h1>' +
+    '<div class="title">' + escapeHtml(d.title || 'Your Title') + '</div>' +
+    (d.tagline ? '<div class="tagline">' + escapeHtml(d.tagline) + '</div>' : '') +
+    (d.location ? '<div class="location">&#x1F4CD; ' + escapeHtml(d.location) + '</div>' : '') +
+    '</header>' +
+    (d.bio ? '<section class="dev-section"><div class="dev-section-title">&#x1F4DD; About Me</div><div class="dev-bio">' + escapeHtml(d.bio) + '</div></section>' : '') +
+    (d.skills.length ? '<section class="dev-section"><div class="dev-section-title">&#x1F6E0;&#xFE0F; Tech Stack</div><div class="dev-skills">' + skillsHtml + '</div></section>' : '') +
+    (d.projects.length ? '<section class="dev-section"><div class="dev-section-title">&#x1F4C2; Projects</div>' + projectsHtml + '</section>' : '') +
+    (contactLinks.length ? '<section class="dev-section"><div class="dev-section-title">&#x1F4EC; Contact</div><div class="dev-contact">' + contactLinks.join('') + '</div></section>' : '') +
+    '<footer class="dev-footer">Built with &#x2764;&#xFE0F; using AI Portfolio Generator</footer>' +
+    '</div></body></html>';
+}
+
+// ============================================
+// TEMPLATE: Designer (Visual-style)
+// ============================================
+function generateDesignerTemplate(d) {
+  const skillsHtml = d.skills.map(s => '<span class="dsg-skill">' + escapeHtml(s) + '</span>').join('');
+  const projectsHtml = d.projects.map((p, i) => {
+    const techHtml = p.techStack.map(t => '<span class="dsg-tech">' + escapeHtml(t) + '</span>').join('');
+    const imgHtml = p.image ? '<div class="dsg-project-img"><img src="' + escapeAttr(p.image) + '" alt="' + escapeAttr(p.name) + '" loading="lazy"></div>' : '<div class="dsg-project-img dsg-placeholder"><span>' + (i + 1) + '</span></div>';
+    const linkHtml = p.link ? '<a href="' + escapeAttr(p.link) + '" target="_blank" rel="noopener" class="dsg-link">View Project &rarr;</a>' : '';
+    return '<div class="dsg-project">' + imgHtml +
+      '<div class="dsg-project-body"><h3>' + escapeHtml(p.name) + '</h3>' +
+      '<p>' + escapeHtml(p.description) + '</p>' +
+      '<div class="dsg-tech-list">' + techHtml + '</div>' +
+      linkHtml + '</div></div>';
+  }).join('');
+  const contactLinks = [];
+  if (d.email) contactLinks.push('<a href="mailto:' + escapeAttr(d.email) + '">Email</a>');
+  if (d.github) contactLinks.push('<a href="https://' + escapeAttr(d.github.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">GitHub</a>');
+  if (d.linkedin) contactLinks.push('<a href="https://' + escapeAttr(d.linkedin.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">LinkedIn</a>');
+  if (d.twitter) contactLinks.push('<a href="https://twitter.com/' + escapeAttr(d.twitter.replace('@', '')) + '" target="_blank" rel="noopener">Twitter</a>');
+  if (d.website) contactLinks.push('<a href="' + escapeAttr(d.website) + '" target="_blank" rel="noopener">Website</a>');
+  const avatarHtml = d.avatar ? '<img src="' + escapeAttr(d.avatar) + '" alt="' + escapeAttr(d.name) + '" class="dsg-avatar">' : '<div class="dsg-avatar-placeholder">' + (d.name ? d.name.charAt(0).toUpperCase() : '?') + '</div>';
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">' +
+    '<title>' + escapeHtml(d.name) + ' - Portfolio</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:"Inter",sans-serif;background:#0a0a0a;color:#e5e5e5;min-height:100vh}' +
+    '.dsg-hero{min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,.15),transparent 70%)}' +
+    '.dsg-hero::before{content:"";position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.08),transparent);top:-200px;right:-100px}' +
+    '.dsg-hero::after{content:"";position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.06),transparent);bottom:-100px;left:-50px}' +
+    '.dsg-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid rgba(99,102,241,.5);margin-bottom:24px;box-shadow:0 0 40px rgba(99,102,241,.2)}' +
+    '.dsg-avatar-placeholder{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a78bfa);display:inline-flex;align-items:center;justify-content:center;font-size:48px;color:#fff;margin-bottom:24px;font-weight:800}' +
+    '.dsg-hero h1{font-size:48px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}' +
+    '.dsg-hero .subtitle{font-size:20px;color:#a78bfa;font-weight:300;margin-bottom:12px}' +
+    '.dsg-hero .tagline{font-size:16px;color:#a3a3a3;max-width:500px;margin:0 auto 8px}' +
+    '.dsg-hero .location{font-size:14px;color:#737373}' +
+    '.dsg-container{max-width:1000px;margin:0 auto;padding:0 24px 60px}' +
+    '.dsg-section{margin-bottom:60px}' +
+    '.dsg-section-title{font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#6366f1;margin-bottom:24px;display:flex;align-items:center;gap:12px}' +
+    '.dsg-section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#6366f1,transparent)}' +
+    '.dsg-bio{font-size:18px;line-height:1.8;color:#d4d4d4;font-weight:300;max-width:700px}' +
+    '.dsg-skills{display:flex;flex-wrap:wrap;gap:10px}' +
+    '.dsg-skill{padding:8px 20px;border-radius:50px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#a78bfa;font-size:14px;font-weight:400;transition:all .3s}' +
+    '.dsg-skill:hover{background:rgba(99,102,241,.2);transform:translateY(-2px)}' +
+    '.dsg-projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}' +
+    '.dsg-project{background:#141414;border:1px solid #262626;border-radius:16px;overflow:hidden;transition:all .3s}' +
+    '.dsg-project:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3);border-color:rgba(99,102,241,.3)}' +
+    '.dsg-project-img{height:200px;overflow:hidden;background:#1a1a1a}' +
+    '.dsg-project-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}' +
+    '.dsg-project:hover .dsg-project-img img{transform:scale(1.05)}' +
+    '.dsg-project-img.dsg-placeholder{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a1a,#262626)}' +
+    '.dsg-project-img.dsg-placeholder span{font-size:48px;color:#333;font-weight:800}' +
+    '.dsg-project-body{padding:20px}' +
+    '.dsg-project-body h3{font-size:18px;font-weight:600;margin-bottom:8px;color:#f5f5f5}' +
+    '.dsg-project-body p{font-size:14px;color:#a3a3a3;line-height:1.6;margin-bottom:12px}' +
+    '.dsg-tech-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}' +
+    '.dsg-tech{padding:3px 10px;border-radius:20px;background:rgba(99,102,241,.08);color:#818cf8;font-size:12px}' +
+    '.dsg-link{color:#6366f1;font-size:14px;font-weight:600;transition:color .2s}' +
+    '.dsg-link:hover{color:#a78bfa}' +
+    '.dsg-contact{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;padding:40px;background:#141414;border:1px solid #262626;border-radius:16px;text-align:center}' +
+    '.dsg-contact a{color:#a78bfa;font-size:15px;text-decoration:none;padding:10px 24px;border:1px solid rgba(99,102,241,.2);border-radius:50px;transition:all .3s}' +
+    '.dsg-contact a:hover{background:rgba(99,102,241,.1);border-color:#6366f1}' +
+    '.dsg-footer{text-align:center;padding:40px;color:#525252;font-size:13px}' +
+    '@media(max-width:768px){.dsg-hero h1{font-size:32px}.dsg-hero .subtitle{font-size:16px}.dsg-projects{grid-template-columns:1fr}.dsg-bio{font-size:16px}}' +
+    '</style></head><body>' +
+    '<section class="dsg-hero">' + avatarHtml +
+    '<h1>' + escapeHtml(d.name || 'Your Name') + '</h1>' +
+    '<div class="subtitle">' + escapeHtml(d.title || 'Your Title') + '</div>' +
+    (d.tagline ? '<div class="tagline">' + escapeHtml(d.tagline) + '</div>' : '') +
+    (d.location ? '<div class="location">&#x1F4CD; ' + escapeHtml(d.location) + '</div>' : '') +
+    '</section>' +
+    '<div class="dsg-container">' +
+    (d.bio ? '<section class="dsg-section"><div class="dsg-section-title">About</div><div class="dsg-bio">' + escapeHtml(d.bio) + '</div></section>' : '') +
+    (d.skills.length ? '<section class="dsg-section"><div class="dsg-section-title">Skills</div><div class="dsg-skills">' + skillsHtml + '</div></section>' : '') +
+    (d.projects.length ? '<section class="dsg-section"><div class="dsg-section-title">Projects</div><div class="dsg-projects">' + projectsHtml + '</div></section>' : '') +
+    (contactLinks.length ? '<section class="dsg-section"><div class="dsg-section-title">Get in Touch</div><div class="dsg-contact">' + contactLinks.join('') + '</div></section>' : '') +
+    '</div>' +
+    '<footer class="dsg-footer">&copy; ' + new Date().getFullYear() + ' ' + escapeHtml(d.name) + '. All rights reserved.</footer>' +
+    '</body></html>';
+}
+
+// ============================================
+// TEMPLATE: Minimal (Clean-style)
+// ============================================
+function generateMinimalTemplate(d) {
+  const skillsHtml = d.skills.map(s => '<span class="min-skill">' + escapeHtml(s) + '</span>').join('');
+  const projectsHtml = d.projects.map(p => {
+    const techHtml = p.techStack.map(t => '<span class="min-tech">' + escapeHtml(t) + '</span>').join('');
+    const imgHtml = p.image ? '<img src="' + escapeAttr(p.image) + '" alt="' + escapeAttr(p.name) + '" class="min-project-img" loading="lazy">' : '';
+    const linkHtml = p.link ? '<a href="' + escapeAttr(p.link) + '" target="_blank" rel="noopener" class="min-link">View &rarr;</a>' : '';
+    return '<article class="min-project">' + imgHtml +
+      '<h3>' + escapeHtml(p.name) + ' ' + linkHtml + '</h3>' +
+      '<p>' + escapeHtml(p.description) + '</p>' +
+      '<div class="min-tech-list">' + techHtml + '</div>' +
+      '</article>';
+  }).join('');
+  const contactItems = [];
+  if (d.email) contactItems.push('<a href="mailto:' + escapeAttr(d.email) + '">' + escapeHtml(d.email) + '</a>');
+  if (d.github) contactItems.push('<a href="https://' + escapeAttr(d.github.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">GitHub</a>');
+  if (d.linkedin) contactItems.push('<a href="https://' + escapeAttr(d.linkedin.replace(/^https?:\/\//, '')) + '" target="_blank" rel="noopener">LinkedIn</a>');
+  if (d.twitter) contactItems.push('<a href="https://twitter.com/' + escapeAttr(d.twitter.replace('@', '')) + '" target="_blank" rel="noopener">Twitter</a>');
+  if (d.website) contactItems.push('<a href="' + escapeAttr(d.website) + '" target="_blank" rel="noopener">Website</a>');
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">' +
+    '<title>' + escapeHtml(d.name) + ' - Portfolio</title>' +
+    '<style>' +
+    '*{box-sizing:border-box;margin:0;padding:0}' +
+    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#fafafa;color:#171717;line-height:1.7;min-height:100vh}' +
+    '.min-container{max-width:680px;margin:0 auto;padding:80px 24px}' +
+    '.min-header{margin-bottom:48px}' +
+    '.min-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:20px;border:2px solid #e5e5e5}' +
+    '.min-avatar-placeholder{width:80px;height:80px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;margin-bottom:20px;font-weight:700}' +
+    '.min-header h1{font-size:32px;font-weight:700;color:#0a0a0a;margin-bottom:4px;letter-spacing:-0.5px}' +
+    '.min-header .title{font-size:16px;color:#6366f1;font-weight:500;margin-bottom:8px}' +
+    '.min-header .tagline{font-size:15px;color:#737373;margin-bottom:4px}' +
+    '.min-header .location{font-size:14px;color:#a3a3a3}' +
+    '.min-section{margin-bottom:40px}' +
+    '.min-section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:#a3a3a3;margin-bottom:16px}' +
+    '.min-bio{font-size:16px;color:#404040;line-height:1.8}' +
+    '.min-skills{display:flex;flex-wrap:wrap;gap:8px}' +
+    '.min-skill{padding:5px 14px;border-radius:6px;background:#f5f5f5;border:1px solid #e5e5e5;font-size:13px;color:#525252;font-weight:500}' +
+    '.min-project{padding:24px 0;border-bottom:1px solid #e5e5e5}' +
+    '.min-project:last-child{border-bottom:none}' +
+    '.min-project h3{font-size:18px;font-weight:600;color:#0a0a0a;margin-bottom:6px}' +
+    '.min-project p{font-size:14px;color:#525252;margin-bottom:10px}' +
+    '.min-project-img{width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-bottom:12px;border:1px solid #e5e5e5}' +
+    '.min-tech-list{display:flex;flex-wrap:wrap;gap:6px}' +
+    '.min-tech{padding:3px 10px;border-radius:4px;background:#f0f0f0;font-size:12px;color:#6366f1;font-weight:500}' +
+    '.min-link{color:#6366f1;font-size:14px;font-weight:500;text-decoration:none}' +
+    '.min-link:hover{text-decoration:underline}' +
+    '.min-contact{display:flex;flex-wrap:wrap;gap:16px}' +
+    '.min-contact a{color:#6366f1;font-size:14px;text-decoration:none;font-weight:500}' +
+    '.min-contact a:hover{text-decoration:underline}' +
+    '.min-footer{margin-top:60px;padding-top:24px;border-top:1px solid #e5e5e5;text-align:center;font-size:13px;color:#a3a3a3}' +
+    '@media(max-width:640px){.min-container{padding:40px 20px}.min-header h1{font-size:26px}}' +
+    '</style></head><body>' +
+    '<div class="min-container">' +
+    '<header class="min-header">' +
+    (d.avatar ? '<img src="' + escapeAttr(d.avatar) + '" alt="' + escapeAttr(d.name) + '" class="min-avatar">' : (d.name ? '<div class="min-avatar-placeholder">' + d.name.charAt(0).toUpperCase() + '</div>' : '')) +
+    '<h1>' + escapeHtml(d.name || 'Your Name') + '</h1>' +
+    '<div class="title">' + escapeHtml(d.title || 'Your Title') + '</div>' +
+    (d.tagline ? '<div class="tagline">' + escapeHtml(d.tagline) + '</div>' : '') +
+    (d.location ? '<div class="location">&#x1F4CD; ' + escapeHtml(d.location) + '</div>' : '') +
+    '</header>' +
+    (d.bio ? '<section class="min-section"><h2 class="min-section-title">About</h2><p class="min-bio">' + escapeHtml(d.bio) + '</p></section>' : '') +
+    (d.skills.length ? '<section class="min-section"><h2 class="min-section-title">Skills</h2><div class="min-skills">' + skillsHtml + '</div></section>' : '') +
+    (d.projects.length ? '<section class="min-section"><h2 class="min-section-title">Projects</h2>' + projectsHtml + '</section>' : '') +
+    (contactItems.length ? '<section class="min-section"><h2 class="min-section-title">Contact</h2><div class="min-contact">' + contactItems.join('') + '</div></section>' : '') +
+    '<footer class="min-footer">&copy; ' + new Date().getFullYear() + ' ' + escapeHtml(d.name) + '. All rights reserved.</footer>' +
+    '</div></body></html>';
+}
+
+// ============================================
+// Main generator dispatcher
+// ============================================
+function generatePortfolioHTML(data, template) {
+  switch (template) {
+    case 'developer': return generateDeveloperTemplate(data);
+    case 'designer': return generateDesignerTemplate(data);
+    case 'minimal': return generateMinimalTemplate(data);
+    default: return generateDeveloperTemplate(data);
+  }
+}
+
+// ============================================
+// Sample data for initial preview
+// ============================================
+function loadSampleData() {
+  document.getElementById('fullName').value = 'Alex Chen';
+  document.getElementById('jobTitle').value = 'Full Stack Developer';
+  document.getElementById('bio').value = 'Passionate developer with 5+ years of experience building web applications. I love creating elegant solutions to complex problems and contributing to open-source projects.';
+  document.getElementById('tagline').value = 'Building the future, one commit at a time';
+  document.getElementById('email').value = 'alex@example.com';
+  document.getElementById('github').value = 'github.com/alexchen';
+  document.getElementById('linkedin').value = 'linkedin.com/in/alexchen';
+  document.getElementById('twitter').value = '@alexchendev';
+  document.getElementById('location').value = 'San Francisco, CA';
+  
+  skills = ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'PostgreSQL', 'Docker', 'AWS'];
+  renderSkills();
+  
+  projects = [
+    {
+      id: projectIdCounter++,
+      name: 'TaskFlow Pro',
+      description: 'A real-time project management tool with drag-and-drop Kanban boards, team collaboration features, and automated workflow triggers.',
+      techStack: ['React', 'Node.js', 'Socket.io', 'MongoDB'],
+      link: 'https://taskflow-demo.com',
+      image: ''
+    },
+    {
+      id: projectIdCounter++,
+      name: 'CloudSync API',
+      description: 'RESTful API service for file synchronization across multiple cloud providers. Handles 10K+ requests per minute with 99.9% uptime.',
+      techStack: ['Python', 'FastAPI', 'Redis', 'AWS S3'],
+      link: 'https://github.com/alexchen/cloudsync',
+      image: ''
+    },
+    {
+      id: projectIdCounter++,
+      name: 'DevMetrics Dashboard',
+      description: 'Analytics dashboard for development teams to track code quality, deployment frequency, and team velocity metrics.',
+      techStack: ['Vue.js', 'D3.js', 'GraphQL', 'PostgreSQL'],
+      link: '',
+      image: ''
+    }
+  ];
+  renderProjects();
+  updatePreview();
+  updateCharCount(document.getElementById('bio'), 'bioCount', 500);
+}
+
+// ============================================
+// Local Storage - Save & Restore
+// ============================================
+function saveToStorage() {
+  try {
+    const data = {
+      fullName: document.getElementById('fullName').value,
+      jobTitle: document.getElementById('jobTitle').value,
+      bio: document.getElementById('bio').value,
+      avatarUrl: document.getElementById('avatarUrl').value,
+      tagline: document.getElementById('tagline').value,
+      email: document.getElementById('email').value,
+      website: document.getElementById('website').value,
+      github: document.getElementById('github').value,
+      linkedin: document.getElementById('linkedin').value,
+      twitter: document.getElementById('twitter').value,
+      location: document.getElementById('location').value,
+      skills: skills,
+      projects: projects,
+      template: currentTemplate
+    };
+    localStorage.setItem('portfolio_generator_data', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function restoreFromStorage() {
+  try {
+    const saved = localStorage.getItem('portfolio_generator_data');
+    if (!saved) return false;
+    const data = JSON.parse(saved);
+    document.getElementById('fullName').value = data.fullName || '';
+    document.getElementById('jobTitle').value = data.jobTitle || '';
+    document.getElementById('bio').value = data.bio || '';
+    document.getElementById('avatarUrl').value = data.avatarUrl || '';
+    document.getElementById('tagline').value = data.tagline || '';
+    document.getElementById('email').value = data.email || '';
+    document.getElementById('website').value = data.website || '';
+    document.getElementById('github').value = data.github || '';
+    document.getElementById('linkedin').value = data.linkedin || '';
+    document.getElementById('twitter').value = data.twitter || '';
+    document.getElementById('location').value = data.location || '';
+    skills = data.skills || [];
+    projects = data.projects || [];
+    projectIdCounter = projects.length ? Math.max(...projects.map(p => p.id)) + 1 : 0;
+    if (data.template) {
+      currentTemplate = data.template;
+      document.querySelectorAll('.template-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.template === currentTemplate);
+      });
+    }
+    renderSkills();
+    renderProjects();
+    updatePreview();
+    if (data.bio) updateCharCount(document.getElementById('bio'), 'bioCount', 500);
+    return true;
+  } catch(e) { return false; }
+}
+
+// Auto-save on changes
+const origUpdatePreview = updatePreview;
+updatePreview = function() {
+  origUpdatePreview();
+  clearTimeout(window._saveTimeout);
+  window._saveTimeout = setTimeout(saveToStorage, 1000);
+};
+
+// ============================================
+// Clear all data
+// ============================================
+function clearAllData() {
+  if (!confirm('Clear all data? This cannot be undone.')) return;
+  document.querySelectorAll('.form-panel input, .form-panel textarea').forEach(el => el.value = '');
+  skills = [];
+  projects = [];
+  projectIdCounter = 0;
+  renderSkills();
+  renderProjects();
+  updatePreview();
+  localStorage.removeItem('portfolio_generator_data');
+  showToast('All data cleared');
+}
+
+// ============================================
+// Initialize
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  const restored = restoreFromStorage();
+  if (!restored) {
+    loadSampleData();
+  }
+});
+
+// ============================================
+// Keyboard shortcuts
+// ============================================
+document.addEventListener('keydown', function(e) {
+  // Ctrl/Cmd + S to export
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    exportHTML();
+  }
+  // Ctrl/Cmd + Shift + C to copy
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+    e.preventDefault();
+    copyHTML();
+  }
+});
+
+// ============================================
+// Accessibility: focus management
+// ============================================
+document.querySelectorAll('.form-section').forEach(section => {
+  section.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const focused = document.activeElement;
+      if (focused && focused.closest('.form-section') === section) {
+        focused.blur();
+      }
+    }
+  });
+});
+</script>
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Portfolio Generator",
+  "description": "Generate beautiful, responsive portfolio websites instantly. Choose from Developer, Designer, or Minimal templates. Export as standalone HTML.",
+  "url": "https://lifa-su.github.io/ai-portfolio-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Lifa AI Tools",
+    "url": "https://lifa-su.github.io"
+  }
+}
+</script>
+
+<!-- Footer -->
+<footer style="text-align:center;padding:32px 24px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border);margin-top:24px">
+  <p style="margin-bottom:8px">
+    <a href="/" style="color:var(--text-muted);margin:0 12px">Home</a>
+    <a href="/ai-resume-builder.html" style="color:var(--text-muted);margin:0 12px">Resume Builder</a>
+    <a href="/ai-readme-generator.html" style="color:var(--text-muted);margin:0 12px">README Generator</a>
+    <a href="/ai-cover-letter-builder.html" style="color:var(--text-muted);margin:0 12px">Cover Letter</a>
+    <a href="/ai-linkedin-optimizer.html" style="color:var(--text-muted);margin:0 12px">LinkedIn Optimizer</a>
+    <a href="/about.html" style="color:var(--text-muted);margin:0 12px">About</a>
+  </p>
+  <p>&copy; 2025 Lifa AI Tools. Free and open-source developer tools.</p>
+  <p style="margin-top:8px;font-size:12px;color:#555">
+    Keyboard shortcuts: Ctrl+S to export &middot; Ctrl+Shift+C to copy code
+  </p>
+</footer>
+
+<!-- Vercel Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
