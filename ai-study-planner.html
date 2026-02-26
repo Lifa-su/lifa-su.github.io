@@ -226,3 +226,1617 @@ footer{text-align:center;padding:32px 20px;color:var(--muted);font-size:13px;bor
 footer a{color:var(--accent)}
 </style>
 </head>
+<body>
+<nav>
+  <a href="/">🧠 Lifa AI Tools</a>
+  <div style="flex:1"></div>
+  <a href="/ai-study-planner.html" style="color:var(--accent)">Study Planner</a>
+</nav>
+
+<div class="hero">
+  <h1>🎓 AI Study Planner</h1>
+  <p>Create personalized learning plans, track knowledge mastery, use Pomodoro timer, and get Ebbinghaus review reminders — all in one place.</p>
+</div>
+
+<div class="container">
+  <!-- Main Tab Navigation -->
+  <div class="main-tabs" role="tablist">
+    <button class="main-tab active" onclick="switchTab('plan')" role="tab" aria-selected="true"><span class="tab-icon">📋</span> Study Plan</button>
+    <button class="main-tab" onclick="switchTab('pomodoro')" role="tab"><span class="tab-icon">🍅</span> Pomodoro</button>
+    <button class="main-tab" onclick="switchTab('knowledge')" role="tab"><span class="tab-icon">🧠</span> Knowledge</button>
+    <button class="main-tab" onclick="switchTab('review')" role="tab"><span class="tab-icon">🔄</span> Review</button>
+    <button class="main-tab" onclick="switchTab('notes')" role="tab"><span class="tab-icon">📝</span> Notes</button>
+    <button class="main-tab" onclick="switchTab('stats')" role="tab"><span class="tab-icon">📊</span> Statistics</button>
+    <button class="main-tab" onclick="switchTab('settings')" role="tab"><span class="tab-icon">⚙️</span> Settings</button>
+  </div>
+
+  <!-- Panel 1: Study Plan Generator -->
+  <div id="panel-plan" class="panel active fade-in">
+    <div class="card">
+      <h2>📋 Create Study Plan</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="plan-goal">Learning Goal</label>
+          <input type="text" id="plan-goal" placeholder="e.g., Master React.js fundamentals">
+        </div>
+        <div class="form-group">
+          <label for="plan-subject">Subject / Category</label>
+          <select id="plan-subject">
+            <option value="programming">💻 Programming</option>
+            <option value="math">📐 Mathematics</option>
+            <option value="science">🔬 Science</option>
+            <option value="language">🌍 Language</option>
+            <option value="design">🎨 Design</option>
+            <option value="business">💼 Business</option>
+            <option value="music">🎵 Music</option>
+            <option value="other">📚 Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="plan-hours">Daily Study Hours</label>
+          <input type="number" id="plan-hours" min="0.5" max="12" step="0.5" value="2">
+        </div>
+        <div class="form-group">
+          <label for="plan-deadline">Target Deadline</label>
+          <input type="date" id="plan-deadline">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="plan-level">Current Level</label>
+          <select id="plan-level">
+            <option value="beginner">🌱 Beginner</option>
+            <option value="intermediate">🌿 Intermediate</option>
+            <option value="advanced">🌳 Advanced</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="plan-priority">Priority</label>
+          <select id="plan-priority">
+            <option value="high">🔴 High</option>
+            <option value="medium">🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="plan-notes">Additional Notes</label>
+        <textarea id="plan-notes" placeholder="Any specific topics, resources, or preferences..."></textarea>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generatePlan()">✨ Generate Study Plan</button>
+        <button class="btn btn-secondary" onclick="clearPlanForm()">🗑️ Clear</button>
+      </div>
+    </div>
+
+    <!-- Learning Path Templates -->
+    <div class="card">
+      <h2>🗺️ Learning Path Templates</h2>
+      <div class="templates-grid" id="templates-grid">
+        <div class="template-card" onclick="selectTemplate('webdev')">
+          <div class="template-icon">🌐</div>
+          <div class="template-name">Web Development</div>
+          <div class="template-desc">HTML, CSS, JS, React, Node.js</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('python')">
+          <div class="template-icon">🐍</div>
+          <div class="template-name">Python Mastery</div>
+          <div class="template-desc">Basics to advanced, Django, ML</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('datascience')">
+          <div class="template-icon">📊</div>
+          <div class="template-name">Data Science</div>
+          <div class="template-desc">Statistics, Python, ML, Deep Learning</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('mobile')">
+          <div class="template-icon">📱</div>
+          <div class="template-name">Mobile Dev</div>
+          <div class="template-desc">React Native / Flutter</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('algorithms')">
+          <div class="template-icon">🧮</div>
+          <div class="template-name">Algorithms & DS</div>
+          <div class="template-desc">Arrays, Trees, Graphs, DP</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('english')">
+          <div class="template-icon">🇬🇧</div>
+          <div class="template-name">English Fluency</div>
+          <div class="template-desc">Grammar, Vocabulary, Speaking</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('design')">
+          <div class="template-icon">🎨</div>
+          <div class="template-name">UI/UX Design</div>
+          <div class="template-desc">Figma, Principles, Prototyping</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('devops')">
+          <div class="template-icon">⚙️</div>
+          <div class="template-name">DevOps</div>
+          <div class="template-desc">Docker, K8s, CI/CD, Cloud</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('math')">
+          <div class="template-icon">📐</div>
+          <div class="template-name">Mathematics</div>
+          <div class="template-desc">Calculus, Linear Algebra, Stats</div>
+        </div>
+        <div class="template-card" onclick="selectTemplate('ai')">
+          <div class="template-icon">🤖</div>
+          <div class="template-name">AI & Machine Learning</div>
+          <div class="template-desc">Neural Networks, NLP, CV</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Plan Display -->
+    <div id="generated-plan" style="display:none">
+      <div class="card">
+        <h2>📅 Your Study Plan</h2>
+        <div class="stats-row" id="plan-stats"></div>
+        <div id="plan-phases"></div>
+      </div>
+    </div>
+
+    <!-- Daily Tasks -->
+    <div class="card">
+      <h2>✅ Today's Tasks</h2>
+      <div id="daily-tasks">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>Generate a study plan or add tasks manually to get started.</p>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="display:flex;gap:8px">
+          <input type="text" id="new-task-input" placeholder="Add a new task..." style="flex:1" onkeydown="if(event.key==='Enter')addManualTask()">
+          <button class="btn btn-primary btn-sm" onclick="addManualTask()">+ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 2: Pomodoro Timer -->
+  <div id="panel-pomodoro" class="panel">
+    <div class="card">
+      <h2>🍅 Pomodoro Timer</h2>
+      <div class="pomodoro-container">
+        <div class="duration-presets">
+          <button class="duration-preset active" onclick="setPomoDuration(25)">25 min</button>
+          <button class="duration-preset" onclick="setPomoDuration(30)">30 min</button>
+          <button class="duration-preset" onclick="setPomoDuration(45)">45 min</button>
+          <button class="duration-preset" onclick="setPomoDuration(50)">50 min</button>
+          <button class="duration-preset" onclick="setPomoDuration(60)">60 min</button>
+        </div>
+        <div class="pomodoro-ring">
+          <svg width="100%" height="100%" viewBox="0 0 260 260">
+            <circle class="ring-bg" cx="130" cy="130" r="120"/>
+            <circle class="ring-progress" id="pomo-ring" cx="130" cy="130" r="120" stroke-dasharray="753.98" stroke-dashoffset="0"/>
+          </svg>
+          <div style="text-align:center;z-index:1">
+            <div class="pomodoro-display" id="pomo-display">25:00</div>
+            <div class="pomodoro-label" id="pomo-label">FOCUS TIME</div>
+          </div>
+        </div>
+        <div class="pomodoro-controls">
+          <button class="btn btn-primary" id="pomo-start-btn" onclick="togglePomodoro()">▶ Start</button>
+          <button class="btn btn-secondary" onclick="resetPomodoro()">⟲ Reset</button>
+          <button class="btn btn-secondary" onclick="skipPomodoro()">⏭ Skip</button>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:inline;font-size:13px;color:var(--muted)">
+            <input type="checkbox" id="pomo-auto-break" checked style="margin-right:6px"> Auto-start breaks
+          </label>
+          <label style="display:inline;font-size:13px;color:var(--muted);margin-left:16px">
+            <input type="checkbox" id="pomo-sound" checked style="margin-right:6px"> Sound alerts
+          </label>
+        </div>
+        <div class="pomodoro-stats">
+          <div class="pomo-stat">
+            <div class="pomo-stat-value" id="pomo-today-count">0</div>
+            <div class="pomo-stat-label">Today's Pomodoros</div>
+          </div>
+          <div class="pomo-stat">
+            <div class="pomo-stat-value" id="pomo-today-hours">0h</div>
+            <div class="pomo-stat-label">Focus Time Today</div>
+          </div>
+          <div class="pomo-stat">
+            <div class="pomo-stat-value" id="pomo-streak">0</div>
+            <div class="pomo-stat-label">Day Streak 🔥</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Pomodoro History -->
+    <div class="card">
+      <h2>📈 Pomodoro History (Last 7 Days)</h2>
+      <div class="chart-container">
+        <div class="chart-bar-group" id="pomo-chart-bars"></div>
+        <div class="chart-labels" id="pomo-chart-labels"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 3: Knowledge Tracker -->
+  <div id="panel-knowledge" class="panel">
+    <div class="card">
+      <h2>🧠 Knowledge Point Tracker</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Track your understanding of key concepts. Mark mastery levels to identify weak areas.</p>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <input type="text" id="knowledge-topic" placeholder="Topic name (e.g., Binary Search)" style="flex:1">
+        <select id="knowledge-category" style="width:160px">
+          <option value="concept">💡 Concept</option>
+          <option value="algorithm">🧮 Algorithm</option>
+          <option value="formula">📐 Formula</option>
+          <option value="vocabulary">📖 Vocabulary</option>
+          <option value="theory">🔬 Theory</option>
+          <option value="practice">🛠️ Practice</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="addKnowledgePoint()">+ Add</button>
+      </div>
+      <!-- Mastery Filter -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary knowledge-filter active" onclick="filterKnowledge('all')">All</button>
+        <button class="btn btn-sm btn-secondary knowledge-filter" onclick="filterKnowledge('not-started')" style="color:#888">⬜ Not Started</button>
+        <button class="btn btn-sm btn-secondary knowledge-filter" onclick="filterKnowledge('learning')" style="color:var(--warn)">🟡 Learning</button>
+        <button class="btn btn-sm btn-secondary knowledge-filter" onclick="filterKnowledge('familiar')" style="color:var(--info)">🔵 Familiar</button>
+        <button class="btn btn-sm btn-secondary knowledge-filter" onclick="filterKnowledge('mastered')" style="color:var(--success)">🟢 Mastered</button>
+      </div>
+      <div id="knowledge-list"></div>
+      <!-- Knowledge Stats -->
+      <div class="stats-row" style="margin-top:20px">
+        <div class="stat-card">
+          <div class="stat-value" id="kn-total">0</div>
+          <div class="stat-label">Total Points</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="kn-mastered">0</div>
+          <div class="stat-label">Mastered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="kn-learning">0</div>
+          <div class="stat-label">Learning</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="kn-progress">0%</div>
+          <div class="stat-label">Mastery Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 4: Ebbinghaus Review Reminders -->
+  <div id="panel-review" class="panel">
+    <div class="card">
+      <h2>🔄 Ebbinghaus Review Schedule</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Spaced repetition based on the Ebbinghaus forgetting curve. Review at optimal intervals: 1 day, 2 days, 4 days, 7 days, 15 days, 30 days.</p>
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <input type="text" id="review-item-input" placeholder="What did you learn? (e.g., JavaScript Closures)" style="flex:1">
+        <input type="date" id="review-learn-date" style="width:160px">
+        <button class="btn btn-primary btn-sm" onclick="addReviewItem()">+ Add</button>
+      </div>
+      <!-- Review Timeline -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-danger review-filter active" onclick="filterReviews('overdue')">🔴 Overdue</button>
+        <button class="btn btn-sm btn-secondary review-filter" onclick="filterReviews('today')">📅 Due Today</button>
+        <button class="btn btn-sm btn-secondary review-filter" onclick="filterReviews('upcoming')">🔜 Upcoming</button>
+        <button class="btn btn-sm btn-secondary review-filter" onclick="filterReviews('completed')">✅ Completed</button>
+        <button class="btn btn-sm btn-secondary review-filter" onclick="filterReviews('all')">📋 All</button>
+      </div>
+      <div id="review-list"></div>
+    </div>
+    <!-- Review Stats -->
+    <div class="card">
+      <h2>📊 Review Statistics</h2>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="rv-total">0</div>
+          <div class="stat-label">Total Items</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="rv-overdue" style="color:var(--error)">0</div>
+          <div class="stat-label">Overdue</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="rv-today" style="color:var(--warn)">0</div>
+          <div class="stat-label">Due Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="rv-completed" style="color:var(--success)">0</div>
+          <div class="stat-label">Completed Cycles</div>
+        </div>
+      </div>
+      <!-- Forgetting Curve Visualization -->
+      <div style="margin-top:20px">
+        <h3 style="color:var(--accent2);margin-bottom:12px">📉 Forgetting Curve</h3>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;height:200px;overflow:hidden">
+          <canvas id="forgetting-curve-canvas" width="600" height="180" style="width:100%;height:100%"></canvas>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted)">
+          <span>Day 0 (Learn)</span><span>Day 1</span><span>Day 2</span><span>Day 4</span><span>Day 7</span><span>Day 15</span><span>Day 30</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 5: Markdown Notes Editor -->
+  <div id="panel-notes" class="panel">
+    <div class="card">
+      <h2>📝 Study Notes</h2>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <input type="text" id="note-title-input" placeholder="Note title..." style="flex:1">
+        <select id="note-folder" style="width:140px">
+          <option value="general">📁 General</option>
+          <option value="lecture">🎓 Lecture</option>
+          <option value="summary">📋 Summary</option>
+          <option value="cheatsheet">⚡ Cheat Sheet</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="createNote()">+ New Note</button>
+      </div>
+      <div style="display:flex;gap:16px;min-height:400px" id="notes-container">
+        <!-- Notes Sidebar -->
+        <div style="width:220px;flex-shrink:0;border-right:1px solid var(--border);padding-right:16px">
+          <div style="margin-bottom:12px">
+            <input type="text" id="note-search" placeholder="🔍 Search notes..." style="font-size:13px;padding:8px 12px" oninput="searchNotes()">
+          </div>
+          <div id="notes-sidebar-list" style="max-height:360px;overflow-y:auto"></div>
+        </div>
+        <!-- Editor Area -->
+        <div style="flex:1;display:flex;flex-direction:column">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-sm btn-secondary" onclick="toggleNoteView('edit')" id="note-edit-btn" style="border-color:var(--accent);color:var(--accent)">✏️ Edit</button>
+            <button class="btn btn-sm btn-secondary" onclick="toggleNoteView('preview')" id="note-preview-btn">👁️ Preview</button>
+            <button class="btn btn-sm btn-secondary" onclick="toggleNoteView('split')" id="note-split-btn">📖 Split</button>
+            <div style="flex:1"></div>
+            <button class="btn btn-sm btn-secondary" onclick="insertMarkdown('bold')"><b>B</b></button>
+            <button class="btn btn-sm btn-secondary" onclick="insertMarkdown('italic')"><i>I</i></button>
+            <button class="btn btn-sm btn-secondary" onclick="insertMarkdown('code')">{ }</button>
+            <button class="btn btn-sm btn-secondary" onclick="insertMarkdown('link')">🔗</button>
+            <button class="btn btn-sm btn-secondary" onclick="insertMarkdown('list')">☰</button>
+          </div>
+          <div style="display:flex;gap:12px;flex:1" id="note-editor-area">
+            <textarea id="note-editor" placeholder="Write your notes in Markdown..." style="flex:1;min-height:320px;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:13px;line-height:1.7;resize:none" oninput="onNoteEdit()"></textarea>
+            <div id="note-preview" style="flex:1;display:none;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);overflow-y:auto;min-height:320px;font-size:14px;line-height:1.8"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <span style="font-size:12px;color:var(--muted)" id="note-word-count">0 words</span>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-secondary" onclick="downloadNote()">💾 Download .md</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteCurrentNote()">🗑️ Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel 6: Statistics -->
+  <div id="panel-stats" class="panel">
+    <div class="card">
+      <h2>📊 Study Statistics</h2>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-hours">0h</div>
+          <div class="stat-label">Total Study Hours</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-pomos">0</div>
+          <div class="stat-label">Total Pomodoros</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-tasks-done">0</div>
+          <div class="stat-label">Tasks Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Current Streak 🔥</div>
+        </div>
+      </div>
+    </div>
+    <!-- Weekly Chart -->
+    <div class="card">
+      <h2>📈 Weekly Study Time</h2>
+      <div class="chart-toggle" id="stats-chart-toggle">
+        <button class="chart-toggle-btn active" onclick="switchStatsChart('week')">This Week</button>
+        <button class="chart-toggle-btn" onclick="switchStatsChart('month')">This Month</button>
+      </div>
+      <div class="chart-container">
+        <div class="chart-bar-group" id="stats-chart-bars" style="height:200px"></div>
+        <div class="chart-labels" id="stats-chart-labels"></div>
+      </div>
+    </div>
+    <!-- Subject Distribution -->
+    <div class="card">
+      <h2>📚 Subject Distribution</h2>
+      <div id="subject-distribution" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+    </div>
+    <!-- Achievement Badges -->
+    <div class="card">
+      <h2>🏆 Achievements</h2>
+      <div id="achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px"></div>
+    </div>
+  </div>
+
+  <!-- Panel 7: Settings -->
+  <div id="panel-settings" class="panel">
+    <div class="card">
+      <h2>⚙️ Settings</h2>
+      <div class="form-group">
+        <label>Pomodoro Duration (minutes)</label>
+        <input type="number" id="setting-pomo-duration" value="25" min="5" max="90" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Short Break Duration (minutes)</label>
+        <input type="number" id="setting-break-short" value="5" min="1" max="30" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Long Break Duration (minutes)</label>
+        <input type="number" id="setting-break-long" value="15" min="5" max="60" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Long Break After (pomodoros)</label>
+        <input type="number" id="setting-long-break-after" value="4" min="2" max="10" onchange="saveSettings()">
+      </div>
+      <div class="form-group">
+        <label>Daily Study Goal (hours)</label>
+        <input type="number" id="setting-daily-goal" value="4" min="0.5" max="16" step="0.5" onchange="saveSettings()">
+      </div>
+    </div>
+    <!-- Export / Import -->
+    <div class="card">
+      <h2>💾 Data Management</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Export all your data as JSON for backup, or import from a previous backup.</p>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="exportAllData()">📤 Export All Data</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 Import Data</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importAllData(event)">
+      </div>
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+        <h3 style="color:var(--error);margin-bottom:12px">⚠️ Danger Zone</h3>
+        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">This will permanently delete all your study plans, notes, and statistics.</p>
+      </div>
+    </div>
+    <!-- About -->
+    <div class="card">
+      <h2>ℹ️ About</h2>
+      <p style="color:var(--muted);font-size:14px;line-height:1.8">
+        AI Study Planner is a free, open-source study tool built by <a href="https://lifa-su.com">Lifa AI Tools</a>.<br>
+        All data is stored locally in your browser. Nothing is sent to any server.<br>
+        Version 2.0 — Built with ❤️ for learners everywhere.
+      </p>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<footer>
+  <p>Built with ❤️ by <a href="https://lifa-su.com">Lifa AI Tools</a> · <a href="https://ko-fi.com/feidev">☕ Support on Ko-fi</a> · <a href="https://github.com/lifa-su">GitHub</a></p>
+  <p style="margin-top:8px">All data stored locally in your browser. 100% private.</p>
+</footer>
+
+<script>
+/* ===== State Management ===== */
+const STORAGE_KEYS = {
+  plans: 'sp_plans', tasks: 'sp_tasks', pomodoro: 'sp_pomodoro',
+  knowledge: 'sp_knowledge', reviews: 'sp_reviews', notes: 'sp_notes',
+  settings: 'sp_settings', stats: 'sp_stats'
+};
+
+function loadData(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+  catch { return fallback; }
+}
+function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+let state = {
+  plans: loadData(STORAGE_KEYS.plans, []),
+  tasks: loadData(STORAGE_KEYS.tasks, []),
+  pomodoro: loadData(STORAGE_KEYS.pomodoro, { history: {}, totalPomos: 0, streak: 0, lastDate: null }),
+  knowledge: loadData(STORAGE_KEYS.knowledge, []),
+  reviews: loadData(STORAGE_KEYS.reviews, []),
+  notes: loadData(STORAGE_KEYS.notes, []),
+  settings: loadData(STORAGE_KEYS.settings, {
+    pomoDuration: 25, breakShort: 5, breakLong: 15, longBreakAfter: 4, dailyGoal: 4
+  }),
+  stats: loadData(STORAGE_KEYS.stats, { totalHours: 0, totalPomos: 0, tasksDone: 0, subjects: {} })
+};
+
+function persistAll() {
+  Object.entries(STORAGE_KEYS).forEach(([k, v]) => saveData(v, state[k]));
+}
+
+/* ===== Tab Switching ===== */
+function switchTab(tabName) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  const panel = document.getElementById('panel-' + tabName);
+  if (panel) { panel.classList.add('active'); panel.classList.add('fade-in'); }
+  const tabs = document.querySelectorAll('.main-tab');
+  const tabMap = ['plan','pomodoro','knowledge','review','notes','stats','settings'];
+  const idx = tabMap.indexOf(tabName);
+  if (idx >= 0 && tabs[idx]) { tabs[idx].classList.add('active'); tabs[idx].setAttribute('aria-selected', 'true'); }
+  if (tabName === 'stats') refreshStats();
+  if (tabName === 'review') { renderReviews(); drawForgettingCurve(); }
+  if (tabName === 'knowledge') renderKnowledge();
+  if (tabName === 'pomodoro') renderPomoChart();
+  if (tabName === 'notes') renderNotesSidebar();
+}
+
+/* ===== Toast Notifications ===== */
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+/* ===== Modal ===== */
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = '<button class="modal-close" onclick="closeModal()">&times;</button>' + html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+
+/* ===== Study Plan Generator ===== */
+const TEMPLATES = {
+  webdev: {
+    name: 'Web Development', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['HTML5 semantic elements & forms','CSS3 Flexbox & Grid layout','JavaScript ES6+ fundamentals','DOM manipulation & events','Responsive design principles','Git version control basics'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['React.js core concepts & hooks','State management (Context/Redux)','REST API integration (fetch/axios)','CSS frameworks (Tailwind/Bootstrap)','Node.js & Express basics','Database fundamentals (MongoDB/SQL)'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Next.js / SSR / SSG','Authentication & authorization','Testing (Jest, React Testing Library)','Performance optimization','CI/CD deployment (Vercel/Netlify)','Portfolio project: Full-stack app'] }
+    ]
+  },
+  python: {
+    name: 'Python Mastery', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Python syntax & data types','Control flow & functions','Lists, dicts, sets, tuples','File I/O & error handling','OOP: classes & inheritance','Modules & virtual environments'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Decorators & generators','Regular expressions','Web scraping (BeautifulSoup)','Django/Flask web framework','Database with SQLAlchemy','API development (FastAPI)'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['NumPy & Pandas data analysis','Matplotlib & Seaborn visualization','Machine Learning with scikit-learn','Async programming (asyncio)','Testing & debugging','Capstone: ML web application'] }
+    ]
+  },
+  datascience: {
+    name: 'Data Science', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Statistics fundamentals','Probability theory','Python for data analysis','NumPy & Pandas mastery','Data cleaning techniques','Exploratory data analysis'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Machine Learning algorithms','Supervised learning (regression, classification)','Unsupervised learning (clustering, PCA)','Feature engineering','Model evaluation & validation','Scikit-learn pipeline'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Deep Learning with TensorFlow/PyTorch','Neural network architectures','Natural Language Processing','Computer Vision basics','Big Data tools (Spark)','End-to-end ML project'] }
+    ]
+  },
+  mobile: {
+    name: 'Mobile Development', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['JavaScript/Dart fundamentals','React Native / Flutter setup','Component architecture','Navigation & routing','State management','Platform-specific APIs'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['REST API integration','Local storage & SQLite','Push notifications','Camera & media access','Maps & geolocation','Animations & gestures'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['App store deployment','Performance optimization','Testing & debugging','CI/CD for mobile','Analytics integration','Portfolio: Published app'] }
+    ]
+  },
+  algorithms: {
+    name: 'Algorithms & Data Structures', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Big O notation & complexity','Arrays & strings','Linked lists','Stacks & queues','Hash tables','Recursion fundamentals'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Binary trees & BST','Heaps & priority queues','Graph representations','BFS & DFS traversal','Sorting algorithms','Binary search variations'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Dynamic programming','Greedy algorithms','Backtracking','Trie & advanced trees','Shortest path algorithms','Contest problem solving'] }
+    ]
+  },
+  english: {
+    name: 'English Fluency', phases: [
+      { name: 'Foundation', duration: '3 weeks', tasks: ['Grammar essentials review','Common vocabulary (1000 words)','Reading comprehension practice','Listening exercises (podcasts)','Basic writing structure','Pronunciation fundamentals'] },
+      { name: 'Intermediate', duration: '4 weeks', tasks: ['Advanced grammar patterns','Academic vocabulary','Essay writing practice','Debate & discussion skills','Idioms & phrasal verbs','IELTS/TOEFL preparation'] },
+      { name: 'Advanced', duration: '4 weeks', tasks: ['Business English','Public speaking practice','Creative writing','Advanced listening (TED talks)','Cultural nuances','Fluency through immersion'] }
+    ]
+  },
+  design: {
+    name: 'UI/UX Design', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Design principles & theory','Color theory & typography','Figma basics & tools','Wireframing techniques','User research methods','Information architecture'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Component design systems','Prototyping & interactions','Usability testing','Responsive design patterns','Accessibility (WCAG)','Design handoff process'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Motion design & micro-interactions','Design tokens & variables','Advanced prototyping','User psychology & behavior','Portfolio case studies','Design system documentation'] }
+    ]
+  },
+  devops: {
+    name: 'DevOps', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Linux command line mastery','Shell scripting (Bash)','Git advanced workflows','Networking fundamentals','Docker containers','Docker Compose'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Kubernetes basics','CI/CD pipelines (GitHub Actions)','Infrastructure as Code (Terraform)','Cloud platforms (AWS/GCP)','Monitoring & logging','Security best practices'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Kubernetes advanced (Helm, operators)','Service mesh (Istio)','GitOps workflows','Chaos engineering','Cost optimization','Production incident management'] }
+    ]
+  },
+  math: {
+    name: 'Mathematics', phases: [
+      { name: 'Foundation', duration: '3 weeks', tasks: ['Algebra review','Functions & graphs','Trigonometry','Sequences & series','Set theory & logic','Proof techniques'] },
+      { name: 'Intermediate', duration: '4 weeks', tasks: ['Single-variable calculus','Multivariable calculus','Linear algebra (vectors, matrices)','Eigenvalues & eigenvectors','Differential equations','Probability & combinatorics'] },
+      { name: 'Advanced', duration: '4 weeks', tasks: ['Real analysis','Abstract algebra','Numerical methods','Optimization theory','Statistics & inference','Applied math project'] }
+    ]
+  },
+  ai: {
+    name: 'AI & Machine Learning', phases: [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Python & NumPy review','Linear algebra for ML','Probability & statistics','Data preprocessing','Supervised learning basics','Evaluation metrics'] },
+      { name: 'Intermediate', duration: '4 weeks', tasks: ['Neural networks from scratch','TensorFlow / PyTorch','CNNs for computer vision','RNNs & LSTMs','Transfer learning','NLP fundamentals'] },
+      { name: 'Advanced', duration: '4 weeks', tasks: ['Transformer architecture','Large Language Models','Reinforcement learning','GANs & diffusion models','MLOps & deployment','Research paper implementation'] }
+    ]
+  }
+};
+
+let selectedTemplate = null;
+
+function selectTemplate(key) {
+  selectedTemplate = key;
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  const tmpl = TEMPLATES[key];
+  document.getElementById('plan-goal').value = 'Master ' + tmpl.name;
+  showToast('Template selected: ' + tmpl.name);
+}
+
+function generatePlan() {
+  const goal = document.getElementById('plan-goal').value.trim();
+  if (!goal) { showToast('Please enter a learning goal', 'error'); return; }
+  const subject = document.getElementById('plan-subject').value;
+  const hours = parseFloat(document.getElementById('plan-hours').value) || 2;
+  const deadline = document.getElementById('plan-deadline').value;
+  const level = document.getElementById('plan-level').value;
+  const priority = document.getElementById('plan-priority').value;
+  const notes = document.getElementById('plan-notes').value;
+
+  let phases;
+  if (selectedTemplate && TEMPLATES[selectedTemplate]) {
+    phases = TEMPLATES[selectedTemplate].phases;
+  } else {
+    phases = [
+      { name: 'Foundation', duration: '2 weeks', tasks: ['Research & gather resources','Core concepts overview','Basic exercises & practice','Set up study environment','Read introductory material','Complete first mini-project'] },
+      { name: 'Intermediate', duration: '3 weeks', tasks: ['Deep dive into key topics','Hands-on projects','Practice problems','Peer discussion & review','Mid-point assessment','Refine understanding'] },
+      { name: 'Advanced', duration: '3 weeks', tasks: ['Advanced topics & edge cases','Real-world application','Final project','Review & consolidate','Self-assessment','Share knowledge & teach'] }
+    ];
+  }
+
+  const plan = {
+    id: Date.now(), goal, subject, hours, deadline, level, priority, notes,
+    phases, createdAt: new Date().toISOString(), progress: 0
+  };
+  state.plans.unshift(plan);
+  saveData(STORAGE_KEYS.plans, state.plans);
+
+  // Generate daily tasks from plan
+  const today = new Date().toISOString().split('T')[0];
+  phases[0].tasks.forEach((task, i) => {
+    state.tasks.push({
+      id: Date.now() + i, text: task, completed: false, planId: plan.id,
+      phase: 'foundation', date: today, duration: Math.round(hours * 60 / phases[0].tasks.length)
+    });
+  });
+  saveData(STORAGE_KEYS.tasks, state.tasks);
+
+  renderPlan(plan);
+  renderTasks();
+  showToast('Study plan generated successfully!');
+}
+
+function renderPlan(plan) {
+  const container = document.getElementById('generated-plan');
+  container.style.display = 'block';
+  const totalTasks = plan.phases.reduce((s, p) => s + p.tasks.length, 0);
+  document.getElementById('plan-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${plan.phases.length}</div><div class="stat-label">Phases</div></div>
+    <div class="stat-card"><div class="stat-value">${totalTasks}</div><div class="stat-label">Total Tasks</div></div>
+    <div class="stat-card"><div class="stat-value">${plan.hours}h/day</div><div class="stat-label">Daily Hours</div></div>
+    <div class="stat-card"><div class="stat-value">${plan.deadline || 'Flexible'}</div><div class="stat-label">Deadline</div></div>
+  `;
+  const phaseColors = ['phase-foundation', 'phase-intermediate', 'phase-advanced'];
+  const phaseEmojis = ['🌱', '🌿', '🌳'];
+  document.getElementById('plan-phases').innerHTML = plan.phases.map((phase, pi) => `
+    <div class="phase-section">
+      <div class="phase-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <h3><span class="task-phase ${phaseColors[pi]}">${phaseEmojis[pi]} ${phase.name}</span> ${phase.duration}</h3>
+        <span style="color:var(--muted)">▼</span>
+      </div>
+      <div class="phase-body">
+        ${phase.tasks.map(t => `<div class="phase-task"><span class="bullet">→</span> ${t}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function clearPlanForm() {
+  document.getElementById('plan-goal').value = '';
+  document.getElementById('plan-notes').value = '';
+  document.getElementById('plan-deadline').value = '';
+  selectedTemplate = null;
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+}
+
+/* ===== Daily Tasks ===== */
+function renderTasks() {
+  const container = document.getElementById('daily-tasks');
+  const today = new Date().toISOString().split('T')[0];
+  const todayTasks = state.tasks.filter(t => t.date === today || !t.date);
+  if (todayTasks.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No tasks for today. Generate a plan or add tasks manually.</p></div>';
+    return;
+  }
+  container.innerHTML = '<ul class="task-list">' + todayTasks.map(t => `
+    <li class="task-item ${t.completed ? 'completed' : ''}">
+      <div class="task-check ${t.completed ? 'checked' : ''}" onclick="toggleTask(${t.id})"></div>
+      <span class="task-text">${t.text}</span>
+      ${t.duration ? `<span class="task-duration">${t.duration}min</span>` : ''}
+      ${t.phase ? `<span class="task-phase phase-${t.phase}">${t.phase}</span>` : ''}
+      <button class="btn btn-sm" style="background:none;color:var(--muted);border:none;padding:4px 8px" onclick="deleteTask(${t.id})">✕</button>
+    </li>
+  `).join('') + '</ul>';
+}
+
+function toggleTask(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    if (task.completed) state.stats.tasksDone++;
+    else state.stats.tasksDone = Math.max(0, state.stats.tasksDone - 1);
+    saveData(STORAGE_KEYS.tasks, state.tasks);
+    saveData(STORAGE_KEYS.stats, state.stats);
+    renderTasks();
+  }
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveData(STORAGE_KEYS.tasks, state.tasks);
+  renderTasks();
+}
+
+function addManualTask() {
+  const input = document.getElementById('new-task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  state.tasks.push({ id: Date.now(), text, completed: false, date: new Date().toISOString().split('T')[0] });
+  saveData(STORAGE_KEYS.tasks, state.tasks);
+  input.value = '';
+  renderTasks();
+  showToast('Task added');
+}
+
+/* ===== Pomodoro Timer ===== */
+let pomoState = { running: false, timeLeft: 25 * 60, duration: 25 * 60, isBreak: false, interval: null, sessionCount: 0 };
+
+function setPomoDuration(mins) {
+  if (pomoState.running) return;
+  document.querySelectorAll('.duration-preset').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  pomoState.duration = mins * 60;
+  pomoState.timeLeft = mins * 60;
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay() {
+  const mins = Math.floor(pomoState.timeLeft / 60);
+  const secs = pomoState.timeLeft % 60;
+  document.getElementById('pomo-display').textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+  // Update ring
+  const ring = document.getElementById('pomo-ring');
+  const circumference = 2 * Math.PI * 120;
+  const progress = 1 - (pomoState.timeLeft / pomoState.duration);
+  ring.style.strokeDashoffset = circumference * (1 - progress);
+  // Update label
+  document.getElementById('pomo-label').textContent = pomoState.isBreak ? 'BREAK TIME' : 'FOCUS TIME';
+  // Update title
+  document.title = (pomoState.running ? (String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0') + ' - ') : '') + 'AI Study Planner';
+}
+
+function togglePomodoro() {
+  if (pomoState.running) {
+    clearInterval(pomoState.interval);
+    pomoState.running = false;
+    document.getElementById('pomo-start-btn').innerHTML = '▶ Start';
+  } else {
+    pomoState.running = true;
+    document.getElementById('pomo-start-btn').innerHTML = '⏸ Pause';
+    pomoState.interval = setInterval(() => {
+      pomoState.timeLeft--;
+      if (pomoState.timeLeft <= 0) {
+        clearInterval(pomoState.interval);
+        pomoState.running = false;
+        document.getElementById('pomo-start-btn').innerHTML = '▶ Start';
+        onPomoComplete();
+      }
+      updatePomoDisplay();
+    }, 1000);
+  }
+}
+
+function resetPomodoro() {
+  clearInterval(pomoState.interval);
+  pomoState.running = false;
+  pomoState.isBreak = false;
+  pomoState.timeLeft = pomoState.duration;
+  document.getElementById('pomo-start-btn').innerHTML = '▶ Start';
+  updatePomoDisplay();
+}
+
+function skipPomodoro() {
+  clearInterval(pomoState.interval);
+  pomoState.running = false;
+  if (!pomoState.isBreak) {
+    startBreak();
+  } else {
+    pomoState.isBreak = false;
+    pomoState.timeLeft = pomoState.duration;
+    document.getElementById('pomo-start-btn').innerHTML = '▶ Start';
+    updatePomoDisplay();
+  }
+}
+
+function onPomoComplete() {
+  if (document.getElementById('pomo-sound').checked) playSound();
+  if (!pomoState.isBreak) {
+    pomoState.sessionCount++;
+    // Record to history
+    const today = new Date().toISOString().split('T')[0];
+    if (!state.pomodoro.history[today]) state.pomodoro.history[today] = { count: 0, minutes: 0 };
+    state.pomodoro.history[today].count++;
+    state.pomodoro.history[today].minutes += Math.round(pomoState.duration / 60);
+    state.pomodoro.totalPomos++;
+    state.stats.totalPomos++;
+    state.stats.totalHours = Math.round((state.stats.totalHours * 60 + pomoState.duration / 60) / 60 * 100) / 100;
+    // Update streak
+    updateStreak();
+    saveData(STORAGE_KEYS.pomodoro, state.pomodoro);
+    saveData(STORAGE_KEYS.stats, state.stats);
+    updatePomoStats();
+    renderPomoChart();
+    showToast('Pomodoro complete! Great focus session! 🎉');
+    if (document.getElementById('pomo-auto-break').checked) startBreak();
+  } else {
+    pomoState.isBreak = false;
+    pomoState.timeLeft = pomoState.duration;
+    updatePomoDisplay();
+    showToast('Break over! Ready for another session? 💪');
+  }
+}
+
+function startBreak() {
+  const settings = state.settings;
+  const isLongBreak = pomoState.sessionCount % (settings.longBreakAfter || 4) === 0;
+  const breakMins = isLongBreak ? (settings.breakLong || 15) : (settings.breakShort || 5);
+  pomoState.isBreak = true;
+  pomoState.duration = breakMins * 60;
+  pomoState.timeLeft = breakMins * 60;
+  updatePomoDisplay();
+  if (document.getElementById('pomo-auto-break').checked) togglePomodoro();
+}
+
+function updateStreak() {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yKey = yesterday.toISOString().split('T')[0];
+  if (state.pomodoro.lastDate === yKey || state.pomodoro.lastDate === today.toISOString().split('T')[0]) {
+    if (state.pomodoro.lastDate !== today.toISOString().split('T')[0]) state.pomodoro.streak++;
+  } else {
+    state.pomodoro.streak = 1;
+  }
+  state.pomodoro.lastDate = today.toISOString().split('T')[0];
+}
+
+function updatePomoStats() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayData = state.pomodoro.history[today] || { count: 0, minutes: 0 };
+  document.getElementById('pomo-today-count').textContent = todayData.count;
+  document.getElementById('pomo-today-hours').textContent = todayData.minutes >= 60 ? Math.round(todayData.minutes / 60 * 10) / 10 + 'h' : todayData.minutes + 'm';
+  document.getElementById('pomo-streak').textContent = state.pomodoro.streak || 0;
+}
+
+function renderPomoChart() {
+  const barsEl = document.getElementById('pomo-chart-bars');
+  const labelsEl = document.getElementById('pomo-chart-labels');
+  if (!barsEl) return;
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  const maxVal = Math.max(1, ...days.map(d => (state.pomodoro.history[d] || {}).count || 0));
+  barsEl.innerHTML = days.map(d => {
+    const count = (state.pomodoro.history[d] || {}).count || 0;
+    const h = Math.max(2, (count / maxVal) * 160);
+    return '<div class="chart-bar-wrapper"><div class="chart-bar-value">' + count + '</div><div class="chart-bar" style="height:' + h + 'px" title="' + count + ' pomodoros"></div></div>';
+  }).join('');
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  labelsEl.innerHTML = days.map(d => '<div class="chart-label">' + dayNames[new Date(d).getDay()] + '</div>').join('');
+}
+
+function playSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const frequencies = [523.25, 659.25, 783.99, 1046.50];
+    frequencies.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.4);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.4);
+    });
+  } catch(e) {}
+}
+
+/* ===== Knowledge Tracker ===== */
+const MASTERY_LEVELS = [
+  { key: 'not-started', label: 'Not Started', emoji: '⬜', color: '#888' },
+  { key: 'learning', label: 'Learning', emoji: '🟡', color: '#f59e0b' },
+  { key: 'familiar', label: 'Familiar', emoji: '🔵', color: '#3b82f6' },
+  { key: 'mastered', label: 'Mastered', emoji: '🟢', color: '#22c55e' }
+];
+
+let knowledgeFilter = 'all';
+
+function addKnowledgePoint() {
+  const topic = document.getElementById('knowledge-topic').value.trim();
+  if (!topic) { showToast('Enter a topic name', 'error'); return; }
+  const category = document.getElementById('knowledge-category').value;
+  state.knowledge.push({
+    id: Date.now(), topic, category, mastery: 'not-started',
+    notes: '', createdAt: new Date().toISOString(), lastReviewed: null
+  });
+  saveData(STORAGE_KEYS.knowledge, state.knowledge);
+  document.getElementById('knowledge-topic').value = '';
+  renderKnowledge();
+  showToast('Knowledge point added');
+}
+
+function filterKnowledge(filter) {
+  knowledgeFilter = filter;
+  document.querySelectorAll('.knowledge-filter').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  renderKnowledge();
+}
+
+function renderKnowledge() {
+  const list = document.getElementById('knowledge-list');
+  let items = state.knowledge;
+  if (knowledgeFilter !== 'all') items = items.filter(k => k.mastery === knowledgeFilter);
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🧠</div><p>No knowledge points yet. Add topics you want to track.</p></div>';
+  } else {
+    list.innerHTML = items.map(k => {
+      const level = MASTERY_LEVELS.find(l => l.key === k.mastery) || MASTERY_LEVELS[0];
+      const catEmojis = { concept: '💡', algorithm: '🧮', formula: '📐', vocabulary: '📖', theory: '🔬', practice: '🛠️' };
+      return `<div class="task-item" style="border-left:3px solid ${level.color}">
+        <span style="font-size:18px">${catEmojis[k.category] || '📌'}</span>
+        <span class="task-text" style="font-weight:600">${k.topic}</span>
+        <select onchange="updateMastery(${k.id}, this.value)" style="width:140px;padding:6px 10px;font-size:12px">
+          ${MASTERY_LEVELS.map(l => `<option value="${l.key}" ${k.mastery === l.key ? 'selected' : ''}>${l.emoji} ${l.label}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm" style="background:none;color:var(--muted);border:none;padding:4px 8px" onclick="deleteKnowledge(${k.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+  // Update stats
+  const total = state.knowledge.length;
+  const mastered = state.knowledge.filter(k => k.mastery === 'mastered').length;
+  const learning = state.knowledge.filter(k => k.mastery === 'learning').length;
+  document.getElementById('kn-total').textContent = total;
+  document.getElementById('kn-mastered').textContent = mastered;
+  document.getElementById('kn-learning').textContent = learning;
+  document.getElementById('kn-progress').textContent = total > 0 ? Math.round(mastered / total * 100) + '%' : '0%';
+}
+
+function updateMastery(id, level) {
+  const item = state.knowledge.find(k => k.id === id);
+  if (item) {
+    item.mastery = level;
+    item.lastReviewed = new Date().toISOString();
+    saveData(STORAGE_KEYS.knowledge, state.knowledge);
+    renderKnowledge();
+  }
+}
+
+function deleteKnowledge(id) {
+  state.knowledge = state.knowledge.filter(k => k.id !== id);
+  saveData(STORAGE_KEYS.knowledge, state.knowledge);
+  renderKnowledge();
+  showToast('Knowledge point removed');
+}
+
+/* ===== Ebbinghaus Review System ===== */
+const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]; // days
+
+function addReviewItem() {
+  const text = document.getElementById('review-item-input').value.trim();
+  if (!text) { showToast('Enter what you learned', 'error'); return; }
+  const learnDate = document.getElementById('review-learn-date').value || new Date().toISOString().split('T')[0];
+  const reviewDates = REVIEW_INTERVALS.map(days => {
+    const d = new Date(learnDate);
+    d.setDate(d.getDate() + days);
+    return { date: d.toISOString().split('T')[0], interval: days, completed: false };
+  });
+  state.reviews.push({
+    id: Date.now(), text, learnDate, reviews: reviewDates,
+    currentCycle: 0, createdAt: new Date().toISOString()
+  });
+  saveData(STORAGE_KEYS.reviews, state.reviews);
+  document.getElementById('review-item-input').value = '';
+  renderReviews();
+  showToast('Review item added with 6 review dates');
+}
+
+let reviewFilter = 'overdue';
+
+function filterReviews(filter) {
+  reviewFilter = filter;
+  document.querySelectorAll('.review-filter').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  renderReviews();
+}
+
+function getReviewStatus(item) {
+  const today = new Date().toISOString().split('T')[0];
+  const nextReview = item.reviews.find(r => !r.completed);
+  if (!nextReview) return 'completed';
+  if (nextReview.date < today) return 'overdue';
+  if (nextReview.date === today) return 'today';
+  return 'upcoming';
+}
+
+function renderReviews() {
+  const list = document.getElementById('review-list');
+  const today = new Date().toISOString().split('T')[0];
+  let items = state.reviews;
+  if (reviewFilter !== 'all') {
+    items = items.filter(item => getReviewStatus(item) === reviewFilter);
+  }
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">🔄</div><p>No review items in this category. Add something you learned to start tracking.</p></div>';
+  } else {
+    list.innerHTML = items.map(item => {
+      const status = getReviewStatus(item);
+      const nextReview = item.reviews.find(r => !r.completed);
+      const completedCount = item.reviews.filter(r => r.completed).length;
+      const statusColors = { overdue: 'var(--error)', today: 'var(--warn)', upcoming: 'var(--info)', completed: 'var(--success)' };
+      const statusEmojis = { overdue: '🔴', today: '📅', upcoming: '🔜', completed: '✅' };
+      const progressPct = Math.round(completedCount / item.reviews.length * 100);
+      return `<div class="task-item" style="border-left:3px solid ${statusColors[status]};flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:600;font-size:14px">${statusEmojis[status]} ${item.text}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">
+            Learned: ${item.learnDate} · Next: ${nextReview ? nextReview.date + ' (Day ' + nextReview.interval + ')' : 'All done!'}
+          </div>
+          <div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+          <div style="font-size:11px;color:var(--muted)">${completedCount}/${item.reviews.length} reviews completed</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${status !== 'completed' ? `<button class="btn btn-sm btn-success" onclick="completeReview(${item.id})">✓ Reviewed</button>` : ''}
+          <button class="btn btn-sm" style="background:none;color:var(--muted);border:none" onclick="deleteReview(${item.id})">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  // Update stats
+  const allItems = state.reviews;
+  document.getElementById('rv-total').textContent = allItems.length;
+  document.getElementById('rv-overdue').textContent = allItems.filter(i => getReviewStatus(i) === 'overdue').length;
+  document.getElementById('rv-today').textContent = allItems.filter(i => getReviewStatus(i) === 'today').length;
+  document.getElementById('rv-completed').textContent = allItems.filter(i => getReviewStatus(i) === 'completed').length;
+}
+
+function completeReview(id) {
+  const item = state.reviews.find(r => r.id === id);
+  if (item) {
+    const next = item.reviews.find(r => !r.completed);
+    if (next) {
+      next.completed = true;
+      next.completedAt = new Date().toISOString();
+      saveData(STORAGE_KEYS.reviews, state.reviews);
+      renderReviews();
+      showToast('Review completed! Keep it up! 🧠');
+    }
+  }
+}
+
+function deleteReview(id) {
+  state.reviews = state.reviews.filter(r => r.id !== id);
+  saveData(STORAGE_KEYS.reviews, state.reviews);
+  renderReviews();
+  showToast('Review item removed');
+}
+
+function drawForgettingCurve() {
+  const canvas = document.getElementById('forgetting-curve-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  // Draw forgetting curve (without review)
+  ctx.strokeStyle = 'rgba(239,68,68,0.6)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  for (let x = 0; x <= w; x++) {
+    const t = (x / w) * 30;
+    const retention = 100 * Math.exp(-0.3 * t);
+    const y = h - (retention / 100) * h;
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // Draw with spaced repetition
+  ctx.strokeStyle = 'rgba(99,102,241,0.9)';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  const reviewDays = [0, 1, 3, 7, 15, 30];
+  let lastRetention = 100;
+  for (let x = 0; x <= w; x++) {
+    const t = (x / w) * 30;
+    let retention = lastRetention;
+    for (let i = 0; i < reviewDays.length; i++) {
+      if (t >= reviewDays[i]) {
+        const timeSinceReview = t - reviewDays[i];
+        const decayRate = 0.3 / (1 + i * 0.5);
+        retention = Math.max(retention, 100 * Math.exp(-decayRate * timeSinceReview));
+      }
+    }
+    const y = h - (retention / 100) * h;
+    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  // Legend
+  ctx.font = '11px -apple-system, sans-serif';
+  ctx.setLineDash([5, 5]);
+  ctx.strokeStyle = 'rgba(239,68,68,0.6)';
+  ctx.beginPath(); ctx.moveTo(w - 180, 15); ctx.lineTo(w - 150, 15); ctx.stroke();
+  ctx.fillStyle = 'rgba(239,68,68,0.8)';
+  ctx.fillText('Without review', w - 145, 19);
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(99,102,241,0.9)';
+  ctx.beginPath(); ctx.moveTo(w - 180, 35); ctx.lineTo(w - 150, 35); ctx.stroke();
+  ctx.fillStyle = 'rgba(99,102,241,0.9)';
+  ctx.fillText('With spaced repetition', w - 145, 39);
+  // Review markers
+  ctx.fillStyle = 'rgba(99,102,241,0.3)';
+  reviewDays.forEach(d => {
+    const x = (d / 30) * w;
+    ctx.beginPath();
+    ctx.arc(x, h - 0.85 * h, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+/* ===== Markdown Notes Editor ===== */
+let currentNoteId = null;
+
+function createNote() {
+  const title = document.getElementById('note-title-input').value.trim() || 'Untitled Note';
+  const folder = document.getElementById('note-folder').value;
+  const note = {
+    id: Date.now(), title, folder, content: '',
+    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+  };
+  state.notes.unshift(note);
+  saveData(STORAGE_KEYS.notes, state.notes);
+  document.getElementById('note-title-input').value = '';
+  currentNoteId = note.id;
+  renderNotesSidebar();
+  loadNote(note.id);
+  showToast('Note created');
+}
+
+function renderNotesSidebar() {
+  const list = document.getElementById('notes-sidebar-list');
+  if (!list) return;
+  const searchTerm = (document.getElementById('note-search')?.value || '').toLowerCase();
+  let notes = state.notes;
+  if (searchTerm) notes = notes.filter(n => n.title.toLowerCase().includes(searchTerm) || n.content.toLowerCase().includes(searchTerm));
+  if (notes.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">No notes yet</div>';
+    return;
+  }
+  const folderEmojis = { general: '📁', lecture: '🎓', summary: '📋', cheatsheet: '⚡' };
+  list.innerHTML = notes.map(n => `
+    <div onclick="loadNote(${n.id})" style="padding:10px 12px;border:1px solid ${currentNoteId === n.id ? 'var(--accent)' : 'var(--border)'};border-radius:var(--radius-xs);margin-bottom:6px;cursor:pointer;transition:all .2s;background:${currentNoteId === n.id ? 'rgba(99,102,241,.08)' : 'transparent'}">
+      <div style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:4px">${folderEmojis[n.folder] || '📁'} ${n.title}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${new Date(n.updatedAt).toLocaleDateString()} · ${n.content.split(/\s+/).filter(Boolean).length} words</div>
+    </div>
+  `).join('');
+}
+
+function searchNotes() { renderNotesSidebar(); }
+
+function loadNote(id) {
+  currentNoteId = id;
+  const note = state.notes.find(n => n.id === id);
+  if (!note) return;
+  document.getElementById('note-editor').value = note.content;
+  updateNotePreview();
+  updateWordCount();
+  renderNotesSidebar();
+}
+
+function onNoteEdit() {
+  if (!currentNoteId) return;
+  const note = state.notes.find(n => n.id === currentNoteId);
+  if (note) {
+    note.content = document.getElementById('note-editor').value;
+    note.updatedAt = new Date().toISOString();
+    saveData(STORAGE_KEYS.notes, state.notes);
+    updateNotePreview();
+    updateWordCount();
+  }
+}
+
+function updateWordCount() {
+  const text = document.getElementById('note-editor').value;
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const chars = text.length;
+  document.getElementById('note-word-count').textContent = words + ' words · ' + chars + ' chars';
+}
+
+function updateNotePreview() {
+  const md = document.getElementById('note-editor').value;
+  document.getElementById('note-preview').innerHTML = parseMarkdown(md);
+}
+
+function parseMarkdown(md) {
+  let html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3 style="color:var(--accent2);margin:16px 0 8px">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 style="color:var(--accent);margin:20px 0 10px;font-size:1.2rem">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 style="color:var(--text);margin:24px 0 12px;font-size:1.4rem">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--surface);padding:2px 6px;border-radius:4px;font-size:13px">$1</code>')
+    .replace(/^- (.+)$/gm, '<li style="margin-left:20px;margin-bottom:4px">$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li style="margin-left:20px;margin-bottom:4px;list-style:decimal">$1</li>')
+    .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:16px 0">')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/^&gt; (.+)$/gm, '<blockquote style="border-left:3px solid var(--accent);padding-left:12px;color:var(--muted);margin:8px 0">$1</blockquote>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+  return html || '<span style="color:var(--muted)">Preview will appear here...</span>';
+}
+
+function toggleNoteView(view) {
+  const editor = document.getElementById('note-editor');
+  const preview = document.getElementById('note-preview');
+  document.getElementById('note-edit-btn').style.borderColor = 'var(--border)';
+  document.getElementById('note-edit-btn').style.color = 'var(--muted)';
+  document.getElementById('note-preview-btn').style.borderColor = 'var(--border)';
+  document.getElementById('note-preview-btn').style.color = 'var(--muted)';
+  document.getElementById('note-split-btn').style.borderColor = 'var(--border)';
+  document.getElementById('note-split-btn').style.color = 'var(--muted)';
+  if (view === 'edit') {
+    editor.style.display = 'block'; preview.style.display = 'none';
+    document.getElementById('note-edit-btn').style.borderColor = 'var(--accent)';
+    document.getElementById('note-edit-btn').style.color = 'var(--accent)';
+  } else if (view === 'preview') {
+    editor.style.display = 'none'; preview.style.display = 'block';
+    document.getElementById('note-preview-btn').style.borderColor = 'var(--accent)';
+    document.getElementById('note-preview-btn').style.color = 'var(--accent)';
+    updateNotePreview();
+  } else {
+    editor.style.display = 'block'; preview.style.display = 'block';
+    document.getElementById('note-split-btn').style.borderColor = 'var(--accent)';
+    document.getElementById('note-split-btn').style.color = 'var(--accent)';
+    updateNotePreview();
+  }
+}
+
+function insertMarkdown(type) {
+  const editor = document.getElementById('note-editor');
+  const start = editor.selectionStart, end = editor.selectionEnd;
+  const selected = editor.value.substring(start, end);
+  const inserts = {
+    bold: { before: '**', after: '**', placeholder: 'bold text' },
+    italic: { before: '*', after: '*', placeholder: 'italic text' },
+    code: { before: '`', after: '`', placeholder: 'code' },
+    link: { before: '[', after: '](url)', placeholder: 'link text' },
+    list: { before: '- ', after: '', placeholder: 'list item' }
+  };
+  const ins = inserts[type];
+  const text = selected || ins.placeholder;
+  editor.value = editor.value.substring(0, start) + ins.before + text + ins.after + editor.value.substring(end);
+  editor.focus();
+  editor.selectionStart = start + ins.before.length;
+  editor.selectionEnd = start + ins.before.length + text.length;
+  onNoteEdit();
+}
+
+function downloadNote() {
+  if (!currentNoteId) { showToast('Select a note first', 'error'); return; }
+  const note = state.notes.find(n => n.id === currentNoteId);
+  if (!note) return;
+  const blob = new Blob([note.content], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = note.title.replace(/[^a-zA-Z0-9]/g, '_') + '.md';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Note downloaded');
+}
+
+function deleteCurrentNote() {
+  if (!currentNoteId) return;
+  if (!confirm('Delete this note?')) return;
+  state.notes = state.notes.filter(n => n.id !== currentNoteId);
+  saveData(STORAGE_KEYS.notes, state.notes);
+  currentNoteId = null;
+  document.getElementById('note-editor').value = '';
+  document.getElementById('note-preview').innerHTML = '';
+  renderNotesSidebar();
+  showToast('Note deleted');
+}
+
+/* ===== Statistics ===== */
+function refreshStats() {
+  // Overall stats
+  document.getElementById('stat-total-hours').textContent = (state.stats.totalHours || 0).toFixed(1) + 'h';
+  document.getElementById('stat-total-pomos').textContent = state.stats.totalPomos || 0;
+  document.getElementById('stat-tasks-done').textContent = state.stats.tasksDone || 0;
+  document.getElementById('stat-streak').textContent = state.pomodoro.streak || 0;
+  // Weekly chart
+  switchStatsChart('week');
+  // Subject distribution
+  renderSubjectDistribution();
+  // Achievements
+  renderAchievements();
+}
+
+function switchStatsChart(period) {
+  document.querySelectorAll('#stats-chart-toggle .chart-toggle-btn').forEach(b => b.classList.remove('active'));
+  event?.currentTarget?.classList.add('active');
+  const barsEl = document.getElementById('stats-chart-bars');
+  const labelsEl = document.getElementById('stats-chart-labels');
+  if (!barsEl) return;
+  const days = [];
+  const count = period === 'week' ? 7 : 30;
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  const data = days.map(d => (state.pomodoro.history[d] || {}).minutes || 0);
+  const maxVal = Math.max(1, ...data);
+  barsEl.innerHTML = data.map((mins, i) => {
+    const h = Math.max(2, (mins / maxVal) * 180);
+    const hours = (mins / 60).toFixed(1);
+    return '<div class="chart-bar-wrapper"><div class="chart-bar-value">' + (mins > 0 ? hours + 'h' : '') + '</div><div class="chart-bar" style="height:' + h + 'px" title="' + hours + ' hours"></div></div>';
+  }).join('');
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  if (period === 'week') {
+    labelsEl.innerHTML = days.map(d => '<div class="chart-label">' + dayNames[new Date(d).getDay()] + '</div>').join('');
+  } else {
+    labelsEl.innerHTML = days.map((d, i) => '<div class="chart-label">' + (i % 5 === 0 ? d.slice(5) : '') + '</div>').join('');
+  }
+}
+
+function renderSubjectDistribution() {
+  const container = document.getElementById('subject-distribution');
+  if (!container) return;
+  const subjects = {};
+  state.plans.forEach(p => {
+    subjects[p.subject] = (subjects[p.subject] || 0) + 1;
+  });
+  state.knowledge.forEach(k => {
+    subjects[k.category] = (subjects[k.category] || 0) + 1;
+  });
+  const subjectEmojis = {
+    programming: '💻', math: '📐', science: '🔬', language: '🌍',
+    design: '🎨', business: '💼', music: '🎵', other: '📚',
+    concept: '💡', algorithm: '🧮', formula: '📐', vocabulary: '📖',
+    theory: '🔬', practice: '🛠️'
+  };
+  const total = Object.values(subjects).reduce((s, v) => s + v, 0) || 1;
+  if (Object.keys(subjects).length === 0) {
+    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px">No data yet. Create study plans and track knowledge to see distribution.</div>';
+    return;
+  }
+  container.innerHTML = Object.entries(subjects).map(([key, count]) => {
+    const pct = Math.round(count / total * 100);
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:600">${subjectEmojis[key] || '📌'} ${key}</span>
+        <span style="font-size:13px;color:var(--muted)">${pct}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderAchievements() {
+  const container = document.getElementById('achievements-grid');
+  if (!container) return;
+  const achievements = [
+    { icon: '🌱', name: 'First Step', desc: 'Complete your first task', unlocked: state.stats.tasksDone >= 1 },
+    { icon: '🍅', name: 'Tomato Lover', desc: 'Complete 10 pomodoros', unlocked: state.stats.totalPomos >= 10 },
+    { icon: '🔥', name: 'On Fire', desc: '3-day study streak', unlocked: (state.pomodoro.streak || 0) >= 3 },
+    { icon: '🧠', name: 'Knowledge Seeker', desc: 'Track 10 knowledge points', unlocked: state.knowledge.length >= 10 },
+    { icon: '📝', name: 'Note Taker', desc: 'Create 5 notes', unlocked: state.notes.length >= 5 },
+    { icon: '🎯', name: 'Planner', desc: 'Create 3 study plans', unlocked: state.plans.length >= 3 },
+    { icon: '⏰', name: 'Marathon', desc: 'Study 10+ hours total', unlocked: (state.stats.totalHours || 0) >= 10 },
+    { icon: '🏆', name: 'Master', desc: 'Master 20 knowledge points', unlocked: state.knowledge.filter(k => k.mastery === 'mastered').length >= 20 },
+    { icon: '📚', name: 'Scholar', desc: 'Complete 50 tasks', unlocked: state.stats.tasksDone >= 50 },
+    { icon: '💎', name: 'Diamond', desc: '30-day streak', unlocked: (state.pomodoro.streak || 0) >= 30 },
+    { icon: '🔄', name: 'Reviewer', desc: 'Complete 10 reviews', unlocked: state.reviews.filter(r => r.reviews.some(rv => rv.completed)).length >= 10 },
+    { icon: '🚀', name: 'Unstoppable', desc: '100 pomodoros total', unlocked: state.stats.totalPomos >= 100 }
+  ];
+  container.innerHTML = achievements.map(a => `
+    <div style="background:${a.unlocked ? 'rgba(99,102,241,.08)' : 'var(--surface)'};border:1px solid ${a.unlocked ? 'var(--accent)' : 'var(--border)'};border-radius:var(--radius);padding:16px;text-align:center;opacity:${a.unlocked ? '1' : '0.5'};transition:all .2s">
+      <div style="font-size:2rem;margin-bottom:6px">${a.icon}</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${a.name}</div>
+      <div style="font-size:11px;color:var(--muted)">${a.desc}</div>
+      ${a.unlocked ? '<div style="font-size:10px;color:var(--accent);margin-top:6px;font-weight:600">✓ UNLOCKED</div>' : ''}
+    </div>
+  `).join('');
+}
+
+/* ===== Settings ===== */
+function saveSettings() {
+  state.settings.pomoDuration = parseInt(document.getElementById('setting-pomo-duration').value) || 25;
+  state.settings.breakShort = parseInt(document.getElementById('setting-break-short').value) || 5;
+  state.settings.breakLong = parseInt(document.getElementById('setting-break-long').value) || 15;
+  state.settings.longBreakAfter = parseInt(document.getElementById('setting-long-break-after').value) || 4;
+  state.settings.dailyGoal = parseFloat(document.getElementById('setting-daily-goal').value) || 4;
+  saveData(STORAGE_KEYS.settings, state.settings);
+  // Update pomodoro duration if not running
+  if (!pomoState.running) {
+    pomoState.duration = state.settings.pomoDuration * 60;
+    pomoState.timeLeft = state.settings.pomoDuration * 60;
+    updatePomoDisplay();
+  }
+  showToast('Settings saved');
+}
+
+function loadSettings() {
+  document.getElementById('setting-pomo-duration').value = state.settings.pomoDuration || 25;
+  document.getElementById('setting-break-short').value = state.settings.breakShort || 5;
+  document.getElementById('setting-break-long').value = state.settings.breakLong || 15;
+  document.getElementById('setting-long-break-after').value = state.settings.longBreakAfter || 4;
+  document.getElementById('setting-daily-goal').value = state.settings.dailyGoal || 4;
+}
+
+/* ===== Export / Import ===== */
+function exportAllData() {
+  const data = {
+    version: '2.0',
+    exportedAt: new Date().toISOString(),
+    plans: state.plans,
+    tasks: state.tasks,
+    pomodoro: state.pomodoro,
+    knowledge: state.knowledge,
+    reviews: state.reviews,
+    notes: state.notes,
+    settings: state.settings,
+    stats: state.stats
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'study-planner-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Data exported successfully');
+}
+
+function importAllData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.version) { showToast('Invalid backup file', 'error'); return; }
+      if (!confirm('This will replace all current data. Continue?')) return;
+      if (data.plans) { state.plans = data.plans; saveData(STORAGE_KEYS.plans, state.plans); }
+      if (data.tasks) { state.tasks = data.tasks; saveData(STORAGE_KEYS.tasks, state.tasks); }
+      if (data.pomodoro) { state.pomodoro = data.pomodoro; saveData(STORAGE_KEYS.pomodoro, state.pomodoro); }
+      if (data.knowledge) { state.knowledge = data.knowledge; saveData(STORAGE_KEYS.knowledge, state.knowledge); }
+      if (data.reviews) { state.reviews = data.reviews; saveData(STORAGE_KEYS.reviews, state.reviews); }
+      if (data.notes) { state.notes = data.notes; saveData(STORAGE_KEYS.notes, state.notes); }
+      if (data.settings) { state.settings = data.settings; saveData(STORAGE_KEYS.settings, state.settings); }
+      if (data.stats) { state.stats = data.stats; saveData(STORAGE_KEYS.stats, state.stats); }
+      initApp();
+      showToast('Data imported successfully! ' + (data.exportedAt ? 'Backup from ' + data.exportedAt.split('T')[0] : ''));
+    } catch(err) {
+      showToast('Failed to import: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAllData() {
+  if (!confirm('Are you sure? This will delete ALL your data permanently.')) return;
+  if (!confirm('Really? This cannot be undone.')) return;
+  Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
+  state = {
+    plans: [], tasks: [],
+    pomodoro: { history: {}, totalPomos: 0, streak: 0, lastDate: null },
+    knowledge: [], reviews: [], notes: [],
+    settings: { pomoDuration: 25, breakShort: 5, breakLong: 15, longBreakAfter: 4, dailyGoal: 4 },
+    stats: { totalHours: 0, totalPomos: 0, tasksDone: 0, subjects: {} }
+  };
+  initApp();
+  showToast('All data cleared');
+}
+
+/* ===== Initialization ===== */
+function initApp() {
+  // Set default deadline to 2 months from now
+  const defaultDeadline = new Date();
+  defaultDeadline.setMonth(defaultDeadline.getMonth() + 2);
+  const deadlineInput = document.getElementById('plan-deadline');
+  if (deadlineInput && !deadlineInput.value) {
+    deadlineInput.value = defaultDeadline.toISOString().split('T')[0];
+  }
+  // Set default review learn date to today
+  const reviewDateInput = document.getElementById('review-learn-date');
+  if (reviewDateInput) {
+    reviewDateInput.value = new Date().toISOString().split('T')[0];
+  }
+  // Load settings
+  loadSettings();
+  // Initialize pomodoro
+  pomoState.duration = (state.settings.pomoDuration || 25) * 60;
+  pomoState.timeLeft = pomoState.duration;
+  updatePomoDisplay();
+  updatePomoStats();
+  // Render all sections
+  renderTasks();
+  renderKnowledge();
+  renderReviews();
+  renderNotesSidebar();
+  renderPomoChart();
+  // Render last plan if exists
+  if (state.plans.length > 0) renderPlan(state.plans[0]);
+  // Check for overdue reviews notification
+  const overdueCount = state.reviews.filter(i => getReviewStatus(i) === 'overdue').length;
+  const todayCount = state.reviews.filter(i => getReviewStatus(i) === 'today').length;
+  if (overdueCount > 0) {
+    setTimeout(() => showToast('You have ' + overdueCount + ' overdue review(s)! Check the Review tab.', 'error'), 1000);
+  } else if (todayCount > 0) {
+    setTimeout(() => showToast('You have ' + todayCount + ' review(s) due today!'), 1000);
+  }
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', initApp);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === '1') { e.preventDefault(); switchTab('plan'); }
+    if (e.key === '2') { e.preventDefault(); switchTab('pomodoro'); }
+    if (e.key === '3') { e.preventDefault(); switchTab('knowledge'); }
+    if (e.key === '4') { e.preventDefault(); switchTab('review'); }
+    if (e.key === '5') { e.preventDefault(); switchTab('notes'); }
+    if (e.key === '6') { e.preventDefault(); switchTab('stats'); }
+    if (e.key === '7') { e.preventDefault(); switchTab('settings'); }
+    if (e.key === 's' && document.activeElement.id === 'note-editor') {
+      e.preventDefault();
+      showToast('Notes auto-saved');
+    }
+  }
+  // Space to toggle pomodoro when focused
+  if (e.code === 'Space' && document.getElementById('panel-pomodoro')?.classList.contains('active') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    togglePomodoro();
+  }
+});
+
+// Warn before leaving if pomodoro is running
+window.addEventListener('beforeunload', function(e) {
+  if (pomoState.running) {
+    e.preventDefault();
+    e.returnValue = 'Pomodoro timer is still running. Are you sure you want to leave?';
+  }
+});
+</script>
+
+<!-- Vercel Analytics -->
+<script defer src="/_vercel/insights/script.js"></script>
+<!-- Vercel Speed Insights -->
+<script defer src="/_vercel/speed-insights/script.js"></script>
+
+</body>
+</html>
