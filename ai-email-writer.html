@@ -534,3 +534,858 @@ Generate Cold Email
 </div>
 <p>&copy; 2025 Lifa AI Tools. Free AI-powered tools for everyone.</p>
 </footer>
+
+<script>
+// ==========================================
+// AI Email Writer - Complete JavaScript
+// ==========================================
+
+// --- State ---
+let selectedScenario = 'meeting';
+let selectedTone = 'formal';
+let currentModalTemplate = null;
+
+// --- Tab Switching ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// --- Scenario Selection ---
+const scenarioFields = {
+  meeting: [
+    {id:'gen-topic',label:'Meeting Topic',type:'text',placeholder:'e.g. Q1 Budget Review'},
+    {id:'gen-datetime',label:'Date & Time',type:'text',placeholder:'e.g. March 15, 2026 at 2:00 PM EST'},
+    {id:'gen-location',label:'Location / Meeting Link',type:'text',placeholder:'e.g. Conference Room B / Zoom link'},
+    {id:'gen-agenda',label:'Agenda Points',type:'textarea',placeholder:'Key items to discuss...'}
+  ],
+  update: [
+    {id:'gen-project',label:'Project Name',type:'text',placeholder:'e.g. Website Redesign'},
+    {id:'gen-status',label:'Current Status',type:'select',options:['On Track','At Risk','Delayed','Completed']},
+    {id:'gen-updates',label:'Key Updates',type:'textarea',placeholder:'What has been accomplished...'},
+    {id:'gen-nextsteps',label:'Next Steps',type:'textarea',placeholder:'Upcoming milestones and action items...'}
+  ],
+  followup: [
+    {id:'gen-prevtopic',label:'Previous Meeting/Topic',type:'text',placeholder:'e.g. Product demo on March 10'},
+    {id:'gen-keypoints',label:'Key Points Discussed',type:'textarea',placeholder:'Main takeaways from the conversation...'},
+    {id:'gen-nextsteps2',label:'Proposed Next Steps',type:'textarea',placeholder:'What you suggest moving forward...'}
+  ],
+  complaint: [
+    {id:'gen-issue',label:'Issue Summary',type:'text',placeholder:'e.g. Delayed shipment of order #12345'},
+    {id:'gen-resolution',label:'Proposed Resolution',type:'textarea',placeholder:'How you plan to resolve this...'},
+    {id:'gen-timeline',label:'Resolution Timeline',type:'text',placeholder:'e.g. Within 48 hours'}
+  ],
+  proposal: [
+    {id:'gen-partnertype',label:'Partnership Type',type:'text',placeholder:'e.g. Co-marketing campaign'},
+    {id:'gen-benefits',label:'Mutual Benefits',type:'textarea',placeholder:'What both parties gain...'},
+    {id:'gen-terms',label:'Proposed Terms',type:'textarea',placeholder:'Initial terms or next steps...'}
+  ]
+};
+
+function updateScenarioFields() {
+  const container = document.getElementById('scenario-fields');
+  const fields = scenarioFields[selectedScenario] || [];
+  let html = '';
+  fields.forEach(f => {
+    if (f.type === 'textarea') {
+      html += '<div class="form-group"><label for="'+f.id+'">'+f.label+'</label><textarea id="'+f.id+'" rows="3" placeholder="'+f.placeholder+'"></textarea></div>';
+    } else if (f.type === 'select') {
+      let opts = '';
+      f.options.forEach(o => { opts += '<option value="'+o.toLowerCase().replace(/\s+/g,'-')+'">'+o+'</option>'; });
+      html += '<div class="form-group"><label for="'+f.id+'">'+f.label+'</label><select id="'+f.id+'">'+opts+'</select></div>';
+    } else {
+      html += '<div class="form-group"><label for="'+f.id+'">'+f.label+'</label><input type="text" id="'+f.id+'" placeholder="'+f.placeholder+'"></div>';
+    }
+  });
+  container.innerHTML = html;
+}
+
+document.querySelectorAll('.scenario-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedScenario = card.dataset.scenario;
+    updateScenarioFields();
+  });
+});
+
+// --- Tone Selection ---
+document.querySelectorAll('.tone-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedTone = chip.dataset.tone;
+  });
+});
+
+// --- Helpers ---
+function getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function updateWordCount(id, text) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = text.split(/\s+/).filter(function(w){return w;}).length + ' words';
+}
+function setOutput(id, text) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.classList.remove('empty');
+}
+
+// --- Business Email Generator ---
+function generateBusinessEmail() {
+  var sender = getVal('gen-sender') || 'Alex';
+  var recipient = getVal('gen-recipient') || 'Team';
+  var company = getVal('gen-company');
+  var extra = getVal('gen-extra');
+  var subject = '', body = '';
+  var greeting = rand(['Dear '+recipient+',', 'Hi '+recipient+',', 'Hello '+recipient+',']);
+  var closing = rand(['Best regards,\n'+sender, 'Kind regards,\n'+sender, 'Sincerely,\n'+sender, 'Best,\n'+sender]);
+  var companyLine = company ? ' at ' + company : '';
+
+  if (selectedScenario === 'meeting') {
+    var topic = getVal('gen-topic') || 'upcoming discussion';
+    var datetime = getVal('gen-datetime') || 'a convenient time';
+    var location = getVal('gen-location') || 'to be confirmed';
+    var agenda = getVal('gen-agenda') || '';
+    subject = 'Meeting Request: ' + topic;
+    body = greeting + '\n\n';
+    body += rand([
+      'I would like to schedule a meeting to discuss ' + topic + '.',
+      'I am writing to invite you to a meeting regarding ' + topic + '.',
+      'Could we set up a meeting to go over ' + topic + '?'
+    ]);
+    body += '\n\nProposed Details:\n';
+    body += '- Date & Time: ' + datetime + '\n';
+    body += '- Location: ' + location + '\n';
+    if (agenda) { body += '\nAgenda:\n' + agenda.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    body += '\n' + rand([
+      'Please let me know if this time works for you, or suggest an alternative.',
+      'Kindly confirm your availability or propose a different time.',
+      'I am flexible on timing, so feel free to suggest what works best for you.'
+    ]);
+    if (extra) body += '\n\nAdditional note: ' + extra;
+    body += '\n\n' + closing;
+  }
+  else if (selectedScenario === 'update') {
+    var project = getVal('gen-project') || 'the project';
+    var status = getVal('gen-status') || 'on track';
+    var updates = getVal('gen-updates') || '';
+    var nextsteps = getVal('gen-nextsteps') || '';
+    subject = 'Project Update: ' + project + ' - Status: ' + status.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
+    body = greeting + '\n\n';
+    body += rand([
+      'I wanted to provide you with an update on ' + project + '.',
+      'Here is the latest status report for ' + project + '.',
+      'Please find below the current progress update for ' + project + '.'
+    ]);
+    body += '\n\nCurrent Status: ' + status.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();}) + '\n';
+    if (updates) { body += '\nKey Updates:\n' + updates.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    if (nextsteps) { body += '\nNext Steps:\n' + nextsteps.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    body += '\n' + rand([
+      'Please let me know if you have any questions or need further details.',
+      'Feel free to reach out if you need any clarification.',
+      'I am happy to discuss any of these points in more detail.'
+    ]);
+    if (extra) body += '\n\nAdditional note: ' + extra;
+    body += '\n\n' + closing;
+  }
+  else if (selectedScenario === 'followup') {
+    var prevtopic = getVal('gen-prevtopic') || 'our recent conversation';
+    var keypoints = getVal('gen-keypoints') || '';
+    var nextsteps2 = getVal('gen-nextsteps2') || '';
+    subject = 'Follow-up: ' + prevtopic;
+    body = greeting + '\n\n';
+    body += rand([
+      'Thank you for taking the time to meet regarding ' + prevtopic + '.',
+      'I appreciate the opportunity to discuss ' + prevtopic + ' with you.',
+      'It was great connecting with you about ' + prevtopic + '.'
+    ]);
+    if (keypoints) { body += '\n\nKey Points from Our Discussion:\n' + keypoints.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    if (nextsteps2) { body += '\nProposed Next Steps:\n' + nextsteps2.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    body += '\n' + rand([
+      'I look forward to hearing your thoughts on the above.',
+      'Please let me know if this aligns with your expectations.',
+      'Would love to hear your feedback on the proposed next steps.'
+    ]);
+    if (extra) body += '\n\nAdditional note: ' + extra;
+    body += '\n\n' + closing;
+  }
+  else if (selectedScenario === 'complaint') {
+    var issue = getVal('gen-issue') || 'the reported issue';
+    var resolution = getVal('gen-resolution') || '';
+    var timeline = getVal('gen-timeline') || 'as soon as possible';
+    subject = 'Re: ' + issue + ' - Our Response';
+    body = greeting + '\n\n';
+    body += rand([
+      'Thank you for bringing this matter to our attention regarding ' + issue + '.',
+      'We sincerely apologize for the inconvenience caused by ' + issue + '.',
+      'I want to personally address your concern about ' + issue + '.'
+    ]);
+    body += ' ' + rand([
+      'We take all feedback seriously and are committed to resolving this promptly.',
+      'Your satisfaction is our top priority, and we are working to make this right.',
+      'We understand your frustration and want to assure you this is being handled with urgency.'
+    ]);
+    if (resolution) { body += '\n\nResolution Plan:\n' + resolution; }
+    body += '\n\nExpected Timeline: ' + timeline;
+    body += '\n\n' + rand([
+      'Please do not hesitate to reach out if you have any further concerns.',
+      'We will keep you updated on the progress. Thank you for your patience.',
+      'If there is anything else we can do, please let us know immediately.'
+    ]);
+    if (extra) body += '\n\nAdditional note: ' + extra;
+    body += '\n\n' + closing;
+  }
+  else if (selectedScenario === 'proposal') {
+    var partnertype = getVal('gen-partnertype') || 'a strategic partnership';
+    var benefits = getVal('gen-benefits') || '';
+    var terms = getVal('gen-terms') || '';
+    subject = 'Partnership Proposal: ' + partnertype;
+    body = greeting + '\n\n';
+    body += rand([
+      'I am reaching out to explore the possibility of ' + partnertype + ' between our organizations.',
+      'I would like to propose ' + partnertype + ' that I believe could be mutually beneficial.',
+      'After researching your company' + companyLine + ', I believe there is a great opportunity for ' + partnertype + '.'
+    ]);
+    if (benefits) { body += '\n\nMutual Benefits:\n' + benefits.split('\n').map(function(l){return l.trim()?'- '+l.trim():'';}).filter(function(l){return l;}).join('\n') + '\n'; }
+    if (terms) { body += '\nProposed Terms:\n' + terms; }
+    body += '\n\n' + rand([
+      'I would welcome the opportunity to discuss this further at your convenience.',
+      'Would you be open to a brief call to explore this opportunity?',
+      'I would love to schedule a meeting to discuss the details in person.'
+    ]);
+    if (extra) body += '\n\nAdditional note: ' + extra;
+    body += '\n\n' + closing;
+  }
+
+  var result = 'Subject: ' + subject + '\n\n' + body;
+  setOutput('gen-output', result);
+  updateWordCount('gen-word-count', result);
+  showToast('Email generated successfully!', 'success');
+}
+
+// --- Tone Adjuster ---
+function adjustTone() {
+  var input = getVal('tone-input');
+  if (!input) { showToast('Please paste an email to adjust', 'error'); return; }
+  var sentences = input.replace(/([.!?])\s+/g, '$1|').split('|').filter(function(s){return s.trim();});
+  var result = '';
+
+  if (selectedTone === 'formal') {
+    result = sentences.map(function(s) {
+      s = s.trim();
+      s = s.replace(/\bhi\b/gi, 'Dear colleague');
+      s = s.replace(/\bhey\b/gi, 'Greetings');
+      s = s.replace(/\bthanks\b/gi, 'Thank you');
+      s = s.replace(/\bwanna\b/gi, 'would like to');
+      s = s.replace(/\bgonna\b/gi, 'going to');
+      s = s.replace(/\basap\b/gi, 'at your earliest convenience');
+      s = s.replace(/\bcan't\b/gi, 'cannot');
+      s = s.replace(/\bwon't\b/gi, 'will not');
+      s = s.replace(/\bdon't\b/gi, 'do not');
+      s = s.replace(/\bI'm\b/gi, 'I am');
+      s = s.replace(/\blet's\b/gi, 'let us');
+      s = s.replace(/\bget back to\b/gi, 'respond to');
+      s = s.replace(/\bset up\b/gi, 'arrange');
+      s = s.replace(/\bfigure out\b/gi, 'determine');
+      s = s.replace(/\blook into\b/gi, 'investigate');
+      return s;
+    }).join(' ');
+    result = 'Dear Sir/Madam,\n\nI hope this message finds you well.\n\n' + result + '\n\nI look forward to your response at your earliest convenience.\n\nYours sincerely,\n[Your Name]';
+  }
+  else if (selectedTone === 'friendly') {
+    result = sentences.map(function(s) {
+      s = s.trim();
+      s = s.replace(/\bDear\s+\w+,?/gi, 'Hey there!');
+      s = s.replace(/\bSincerely\b/gi, 'Cheers');
+      s = s.replace(/\bRegards\b/gi, 'Talk soon');
+      s = s.replace(/\bI would like to\b/gi, "I'd love to");
+      s = s.replace(/\bplease be advised\b/gi, 'just a heads up');
+      s = s.replace(/\bkindly\b/gi, '');
+      s = s.replace(/\bpursuant to\b/gi, 'about');
+      s = s.replace(/\bat your earliest convenience\b/gi, 'when you get a chance');
+      s = s.replace(/\bdo not hesitate\b/gi, 'feel free');
+      return s;
+    }).join(' ');
+    result = 'Hey! 👋\n\nHope you\'re doing great!\n\n' + result + '\n\nLet me know what you think! 😊\n\nCheers,\n[Your Name]';
+  }
+  else if (selectedTone === 'urgent') {
+    result = sentences.map(function(s) {
+      s = s.trim();
+      s = s.replace(/\bwhen you can\b/gi, 'immediately');
+      s = s.replace(/\bat your convenience\b/gi, 'as a matter of urgency');
+      s = s.replace(/\bsoon\b/gi, 'right away');
+      s = s.replace(/\bwould appreciate\b/gi, 'urgently need');
+      s = s.replace(/\bplease consider\b/gi, 'please prioritize');
+      return s;
+    }).join(' ');
+    result = 'URGENT - Action Required\n\nDear Team,\n\nThis requires your immediate attention.\n\n' + result + '\n\nPlease respond by end of day today. This is time-sensitive and cannot be delayed.\n\nThank you for your prompt attention to this matter.\n\n[Your Name]';
+  }
+  else if (selectedTone === 'apologetic') {
+    result = sentences.map(function(s) {
+      s = s.trim();
+      s = s.replace(/\bthe issue\b/gi, 'this unfortunate situation');
+      s = s.replace(/\bproblem\b/gi, 'inconvenience');
+      s = s.replace(/\bmistake\b/gi, 'oversight on our part');
+      s = s.replace(/\berror\b/gi, 'unintended oversight');
+      return s;
+    }).join(' ');
+    result = 'Dear [Recipient],\n\nI sincerely apologize for any inconvenience this may have caused.\n\n' + result + '\n\nWe take full responsibility and are committed to making this right. Please know that we value your trust and are taking steps to ensure this does not happen again.\n\nWith sincere apologies,\n[Your Name]';
+  }
+  else if (selectedTone === 'persuasive') {
+    result = sentences.map(function(s) {
+      s = s.trim();
+      s = s.replace(/\bI think\b/gi, 'I am confident that');
+      s = s.replace(/\bmaybe\b/gi, 'certainly');
+      s = s.replace(/\bcould\b/gi, 'will');
+      s = s.replace(/\bmight\b/gi, 'will likely');
+      s = s.replace(/\bgood\b/gi, 'exceptional');
+      return s;
+    }).join(' ');
+    result = 'Dear [Recipient],\n\nI have an exciting opportunity I believe will greatly benefit you.\n\n' + result + '\n\nThe data speaks for itself, and I am confident this will deliver outstanding results. Let us schedule a brief call to discuss how we can move forward together.\n\nI look forward to your positive response.\n\nBest regards,\n[Your Name]';
+  }
+
+  setOutput('tone-output', result);
+  updateWordCount('tone-word-count', result);
+  showToast('Tone adjusted to ' + selectedTone + '!', 'success');
+}
+
+// --- Email Summarizer ---
+function summarizeEmail() {
+  var input = getVal('summary-input');
+  if (!input) { showToast('Please paste an email to summarize', 'error'); return; }
+  var sentences = input.replace(/([.!?])\s+/g, '$1|').split('|').filter(function(s){return s.trim() && s.trim().length > 15;});
+  var wordCount = input.split(/\s+/).length;
+
+  // Extract key sentences (first, last, and longest ones)
+  var scored = sentences.map(function(s, i) {
+    var score = 0;
+    if (i === 0) score += 3;
+    if (i === sentences.length - 1) score += 2;
+    if (/\b(important|urgent|deadline|action|required|please|must|need|key|critical|asap|priority)\b/i.test(s)) score += 3;
+    if (/\b(meeting|call|schedule|date|time|tomorrow|monday|tuesday|wednesday|thursday|friday)\b/i.test(s)) score += 2;
+    if (/\b(budget|cost|price|revenue|profit|amount|payment|invoice)\b/i.test(s)) score += 2;
+    if (/\d/.test(s)) score += 1;
+    score += Math.min(s.split(/\s+/).length / 10, 2);
+    return {text: s.trim(), score: score, index: i};
+  });
+  scored.sort(function(a, b) { return b.score - a.score; });
+  var topPoints = scored.slice(0, Math.min(5, Math.ceil(sentences.length / 3)));
+  topPoints.sort(function(a, b) { return a.index - b.index; });
+
+  var summary = '📋 EMAIL SUMMARY\n';
+  summary += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  summary += 'Original length: ' + wordCount + ' words, ' + sentences.length + ' sentences\n\n';
+  summary += '🔑 Key Points:\n';
+  topPoints.forEach(function(p, i) {
+    summary += (i + 1) + '. ' + p.text + '\n';
+  });
+
+  // Detect action items
+  var actions = sentences.filter(function(s) {
+    return /\b(please|action|need to|must|should|deadline|by\s+(monday|tuesday|wednesday|thursday|friday|tomorrow|end of|eod|eow))\b/i.test(s);
+  });
+  if (actions.length > 0) {
+    summary += '\n⚡ Action Items:\n';
+    actions.forEach(function(a) { summary += '• ' + a.trim() + '\n'; });
+  }
+
+  // Detect dates/deadlines
+  var dates = input.match(/\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\w+\s+\d{1,2},?\s+\d{4}|tomorrow|next\s+\w+day|end of (week|month|day)|EOD|EOW)\b/gi);
+  if (dates && dates.length > 0) {
+    summary += '\n📅 Dates/Deadlines Mentioned:\n';
+    var unique = dates.filter(function(d, i, arr) { return arr.indexOf(d) === i; });
+    unique.forEach(function(d) { summary += '• ' + d + '\n'; });
+  }
+
+  setOutput('summary-output', summary);
+
+  // Generate suggested reply
+  var reply = rand(['Hi,', 'Hello,', 'Thanks for the update,']) + '\n\n';
+  reply += rand([
+    'Thank you for the detailed email.',
+    'I appreciate you sharing this information.',
+    'Thanks for keeping me in the loop.'
+  ]) + ' ';
+  if (topPoints.length > 0) {
+    reply += rand([
+      'I have reviewed the key points and have the following thoughts:',
+      'After reviewing your message, here are my initial thoughts:',
+      'I have noted the main points. Here is my feedback:'
+    ]);
+    reply += '\n\n';
+    reply += rand([
+      '1. [Your response to point 1]\n2. [Your response to point 2]\n',
+      '- Regarding the first point: [your thoughts]\n- On the second matter: [your thoughts]\n',
+      'I agree with the overall direction. Specifically:\n- [Your feedback]\n- [Additional comments]\n'
+    ]);
+  }
+  if (actions.length > 0) {
+    reply += '\n' + rand([
+      'Regarding the action items, I will address them by the specified deadline.',
+      'I will take care of the action items mentioned and keep you posted.',
+      'Noted on the action items. I will prioritize accordingly.'
+    ]);
+  }
+  reply += '\n\n' + rand(['Best regards,', 'Kind regards,', 'Thanks,']) + '\n[Your Name]';
+
+  setOutput('reply-output', reply);
+  showToast('Email summarized!', 'success');
+}
+
+// --- Cold Email Generator ---
+function generateColdEmail() {
+  var targetName = getVal('cold-target-name') || '[Recipient]';
+  var targetCompany = getVal('cold-target-company') || '[Company]';
+  var yourName = getVal('cold-your-name') || '[Your Name]';
+  var yourCompany = getVal('cold-your-company') || '[Your Company]';
+  var purpose = getVal('cold-purpose');
+  var value = getVal('cold-value') || '';
+  var personalization = getVal('cold-personalization') || '';
+  var firstName = targetName.split(/[\s,]/)[0];
+
+  var subject = '', body = '';
+  var greeting = rand(['Hi ' + firstName + ',', 'Hello ' + firstName + ',', 'Dear ' + firstName + ',']);
+
+  // Personalization hook
+  var hook = '';
+  if (personalization) {
+    hook = personalization + ' ';
+  } else {
+    hook = rand([
+      'I came across ' + targetCompany + ' and was impressed by what your team is building. ',
+      'I have been following ' + targetCompany + '\'s work and really admire your approach. ',
+      'Your work at ' + targetCompany + ' caught my attention, and I wanted to reach out. '
+    ]);
+  }
+
+  if (purpose === 'partnership') {
+    subject = rand(['Partnership Opportunity: '+yourCompany+' x '+targetCompany, 'Collaboration Idea for '+targetCompany, 'Let\'s Create Something Great Together']);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I believe there is a strong synergy between ' + yourCompany + ' and ' + targetCompany + ' that could benefit both our audiences.',
+      'I see a great opportunity for ' + yourCompany + ' and ' + targetCompany + ' to collaborate in a way that creates value for both sides.'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'Would you be open to a 15-minute call to explore this further?',
+      'I would love to chat for 15 minutes about how we could work together.',
+      'Could we schedule a brief call to discuss potential collaboration?'
+    ]);
+  }
+  else if (purpose === 'sales') {
+    subject = rand(['Quick question about '+targetCompany+'\'s workflow', firstName+', a better way to handle [pain point]', 'Idea for '+targetCompany]);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I noticed that companies like ' + targetCompany + ' often face challenges with [specific pain point]. At ' + yourCompany + ', we have helped similar companies solve this.',
+      'Many teams in your space struggle with [specific challenge]. We built ' + yourCompany + ' specifically to address this.'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'Would it make sense to show you how this works in a quick 10-minute demo?',
+      'Happy to share a case study showing how we helped a similar company. Interested?',
+      'Would you be open to seeing how this could work for ' + targetCompany + '?'
+    ]);
+  }
+  else if (purpose === 'networking') {
+    subject = rand(['Coffee chat?', 'Fellow '+yourCompany+' founder reaching out', 'Would love to connect, '+firstName]);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I am also working in this space as ' + yourCompany + ', and I think we could have a really interesting conversation.',
+      'As someone building ' + yourCompany + ', I would love to learn from your experience at ' + targetCompany + '.'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'Would you be up for a virtual coffee sometime this week or next?',
+      'I would love to buy you a coffee (virtual or in-person) and pick your brain.',
+      'No agenda, just a genuine desire to connect. Would you be open to a quick chat?'
+    ]);
+  }
+  else if (purpose === 'job') {
+    subject = rand(['Interested in joining '+targetCompany, 'Experienced '+yourCompany+' - Love what you\'re building', firstName+', I\'d love to contribute to '+targetCompany]);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I am currently ' + yourCompany + ' and am very interested in contributing to ' + targetCompany + '\'s mission.',
+      'As ' + yourCompany + ', I have been looking for my next challenge, and ' + targetCompany + ' is at the top of my list.'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'I would love the opportunity to discuss how my experience could benefit your team.',
+      'Would you be open to a brief conversation about potential opportunities?',
+      'I have attached my resume for your reference. Would love to chat if there is a fit.'
+    ]);
+  }
+  else if (purpose === 'investment') {
+    subject = rand([yourCompany+' - Seeking Strategic Investment', 'Investment Opportunity: '+yourCompany, firstName+', exciting opportunity in [industry]']);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I am the founder of ' + yourCompany + ', and we are currently raising our next round of funding.',
+      'At ' + yourCompany + ', we are building [brief description] and are looking for strategic investors like yourself.'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'I would love to share our deck and discuss how this aligns with your investment thesis.',
+      'Would you be open to a 20-minute call to learn more about what we are building?',
+      'Happy to send over our pitch deck if this sounds interesting.'
+    ]);
+  }
+  else if (purpose === 'guest') {
+    subject = rand(['Guest contribution idea for '+targetCompany, 'Content collaboration: '+yourCompany+' x '+targetCompany, firstName+', I have a story your audience will love']);
+    body = greeting + '\n\n' + hook;
+    body += rand([
+      'I have a content idea that I think would resonate strongly with your audience.',
+      'I would love to contribute a guest piece (or join your podcast) to share insights on [topic].'
+    ]);
+    if (value) body += '\n\n' + value;
+    body += '\n\n' + rand([
+      'Would you be interested in exploring this? I can send over a brief outline.',
+      'Happy to share some topic ideas that align with your content strategy.',
+      'Let me know if this sounds like a fit, and I will put together a draft outline.'
+    ]);
+  }
+
+  body += '\n\nLooking forward to hearing from you.\n\nBest,\n' + yourName + '\n' + yourCompany;
+  var result = 'Subject: ' + subject + '\n\n' + body;
+  setOutput('cold-output', result);
+  updateWordCount('cold-word-count', result);
+  showToast('Cold email generated!', 'success');
+}
+
+// --- Template Library Data ---
+var templates = [
+  // Business (4)
+  {name:'Meeting Request',cat:'business',icon:'📅',preview:'Request a meeting with clear agenda and proposed times.',body:'Subject: Meeting Request: [Topic]\n\nDear [Recipient],\n\nI hope this message finds you well. I would like to schedule a meeting to discuss [topic/purpose].\n\nProposed Details:\n- Date: [Preferred Date]\n- Time: [Preferred Time]\n- Duration: [30 min / 1 hour]\n- Location: [Room / Zoom Link]\n\nAgenda:\n1. [First agenda item]\n2. [Second agenda item]\n3. [Third agenda item]\n\nPlease let me know if this time works for you, or feel free to suggest an alternative that fits your schedule.\n\nBest regards,\n[Your Name]\n[Your Title]'},
+  {name:'Project Proposal',cat:'business',icon:'💡',preview:'Present a new project idea with objectives and timeline.',body:'Subject: Project Proposal: [Project Name]\n\nDear [Recipient],\n\nI am writing to propose a new project that I believe will significantly benefit our organization.\n\nProject Overview:\n[Brief description of the project]\n\nObjectives:\n1. [Primary objective]\n2. [Secondary objective]\n3. [Tertiary objective]\n\nEstimated Timeline: [Duration]\nEstimated Budget: [Amount]\n\nKey Milestones:\n- Phase 1: [Description] - [Date]\n- Phase 2: [Description] - [Date]\n- Phase 3: [Description] - [Date]\n\nExpected ROI:\n[Describe the expected return on investment]\n\nI would welcome the opportunity to present this proposal in more detail. Would you be available for a brief meeting this week?\n\nBest regards,\n[Your Name]'},
+  {name:'Budget Approval Request',cat:'business',icon:'💰',preview:'Request budget approval with detailed cost breakdown.',body:'Subject: Budget Approval Request - [Project/Department]\n\nDear [Approver Name],\n\nI am writing to request approval for the following budget allocation:\n\nDepartment/Project: [Name]\nTotal Amount Requested: $[Amount]\nBudget Period: [Start Date] to [End Date]\n\nCost Breakdown:\n1. [Category 1]: $[Amount] - [Justification]\n2. [Category 2]: $[Amount] - [Justification]\n3. [Category 3]: $[Amount] - [Justification]\n\nBusiness Justification:\n[Explain why this budget is necessary and what it will achieve]\n\nExpected Outcomes:\n- [Outcome 1]\n- [Outcome 2]\n- [Outcome 3]\n\nI have attached the detailed budget spreadsheet for your review. Please let me know if you need any additional information.\n\nThank you for your consideration.\n\nBest regards,\n[Your Name]\n[Your Title]'},
+  {name:'Quarterly Status Report',cat:'business',icon:'📊',preview:'Comprehensive quarterly update with metrics and goals.',body:'Subject: Q[X] [Year] Status Report - [Department/Project]\n\nDear [Recipient],\n\nPlease find below the quarterly status report for [Department/Project].\n\nExecutive Summary:\n[2-3 sentence overview of the quarter]\n\nKey Metrics:\n- [Metric 1]: [Value] ([+/-]% vs last quarter)\n- [Metric 2]: [Value] ([+/-]% vs last quarter)\n- [Metric 3]: [Value] ([+/-]% vs last quarter)\n\nMajor Accomplishments:\n1. [Achievement 1]\n2. [Achievement 2]\n3. [Achievement 3]\n\nChallenges & Risks:\n1. [Challenge 1] - Mitigation: [Plan]\n2. [Challenge 2] - Mitigation: [Plan]\n\nGoals for Next Quarter:\n1. [Goal 1]\n2. [Goal 2]\n3. [Goal 3]\n\nI am happy to discuss any of these points in more detail.\n\nBest regards,\n[Your Name]'},
+
+  // HR & Hiring (4)
+  {name:'Job Offer Letter',cat:'hr',icon:'🎉',preview:'Extend a formal job offer with compensation details.',body:'Subject: Job Offer - [Position Title] at [Company]\n\nDear [Candidate Name],\n\nWe are thrilled to extend an offer for the position of [Position Title] at [Company Name]!\n\nOffer Details:\n- Position: [Title]\n- Department: [Department]\n- Start Date: [Date]\n- Salary: $[Amount] per year\n- Benefits: [Health, dental, vision, 401k, etc.]\n- PTO: [X] days per year\n\nReporting Structure:\nYou will report directly to [Manager Name], [Manager Title].\n\nWe were very impressed with your experience in [relevant skill/experience] and believe you will be a valuable addition to our team.\n\nPlease review the attached formal offer letter and let us know your decision by [deadline date].\n\nWe look forward to welcoming you aboard!\n\nWarm regards,\n[HR Name]\n[HR Title]\n[Company]'},
+  {name:'Interview Invitation',cat:'hr',icon:'🗓️',preview:'Invite a candidate for an interview with all details.',body:'Subject: Interview Invitation - [Position Title] at [Company]\n\nDear [Candidate Name],\n\nThank you for your application for the [Position Title] role at [Company]. We were impressed with your background and would like to invite you for an interview.\n\nInterview Details:\n- Date: [Date]\n- Time: [Time] ([Timezone])\n- Duration: Approximately [X] minutes\n- Format: [In-person / Video call / Phone]\n- Location/Link: [Address or meeting link]\n\nYou will be meeting with:\n- [Interviewer 1 Name], [Title]\n- [Interviewer 2 Name], [Title]\n\nPlease bring/prepare:\n- [Item 1, e.g., portfolio, ID]\n- [Item 2, e.g., references]\n\nPlease confirm your availability by replying to this email. If the proposed time does not work, we are happy to accommodate an alternative.\n\nBest regards,\n[Recruiter Name]\n[Company]'},
+  {name:'Kind Rejection Letter',cat:'hr',icon:'📝',preview:'Respectfully decline a candidate while keeping the door open.',body:'Subject: Update on Your Application - [Position Title]\n\nDear [Candidate Name],\n\nThank you for taking the time to interview for the [Position Title] position at [Company]. We truly appreciated the opportunity to learn about your skills and experience.\n\nAfter careful consideration, we have decided to move forward with another candidate whose experience more closely aligns with our current needs. This was a difficult decision, as we were impressed by your [specific positive quality].\n\nWe would like to keep your resume on file for future opportunities that may be a better fit. We encourage you to apply again as new positions open up.\n\nWe wish you all the best in your career journey and are confident you will find an excellent opportunity.\n\nWarm regards,\n[HR Name]\n[Company]'},
+  {name:'Onboarding Welcome',cat:'hr',icon:'👋',preview:'Welcome a new team member with first-day information.',body:'Subject: Welcome to [Company]! Your First Day Info\n\nDear [New Employee Name],\n\nWelcome to the [Company] team! We are excited to have you join us as [Position Title] starting [Start Date].\n\nFirst Day Details:\n- Arrival Time: [Time]\n- Location: [Address / Floor / Room]\n- Dress Code: [Business casual / etc.]\n- Parking: [Instructions]\n\nWhat to Bring:\n- Government-issued ID\n- Completed paperwork (attached)\n- [Any other items]\n\nYour First Week:\n- Day 1: Orientation & IT setup\n- Day 2: Team introductions & department overview\n- Day 3-5: Training sessions & shadowing\n\nYour Buddy: [Buddy Name] ([email]) will be your go-to person for any questions during your first weeks.\n\nIf you have any questions before your start date, do not hesitate to reach out.\n\nWe cannot wait to have you on board!\n\nBest,\n[HR Name]\n[Company]'},
+
+  // Sales (4)
+  {name:'Product Introduction',cat:'sales',icon:'🚀',preview:'Introduce your product or service to a potential client.',body:'Subject: [Product Name] - Solving [Pain Point] for Teams Like Yours\n\nHi [First Name],\n\nI hope this email finds you well. I am [Your Name] from [Your Company], and I wanted to introduce you to [Product Name].\n\nWe help companies like [Their Company] solve [specific pain point] by providing:\n\n✅ [Key Feature 1] - [Brief benefit]\n✅ [Key Feature 2] - [Brief benefit]\n✅ [Key Feature 3] - [Brief benefit]\n\nResults our clients have seen:\n- [Client A]: [Specific result, e.g., 40% increase in efficiency]\n- [Client B]: [Specific result, e.g., $50K saved annually]\n\nI would love to show you how [Product Name] could work for [Their Company]. Would you be open to a quick 15-minute demo this week?\n\nBest,\n[Your Name]\n[Your Title] | [Your Company]\n[Phone] | [Website]'},
+  {name:'Post-Demo Follow-up',cat:'sales',icon:'🤝',preview:'Follow up after a product demo with next steps.',body:'Subject: Great Connecting Today - Next Steps for [Their Company]\n\nHi [First Name],\n\nThank you for taking the time to see [Product Name] in action today! It was great learning more about [Their Company]\'s goals.\n\nAs discussed, here is a quick recap:\n\nKey Points:\n- [Pain point they mentioned] → Our solution: [Feature]\n- [Goal they shared] → How we help: [Benefit]\n- [Question they asked] → Answer: [Response]\n\nNext Steps:\n1. [Action item 1, e.g., I will send the pricing proposal by Friday]\n2. [Action item 2, e.g., Schedule a call with your technical team]\n3. [Action item 3, e.g., Start a free trial]\n\nI have attached [relevant materials: case study, pricing, etc.] for your review.\n\nLooking forward to helping [Their Company] achieve [specific goal]!\n\nBest,\n[Your Name]'},
+  {name:'Special Discount Offer',cat:'sales',icon:'🏷️',preview:'Present a limited-time discount to drive conversion.',body:'Subject: Exclusive Offer for [Their Company] - [X]% Off [Product]\n\nHi [First Name],\n\nI wanted to reach out with an exclusive offer for [Their Company].\n\nFor a limited time, we are offering [X]% off [Product/Plan Name] when you sign up by [Deadline Date].\n\nWhat you get:\n- [Feature 1]\n- [Feature 2]\n- [Feature 3]\n- [Bonus: e.g., Free onboarding, extended trial]\n\nRegular Price: $[Amount]/month\nYour Price: $[Discounted Amount]/month (Save $[Savings])\n\nThis offer is available until [Date] and is limited to [X] spots.\n\nWould you like me to set this up for you? Just reply to this email or book a quick call: [Calendar Link]\n\nBest,\n[Your Name]'},
+  {name:'Renewal Reminder',cat:'sales',icon:'🔄',preview:'Remind a client about upcoming subscription renewal.',body:'Subject: Your [Product] Subscription Renewal - Action Needed by [Date]\n\nHi [First Name],\n\nI hope you have been enjoying [Product Name]! I wanted to let you know that your subscription is coming up for renewal on [Renewal Date].\n\nYour Current Plan:\n- Plan: [Plan Name]\n- Price: $[Amount]/[period]\n- Renewal Date: [Date]\n\nOver the past [period], you have:\n- [Usage stat 1, e.g., Created 150 projects]\n- [Usage stat 2, e.g., Saved approximately 40 hours]\n- [Usage stat 3, e.g., Collaborated with 12 team members]\n\nRenewal Options:\n1. Auto-renew at current rate ✅\n2. Upgrade to [Higher Plan] for [additional benefits]\n3. Contact us to discuss custom options\n\nIf you have any questions about your renewal, I am here to help.\n\nBest regards,\n[Your Name]\n[Company]'},
+
+  // Support (4)
+  {name:'Issue Acknowledgment',cat:'support',icon:'📩',preview:'Acknowledge a customer issue and set expectations.',body:'Subject: Re: [Issue Title] - Ticket #[Number]\n\nDear [Customer Name],\n\nThank you for reaching out to us. We have received your report regarding [brief issue description] and want to assure you that we are on it.\n\nTicket Details:\n- Ticket ID: #[Number]\n- Priority: [High/Medium/Low]\n- Category: [Category]\n\nWhat happens next:\n1. Our [team name] team is reviewing your case\n2. You can expect an update within [timeframe]\n3. If we need additional information, we will reach out\n\nIn the meantime, you can:\n- Track your ticket status at [link]\n- Reply to this email with any additional details\n- Contact us at [phone/chat] for urgent matters\n\nWe understand this is frustrating and appreciate your patience.\n\nBest regards,\n[Agent Name]\n[Support Team]\n[Company]'},
+  {name:'Resolution Notification',cat:'support',icon:'✅',preview:'Notify a customer that their issue has been resolved.',body:'Subject: Resolved: [Issue Title] - Ticket #[Number]\n\nDear [Customer Name],\n\nGreat news! We have resolved the issue you reported regarding [brief description].\n\nResolution Summary:\n- Issue: [What was wrong]\n- Cause: [Root cause]\n- Solution: [What was done to fix it]\n- Prevention: [Steps taken to prevent recurrence]\n\nPlease verify that everything is working correctly on your end. If you experience any further issues, simply reply to this email and we will reopen your ticket immediately.\n\nWe apologize for any inconvenience this may have caused and appreciate your patience throughout the process.\n\nIs there anything else we can help you with?\n\nBest regards,\n[Agent Name]\n[Support Team]'},
+  {name:'Feedback Request',cat:'support',icon:'⭐',preview:'Ask customers for feedback after resolving their issue.',body:'Subject: How Did We Do? Quick Feedback on Your Recent Experience\n\nHi [Customer Name],\n\nWe recently helped you with [brief issue description] (Ticket #[Number]), and we would love to hear how it went!\n\nCould you take 30 seconds to answer one question?\n\nHow would you rate your support experience?\n⭐⭐⭐⭐⭐ Excellent\n⭐⭐⭐⭐ Good\n⭐⭐⭐ Average\n⭐⭐ Below Average\n⭐ Poor\n\n[Link to survey]\n\nYour feedback helps us improve and serve you better. Every response is read by our team.\n\nThank you for being a valued [Company] customer!\n\nBest,\n[Agent Name]\n[Company]'},
+  {name:'Service Outage Notice',cat:'support',icon:'⚠️',preview:'Notify customers about a service outage and expected resolution.',body:'Subject: [Service Name] - Service Disruption Notice\n\nDear Valued Customer,\n\nWe are writing to inform you that [Service Name] is currently experiencing [type of issue, e.g., intermittent connectivity issues].\n\nIncident Details:\n- Start Time: [Date, Time, Timezone]\n- Affected Services: [List of affected services]\n- Impact: [Description of impact]\n- Current Status: [Investigating / Identified / Monitoring]\n\nWhat We Are Doing:\nOur engineering team has been mobilized and is actively working to resolve this issue. We have identified [brief technical explanation if appropriate] and are implementing a fix.\n\nEstimated Resolution: [Time estimate or "We will provide updates every [X] minutes"]\n\nWhat You Can Do:\n- [Workaround if available]\n- Check our status page: [URL]\n- Follow @[handle] for real-time updates\n\nWe sincerely apologize for the inconvenience and will keep you updated.\n\n[Company] Engineering Team'},
+
+  // Networking (4)
+  {name:'Professional Introduction',cat:'networking',icon:'🤝',preview:'Introduce yourself to a new professional contact.',body:'Subject: Introduction - [Your Name] from [Your Company/Industry]\n\nHi [First Name],\n\nI hope this email finds you well! My name is [Your Name], and I am [your role] at [Company/Organization].\n\nI came across your [profile/article/talk about topic] and was really impressed by [specific thing you admired]. Your perspective on [topic] resonated with me because [brief reason].\n\nA bit about me:\n- I work in [industry/field] focusing on [specialty]\n- I am passionate about [relevant interest]\n- Currently working on [relevant project or goal]\n\nI would love to connect and learn more about your work in [their area]. No agenda — just genuinely interested in exchanging ideas.\n\nWould you be open to a brief virtual coffee sometime?\n\nBest,\n[Your Name]\n[LinkedIn/Website]'},
+  {name:'Thank You After Meeting',cat:'networking',icon:'🙏',preview:'Send a thoughtful thank-you after a networking meeting.',body:'Subject: Great Meeting You, [First Name]!\n\nHi [First Name],\n\nThank you so much for taking the time to meet with me [today/yesterday/at event name]. I really enjoyed our conversation about [topic discussed].\n\nA few things that stood out to me:\n- Your insight about [specific point] was really eye-opening\n- I loved your approach to [specific topic]\n- The resource you mentioned ([book/tool/article]) — I am definitely going to check it out\n\nAs promised, here is [thing you promised to share: article link, contact info, resource].\n\nI would love to stay in touch and continue the conversation. [Specific follow-up suggestion, e.g., "Let me know if you would like an intro to [person]" or "I will keep you posted on [project]"].\n\nThanks again for your time and insights!\n\nBest,\n[Your Name]'},
+  {name:'Referral Request',cat:'networking',icon:'🔗',preview:'Ask a contact for a professional referral or introduction.',body:'Subject: Quick Favor - Introduction to [Target Person/Company]\n\nHi [Contact Name],\n\nI hope you are doing well! I am reaching out because I noticed you are connected with [Target Person] at [Target Company] on [LinkedIn/through mutual connection].\n\nI am currently [reason for wanting the intro: exploring opportunities at their company / looking to partner / interested in their work on X], and I think a brief introduction could be really valuable.\n\nTo make it easy for you, here is a brief blurb you could forward:\n\n---\n"Hi [Target Person], I wanted to introduce you to [Your Name]. [He/She/They] is [brief description] and [reason this intro makes sense]. I thought you two should connect because [mutual benefit]. I will let you take it from here!"\n---\n\nOf course, no pressure at all — I completely understand if the timing is not right. And please let me know if there is anything I can do for you in return!\n\nThanks so much,\n[Your Name]'},
+  {name:'Partnership Inquiry',cat:'networking',icon:'💼',preview:'Reach out to explore potential business partnerships.',body:'Subject: Exploring Partnership Opportunities - [Your Company] x [Their Company]\n\nDear [First Name],\n\nI am [Your Name], [Your Title] at [Your Company]. I have been following [Their Company]\'s impressive work in [their field/recent achievement], and I believe there is a compelling opportunity for collaboration.\n\nAbout [Your Company]:\n[2-3 sentences about what you do and your key strengths]\n\nWhy I Think We Should Connect:\n- [Synergy point 1: complementary audiences, products, or expertise]\n- [Synergy point 2: shared goals or values]\n- [Synergy point 3: specific collaboration idea]\n\nPotential Partnership Ideas:\n1. [Idea 1: e.g., co-hosted webinar, joint content]\n2. [Idea 2: e.g., integration, cross-promotion]\n3. [Idea 3: e.g., referral program, bundled offering]\n\nI would love to explore this further over a brief call. Would you have 20 minutes this week or next?\n\nBest regards,\n[Your Name]\n[Your Title] | [Your Company]\n[Website]'},
+
+  // Internal (4)
+  {name:'Team Announcement',cat:'internal',icon:'📢',preview:'Make an important announcement to your team.',body:'Subject: [Announcement Type] - [Brief Title]\n\nHi Team,\n\nI am excited to share some important news with you all.\n\n[Main announcement in 2-3 sentences]\n\nKey Details:\n- What: [What is changing/happening]\n- When: [Effective date or timeline]\n- Who: [Who is affected]\n- Impact: [How this affects the team]\n\nWhat This Means for You:\n1. [Specific impact or action item 1]\n2. [Specific impact or action item 2]\n3. [Specific impact or action item 3]\n\nNext Steps:\n- [Action item with deadline]\n- [Resource or link for more information]\n- [Who to contact with questions]\n\nI know change can bring questions, so I have scheduled a team Q&A session on [date/time]. Please come prepared with any questions or concerns.\n\nThank you for your continued dedication and flexibility.\n\nBest,\n[Your Name]'},
+  {name:'Policy Update',cat:'internal',icon:'📋',preview:'Communicate a policy change to the organization.',body:'Subject: Policy Update: [Policy Name] - Effective [Date]\n\nDear Team,\n\nI am writing to inform you of an update to our [Policy Name] policy, effective [Date].\n\nSummary of Changes:\n\nPrevious Policy:\n- [Old rule/guideline 1]\n- [Old rule/guideline 2]\n\nUpdated Policy:\n- [New rule/guideline 1]\n- [New rule/guideline 2]\n\nReason for Change:\n[Brief explanation of why this change is being made]\n\nWhat You Need to Do:\n1. [Action item 1, e.g., Review the updated policy document]\n2. [Action item 2, e.g., Complete acknowledgment form by date]\n3. [Action item 3, e.g., Attend briefing session]\n\nThe full updated policy document is available at [link/location].\n\nIf you have questions or concerns, please reach out to [Contact Person] at [email] or attend the open Q&A on [date].\n\nThank you for your attention to this matter.\n\nBest regards,\n[Your Name]\n[Department]'},
+  {name:'All-Hands Meeting Invite',cat:'internal',icon:'🏢',preview:'Invite the entire team to an all-hands meeting.',body:'Subject: All-Hands Meeting - [Date] at [Time]\n\nHi Everyone,\n\nPlease mark your calendars for our upcoming all-hands meeting!\n\nMeeting Details:\n- Date: [Date]\n- Time: [Time] ([Timezone])\n- Duration: [X] hour(s)\n- Location: [Room / Virtual Link]\n\nAgenda:\n1. [Opening / Welcome] - [Speaker] (5 min)\n2. [Company Update / Quarterly Review] - [Speaker] (15 min)\n3. [Department Highlights] - [Various] (20 min)\n4. [Special Topic / Guest Speaker] - [Speaker] (15 min)\n5. [Q&A / Open Discussion] - All (15 min)\n6. [Recognition & Celebrations] (10 min)\n\nPlease submit any questions in advance via [form/channel] so we can address as many as possible.\n\nAttendance is [required/encouraged] for all team members. If you cannot attend, please let your manager know and watch the recording that will be shared afterward.\n\nSee you there!\n\n[Your Name]'},
+  {name:'Congratulations & Recognition',cat:'internal',icon:'🏆',preview:'Recognize a team member or team achievement.',body:'Subject: Congratulations to [Person/Team] - [Achievement]!\n\nHi Team,\n\nI am thrilled to recognize [Person/Team Name] for an outstanding achievement!\n\n🏆 [Brief description of the achievement]\n\nWhy This Matters:\n[2-3 sentences about the impact of this achievement on the team/company]\n\nThe Details:\n- [Specific accomplishment 1]\n- [Specific accomplishment 2]\n- [Metric or result that demonstrates impact]\n\n[Person/Team Name] demonstrated exceptional [quality: dedication, creativity, leadership, teamwork] throughout this process, and the results speak for themselves.\n\nPlease join me in congratulating [them] on this well-deserved recognition! 🎉\n\n[Optional: mention any reward, e.g., "As a token of our appreciation, [reward details]"]\n\nKeep up the amazing work, everyone!\n\nBest,\n[Your Name]'}
+];
+
+// --- Template Rendering ---
+function renderTemplates(filter) {
+  var grid = document.getElementById('template-grid');
+  var filtered = templates.filter(function(t) { return filter === 'all' || t.cat === filter; });
+  document.getElementById('template-count').textContent = filtered.length + ' templates';
+  var html = '';
+  filtered.forEach(function(t, i) {
+    var realIndex = templates.indexOf(t);
+    html += '<div class="template-card" onclick="openTemplateModal('+realIndex+')">';
+    html += '<div class="t-header"><span class="t-title">'+t.icon+' '+t.name+'</span><span class="t-cat">'+t.cat+'</span></div>';
+    html += '<div class="t-preview">'+t.preview+'</div>';
+    html += '<div class="t-actions"><button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();copyTemplate('+realIndex+')">📋 Copy</button><button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();useTemplateByIndex('+realIndex+')">✏️ Use</button></div>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+}
+
+// --- Template Filters ---
+document.querySelectorAll('.filter-chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+    renderTemplates(chip.dataset.filter);
+  });
+});
+
+// --- Template Modal ---
+function openTemplateModal(index) {
+  currentModalTemplate = index;
+  var t = templates[index];
+  document.getElementById('modal-title').textContent = t.icon + ' ' + t.name;
+  document.getElementById('modal-cat').textContent = t.cat.charAt(0).toUpperCase() + t.cat.slice(1);
+  document.getElementById('modal-body').textContent = t.body;
+  var modal = document.getElementById('template-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTemplateModal() {
+  document.getElementById('template-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  currentModalTemplate = null;
+}
+
+function copyModalContent() {
+  if (currentModalTemplate === null) return;
+  var text = templates[currentModalTemplate].body;
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('Template copied to clipboard!', 'success');
+  });
+}
+
+function copyTemplate(index) {
+  navigator.clipboard.writeText(templates[index].body).then(function() {
+    showToast('Template copied!', 'success');
+  });
+}
+
+function useTemplate() {
+  if (currentModalTemplate === null) return;
+  useTemplateByIndex(currentModalTemplate);
+  closeTemplateModal();
+}
+
+function useTemplateByIndex(index) {
+  var t = templates[index];
+  // Switch to generator tab and paste template
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var genBtn = document.querySelector('[data-tab="generator"]');
+  genBtn.classList.add('active');
+  genBtn.setAttribute('aria-selected','true');
+  document.getElementById('panel-generator').classList.add('active');
+  // Put template in output
+  setOutput('gen-output', t.body);
+  updateWordCount('gen-word-count', t.body);
+  showToast('Template loaded in editor!', 'success');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeTemplateModal();
+    if (document.querySelector('.history-panel.open')) toggleHistory();
+  }
+});
+
+// Close modal on backdrop click
+document.getElementById('template-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeTemplateModal();
+});
+
+// --- Utility Functions ---
+function copyOutput(id) {
+  var el = document.getElementById(id);
+  var text = el.textContent;
+  if (!text || el.classList.contains('empty')) {
+    showToast('Nothing to copy yet!', 'error');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(function() {
+    showToast('Copied to clipboard!', 'success');
+  }).catch(function() {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard!', 'success');
+  });
+}
+
+function downloadOutput(id, filename) {
+  var el = document.getElementById(id);
+  var text = el.textContent;
+  if (!text || el.classList.contains('empty')) {
+    showToast('Nothing to download yet!', 'error');
+    return;
+  }
+  var blob = new Blob([text], {type: 'text/plain'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Downloaded ' + filename, 'success');
+}
+
+function showToast(message, type) {
+  var toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast' + (type === 'success' ? ' success' : '');
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+// --- History Management ---
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('emailHistory') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveToHistory(type, outputId) {
+  var el = document.getElementById(outputId);
+  var text = el.textContent;
+  if (!text || el.classList.contains('empty')) {
+    showToast('Nothing to save yet!', 'error');
+    return;
+  }
+  var history = getHistory();
+  var typeLabels = {business:'Business Email',tone:'Tone Adjusted',summary:'Summary',cold:'Cold Email'};
+  history.unshift({
+    type: type,
+    label: typeLabels[type] || type,
+    preview: text.substring(0, 120),
+    content: text,
+    time: new Date().toLocaleString()
+  });
+  if (history.length > 50) history = history.slice(0, 50);
+  localStorage.setItem('emailHistory', JSON.stringify(history));
+  renderHistory();
+  showToast('Saved to history!', 'success');
+}
+
+function renderHistory() {
+  var history = getHistory();
+  var container = document.getElementById('history-list');
+  if (history.length === 0) {
+    container.innerHTML = '<div class="history-empty"><p>📭 No saved emails yet</p><p style="font-size:.75rem;margin-top:8px">Generated emails will appear here when you save them.</p></div>';
+    return;
+  }
+  var html = '';
+  history.forEach(function(item, i) {
+    html += '<div class="history-item" onclick="loadFromHistory('+i+')">';
+    html += '<span class="h-type">'+item.label+'</span>';
+    html += '<div class="h-preview">'+item.preview+'</div>';
+    html += '<div class="h-time">'+item.time+'</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function loadFromHistory(index) {
+  var history = getHistory();
+  if (!history[index]) return;
+  var item = history[index];
+  // Determine which output to load into
+  var outputMap = {business:'gen-output',tone:'tone-output',summary:'summary-output',cold:'cold-output'};
+  var tabMap = {business:'generator',tone:'tone',summary:'summarizer',cold:'cold'};
+  var outputId = outputMap[item.type] || 'gen-output';
+  var tabName = tabMap[item.type] || 'generator';
+  // Switch to correct tab
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var tabBtn = document.querySelector('[data-tab="'+tabName+'"]');
+  if (tabBtn) { tabBtn.classList.add('active'); tabBtn.setAttribute('aria-selected','true'); }
+  var panel = document.getElementById('panel-'+tabName);
+  if (panel) panel.classList.add('active');
+  setOutput(outputId, item.content);
+  toggleHistory();
+  showToast('Loaded from history', 'success');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all saved emails?')) return;
+  localStorage.removeItem('emailHistory');
+  renderHistory();
+  showToast('History cleared', 'success');
+}
+
+function toggleHistory() {
+  var panel = document.getElementById('history-panel');
+  var overlay = document.querySelector('.history-overlay');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.body.style.overflow = 'hidden';
+    renderHistory();
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+// --- Character Counting ---
+document.getElementById('tone-input').addEventListener('input', function() {
+  document.getElementById('tone-char-count').textContent = this.value.length;
+});
+document.getElementById('summary-input').addEventListener('input', function() {
+  document.getElementById('summary-char-count').textContent = this.value.length;
+});
+
+// --- Keyboard Shortcuts ---
+document.addEventListener('keydown', function(e) {
+  // Ctrl/Cmd + Enter to generate in active tab
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    var activeTab = document.querySelector('.tab-btn.active');
+    if (!activeTab) return;
+    var tab = activeTab.dataset.tab;
+    if (tab === 'generator') generateBusinessEmail();
+    else if (tab === 'tone') adjustTone();
+    else if (tab === 'summarizer') summarizeEmail();
+    else if (tab === 'cold') generateColdEmail();
+    e.preventDefault();
+  }
+});
+
+// --- Initialize ---
+updateScenarioFields();
+renderTemplates('all');
+renderHistory();
+</script>
+
+<!-- Schema.org Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI Email Writer",
+  "description": "Free AI-powered email writing tool with business email generator, tone adjuster, summarizer, cold email creator, and 20+ professional templates.",
+  "url": "https://lifa-su.com/ai-email-writer.html",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Lifa AI Tools",
+    "url": "https://lifa-su.com"
+  },
+  "featureList": [
+    "Business Email Generator with 5 scenarios",
+    "Email Tone Adjuster (Formal, Friendly, Urgent, Apologetic, Persuasive)",
+    "Email Summarizer with action item extraction",
+    "Cold Email Generator for outreach",
+    "24+ Professional Email Templates",
+    "One-click copy and download",
+    "Email history with local storage",
+    "No signup required"
+  ]
+}
+</script>
+
+</body>
+</html>
