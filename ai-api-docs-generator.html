@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI API Docs Generator - Generate OpenAPI & Markdown Documentation</title>
+<meta name="description" content="Free online AI API documentation generator. Create OpenAPI 3.0 YAML/JSON specs and Markdown docs with an intuitive visual editor. Supports multiple endpoints, parameters, auth methods, and live preview.">
+<meta name="keywords" content="API documentation generator, OpenAPI 3.0, Swagger, Markdown API docs, REST API, API spec builder, YAML, JSON, free tool">
+<meta name="author" content="Lifa Tools">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lifa-su.github.io/ai-api-docs-generator.html">
+<meta property="og:title" content="AI API Docs Generator - OpenAPI & Markdown">
+<meta property="og:description" content="Generate professional API documentation in OpenAPI 3.0 and Markdown formats with a visual editor.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.github.io/ai-api-docs-generator.html">
+<meta property="og:image" content="https://lifa-su.github.io/og-api-docs.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI API Docs Generator">
+<meta name="twitter:description" content="Generate OpenAPI 3.0 and Markdown API documentation visually.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0a0a;--bg-secondary:#1a1a1a;--bg-tertiary:#252525;--bg-hover:#2a2a2a;
+  --accent:#6366f1;--accent-hover:#818cf8;--accent-dim:rgba(99,102,241,0.15);
+  --text-primary:#e5e5e5;--text-secondary:#a0a0a0;--text-muted:#666;
+  --border:#333;--border-focus:#6366f1;
+  --success:#22c55e;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;
+  --radius:8px;--radius-sm:4px;--radius-lg:12px;
+  --mono:"SF Mono","Fira Code","JetBrains Mono",Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --transition:all 0.2s ease;
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg-secondary)}
+::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#555}
+::selection{background:var(--accent);color:#fff}
+
+/* Layout */
+.app-container{display:grid;grid-template-rows:auto 1fr;height:100vh}
+.top-bar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.top-bar .logo{display:flex;align-items:center;gap:8px;font-size:1.1rem;font-weight:700;color:var(--accent);white-space:nowrap}
+.top-bar .logo svg{width:24px;height:24px}
+.main-layout{display:grid;grid-template-columns:280px 1fr 1fr;overflow:hidden}
+@media(max-width:1200px){.main-layout{grid-template-columns:240px 1fr;grid-template-rows:1fr 1fr}
+  .output-panel{grid-column:1/-1}}
+@media(max-width:768px){.main-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr 1fr}
+  .sidebar{max-height:200px}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:none;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:var(--sans)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn-secondary{background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);background:var(--bg-hover)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-ghost{background:transparent;color:var(--text-secondary);padding:5px 8px}
+.btn-ghost:hover{color:var(--text-primary);background:var(--bg-tertiary)}
+.btn-sm{padding:4px 10px;font-size:0.8rem}
+.btn-icon{padding:6px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;justify-content:center}
+.btn-icon:hover{color:var(--text-primary);background:var(--bg-tertiary)}
+
+/* Inputs */
+input,select,textarea{background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);padding:8px 12px;font-size:0.85rem;font-family:var(--sans);transition:var(--transition);width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--border-focus);box-shadow:0 0 0 3px var(--accent-dim)}
+textarea{font-family:var(--mono);resize:vertical;min-height:80px;line-height:1.5}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+label{font-size:0.8rem;color:var(--text-secondary);font-weight:500;margin-bottom:4px;display:block}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-row{display:grid;gap:12px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-row-4{grid-template-columns:1fr 1fr 1fr 1fr}
+
+/* Sidebar */
+.sidebar{background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-header h3{font-size:0.9rem;font-weight:600;color:var(--text-primary)}
+.endpoint-list{flex:1;overflow-y:auto;padding:8px}
+.endpoint-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:var(--transition);margin-bottom:4px;border:1px solid transparent}
+.endpoint-item:hover{background:var(--bg-hover);border-color:var(--border)}
+.endpoint-item.active{background:var(--accent-dim);border-color:var(--accent)}
+.endpoint-item .method-badge{font-size:0.7rem;font-weight:700;font-family:var(--mono);padding:2px 6px;border-radius:3px;min-width:42px;text-align:center;text-transform:uppercase}
+.method-GET{background:rgba(34,197,94,0.15);color:#22c55e}
+.method-POST{background:rgba(59,130,246,0.15);color:#3b82f6}
+.method-PUT{background:rgba(245,158,11,0.15);color:#f59e0b}
+.method-PATCH{background:rgba(168,85,247,0.15);color:#a855f7}
+.method-DELETE{background:rgba(239,68,68,0.15);color:#ef4444}
+.method-HEAD{background:rgba(107,114,128,0.15);color:#6b7280}
+.method-OPTIONS{background:rgba(20,184,166,0.15);color:#14b8a6}
+.endpoint-item .ep-info{flex:1;min-width:0}
+.endpoint-item .ep-path{font-family:var(--mono);font-size:0.8rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.endpoint-item .ep-summary{font-size:0.72rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.endpoint-item .ep-actions{display:flex;gap:2px;opacity:0;transition:var(--transition)}
+.endpoint-item:hover .ep-actions{opacity:1}
+.drag-handle{cursor:grab;color:var(--text-muted);font-size:1rem;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.empty-state{padding:30px 20px;text-align:center;color:var(--text-muted)}
+.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:0.3}
+.empty-state p{font-size:0.85rem;margin-bottom:12px}
+
+/* Editor Panel */
+.editor-panel{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
+.editor-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg-secondary);overflow-x:auto;flex-shrink:0}
+.editor-tab{padding:10px 18px;font-size:0.82rem;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition);white-space:nowrap}
+.editor-tab:hover{color:var(--text-primary);background:var(--bg-hover)}
+.editor-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.editor-content{flex:1;overflow-y:auto;padding:20px}
+.editor-section{margin-bottom:24px}
+.editor-section h4{font-size:0.85rem;font-weight:600;margin-bottom:12px;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+.editor-section h4 .count{background:var(--accent-dim);color:var(--accent);font-size:0.72rem;padding:1px 7px;border-radius:10px}
+
+/* Parameter Table */
+.param-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+.param-table th{text-align:left;padding:8px 10px;background:var(--bg-tertiary);color:var(--text-secondary);font-weight:500;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)}
+.param-table td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.param-table tr:hover td{background:var(--bg-hover)}
+.param-table input,.param-table select{padding:5px 8px;font-size:0.8rem}
+.param-table .required-toggle{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.add-row-btn{margin-top:8px}
+
+/* Response Editor */
+.response-item{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.response-item .response-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.response-item .status-code{font-family:var(--mono);font-weight:700;font-size:0.9rem}
+.status-2xx{color:var(--success)}
+.status-3xx{color:var(--info)}
+.status-4xx{color:var(--warning)}
+.status-5xx{color:var(--danger)}
+
+/* Auth Panel */
+.auth-type-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.auth-type-card{padding:14px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:var(--transition);text-align:center}
+.auth-type-card:hover{border-color:var(--accent);background:var(--bg-hover)}
+.auth-type-card.selected{border-color:var(--accent);background:var(--accent-dim)}
+.auth-type-card .auth-icon{font-size:1.5rem;margin-bottom:6px}
+.auth-type-card .auth-name{font-size:0.82rem;font-weight:600}
+.auth-type-card .auth-desc{font-size:0.72rem;color:var(--text-muted);margin-top:4px}
+.auth-config{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px}
+
+/* Output Panel */
+.output-panel{display:flex;flex-direction:column;overflow:hidden}
+.output-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg-secondary);overflow-x:auto;flex-shrink:0}
+.output-tab{padding:10px 16px;font-size:0.82rem;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:var(--transition);white-space:nowrap}
+.output-tab:hover{color:var(--text-primary);background:var(--bg-hover)}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.output-actions{display:flex;gap:6px;padding:8px 14px;background:var(--bg-secondary);border-bottom:1px solid var(--border);flex-shrink:0}
+.output-content{flex:1;overflow:auto;position:relative}
+.code-output{font-family:var(--mono);font-size:0.8rem;line-height:1.6;padding:16px;white-space:pre;color:var(--text-primary);min-height:100%;tab-size:2}
+.preview-frame{padding:20px;font-family:var(--sans);line-height:1.7}
+.preview-frame h1{font-size:1.6rem;font-weight:700;margin-bottom:8px;color:var(--accent)}
+.preview-frame h2{font-size:1.2rem;font-weight:600;margin:24px 0 12px;color:var(--text-primary);border-bottom:1px solid var(--border);padding-bottom:8px}
+.preview-frame h3{font-size:1rem;font-weight:600;margin:16px 0 8px;color:var(--text-primary)}
+.preview-frame p{color:var(--text-secondary);margin-bottom:8px}
+.preview-frame code{font-family:var(--mono);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;font-size:0.85em;color:var(--accent)}
+.preview-frame pre{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:14px;overflow-x:auto;margin:10px 0}
+.preview-frame pre code{background:none;padding:0;color:var(--text-primary)}
+.preview-frame table{width:100%;border-collapse:collapse;margin:10px 0;font-size:0.85rem}
+.preview-frame table th{background:var(--bg-tertiary);padding:8px 12px;text-align:left;font-weight:600;border:1px solid var(--border)}
+.preview-frame table td{padding:8px 12px;border:1px solid var(--border)}
+.preview-frame .method-tag{display:inline-block;padding:2px 8px;border-radius:3px;font-family:var(--mono);font-size:0.8rem;font-weight:700;margin-right:8px}
+
+/* API Info Bar */
+.api-info-section{display:flex;gap:12px;flex:1;align-items:center;flex-wrap:wrap}
+.api-info-section input{max-width:200px}
+.api-info-section input.api-title{max-width:250px;font-weight:600}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;align-items:center}
+.toolbar .divider{width:1px;height:24px;background:var(--border)}
+
+/* Toast */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{padding:12px 20px;border-radius:var(--radius);font-size:0.85rem;color:#fff;box-shadow:var(--shadow);animation:slideIn 0.3s ease;display:flex;align-items:center;gap:8px}
+.toast-success{background:#16a34a}
+.toast-error{background:#dc2626}
+.toast-info{background:#2563eb}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal h3{font-size:1rem;margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* Tags */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--accent-dim);color:var(--accent);border-radius:12px;font-size:0.75rem;font-weight:500}
+.tag .remove-tag{cursor:pointer;opacity:0.6;font-size:0.9rem}
+.tag .remove-tag:hover{opacity:1}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 10px;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius-sm);min-height:36px}
+.tag-input-wrap input{border:none;background:none;padding:2px;min-width:80px;flex:1}
+.tag-input-wrap input:focus{box-shadow:none}
+
+/* Responsive helpers */
+.mobile-only{display:none}
+@media(max-width:768px){.mobile-only{display:block}.desktop-only{display:none}}
+
+/* Drag and drop */
+.endpoint-item.dragging{opacity:0.4;border:1px dashed var(--accent)}
+.endpoint-item.drag-over{border-top:2px solid var(--accent)}
+
+/* Syntax highlighting (basic) */
+.hl-key{color:#f59e0b}
+.hl-string{color:#22c55e}
+.hl-number{color:#3b82f6}
+.hl-bool{color:#a855f7}
+.hl-null{color:#6b7280}
+.hl-comment{color:#555;font-style:italic}
+
+/* No endpoint selected */
+.no-selection{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);text-align:center;padding:40px}
+.no-selection svg{width:64px;height:64px;margin-bottom:16px;opacity:0.2}
+.no-selection h3{font-size:1rem;margin-bottom:8px;color:var(--text-secondary)}
+.no-selection p{font-size:0.85rem}
+
+/* Keyboard shortcut hints */
+.kbd{display:inline-block;padding:2px 6px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:3px;font-family:var(--mono);font-size:0.72rem;color:var(--text-muted)}
+</style>
+</head>
+<body>
+<div class="app-container">
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      API Docs Generator
+    </div>
+    <div class="api-info-section">
+      <input type="text" class="api-title" id="apiTitle" placeholder="API Title" value="My API">
+      <input type="text" id="apiVersion" placeholder="Version" value="1.0.0" style="max-width:100px">
+      <input type="text" id="apiBaseUrl" placeholder="Base URL (e.g. https://api.example.com/v1)" style="max-width:320px">
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-secondary btn-sm" onclick="showImportModal()" title="Import OpenAPI spec">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="exportSpec()" title="Export OpenAPI spec">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Export
+      </button>
+      <div class="divider"></div>
+      <button class="btn btn-ghost btn-sm" onclick="loadExample()" title="Load example API">Example</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetAll()" title="Reset everything">Reset</button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar: Endpoint List -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Endpoints</h3>
+        <button class="btn btn-primary btn-sm" onclick="addEndpoint()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add
+        </button>
+      </div>
+      <div class="endpoint-list" id="endpointList">
+        <div class="empty-state" id="emptyState">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <p>No endpoints yet</p>
+          <button class="btn btn-primary btn-sm" onclick="addEndpoint()">Add first endpoint</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+      <div id="editorPlaceholder" class="no-selection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <h3>Select an endpoint to edit</h3>
+        <p>Choose from the sidebar or create a new one</p>
+      </div>
+      <div id="editorArea" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div class="editor-tabs">
+          <div class="editor-tab active" data-tab="general" onclick="switchEditorTab(this)">General</div>
+          <div class="editor-tab" data-tab="parameters" onclick="switchEditorTab(this)">Parameters <span class="count" id="paramCount">0</span></div>
+          <div class="editor-tab" data-tab="responses" onclick="switchEditorTab(this)">Responses <span class="count" id="responseCount">0</span></div>
+          <div class="editor-tab" data-tab="auth" onclick="switchEditorTab(this)">Auth</div>
+        </div>
+        <div class="editor-content">
+          <!-- General Tab -->
+          <div class="tab-content" id="tab-general">
+            <div class="editor-section">
+              <div class="form-row form-row-3" style="margin-bottom:14px">
+                <div class="form-group">
+                  <label>HTTP Method</label>
+                  <select id="epMethod" onchange="updateEndpoint()">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                  </select>
+                </div>
+                <div class="form-group" style="grid-column:span 2">
+                  <label>Path</label>
+                  <input type="text" id="epPath" placeholder="/users/{id}" oninput="updateEndpoint()" style="font-family:var(--mono)">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label>Summary</label>
+                <input type="text" id="epSummary" placeholder="Brief description of this endpoint" oninput="updateEndpoint()">
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label>Description</label>
+                <textarea id="epDescription" placeholder="Detailed description (supports Markdown)" rows="3" oninput="updateEndpoint()"></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label>Operation ID</label>
+                <input type="text" id="epOperationId" placeholder="getUser (unique identifier)" oninput="updateEndpoint()" style="font-family:var(--mono)">
+              </div>
+              <div class="form-group">
+                <label>Tags</label>
+                <div class="tag-input-wrap" id="tagInputWrap">
+                  <input type="text" id="tagInput" placeholder="Type and press Enter" onkeydown="handleTagInput(event)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parameters Tab -->
+          <div class="tab-content" id="tab-parameters" style="display:none">
+            <div class="editor-section">
+              <h4>Path Parameters <span class="count" id="pathParamCount">0</span></h4>
+              <div id="pathParamsContainer"></div>
+              <button class="btn btn-secondary btn-sm add-row-btn" onclick="addParam('path')">+ Add Path Parameter</button>
+            </div>
+            <div class="editor-section">
+              <h4>Query Parameters <span class="count" id="queryParamCount">0</span></h4>
+              <div id="queryParamsContainer"></div>
+              <button class="btn btn-secondary btn-sm add-row-btn" onclick="addParam('query')">+ Add Query Parameter</button>
+            </div>
+            <div class="editor-section">
+              <h4>Header Parameters <span class="count" id="headerParamCount">0</span></h4>
+              <div id="headerParamsContainer"></div>
+              <button class="btn btn-secondary btn-sm add-row-btn" onclick="addParam('header')">+ Add Header Parameter</button>
+            </div>
+            <div class="editor-section">
+              <h4>Request Body</h4>
+              <div class="form-group" style="margin-bottom:10px">
+                <label>Content Type</label>
+                <select id="bodyContentType" onchange="updateEndpoint()" style="max-width:300px">
+                  <option value="application/json">application/json</option>
+                  <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+                  <option value="multipart/form-data">multipart/form-data</option>
+                  <option value="text/plain">text/plain</option>
+                  <option value="application/xml">application/xml</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Body Schema (JSON)</label>
+                <textarea id="bodySchema" rows="8" placeholder='{"type":"object","properties":{"name":{"type":"string"},"email":{"type":"string","format":"email"}},"required":["name","email"]}' oninput="updateEndpoint()" style="font-family:var(--mono);font-size:0.8rem"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Responses Tab -->
+          <div class="tab-content" id="tab-responses" style="display:none">
+            <div class="editor-section">
+              <h4>Responses</h4>
+              <div id="responsesContainer"></div>
+              <button class="btn btn-secondary btn-sm add-row-btn" onclick="addResponse()">+ Add Response</button>
+            </div>
+          </div>
+
+          <!-- Auth Tab -->
+          <div class="tab-content" id="tab-auth" style="display:none">
+            <div class="editor-section">
+              <h4>Authentication Method</h4>
+              <div class="auth-type-grid">
+                <div class="auth-type-card" data-auth="none" onclick="selectAuth(this)">
+                  <div class="auth-icon">🔓</div>
+                  <div class="auth-name">None</div>
+                  <div class="auth-desc">No authentication</div>
+                </div>
+                <div class="auth-type-card" data-auth="bearer" onclick="selectAuth(this)">
+                  <div class="auth-icon">🔑</div>
+                  <div class="auth-name">Bearer Token</div>
+                  <div class="auth-desc">JWT or OAuth token</div>
+                </div>
+                <div class="auth-type-card" data-auth="apiKey" onclick="selectAuth(this)">
+                  <div class="auth-icon">🗝️</div>
+                  <div class="auth-name">API Key</div>
+                  <div class="auth-desc">Header or query key</div>
+                </div>
+                <div class="auth-type-card" data-auth="oauth2" onclick="selectAuth(this)">
+                  <div class="auth-icon">🛡️</div>
+                  <div class="auth-name">OAuth 2.0</div>
+                  <div class="auth-desc">Authorization flows</div>
+                </div>
+                <div class="auth-type-card" data-auth="basic" onclick="selectAuth(this)">
+                  <div class="auth-icon">👤</div>
+                  <div class="auth-name">Basic Auth</div>
+                  <div class="auth-desc">Username & password</div>
+                </div>
+              </div>
+              <div id="authConfig"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="output-panel">
+      <div class="output-tabs">
+        <div class="output-tab active" data-output="yaml" onclick="switchOutputTab(this)">OpenAPI YAML</div>
+        <div class="output-tab" data-output="json" onclick="switchOutputTab(this)">OpenAPI JSON</div>
+        <div class="output-tab" data-output="markdown" onclick="switchOutputTab(this)">Markdown</div>
+        <div class="output-tab" data-output="preview" onclick="switchOutputTab(this)">Preview</div>
+      </div>
+      <div class="output-actions">
+        <button class="btn btn-secondary btn-sm" onclick="copyOutput()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="downloadOutput()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="generateAll()" style="margin-left:auto">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Generate
+        </button>
+      </div>
+      <div class="output-content">
+        <div class="output-pane" id="output-yaml"><pre class="code-output" id="yamlOutput">Click "Generate" to create OpenAPI YAML spec...</pre></div>
+        <div class="output-pane" id="output-json" style="display:none"><pre class="code-output" id="jsonOutput">Click "Generate" to create OpenAPI JSON spec...</pre></div>
+        <div class="output-pane" id="output-markdown" style="display:none"><pre class="code-output" id="markdownOutput">Click "Generate" to create Markdown documentation...</pre></div>
+        <div class="output-pane" id="output-preview" style="display:none"><div class="preview-frame" id="previewOutput"><p style="color:var(--text-muted)">Click "Generate" to see the preview...</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <h3>Import OpenAPI Specification</h3>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Paste your OpenAPI JSON or YAML spec below</label>
+      <textarea id="importContent" rows="12" placeholder="Paste OpenAPI 3.0 JSON or YAML here..." style="font-family:var(--mono);font-size:0.8rem"></textarea>
+    </div>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px">Or upload a file:</p>
+    <input type="file" id="importFile" accept=".json,.yaml,.yml" onchange="handleFileImport(event)" style="font-size:0.8rem;margin-bottom:14px">
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="doImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// State Management
+// ============================================================
+let state = {
+  apiInfo: { title: 'My API', version: '1.0.0', description: '', baseUrl: '' },
+  auth: { type: 'none', config: {} },
+  endpoints: [],
+  selectedId: null,
+  activeEditorTab: 'general',
+  activeOutputTab: 'yaml'
+};
+
+let dragSrcIndex = null;
+let idCounter = 1;
+
+function genId() { return 'ep_' + (idCounter++) + '_' + Date.now().toString(36); }
+
+function getSelected() {
+  return state.endpoints.find(e => e.id === state.selectedId) || null;
+}
+
+// ============================================================
+// Toast Notifications
+// ============================================================
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.innerHTML = (type === 'success' ? '&#10003; ' : type === 'error' ? '&#10007; ' : '&#9432; ') + msg;
+  container.appendChild(el);
+  setTimeout(() => { el.style.animation = 'slideOut 0.3s ease forwards'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// ============================================================
+// Endpoint CRUD
+// ============================================================
+function addEndpoint() {
+  const ep = {
+    id: genId(),
+    method: 'GET',
+    path: '/new-endpoint',
+    summary: '',
+    description: '',
+    operationId: '',
+    tags: [],
+    parameters: [],
+    requestBody: { contentType: 'application/json', schema: '' },
+    responses: [{ statusCode: '200', description: 'Successful response', body: '' }]
+  };
+  state.endpoints.push(ep);
+  state.selectedId = ep.id;
+  renderEndpointList();
+  renderEditor();
+  toast('Endpoint added', 'success');
+}
+
+function deleteEndpoint(id, evt) {
+  if (evt) evt.stopPropagation();
+  const idx = state.endpoints.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  state.endpoints.splice(idx, 1);
+  if (state.selectedId === id) {
+    state.selectedId = state.endpoints.length > 0 ? state.endpoints[Math.min(idx, state.endpoints.length - 1)].id : null;
+  }
+  renderEndpointList();
+  renderEditor();
+  toast('Endpoint removed', 'info');
+}
+
+function duplicateEndpoint(id, evt) {
+  if (evt) evt.stopPropagation();
+  const src = state.endpoints.find(e => e.id === id);
+  if (!src) return;
+  const dup = JSON.parse(JSON.stringify(src));
+  dup.id = genId();
+  dup.path = src.path + '-copy';
+  dup.operationId = src.operationId ? src.operationId + 'Copy' : '';
+  const idx = state.endpoints.findIndex(e => e.id === id);
+  state.endpoints.splice(idx + 1, 0, dup);
+  state.selectedId = dup.id;
+  renderEndpointList();
+  renderEditor();
+  toast('Endpoint duplicated', 'success');
+}
+
+function selectEndpoint(id) {
+  state.selectedId = id;
+  renderEndpointList();
+  renderEditor();
+}
+
+function moveEndpoint(fromIdx, toIdx) {
+  if (fromIdx === toIdx) return;
+  const [item] = state.endpoints.splice(fromIdx, 1);
+  state.endpoints.splice(toIdx, 0, item);
+  renderEndpointList();
+}
+
+// ============================================================
+// Render Endpoint List
+// ============================================================
+function renderEndpointList() {
+  const list = document.getElementById('endpointList');
+  const empty = document.getElementById('emptyState');
+  if (state.endpoints.length === 0) {
+    list.innerHTML = '';
+    list.appendChild(empty);
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  let html = '';
+  state.endpoints.forEach((ep, idx) => {
+    const active = ep.id === state.selectedId ? ' active' : '';
+    html += '<div class="endpoint-item' + active + '" data-id="' + ep.id + '" data-idx="' + idx + '" onclick="selectEndpoint(\'' + ep.id + '\')" draggable="true" ondragstart="onDragStart(event,' + idx + ')" ondragover="onDragOver(event)" ondrop="onDrop(event,' + idx + ')" ondragend="onDragEnd(event)">';
+    html += '<span class="drag-handle" title="Drag to reorder">&#9776;</span>';
+    html += '<span class="method-badge method-' + ep.method + '">' + ep.method + '</span>';
+    html += '<div class="ep-info"><div class="ep-path">' + escHtml(ep.path) + '</div>';
+    if (ep.summary) html += '<div class="ep-summary">' + escHtml(ep.summary) + '</div>';
+    html += '</div>';
+    html += '<div class="ep-actions">';
+    html += '<button class="btn-icon" onclick="duplicateEndpoint(\'' + ep.id + '\',event)" title="Duplicate">&#128464;</button>';
+    html += '<button class="btn-icon" onclick="deleteEndpoint(\'' + ep.id + '\',event)" title="Delete" style="color:var(--danger)">&#128465;</button>';
+    html += '</div></div>';
+  });
+  list.innerHTML = html;
+  list.appendChild(empty);
+}
+
+// ============================================================
+// Drag & Drop for Endpoint Reordering
+// ============================================================
+function onDragStart(e, idx) {
+  dragSrcIndex = idx;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const item = e.target.closest('.endpoint-item');
+  document.querySelectorAll('.endpoint-item').forEach(el => el.classList.remove('drag-over'));
+  if (item) item.classList.add('drag-over');
+}
+function onDrop(e, toIdx) {
+  e.preventDefault();
+  document.querySelectorAll('.endpoint-item').forEach(el => el.classList.remove('drag-over'));
+  if (dragSrcIndex !== null && dragSrcIndex !== toIdx) {
+    moveEndpoint(dragSrcIndex, toIdx);
+  }
+  dragSrcIndex = null;
+}
+function onDragEnd(e) {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.endpoint-item').forEach(el => el.classList.remove('drag-over'));
+  dragSrcIndex = null;
+}
+
+// ============================================================
+// Editor Rendering
+// ============================================================
+function renderEditor() {
+  const placeholder = document.getElementById('editorPlaceholder');
+  const area = document.getElementById('editorArea');
+  const ep = getSelected();
+  if (!ep) {
+    placeholder.style.display = 'flex';
+    area.style.display = 'none';
+    return;
+  }
+  placeholder.style.display = 'none';
+  area.style.display = 'flex';
+
+  // General tab
+  document.getElementById('epMethod').value = ep.method;
+  document.getElementById('epPath').value = ep.path;
+  document.getElementById('epSummary').value = ep.summary;
+  document.getElementById('epDescription').value = ep.description;
+  document.getElementById('epOperationId').value = ep.operationId;
+  renderTags(ep);
+
+  // Parameters tab
+  renderParams('path', ep.parameters.filter(p => p.in === 'path'));
+  renderParams('query', ep.parameters.filter(p => p.in === 'query'));
+  renderParams('header', ep.parameters.filter(p => p.in === 'header'));
+  document.getElementById('bodyContentType').value = ep.requestBody.contentType;
+  document.getElementById('bodySchema').value = ep.requestBody.schema;
+
+  // Responses tab
+  renderResponses(ep);
+
+  // Auth tab
+  renderAuth();
+
+  // Update counts
+  updateCounts(ep);
+}
+
+function updateCounts(ep) {
+  document.getElementById('paramCount').textContent = ep.parameters.length;
+  document.getElementById('responseCount').textContent = ep.responses.length;
+  const pathP = ep.parameters.filter(p => p.in === 'path').length;
+  const queryP = ep.parameters.filter(p => p.in === 'query').length;
+  const headerP = ep.parameters.filter(p => p.in === 'header').length;
+  document.getElementById('pathParamCount').textContent = pathP;
+  document.getElementById('queryParamCount').textContent = queryP;
+  document.getElementById('headerParamCount').textContent = headerP;
+}
+
+function updateEndpoint() {
+  const ep = getSelected();
+  if (!ep) return;
+  ep.method = document.getElementById('epMethod').value;
+  ep.path = document.getElementById('epPath').value;
+  ep.summary = document.getElementById('epSummary').value;
+  ep.description = document.getElementById('epDescription').value;
+  ep.operationId = document.getElementById('epOperationId').value;
+  ep.requestBody.contentType = document.getElementById('bodyContentType').value;
+  ep.requestBody.schema = document.getElementById('bodySchema').value;
+  renderEndpointList();
+}
+
+// ============================================================
+// Tags
+// ============================================================
+function renderTags(ep) {
+  const wrap = document.getElementById('tagInputWrap');
+  const input = document.getElementById('tagInput');
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  ep.tags.forEach((tag, i) => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.innerHTML = escHtml(tag) + ' <span class="remove-tag" onclick="removeTag(' + i + ')">&times;</span>';
+    wrap.insertBefore(span, input);
+  });
+}
+
+function handleTagInput(e) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const val = e.target.value.trim();
+  if (!val) return;
+  const ep = getSelected();
+  if (!ep) return;
+  if (!ep.tags.includes(val)) ep.tags.push(val);
+  e.target.value = '';
+  renderTags(ep);
+}
+
+function removeTag(idx) {
+  const ep = getSelected();
+  if (!ep) return;
+  ep.tags.splice(idx, 1);
+  renderTags(ep);
+}
+
+// ============================================================
+// Parameter Editor
+// ============================================================
+function renderParams(location, params) {
+  const container = document.getElementById(location + 'ParamsContainer');
+  if (params.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;padding:8px 0">No ' + location + ' parameters defined.</p>';
+    return;
+  }
+  let html = '<table class="param-table"><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th><th></th></tr></thead><tbody>';
+  params.forEach((p, i) => {
+    const globalIdx = getSelected().parameters.indexOf(p);
+    html += '<tr>';
+    html += '<td><input type="text" value="' + escAttr(p.name) + '" onchange="updateParam(' + globalIdx + ',\'name\',this.value)" style="font-family:var(--mono)"></td>';
+    html += '<td><select onchange="updateParam(' + globalIdx + ',\'type\',this.value)">';
+    ['string','integer','number','boolean','array','object'].forEach(t => {
+      html += '<option value="' + t + '"' + (p.type === t ? ' selected' : '') + '>' + t + '</option>';
+    });
+    html += '</select></td>';
+    html += '<td style="text-align:center"><input type="checkbox" class="required-toggle"' + (p.required ? ' checked' : '') + ' onchange="updateParam(' + globalIdx + ',\'required\',this.checked)"></td>';
+    html += '<td><input type="text" value="' + escAttr(p.description) + '" onchange="updateParam(' + globalIdx + ',\'description\',this.value)"></td>';
+    html += '<td><button class="btn-icon" onclick="removeParam(' + globalIdx + ')" style="color:var(--danger)" title="Remove">&times;</button></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function addParam(location) {
+  const ep = getSelected();
+  if (!ep) return;
+  ep.parameters.push({ name: '', in: location, type: 'string', required: location === 'path', description: '' });
+  renderEditor();
+}
+
+function updateParam(idx, field, value) {
+  const ep = getSelected();
+  if (!ep || !ep.parameters[idx]) return;
+  ep.parameters[idx][field] = value;
+}
+
+function removeParam(idx) {
+  const ep = getSelected();
+  if (!ep) return;
+  ep.parameters.splice(idx, 1);
+  renderEditor();
+}
+
+// ============================================================
+// Response Editor
+// ============================================================
+function renderResponses(ep) {
+  const container = document.getElementById('responsesContainer');
+  if (ep.responses.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.82rem;padding:8px 0">No responses defined.</p>';
+    return;
+  }
+  let html = '';
+  ep.responses.forEach((r, i) => {
+    const statusClass = r.statusCode.startsWith('2') ? '2xx' : r.statusCode.startsWith('3') ? '3xx' : r.statusCode.startsWith('4') ? '4xx' : '5xx';
+    html += '<div class="response-item">';
+    html += '<div class="response-header">';
+    html += '<div class="form-group" style="max-width:120px"><label>Status Code</label><input type="text" class="status-code status-' + statusClass + '" value="' + escAttr(r.statusCode) + '" onchange="updateResponse(' + i + ',\'statusCode\',this.value)" style="font-family:var(--mono);font-weight:700"></div>';
+    html += '<div class="form-group" style="flex:1"><label>Description</label><input type="text" value="' + escAttr(r.description) + '" onchange="updateResponse(' + i + ',\'description\',this.value)"></div>';
+    html += '<button class="btn-icon" onclick="removeResponse(' + i + ')" style="color:var(--danger);align-self:flex-end;margin-bottom:4px" title="Remove">&times;</button>';
+    html += '</div>';
+    html += '<div class="form-group"><label>Response Body (JSON)</label>';
+    html += '<textarea rows="6" style="font-family:var(--mono);font-size:0.8rem" onchange="updateResponse(' + i + ',\'body\',this.value)" placeholder='{"id":1,"name":"Example"}'>' + escHtml(r.body) + '</textarea>';
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function addResponse() {
+  const ep = getSelected();
+  if (!ep) return;
+  const codes = ep.responses.map(r => r.statusCode);
+  let newCode = '200';
+  if (codes.includes('200')) newCode = '201';
+  if (codes.includes('201')) newCode = '400';
+  if (codes.includes('400')) newCode = '404';
+  if (codes.includes('404')) newCode = '500';
+  ep.responses.push({ statusCode: newCode, description: '', body: '' });
+  renderEditor();
+}
+
+function updateResponse(idx, field, value) {
+  const ep = getSelected();
+  if (!ep || !ep.responses[idx]) return;
+  ep.responses[idx][field] = value;
+}
+
+function removeResponse(idx) {
+  const ep = getSelected();
+  if (!ep) return;
+  ep.responses.splice(idx, 1);
+  renderEditor();
+}
+
+// ============================================================
+// Auth Editor
+// ============================================================
+function selectAuth(el) {
+  document.querySelectorAll('.auth-type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.auth.type = el.dataset.auth;
+  state.auth.config = {};
+  renderAuthConfig();
+}
+
+function renderAuth() {
+  document.querySelectorAll('.auth-type-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.auth === state.auth.type);
+  });
+  renderAuthConfig();
+}
+
+function renderAuthConfig() {
+  const container = document.getElementById('authConfig');
+  const type = state.auth.type;
+  if (type === 'none') { container.innerHTML = ''; return; }
+
+  let html = '<div class="auth-config">';
+  if (type === 'bearer') {
+    html += '<div class="form-group"><label>Token Header Name</label><input type="text" value="' + escAttr(state.auth.config.headerName || 'Authorization') + '" onchange="state.auth.config.headerName=this.value"></div>';
+    html += '<div class="form-group" style="margin-top:10px"><label>Bearer Format (optional)</label><input type="text" value="' + escAttr(state.auth.config.bearerFormat || 'JWT') + '" onchange="state.auth.config.bearerFormat=this.value" placeholder="JWT"></div>';
+  } else if (type === 'apiKey') {
+    html += '<div class="form-row form-row-2">';
+    html += '<div class="form-group"><label>Key Name</label><input type="text" value="' + escAttr(state.auth.config.name || 'X-API-Key') + '" onchange="state.auth.config.name=this.value"></div>';
+    html += '<div class="form-group"><label>Location</label><select onchange="state.auth.config.in=this.value">';
+    ['header','query','cookie'].forEach(loc => {
+      html += '<option value="' + loc + '"' + ((state.auth.config.in || 'header') === loc ? ' selected' : '') + '>' + loc + '</option>';
+    });
+    html += '</select></div></div>';
+  } else if (type === 'oauth2') {
+    html += '<div class="form-group"><label>Authorization URL</label><input type="text" value="' + escAttr(state.auth.config.authUrl || '') + '" onchange="state.auth.config.authUrl=this.value" placeholder="https://auth.example.com/authorize"></div>';
+    html += '<div class="form-group" style="margin-top:10px"><label>Token URL</label><input type="text" value="' + escAttr(state.auth.config.tokenUrl || '') + '" onchange="state.auth.config.tokenUrl=this.value" placeholder="https://auth.example.com/token"></div>';
+    html += '<div class="form-group" style="margin-top:10px"><label>Scopes (comma-separated)</label><input type="text" value="' + escAttr(state.auth.config.scopes || '') + '" onchange="state.auth.config.scopes=this.value" placeholder="read,write,admin"></div>';
+  } else if (type === 'basic') {
+    html += '<p style="color:var(--text-secondary);font-size:0.85rem">HTTP Basic Authentication using username and password encoded in Base64.</p>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ============================================================
+// Tab Switching
+// ============================================================
+function switchEditorTab(el) {
+  const tab = el.dataset.tab;
+  state.activeEditorTab = tab;
+  document.querySelectorAll('.editor-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  document.getElementById('tab-' + tab).style.display = 'block';
+}
+
+function switchOutputTab(el) {
+  const tab = el.dataset.output;
+  state.activeOutputTab = tab;
+  document.querySelectorAll('.output-tab').forEach(t => t.classList.toggle('active', t.dataset.output === tab));
+  document.querySelectorAll('.output-pane').forEach(c => c.style.display = 'none');
+  document.getElementById('output-' + tab).style.display = 'block';
+}
+
+// ============================================================
+// Utility
+// ============================================================
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function escAttr(s) { return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+
+// ============================================================
+// OpenAPI 3.0 Spec Builder
+// ============================================================
+function buildOpenAPISpec() {
+  const info = {
+    title: document.getElementById('apiTitle').value || 'My API',
+    version: document.getElementById('apiVersion').value || '1.0.0'
+  };
+  const desc = state.apiInfo.description;
+  if (desc) info.description = desc;
+
+  const spec = {
+    openapi: '3.0.3',
+    info: info
+  };
+
+  const baseUrl = document.getElementById('apiBaseUrl').value;
+  if (baseUrl) {
+    spec.servers = [{ url: baseUrl }];
+  }
+
+  // Security schemes
+  if (state.auth.type !== 'none') {
+    spec.components = spec.components || {};
+    spec.components.securitySchemes = {};
+    if (state.auth.type === 'bearer') {
+      spec.components.securitySchemes.bearerAuth = {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: state.auth.config.bearerFormat || 'JWT'
+      };
+      spec.security = [{ bearerAuth: [] }];
+    } else if (state.auth.type === 'apiKey') {
+      spec.components.securitySchemes.apiKeyAuth = {
+        type: 'apiKey',
+        in: state.auth.config.in || 'header',
+        name: state.auth.config.name || 'X-API-Key'
+      };
+      spec.security = [{ apiKeyAuth: [] }];
+    } else if (state.auth.type === 'oauth2') {
+      const scopes = {};
+      (state.auth.config.scopes || '').split(',').map(s => s.trim()).filter(Boolean).forEach(s => { scopes[s] = s + ' access'; });
+      spec.components.securitySchemes.oauth2Auth = {
+        type: 'oauth2',
+        flows: {
+          authorizationCode: {
+            authorizationUrl: state.auth.config.authUrl || 'https://example.com/authorize',
+            tokenUrl: state.auth.config.tokenUrl || 'https://example.com/token',
+            scopes: scopes
+          }
+        }
+      };
+      spec.security = [{ oauth2Auth: Object.keys(scopes) }];
+    } else if (state.auth.type === 'basic') {
+      spec.components.securitySchemes.basicAuth = {
+        type: 'http',
+        scheme: 'basic'
+      };
+      spec.security = [{ basicAuth: [] }];
+    }
+  }
+
+  // Paths
+  spec.paths = {};
+  const allTags = new Set();
+
+  state.endpoints.forEach(ep => {
+    const pathKey = ep.path || '/';
+    if (!spec.paths[pathKey]) spec.paths[pathKey] = {};
+
+    const operation = {};
+    if (ep.summary) operation.summary = ep.summary;
+    if (ep.description) operation.description = ep.description;
+    if (ep.operationId) operation.operationId = ep.operationId;
+    if (ep.tags.length > 0) {
+      operation.tags = [...ep.tags];
+      ep.tags.forEach(t => allTags.add(t));
+    }
+
+    // Parameters
+    if (ep.parameters.length > 0) {
+      operation.parameters = ep.parameters.map(p => {
+        const param = { name: p.name || 'param', in: p.in, schema: { type: p.type || 'string' } };
+        if (p.required) param.required = true;
+        if (p.description) param.description = p.description;
+        return param;
+      });
+    }
+
+    // Request body
+    if (['POST','PUT','PATCH'].includes(ep.method) && ep.requestBody.schema) {
+      let schema;
+      try { schema = JSON.parse(ep.requestBody.schema); } catch(e) { schema = { type: 'object' }; }
+      operation.requestBody = {
+        required: true,
+        content: {}
+      };
+      operation.requestBody.content[ep.requestBody.contentType] = { schema: schema };
+    }
+
+    // Responses
+    operation.responses = {};
+    ep.responses.forEach(r => {
+      const resp = { description: r.description || 'Response' };
+      if (r.body) {
+        try {
+          const bodyObj = JSON.parse(r.body);
+          resp.content = { 'application/json': { example: bodyObj } };
+        } catch(e) {
+          resp.content = { 'text/plain': { example: r.body } };
+        }
+      }
+      operation.responses[r.statusCode] = resp;
+    });
+    if (Object.keys(operation.responses).length === 0) {
+      operation.responses['200'] = { description: 'Successful response' };
+    }
+
+    spec.paths[pathKey][ep.method.toLowerCase()] = operation;
+  });
+
+  // Tags
+  if (allTags.size > 0) {
+    spec.tags = [...allTags].map(t => ({ name: t }));
+  }
+
+  return spec;
+}
+
+// ============================================================
+// Simple YAML Serializer (no dependencies)
+// ============================================================
+function toYAML(obj, indent) {
+  indent = indent || 0;
+  const pad = '  '.repeat(indent);
+  let out = '';
+
+  if (obj === null || obj === undefined) return pad + 'null\n';
+  if (typeof obj === 'boolean') return pad + (obj ? 'true' : 'false') + '\n';
+  if (typeof obj === 'number') return pad + obj + '\n';
+  if (typeof obj === 'string') {
+    if (obj === '') return pad + "''" + '\n';
+    if (obj.includes('\n')) {
+      out = pad + '|\n';
+      obj.split('\n').forEach(line => { out += pad + '  ' + line + '\n'; });
+      return out;
+    }
+    if (/^[\w\/\.\-\s]+$/.test(obj) && !['true','false','null','yes','no','on','off'].includes(obj.toLowerCase()) && !/^\d+(\.\d+)?$/.test(obj)) {
+      return pad + obj + '\n';
+    }
+    return pad + "'" + obj.replace(/'/g, "''") + "'\n";
+  }
+
+  if (Array.isArray(obj)) {
+    if (obj.length === 0) return pad + '[]\n';
+    // Check if simple array (all primitives)
+    const allSimple = obj.every(v => typeof v !== 'object' || v === null);
+    if (allSimple && obj.length <= 5) {
+      return pad + '[' + obj.map(v => typeof v === 'string' ? "'" + v.replace(/'/g, "''") + "'" : String(v)).join(', ') + ']\n';
+    }
+    obj.forEach(item => {
+      if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+        const keys = Object.keys(item);
+        if (keys.length > 0) {
+          const firstKey = keys[0];
+          out += pad + '- ' + firstKey + ': ' + toYAML(item[firstKey], 0).trim() + '\n';
+          keys.slice(1).forEach(k => {
+            out += pad + '  ' + k + ': ' + toYAML(item[k], 0).trim() + '\n';
+            // Handle nested objects
+            if (typeof item[k] === 'object' && item[k] !== null) {
+              // Re-do with proper nesting
+            }
+          });
+        } else {
+          out += pad + '- {}\n';
+        }
+      } else {
+        out += pad + '- ' + toYAML(item, 0).trim() + '\n';
+      }
+    });
+    return out;
+  }
+
+  if (typeof obj === 'object') {
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return pad + '{}\n';
+    keys.forEach(key => {
+      const val = obj[key];
+      if (typeof val === 'object' && val !== null) {
+        if (Array.isArray(val) && val.length === 0) {
+          out += pad + key + ': []\n';
+        } else if (!Array.isArray(val) && Object.keys(val).length === 0) {
+          out += pad + key + ': {}\n';
+        } else {
+          out += pad + key + ':\n' + toYAML(val, indent + 1);
+        }
+      } else {
+        out += pad + key + ': ' + toYAML(val, 0).trim() + '\n';
+      }
+    });
+    return out;
+  }
+
+  return pad + String(obj) + '\n';
+}
+
+// ============================================================
+// Markdown Generator
+// ============================================================
+function generateMarkdown() {
+  const title = document.getElementById('apiTitle').value || 'My API';
+  const version = document.getElementById('apiVersion').value || '1.0.0';
+  const baseUrl = document.getElementById('apiBaseUrl').value;
+  let md = '';
+
+  md += '# ' + title + '\n\n';
+  md += '**Version:** ' + version + '\n\n';
+  if (baseUrl) md += '**Base URL:** `' + baseUrl + '`\n\n';
+  if (state.apiInfo.description) md += state.apiInfo.description + '\n\n';
+
+  // Auth section
+  if (state.auth.type !== 'none') {
+    md += '## Authentication\n\n';
+    if (state.auth.type === 'bearer') {
+      md += 'This API uses **Bearer Token** authentication.\n\n';
+      md += '```\nAuthorization: Bearer <your-token>\n```\n\n';
+    } else if (state.auth.type === 'apiKey') {
+      const loc = state.auth.config.in || 'header';
+      const name = state.auth.config.name || 'X-API-Key';
+      md += 'This API uses **API Key** authentication.\n\n';
+      md += '- **Location:** ' + loc + '\n';
+      md += '- **Key Name:** `' + name + '`\n\n';
+    } else if (state.auth.type === 'oauth2') {
+      md += 'This API uses **OAuth 2.0** authentication.\n\n';
+      if (state.auth.config.authUrl) md += '- **Authorization URL:** `' + state.auth.config.authUrl + '`\n';
+      if (state.auth.config.tokenUrl) md += '- **Token URL:** `' + state.auth.config.tokenUrl + '`\n';
+      if (state.auth.config.scopes) md += '- **Scopes:** ' + state.auth.config.scopes.split(',').map(function(s){return '`' + s.trim() + '`';}).join(', ') + '\n';
+      md += '\n';
+    } else if (state.auth.type === 'basic') {
+      md += 'This API uses **HTTP Basic** authentication.\n\n';
+      md += '```\nAuthorization: Basic <base64(username:password)>\n```\n\n';
+    }
+  }
+
+  // Table of Contents
+  if (state.endpoints.length > 0) {
+    md += '## Endpoints\n\n';
+    md += '| Method | Path | Summary |\n';
+    md += '|--------|------|---------|\n';
+    state.endpoints.forEach(function(ep) {
+      md += '| `' + ep.method + '` | `' + ep.path + '` | ' + (ep.summary || '-') + ' |\n';
+    });
+    md += '\n---\n\n';
+  }
+
+  // Endpoint details
+  state.endpoints.forEach(function(ep) {
+    md += '## ' + ep.method + ' ' + ep.path + '\n\n';
+    if (ep.summary) md += '**' + ep.summary + '**\n\n';
+    if (ep.description) md += ep.description + '\n\n';
+    if (ep.tags.length > 0) md += '**Tags:** ' + ep.tags.map(function(t){return '`' + t + '`';}).join(', ') + '\n\n';
+
+    // Parameters
+    const params = ep.parameters.filter(function(p){return p.name;});
+    if (params.length > 0) {
+      md += '### Parameters\n\n';
+      md += '| Name | In | Type | Required | Description |\n';
+      md += '|------|----|------|----------|-------------|\n';
+      params.forEach(function(p) {
+        md += '| `' + p.name + '` | ' + p.in + ' | `' + p.type + '` | ' + (p.required ? 'Yes' : 'No') + ' | ' + (p.description || '-') + ' |\n';
+      });
+      md += '\n';
+    }
+
+    // Request body
+    if (['POST','PUT','PATCH'].includes(ep.method) && ep.requestBody.schema) {
+      md += '### Request Body\n\n';
+      md += '**Content-Type:** `' + ep.requestBody.contentType + '`\n\n';
+      md += '```json\n' + ep.requestBody.schema + '\n```\n\n';
+    }
+
+    // Responses
+    if (ep.responses.length > 0) {
+      md += '### Responses\n\n';
+      ep.responses.forEach(function(r) {
+        md += '#### ' + r.statusCode + (r.description ? ' - ' + r.description : '') + '\n\n';
+        if (r.body) {
+          md += '```json\n' + r.body + '\n```\n\n';
+        }
+      });
+    }
+
+    md += '---\n\n';
+  });
+
+  return md;
+}
+
+// ============================================================
+// Generate All Outputs
+// ============================================================
+function generateAll() {
+  if (state.endpoints.length === 0) {
+    toast('Add at least one endpoint first', 'error');
+    return;
+  }
+
+  // Sync API info from inputs
+  state.apiInfo.title = document.getElementById('apiTitle').value;
+  state.apiInfo.version = document.getElementById('apiVersion').value;
+  state.apiInfo.baseUrl = document.getElementById('apiBaseUrl').value;
+
+  const spec = buildOpenAPISpec();
+
+  // YAML output
+  const yamlStr = toYAML(spec);
+  document.getElementById('yamlOutput').textContent = yamlStr;
+
+  // JSON output
+  const jsonStr = JSON.stringify(spec, null, 2);
+  document.getElementById('jsonOutput').textContent = jsonStr;
+
+  // Markdown output
+  const mdStr = generateMarkdown();
+  document.getElementById('markdownOutput').textContent = mdStr;
+
+  // Preview output
+  renderPreview(mdStr);
+
+  toast('Documentation generated', 'success');
+}
+
+// ============================================================
+// Preview Renderer (Markdown to HTML)
+// ============================================================
+function renderPreview(md) {
+  const container = document.getElementById('previewOutput');
+  let html = md;
+
+  // Code blocks
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(m, lang, code) {
+    return '<pre><code class="lang-' + lang + '">' + escHtml(code.trim()) + '</code></pre>';
+  });
+
+  // Inline code
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Headers
+  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+  // Bold
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Tables
+  html = html.replace(/^\|(.+)\|\n\|[-| ]+\|\n((?:\|.+\|\n)*)/gm, function(m, header, rows) {
+    let table = '<table><thead><tr>';
+    header.split('|').filter(Boolean).forEach(function(h) { table += '<th>' + h.trim() + '</th>'; });
+    table += '</tr></thead><tbody>';
+    rows.trim().split('\n').forEach(function(row) {
+      table += '<tr>';
+      row.split('|').filter(Boolean).forEach(function(cell) { table += '<td>' + cell.trim() + '</td>'; });
+      table += '</tr>';
+    });
+    table += '</tbody></table>';
+    return table;
+  });
+
+  // Horizontal rules
+  html = html.replace(/^---$/gm, '<hr>');
+
+  // List items
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+  // Paragraphs (simple)
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p>\s*<(h[1-4]|pre|table|ul|hr|ol)/g, '<$1');
+  html = html.replace(/<\/(h[1-4]|pre|table|ul|hr|ol)>\s*<\/p>/g, '</$1>');
+  html = html.replace(/<p>\s*<\/p>/g, '');
+
+  // Method tags in preview
+  html = html.replace(/<h2>(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) (.+?)<\/h2>/g, function(m, method, path) {
+    return '<h2><span class="method-tag method-' + method + '">' + method + '</span>' + path + '</h2>';
+  });
+
+  container.innerHTML = html;
+}
+
+
+// ============================================================
+// Copy & Download
+// ============================================================
+function copyOutput() {
+  const tab = state.activeOutputTab;
+  let text = '';
+  if (tab === 'yaml') text = document.getElementById('yamlOutput').textContent;
+  else if (tab === 'json') text = document.getElementById('jsonOutput').textContent;
+  else if (tab === 'markdown') text = document.getElementById('markdownOutput').textContent;
+  else if (tab === 'preview') text = document.getElementById('previewOutput').innerText;
+
+  if (!text || text.startsWith('Click "Generate"')) {
+    toast('Generate documentation first', 'error');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(function() {
+    toast('Copied to clipboard', 'success');
+  }).catch(function() {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Copied to clipboard', 'success');
+  });
+}
+
+function downloadOutput() {
+  const tab = state.activeOutputTab;
+  let text = '', filename = '', mime = 'text/plain';
+  if (tab === 'yaml') {
+    text = document.getElementById('yamlOutput').textContent;
+    filename = 'openapi-spec.yaml';
+    mime = 'text/yaml';
+  } else if (tab === 'json') {
+    text = document.getElementById('jsonOutput').textContent;
+    filename = 'openapi-spec.json';
+    mime = 'application/json';
+  } else if (tab === 'markdown') {
+    text = document.getElementById('markdownOutput').textContent;
+    filename = 'api-docs.md';
+  } else if (tab === 'preview') {
+    text = document.getElementById('previewOutput').innerHTML;
+    filename = 'api-docs.html';
+    mime = 'text/html';
+  }
+
+  if (!text || text.startsWith('Click "Generate"')) {
+    toast('Generate documentation first', 'error');
+    return;
+  }
+
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Downloaded ' + filename, 'success');
+}
+
+// ============================================================
+// Export Full Spec
+// ============================================================
+function exportSpec() {
+  if (state.endpoints.length === 0) {
+    toast('Nothing to export', 'error');
+    return;
+  }
+  state.apiInfo.title = document.getElementById('apiTitle').value;
+  state.apiInfo.version = document.getElementById('apiVersion').value;
+  state.apiInfo.baseUrl = document.getElementById('apiBaseUrl').value;
+
+  const spec = buildOpenAPISpec();
+  const jsonStr = JSON.stringify(spec, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'openapi-spec.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Exported OpenAPI spec', 'success');
+}
+
+// ============================================================
+// Import
+// ============================================================
+function showImportModal() {
+  document.getElementById('importModal').classList.add('active');
+  document.getElementById('importContent').value = '';
+  document.getElementById('importFile').value = '';
+}
+
+function closeImportModal() {
+  document.getElementById('importModal').classList.remove('active');
+}
+
+function handleFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('importContent').value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function doImport() {
+  const content = document.getElementById('importContent').value.trim();
+  if (!content) {
+    toast('No content to import', 'error');
+    return;
+  }
+
+  let spec;
+  try {
+    spec = JSON.parse(content);
+  } catch(e) {
+    // Try basic YAML parsing (key: value)
+    try {
+      spec = simpleYAMLParse(content);
+    } catch(e2) {
+      toast('Invalid JSON or YAML format', 'error');
+      return;
+    }
+  }
+
+  if (!spec || !spec.paths) {
+    toast('Invalid OpenAPI spec: missing paths', 'error');
+    return;
+  }
+
+  // Import API info
+  if (spec.info) {
+    document.getElementById('apiTitle').value = spec.info.title || 'My API';
+    document.getElementById('apiVersion').value = spec.info.version || '1.0.0';
+    state.apiInfo.description = spec.info.description || '';
+  }
+  if (spec.servers && spec.servers[0]) {
+    document.getElementById('apiBaseUrl').value = spec.servers[0].url || '';
+  }
+
+  // Import security
+  if (spec.components && spec.components.securitySchemes) {
+    const schemes = spec.components.securitySchemes;
+    if (schemes.bearerAuth) {
+      state.auth = { type: 'bearer', config: { bearerFormat: schemes.bearerAuth.bearerFormat || 'JWT' } };
+    } else if (schemes.apiKeyAuth) {
+      state.auth = { type: 'apiKey', config: { name: schemes.apiKeyAuth.name, in: schemes.apiKeyAuth.in } };
+    } else if (schemes.oauth2Auth) {
+      const flow = schemes.oauth2Auth.flows && schemes.oauth2Auth.flows.authorizationCode;
+      state.auth = { type: 'oauth2', config: {
+        authUrl: flow ? flow.authorizationUrl : '',
+        tokenUrl: flow ? flow.tokenUrl : '',
+        scopes: flow ? Object.keys(flow.scopes || {}).join(',') : ''
+      }};
+    } else if (schemes.basicAuth) {
+      state.auth = { type: 'basic', config: {} };
+    }
+  }
+
+  // Import endpoints
+  state.endpoints = [];
+  Object.keys(spec.paths).forEach(function(path) {
+    const methods = spec.paths[path];
+    Object.keys(methods).forEach(function(method) {
+      if (['get','post','put','patch','delete','head','options'].indexOf(method) === -1) return;
+      const op = methods[method];
+      const ep = {
+        id: genId(),
+        method: method.toUpperCase(),
+        path: path,
+        summary: op.summary || '',
+        description: op.description || '',
+        operationId: op.operationId || '',
+        tags: op.tags || [],
+        parameters: [],
+        requestBody: { contentType: 'application/json', schema: '' },
+        responses: []
+      };
+
+      // Parameters
+      if (op.parameters) {
+        ep.parameters = op.parameters.map(function(p) {
+          return {
+            name: p.name || '',
+            in: p.in || 'query',
+            type: (p.schema && p.schema.type) || 'string',
+            required: !!p.required,
+            description: p.description || ''
+          };
+        });
+      }
+
+      // Request body
+      if (op.requestBody && op.requestBody.content) {
+        const contentTypes = Object.keys(op.requestBody.content);
+        if (contentTypes.length > 0) {
+          ep.requestBody.contentType = contentTypes[0];
+          const ct = op.requestBody.content[contentTypes[0]];
+          if (ct.schema) {
+            ep.requestBody.schema = JSON.stringify(ct.schema, null, 2);
+          }
+        }
+      }
+
+      // Responses
+      if (op.responses) {
+        Object.keys(op.responses).forEach(function(code) {
+          const r = op.responses[code];
+          let body = '';
+          if (r.content) {
+            const ct = Object.keys(r.content)[0];
+            if (ct && r.content[ct].example) {
+              body = JSON.stringify(r.content[ct].example, null, 2);
+            } else if (ct && r.content[ct].schema) {
+              body = JSON.stringify(r.content[ct].schema, null, 2);
+            }
+          }
+          ep.responses.push({ statusCode: code, description: r.description || '', body: body });
+        });
+      }
+
+      state.endpoints.push(ep);
+    });
+  });
+
+  if (state.endpoints.length > 0) {
+    state.selectedId = state.endpoints[0].id;
+  }
+
+  closeImportModal();
+  renderEndpointList();
+  renderEditor();
+  toast('Imported ' + state.endpoints.length + ' endpoints', 'success');
+}
+
+// Simple YAML parser (handles basic key-value, not full YAML)
+function simpleYAMLParse(text) {
+  // For import, we primarily support JSON. This is a basic fallback.
+  // Convert simple YAML to JSON-like structure
+  try {
+    // Remove comments
+    const lines = text.split('\n').filter(function(l) { return !l.trim().startsWith('#'); });
+    // Try to evaluate as JSON after basic transforms
+    let jsonish = lines.join('\n');
+    // This is intentionally limited - full YAML parsing needs a library
+    toast('For best results, import JSON format', 'info');
+    return JSON.parse(jsonish);
+  } catch(e) {
+    throw new Error('YAML parsing not fully supported. Please use JSON format.');
+  }
+}
+
+// ============================================================
+// Load Example
+// ============================================================
+function loadExample() {
+  document.getElementById('apiTitle').value = 'Pet Store API';
+  document.getElementById('apiVersion').value = '1.0.0';
+  document.getElementById('apiBaseUrl').value = 'https://api.petstore.example.com/v1';
+  state.apiInfo.description = 'A sample Pet Store API demonstrating OpenAPI 3.0 features.';
+
+  state.auth = { type: 'bearer', config: { bearerFormat: 'JWT' } };
+
+  state.endpoints = [
+    {
+      id: genId(), method: 'GET', path: '/pets', summary: 'List all pets',
+      description: 'Returns a paginated list of all pets in the store.',
+      operationId: 'listPets', tags: ['Pets'],
+      parameters: [
+        { name: 'limit', in: 'query', type: 'integer', required: false, description: 'Maximum number of pets to return (max 100)' },
+        { name: 'offset', in: 'query', type: 'integer', required: false, description: 'Number of pets to skip' },
+        { name: 'status', in: 'query', type: 'string', required: false, description: 'Filter by status (available, pending, sold)' }
+      ],
+      requestBody: { contentType: 'application/json', schema: '' },
+      responses: [
+        { statusCode: '200', description: 'A list of pets', body: '[\n  {\n    "id": 1,\n    "name": "Buddy",\n    "species": "dog",\n    "status": "available",\n    "age": 3\n  },\n  {\n    "id": 2,\n    "name": "Whiskers",\n    "species": "cat",\n    "status": "available",\n    "age": 2\n  }\n]' },
+        { statusCode: '401', description: 'Unauthorized', body: '{\n  "error": "unauthorized",\n  "message": "Invalid or missing authentication token"\n}' }
+      ]
+    },
+    {
+      id: genId(), method: 'POST', path: '/pets', summary: 'Create a pet',
+      description: 'Add a new pet to the store inventory.',
+      operationId: 'createPet', tags: ['Pets'],
+      parameters: [],
+      requestBody: { contentType: 'application/json', schema: '{\n  "type": "object",\n  "properties": {\n    "name": { "type": "string", "minLength": 1 },\n    "species": { "type": "string", "enum": ["dog", "cat", "bird", "fish"] },\n    "age": { "type": "integer", "minimum": 0 },\n    "status": { "type": "string", "enum": ["available", "pending", "sold"] }\n  },\n  "required": ["name", "species"]\n}' },
+      responses: [
+        { statusCode: '201', description: 'Pet created successfully', body: '{\n  "id": 3,\n  "name": "Rex",\n  "species": "dog",\n  "status": "available",\n  "age": 1\n}' },
+        { statusCode: '400', description: 'Invalid input', body: '{\n  "error": "validation_error",\n  "message": "Name is required",\n  "details": [{ "field": "name", "issue": "required" }]\n}' }
+      ]
+    },
+    {
+      id: genId(), method: 'GET', path: '/pets/{petId}', summary: 'Get a pet by ID',
+      description: 'Returns detailed information about a specific pet.',
+      operationId: 'getPet', tags: ['Pets'],
+      parameters: [
+        { name: 'petId', in: 'path', type: 'integer', required: true, description: 'The unique identifier of the pet' }
+      ],
+      requestBody: { contentType: 'application/json', schema: '' },
+      responses: [
+        { statusCode: '200', description: 'Pet details', body: '{\n  "id": 1,\n  "name": "Buddy",\n  "species": "dog",\n  "status": "available",\n  "age": 3,\n  "vaccinated": true,\n  "createdAt": "2025-01-15T10:30:00Z"\n}' },
+        { statusCode: '404', description: 'Pet not found', body: '{\n  "error": "not_found",\n  "message": "Pet with ID 999 not found"\n}' }
+      ]
+    },
+    {
+      id: genId(), method: 'PUT', path: '/pets/{petId}', summary: 'Update a pet',
+      description: 'Update all fields of an existing pet.',
+      operationId: 'updatePet', tags: ['Pets'],
+      parameters: [
+        { name: 'petId', in: 'path', type: 'integer', required: true, description: 'The unique identifier of the pet' }
+      ],
+      requestBody: { contentType: 'application/json', schema: '{\n  "type": "object",\n  "properties": {\n    "name": { "type": "string" },\n    "species": { "type": "string" },\n    "age": { "type": "integer" },\n    "status": { "type": "string" }\n  }\n}' },
+      responses: [
+        { statusCode: '200', description: 'Pet updated', body: '{\n  "id": 1,\n  "name": "Buddy Updated",\n  "species": "dog",\n  "status": "sold",\n  "age": 4\n}' },
+        { statusCode: '404', description: 'Pet not found', body: '{\n  "error": "not_found",\n  "message": "Pet not found"\n}' }
+      ]
+    },
+    {
+      id: genId(), method: 'DELETE', path: '/pets/{petId}', summary: 'Delete a pet',
+      description: 'Remove a pet from the store. This action is irreversible.',
+      operationId: 'deletePet', tags: ['Pets'],
+      parameters: [
+        { name: 'petId', in: 'path', type: 'integer', required: true, description: 'The unique identifier of the pet' }
+      ],
+      requestBody: { contentType: 'application/json', schema: '' },
+      responses: [
+        { statusCode: '204', description: 'Pet deleted successfully', body: '' },
+        { statusCode: '404', description: 'Pet not found', body: '{\n  "error": "not_found",\n  "message": "Pet not found"\n}' }
+      ]
+    },
+    {
+      id: genId(), method: 'GET', path: '/store/inventory', summary: 'Get store inventory',
+      description: 'Returns a summary of pet inventory grouped by status.',
+      operationId: 'getInventory', tags: ['Store'],
+      parameters: [],
+      requestBody: { contentType: 'application/json', schema: '' },
+      responses: [
+        { statusCode: '200', description: 'Inventory counts', body: '{\n  "available": 12,\n  "pending": 3,\n  "sold": 45\n}' }
+      ]
+    }
+  ];
+
+  state.selectedId = state.endpoints[0].id;
+  renderEndpointList();
+  renderEditor();
+  toast('Example API loaded with 6 endpoints', 'success');
+}
+
+// ============================================================
+// Reset
+// ============================================================
+function resetAll() {
+  if (!confirm('Reset everything? This will clear all endpoints and settings.')) return;
+  state.endpoints = [];
+  state.selectedId = null;
+  state.auth = { type: 'none', config: {} };
+  state.apiInfo = { title: 'My API', version: '1.0.0', description: '', baseUrl: '' };
+  document.getElementById('apiTitle').value = 'My API';
+  document.getElementById('apiVersion').value = '1.0.0';
+  document.getElementById('apiBaseUrl').value = '';
+  document.getElementById('yamlOutput').textContent = 'Click "Generate" to create OpenAPI YAML spec...';
+  document.getElementById('jsonOutput').textContent = 'Click "Generate" to create OpenAPI JSON spec...';
+  document.getElementById('markdownOutput').textContent = 'Click "Generate" to create Markdown documentation...';
+  document.getElementById('previewOutput').innerHTML = '<p style="color:var(--text-muted)">Click "Generate" to see the preview...</p>';
+  renderEndpointList();
+  renderEditor();
+  toast('Everything reset', 'info');
+}
+
+// ============================================================
+// Auto-save to localStorage
+// ============================================================
+function saveState() {
+  try {
+    const data = {
+      apiInfo: {
+        title: document.getElementById('apiTitle').value,
+        version: document.getElementById('apiVersion').value,
+        baseUrl: document.getElementById('apiBaseUrl').value,
+        description: state.apiInfo.description
+      },
+      auth: state.auth,
+      endpoints: state.endpoints,
+      selectedId: state.selectedId
+    };
+    localStorage.setItem('apiDocsGenerator', JSON.stringify(data));
+  } catch(e) { /* ignore */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('apiDocsGenerator');
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.apiInfo) {
+      document.getElementById('apiTitle').value = data.apiInfo.title || 'My API';
+      document.getElementById('apiVersion').value = data.apiInfo.version || '1.0.0';
+      document.getElementById('apiBaseUrl').value = data.apiInfo.baseUrl || '';
+      state.apiInfo = data.apiInfo;
+    }
+    if (data.auth) state.auth = data.auth;
+    if (data.endpoints) {
+      state.endpoints = data.endpoints;
+      // Ensure IDs are unique and counter is ahead
+      state.endpoints.forEach(function(ep) {
+        if (!ep.id) ep.id = genId();
+      });
+    }
+    if (data.selectedId && state.endpoints.find(function(e){return e.id === data.selectedId;})) {
+      state.selectedId = data.selectedId;
+    } else if (state.endpoints.length > 0) {
+      state.selectedId = state.endpoints[0].id;
+    }
+    return state.endpoints.length > 0;
+  } catch(e) { return false; }
+}
+
+// Auto-save on changes
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, 1000);
+}
+
+// Observe changes
+const origUpdate = updateEndpoint;
+updateEndpoint = function() { origUpdate(); scheduleSave(); };
+
+// ============================================================
+// Keyboard Shortcuts
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  // Ctrl/Cmd + G = Generate
+  if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+    e.preventDefault();
+    generateAll();
+  }
+  // Ctrl/Cmd + Shift + N = New endpoint
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'N') {
+    e.preventDefault();
+    addEndpoint();
+  }
+  // Ctrl/Cmd + S = Save (prevent default, auto-save handles it)
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveState();
+    toast('Saved', 'success');
+  }
+  // Ctrl/Cmd + I = Import
+  if ((e.ctrlKey || e.metaKey) && e.key === 'i' && !e.shiftKey) {
+    e.preventDefault();
+    showImportModal();
+  }
+  // Escape = Close modal
+  if (e.key === 'Escape') {
+    closeImportModal();
+  }
+});
+
+// ============================================================
+// Initialization
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const loaded = loadState();
+  renderEndpointList();
+  renderEditor();
+  if (!loaded) {
+    // Show a subtle hint
+    setTimeout(function() {
+      toast('Tip: Click "Example" to load a sample API, or "Add" to start fresh', 'info');
+    }, 500);
+  }
+});
+
+// Close modal on overlay click
+document.getElementById('importModal').addEventListener('click', function(e) {
+  if (e.target === this) closeImportModal();
+});
+</script>
+
+<!-- Vercel Analytics -->
+<script defer src="https://va.vercel-scripts.com/v1/script.js" data-endpoint="/_vercel/insights/event"></script>
+
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI API Docs Generator",
+  "description": "Free online tool to generate OpenAPI 3.0 and Markdown API documentation with a visual editor.",
+  "url": "https://lifa-su.github.io/ai-api-docs-generator.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "Lifa Tools"
+  }
+}
+</script>
+</body>
+</html>

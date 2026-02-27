@@ -394,3 +394,359 @@ function removeBadge(btn) {
     autoGenerate();
   }
 }
+
+function generateReadme() {
+  const name = document.getElementById("project-name").value.trim() || "my-project";
+  const desc = document.getElementById("project-desc").value.trim() || "A brief description of your project.";
+  const techRaw = document.getElementById("tech-stack").value.trim();
+  const techList = techRaw ? techRaw.split(",").map(t => t.trim()).filter(Boolean) : [];
+  const featRaw = document.getElementById("features").value.trim();
+  const featList = featRaw ? featRaw.split("\n").map(f => f.trim()).filter(Boolean) : [];
+  const sections = getActiveSections();
+  const ghUser = document.getElementById("github-user").value.trim() || "username";
+  const licenseType = document.getElementById("license-type").value;
+  let md = "";
+
+  // Collect badges
+  let badgeLine = "";
+  if (sections.includes("badges")) {
+    const badges = [];
+    document.querySelectorAll("#badge-list .badge-row").forEach(row => {
+      const sel = row.querySelector("select");
+      const inp = row.querySelector("input");
+      const bmd = getBadgeMarkdown(sel.value, inp.value);
+      if (bmd) badges.push(bmd);
+    });
+    if (badges.length) badgeLine = badges.join(" ") + "\n\n";
+  }
+
+  if (currentTemplate === "awesome") {
+    md += '<div align="center">\n\n';
+    md += "# " + name + "\n\n";
+    if (badgeLine) md += badgeLine;
+    md += "> " + desc + "\n\n";
+    if (techList.length) {
+      md += techList.map(t => "`" + t + "`").join(" · ") + "\n\n";
+    }
+    md += "[Getting Started](#installation) · [Documentation](#usage) · [Contributing](#contributing)\n\n";
+    md += "</div>\n\n---\n\n";
+  } else {
+    md += "# " + name + "\n\n";
+    if (badgeLine) md += badgeLine;
+    md += desc + "\n\n";
+  }
+
+  // Table of Contents for detailed/awesome
+  if (currentTemplate === "detailed" || currentTemplate === "awesome") {
+    md += "## Table of Contents\n\n";
+    const tocMap = {installation:"Installation",usage:"Usage",api:"API Reference",screenshots:"Screenshots",roadmap:"Roadmap",faq:"FAQ",contributing:"Contributing",changelog:"Changelog",license:"License"};
+    sections.forEach(s => {
+      if (tocMap[s]) md += "- [" + tocMap[s] + "](#" + s.replace("api","api-reference") + ")\n";
+    });
+    md += "\n";
+  }
+
+  // Tech Stack
+  if (techList.length && currentTemplate !== "awesome") {
+    if (currentTemplate === "minimal") {
+      md += "**Built with:** " + techList.join(", ") + "\n\n";
+    } else {
+      md += "## Tech Stack\n\n";
+      techList.forEach(t => { md += "- " + t + "\n"; });
+      md += "\n";
+    }
+  }
+
+  // Features
+  if (featList.length) {
+    if (currentTemplate === "minimal") {
+      md += "## Features\n\n";
+      featList.forEach(f => { md += "- " + f + "\n"; });
+      md += "\n";
+    } else if (currentTemplate === "awesome") {
+      md += "## ✨ Features\n\n";
+      featList.forEach(f => { md += "- **" + f + "**\n"; });
+      md += "\n";
+    } else {
+      md += "## Features\n\n";
+      featList.forEach(f => { md += "- " + f + "\n"; });
+      md += "\n";
+    }
+  }
+
+  // Screenshots
+  if (sections.includes("screenshots")) {
+    md += "## Screenshots\n\n";
+    md += "| Desktop | Mobile |\n";
+    md += "|---------|--------|\n";
+    md += "| ![Desktop](screenshots/desktop.png) | ![Mobile](screenshots/mobile.png) |\n\n";
+  }
+
+  // Installation
+  if (sections.includes("installation")) {
+    const heading = currentTemplate === "awesome" ? "## 🚀 Installation" : "## Installation";
+    md += heading + "\n\n";
+    if (currentTemplate === "minimal") {
+      md += "```bash\ngit clone https://github.com/" + ghUser + "/" + name + ".git\ncd " + name + "\nnpm install\n```\n\n";
+    } else {
+      md += "### Prerequisites\n\n";
+      if (techList.length) {
+        md += techList.slice(0,3).map(t => "- " + t).join("\n") + "\n\n";
+      } else {
+        md += "- Node.js >= 18\n- npm or yarn\n\n";
+      }
+      md += "### Setup\n\n";
+      md += "```bash\n# Clone the repository\ngit clone https://github.com/" + ghUser + "/" + name + ".git\n\n# Navigate to directory\ncd " + name + "\n\n# Install dependencies\nnpm install\n\n# Start development server\nnpm run dev\n```\n\n";
+    }
+  }
+
+  // Usage
+  if (sections.includes("usage")) {
+    const heading = currentTemplate === "awesome" ? "## 📖 Usage" : "## Usage";
+    md += heading + "\n\n";
+    md += "```bash\nnpm start\n```\n\n";
+    if (currentTemplate !== "minimal") {
+      md += "### Configuration\n\n";
+      md += "Create a `.env` file in the root directory:\n\n";
+      md += "```env\nPORT=3000\nDATABASE_URL=your_database_url\nAPI_KEY=your_api_key\n```\n\n";
+    }
+  }
+
+  // API Reference
+  if (sections.includes("api")) {
+    const heading = currentTemplate === "awesome" ? "## 📡 API Reference" : "## API Reference";
+    md += heading + "\n\n";
+    md += "### Get all items\n\n";
+    md += "```http\nGET /api/items\n```\n\n";
+    md += "| Parameter | Type     | Description                |\n";
+    md += "| :-------- | :------- | :------------------------- |\n";
+    md += "| `api_key` | `string` | **Required**. Your API key |\n\n";
+    md += "### Get item\n\n";
+    md += "```http\nGET /api/items/${id}\n```\n\n";
+    md += "| Parameter | Type     | Description                       |\n";
+    md += "| :-------- | :------- | :-------------------------------- |\n";
+    md += "| `id`      | `string` | **Required**. Id of item to fetch |\n\n";
+  }
+
+  // Roadmap
+  if (sections.includes("roadmap")) {
+    const heading = currentTemplate === "awesome" ? "## 🗺️ Roadmap" : "## Roadmap";
+    md += heading + "\n\n";
+    md += "- [x] Initial release\n";
+    md += "- [x] Core features\n";
+    md += "- [ ] Add more integrations\n";
+    md += "- [ ] Improve documentation\n";
+    md += "- [ ] Add tests\n\n";
+  }
+
+  // FAQ
+  if (sections.includes("faq")) {
+    md += "## FAQ\n\n";
+    md += "#### How do I get started?\n\n";
+    md += "Follow the [Installation](#installation) guide above.\n\n";
+    md += "#### How can I contribute?\n\n";
+    md += "See the [Contributing](#contributing) section.\n\n";
+  }
+
+  // Contributing
+  if (sections.includes("contributing")) {
+    const heading = currentTemplate === "awesome" ? "## 🤝 Contributing" : "## Contributing";
+    md += heading + "\n\n";
+    md += "Contributions are welcome!\n\n";
+    if (currentTemplate === "minimal") {
+      md += "Please open an issue or submit a pull request.\n\n";
+    } else {
+      md += "1. Fork the repository\n";
+      md += "2. Create your feature branch (`git checkout -b feature/amazing-feature`)\n";
+      md += "3. Commit your changes (`git commit -m \x27Add amazing feature\x27`)\n";
+      md += "4. Push to the branch (`git push origin feature/amazing-feature`)\n";
+      md += "5. Open a Pull Request\n\n";
+      md += "Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.\n\n";
+    }
+  }
+
+  // Changelog
+  if (sections.includes("changelog")) {
+    md += "## Changelog\n\n";
+    md += "### v1.0.0 (2025-01-01)\n\n";
+    md += "- Initial release\n";
+    md += "- Core features implemented\n\n";
+  }
+
+  // License
+  if (sections.includes("license")) {
+    const heading = currentTemplate === "awesome" ? "## 📄 License" : "## License";
+    md += heading + "\n\n";
+    md += "This project is licensed under the " + licenseType + " License - see the [LICENSE](LICENSE) file for details.\n\n";
+  }
+
+  // Footer for awesome
+  if (currentTemplate === "awesome") {
+    md += "---\n\n";
+    md += '<div align="center">\n\n';
+    md += "Made with ❤️ by [" + ghUser + "](https://github.com/" + ghUser + ")\n\n";
+    md += "If you found this project helpful, please give it a ⭐\n\n";
+    md += "</div>\n";
+  }
+
+  document.getElementById("markdown-output").value = md;
+  updatePreview();
+  autoSave();
+}
+
+function updatePreview() {
+  const md = document.getElementById("markdown-output").value;
+  const area = document.getElementById("preview-area");
+  if (typeof marked !== "undefined" && md) {
+    marked.setOptions({ breaks: true, gfm: true });
+    area.innerHTML = marked.parse(md);
+  } else {
+    area.innerHTML = "<p style=\"color:var(--text-dim)\">Generate a README to see the preview...</p>";
+  }
+}
+
+function copyMarkdown() {
+  const md = document.getElementById("markdown-output").value;
+  if (!md) { showToast("Nothing to copy"); return; }
+  navigator.clipboard.writeText(md).then(() => showToast("Copied to clipboard!")).catch(() => {
+    const ta = document.createElement("textarea");
+    ta.value = md; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    showToast("Copied to clipboard!");
+  });
+}
+
+function downloadMarkdown() {
+  const md = document.getElementById("markdown-output").value;
+  if (!md) { showToast("Nothing to download"); return; }
+  const blob = new Blob([md], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = (document.getElementById("project-name").value.trim() || "README") + ".md";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Downloaded!");
+}
+
+function downloadHTML() {
+  const md = document.getElementById("markdown-output").value;
+  if (!md) { showToast("Nothing to download"); return; }
+  if (typeof marked === "undefined") { showToast("Preview not available"); return; }
+  marked.setOptions({ breaks: true, gfm: true });
+  const rendered = marked.parse(md);
+  const name = document.getElementById("project-name").value.trim() || "README";
+  const html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>" + name + "</title><style>body{max-width:800px;margin:40px auto;padding:0 20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.6;color:#24292f}pre{background:#f6f8fa;padding:16px;border-radius:6px;overflow-x:auto}code{background:#f6f8fa;padding:2px 6px;border-radius:3px;font-size:85%}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%}th,td{border:1px solid #d0d7de;padding:8px 12px}img{max-width:100%}blockquote{border-left:4px solid #d0d7de;padding-left:16px;color:#57606a}h1,h2{border-bottom:1px solid #d0d7de;padding-bottom:8px}</style></head><body>" + rendered + "</body></html>";
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name + ".html";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("HTML downloaded!");
+}
+
+// localStorage
+function autoSave() {
+  const data = {
+    projectName: document.getElementById("project-name").value,
+    projectDesc: document.getElementById("project-desc").value,
+    techStack: document.getElementById("tech-stack").value,
+    features: document.getElementById("features").value,
+    ghUser: document.getElementById("github-user").value,
+    licenseType: document.getElementById("license-type").value,
+    template: currentTemplate,
+    sections: getActiveSections(),
+    badges: getBadgeData(),
+    savedAt: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem("readme-generator-draft", JSON.stringify(data));
+    const notice = document.getElementById("draft-notice");
+    notice.textContent = "Draft auto-saved at " + new Date().toLocaleTimeString();
+  } catch(e) {}
+}
+
+function getBadgeData() {
+  const badges = [];
+  document.querySelectorAll("#badge-list .badge-row").forEach(row => {
+    badges.push({
+      type: row.querySelector("select").value,
+      value: row.querySelector("input").value
+    });
+  });
+  return badges;
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem("readme-generator-draft");
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.projectName) document.getElementById("project-name").value = data.projectName;
+    if (data.projectDesc) document.getElementById("project-desc").value = data.projectDesc;
+    if (data.techStack) document.getElementById("tech-stack").value = data.techStack;
+    if (data.features) document.getElementById("features").value = data.features;
+    if (data.ghUser) document.getElementById("github-user").value = data.ghUser;
+    if (data.licenseType) document.getElementById("license-type").value = data.licenseType;
+    if (data.template) {
+      currentTemplate = data.template;
+      document.querySelectorAll(".template-card").forEach(c => {
+        c.classList.toggle("active", c.dataset.template === data.template);
+      });
+    }
+    if (data.sections) {
+      document.querySelectorAll(".section-toggle").forEach(t => {
+        t.classList.toggle("active", data.sections.includes(t.dataset.section));
+      });
+    }
+    if (data.badges && data.badges.length) {
+      const list = document.getElementById("badge-list");
+      list.innerHTML = "";
+      data.badges.forEach((b, i) => {
+        const row = document.createElement("div");
+        row.className = "badge-row";
+        row.dataset.badgeIdx = i;
+        row.innerHTML = '<select onchange="updateBadges();autoGenerate()"><option value="build"' + (b.type==="build"?" selected":"") + '>Build Status</option><option value="version"' + (b.type==="version"?" selected":"") + '>Version</option><option value="license"' + (b.type==="license"?" selected":"") + '>License</option><option value="downloads"' + (b.type==="downloads"?" selected":"") + '>Downloads</option><option value="stars"' + (b.type==="stars"?" selected":"") + '>Stars</option><option value="issues"' + (b.type==="issues"?" selected":"") + '>Issues</option><option value="prs"' + (b.type==="prs"?" selected":"") + '>Pull Requests</option><option value="coverage"' + (b.type==="coverage"?" selected":"") + '>Coverage</option><option value="custom"' + (b.type==="custom"?" selected":"") + '>Custom</option></select><input type="text" placeholder="owner/repo or value" value="' + (b.value||"").replace(/"/g,"&quot;") + '" oninput="updateBadges();autoGenerate()"><button class="remove-badge" onclick="removeBadge(this)" title="Remove">\u2715</button>';
+        list.appendChild(row);
+      });
+    }
+    if (data.savedAt) {
+      document.getElementById("draft-notice").textContent = "Draft restored from " + new Date(data.savedAt).toLocaleString();
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
+function clearAll() {
+  if (!confirm("Clear all fields and start fresh?")) return;
+  document.getElementById("project-name").value = "";
+  document.getElementById("project-desc").value = "";
+  document.getElementById("tech-stack").value = "";
+  document.getElementById("features").value = "";
+  document.getElementById("github-user").value = "";
+  document.getElementById("license-type").value = "MIT";
+  document.getElementById("markdown-output").value = "";
+  document.getElementById("preview-area").innerHTML = "";
+  currentTemplate = "minimal";
+  document.querySelectorAll(".template-card").forEach(c => c.classList.toggle("active", c.dataset.template === "minimal"));
+  selectTemplate(document.querySelector(".template-card.active"));
+  const list = document.getElementById("badge-list");
+  list.innerHTML = '<div class="badge-row" data-badge-idx="0"><select onchange="updateBadges();autoGenerate()"><option value="build">Build Status</option><option value="version">Version</option><option value="license">License</option><option value="downloads">Downloads</option><option value="stars">Stars</option><option value="issues">Issues</option><option value="prs">Pull Requests</option><option value="coverage">Coverage</option><option value="custom">Custom</option></select><input type="text" placeholder="owner/repo or value" oninput="updateBadges();autoGenerate()"><button class="remove-badge" onclick="removeBadge(this)" title="Remove">\u2715</button></div>';
+  document.getElementById("badge-preview").innerHTML = "";
+  document.getElementById("draft-notice").textContent = "";
+  try { localStorage.removeItem("readme-generator-draft"); } catch(e) {}
+  showToast("Cleared!");
+}
+
+// Init
+document.addEventListener("DOMContentLoaded", function() {
+  loadDraft();
+  generateReadme();
+  updateBadges();
+});
+</script>
+
+<script defer src="https://va.vercel-scripts.com/v1/script.js"></script>
+</body>
+</html>
