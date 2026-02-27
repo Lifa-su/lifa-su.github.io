@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Slides Generator - AI幻灯片生成器 | Free Online Presentation Maker</title>
+    <meta name="description" content="Free AI-powered slide generator. Create professional presentations in minutes with 5+ templates, 6 layouts, color themes, fullscreen mode and HTML export. 免费AI幻灯片生成器。">
+    <meta name="keywords" content="AI slides generator, presentation maker, 幻灯片生成器, PPT maker, free slides, AI presentation, 演示文稿生成器">
+    <meta name="author" content="Lifa AI Tools">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="AI Slides Generator - Free Online Presentation Maker">
+    <meta property="og:description" content="Create professional presentations with AI. 5+ templates, fullscreen mode, HTML export.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lifa-su.github.io/ai-slides-generator.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Slides Generator - Free Presentation Maker">
+    <meta name="twitter:description" content="Create professional presentations with AI. Free online tool.">
+    <link rel="canonical" href="https://lifa-su.github.io/ai-slides-generator.html">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-dim: rgba(99,102,241,0.15);
+            --text-primary: #f1f1f1;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --border: #333;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        a { color: var(--accent); text-decoration: none; transition: var(--transition); }
+        a:hover { color: var(--accent-hover); }
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        input, textarea, select {
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .logo { font-size: 24px; }
+        .header-title { font-size: 20px; font-weight: 700; }
+        .header-subtitle { font-size: 12px; color: var(--text-secondary); }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .back-link {
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-link:hover { color: var(--accent); }
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .btn-icon {
+            width: 36px; height: 36px; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+        /* Main Layout */
+        .app-container {
+            display: none;
+            height: calc(100vh - 65px);
+        }
+        .app-container.active { display: flex; }
+        /* Setup Screen */
+        .setup-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 65px);
+            padding: 40px 20px;
+        }
+        .setup-screen.hidden { display: none; }
+        .setup-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            max-width: 720px;
+            width: 100%;
+            box-shadow: var(--shadow);
+        }
+        .setup-card h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .setup-card p { color: var(--text-secondary); margin-bottom: 32px; }
+        .form-group { margin-bottom: 24px; }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+        .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+        .form-input::placeholder { color: var(--text-muted); }
+        /* Option Cards */
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .option-card {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .option-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .option-card.selected { border-color: var(--accent); background: var(--accent-dim); }
+        .option-card .icon { font-size: 28px; margin-bottom: 8px; }
+        .option-card .label { font-size: 13px; font-weight: 600; }
+        .option-card .desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+        /* Slide Count */
+        .count-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        .count-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .count-btn:hover { border-color: var(--accent); }
+        .count-btn.selected { border-color: var(--accent); background: var(--accent-dim); }
+        .count-btn span { display: block; font-size: 11px; font-weight: 400; color: var(--text-secondary); margin-top: 4px; }
+        /* Color Themes */
+        .theme-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        .theme-btn {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        .theme-btn:hover { transform: scale(1.15); }
+        .theme-btn.selected { border-color: white; box-shadow: 0 0 0 3px var(--accent); }
+        .theme-btn::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        /* Editor Layout */
+        .editor-sidebar {
+            width: 220px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sidebar-header h3 { font-size: 14px; font-weight: 600; }
+        .slide-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .slide-list::-webkit-scrollbar { width: 4px; }
+        .slide-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .slide-thumb {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            min-height: 70px;
+        }
+        .slide-thumb:hover { border-color: var(--accent); }
+        .slide-thumb.active { border-color: var(--accent); background: var(--accent-dim); }
+        .slide-thumb-number {
+            font-size: 10px;
+            color: var(--text-muted);
+            position: absolute;
+            top: 4px;
+            left: 8px;
+        }
+        .slide-thumb-title {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .slide-thumb-layout {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .slide-thumb-actions {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            display: none;
+            gap: 2px;
+        }
+        .slide-thumb:hover .slide-thumb-actions { display: flex; }
+        .slide-thumb-actions button {
+            width: 20px; height: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slide-thumb-actions button:hover { color: var(--accent); border-color: var(--accent); }
+        .add-slide-btn {
+            margin: 12px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .add-slide-btn:hover { border-color: var(--accent); color: var(--accent); }
+        /* Editor Main */
+        .editor-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .editor-toolbar {
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        .toolbar-select {
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .toolbar-select:focus { border-color: var(--accent); }
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+        /* Preview Area */
+        .editor-preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+            background: var(--bg-primary);
+        }
+        .slide-preview {
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        /* Slide Layouts */
+        .slide-content {
+            width: 100%;
+            height: 100%;
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .slide-content.layout-title {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .slide-content.layout-title-content {
+            justify-content: flex-start;
+        }
+        .slide-content.layout-two-column {
+            flex-direction: row;
+            gap: 32px;
+        }
+        .slide-content.layout-image-text {
+            flex-direction: row;
+            gap: 32px;
+            align-items: center;
+        }
+        .slide-content.layout-quote {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .slide-content.layout-data {
+            justify-content: flex-start;
+        }
+        .slide-title-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .slide-title-input:focus { background: rgba(255,255,255,0.05); }
+        .slide-title-input::placeholder { color: rgba(255,255,255,0.2); }
+        .slide-body-input {
+            width: 100%;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            line-height: 1.8;
+            resize: none;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .slide-body-input:focus { background: rgba(255,255,255,0.05); }
+        .slide-body-input::placeholder { color: rgba(255,255,255,0.2); }
+        .column-half {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .image-placeholder {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            min-height: 200px;
+        }
+        .quote-mark {
+            font-size: 72px;
+            color: var(--accent);
+            line-height: 1;
+            opacity: 0.5;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .data-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+        }
+        .data-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .data-card .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        /* Speaker Notes */
+        .notes-panel {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 12px 20px;
+        }
+        .notes-toggle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            background: none;
+        }
+        .notes-toggle:hover { color: var(--accent); }
+        .notes-textarea {
+            width: 100%;
+            height: 80px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            padding: 10px;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .notes-textarea:focus { border-color: var(--accent); }
+        .notes-textarea::placeholder { color: var(--text-muted); }
+        .notes-content { display: none; }
+        .notes-content.open { display: block; }
+        /* Presentation Mode */
+        .presentation-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            z-index: 9999;
+            cursor: none;
+        }
+        .presentation-overlay.active { display: flex; align-items: center; justify-content: center; }
+        .presentation-slide {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .presentation-slide .slide-content {
+            font-size: 1.5em;
+        }
+        .presentation-slide .slide-title-input {
+            font-size: 48px;
+            pointer-events: none;
+        }
+        .presentation-slide .slide-body-input {
+            font-size: 28px;
+            pointer-events: none;
+        }
+        .pres-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10000;
+        }
+        .presentation-overlay:hover .pres-nav { opacity: 1; cursor: default; }
+        .pres-nav button {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .pres-nav button:hover { background: var(--accent); }
+        .pres-nav .pres-counter { color: rgba(255,255,255,0.6); font-size: 13px; }
+        .pres-notes-bar {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 600px;
+            width: 90%;
+            background: rgba(0,0,0,0.8);
+            color: rgba(255,255,255,0.7);
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+            z-index: 10000;
+        }
+        .presentation-overlay:hover .pres-notes-bar { opacity: 1; }
+        /* Export Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: var(--shadow);
+        }
+        .modal h3 { font-size: 20px; margin-bottom: 16px; }
+        .modal p { color: var(--text-secondary); margin-bottom: 20px; font-size: 14px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .editor-sidebar { width: 160px; }
+            .slide-preview { aspect-ratio: 4/3; }
+            .slide-title-input { font-size: 22px; }
+            .slide-body-input { font-size: 14px; }
+            .slide-content { padding: 24px; }
+            .setup-card { padding: 24px; }
+            .setup-card h2 { font-size: 22px; }
+            .option-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .data-grid { grid-template-columns: repeat(2, 1fr); }
+            .header-title { font-size: 16px; }
+        }
+        @media (max-width: 480px) {
+            .editor-sidebar { display: none; }
+            .header { padding: 12px 16px; }
+            .setup-card { padding: 20px; }
+        }
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        .slide-in { animation: slideIn 0.3s ease-out; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        /* Drag */
+        .slide-thumb.dragging { opacity: 0.5; }
+        .slide-thumb.drag-over { border-color: var(--accent); border-style: dashed; }
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 20px;
+            font-size: 13px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast.info { border-left: 3px solid var(--accent); }
+        /* Progress indicator */
+        .slide-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <span class="logo">🎯</span>
+            <div>
+                <div class="header-title">AI Slides Generator</div>
+                <div class="header-subtitle">AI幻灯片生成器</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">← 返回工具箱</a>
+        </div>
+    </header>
+
+    <!-- Setup Screen -->
+    <div class="setup-screen" id="setupScreen">
+        <div class="setup-card fade-in">
+            <h2>✨ 创建新演示文稿</h2>
+            <p>选择模板、配色和幻灯片数量，快速开始制作专业演示文稿</p>
+
+            <!-- Topic Input -->
+            <div class="form-group">
+                <label class="form-label">📝 演示主题</label>
+                <input type="text" class="form-input" id="topicInput" placeholder="例如：2026年Q1产品发布会" maxlength="100">
+            </div>
+
+            <!-- Template Selection -->
+            <div class="form-group">
+                <label class="form-label">📋 选择模板</label>
+                <div class="option-grid" id="templateGrid">
+                    <div class="option-card selected" data-template="business" onclick="selectTemplate(this)">
+                        <div class="icon">📊</div>
+                        <div class="label">商务报告</div>
+                        <div class="desc">季度汇报、年度总结</div>
+                    </div>
+                    <div class="option-card" data-template="product" onclick="selectTemplate(this)">
+                        <div class="icon">🚀</div>
+                        <div class="label">产品发布</div>
+                        <div class="desc">新品发布、功能介绍</div>
+                    </div>
+                    <div class="option-card" data-template="education" onclick="selectTemplate(this)">
+                        <div class="icon">📚</div>
+                        <div class="label">教育培训</div>
+                        <div class="desc">课程讲义、培训材料</div>
+                    </div>
+                    <div class="option-card" data-template="pitch" onclick="selectTemplate(this)">
+                        <div class="icon">💡</div>
+                        <div class="label">创业路演</div>
+                        <div class="desc">融资路演、商业计划</div>
+                    </div>
+                    <div class="option-card" data-template="tech" onclick="selectTemplate(this)">
+                        <div class="icon">⚙️</div>
+                        <div class="label">技术分享</div>
+                        <div class="desc">技术方案、架构设计</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide Count -->
+            <div class="form-group">
+                <label class="form-label">📄 幻灯片数量</label>
+                <div class="count-options" id="countOptions">
+                    <div class="count-btn selected" data-count="5" onclick="selectCount(this)">5<span>快速演示</span></div>
+                    <div class="count-btn" data-count="10" onclick="selectCount(this)">10<span>标准演示</span></div>
+                    <div class="count-btn" data-count="15" onclick="selectCount(this)">15<span>详细演示</span></div>
+                    <div class="count-btn" data-count="20" onclick="selectCount(this)">20<span>完整演示</span></div>
+                </div>
+            </div>
+
+            <!-- Color Theme -->
+            <div class="form-group">
+                <label class="form-label">🎨 配色方案</label>
+                <div class="theme-options" id="themeOptions">
+                    <button class="theme-btn selected" data-theme="indigo" data-name="靛蓝" style="background: linear-gradient(135deg, #6366f1, #818cf8);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="emerald" data-name="翡翠" style="background: linear-gradient(135deg, #10b981, #34d399);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="rose" data-name="玫瑰" style="background: linear-gradient(135deg, #f43f5e, #fb7185);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="amber" data-name="琥珀" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="cyan" data-name="青色" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="violet" data-name="紫罗兰" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);" onclick="selectTheme(this)"></button>
+                    <button class="theme-btn" data-theme="orange" data-name="橙色" style="background: linear-gradient(135deg, #f97316, #fb923c);" onclick="selectTheme(this)"></button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:16px; margin-top:8px;" onclick="startEditor()">
+                🎬 开始创建
+            </button>
+        </div>
+    </div>
+
+    <!-- Editor -->
+    <div class="app-container" id="editorContainer">
+        <!-- Sidebar - Slide Thumbnails -->
+        <div class="editor-sidebar">
+            <div class="sidebar-header">
+                <h3>📑 幻灯片</h3>
+                <span id="slideCounter" style="font-size:12px; color:var(--text-secondary);">0/0</span>
+            </div>
+            <div class="slide-list" id="slideList"></div>
+            <div class="add-slide-btn" onclick="addSlide()">+ 添加幻灯片</div>
+        </div>
+
+        <!-- Main Editor -->
+        <div class="editor-main">
+            <!-- Toolbar -->
+            <div class="editor-toolbar">
+                <div class="toolbar-group">
+                    <label>布局</label>
+                    <select class="toolbar-select" id="layoutSelect" onchange="changeLayout()">
+                        <option value="title">标题页</option>
+                        <option value="title-content">标题+内容</option>
+                        <option value="two-column">两栏布局</option>
+                        <option value="image-text">图文混排</option>
+                        <option value="quote">引用</option>
+                        <option value="data">数据展示</option>
+                    </select>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group">
+                    <label>主题</label>
+                    <select class="toolbar-select" id="themeSelect" onchange="changeThemeFromToolbar()">
+                        <option value="indigo">靛蓝</option>
+                        <option value="emerald">翡翠</option>
+                        <option value="rose">玫瑰</option>
+                        <option value="amber">琥珀</option>
+                        <option value="cyan">青色</option>
+                        <option value="violet">紫罗兰</option>
+                        <option value="orange">橙色</option>
+                    </select>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-group" style="margin-left:auto;">
+                    <button class="btn btn-secondary btn-sm" onclick="openExportModal()" title="导出HTML">📥 导出</button>
+                    <button class="btn btn-primary btn-sm" onclick="startPresentation()" title="全屏演示">▶ 演示</button>
+                </div>
+            </div>
+
+            <!-- Preview Area -->
+            <div class="editor-preview-area">
+                <div class="slide-preview" id="slidePreview">
+                    <!-- Dynamic slide content rendered here -->
+                </div>
+            </div>
+
+            <!-- Speaker Notes -->
+            <div class="notes-panel">
+                <button class="notes-toggle" onclick="toggleNotes()">
+                    <span id="notesArrow">▶</span> 演讲者备注
+                </button>
+                <div class="notes-content" id="notesContent">
+                    <textarea class="notes-textarea" id="notesInput" placeholder="在此添加演讲者备注..." oninput="updateNotes()"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Presentation Mode -->
+    <div class="presentation-overlay" id="presentationOverlay">
+        <div class="presentation-slide" id="presentationSlide"></div>
+        <div class="pres-notes-bar" id="presNotesBar"></div>
+        <div class="pres-nav">
+            <button onclick="presNav(-1)" title="上一张 (←)">◀</button>
+            <span class="pres-counter" id="presCounter">1 / 1</span>
+            <button onclick="presNav(1)" title="下一张 (→)">▶</button>
+            <button onclick="exitPresentation()" title="退出 (Esc)" style="margin-left:8px;">✕</button>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal fade-in">
+            <h3>📥 导出演示文稿</h3>
+            <p>将演示文稿导出为独立的HTML文件，可在任何浏览器中打开和演示。</p>
+            <div class="form-group">
+                <label class="form-label">文件名</label>
+                <input type="text" class="form-input" id="exportFilename" placeholder="my-presentation" value="my-presentation">
+            </div>
+            <div class="form-group">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px;">
+                    <input type="checkbox" id="exportNotes" checked> 包含演讲者备注
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeExportModal()">取消</button>
+                <button class="btn btn-success" onclick="exportPresentation()">📥 导出HTML</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== State =====
+        let slides = [];
+        let currentSlideIndex = 0;
+        let selectedTemplate = 'business';
+        let selectedCount = 5;
+        let selectedTheme = 'indigo';
+        let presIndex = 0;
+        let notesOpen = false;
+
+        const THEMES = {
+            indigo:  { primary: '#6366f1', secondary: '#818cf8', bg: '#1e1b4b', name: '靛蓝' },
+            emerald: { primary: '#10b981', secondary: '#34d399', bg: '#064e3b', name: '翡翠' },
+            rose:    { primary: '#f43f5e', secondary: '#fb7185', bg: '#4c0519', name: '玫瑰' },
+            amber:   { primary: '#f59e0b', secondary: '#fbbf24', bg: '#451a03', name: '琥珀' },
+            cyan:    { primary: '#06b6d4', secondary: '#22d3ee', bg: '#083344', name: '青色' },
+            violet:  { primary: '#8b5cf6', secondary: '#a78bfa', bg: '#2e1065', name: '紫罗兰' },
+            orange:  { primary: '#f97316', secondary: '#fb923c', bg: '#431407', name: '橙色' }
+        };
+
+        const TEMPLATES = {
+            business: {
+                name: '商务报告',
+                slides: [
+                    { title: '季度业务报告', body: '2026年第一季度\n公司名称', layout: 'title', notes: '开场白，介绍报告目的' },
+                    { title: '目录', body: '1. 业绩概览\n2. 关键指标\n3. 市场分析\n4. 下季度计划', layout: 'title-content', notes: '简要介绍各部分内容' },
+                    { title: '业绩概览', body: '本季度营收同比增长25%，用户活跃度提升18%，客户满意度达到95分。', layout: 'title-content', notes: '重点强调增长数据' },
+                    { title: '关键数据', body: '营收|增长率|用户数\n¥1.2亿|+25%|50万', layout: 'data', notes: '用数据说话' },
+                    { title: '总结与展望', body: '持续优化产品体验\n拓展新市场渠道\n加强团队建设', layout: 'title-content', notes: '总结要点，展望未来' }
+                ]
+            },
+            product: {
+                name: '产品发布',
+                slides: [
+                    { title: '全新产品发布', body: '重新定义用户体验\n产品名称 v2.0', layout: 'title', notes: '制造期待感' },
+                    { title: '痛点分析', body: '用户面临的核心问题：\n• 效率低下\n• 体验割裂\n• 成本过高', layout: 'title-content', notes: '引起共鸣' },
+                    { title: '解决方案', body: '我们的产品如何解决这些问题：\n智能化 · 一体化 · 低成本', layout: 'two-column', notes: '展示产品优势' },
+                    { title: '核心功能', body: 'AI驱动|一键操作|实时协作\n智能推荐|数据分析|云端同步', layout: 'data', notes: '逐一介绍功能亮点' },
+                    { title: '立即体验', body: '扫码下载 · 免费试用30天\nwww.example.com', layout: 'title', notes: '引导行动' }
+                ]
+            },
+            education: {
+                name: '教育培训',
+                slides: [
+                    { title: '课程主题', body: '讲师：张老师\n日期：2026年3月', layout: 'title', notes: '自我介绍' },
+                    { title: '学习目标', body: '完成本课程后，你将能够：\n1. 掌握核心概念\n2. 应用实践技能\n3. 独立完成项目', layout: 'title-content', notes: '明确学习预期' },
+                    { title: '核心概念', body: '基础理论：\n• 概念定义\n• 发展历程\n• 应用场景', layout: 'two-column', notes: '深入讲解' },
+                    { title: '实践练习', body: '动手实践是最好的学习方式', layout: 'quote', notes: '安排练习时间' },
+                    { title: '课程总结', body: '回顾要点\n推荐资源\n下次课程预告', layout: 'title-content', notes: '布置作业' }
+                ]
+            },
+            pitch: {
+                name: '创业路演',
+                slides: [
+                    { title: '项目名称', body: '一句话描述你的项目\nSeed轮融资', layout: 'title', notes: '30秒电梯演讲' },
+                    { title: '市场痛点', body: '目标市场规模：¥100亿\n核心痛点：\n• 现有方案效率低\n• 用户体验差\n• 价格不透明', layout: 'title-content', notes: '用数据支撑市场规模' },
+                    { title: '我们的方案', body: '技术创新 + 商业模式创新\n= 10倍效率提升', layout: 'image-text', notes: '展示产品demo' },
+                    { title: '商业模式', body: 'SaaS订阅|企业定制|数据服务\n月费¥99|年费¥999|按需定价', layout: 'data', notes: '说明盈利模式' },
+                    { title: '融资计划', body: '目标融资：¥500万\n用途：产品研发60% · 市场推广30% · 运营10%', layout: 'title-content', notes: '明确资金用途' }
+                ]
+            },
+            tech: {
+                name: '技术分享',
+                slides: [
+                    { title: '技术主题分享', body: '分享者：开发者\n技术社区 · 2026', layout: 'title', notes: '技术背景介绍' },
+                    { title: '技术背景', body: '为什么选择这个技术栈：\n• 性能优势\n• 生态完善\n• 社区活跃', layout: 'title-content', notes: '说明技术选型原因' },
+                    { title: '架构设计', body: '前端层 → API网关 → 微服务\n↓\n数据层 → 缓存 → 数据库', layout: 'two-column', notes: '画架构图讲解' },
+                    { title: '核心代码', body: '// 关键实现\nconst result = await\n  pipeline(data)\n    .transform()\n    .validate()\n    .save();', layout: 'quote', notes: '代码演示' },
+                    { title: 'Q&A', body: '感谢聆听\n欢迎提问和讨论\nGitHub: github.com/example', layout: 'title', notes: '准备常见问题答案' }
+                ]
+            }
+        };
+
+        const LAYOUTS = {
+            'title': '标题页',
+            'title-content': '标题+内容',
+            'two-column': '两栏布局',
+            'image-text': '图文混排',
+            'quote': '引用',
+            'data': '数据展示'
+        };
+
+        // ===== Selection Functions =====
+        function selectTemplate(el) {
+            document.querySelectorAll('#templateGrid .option-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTemplate = el.dataset.template;
+        }
+
+        function selectCount(el) {
+            document.querySelectorAll('#countOptions .count-btn').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedCount = parseInt(el.dataset.count);
+        }
+
+        function selectTheme(el) {
+            document.querySelectorAll('#themeOptions .theme-btn').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTheme = el.dataset.theme;
+        }
+
+        function changeThemeFromToolbar() {
+            selectedTheme = document.getElementById('themeSelect').value;
+            applyTheme();
+            renderSlidePreview();
+        }
+
+        function applyTheme() {
+            const theme = THEMES[selectedTheme];
+            document.documentElement.style.setProperty('--accent', theme.primary);
+            document.documentElement.style.setProperty('--accent-hover', theme.secondary);
+            document.documentElement.style.setProperty('--accent-dim', theme.primary + '26');
+        }
+
+        // ===== Start Editor =====
+        function startEditor() {
+            const topic = document.getElementById('topicInput').value.trim() || '未命名演示文稿';
+            const template = TEMPLATES[selectedTemplate];
+            
+            // Generate slides based on template and count
+            slides = [];
+            const baseSlides = template.slides;
+            for (let i = 0; i < selectedCount; i++) {
+                if (i < baseSlides.length) {
+                    slides.push({
+                        id: Date.now() + i,
+                        title: i === 0 ? topic : baseSlides[i].title,
+                        body: baseSlides[i].body,
+                        layout: baseSlides[i].layout,
+                        notes: baseSlides[i].notes || ''
+                    });
+                } else {
+                    const idx = i % baseSlides.length;
+                    slides.push({
+                        id: Date.now() + i,
+                        title: '幻灯片 ' + (i + 1),
+                        body: '在此输入内容...',
+                        layout: baseSlides[idx].layout,
+                        notes: ''
+                    });
+                }
+            }
+
+            currentSlideIndex = 0;
+            applyTheme();
+            document.getElementById('themeSelect').value = selectedTheme;
+
+            // Switch to editor view
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('editorContainer').classList.add('active');
+
+            renderSlideList();
+            renderSlidePreview();
+            showToast('演示文稿已创建：' + topic, 'success');
+        }
+
+        // ===== Render Slide List (Sidebar) =====
+        function renderSlideList() {
+            const list = document.getElementById('slideList');
+            list.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'slide-thumb' + (index === currentSlideIndex ? ' active' : '');
+                thumb.draggable = true;
+                thumb.dataset.index = index;
+                thumb.innerHTML = `
+                    <span class="slide-thumb-number">${index + 1}</span>
+                    <div class="slide-thumb-actions">
+                        <button onclick="event.stopPropagation(); duplicateSlide(${index})" title="复制">📋</button>
+                        <button onclick="event.stopPropagation(); deleteSlide(${index})" title="删除">🗑</button>
+                    </div>
+                    <div class="slide-thumb-title">${slide.title || '无标题'}</div>
+                    <div class="slide-thumb-layout">${LAYOUTS[slide.layout] || slide.layout}</div>
+                `;
+                thumb.onclick = () => {
+                    currentSlideIndex = index;
+                    renderSlideList();
+                    renderSlidePreview();
+                };
+
+                // Drag events
+                thumb.ondragstart = (e) => {
+                    e.dataTransfer.setData('text/plain', index);
+                    thumb.classList.add('dragging');
+                };
+                thumb.ondragend = () => thumb.classList.remove('dragging');
+                thumb.ondragover = (e) => { e.preventDefault(); thumb.classList.add('drag-over'); };
+                thumb.ondragleave = () => thumb.classList.remove('drag-over');
+                thumb.ondrop = (e) => {
+                    e.preventDefault();
+                    thumb.classList.remove('drag-over');
+                    const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const toIndex = index;
+                    if (fromIndex !== toIndex) {
+                        const [moved] = slides.splice(fromIndex, 1);
+                        slides.splice(toIndex, 0, moved);
+                        if (currentSlideIndex === fromIndex) currentSlideIndex = toIndex;
+                        else if (fromIndex < currentSlideIndex && toIndex >= currentSlideIndex) currentSlideIndex--;
+                        else if (fromIndex > currentSlideIndex && toIndex <= currentSlideIndex) currentSlideIndex++;
+                        renderSlideList();
+                        renderSlidePreview();
+                    }
+                };
+
+                list.appendChild(thumb);
+            });
+            document.getElementById('slideCounter').textContent = `${currentSlideIndex + 1}/${slides.length}`;
+        }
+
+        // ===== Render Slide Preview =====
+        function renderSlidePreview() {
+            const slide = slides[currentSlideIndex];
+            if (!slide) return;
+
+            const preview = document.getElementById('slidePreview');
+            const theme = THEMES[selectedTheme];
+            
+            // Update toolbar
+            document.getElementById('layoutSelect').value = slide.layout;
+            document.getElementById('notesInput').value = slide.notes || '';
+
+            // Build slide content based on layout
+            let html = '';
+            const bgStyle = `background: linear-gradient(135deg, ${theme.bg}, #0a0a0a);`;
+
+            switch (slide.layout) {
+                case 'title':
+                    html = `<div class="slide-content layout-title" style="${bgStyle}">
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="输入标题..."
+                            style="font-size:40px; color:${theme.primary}; text-align:center;">
+                        <textarea class="slide-body-input" oninput="updateSlideBody(this.value)" 
+                            placeholder="输入副标题..." style="text-align:center; flex:none; height:80px; color:${theme.secondary};">${escapeHtml(slide.body)}</textarea>
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+
+                case 'title-content':
+                    html = `<div class="slide-content layout-title-content" style="${bgStyle}">
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="输入标题..."
+                            style="color:${theme.primary};">
+                        <textarea class="slide-body-input" oninput="updateSlideBody(this.value)" 
+                            placeholder="输入内容...">${escapeHtml(slide.body)}</textarea>
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+
+                case 'two-column':
+                    const cols = (slide.body || '').split('\n');
+                    const mid = Math.ceil(cols.length / 2);
+                    const leftContent = cols.slice(0, mid).join('\n');
+                    const rightContent = cols.slice(mid).join('\n');
+                    html = `<div class="slide-content layout-title-content" style="${bgStyle}">
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="输入标题..."
+                            style="color:${theme.primary};">
+                        <div style="display:flex; gap:24px; flex:1;">
+                            <div class="column-half" style="border-right:1px solid ${theme.primary}33; padding-right:24px;">
+                                <textarea class="slide-body-input" oninput="updateTwoCol(0, this.value)" 
+                                    placeholder="左栏内容...">${escapeHtml(leftContent)}</textarea>
+                            </div>
+                            <div class="column-half">
+                                <textarea class="slide-body-input" oninput="updateTwoCol(1, this.value)" 
+                                    placeholder="右栏内容...">${escapeHtml(rightContent)}</textarea>
+                            </div>
+                        </div>
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+
+                case 'image-text':
+                    html = `<div class="slide-content layout-title-content" style="${bgStyle}">
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="输入标题..."
+                            style="color:${theme.primary};">
+                        <div style="display:flex; gap:24px; flex:1; align-items:center;">
+                            <div class="image-placeholder" style="border-color:${theme.primary}44;">
+                                <span>🖼️ 图片占位区</span>
+                            </div>
+                            <div class="column-half">
+                                <textarea class="slide-body-input" oninput="updateSlideBody(this.value)" 
+                                    placeholder="输入描述文字...">${escapeHtml(slide.body)}</textarea>
+                            </div>
+                        </div>
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+
+                case 'quote':
+                    html = `<div class="slide-content layout-quote" style="${bgStyle}">
+                        <div class="quote-mark" style="color:${theme.primary};">"</div>
+                        <textarea class="slide-body-input" oninput="updateSlideBody(this.value)" 
+                            placeholder="输入引用内容..." 
+                            style="text-align:center; font-style:italic; font-size:22px; flex:none; height:120px;">${escapeHtml(slide.body)}</textarea>
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="— 引用来源"
+                            style="font-size:18px; color:${theme.secondary}; text-align:center; margin-top:16px;">
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+
+                case 'data':
+                    const dataLines = (slide.body || '').split('\n').filter(l => l.trim());
+                    let dataHtml = '';
+                    dataLines.forEach(line => {
+                        const parts = line.split('|').map(p => p.trim());
+                        parts.forEach((part, i) => {
+                            if (i === 0 && parts.length > 1) {
+                                dataHtml += `<div class="data-card"><div class="value" style="color:${theme.primary};">${escapeHtml(part)}</div>`;
+                            } else if (parts.length > 1) {
+                                dataHtml += `<div class="label">${escapeHtml(part)}</div></div>`;
+                            } else {
+                                dataHtml += `<div class="data-card"><div class="value" style="color:${theme.primary};">${escapeHtml(part)}</div><div class="label"></div></div>`;
+                            }
+                        });
+                    });
+                    html = `<div class="slide-content layout-data" style="${bgStyle}">
+                        <input class="slide-title-input" value="${escapeHtml(slide.title)}" 
+                            oninput="updateSlideTitle(this.value)" placeholder="输入标题..."
+                            style="color:${theme.primary};">
+                        <div class="data-grid">${dataHtml}</div>
+                        <textarea class="slide-body-input" oninput="updateSlideBody(this.value)" 
+                            placeholder="数据格式：值1|值2|值3（每行一组）" 
+                            style="flex:none; height:80px; margin-top:16px; font-size:13px; opacity:0.7;">${escapeHtml(slide.body)}</textarea>
+                        <div class="slide-progress" style="width:${((currentSlideIndex+1)/slides.length)*100}%; background:${theme.primary};"></div>
+                    </div>`;
+                    break;
+            }
+
+            preview.innerHTML = html;
+        }
+
+        // ===== Helper Functions =====
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function updateSlideTitle(value) {
+            slides[currentSlideIndex].title = value;
+            // Update thumbnail
+            const thumbs = document.querySelectorAll('.slide-thumb-title');
+            if (thumbs[currentSlideIndex]) {
+                thumbs[currentSlideIndex].textContent = value || '无标题';
+            }
+        }
+
+        function updateSlideBody(value) {
+            slides[currentSlideIndex].body = value;
+        }
+
+        function updateTwoCol(colIndex, value) {
+            const slide = slides[currentSlideIndex];
+            const lines = (slide.body || '').split('\n');
+            const mid = Math.ceil(lines.length / 2);
+            let left = lines.slice(0, mid);
+            let right = lines.slice(mid);
+            if (colIndex === 0) left = value.split('\n');
+            else right = value.split('\n');
+            slide.body = left.concat(right).join('\n');
+        }
+
+        function updateNotes() {
+            slides[currentSlideIndex].notes = document.getElementById('notesInput').value;
+        }
+
+        function changeLayout() {
+            slides[currentSlideIndex].layout = document.getElementById('layoutSelect').value;
+            renderSlidePreview();
+            renderSlideList();
+        }
+
+        function toggleNotes() {
+            notesOpen = !notesOpen;
+            document.getElementById('notesContent').classList.toggle('open', notesOpen);
+            document.getElementById('notesArrow').textContent = notesOpen ? '▼' : '▶';
+        }
+
+        // ===== Slide Management =====
+        function addSlide() {
+            const theme = THEMES[selectedTheme];
+            slides.push({
+                id: Date.now(),
+                title: '新幻灯片',
+                body: '在此输入内容...',
+                layout: 'title-content',
+                notes: ''
+            });
+            currentSlideIndex = slides.length - 1;
+            renderSlideList();
+            renderSlidePreview();
+            showToast('已添加新幻灯片', 'success');
+        }
+
+        function deleteSlide(index) {
+            if (slides.length <= 1) {
+                showToast('至少保留一张幻灯片', 'error');
+                return;
+            }
+            slides.splice(index, 1);
+            if (currentSlideIndex >= slides.length) currentSlideIndex = slides.length - 1;
+            renderSlideList();
+            renderSlidePreview();
+            showToast('已删除幻灯片', 'info');
+        }
+
+        function duplicateSlide(index) {
+            const original = slides[index];
+            const copy = {
+                id: Date.now(),
+                title: original.title + ' (副本)',
+                body: original.body,
+                layout: original.layout,
+                notes: original.notes
+            };
+            slides.splice(index + 1, 0, copy);
+            currentSlideIndex = index + 1;
+            renderSlideList();
+            renderSlidePreview();
+            showToast('已复制幻灯片', 'success');
+        }
+
+        function moveSlide(fromIndex, direction) {
+            const toIndex = fromIndex + direction;
+            if (toIndex < 0 || toIndex >= slides.length) return;
+            [slides[fromIndex], slides[toIndex]] = [slides[toIndex], slides[fromIndex]];
+            currentSlideIndex = toIndex;
+            renderSlideList();
+            renderSlidePreview();
+        }
+
+        // ===== Presentation Mode =====
+        function startPresentation() {
+            presIndex = currentSlideIndex;
+            document.getElementById('presentationOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderPresSlide();
+            // Try fullscreen
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        }
+
+        function exitPresentation() {
+            document.getElementById('presentationOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            currentSlideIndex = presIndex;
+            renderSlideList();
+            renderSlidePreview();
+        }
+
+        function presNav(dir) {
+            presIndex = Math.max(0, Math.min(slides.length - 1, presIndex + dir));
+            renderPresSlide();
+        }
+
+        function renderPresSlide() {
+            const slide = slides[presIndex];
+            if (!slide) return;
+            const theme = THEMES[selectedTheme];
+            const bgStyle = `background: linear-gradient(135deg, ${theme.bg}, #000); width:100%; height:100%;`;
+            
+            let bodyHtml = (slide.body || '').replace(/\n/g, '<br>');
+            let contentHtml = '';
+
+            switch (slide.layout) {
+                case 'title':
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:60px;">
+                        <h1 style="font-size:64px; color:${theme.primary}; margin-bottom:24px; font-weight:800;">${escapeHtml(slide.title)}</h1>
+                        <p style="font-size:28px; color:${theme.secondary}; line-height:1.6;">${bodyHtml}</p>
+                    </div>`;
+                    break;
+                case 'title-content':
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; padding:60px 80px;">
+                        <h1 style="font-size:48px; color:${theme.primary}; margin-bottom:32px; font-weight:700;">${escapeHtml(slide.title)}</h1>
+                        <div style="font-size:28px; color:#e0e0e0; line-height:1.8; flex:1;">${bodyHtml}</div>
+                    </div>`;
+                    break;
+                case 'two-column':
+                    const lines = (slide.body || '').split('\n');
+                    const mid = Math.ceil(lines.length / 2);
+                    const leftHtml = lines.slice(0, mid).join('<br>');
+                    const rightHtml = lines.slice(mid).join('<br>');
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; padding:60px 80px;">
+                        <h1 style="font-size:48px; color:${theme.primary}; margin-bottom:32px; font-weight:700;">${escapeHtml(slide.title)}</h1>
+                        <div style="display:flex; gap:40px; flex:1;">
+                            <div style="flex:1; font-size:24px; color:#e0e0e0; line-height:1.8; border-right:2px solid ${theme.primary}33; padding-right:40px;">${leftHtml}</div>
+                            <div style="flex:1; font-size:24px; color:#e0e0e0; line-height:1.8;">${rightHtml}</div>
+                        </div>
+                    </div>`;
+                    break;
+                case 'image-text':
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; padding:60px 80px;">
+                        <h1 style="font-size:48px; color:${theme.primary}; margin-bottom:32px; font-weight:700;">${escapeHtml(slide.title)}</h1>
+                        <div style="display:flex; gap:40px; flex:1; align-items:center;">
+                            <div style="flex:1; background:${theme.primary}11; border:2px dashed ${theme.primary}44; border-radius:16px; display:flex; align-items:center; justify-content:center; min-height:300px;">
+                                <span style="font-size:48px;">🖼️</span>
+                            </div>
+                            <div style="flex:1; font-size:24px; color:#e0e0e0; line-height:1.8;">${bodyHtml}</div>
+                        </div>
+                    </div>`;
+                    break;
+                case 'quote':
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:80px;">
+                        <div style="font-size:120px; color:${theme.primary}; opacity:0.4; line-height:1;">"</div>
+                        <p style="font-size:32px; color:#e0e0e0; font-style:italic; line-height:1.6; max-width:800px; margin:20px 0;">${bodyHtml}</p>
+                        <p style="font-size:22px; color:${theme.secondary}; margin-top:24px;">— ${escapeHtml(slide.title)}</p>
+                    </div>`;
+                    break;
+                case 'data':
+                    const dataLines = (slide.body || '').split('\n').filter(l => l.trim());
+                    let dataCards = '';
+                    dataLines.forEach(line => {
+                        const parts = line.split('|').map(p => p.trim());
+                        parts.forEach((part, i) => {
+                            if (parts.length === 1 || i % 2 === 0) {
+                                dataCards += `<div style="background:${theme.primary}15; border-radius:16px; padding:32px; text-align:center;">
+                                    <div style="font-size:36px; font-weight:800; color:${theme.primary};">${escapeHtml(part)}</div>`;
+                            }
+                            if (parts.length > 1 && i % 2 === 1) {
+                                dataCards += `<div style="font-size:16px; color:#999; margin-top:8px;">${escapeHtml(part)}</div></div>`;
+                            } else if (parts.length === 1) {
+                                dataCards += `</div>`;
+                            }
+                        });
+                    });
+                    contentHtml = `<div style="${bgStyle} display:flex; flex-direction:column; padding:60px 80px;">
+                        <h1 style="font-size:48px; color:${theme.primary}; margin-bottom:40px; font-weight:700;">${escapeHtml(slide.title)}</h1>
+                        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px; flex:1; align-content:center;">${dataCards}</div>
+                    </div>`;
+                    break;
+            }
+
+            document.getElementById('presentationSlide').innerHTML = contentHtml;
+            document.getElementById('presCounter').textContent = `${presIndex + 1} / ${slides.length}`;
+            
+            // Show notes
+            const notesBar = document.getElementById('presNotesBar');
+            if (slide.notes) {
+                notesBar.textContent = slide.notes;
+                notesBar.style.display = '';
+            } else {
+                notesBar.style.display = 'none';
+            }
+        }
+
+        // ===== Export =====
+        function openExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('active');
+        }
+
+        function exportPresentation() {
+            const filename = (document.getElementById('exportFilename').value.trim() || 'presentation') + '.html';
+            const includeNotes = document.getElementById('exportNotes').checked;
+            const theme = THEMES[selectedTheme];
+
+            let slidesHtml = '';
+            slides.forEach((slide, i) => {
+                let bodyHtml = (slide.body || '').replace(/\n/g, '<br>');
+                let sContent = '';
+                switch (slide.layout) {
+                    case 'title':
+                        sContent = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:100%;padding:60px;">
+                            <h1 style="font-size:64px;color:${theme.primary};margin-bottom:24px;font-weight:800;">${escapeHtml(slide.title)}</h1>
+                            <p style="font-size:28px;color:${theme.secondary};line-height:1.6;">${bodyHtml}</p></div>`;
+                        break;
+                    case 'title-content':
+                        sContent = `<div style="padding:60px 80px;height:100%;display:flex;flex-direction:column;">
+                            <h1 style="font-size:48px;color:${theme.primary};margin-bottom:32px;">${escapeHtml(slide.title)}</h1>
+                            <div style="font-size:28px;color:#e0e0e0;line-height:1.8;flex:1;">${bodyHtml}</div></div>`;
+                        break;
+                    case 'two-column':
+                        const lines = (slide.body||'').split('\n'); const mid=Math.ceil(lines.length/2);
+                        sContent = `<div style="padding:60px 80px;height:100%;display:flex;flex-direction:column;">
+                            <h1 style="font-size:48px;color:${theme.primary};margin-bottom:32px;">${escapeHtml(slide.title)}</h1>
+                            <div style="display:flex;gap:40px;flex:1;">
+                            <div style="flex:1;font-size:24px;color:#e0e0e0;line-height:1.8;border-right:2px solid ${theme.primary}33;padding-right:40px;">${lines.slice(0,mid).join('<br>')}</div>
+                            <div style="flex:1;font-size:24px;color:#e0e0e0;line-height:1.8;">${lines.slice(mid).join('<br>')}</div></div></div>`;
+                        break;
+                    case 'image-text':
+                        sContent = `<div style="padding:60px 80px;height:100%;display:flex;flex-direction:column;">
+                            <h1 style="font-size:48px;color:${theme.primary};margin-bottom:32px;">${escapeHtml(slide.title)}</h1>
+                            <div style="display:flex;gap:40px;flex:1;align-items:center;">
+                            <div style="flex:1;background:${theme.primary}11;border:2px dashed ${theme.primary}44;border-radius:16px;display:flex;align-items:center;justify-content:center;min-height:300px;font-size:48px;">🖼️</div>
+                            <div style="flex:1;font-size:24px;color:#e0e0e0;line-height:1.8;">${bodyHtml}</div></div></div>`;
+                        break;
+                    case 'quote':
+                        sContent = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:100%;padding:80px;">
+                            <div style="font-size:120px;color:${theme.primary};opacity:0.4;line-height:1;">"</div>
+                            <p style="font-size:32px;color:#e0e0e0;font-style:italic;line-height:1.6;max-width:800px;margin:20px 0;">${bodyHtml}</p>
+                            <p style="font-size:22px;color:${theme.secondary};margin-top:24px;">— ${escapeHtml(slide.title)}</p></div>`;
+                        break;
+                    case 'data':
+                        const dLines = (slide.body||'').split('\n').filter(l=>l.trim());
+                        let dCards = '';
+                        dLines.forEach(line => {
+                            const parts = line.split('|').map(p=>p.trim());
+                            parts.forEach((part,pi) => {
+                                if(parts.length===1||pi%2===0) dCards+=`<div style="background:${theme.primary}15;border-radius:16px;padding:32px;text-align:center;"><div style="font-size:36px;font-weight:800;color:${theme.primary};">${escapeHtml(part)}</div>`;
+                                if(parts.length>1&&pi%2===1) dCards+=`<div style="font-size:16px;color:#999;margin-top:8px;">${escapeHtml(part)}</div></div>`;
+                                else if(parts.length===1) dCards+=`</div>`;
+                            });
+                        });
+                        sContent = `<div style="padding:60px 80px;height:100%;display:flex;flex-direction:column;">
+                            <h1 style="font-size:48px;color:${theme.primary};margin-bottom:40px;">${escapeHtml(slide.title)}</h1>
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;flex:1;align-content:center;">${dCards}</div></div>`;
+                        break;
+                }
+                const notesHtml = includeNotes && slide.notes ? `<div class="speaker-notes" style="display:none;" data-notes="${escapeHtml(slide.notes)}"></div>` : '';
+                slidesHtml += `<div class="slide" data-index="${i}" style="display:${i===0?'block':'none'};width:100%;height:100%;background:linear-gradient(135deg,${theme.bg},#000);position:absolute;top:0;left:0;">${sContent}${notesHtml}</div>`;
+            });
+
+            const exportHtml = `<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${escapeHtml(document.getElementById('topicInput')?.value || '演示文稿')}</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden;width:100vw;height:100vh;}
+.slide-container{width:100vw;height:100vh;position:relative;}.slide{transition:opacity 0.5s;}
+.nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:16px;background:rgba(0,0,0,0.7);padding:10px 20px;border-radius:30px;opacity:0;transition:opacity 0.3s;z-index:100;}
+body:hover .nav{opacity:1;}.nav button{background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;}
+.nav button:hover{background:${theme.primary};}.counter{color:rgba(255,255,255,0.6);font-size:13px;}
+${includeNotes ? `.notes-bar{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);max-width:600px;width:90%;background:rgba(0,0,0,0.8);color:rgba(255,255,255,0.7);padding:12px 20px;border-radius:8px;font-size:14px;text-align:center;opacity:0;transition:opacity 0.3s;z-index:100;}body:hover .notes-bar{opacity:1;}` : ''}
+</style></head><body>
+<div class="slide-container">${slidesHtml}</div>
+${includeNotes ? '<div class="notes-bar" id="notesBar"></div>' : ''}
+<div class="nav"><button onclick="nav(-1)">◀</button><span class="counter" id="counter">1/${slides.length}</span><button onclick="nav(1)">▶</button></div>
+<script>let idx=0;const total=${slides.length};function nav(d){const ss=document.querySelectorAll('.slide');ss[idx].style.display='none';idx=Math.max(0,Math.min(total-1,idx+d));ss[idx].style.display='block';document.getElementById('counter').textContent=(idx+1)+'/'+total;${includeNotes ? "const n=ss[idx].querySelector('.speaker-notes');document.getElementById('notesBar').textContent=n?n.dataset.notes:'';" : ''}}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);if(e.key==='Escape')window.close();});${includeNotes ? "nav(0);" : ""}</script></body></html>`;
+
+            const blob = new Blob([exportHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            closeExportModal();
+            showToast('已导出：' + filename, 'success');
+        }
+
+        // ===== Toast =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ===== Keyboard Shortcuts =====
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('presentationOverlay');
+            const isPresenting = overlay.classList.contains('active');
+
+            if (isPresenting) {
+                if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    presNav(1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+                    e.preventDefault();
+                    presNav(-1);
+                } else if (e.key === 'Escape') {
+                    exitPresentation();
+                } else if (e.key === 'Home') {
+                    presIndex = 0;
+                    renderPresSlide();
+                } else if (e.key === 'End') {
+                    presIndex = slides.length - 1;
+                    renderPresSlide();
+                }
+                return;
+            }
+
+            // Editor shortcuts
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+            if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    renderSlideList();
+                    renderSlidePreview();
+                }
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                if (currentSlideIndex < slides.length - 1) {
+                    currentSlideIndex++;
+                    renderSlideList();
+                    renderSlidePreview();
+                }
+            } else if (e.key === 'F5' || (e.key === 'p' && (e.ctrlKey || e.metaKey))) {
+                e.preventDefault();
+                startPresentation();
+            } else if (e.key === 'n' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                addSlide();
+            }
+        });
+
+        // ===== Click outside modal to close =====
+        document.getElementById('exportModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('exportModal')) closeExportModal();
+        });
+
+        // ===== Auto-save to localStorage =====
+        function autoSave() {
+            try {
+                const data = {
+                    slides, currentSlideIndex, selectedTemplate, selectedTheme,
+                    topic: document.getElementById('topicInput')?.value || ''
+                };
+                localStorage.setItem('ai-slides-data', JSON.stringify(data));
+            } catch(e) {}
+        }
+
+        function autoLoad() {
+            try {
+                const saved = localStorage.getItem('ai-slides-data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    if (data.slides && data.slides.length > 0) {
+                        if (confirm('发现上次编辑的演示文稿，是否恢复？')) {
+                            slides = data.slides;
+                            currentSlideIndex = data.currentSlideIndex || 0;
+                            selectedTheme = data.selectedTheme || 'indigo';
+                            selectedTemplate = data.selectedTemplate || 'business';
+                            applyTheme();
+                            document.getElementById('themeSelect').value = selectedTheme;
+                            document.getElementById('setupScreen').classList.add('hidden');
+                            document.getElementById('editorContainer').classList.add('active');
+                            renderSlideList();
+                            renderSlidePreview();
+                            showToast('已恢复上次编辑的演示文稿', 'success');
+                            return true;
+                        }
+                    }
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        // Auto-save every 30 seconds
+        setInterval(autoSave, 30000);
+
+        // Try to load saved data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            autoLoad();
+        });
+    </script>
+
+    <!-- Vercel Analytics -->
+    <script defer src="/_vercel/insights/script.js"></script>
+
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "AI Slides Generator",
+        "alternateName": "AI幻灯片生成器",
+        "description": "Free AI-powered slide generator. Create professional presentations with templates, themes, and fullscreen mode.",
+        "url": "https://lifa-su.github.io/ai-slides-generator.html",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Lifa AI Tools",
+            "url": "https://lifa-su.github.io"
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ultimate Regex Cheat Sheet with Real-World Examples (2026) | Lifa AI Tools Blog</title>
+<meta name="description" content="A comprehensive regex cheat sheet with real-world examples for email validation, URL parsing, log extraction, and more. Copy-paste patterns that actually work in production.">
+<meta name="keywords" content="regex cheat sheet, regular expressions, regex examples, regex patterns, email regex, url regex, regex tutorial 2026, regex reference">
+<meta property="og:title" content="The Ultimate Regex Cheat Sheet with Real-World Examples (2026)">
+<meta property="og:description" content="Stop guessing regex patterns. Copy-paste production-ready regular expressions for email, URL, IP, date validation and more.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://lifa-su.com/blog/regex-cheat-sheet-with-examples.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Ultimate Regex Cheat Sheet with Real-World Examples (2026)">
+<meta name="twitter:description" content="Production-ready regex patterns with explanations. The only cheat sheet you'll ever bookmark.">
+<link rel="canonical" href="https://lifa-su.com/blog/regex-cheat-sheet-with-examples.html">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--text:#e2e2e8;--muted:#8888a0;--accent:#6c5ce7;--accent2:#00cec9;--glow:rgba(108,92,231,0.15)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.8}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{max-width:800px;margin:0 auto;padding:20px;display:flex;justify-content:space-between;align-items:center}
+nav a.logo{font-weight:700;font-size:1.1rem;color:#fff}
+nav .links a{margin-left:20px;color:var(--muted);font-size:0.9rem}
+nav .links a:hover{color:var(--accent2)}
+.article{max-width:800px;margin:0 auto;padding:20px 20px 80px}
+.article .meta{color:var(--muted);font-size:0.85rem;margin-bottom:24px}
+.article h1{font-size:2.2rem;font-weight:800;line-height:1.3;margin-bottom:12px;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.article h2{font-size:1.5rem;font-weight:700;margin:40px 0 16px;color:#fff}
+.article h3{font-size:1.2rem;font-weight:600;margin:28px 0 12px;color:var(--accent2)}
+.article p{margin-bottom:16px;color:var(--text);font-size:1rem}
+.article ul,.article ol{margin:0 0 16px 24px}
+.article li{margin-bottom:8px;color:var(--text)}
+.article blockquote{border-left:3px solid var(--accent);padding:12px 20px;margin:20px 0;background:rgba(108,92,231,0.08);border-radius:0 8px 8px 0}
+.article code{background:rgba(108,92,231,0.15);padding:2px 6px;border-radius:4px;font-size:0.9rem;font-family:'SF Mono',Consolas,'Liberation Mono',Menlo,monospace}
+pre{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0;overflow-x:auto;font-size:0.88rem;line-height:1.6}
+pre code{background:none;padding:0;font-size:inherit}
+.regex-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;transition:border-color .25s}
+.regex-card:hover{border-color:var(--accent)}
+.regex-card h3{margin:0 0 8px;color:#fff;font-size:1.1rem}
+.regex-card .pattern{background:#0d0d15;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:8px 0;font-family:'SF Mono',Consolas,monospace;font-size:0.85rem;color:var(--accent2);word-break:break-all}
+.regex-card .explanation{font-size:0.9rem;color:var(--muted);margin-top:8px}
+.ref-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9rem}
+.ref-table th{background:var(--card);color:var(--accent2);padding:10px 12px;text-align:left;border-bottom:2px solid var(--accent)}
+.ref-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.ref-table td:first-child{font-family:'SF Mono',Consolas,monospace;color:var(--accent2);white-space:nowrap}
+.ref-table tr:hover{background:rgba(108,92,231,0.05)}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;transition:border-color .25s}
+.tool-card:hover{border-color:var(--accent)}
+.tool-card h3{margin:0 0 8px;color:#fff}
+.tool-card p{margin:0;font-size:0.95rem}
+.cta-box{background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(0,206,201,0.1));border:1px solid var(--accent);border-radius:12px;padding:24px;margin:32px 0;text-align:center}
+.cta-box a{display:inline-block;padding:10px 24px;background:var(--accent);color:#fff;border-radius:8px;font-weight:600;margin-top:12px}
+.cta-box a:hover{background:#5a4bd1;text-decoration:none}
+footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;max-width:800px;margin:0 auto}
+@media(max-width:640px){.article h1{font-size:1.6rem}.article h2{font-size:1.3rem}.ref-table{font-size:0.8rem}pre{font-size:0.8rem;padding:12px}}
+</style>
+</head>
+<body>
+<nav>
+<a class="logo" href="https://lifa-su.com/">⚡ Lifa AI Tools</a>
+<div class="links">
+<a href="https://lifa-su.com/">Home</a>
+<a href="https://lifa-su.com/blog/">Blog</a>
+<a href="https://lifa-su.com/about.html">About</a>
+</div>
+</nav>
+
+<article class="article">
+<h1>The Ultimate Regex Cheat Sheet with Real-World Examples (2026)</h1>
+<div class="meta">Published February 27, 2026 · 11 min read · Developer Tools</div>
+
+<p>Regular expressions are one of those tools that every developer needs but nobody enjoys writing from scratch. You know the pattern exists somewhere in your brain — or more likely, somewhere on Stack Overflow — but translating "match an email address" into <code>^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</code> never feels intuitive.</p>
+
+<p>This cheat sheet is different. Instead of listing every metacharacter in alphabetical order (you can find that anywhere), we've organized patterns by real-world use case. Each section includes a production-ready pattern, a plain-English explanation, and notes on edge cases. Bookmark this page — you'll be back.</p>
+
+<h2>Quick Reference: Core Syntax</h2>
+
+<p>If you need a refresher on the basics, here's the essential syntax. Skip ahead to the <a href="#real-world">real-world patterns</a> if you're already comfortable with regex fundamentals.</p>
+
+<table class="ref-table">
+<thead><tr><th>Pattern</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>.</td><td>Any character except newline</td><td><code>a.c</code> → "abc", "a1c"</td></tr>
+<tr><td>^</td><td>Start of string (or line with <code>m</code> flag)</td><td><code>^Hello</code> → "Hello world"</td></tr>
+<tr><td>$</td><td>End of string (or line with <code>m</code> flag)</td><td><code>world$</code> → "Hello world"</td></tr>
+<tr><td>*</td><td>Zero or more of previous</td><td><code>ab*c</code> → "ac", "abc", "abbc"</td></tr>
+<tr><td>+</td><td>One or more of previous</td><td><code>ab+c</code> → "abc", "abbc" (not "ac")</td></tr>
+<tr><td>?</td><td>Zero or one of previous (optional)</td><td><code>colou?r</code> → "color", "colour"</td></tr>
+<tr><td>{n,m}</td><td>Between n and m repetitions</td><td><code>a{2,4}</code> → "aa", "aaa", "aaaa"</td></tr>
+<tr><td>[abc]</td><td>Character class — any of a, b, c</td><td><code>[aeiou]</code> → any vowel</td></tr>
+<tr><td>[^abc]</td><td>Negated class — not a, b, or c</td><td><code>[^0-9]</code> → any non-digit</td></tr>
+<tr><td>\d</td><td>Digit [0-9]</td><td><code>\d{3}</code> → "123", "456"</td></tr>
+<tr><td>\w</td><td>Word character [a-zA-Z0-9_]</td><td><code>\w+</code> → "hello_world"</td></tr>
+<tr><td>\s</td><td>Whitespace (space, tab, newline)</td><td><code>\s+</code> → "   "</td></tr>
+<tr><td>\b</td><td>Word boundary</td><td><code>\bcat\b</code> → "cat" (not "catch")</td></tr>
+<tr><td>(abc)</td><td>Capture group</td><td><code>(\d+)-(\d+)</code> → groups "123" and "456"</td></tr>
+<tr><td>(?:abc)</td><td>Non-capturing group</td><td>Groups without capturing</td></tr>
+<tr><td>a|b</td><td>Alternation — a or b</td><td><code>cat|dog</code> → "cat" or "dog"</td></tr>
+<tr><td>(?=abc)</td><td>Positive lookahead</td><td><code>\d+(?=px)</code> → "12" in "12px"</td></tr>
+<tr><td>(?&lt;=abc)</td><td>Positive lookbehind</td><td><code>(?&lt;=\$)\d+</code> → "50" in "$50"</td></tr>
+</tbody>
+</table>
+
+<h2 id="real-world">Real-World Patterns You'll Actually Use</h2>
+
+<p>Here's where it gets practical. These are the patterns developers reach for most often, tested against real data and edge cases.</p>
+
+<h3>Email Validation</h3>
+
+<div class="regex-card">
+<h3>📧 Email Address</h3>
+<div class="pattern">^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</div>
+<p class="explanation">Matches standard email formats. Handles dots, hyphens, and plus-addressing (user+tag@domain.com). Requires a TLD of at least 2 characters.</p>
+</div>
+
+<p><strong>Matches:</strong> <code>user@example.com</code>, <code>first.last+tag@sub.domain.co.uk</code></p>
+<p><strong>Doesn't match:</strong> <code>@domain.com</code>, <code>user@.com</code>, <code>user@domain</code></p>
+<p><strong>Caveat:</strong> No regex can fully validate email per RFC 5322. For production, send a confirmation email — that's the only real validation. This pattern covers 99.9% of real-world addresses.</p>
+
+<h3>URL Matching</h3>
+
+<div class="regex-card">
+<h3>🔗 URL (HTTP/HTTPS)</h3>
+<div class="pattern">https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)</div>
+<p class="explanation">Matches HTTP and HTTPS URLs with optional www prefix. Handles query strings, fragments, and paths. Works for most common URL formats.</p>
+</div>
+
+<p><strong>Matches:</strong> <code>https://example.com/path?q=test#section</code>, <code>http://sub.domain.co.uk/page</code></p>
+<p><strong>Doesn't match:</strong> <code>ftp://files.example.com</code>, <code>example.com</code> (no protocol)</p>
+
+<h3>IP Address Validation</h3>
+
+<div class="regex-card">
+<h3>🌐 IPv4 Address</h3>
+<div class="pattern">^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$</div>
+<p class="explanation">Validates IPv4 addresses with proper octet range (0-255). Rejects values like 256.1.1.1 or 999.999.999.999 that simpler patterns would accept.</p>
+</div>
+
+<p><strong>Why this matters:</strong> The naive pattern <code>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}</code> matches "999.999.999.999" — which isn't a valid IP. The pattern above enforces the 0-255 range per octet.</p>
+
+<h3>Date Formats</h3>
+
+<div class="regex-card">
+<h3>📅 ISO 8601 Date (YYYY-MM-DD)</h3>
+<div class="pattern">^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$</div>
+<p class="explanation">Matches dates in ISO 8601 format with basic month (01-12) and day (01-31) validation. Doesn't validate month-day combinations (e.g., Feb 31).</p>
+</div>
+
+<div class="regex-card">
+<h3>📅 Common Date Formats (MM/DD/YYYY or DD/MM/YYYY)</h3>
+<div class="pattern">^(0[1-9]|[12]\d|3[01])[\/\-](0[1-9]|1[0-2])[\/\-]\d{4}$</div>
+<p class="explanation">Matches dates with slash or hyphen separators. Accepts both DD/MM/YYYY and MM/DD/YYYY — you'll need application logic to disambiguate.</p>
+</div>
+
+<h3>Password Strength</h3>
+
+<div class="regex-card">
+<h3>🔐 Strong Password</h3>
+<div class="pattern">^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$</div>
+<p class="explanation">Requires at least 8 characters with: one lowercase, one uppercase, one digit, and one special character. Uses lookaheads to check each requirement independently.</p>
+</div>
+
+<p><strong>How it works:</strong> Each <code>(?=.*X)</code> is a lookahead that asserts "somewhere in the string, there's an X" without consuming characters. This lets you check multiple conditions at the same position.</p>
+
+<h3>Phone Numbers</h3>
+
+<div class="regex-card">
+<h3>📱 International Phone (E.164)</h3>
+<div class="pattern">^\+[1-9]\d{1,14}$</div>
+<p class="explanation">Matches E.164 international phone format: plus sign, country code (1-3 digits), subscriber number. Total 2-15 digits after the plus.</p>
+</div>
+
+<div class="regex-card">
+<h3>📱 US Phone Number (Flexible)</h3>
+<div class="pattern">^(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$</div>
+<p class="explanation">Matches US phone numbers in various formats: (555) 123-4567, 555-123-4567, 5551234567, +1 555 123 4567.</p>
+</div>
+
+<h3>Code & Development Patterns</h3>
+
+<div class="regex-card">
+<h3>🏷️ HTML Tags</h3>
+<div class="pattern">&lt;([a-z][a-z0-9]*)\b[^&gt;]*&gt;(.*?)&lt;\/\1&gt;</div>
+<p class="explanation">Matches opening and closing HTML tag pairs. The \1 backreference ensures the closing tag matches the opening tag name. Use with caution — regex is not an HTML parser.</p>
+</div>
+
+<div class="regex-card">
+<h3>📝 Hex Color Code</h3>
+<div class="pattern">^#(?:[0-9a-fA-F]{3}){1,2}$</div>
+<p class="explanation">Matches 3-digit (#fff) and 6-digit (#ffffff) hex color codes. Case-insensitive.</p>
+</div>
+
+<div class="regex-card">
+<h3>🔢 Semantic Version (SemVer)</h3>
+<div class="pattern">^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$</div>
+<p class="explanation">Full SemVer 2.0.0 validation including pre-release tags and build metadata. Matches "1.2.3", "1.0.0-alpha.1", "2.1.0+build.123".</p>
+</div>
+
+<h3>Log Parsing</h3>
+
+<div class="regex-card">
+<h3>📋 Common Log Format (Apache/Nginx)</h3>
+<div class="pattern">^(\S+) \S+ \S+ \[([^\]]+)\] "(\S+) (\S+) \S+" (\d{3}) (\d+|-)</div>
+<p class="explanation">Extracts IP, timestamp, method, path, status code, and bytes from standard web server access logs. Groups: (1) IP, (2) timestamp, (3) method, (4) path, (5) status, (6) bytes.</p>
+</div>
+
+<pre><code># Example log line:
+# 192.168.1.1 - - [27/Feb/2026:10:15:32 +0000] "GET /api/users HTTP/1.1" 200 1234
+#
+# Captured groups:
+# Group 1: 192.168.1.1
+# Group 2: 27/Feb/2026:10:15:32 +0000
+# Group 3: GET
+# Group 4: /api/users
+# Group 5: 200
+# Group 6: 1234</code></pre>
+
+<div class="regex-card">
+<h3>📋 JSON Key-Value Extraction</h3>
+<div class="pattern">"(\w+)"\s*:\s*"([^"]*)"</div>
+<p class="explanation">Extracts string key-value pairs from JSON. Group 1 is the key, Group 2 is the value. For proper JSON parsing, use a JSON parser — but this works great for quick log grep.</p>
+</div>
+
+<h2>Advanced Techniques</h2>
+
+<h3>Named Capture Groups</h3>
+
+<p>Instead of referencing groups by number, give them names for readable code:</p>
+
+<pre><code># Python
+import re
+pattern = r'(?P&lt;year&gt;\d{4})-(?P&lt;month&gt;\d{2})-(?P&lt;day&gt;\d{2})'
+match = re.match(pattern, '2026-02-27')
+print(match.group('year'))   # 2026
+print(match.group('month'))  # 02
+
+# JavaScript
+const pattern = /(?&lt;year&gt;\d{4})-(?&lt;month&gt;\d{2})-(?&lt;day&gt;\d{2})/
+const match = '2026-02-27'.match(pattern)
+console.log(match.groups.year)   // 2026
+console.log(match.groups.month)  // 02</code></pre>
+
+<h3>Lazy vs. Greedy Quantifiers</h3>
+
+<p>By default, quantifiers are greedy — they match as much as possible. Add <code>?</code> to make them lazy:</p>
+
+<pre><code># Greedy: matches everything between FIRST &lt; and LAST &gt;
+&lt;.+&gt;   on "&lt;b&gt;bold&lt;/b&gt;" → "&lt;b&gt;bold&lt;/b&gt;"
+
+# Lazy: matches between FIRST &lt; and NEXT &gt;
+&lt;.+?&gt;  on "&lt;b&gt;bold&lt;/b&gt;" → "&lt;b&gt;", "&lt;/b&gt;"</code></pre>
+
+<p>This is one of the most common regex gotchas. When extracting content between delimiters, you almost always want the lazy version.</p>
+
+<h3>Atomic Groups & Possessive Quantifiers</h3>
+
+<p>For performance-critical regex (processing millions of lines), possessive quantifiers prevent catastrophic backtracking:</p>
+
+<pre><code># Standard (can backtrack — slow on non-matches):
+^(a+)+$
+
+# Possessive (no backtracking — fails fast):
+^(a++)++$    # Supported in Java, PCRE, .NET
+
+# Atomic group equivalent:
+^(?&gt;a+)+$    # Supported in PCRE, .NET, Ruby</code></pre>
+
+<p><strong>Rule of thumb:</strong> If your regex takes more than a second on a non-matching string, you likely have a catastrophic backtracking problem. Possessive quantifiers or atomic groups are the fix.</p>
+
+<h2>Common Mistakes to Avoid</h2>
+
+<ol>
+<li><strong>Forgetting to escape dots</strong> — <code>.</code> matches ANY character. Use <code>\.</code> for a literal dot. The pattern <code>192.168.1.1</code> also matches "192x168y1z1".</li>
+<li><strong>Greedy matching in HTML</strong> — <code>&lt;.*&gt;</code> on <code>&lt;b&gt;text&lt;/b&gt;</code> matches the entire string, not just <code>&lt;b&gt;</code>. Use <code>&lt;.*?&gt;</code> instead.</li>
+<li><strong>Not anchoring patterns</strong> — Without <code>^</code> and <code>$</code>, your pattern matches substrings. <code>\d{3}</code> matches "123" inside "abc123def".</li>
+<li><strong>Catastrophic backtracking</strong> — Nested quantifiers like <code>(a+)+</code> can cause exponential runtime. Always test with non-matching input.</li>
+<li><strong>Using regex for everything</strong> — Don't parse HTML, JSON, or XML with regex. Use a proper parser. Regex is for pattern matching, not structural parsing.</li>
+</ol>
+
+<h2>Stop Writing Regex by Hand</h2>
+
+<p>Even with this cheat sheet, writing complex regex from scratch is error-prone. Our <a href="/ai-regex-generator.html">AI Regex Generator</a> lets you describe what you want to match in plain English and generates a tested pattern instantly. It also explains each part of the pattern so you understand what it does.</p>
+
+<div class="cta-box">
+<p>🎯 Describe your pattern in English, get production-ready regex instantly. No guessing, no debugging.</p>
+<a href="/ai-regex-generator.html">Try AI Regex Generator →</a>
+</div>
+
+<h2>Related Resources</h2>
+
+<ul>
+<li><a href="/ai-regex-generator.html">AI Regex Generator — Free Online Tool</a></li>
+<li><a href="/blog/10-free-ai-tools-every-developer-needs-2026.html">10 Free AI Tools Every Developer Needs in 2026</a></li>
+<li><a href="/blog/">Browse All Blog Posts</a></li>
+</ul>
+
+</article>
+
+<footer>
+<p>© 2026 Lifa AI Tools. Free, open-source AI tools for developers.</p>
+<p style="margin-top:8px"><a href="https://lifa-su.com/">Home</a> · <a href="https://lifa-su.com/blog/">Blog</a> · <a href="https://lifa-su.com/about.html">About</a></p>
+</footer>
+
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
