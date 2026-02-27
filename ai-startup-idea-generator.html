@@ -19,7 +19,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--neon-green:#00ff88;--neon-red:#ff6b6b;--neon-blue:#00d4ff;--neon-purple:#b44dff;--neon-yellow:#ffd93d;--bg-dark:#0a0a0f;--bg-card:#12121a;--bg-card-hover:#1a1a25;--bg-reel:#08080d;--text-primary:#e8e8f0;--text-secondary:#8888a0;--text-dim:#555570;--border-color:#2a2a3a;--glow-green:0 0 10px rgba(0,255,136,0.3),0 0 20px rgba(0,255,136,0.1);--glow-red:0 0 10px rgba(255,107,107,0.3),0 0 20px rgba(255,107,107,0.1)}
+:root{--neon-green:#00ff88;--neon-red:#ff6b6b;--neon-blue:#00d4ff;--neon-purple:#b44dff;--neon-yellow:#ffd93d;--bg-dark:#0a0a0a;--bg-card:#111118;--bg-card-hover:#1a1a25;--bg-reel:#08080d;--text-primary:#e8e8f0;--text-secondary:#8888a0;--text-dim:#555570;--border-color:#2a2a3a;--glow-green:0 0 10px rgba(0,255,136,0.3),0 0 20px rgba(0,255,136,0.1);--glow-red:0 0 10px rgba(255,107,107,0.3),0 0 20px rgba(255,107,107,0.1)}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,sans-serif;background:var(--bg-dark);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 50%,rgba(0,255,136,0.03) 0%,transparent 50%),radial-gradient(ellipse at 80% 50%,rgba(255,107,107,0.03) 0%,transparent 50%),radial-gradient(ellipse at 50% 0%,rgba(0,212,255,0.02) 0%,transparent 50%);pointer-events:none;z-index:0}
 .scanline{position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,0.008) 2px,rgba(0,255,136,0.008) 4px);pointer-events:none;z-index:9999;opacity:0.4}
@@ -33,21 +33,23 @@ header h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var
 .stat-value{font-size:1.1rem;font-weight:700;color:var(--neon-green)}
 .stat-label{font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
 .slot-machine{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:28px 20px;margin:20px 0;position:relative;overflow:hidden}
-.slot-machine::before{content:'';position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--neon-green),transparent)}
-.reels-container{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+.slot-machine::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon-green),transparent)}
+.reels-container{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:10px}
 .reel-wrapper{position:relative}
-.reel-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary)}
-.lock-btn{background:none;border:1px solid var(--border-color);color:var(--text-dim);cursor:pointer;padding:3px 10px;border-radius:6px;font-size:0.7rem;transition:all 0.3s;display:flex;align-items:center;gap:3px}
-.lock-btn:hover{border-color:var(--neon-green);color:var(--neon-green)}
-.lock-btn.locked{background:rgba(0,255,136,0.1);border-color:var(--neon-green);color:var(--neon-green);box-shadow:var(--glow-green)}
-.reel{background:var(--bg-reel);border:2px solid var(--border-color);border-radius:12px;height:120px;overflow:hidden;position:relative;transition:border-color 0.3s,box-shadow 0.3s}
+.reel-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);text-align:center;margin-bottom:6px;font-weight:600}
+.lock-btn{position:absolute;top:0;right:0;background:none;border:1px solid var(--border-color);color:var(--text-dim);width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;z-index:3}
+.lock-btn:hover{border-color:var(--neon-purple);color:var(--neon-purple)}
+.lock-btn.locked{background:rgba(180,77,255,0.15);border-color:var(--neon-purple);color:var(--neon-purple)}
+.reel{height:120px;background:var(--bg-reel);border:1px solid var(--border-color);border-radius:10px;overflow:hidden;position:relative}
 .reel::before,.reel::after{content:'';position:absolute;left:0;right:0;height:30px;z-index:2;pointer-events:none}
 .reel::before{top:0;background:linear-gradient(to bottom,var(--bg-reel) 0%,transparent 100%)}
 .reel::after{bottom:0;background:linear-gradient(to top,var(--bg-reel) 0%,transparent 100%)}
 .reel.highlight{border-color:var(--neon-green);box-shadow:var(--glow-green)}
 .reel.locked-reel{border-color:var(--neon-purple);box-shadow:0 0 10px rgba(180,77,255,0.2)}
-.reel-track{position:relative;height:100%;transition:transform 0.1s linear}
+.reel-track{position:relative;height:100%}
 .reel-item{height:120px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;font-size:0.92rem;font-weight:600;color:var(--text-primary);line-height:1.3}
+@keyframes reelSpin{0%{transform:translateY(0)}100%{transform:translateY(-120px)}}
+.reel-track.spinning{animation:reelSpin 0.08s linear infinite}
 .spin-section{text-align:center;margin-top:10px}
 .spin-btn{background:linear-gradient(135deg,var(--neon-green),#00cc6a);color:#000;border:none;padding:14px 52px;font-size:1.1rem;font-weight:800;border-radius:12px;cursor:pointer;transition:all 0.3s;text-transform:uppercase;letter-spacing:2px;position:relative;overflow:hidden}
 .spin-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,255,136,0.35)}
@@ -56,6 +58,7 @@ header h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var
 .spin-btn::after{content:'';position:absolute;top:-50%;left:-60%;width:200%;height:200%;background:linear-gradient(transparent,rgba(255,255,255,0.15),transparent);transform:rotate(45deg);transition:left 0.6s}
 .spin-btn:hover::after{left:120%}
 .spin-hint{color:var(--text-dim);font-size:0.78rem;margin-top:8px}
+
 .result-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:24px;margin:20px 0;position:relative;overflow:hidden;display:none}
 .result-card.visible{display:block;animation:fadeInUp 0.5s ease}
 .result-card::before{content:'';position:absolute;top:-1px;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--neon-red),transparent)}
@@ -101,6 +104,7 @@ header h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var
 .empty-state{text-align:center;padding:40px 20px;color:var(--text-dim)}
 .empty-icon{font-size:2.5rem;margin-bottom:10px;display:block}
 .empty-state p{font-size:0.88rem}
+
 .share-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .share-modal.visible{display:flex}
 .share-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:28px;max-width:500px;width:100%;position:relative;animation:fadeInUp 0.3s ease}
@@ -148,6 +152,7 @@ header h1{font-size:1.6rem}
 .tab-bar{gap:6px}
 .tab-btn{padding:8px 12px;font-size:0.78rem}
 }
+
 </style>
 </head>
 <body>
@@ -158,35 +163,39 @@ header h1{font-size:1.6rem}
 <h1>AI Startup Idea Generator</h1>
 <p class="subtitle">Spin the reels. Discover your next billion-dollar idea.</p>
 </header>
-<div class="stats-bar" aria-label="Statistics">
-<div class="stat-item"><div class="stat-value" id="statCombos">75,000+</div><div class="stat-label">Combinations</div></div>
-<div class="stat-item"><div class="stat-value" id="statSpins">0</div><div class="stat-label">Spins</div></div>
-<div class="stat-item"><div class="stat-value" id="statFavs">0</div><div class="stat-label">Saved</div></div>
+<div class="stats-bar">
+<div class="stat-item"><div class="stat-value" id="totalCombos">0</div><div class="stat-label">Combinations</div></div>
+<div class="stat-item"><div class="stat-value" id="industriesCount">0</div><div class="stat-label">Industries</div></div>
+<div class="stat-item"><div class="stat-value" id="painCount">0</div><div class="stat-label">Pain Points</div></div>
+<div class="stat-item"><div class="stat-value" id="modelCount">0</div><div class="stat-label">Models</div></div>
 </div>
-<section class="slot-machine" aria-label="Startup idea slot machine">
+<div class="slot-machine">
 <div class="reels-container">
 <div class="reel-wrapper">
-<div class="reel-label"><span>🏭 Industry</span><button class="lock-btn" onclick="toggleLock(0)" aria-label="Lock industry reel"><span class="lock-icon">🔓</span> Lock</button></div>
-<div class="reel" id="reel0"><div class="reel-track" id="track0"></div></div>
+<div class="reel-label">🏭 Industry</div>
+<button class="lock-btn" onclick="toggleLock(0)" aria-label="Lock industry reel">🔓</button>
+<div class="reel"><div class="reel-track" id="track0"><div class="reel-item">Press Spin!</div></div></div>
 </div>
 <div class="reel-wrapper">
-<div class="reel-label"><span>😤 Pain Point</span><button class="lock-btn" onclick="toggleLock(1)" aria-label="Lock pain point reel"><span class="lock-icon">🔓</span> Lock</button></div>
-<div class="reel" id="reel1"><div class="reel-track" id="track1"></div></div>
+<div class="reel-label">😤 Pain Point</div>
+<button class="lock-btn" onclick="toggleLock(1)" aria-label="Lock pain point reel">🔓</button>
+<div class="reel"><div class="reel-track" id="track1"><div class="reel-item">Press Spin!</div></div></div>
 </div>
 <div class="reel-wrapper">
-<div class="reel-label"><span>💰 Biz Model</span><button class="lock-btn" onclick="toggleLock(2)" aria-label="Lock business model reel"><span class="lock-icon">🔓</span> Lock</button></div>
-<div class="reel" id="reel2"><div class="reel-track" id="track2"></div></div>
+<div class="reel-label">💰 Business Model</div>
+<button class="lock-btn" onclick="toggleLock(2)" aria-label="Lock business model reel">🔓</button>
+<div class="reel"><div class="reel-track" id="track2"><div class="reel-item">Press Spin!</div></div></div>
 </div>
 </div>
 <div class="spin-section">
-<button class="spin-btn" id="spinBtn" onclick="spin()">🎰 SPIN TO GENERATE</button>
-<p class="spin-hint">Press Space or click to spin &middot; Lock reels to filter</p>
+<button class="spin-btn" id="spinBtn" onclick="spin()">🎰 SPIN</button>
+<p class="spin-hint">Press Space or click to spin • Lock reels with 🔓</p>
 </div>
-</section>
-<section class="result-card" id="resultCard" aria-label="Generated startup idea">
+</div>
+<section class="result-card" id="resultCard" aria-live="polite">
 <div class="result-header">
-<div style="flex:1;min-width:0">
-<div class="result-combo" id="resultCombo"></div>
+<div>
+<div class="result-combo" id="comboParts"></div>
 <div class="elevator-pitch" id="elevatorPitch"></div>
 </div>
 <div class="result-actions">
@@ -209,23 +218,378 @@ header h1{font-size:1.6rem}
 <button class="tab-btn active" onclick="switchTab('history')" role="tab" data-tab="history">📜 History <span class="tab-badge" id="histBadge">0</span></button>
 <button class="tab-btn" onclick="switchTab('favorites')" role="tab" data-tab="favorites">⭐ Favorites <span class="tab-badge" id="favBadge">0</span></button>
 </div>
-<div class="tab-content active" id="tab-history" role="tabpanel"><div id="historyList"><div class="empty-state"><span class="empty-icon">🎲</span><p>No ideas generated yet. Spin the reels!</p></div></div></div>
-<div class="tab-content" id="tab-favorites" role="tabpanel"><div id="favList"><div class="empty-state"><span class="empty-icon">⭐</span><p>No favorites yet. Heart an idea to save it!</p></div></div></div>
+<div class="tab-content active" id="tab-history" role="tabpanel">
+<div id="historyList"><div class="empty-state"><span class="empty-icon">🎲</span><p>No ideas generated yet. Spin the reels!</p></div></div>
+</div>
+<div class="tab-content" id="tab-favorites" role="tabpanel">
+<div id="favList"><div class="empty-state"><span class="empty-icon">⭐</span><p>No favorites yet. Heart an idea to save it!</p></div></div>
+</div>
 <div class="share-modal" id="shareModal" role="dialog" aria-label="Share idea">
 <div class="share-card">
 <button class="share-close" onclick="closeShare()" aria-label="Close">&times;</button>
 <div class="share-title">Share This Idea</div>
 <div class="share-preview" id="sharePreview"></div>
 <div class="share-btns">
-<a class="share-btn tw" id="twLink" href="#" target="_blank" rel="noopener noreferrer">🐦 Twitter</a>
+<a class="share-btn tw" id="twLink" href="#" target="_blank" rel="noopener noreferrer">🐦 Tweet</a>
 <button class="share-btn cp" onclick="copyIdea()">📋 Copy</button>
 <a class="share-btn li" id="liLink" href="#" target="_blank" rel="noopener noreferrer">💼 LinkedIn</a>
 </div>
 </div>
 </div>
 <footer>
-<p>Built with 💚 by <a href="https://lifa-su.github.io/">Lifa Tools</a></p>
-<p><a href="https://lifa-su.github.io/">More Free AI Tools</a> &middot; Spin responsibly. Not financial advice. 😄</p>
+<p>🎰 AI Startup Idea Generator — <span id="totalGenerated">75,000+</span> possible combinations</p>
+<p>Built with ❤️ by <a href="https://lifa-su.github.io/">Lifa Tools</a> • <a href="https://lifa-su.github.io/tools.html">More Free Tools</a></p>
 </footer>
 </div>
 <div class="toast" id="toast"></div>
+
+<script>
+const INDUSTRIES = ["Healthcare", "FinTech", "EdTech", "E-commerce", "Real Estate", "Agriculture", "Logistics", "Travel", "Food & Beverage", "Entertainment", "Fitness & Wellness", "Legal Tech", "HR & Recruiting", "Cybersecurity", "Climate Tech", "Mental Health", "Pet Care", "Fashion", "Gaming", "Music", "Sports", "Insurance", "Construction", "Automotive", "Aerospace", "Biotech", "Robotics", "IoT / Smart Home", "Social Media", "Dating", "Parenting", "Senior Care", "Freelancing", "Creator Economy", "Sustainability", "Energy", "Mining", "Telecom", "Government", "Nonprofit", "Beauty", "Dental", "Pharmacy", "Veterinary", "Photography", "Event Planning", "Interior Design", "Podcasting", "Newsletter", "No-Code Tools", "AI Infrastructure", "Developer Tools", "Data Analytics", "Supply Chain", "Waste Management", "Water Tech", "Space Tech", "AR / VR", "Blockchain", "Web3"];
+const PAIN_POINTS = ["Too expensive", "Too slow", "Too complicated", "No transparency", "Bad customer support", "Data silos", "Manual processes", "Talent shortage", "High churn rate", "Poor onboarding", "Information overload", "Compliance burden", "Fragmented tools", "No personalization", "Trust deficit", "Language barriers", "Accessibility gaps", "Scheduling chaos", "Payment friction", "Discovery problem", "Quality inconsistency", "Supply-demand mismatch", "Skill gaps", "Burnout & overwork", "Privacy concerns", "Vendor lock-in", "Legacy systems", "Poor collaboration", "Wasted resources", "Long sales cycles", "Inventory management", "Fraud & scams", "Content creation bottleneck", "Decision fatigue", "Lack of mentorship", "Geographic limitations", "Regulatory complexity", "Integration nightmares", "Poor documentation", "Customer retention", "Pricing confusion", "Feedback loops broken", "Onboarding friction", "Knowledge management", "Communication gaps", "Scaling challenges", "Technical debt", "Market research gaps", "Brand building difficulty", "ROI measurement", "Cross-border complexity", "Environmental impact tracking", "Digital literacy gaps"];
+const BIZ_MODELS = ["SaaS Subscription", "Marketplace", "Freemium", "API-as-a-Service", "White Label", "Consulting + Software", "Usage-Based Pricing", "Community Membership", "Affiliate Platform", "Data Licensing", "Hardware + Software", "Micro-transactions", "Ad-Supported Free", "Enterprise License", "Open Source + Premium", "Franchise Model", "Pay-Per-Result", "Reverse Auction", "Aggregator", "Vertical SaaS", "Embedded Finance", "Creator Tools", "B2B2C Platform", "Managed Service", "Productized Service", "Peer-to-Peer", "Tokenized / Web3", "Insurance Model", "Rental / Leasing", "Bundle & Save", "Outcome-Based Pricing", "Sponsorship Model", "Licensing & Royalties", "Cooperative Model"];
+const TARGET_USERS = ["Solo entrepreneurs", "SMB owners (10-50 employees)", "Enterprise CTOs", "Freelancers & gig workers", "College students", "Working parents", "Remote teams", "Healthcare professionals", "Teachers & educators", "Content creators", "Real estate agents", "Restaurant owners", "Fitness trainers", "Legal professionals", "HR managers", "Financial advisors", "Non-profit orgs", "Government agencies", "Retail store owners", "E-commerce sellers", "SaaS founders", "Product managers", "UX designers", "Data scientists", "Marketing agencies", "Sales teams", "Customer success managers", "Supply chain managers", "DevOps engineers", "Venture capitalists"];
+const COMP_EDGES = ["AI automation reduces costs by 80%", "Real-time analytics no competitor offers", "10x faster than existing solutions", "First mover in underserved niche", "Network effects create natural moat", "Proprietary dataset competitors can't replicate", "Vertical integration end to end", "Community-driven flywheel effect", "Patent-pending technology", "White-glove onboarding competitors skip", "API-first enables infinite integrations", "Mobile-first when competitors are desktop-only", "Transparent pricing in opaque market", "Built-in compliance automation", "Hyper-personalization via ML", "No-code interface for non-technical users", "Cross-border support out of the box", "Offline-first capability", "Open-source core builds trust", "Gamification drives 3x engagement"];
+const MARKET_SIZES = ["$2.1B", "$3.5B", "$5.8B", "$7.2B", "$8.9B", "$12B", "$15B", "$18.4B", "$22B", "$28B", "$35B", "$42B", "$50B", "$65B", "$78B", "$95B", "$120B", "$150B", "$180B", "$210B"];
+const FIRST_STEPS = ["Interview 20 potential users and validate the core pain point", "Build a no-code MVP using Bubble or Webflow in 2 weeks", "Launch a landing page and collect 500 email signups", "Create a competitive analysis of top 5 players", "Ship a Chrome extension as proof of concept", "Run 3 paid ads experiments to test messaging", "Partner with 2 industry influencers for early traction", "Set up analytics and define your North Star metric", "Write 10 SEO blog posts for organic traffic", "Build a Slack/Discord community of early adopters", "Create a free tool that solves 10% of the problem", "Attend 3 industry conferences and pitch to strangers", "Launch on Product Hunt with a compelling story", "Offer free pilot to 5 companies for case studies", "Record 5 demo videos showing the product in action", "Set up a referral program with 2-sided incentives", "Publish a research report for thought leadership", "Build integrations with 3 popular tools in the space", "Create a comparison page vs top competitors for SEO", "Host a free webinar to generate qualified leads"];
+
+
+let isSpinning = false;
+let currentIdea = null;
+let history = JSON.parse(localStorage.getItem('sig_history') || '[]');
+let favorites = JSON.parse(localStorage.getItem('sig_favorites') || '[]');
+let lockedReels = [false, false, false];
+let currentValues = [null, null, null];
+let spinCount = parseInt(localStorage.getItem('sig_spinCount') || '0');
+
+function init() {
+  updateBadges();
+  renderHistory();
+  renderFavorites();
+  document.getElementById('totalCombos').textContent = (INDUSTRIES.length * PAIN_POINTS.length * BIZ_MODELS.length).toLocaleString();
+  document.getElementById('industriesCount').textContent = INDUSTRIES.length;
+  document.getElementById('painCount').textContent = PAIN_POINTS.length;
+  document.getElementById('modelCount').textContent = BIZ_MODELS.length;
+  // Set initial reel values
+  [INDUSTRIES, PAIN_POINTS, BIZ_MODELS].forEach((arr, i) => {
+    const track = document.getElementById('track' + i);
+    const val = arr[Math.floor(Math.random() * arr.length)];
+    track.innerHTML = '<div class="reel-item">' + val + '</div>';
+    currentValues[i] = val;
+  });
+}
+
+function toggleLock(idx) {
+  if (isSpinning) return;
+  lockedReels[idx] = !lockedReels[idx];
+  const btn = document.querySelectorAll('.lock-btn')[idx];
+  const reel = document.querySelectorAll('.reel')[idx];
+  btn.classList.toggle('locked');
+  btn.textContent = lockedReels[idx] ? '🔒' : '🔓';
+  reel.classList.toggle('locked-reel');
+}
+
+function pickRandom(arr, exclude) {
+  let val;
+  do { val = arr[Math.floor(Math.random() * arr.length)]; } while (val === exclude && arr.length > 1);
+  return val;
+}
+
+function spin() {
+  if (isSpinning) return;
+  isSpinning = true;
+  const btn = document.getElementById('spinBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ SPINNING...';
+  document.getElementById('resultCard').classList.remove('visible');
+
+  const datasets = [INDUSTRIES, PAIN_POINTS, BIZ_MODELS];
+  const delays = [1200, 1800, 2400];
+  const finalValues = [null, null, null];
+
+  datasets.forEach((data, i) => {
+    const track = document.getElementById('track' + i);
+    const reel = document.querySelectorAll('.reel')[i];
+    if (lockedReels[i]) {
+      finalValues[i] = currentValues[i];
+      return;
+    }
+    // Build spinning items
+    let items = '';
+    for (let j = 0; j < 30; j++) {
+      items += '<div class="reel-item">' + data[Math.floor(Math.random() * data.length)] + '</div>';
+    }
+    const final = pickRandom(data, currentValues[i]);
+    items += '<div class="reel-item">' + final + '</div>';
+    finalValues[i] = final;
+    track.innerHTML = items;
+    track.classList.add('spinning');
+    reel.classList.add('highlight');
+
+    setTimeout(() => {
+      track.classList.remove('spinning');
+      track.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+      track.style.transform = 'translateY(-' + (30 * 120) + 'px)';
+      setTimeout(() => {
+        track.innerHTML = '<div class="reel-item">' + final + '</div>';
+        track.style.transition = 'none';
+        track.style.transform = 'translateY(0)';
+        reel.classList.remove('highlight');
+      }, 650);
+    }, delays[i]);
+  });
+
+  setTimeout(() => {
+    currentValues = finalValues;
+    generateIdea(finalValues[0], finalValues[1], finalValues[2]);
+    isSpinning = false;
+    btn.disabled = false;
+    btn.textContent = '🎰 SPIN';
+    spinCount++;
+    localStorage.setItem('sig_spinCount', spinCount);
+  }, 3100);
+}
+
+function generateIdea(industry, painPoint, bizModel) {
+  const pitch = generatePitch(industry, painPoint, bizModel);
+  const target = pickRandom(TARGET_USERS);
+  const edge = pickRandom(COMP_EDGES);
+  const market = pickRandom(MARKET_SIZES);
+  const diff = Math.floor(Math.random() * 5) + 1;
+  const steps = [];
+  const used = new Set();
+  while (steps.length < 3) {
+    const s = pickRandom(FIRST_STEPS);
+    if (!used.has(s)) { steps.push(s); used.add(s); }
+  }
+
+  currentIdea = { industry, painPoint, bizModel, pitch, target, edge, market, difficulty: diff, steps, timestamp: Date.now() };
+
+  // Update UI
+  document.getElementById('comboParts').innerHTML =
+    '<span class="combo-tag">' + industry + '</span> × <span class="combo-tag">' + painPoint + '</span> × <span class="combo-tag">' + bizModel + '</span>';
+  document.getElementById('elevatorPitch').textContent = pitch;
+  document.getElementById('targetUsers').textContent = target;
+  document.getElementById('compEdge').textContent = edge;
+  document.getElementById('marketSize').textContent = market;
+  document.getElementById('difficulty').textContent = '★'.repeat(diff) + '☆'.repeat(5 - diff);
+  let stepsHtml = '';
+  steps.forEach((s, i) => {
+    stepsHtml += '<div class="plan-step"><div class="step-num">' + (i+1) + '</div><div class="step-text">' + s + '</div></div>';
+  });
+  document.getElementById('planSteps').innerHTML = stepsHtml;
+
+  // Update fav button
+  const isFav = favorites.some(f => f.pitch === pitch);
+  document.getElementById('favBtn').textContent = isFav ? '❤️' : '🤍';
+  document.getElementById('favBtn').classList.toggle('favorited', isFav);
+
+  document.getElementById('resultCard').classList.add('visible');
+
+  // Add to history
+  history.unshift(currentIdea);
+  if (history.length > 20) history = history.slice(0, 20);
+  localStorage.setItem('sig_history', JSON.stringify(history));
+  renderHistory();
+  updateBadges();
+}
+
+function generatePitch(ind, pain, biz) {
+  const templates = [
+    `An AI-powered ${biz.toLowerCase()} platform that solves "${pain.toLowerCase()}" in the ${ind.toLowerCase()} industry`,
+    `A ${biz.toLowerCase()} solution using AI to eliminate ${pain.toLowerCase()} for ${ind.toLowerCase()} professionals`,
+    `Disrupting ${ind.toLowerCase()} by tackling ${pain.toLowerCase()} through an innovative ${biz.toLowerCase()} model`,
+    `The first ${biz.toLowerCase()} built specifically to address ${pain.toLowerCase()} in ${ind.toLowerCase()}`,
+    `AI meets ${ind.toLowerCase()}: a ${biz.toLowerCase()} approach to finally fix ${pain.toLowerCase()}`,
+    `Reimagining ${ind.toLowerCase()} with a ${biz.toLowerCase()} that makes ${pain.toLowerCase()} a thing of the past`,
+    `A next-gen ${biz.toLowerCase()} platform where ${ind.toLowerCase()} meets AI to solve ${pain.toLowerCase()}`,
+    `Transforming how ${ind.toLowerCase()} handles ${pain.toLowerCase()} via a smart ${biz.toLowerCase()} model`
+  ];
+  return templates[Math.floor(Math.random() * templates.length)];
+}
+
+function toggleFavorite() {
+  if (!currentIdea) return;
+  const idx = favorites.findIndex(f => f.pitch === currentIdea.pitch);
+  if (idx >= 0) {
+    favorites.splice(idx, 1);
+    document.getElementById('favBtn').textContent = '🤍';
+    document.getElementById('favBtn').classList.remove('favorited');
+    showToast('Removed from favorites');
+  } else {
+    favorites.unshift(currentIdea);
+    document.getElementById('favBtn').textContent = '❤️';
+    document.getElementById('favBtn').classList.add('favorited');
+    showToast('Added to favorites! ⭐');
+  }
+  localStorage.setItem('sig_favorites', JSON.stringify(favorites));
+  renderFavorites();
+  updateBadges();
+}
+
+function removeFavorite(idx) {
+  favorites.splice(idx, 1);
+  localStorage.setItem('sig_favorites', JSON.stringify(favorites));
+  renderFavorites();
+  updateBadges();
+  if (currentIdea && !favorites.some(f => f.pitch === currentIdea.pitch)) {
+    document.getElementById('favBtn').textContent = '🤍';
+    document.getElementById('favBtn').classList.remove('favorited');
+  }
+  showToast('Removed from favorites');
+}
+
+function removeHistory(idx) {
+  history.splice(idx, 1);
+  localStorage.setItem('sig_history', JSON.stringify(history));
+  renderHistory();
+  updateBadges();
+  showToast('Removed from history');
+}
+
+function updateBadges() {
+  document.getElementById('histBadge').textContent = history.length;
+  document.getElementById('favBadge').textContent = favorites.length;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (history.length === 0) {
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">🎲</span><p>No ideas generated yet. Spin the reels!</p></div>';
+    return;
+  }
+  el.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="loadIdea(${i}, 'history')">
+      <div class="hi-combo">${h.industry} × ${h.painPoint} × ${h.bizModel}</div>
+      <div class="hi-pitch">${h.pitch}</div>
+      <div class="hi-meta">
+        <span class="hi-time">${timeAgo(h.timestamp)}</span>
+        <div class="hi-actions">
+          <button class="hi-btn" onclick="event.stopPropagation();removeHistory(${i})">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFavorites() {
+  const el = document.getElementById('favList');
+  if (favorites.length === 0) {
+    el.innerHTML = '<div class="empty-state"><span class="empty-icon">⭐</span><p>No favorites yet. Heart an idea to save it!</p></div>';
+    return;
+  }
+  el.innerHTML = favorites.map((f, i) => `
+    <div class="history-item" onclick="loadIdea(${i}, 'favorites')">
+      <div class="hi-combo">${f.industry} × ${f.painPoint} × ${f.bizModel}</div>
+      <div class="hi-pitch">${f.pitch}</div>
+      <div class="hi-meta">
+        <span class="hi-time">${timeAgo(f.timestamp)}</span>
+        <div class="hi-actions">
+          <button class="hi-btn hi-fav" onclick="event.stopPropagation();removeFavorite(${i})">💔</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadIdea(idx, source) {
+  const idea = source === 'history' ? history[idx] : favorites[idx];
+  if (!idea) return;
+  currentIdea = idea;
+  currentValues = [idea.industry, idea.painPoint, idea.bizModel];
+  // Update reels
+  ['track0','track1','track2'].forEach((id, i) => {
+    document.getElementById(id).innerHTML = '<div class="reel-item">' + currentValues[i] + '</div>';
+  });
+  // Update result card
+  document.getElementById('comboParts').innerHTML =
+    '<span class="combo-tag">' + idea.industry + '</span> × <span class="combo-tag">' + idea.painPoint + '</span> × <span class="combo-tag">' + idea.bizModel + '</span>';
+  document.getElementById('elevatorPitch').textContent = idea.pitch;
+  document.getElementById('targetUsers').textContent = idea.target;
+  document.getElementById('compEdge').textContent = idea.edge;
+  document.getElementById('marketSize').textContent = idea.market;
+  document.getElementById('difficulty').textContent = '★'.repeat(idea.difficulty) + '☆'.repeat(5 - idea.difficulty);
+  let stepsHtml = '';
+  idea.steps.forEach((s, i) => {
+    stepsHtml += '<div class="plan-step"><div class="step-num">' + (i+1) + '</div><div class="step-text">' + s + '</div></div>';
+  });
+  document.getElementById('planSteps').innerHTML = stepsHtml;
+  const isFav = favorites.some(f => f.pitch === idea.pitch);
+  document.getElementById('favBtn').textContent = isFav ? '❤️' : '🤍';
+  document.getElementById('favBtn').classList.toggle('favorited', isFav);
+  document.getElementById('resultCard').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openShare() {
+  if (!currentIdea) return;
+  const p = document.getElementById('sharePreview');
+  p.innerHTML = `
+    <div class="sp-combo">${currentIdea.industry} × ${currentIdea.painPoint} × ${currentIdea.bizModel}</div>
+    <div class="sp-pitch">${currentIdea.pitch}</div>
+    <div class="sp-grid">
+      <div class="sp-item"><div class="sp-item-label">Target</div><div class="sp-item-val">${currentIdea.target}</div></div>
+      <div class="sp-item"><div class="sp-item-label">Market</div><div class="sp-item-val">${currentIdea.market}</div></div>
+      <div class="sp-item"><div class="sp-item-label">Edge</div><div class="sp-item-val">${currentIdea.edge}</div></div>
+      <div class="sp-item"><div class="sp-item-label">Difficulty</div><div class="sp-item-val">${'★'.repeat(currentIdea.difficulty)}${'☆'.repeat(5-currentIdea.difficulty)}</div></div>
+    </div>
+    <div class="sp-footer">Generated by AI Startup Idea Generator — lifa-su.github.io</div>
+  `;
+  const tweetText = encodeURIComponent(`🎰 AI Startup Idea:\n\n${currentIdea.pitch}\n\n${currentIdea.industry} × ${currentIdea.painPoint} × ${currentIdea.bizModel}\n\nGenerate yours 👉 lifa-su.github.io/ai-startup-idea-generator.html`);
+  document.getElementById('twLink').href = 'https://twitter.com/intent/tweet?text=' + tweetText;
+  const liUrl = encodeURIComponent('https://lifa-su.github.io/ai-startup-idea-generator.html');
+  document.getElementById('liLink').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + liUrl;
+  document.getElementById('shareModal').classList.add('visible');
+}
+
+function closeShare() {
+  document.getElementById('shareModal').classList.remove('visible');
+}
+
+function copyIdea() {
+  if (!currentIdea) return;
+  const text = `🎰 AI Startup Idea\n\n${currentIdea.pitch}\n\nIndustry: ${currentIdea.industry}\nPain Point: ${currentIdea.painPoint}\nBusiness Model: ${currentIdea.bizModel}\nTarget: ${currentIdea.target}\nMarket: ${currentIdea.market}\nEdge: ${currentIdea.edge}\nDifficulty: ${'★'.repeat(currentIdea.difficulty)}${'☆'.repeat(5-currentIdea.difficulty)}\n\nFirst Month Plan:\n${currentIdea.steps.map((s,i) => (i+1)+'. '+s).join('\n')}\n\nGenerated at lifa-su.github.io/ai-startup-idea-generator.html`;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard! 📋'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !isSpinning && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    spin();
+  }
+  if (e.code === 'Escape') closeShare();
+});
+
+// Close modal on backdrop click
+document.getElementById('shareModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeShare();
+});
+
+// Init
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
