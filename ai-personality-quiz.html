@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Personality Quiz - Which AI Tool Are You? | Lifa AI Tools</title>
+<meta name="description" content="Take this fun personality quiz to discover which AI tool matches your personality. Are you ChatGPT, Notion, VS Code, or something else? Share your result!">
+<meta property="og:title" content="Which AI Tool Are You? 🤖 Take the Quiz!">
+<meta property="og:description" content="I just found out which AI tool I am. Take the quiz and find out yours!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-personality-quiz.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Which AI Tool Are You? 🤖">
+<meta name="twitter:description" content="I just found out which AI tool matches my personality. Take the quiz!">
+<meta name="keywords" content="AI personality quiz, which AI tool are you, personality test, AI quiz, fun quiz, tech personality">
+<link rel="canonical" href="https://lifa-su.com/ai-personality-quiz.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--card:#1a1a1a;--border:#2a2a2a;--text:#f0f0f0;--muted:#888;--accent:#6366f1;--accent2:#a855f7;--glow:rgba(99,102,241,0.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--accent);text-decoration:none}a:hover{color:var(--accent2)}
+.nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}.nav-logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:20px}.nav-links a{color:var(--muted);font-size:14px}
+.container{max-width:700px;margin:0 auto;padding:24px}
+.hero{text-align:center;padding:48px 0 32px}
+.hero h1{font-size:42px;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:18px;margin-bottom:32px}
+.start-btn,.retake-btn{padding:16px 40px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:18px;font-weight:700;cursor:pointer;transition:all .3s}
+.start-btn:hover,.retake-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--glow)}
+.progress{width:100%;height:6px;background:var(--border);border-radius:3px;margin-bottom:24px;overflow:hidden;display:none}
+.progress.active{display:block}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease}
+.progress-text{text-align:center;color:var(--muted);font-size:14px;margin-bottom:16px;display:none}
+.progress-text.active{display:block}
+.quiz-section{display:none}
+.quiz-section.active{display:block}
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;animation:slideIn .4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-40px)}}
+.question-num{font-size:13px;color:var(--accent);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.question-text{font-size:22px;font-weight:700;margin-bottom:24px;line-height:1.4}
+.options{display:flex;flex-direction:column;gap:12px}
+.option{padding:16px 20px;border-radius:12px;border:2px solid var(--border);background:#111;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:12px}
+.option:hover{border-color:var(--accent);background:rgba(99,102,241,0.05);transform:translateX(4px)}
+.option.selected{border-color:var(--accent);background:rgba(99,102,241,0.1)}
+.option-letter{width:32px;height:32px;border-radius:8px;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;transition:all .3s}
+.option:hover .option-letter{background:var(--accent);color:#fff}
+.option.selected .option-letter{background:var(--accent);color:#fff}
+.option-text{font-size:15px}
+.result-section{display:none;text-align:center;animation:fadeIn .6s ease}
+.result-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px 32px;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.result-emoji{font-size:80px;display:block;margin-bottom:16px}
+.result-type{font-size:14px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.result-name{font-size:36px;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.result-desc{color:var(--muted);font-size:16px;max-width:500px;margin:0 auto 24px;line-height:1.6}
+.traits{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;text-align:left}
+.trait-box{background:#111;border:1px solid var(--border);border-radius:12px;padding:16px}
+.trait-box h4{font-size:13px;color:var(--accent);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.trait-box ul{list-style:none;font-size:14px;color:var(--muted)}
+.trait-box ul li{padding:3px 0}
+.trait-box ul li::before{content:'→ ';color:var(--accent)}
+.best-partner{background:#111;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px}
+.best-partner h4{font-size:13px;color:var(--accent);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+.best-partner p{font-size:15px}
+.share-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.share-btn{padding:12px 24px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px}
+.share-btn.twitter{background:#1da1f2;color:#fff}.share-btn.twitter:hover{background:#0d8bd9}
+.share-btn.linkedin{background:#0077b5;color:#fff}.share-btn.linkedin:hover{background:#005e93}
+.share-btn.copy{background:var(--border);color:var(--text)}.share-btn.copy:hover{background:#444}
+.retake-btn{margin-top:24px}
+.cta{text-align:center;padding:48px 24px;margin-top:32px}
+.cta p{color:var(--muted);margin-bottom:16px}
+.cta a{display:inline-block;padding:12px 28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600;transition:all .3s}
+.cta a:hover{transform:translateY(-2px);box-shadow:0 4px 20px var(--glow);color:#fff}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:13px;border-top:1px solid var(--border)}
+@media(max-width:600px){.hero h1{font-size:32px}.result-name{font-size:28px}.traits{grid-template-columns:1fr}.scores{grid-template-columns:1fr}.input-box{flex-direction:column}}
+</style>
+</head>
+<body>
+<nav class="nav"><a class="nav-logo" href="/">🤖 <span>Lifa AI Tools</span></a><div class="nav-links"><a href="/">All Tools</a><a href="/ai-roast-my-website.html">Roast My Site</a></div></nav>
+<div class="container">
+<div class="hero" id="heroSection">
+<h1>Which AI Tool Are You? 🤖</h1>
+<p>Answer 10 quick questions and discover your AI tool personality. Share your result with friends!</p>
+<button class="start-btn" onclick="startQuiz()">Start the Quiz →</button>
+</div>
+<div class="progress" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText"></div>
+<div class="quiz-section" id="quizSection"></div>
+<div class="result-section" id="resultSection"></div>
+</div>
+<div class="cta"><p>Want more AI-powered tools?</p><a href="/">Explore 200+ Free AI Tools →</a></div>
+<footer>© 2026 Lifa AI Tools. All rights reserved. | <a href="/privacy-policy.html">Privacy</a></footer>
+<script>
+const questions=[
+{q:"When you face a complex problem, you usually...",opts:[
+{t:"Break it into data points and analyze patterns",scores:{analyzer:3,optimizer:1}},
+{t:"Brainstorm creative solutions and experiment",scores:{creator:3,explorer:1}},
+{t:"Look for the most efficient shortcut",scores:{optimizer:3,builder:1}},
+{t:"Ask others for input and collaborate",scores:{connector:3,organizer:1}}
+]},{q:"Your ideal workspace looks like...",opts:[
+{t:"Multiple monitors with spreadsheets and dashboards",scores:{analyzer:3,guardian:1}},
+{t:"A creative studio with mood boards everywhere",scores:{creator:3,explorer:1}},
+{t:"Minimal desk, everything in the cloud",scores:{organizer:3,optimizer:1}},
+{t:"A cozy spot with great coffee and good vibes",scores:{connector:3,creator:1}}
+]},{q:"When learning something new, you prefer to...",opts:[
+{t:"Read documentation and study the theory first",scores:{analyzer:2,guardian:2}},
+{t:"Jump in and figure it out by doing",scores:{builder:3,explorer:1}},
+{t:"Watch a quick tutorial and adapt it",scores:{optimizer:2,creator:2}},
+{t:"Learn with a group or find a mentor",scores:{connector:3,organizer:1}}
+]},{q:"Your friends would describe you as...",opts:[
+{t:"The one who always has the facts",scores:{analyzer:3,guardian:1}},
+{t:"The creative one with wild ideas",scores:{creator:3,explorer:1}},
+{t:"The one who gets things done fast",scores:{builder:3,optimizer:1}},
+{t:"The glue that holds the group together",scores:{connector:3,organizer:1}}
+]},{q:"When your to-do list is overwhelming, you...",opts:[
+{t:"Prioritize by impact and create a system",scores:{organizer:3,analyzer:1}},
+{t:"Tackle the most interesting task first",scores:{creator:2,explorer:2}},
+{t:"Automate or delegate whatever possible",scores:{optimizer:3,builder:1}},
+{t:"Ask for help and divide the work",scores:{connector:3,organizer:1}}
+]},{q:"Your biggest strength at work is...",opts:[
+{t:"Attention to detail and accuracy",scores:{analyzer:2,guardian:2}},
+{t:"Coming up with original ideas",scores:{creator:3,explorer:1}},
+{t:"Building things from scratch",scores:{builder:3,optimizer:1}},
+{t:"Keeping everything organized and on track",scores:{organizer:3,guardian:1}}
+]},{q:"On a weekend, you're most likely to...",opts:[
+{t:"Dive into a rabbit hole researching something",scores:{explorer:3,analyzer:1}},
+{t:"Work on a personal creative project",scores:{creator:3,builder:1}},
+{t:"Optimize your home setup or routines",scores:{optimizer:2,organizer:2}},
+{t:"Catch up with friends or attend an event",scores:{connector:3,explorer:1}}
+]},{q:"When a project goes wrong, your first instinct is...",opts:[
+{t:"Analyze what went wrong with data",scores:{analyzer:3,guardian:1}},
+{t:"Pivot and try a completely different approach",scores:{creator:2,explorer:2}},
+{t:"Fix the code/system and ship a patch fast",scores:{builder:3,optimizer:1}},
+{t:"Rally the team and communicate clearly",scores:{connector:3,organizer:1}}
+]},{q:"Your email inbox is usually...",opts:[
+{t:"Zero inbox, everything labeled and archived",scores:{organizer:3,guardian:1}},
+{t:"A beautiful mess of inspiration and ideas",scores:{creator:3,explorer:1}},
+{t:"Filtered by scripts and auto-rules",scores:{optimizer:3,builder:1}},
+{t:"Full of conversations and group threads",scores:{connector:3,analyzer:1}}
+]},{q:"If you could have one superpower, it would be...",opts:[
+{t:"Seeing the future through data prediction",scores:{analyzer:2,guardian:2}},
+{t:"Unlimited creativity and imagination",scores:{creator:3,explorer:1}},
+{t:"Super speed to build anything instantly",scores:{builder:3,optimizer:1}},
+{t:"Telepathy to understand everyone perfectly",scores:{connector:3,organizer:1}}
+]}];
+const personalities={
+analyzer:{name:"The Analyzer",emoji:"📊",tool:"Excel / Google Sheets",desc:"You're the data whisperer. While others guess, you calculate. Your superpower is turning chaos into clean, structured insights that actually make sense.",strengths:["Pattern recognition","Data-driven decisions","Attention to detail","Logical thinking"],weaknesses:["Analysis paralysis","Over-thinking simple things","Spreadsheet addiction","Forgetting the human element"],partner:"The Creator",partnerDesc:"They bring the vision, you bring the validation. Together, unstoppable."},
+creator:{name:"The Creator",emoji:"🎨",tool:"Photoshop / Figma",desc:"You see the world as a canvas. Every problem is a design challenge, every solution is a work of art. You make things beautiful AND functional.",strengths:["Original thinking","Visual communication","Turning ideas into reality","Making boring things exciting"],weaknesses:["Too many projects at once","Perfectionism on aesthetics","Ignoring constraints","Shiny object syndrome"],partner:"The Builder",partnerDesc:"They turn your wild designs into working products. Dream team."},
+optimizer:{name:"The Optimizer",emoji:"⚡",tool:"ChatGPT / Claude",desc:"Efficiency is your love language. You see waste everywhere and can't help but fix it. You're the person who automates their morning routine.",strengths:["Finding shortcuts","Process improvement","Quick problem-solving","Maximizing output"],weaknesses:["Impatience with slow processes","Over-optimizing trivial things","Skipping the 'why'","Burnout from constant improvement"],partner:"The Analyzer",partnerDesc:"They give you the data to optimize even better. Efficiency squared."},
+connector:{name:"The Connector",emoji:"🤝",tool:"Slack / Discord",desc:"You're the human API. You know everyone, connect the right people, and make collaboration feel effortless. Teams work better when you're around.",strengths:["Networking","Team building","Communication","Emotional intelligence"],weaknesses:["Too many meetings","Difficulty saying no","FOMO on conversations","Neglecting solo deep work"],partner:"The Organizer",partnerDesc:"They structure what you connect. Together, you build communities that actually work."},
+builder:{name:"The Builder",emoji:"🔨",tool:"VS Code / Terminal",desc:"You don't just talk about ideas — you ship them. While others are still planning, you've already pushed to production. Move fast, build things.",strengths:["Rapid prototyping","Technical execution","Problem-solving by doing","Shipping fast"],weaknesses:["Skipping planning","Technical debt","'It works on my machine'","Forgetting documentation"],partner:"The Creator",partnerDesc:"They design it, you build it. Products that look AND work great."},
+organizer:{name:"The Organizer",emoji:"📋",tool:"Notion / Obsidian",desc:"Your life is a well-oiled machine of systems, templates, and workflows. You bring order to chaos and make everyone around you more productive.",strengths:["System design","Project management","Documentation","Keeping things on track"],weaknesses:["Over-planning","Template hoarding","Rigidity","Spending more time organizing than doing"],partner:"The Connector",partnerDesc:"They bring the people, you bring the structure. Organized chaos becomes just organized."},
+explorer:{name:"The Explorer",emoji:"🔍",tool:"Chrome / Arc Browser",desc:"Curiosity is your fuel. You have 47 tabs open right now and you're not sorry. You discover things others miss and connect dots across domains.",strengths:["Research skills","Curiosity-driven learning","Cross-domain thinking","Finding hidden gems"],weaknesses:["47 open tabs (minimum)","Rabbit hole addiction","Starting more than finishing","Information overload"],partner:"The Optimizer",partnerDesc:"They help you focus your discoveries into actionable insights."},
+guardian:{name:"The Guardian",emoji:"🛡️",tool:"1Password / Bitwarden",desc:"Security, reliability, consistency — that's your jam. You're the one who actually reads the terms of service and has backups of your backups.",strengths:["Risk assessment","Security mindset","Reliability","Thoroughness"],weaknesses:["Over-cautious","Slow to adopt new things","Trust issues with new tools","The 'what if' spiral"],partner:"The Builder",partnerDesc:"They move fast, you keep things safe. Speed + security = perfection."}}
+;let current=0,scores={analyzer:0,creator:0,optimizer:0,connector:0,builder:0,organizer:0,explorer:0,guardian:0};
+function startQuiz(){document.getElementById('heroSection').style.display='none';document.getElementById('progressBar').classList.add('active');document.getElementById('progressText').classList.add('active');current=0;scores={analyzer:0,creator:0,optimizer:0,connector:0,builder:0,organizer:0,explorer:0,guardian:0};showQuestion()}
+function showQuestion(){const q=questions[current];const pct=((current)/questions.length*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Question ${current+1} of ${questions.length}`;const html=`<div class="question-card"><div class="question-num">Question ${current+1} of ${questions.length}</div><div class="question-text">${q.q}</div><div class="options">${q.opts.map((o,i)=>`<div class="option" onclick="selectOption(${i})"><div class="option-letter">${'ABCD'[i]}</div><div class="option-text">${o.t}</div></div>`).join('')}</div></div>`;document.getElementById('quizSection').innerHTML=html;document.getElementById('quizSection').classList.add('active')}
+function selectOption(i){const opts=document.querySelectorAll('.option');opts[i].classList.add('selected');const s=questions[current].opts[i].scores;Object.keys(s).forEach(k=>{scores[k]=(scores[k]||0)+s[k]});setTimeout(()=>{current++;if(current<questions.length){showQuestion()}else{showResult()}},400)}
+function showResult(){document.getElementById('quizSection').classList.remove('active');document.getElementById('progressBar').classList.remove('active');document.getElementById('progressText').classList.remove('active');const winner=Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);const p=personalities[winner];const html=`<div class="result-card"><div class="result-emoji">${p.emoji}</div><div class="result-type">You are...</div><div class="result-name">${p.name}</div><div class="result-desc">${p.desc}</div><p style="color:var(--muted);font-size:14px;margin-bottom:24px">Your AI tool match: <strong style="color:var(--accent)">${p.tool}</strong></p><div class="traits"><div class="trait-box"><h4>💪 Strengths</h4><ul>${p.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div><div class="trait-box"><h4>😅 Weaknesses</h4><ul>${p.weaknesses.map(w=>`<li>${w}</li>`).join('')}</ul></div></div><div class="best-partner"><h4>🤝 Best Partner</h4><p><strong>${p.partner}</strong> — ${p.partnerDesc}</p></div><div class="share-row"><button class="share-btn twitter" onclick="shareTwitter('${winner}')">𝕏 Share on Twitter</button><button class="share-btn linkedin" onclick="shareLinkedIn('${winner}')">in Share on LinkedIn</button><button class="share-btn copy" onclick="copyResult('${winner}')">📋 Copy Result</button></div><button class="retake-btn" onclick="startQuiz()">🔄 Retake Quiz</button></div>`;document.getElementById('resultSection').innerHTML=html;document.getElementById('resultSection').classList.add('active');document.getElementById('resultSection').scrollIntoView({behavior:'smooth'})}
+function shareTwitter(w){const p=personalities[w];const text=encodeURIComponent(`I just took the AI Personality Quiz and I'm ${p.name} ${p.emoji}! My AI tool match is ${p.tool}. Which AI tool are you? 🤖`);window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent('https://lifa-su.com/ai-personality-quiz.html')}`,'_blank')}
+function shareLinkedIn(w){window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://lifa-su.com/ai-personality-quiz.html')}`,'_blank')}
+function copyResult(w){const p=personalities[w];const text=`🤖 AI Personality Quiz Result\n\nI'm ${p.name} ${p.emoji}\nMy AI tool match: ${p.tool}\n\n${p.desc}\n\nTake the quiz: https://lifa-su.com/ai-personality-quiz.html`;navigator.clipboard.writeText(text).then(()=>{const btn=document.querySelector('.share-btn.copy');btn.textContent='✅ Copied!';setTimeout(()=>btn.innerHTML='📋 Copy Result',2000)})}
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+</body>
+</html>
