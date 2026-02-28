@@ -141,6 +141,35 @@ a:hover{color:var(--accent-hover)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
 
+/* Tooltip for clause explanations */
+.clause-tip{position:relative;display:inline-block;cursor:help;border-bottom:1px dashed var(--accent);color:var(--accent)}
+.clause-tip .tip-box{visibility:hidden;opacity:0;width:280px;background:#1e1e2e;color:var(--text);text-align:left;border-radius:8px;padding:10px 14px;position:absolute;z-index:200;bottom:125%;left:50%;transform:translateX(-50%);border:1px solid var(--accent);font-size:0.8rem;line-height:1.5;pointer-events:none;transition:opacity 0.2s;box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+.clause-tip .tip-box::after{content:'';position:absolute;top:100%;left:50%;margin-left:-6px;border-width:6px;border-style:solid;border-color:#1e1e2e transparent transparent transparent}
+.clause-tip:hover .tip-box{visibility:visible;opacity:1}
+
+/* Variable highlighting in preview */
+.var-highlight{background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);border-radius:4px;padding:0 4px;font-style:italic;font-weight:600;cursor:pointer;transition:background 0.2s}
+.var-highlight:hover{background:rgba(245,158,11,0.35)}
+.var-highlight.filled{background:rgba(34,197,94,0.15);color:#22c55e;border-color:rgba(34,197,94,0.3)}
+
+/* Legal disclaimer banner */
+.disclaimer-banner{background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(239,68,68,0.08));border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:14px 20px;margin:16px 0;display:flex;align-items:flex-start;gap:12px}
+.disclaimer-banner .disc-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+.disclaimer-banner p{font-size:0.82rem;color:var(--text-muted);margin:0;line-height:1.5}
+.disclaimer-banner strong{color:var(--warning)}
+
+/* PDF button */
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+
+/* Clause info panel */
+.clause-panel{background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:14px;margin-top:12px;font-size:0.82rem;color:var(--text-muted);display:none}
+.clause-panel.show{display:block}
+.clause-panel h4{color:var(--accent);margin-bottom:6px;font-size:0.85rem}
+
+/* Word count badge */
+.wc-badge{background:rgba(99,102,241,0.15);color:var(--accent);padding:3px 10px;border-radius:12px;font-size:0.78rem;font-weight:600}
+
 /* Print */
 @media print{
   .header,.sidebar,.output-header,.status-bar,.footer,.btn{display:none!important}
@@ -191,7 +220,16 @@ a:hover{color:var(--accent-hover)}
     <button class="doc-type-btn" data-type="refund" onclick="selectDocType(this)"><span class="icon">💰</span>Refund Policy</button>
     <button class="doc-type-btn" data-type="eula" onclick="selectDocType(this)"><span class="icon">📱</span>EULA</button>
     <button class="doc-type-btn" data-type="nda" onclick="selectDocType(this)"><span class="icon">🤝</span>NDA</button>
+    <button class="doc-type-btn" data-type="service" onclick="selectDocType(this)"><span class="icon">🛎️</span>Service Agreement</button>
+    <button class="doc-type-btn" data-type="useragreement" onclick="selectDocType(this)"><span class="icon">👤</span>User Agreement</button>
+    <button class="doc-type-btn" data-type="contractor" onclick="selectDocType(this)"><span class="icon">🔧</span>Contractor Agreement</button>
+    <button class="doc-type-btn" data-type="partnership" onclick="selectDocType(this)"><span class="icon">🤲</span>Partnership Agreement</button>
   </div>
+</div>
+
+<div class="disclaimer-banner">
+  <span class="disc-icon">⚖️</span>
+  <p><strong>Legal Disclaimer:</strong> These templates are for informational purposes only and <strong>do not constitute legal advice</strong>. Always consult a qualified attorney before using any legal document. Laws vary by jurisdiction and your specific circumstances may require custom provisions.</p>
 </div>
 
 <div class="card">
@@ -263,8 +301,10 @@ a:hover{color:var(--accent-hover)}
   </div>
   <div class="btn-group">
     <button class="btn btn-secondary btn-sm" onclick="copyOutput()">📋 Copy</button>
+    <button class="btn btn-secondary btn-sm" onclick="downloadOutput('txt')">⬇️ TXT</button>
     <button class="btn btn-secondary btn-sm" onclick="downloadOutput('html')">⬇️ HTML</button>
     <button class="btn btn-secondary btn-sm" onclick="downloadOutput('md')">⬇️ Markdown</button>
+    <button class="btn btn-danger btn-sm" onclick="downloadPDF()">⬇️ PDF</button>
   </div>
 </div>
 
@@ -460,9 +500,13 @@ function downloadOutput(format) {
   const d = getFormData();
   const slug = currentDocType;
   if (format === 'html') {
-    content = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + slug + '</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.8;color:#333}h1{color:#1a1a1a}h2{color:#444;border-bottom:1px solid #ddd;padding-bottom:8px}h3{color:#555}</style></head><body>' + generatedHTML + '</body></html>';
+    content = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + slug + '</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.8;color:#333}h1{color:#1a1a1a}h2{color:#444;border-bottom:1px solid #ddd;padding-bottom:8px}h3{color:#555}.var-highlight{background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:3px;padding:0 3px;}</style></head><body>' + generatedHTML + '</body></html>';
     filename = slug + '-' + d.company.replace(/\s+/g,'-').toLowerCase() + '.html';
     mime = 'text/html';
+  } else if (format === 'txt') {
+    content = generatedMarkdown.replace(/^#+\s*/gm,'').replace(/\*\*/g,'').replace(/\*/g,'');
+    filename = slug + '-' + d.company.replace(/\s+/g,'-').toLowerCase() + '.txt';
+    mime = 'text/plain';
   } else {
     content = generatedMarkdown;
     filename = slug + '-' + d.company.replace(/\s+/g,'-').toLowerCase() + '.md';
@@ -476,6 +520,29 @@ function downloadOutput(format) {
   a.click();
   URL.revokeObjectURL(a.href);
   showToast('Downloaded ' + filename);
+}
+
+function downloadPDF() {
+  if (!generatedHTML) { showToast('Generate a document first'); return; }
+  const d = getFormData();
+  const slug = currentDocType;
+  const w = window.open('', '_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + slug + '</title><style>');
+  w.document.write('body{font-family:Georgia,"Times New Roman",serif;max-width:750px;margin:40px auto;padding:20px 40px;line-height:1.9;color:#1a1a1a;font-size:11pt}');
+  w.document.write('h1{font-size:18pt;color:#1a1a1a;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:20px}');
+  w.document.write('h2{font-size:13pt;color:#2c2c2c;margin-top:24px;margin-bottom:8px;border-bottom:1px solid #ccc;padding-bottom:4px}');
+  w.document.write('h3{font-size:11pt;color:#333;margin-top:16px}');
+  w.document.write('p{margin-bottom:10px}ul,ol{margin:8px 0 14px 22px}li{margin-bottom:4px}');
+  w.document.write('strong{color:#1a1a1a}.var-highlight{background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:3px;padding:0 3px}');
+  w.document.write('.disclaimer{background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;padding:12px 16px;margin-top:30px;font-size:9pt;color:#6c757d}');
+  w.document.write('@media print{body{margin:0;padding:20px}@page{margin:2cm}}');
+  w.document.write('</style></head><body>');
+  w.document.write(generatedHTML);
+  w.document.write('<div class="disclaimer"><strong>⚠️ Legal Disclaimer:</strong> This document was generated by AI Legal Document Generator as a template only. It does not constitute legal advice. Please consult a qualified attorney before use. Laws vary by jurisdiction.</div>');
+  w.document.write('</body></html>');
+  w.document.close();
+  setTimeout(() => { w.print(); }, 600);
+  showToast('PDF print dialog opened');
 }
 
 // ===== HTML to Markdown =====
@@ -514,23 +581,41 @@ function generateDocument() {
     disclaimer: generateDisclaimer,
     refund: generateRefundPolicy,
     eula: generateEULA,
-    nda: generateNDA
+    nda: generateNDA,
+    service: generateServiceAgreement,
+    useragreement: generateUserAgreement,
+    contractor: generateContractorAgreement,
+    partnership: generatePartnershipAgreement
   };
 
   const gen = generators[currentDocType];
   if (!gen) { showToast('Unknown document type'); return; }
 
   generatedHTML = gen(d, fdate);
+  // Highlight unfilled variables (bracketed placeholders)
+  const highlightedHTML = generatedHTML.replace(/\[([^\]]+)\]/g, '<span class="var-highlight" title="Click to fill in: $1">[$1]</span>');
   generatedMarkdown = htmlToMarkdown(generatedHTML);
 
-  document.getElementById('previewPane').innerHTML = generatedHTML;
+  document.getElementById('previewPane').innerHTML = highlightedHTML;
   document.getElementById('htmlPane').textContent = generatedHTML;
   document.getElementById('markdownPane').textContent = generatedMarkdown;
 
+  // Make variable highlights clickable
+  document.querySelectorAll('.var-highlight').forEach(el => {
+    el.addEventListener('click', function() {
+      const val = prompt('Enter value for: ' + this.textContent.replace(/[\[\]]/g,''));
+      if (val !== null && val.trim()) {
+        this.textContent = val;
+        this.classList.add('filled');
+        generatedHTML = generatedHTML.replace(this.dataset.orig || this.textContent, val);
+      }
+    });
+  });
+
   const wc = generatedHTML.replace(/<[^>]+>/g, '').split(/\s+/).filter(w => w).length;
-  document.getElementById('wordCount').textContent = wc.toLocaleString() + ' words';
+  document.getElementById('wordCount').innerHTML = '<span class="wc-badge">📝 ' + wc.toLocaleString() + ' words</span>';
   document.getElementById('statusText').textContent = 'Document generated';
-  showToast('Document generated successfully!');
+  showToast('Document generated successfully! Yellow highlights = fields to fill in.');
 }
 
 // ===== PRIVACY POLICY =====
