@@ -236,6 +236,29 @@ header h1{font-size:1.6rem}
 .footer-seo{font-size:0.7rem;color:var(--text-dim);margin-top:8px;opacity:0.6}
 @media(max-width:640px){.steps-grid{grid-template-columns:1fr}}
 }
+/* Batch generation */
+.batch-section{margin:20px 0;display:none}
+.batch-section.visible{display:block;animation:fadeInUp 0.5s ease}
+.batch-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.batch-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:18px;position:relative;transition:all 0.3s;cursor:pointer}
+.batch-card:hover{border-color:var(--neon-green);transform:translateY(-2px)}
+.batch-card.selected{border-color:var(--neon-green);box-shadow:var(--glow-green)}
+.batch-num{position:absolute;top:10px;right:12px;background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800}
+.batch-combo{font-size:0.68rem;color:var(--neon-green);font-weight:600;margin-bottom:6px;display:flex;gap:4px;flex-wrap:wrap}
+.batch-combo .combo-tag{font-size:0.65rem;padding:1px 6px}
+.batch-pitch{font-size:0.9rem;font-weight:700;line-height:1.4;color:var(--text-primary);margin-bottom:12px}
+.batch-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.batch-meta-label{color:var(--text-dim);text-transform:uppercase;font-size:0.6rem;letter-spacing:0.5px}
+.batch-meta-val{color:var(--text-secondary);font-size:0.72rem}
+.batch-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-color)}
+.batch-action-btn{flex:1;background:var(--bg-reel);border:1px solid var(--border-color);color:var(--text-secondary);padding:6px 8px;border-radius:6px;font-size:0.75rem;cursor:pointer;transition:all 0.2s;text-align:center}
+.batch-action-btn:hover{border-color:var(--neon-green);color:var(--neon-green)}
+.batch-action-btn.fav-btn:hover{border-color:var(--neon-red);color:var(--neon-red)}
+.spin-buttons{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.batch-btn{background:linear-gradient(135deg,var(--neon-purple),#8833cc);color:#fff;border:none;padding:14px 32px;font-size:0.95rem;font-weight:800;border-radius:12px;cursor:pointer;transition:all 0.3s;text-transform:uppercase;letter-spacing:1px}
+.batch-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(180,77,255,0.35)}
+.batch-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+@media(max-width:640px){.batch-grid{grid-template-columns:1fr}.spin-buttons{flex-direction:column;align-items:stretch}.batch-btn,.spin-btn{width:100%}}
 
 </style>
 </head>
@@ -306,10 +329,17 @@ header h1{font-size:1.6rem}
 </div>
 </div>
 <div class="spin-section">
+<div class="spin-buttons">
 <button class="spin-btn" id="spinBtn" onclick="spin()">🎰 SPIN</button>
-<p class="spin-hint">Press Space or click to spin • Lock reels with 🔓</p>
+<button class="batch-btn" id="batchBtn" onclick="batchSpin()">⚡ GENERATE 3</button>
+</div>
+<p class="spin-hint">Press Space or click to spin • Lock reels with 🔓 • Generate 3 to compare ideas side by side</p>
 </div>
 </div>
+<section class="batch-section" id="batchSection" aria-live="polite">
+<div class="batch-grid" id="batchGrid"></div>
+</section>
+
 <section class="result-card" id="resultCard" aria-live="polite">
 <div class="result-header">
 <div>
@@ -455,7 +485,10 @@ function spin() {
   btn.textContent = '⏳ SPINNING...';
   document.getElementById('resultCard').classList.remove('visible');
 
-  const datasets = [INDUSTRIES, PAIN_POINTS, BIZ_MODELS];
+  document.getElementById('batchSection').classList.remove('visible');
+  const filteredIndustries = getFilteredArray(INDUSTRIES, activeFilters.industry, INDUSTRY_CATEGORIES);
+  const filteredModels = getFilteredArray(BIZ_MODELS, activeFilters.bizModel, BIZMODEL_CATEGORIES);
+  const datasets = [filteredIndustries, PAIN_POINTS, filteredModels];
   const delays = [1200, 1800, 2400];
   const finalValues = [null, null, null];
 
@@ -724,6 +757,231 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// --- Filter functions ---
+const INDUSTRY_CATEGORIES = {
+  'B2B': ['HR & Recruiting','Cybersecurity','Developer Tools','Data Analytics','Supply Chain','AI Infrastructure','No-Code Tools','Government','Telecom'],
+  'Consumer': ['E-commerce','Entertainment','Gaming','Music','Social Media','Dating','Fashion','Beauty','Photography','Podcasting','Newsletter'],
+  'Healthcare': ['Healthcare','Mental Health','Dental','Pharmacy','Biotech','Senior Care','Fitness & Wellness'],
+  'FinTech': ['FinTech','Insurance'],
+  'Climate': ['Climate Tech','Sustainability','Energy','Waste Management','Water Tech'],
+  'Creator': ['Creator Economy','Podcasting','Newsletter','Photography','Event Planning'],
+  'Enterprise': ['Legal Tech','Construction','Automotive','Aerospace','Logistics','Mining','Real Estate'],
+  'DeepTech': ['Robotics','IoT / Smart Home','Space Tech','AR / VR','Blockchain','Web3']
+};
+const BIZMODEL_CATEGORIES = {
+  'SaaS': ['SaaS Subscription','Vertical SaaS'],
+  'Marketplace': ['Marketplace','Reverse Auction','Aggregator','Peer-to-Peer'],
+  'Freemium': ['Freemium','Open Source + Premium','Ad-Supported Free'],
+  'API': ['API-as-a-Service','White Label','Data Licensing'],
+  'Community': ['Community Membership','Creator Tools','Sponsorship Model','Cooperative Model'],
+  'B2B2C': ['B2B2C Platform','Embedded Finance','Franchise Model'],
+  'Usage': ['Usage-Based Pricing','Pay-Per-Result','Micro-transactions','Outcome-Based Pricing']
+};
+const USER_CATEGORIES = {
+  'Solo': ['Solo entrepreneurs','Freelancers & gig workers'],
+  'SMB': ['SMB owners (10-50 employees)','Restaurant owners','Retail store owners','Real estate agents'],
+  'Enterprise': ['Enterprise CTOs','Government agencies','Non-profit orgs'],
+  'Consumer': ['College students','Working parents'],
+  'Developer': ['DevOps engineers','Data scientists','SaaS founders','Product managers'],
+  'Creative': ['Content creators','UX designers','Photography','Fitness trainers']
+};
+
+let activeFilters = { industry: '', bizModel: '', user: '' };
+
+function applyFilters() {
+  activeFilters.industry = document.getElementById('filterIndustry').value;
+  activeFilters.bizModel = document.getElementById('filterBizModel').value;
+  activeFilters.user = document.getElementById('filterUser').value;
+  showToast('Filters applied — next spin will use them');
+}
+
+function resetFilters() {
+  document.getElementById('filterIndustry').value = '';
+  document.getElementById('filterBizModel').value = '';
+  document.getElementById('filterUser').value = '';
+  activeFilters = { industry: '', bizModel: '', user: '' };
+  showToast('Filters reset ✕');
+}
+
+function getFilteredArray(arr, filterVal, categoryMap) {
+  if (!filterVal || !categoryMap[filterVal]) return arr;
+  const allowed = categoryMap[filterVal];
+  const filtered = arr.filter(item => allowed.includes(item));
+  return filtered.length > 0 ? filtered : arr;
+}
+
+// --- Export functions ---
+function exportIdea(format) {
+  if (!currentIdea) { showToast('Generate an idea first!'); return; }
+  const idea = currentIdea;
+  let content, filename, mime;
+  if (format === 'md') {
+    content = `# 🎰 Startup Idea\n\n## ${idea.pitch}\n\n| Field | Value |\n|---|---|\n| **Industry** | ${idea.industry} |\n| **Pain Point** | ${idea.painPoint} |\n| **Business Model** | ${idea.bizModel} |\n| **Target Users** | ${idea.target} |\n| **Competitive Edge** | ${idea.edge} |\n| **Market Size** | ${idea.market} |\n| **Difficulty** | ${'★'.repeat(idea.difficulty)}${'☆'.repeat(5-idea.difficulty)} |\n\n## 📋 First Month Action Plan\n\n${idea.steps.map((s,i) => `${i+1}. ${s}`).join('\n')}\n\n---\n*Generated by [AI Startup Idea Generator](https://lifa-su.github.io/ai-startup-idea-generator.html)*`;
+    filename = 'startup-idea.md'; mime = 'text/markdown';
+  } else if (format === 'json') {
+    content = JSON.stringify(idea, null, 2);
+    filename = 'startup-idea.json'; mime = 'application/json';
+  } else {
+    content = `🎰 Startup Idea\n\n${idea.pitch}\n\nIndustry: ${idea.industry}\nPain Point: ${idea.painPoint}\nBusiness Model: ${idea.bizModel}\nTarget Users: ${idea.target}\nCompetitive Edge: ${idea.edge}\nMarket Size: ${idea.market}\nDifficulty: ${'★'.repeat(idea.difficulty)}${'☆'.repeat(5-idea.difficulty)}\n\nFirst Month Action Plan:\n${idea.steps.map((s,i) => (i+1)+'. '+s).join('\n')}\n\nGenerated at lifa-su.github.io/ai-startup-idea-generator.html`;
+    filename = 'startup-idea.txt'; mime = 'text/plain';
+  }
+  downloadFile(content, filename, mime);
+  showToast('Exported as ' + format.toUpperCase() + ' 📥');
+}
+
+function exportFavorites(format) {
+  if (favorites.length === 0) { showToast('No favorites to export!'); return; }
+  let content, filename, mime;
+  if (format === 'json') {
+    content = JSON.stringify(favorites, null, 2);
+    filename = 'startup-favorites.json'; mime = 'application/json';
+  } else {
+    content = favorites.map((f, i) => `--- Idea ${i+1} ---\n${f.pitch}\nIndustry: ${f.industry} | Pain: ${f.painPoint} | Model: ${f.bizModel}\nTarget: ${f.target} | Market: ${f.market}\n`).join('\n');
+    filename = 'startup-favorites.txt'; mime = 'text/plain';
+  }
+  downloadFile(content, filename, mime);
+  showToast('Exported ' + favorites.length + ' favorites 📥');
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// --- Batch generation ---
+let batchIdeas = [];
+
+function createIdeaFromValues(industry, painPoint, bizModel) {
+  const pitch = generatePitch(industry, painPoint, bizModel);
+  const filteredUsers = getFilteredArray(TARGET_USERS, activeFilters.user, USER_CATEGORIES);
+  const target = pickRandom(filteredUsers);
+  const edge = pickRandom(COMP_EDGES);
+  const market = pickRandom(MARKET_SIZES);
+  const diff = Math.floor(Math.random() * 5) + 1;
+  const steps = [];
+  const used = new Set();
+  while (steps.length < 3) {
+    const s = pickRandom(FIRST_STEPS);
+    if (!used.has(s)) { steps.push(s); used.add(s); }
+  }
+  return { industry, painPoint, bizModel, pitch, target, edge, market, difficulty: diff, steps, timestamp: Date.now() };
+}
+
+function batchSpin() {
+  if (isSpinning) return;
+  isSpinning = true;
+  const btn = document.getElementById('batchBtn');
+  const spinBtn = document.getElementById('spinBtn');
+  btn.disabled = true; spinBtn.disabled = true;
+  btn.textContent = '⏳ GENERATING...';
+  document.getElementById('resultCard').classList.remove('visible');
+  document.getElementById('batchSection').classList.remove('visible');
+
+  const filteredIndustries = getFilteredArray(INDUSTRIES, activeFilters.industry, INDUSTRY_CATEGORIES);
+  const filteredModels = getFilteredArray(BIZ_MODELS, activeFilters.bizModel, BIZMODEL_CATEGORIES);
+
+  batchIdeas = [];
+  for (let i = 0; i < 3; i++) {
+    const ind = pickRandom(filteredIndustries, i > 0 ? batchIdeas[i-1]?.industry : null);
+    const pain = pickRandom(PAIN_POINTS, i > 0 ? batchIdeas[i-1]?.painPoint : null);
+    const biz = pickRandom(filteredModels, i > 0 ? batchIdeas[i-1]?.bizModel : null);
+    batchIdeas.push(createIdeaFromValues(ind, pain, biz));
+  }
+
+  setTimeout(() => {
+    renderBatch();
+    // Add all to history
+    batchIdeas.forEach(idea => {
+      history.unshift(idea);
+    });
+    if (history.length > 20) history = history.slice(0, 20);
+    localStorage.setItem('sig_history', JSON.stringify(history));
+    renderHistory();
+    updateBadges();
+    isSpinning = false;
+    btn.disabled = false; spinBtn.disabled = false;
+    btn.textContent = '⚡ GENERATE 3';
+    spinCount += 3;
+    localStorage.setItem('sig_spinCount', spinCount);
+  }, 800);
+}
+
+function renderBatch() {
+  const grid = document.getElementById('batchGrid');
+  grid.innerHTML = batchIdeas.map((idea, i) => {
+    const isFav = favorites.some(f => f.pitch === idea.pitch);
+    return `<div class="batch-card" onclick="selectBatchIdea(${i})">
+      <div class="batch-num">${i+1}</div>
+      <div class="batch-combo">
+        <span class="combo-tag">${idea.industry}</span> × <span class="combo-tag">${idea.painPoint}</span> × <span class="combo-tag">${idea.bizModel}</span>
+      </div>
+      <div class="batch-pitch">${idea.pitch}</div>
+      <div class="batch-meta">
+        <div><div class="batch-meta-label">Target</div><div class="batch-meta-val">${idea.target}</div></div>
+        <div><div class="batch-meta-label">Market</div><div class="batch-meta-val">${idea.market}</div></div>
+        <div><div class="batch-meta-label">Edge</div><div class="batch-meta-val">${idea.edge}</div></div>
+        <div><div class="batch-meta-label">Difficulty</div><div class="batch-meta-val">${'★'.repeat(idea.difficulty)}${'☆'.repeat(5-idea.difficulty)}</div></div>
+      </div>
+      <div class="batch-actions">
+        <button class="batch-action-btn" onclick="event.stopPropagation();selectBatchIdea(${i})">📋 Expand</button>
+        <button class="batch-action-btn fav-btn" onclick="event.stopPropagation();batchFavorite(${i})">${isFav ? '❤️' : '🤍'} Fav</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('batchSection').classList.add('visible');
+}
+
+function selectBatchIdea(idx) {
+  const idea = batchIdeas[idx];
+  if (!idea) return;
+  currentIdea = idea;
+  currentValues = [idea.industry, idea.painPoint, idea.bizModel];
+  ['track0','track1','track2'].forEach((id, i) => {
+    document.getElementById(id).innerHTML = '<div class="reel-item">' + currentValues[i] + '</div>';
+  });
+  document.getElementById('comboParts').innerHTML =
+    '<span class="combo-tag">' + idea.industry + '</span> × <span class="combo-tag">' + idea.painPoint + '</span> × <span class="combo-tag">' + idea.bizModel + '</span>';
+  document.getElementById('elevatorPitch').textContent = idea.pitch;
+  document.getElementById('targetUsers').textContent = idea.target;
+  document.getElementById('compEdge').textContent = idea.edge;
+  document.getElementById('marketSize').textContent = idea.market;
+  document.getElementById('difficulty').textContent = '★'.repeat(idea.difficulty) + '☆'.repeat(5 - idea.difficulty);
+  let stepsHtml = '';
+  idea.steps.forEach((s, i) => {
+    stepsHtml += '<div class="plan-step"><div class="step-num">' + (i+1) + '</div><div class="step-text">' + s + '</div></div>';
+  });
+  document.getElementById('planSteps').innerHTML = stepsHtml;
+  const isFav = favorites.some(f => f.pitch === idea.pitch);
+  document.getElementById('favBtn').textContent = isFav ? '❤️' : '🤍';
+  document.getElementById('favBtn').classList.toggle('favorited', isFav);
+  document.getElementById('resultCard').classList.add('visible');
+  // Highlight selected card
+  document.querySelectorAll('.batch-card').forEach((c,i) => c.classList.toggle('selected', i === idx));
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function batchFavorite(idx) {
+  const idea = batchIdeas[idx];
+  if (!idea) return;
+  const fidx = favorites.findIndex(f => f.pitch === idea.pitch);
+  if (fidx >= 0) {
+    favorites.splice(fidx, 1);
+    showToast('Removed from favorites');
+  } else {
+    favorites.unshift(idea);
+    showToast('Added to favorites! ⭐');
+  }
+  localStorage.setItem('sig_favorites', JSON.stringify(favorites));
+  renderFavorites();
+  renderBatch();
+  updateBadges();
 }
 
 // Keyboard shortcut
