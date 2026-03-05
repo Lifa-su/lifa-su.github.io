@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Bio Generator | Lifa Tools</title>
+  <meta name="description" content="Generate a polished professional bio in seconds. Get 3 versions — short, medium, and long — for LinkedIn, websites, speaking events, and social media.">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding:2rem 1rem;}
+    .container{max-width:820px;margin:0 auto;}
+    h1{font-size:2rem;font-weight:800;margin-bottom:.4rem;}
+    .subtitle{color:#94a3b8;margin-bottom:2rem;}
+    .card{background:#1a1d2e;border:1px solid #2d3748;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;}
+    label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:.4rem;font-weight:500;}
+    input,select,textarea{width:100%;background:#0f1117;border:1px solid #2d3748;border-radius:8px;color:#e2e8f0;padding:.7rem 1rem;font-size:.95rem;outline:none;transition:border-color .2s;}
+    input:focus,select:focus,textarea:focus{border-color:#6c63ff;}
+    textarea{resize:vertical;min-height:70px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    @media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+    .row{margin-bottom:1rem;}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;background:#6c63ff;color:#fff;border:none;border-radius:8px;padding:.8rem 1.8rem;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s;}
+    .btn:hover{background:#574fd6;}
+    .btn-sm{padding:.4rem .9rem;font-size:.82rem;border-radius:6px;background:#1a1d2e;border:1px solid #2d3748;color:#94a3b8;cursor:pointer;transition:all .2s;}
+    .btn-sm:hover{border-color:#6c63ff;color:#6c63ff;}
+    .btn-sm.copied{border-color:#10b981;color:#10b981;}
+    .results{display:none;}
+    .results.show{display:block;}
+    .bio-card{background:#1a1d2e;border:1px solid #2d3748;border-radius:12px;padding:1.5rem;margin-bottom:1.2rem;}
+    .bio-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;}
+    .bio-label{font-weight:700;color:#6c63ff;font-size:.95rem;}
+    .bio-use{font-size:.8rem;color:#94a3b8;}
+    .bio-text{font-size:.95rem;line-height:1.7;color:#e2e8f0;}
+    .word-count{font-size:.78rem;color:#64748b;margin-top:.5rem;}
+    .tip{background:#1e2130;border-left:3px solid #6c63ff;border-radius:0 6px 6px 0;padding:.8rem 1rem;font-size:.85rem;color:#94a3b8;margin-top:.5rem;}
+    nav{margin-bottom:1.5rem;}
+    nav a{color:#94a3b8;text-decoration:none;font-size:.9rem;}
+    nav a:hover{color:#6c63ff;}
+    .style-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.3rem;}
+    .style-btn{padding:.4rem .9rem;border-radius:20px;border:1px solid #2d3748;background:transparent;color:#94a3b8;cursor:pointer;font-size:.85rem;transition:all .2s;}
+    .style-btn.active{border-color:#6c63ff;color:#6c63ff;background:#1a1d2e;}
+  </style>
+</head>
+<body>
+<div class="container">
+  <nav><a href="/">← Lifa Tools</a></nav>
+  <h1>🪪 Professional Bio Generator</h1>
+  <p class="subtitle">Create short, medium, and long bios for LinkedIn, websites, talks, and social media.</p>
+
+  <div class="card">
+    <div class="grid2">
+      <div class="row">
+        <label>Full Name *</label>
+        <input type="text" id="name" placeholder="e.g. Sarah Chen">
+      </div>
+      <div class="row">
+        <label>Job Title / Role *</label>
+        <input type="text" id="title" placeholder="e.g. UX Designer, Founder, Marketing Lead">
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="row">
+        <label>Company / Organization</label>
+        <input type="text" id="company" placeholder="e.g. Acme Corp, Self-employed">
+      </div>
+      <div class="row">
+        <label>Industry / Field</label>
+        <input type="text" id="industry" placeholder="e.g. SaaS, Healthcare, Education">
+      </div>
+    </div>
+    <div class="row">
+      <label>Core Expertise (what you're known for)</label>
+      <input type="text" id="expertise" placeholder="e.g. product strategy, data storytelling, brand identity design">
+    </div>
+    <div class="row">
+      <label>Key Achievement or Claim to Fame</label>
+      <textarea id="achievement" placeholder="e.g. Helped 50+ startups raise seed rounds. Built a tool used by 100k+ people. 10 years growing SaaS companies from 0 to $10M ARR."></textarea>
+    </div>
+    <div class="row">
+      <label>Personal Touch (optional)</label>
+      <input type="text" id="personal" placeholder="e.g. Based in Berlin. Coffee snob. Dad of two.">
+    </div>
+    <div class="row">
+      <label>Tone / Style</label>
+      <div class="style-row">
+        <button class="style-btn active" onclick="setStyle(this,'professional')">Professional</button>
+        <button class="style-btn" onclick="setStyle(this,'conversational')">Conversational</button>
+        <button class="style-btn" onclick="setStyle(this,'creative')">Creative</button>
+        <button class="style-btn" onclick="setStyle(this,'bold')">Bold / Punchy</button>
+      </div>
+    </div>
+    <div style="margin-top:1rem;">
+      <button class="btn" onclick="generate()">✨ Generate Bios</button>
+    </div>
+  </div>
+
+  <div class="results" id="results"></div>
+</div>
+
+<script>
+let currentStyle = 'professional';
+function setStyle(el, style) {
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentStyle = style;
+}
+
+function generate() {
+  const name = document.getElementById('name').value.trim() || 'Alex';
+  const title = document.getElementById('title').value.trim() || 'Professional';
+  const company = document.getElementById('company').value.trim();
+  const industry = document.getElementById('industry').value.trim();
+  const expertise = document.getElementById('expertise').value.trim();
+  const achievement = document.getElementById('achievement').value.trim();
+  const personal = document.getElementById('personal').value.trim();
+  const style = currentStyle;
+
+  const at = company ? ` at ${company}` : '';
+  const inField = industry ? ` in ${industry}` : '';
+  const expStr = expertise ? `specializing in ${expertise}` : 'with a passion for impactful work';
+  const achStr = achievement ? achievement : 'driving meaningful results for clients and teams';
+  const perStr = personal ? ` Outside of work: ${personal}` : '';
+
+  let short, medium, long;
+
+  if (style === 'professional') {
+    short = `${name} is a ${title}${at}${inField}, ${expStr}.`;
+    medium = `${name} is a ${title}${at}, ${expStr}. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. ${name} brings a track record of delivering results through strategic thinking and hands-on execution.${perStr}`;
+    long = `${name} is an experienced ${title}${at}, ${expStr}. With a background${inField}, ${name} has built a reputation for ${achStr}. Known for bridging strategy and execution, ${name} helps organizations and individuals achieve measurable outcomes. Whether working with early-stage startups or established teams, ${name} brings both depth of knowledge and a collaborative approach to every engagement.${perStr} Connect on LinkedIn or reach out directly to explore working together.`;
+  } else if (style === 'conversational') {
+    short = `Hey, I'm ${name} — a ${title}${at} who loves ${expStr.replace('specializing in', '')}.`;
+    medium = `I'm ${name}, a ${title}${at}. I spend most of my time ${expStr.replace('specializing in', 'working on')}. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. I believe the best work happens when strategy meets genuine care for the people you're serving.${perStr}`;
+    long = `Hi, I'm ${name} — a ${title}${at} with a background${inField}. I'm passionate about ${expStr.replace('specializing in', '')} and have spent years figuring out what actually works. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. I've worked with teams of all sizes and find the most satisfaction in the moments when complex problems click into elegant solutions. I try to bring honesty, curiosity, and a sense of humor to everything I do.${perStr} If you want to chat, I'm always up for a good conversation.`;
+  } else if (style === 'creative') {
+    short = `${name} is a ${title} who turns ${expertise || 'complex problems'} into something people actually want to use.`;
+    medium = `${name} is a ${title}${at} on a mission to make ${industry || 'the industry'} better through ${expertise || 'great work'}. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. The details matter, the craft matters, and so do the people on the other side of the work.${perStr}`;
+    long = `${name} is a ${title}${at} who believes that good ${expertise || 'work'} should feel effortless — even when it isn't. With roots${inField}, ${name} has built a practice around ${expStr.replace('specializing in', '')} that's as rigorous as it is human. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. Every project is a chance to make something that genuinely works — not just technically, but for the people it's designed to serve. Equal parts thinker and maker.${perStr}`;
+  } else { // bold
+    short = `${name}. ${title}${at}. ${expertise ? expertise.charAt(0).toUpperCase() + expertise.slice(1) + '.' : 'Gets results.'}`;
+    medium = `${name} is a ${title}${at} who doesn't do average. ${expStr.charAt(0).toUpperCase() + expStr.slice(1)}. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. Fast, precise, and always focused on what actually moves the needle.${perStr}`;
+    long = `${name} is a ${title}${at} with a simple philosophy: do exceptional work, nothing less. Specialties include ${expertise || 'delivering outstanding results'}${inField}. ${achStr.charAt(0).toUpperCase() + achStr.slice(1)}. No fluff, no wasted motion — just clear thinking and relentless follow-through. If you're looking for someone who will show up fully and deliver beyond expectations, that's ${name}.${perStr}`;
+  }
+
+  const bios = [
+    { label: '⚡ Short Bio (50 words)', use: 'Best for: Social media profiles, speaker intros, Twitter/X, quick pitches', text: short },
+    { label: '📝 Medium Bio (150 words)', use: 'Best for: LinkedIn summary, email signatures, directory listings', text: medium },
+    { label: '📄 Long Bio (300 words)', use: 'Best for: Personal website About page, press kit, conference programs', text: long },
+  ];
+
+  let html = '';
+  bios.forEach(bio => {
+    const wc = bio.text.split(/\s+/).length;
+    html += `<div class="bio-card">
+      <div class="bio-header">
+        <span class="bio-label">${bio.label}</span>
+        <button class="btn-sm" onclick="copyBio(this, \`${bio.text.replace(/`/g,"'").replace(/\n/g,' ')}\`)">📋 Copy</button>
+      </div>
+      <div class="bio-use">${bio.use}</div>
+      <p class="bio-text" style="margin-top:.8rem">${bio.text}</p>
+      <div class="word-count">~${wc} words</div>
+    </div>`;
+  });
+  html += `<div class="tip">💡 <strong>Tip:</strong> Use the short bio for social platforms, medium for LinkedIn, and long for your personal website. Update your bios every 6–12 months as your focus evolves.</div>`;
+
+  document.getElementById('results').innerHTML = html;
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+
+function copyBio(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
