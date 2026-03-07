@@ -1,109 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Browser Support Checker - CSS & JS API Compatibility</title>
-<meta name="description" content="Check browser compatibility for CSS properties and JavaScript APIs.">
-<link rel="canonical" href="https://lifa-su.com/ai-browser-support/">
-<style>*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--border:#2e3348;--text:#e4e6f0;--text2:#9498b0;--accent:#6c5ce7;--accent2:#a29bfe;--green:#00b894;--yellow:#fdcb6e;--red:#e17055;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.3)}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
-.container{max-width:900px;margin:0 auto;padding:20px}
-header{text-align:center;padding:40px 0 30px}
-header h1{font-size:2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
-header p{color:var(--text2);font-size:1rem}
-.search-box{position:relative;margin:0 auto 30px;max-width:600px}
-.search-box input{width:100%;padding:16px 20px 16px 48px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:1.1rem;outline:none;transition:border-color .2s}
-.search-box input:focus{border-color:var(--accent)}
-.search-box input::placeholder{color:var(--text2)}
-.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:1.2rem;pointer-events:none}
-.suggestions{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);max-height:300px;overflow-y:auto;z-index:10;display:none}
-.suggestions.show{display:block}
-.suggestions div{padding:10px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
-.suggestions div:hover,.suggestions div.active{background:var(--surface2)}
-.suggestions .tag{font-size:.75rem;padding:2px 8px;border-radius:4px;background:var(--accent);color:#fff;opacity:.8}
-.tag-js{background:var(--yellow)!important;color:#333!important}
-.categories{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
-.categories button{padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;font-size:.9rem;transition:all .2s}
-.categories button:hover,.categories button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.result-card h2{font-size:1.3rem;margin-bottom:4px;color:var(--accent2)}
-.result-card .type-badge{display:inline-block;font-size:.75rem;padding:2px 10px;border-radius:4px;margin-bottom:12px}
-.type-css{background:rgba(108,92,231,.2);color:var(--accent2)}
-.type-js{background:rgba(253,203,110,.2);color:var(--yellow)}
-.result-card .desc{color:var(--text2);margin-bottom:16px;font-size:.95rem}
-.browser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-.browser-item{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;transition:transform .15s}
-.browser-item:hover{transform:translateY(-2px)}
-.browser-item .b-name{font-size:.85rem;color:var(--text2);margin-bottom:6px}
-.browser-item .b-status{font-size:1.4rem;margin-bottom:4px}
-.browser-item .b-version{font-size:.75rem;color:var(--text2)}
-.support-full{border-bottom:2px solid var(--green)}
-.support-partial{border-bottom:2px solid var(--yellow)}
-.support-none{border-bottom:2px solid var(--red)}
-.polyfill-box{background:var(--surface2);border-radius:8px;padding:16px;margin-top:12px}
-.polyfill-box h4{font-size:.9rem;color:var(--accent2);margin-bottom:8px}
-.polyfill-box p{font-size:.85rem;color:var(--text2)}
-.polyfill-box code{background:rgba(108,92,231,.15);padding:2px 6px;border-radius:4px;font-family:"SF Mono",Monaco,monospace;font-size:.85rem}
-.stats{display:flex;gap:20px;justify-content:center;margin:30px 0;flex-wrap:wrap}
-.stat{text-align:center}
-.stat .num{font-size:1.8rem;font-weight:700;color:var(--accent2)}
-.stat .label{font-size:.8rem;color:var(--text2)}
-.empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
-.empty-state .icon{font-size:3rem;margin-bottom:16px}
-.empty-state p{font-size:1.1rem}
-.browse-all{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:30px}
-.browse-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .2s}
-.browse-item:hover{border-color:var(--accent);transform:translateY(-2px)}
-.browse-item .bi-name{font-weight:600;margin-bottom:4px}
-.browse-item .bi-type{font-size:.75rem;color:var(--text2)}
-.browse-item .bi-compat{margin-top:8px;font-size:1.1rem;letter-spacing:2px}
-.legend{display:flex;gap:16px;justify-content:center;margin:16px 0;font-size:.85rem;color:var(--text2);flex-wrap:wrap}
-.legend span{display:flex;align-items:center;gap:4px}
-footer{text-align:center;padding:40px 0 20px;color:var(--text2);font-size:.8rem}
-footer a{color:var(--accent2);text-decoration:none}
-@media(max-width:600px){header h1{font-size:1.5rem}.browser-grid{grid-template-columns:repeat(3,1fr)}.container{padding:12px}.browse-all{grid-template-columns:1fr}}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Support Checker for Developers &amp; QA | CSS and JavaScript Compatibility</title>
+    <meta name="description" content="Check CSS properties and JavaScript API compatibility across major browsers. Built for developers, QA teams, launch reviews, fallback planning, and browser support workflows.">
+    <meta name="keywords" content="browser support checker, css compatibility checker, javascript api compatibility, browser compatibility testing, developer qa workflow, frontend regression testing, caniuse alternative, browser support matrix">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="theme-color" content="#6c5ce7">
+    <link rel="canonical" href="https://lifa-su.com/ai-browser-support/">
+    <meta property="og:title" content="Browser Support Checker for Developers &amp; QA">
+    <meta property="og:description" content="Search CSS and JavaScript compatibility, review browser support, and plan fallbacks faster for QA, launch checks, and frontend workflow docs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lifa-su.com/ai-browser-support/">
+    <meta property="og:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <meta property="og:site_name" content="Lifa AI Tools">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Browser Support Checker for Developers &amp; QA">
+    <meta name="twitter:description" content="Free browser compatibility checker for CSS features, JavaScript APIs, QA validation, and launch readiness.">
+    <meta name="twitter:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Browser Support Checker",
+          "alternateName": "CSS & JavaScript Compatibility Checker",
+          "url": "https://lifa-su.com/ai-browser-support/",
+          "description": "Free browser support checker for CSS features and JavaScript APIs, designed for developers, QA teams, compatibility triage, and launch reviews.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript and a modern browser.",
+          "featureList": [
+            "Search CSS and JavaScript browser support",
+            "Review support across Chrome, Firefox, Safari, Edge, Opera, and IE",
+            "See fallback and polyfill suggestions",
+            "Use category filters for CSS and JavaScript checks",
+            "Support developer QA and compatibility workflow reviews"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is a browser support checker used for?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A browser support checker helps developers and QA teams verify whether a CSS feature or JavaScript API works across major browsers before release. It is useful for regression testing, planning fallbacks, documenting support policy, and reducing compatibility bugs."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "When should developers check browser compatibility?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Developers should check compatibility when adding newer CSS features, modern JavaScript APIs, design system primitives, performance features, and any code that could affect older Safari, Firefox, Edge, or enterprise browsers."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does a compatibility checker replace real browser testing?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. A compatibility checker is best for fast support triage and planning. Final validation should still include real browser or device testing, responsive review, accessibility checks, and regression QA for the actual user flow."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What should QA document after finding a support gap?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "QA should document the feature name, affected browser and version, visible impact, fallback behavior, severity, test steps, and whether the issue blocks release or can be accepted under the current support policy."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I handle unsupported CSS or JavaScript features?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Use feature detection, progressive enhancement, safe defaults, polyfills where practical, build-time transforms, and clear browser support guidelines. If a feature is critical and lacks safe fallback, consider replacing it with a more widely supported approach."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Which teams benefit from browser support documentation?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Frontend engineers, QA analysts, product owners, technical writers, agencies, and growth teams all benefit from browser support documentation because it reduces ambiguity during implementation, review, and launch coordination."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#242836;--surface3:#2b3042;--border:#2e3348;--text:#e4e6f0;--text2:#9498b0;--text3:#6f748d;--accent:#6c5ce7;--accent2:#a29bfe;--accentGlow:rgba(108,92,231,.18);--green:#00b894;--yellow:#fdcb6e;--red:#e17055;--radius:14px;--radiusSm:10px;--shadow:0 14px 40px rgba(0,0,0,.28)}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:radial-gradient(circle at top,rgba(108,92,231,.12),transparent 30%),var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+    a{color:var(--accent2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1180px;margin:0 auto;padding:24px}
+    .hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.9fr);gap:20px;padding:28px 0 18px}
+    .hero-copy,.hero-panel,.tool-shell,.section-card,.mini-card,.faq-item,.cta-band,.related-card,.footer-note{background:rgba(26,29,39,.94);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}
+    .hero-copy{padding:30px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(108,92,231,.12);border:1px solid rgba(162,155,254,.22);color:var(--accent2);font-size:.8rem;font-weight:700;letter-spacing:.02em;margin-bottom:16px}
+    .hero-copy h1{font-size:clamp(2.1rem,4vw,3.7rem);line-height:1.06;max-width:12ch;margin-bottom:16px}
+    .hero-copy p{color:var(--text2);font-size:1rem;max-width:720px}
+    .hero-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}
+    .hero-points div{background:rgba(108,92,231,.08);border:1px solid rgba(162,155,254,.16);border-radius:14px;padding:14px}
+    .hero-points strong{display:block;font-size:1rem;margin-bottom:4px}
+    .hero-points span{color:var(--text2);font-size:.9rem}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700;border:1px solid transparent;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;color:#fff;text-decoration:none}
+    .btn:hover{text-decoration:none;transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 28px var(--accentGlow)}
+    .btn-secondary{background:var(--surface2);border-color:var(--border);color:var(--text)}
+    .hero-panel{padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+    .hero-panel h2{font-size:1.05rem;margin-bottom:8px}
+    .hero-panel p,.hero-panel li{color:var(--text2);font-size:.94rem}
+    .hero-panel ul{padding-left:18px;display:grid;gap:8px}
+    .tool-shell{padding:22px;margin:10px 0 26px}
+    .tool-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap}
+    .tool-head h2{font-size:1.45rem;margin-bottom:6px}
+    .tool-head p{color:var(--text2);max-width:720px}
+    .quick-links{display:flex;gap:8px;flex-wrap:wrap}
+    .quick-links a{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:999px;color:var(--text2);font-size:.85rem}
+    .quick-links a:hover{border-color:var(--accent);color:var(--text);text-decoration:none}
+    .stats{display:flex;gap:20px;justify-content:flex-start;margin:8px 0 28px;flex-wrap:wrap}
+    .stat{text-align:center;min-width:110px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:14px}
+    .stat .num{font-size:1.8rem;font-weight:700;color:var(--accent2)}
+    .stat .label{font-size:.82rem;color:var(--text2)}
+    .legend{display:flex;gap:16px;justify-content:flex-start;margin:16px 0;font-size:.88rem;color:var(--text2);flex-wrap:wrap}
+    .legend span{display:flex;align-items:center;gap:6px}
+    .categories{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+    .categories button,.chip-row button{padding:9px 18px;border:1px solid var(--border);border-radius:999px;background:transparent;color:var(--text2);cursor:pointer;font-size:.92rem;transition:all .2s}
+    .categories button:hover,.categories button.active,.chip-row button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .search-box{position:relative;margin:0 auto 16px;max-width:760px}
+    .search-box input{width:100%;padding:16px 20px 16px 48px;background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:1.05rem;outline:none;transition:border-color .2s,box-shadow .2s}
+    .search-box input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accentGlow)}
+    .search-box input::placeholder{color:var(--text2)}
+    .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:1.1rem;pointer-events:none}
+    .suggestions{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);max-height:320px;overflow-y:auto;z-index:10;display:none}
+    .suggestions.show{display:block}
+    .suggestions div{padding:10px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+    .suggestions div:hover,.suggestions div.active{background:var(--surface2)}
+    .suggestions .tag{font-size:.75rem;padding:2px 8px;border-radius:4px;background:var(--accent);color:#fff;opacity:.9}
+    .tag-js{background:var(--yellow)!important;color:#333!important}
+    .chip-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+    .result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .result-card h2{font-size:1.3rem;margin-bottom:4px;color:var(--accent2)}
+    .result-card .type-badge{display:inline-block;font-size:.75rem;padding:2px 10px;border-radius:4px;margin-bottom:12px}
+    .type-css{background:rgba(108,92,231,.2);color:var(--accent2)}
+    .type-js{background:rgba(253,203,110,.2);color:var(--yellow)}
+    .result-card .desc{color:var(--text2);margin-bottom:16px;font-size:.95rem}
+    .browser-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+    .browser-item{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;transition:transform .15s}
+    .browser-item:hover{transform:translateY(-2px)}
+    .browser-item .b-name{font-size:.85rem;color:var(--text2);margin-bottom:6px}
+    .browser-item .b-status{font-size:1.4rem;margin-bottom:4px}
+    .browser-item .b-version{font-size:.75rem;color:var(--text2)}
+    .support-full{border-bottom:2px solid var(--green)}
+    .support-partial{border-bottom:2px solid var(--yellow)}
+    .support-none{border-bottom:2px solid var(--red)}
+    .polyfill-box{background:var(--surface2);border-radius:10px;padding:16px;margin-top:12px}
+    .polyfill-box h4{font-size:.92rem;color:var(--accent2);margin-bottom:8px}
+    .polyfill-box p{font-size:.88rem;color:var(--text2)}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text2)}
+    .empty-state .icon{font-size:3rem;margin-bottom:16px}
+    .empty-state p{font-size:1.05rem}
+    .browse-all{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:10px}
+    .browse-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
+    .browse-item:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .browse-item .bi-name{font-weight:600;margin-bottom:4px}
+    .browse-item .bi-type{font-size:.75rem;color:var(--text2)}
+    .browse-item .bi-compat{margin-top:8px;font-size:1.1rem;letter-spacing:2px}
+    .section-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;margin:18px 0 24px}
+    .section-card{padding:22px}
+    .section-card h2{font-size:1.35rem;margin-bottom:10px}
+    .section-card p.lead{color:var(--text2);margin-bottom:18px}
+    .span-12{grid-column:span 12}
+    .span-6{grid-column:span 6}
+    .span-4{grid-column:span 4}
+    .mini-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .mini-card{padding:18px}
+    .mini-card h3{font-size:1.02rem;margin-bottom:8px}
+    .mini-card p,.mini-card li{color:var(--text2);font-size:.93rem}
+    .mini-card ul{padding-left:18px;display:grid;gap:8px}
+    .workflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+    .workflow-step{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative}
+    .workflow-step .step-no{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:rgba(108,92,231,.18);color:var(--accent2);font-weight:800;margin-bottom:10px}
+    .workflow-step h3{font-size:1rem;margin-bottom:6px}
+    .workflow-step p{color:var(--text2);font-size:.92rem}
+    .best-list{display:grid;gap:12px}
+    .best-item{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:14px}
+    .best-item strong{display:block;margin-bottom:4px}
+    .best-item p{color:var(--text2);font-size:.93rem}
+    .faq{display:grid;gap:12px}
+    .faq-item{padding:0;overflow:hidden}
+    .faq-item summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;display:flex;justify-content:space-between;gap:12px}
+    .faq-item summary::-webkit-details-marker{display:none}
+    .faq-item p{padding:0 20px 18px;color:var(--text2)}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .related-card{padding:18px}
+    .related-card h3{margin-bottom:8px;font-size:1rem}
+    .related-card p{color:var(--text2);font-size:.92rem;margin-bottom:12px}
+    .related-card a{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+    .cta-band{padding:24px;margin:8px 0 28px;display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap;background:linear-gradient(135deg,rgba(108,92,231,.16),rgba(162,155,254,.08))}
+    .cta-band h2{font-size:1.45rem;margin-bottom:8px}
+    .cta-band p{color:var(--text2);max-width:760px}
+    .footer-note{padding:18px 20px;text-align:center;color:var(--text2);font-size:.9rem;margin-bottom:22px}
+    .footer-note a{font-weight:700}
+    footer{text-align:center;padding:8px 0 28px;color:var(--text3);font-size:.82rem}
+    @media(max-width:920px){.hero{grid-template-columns:1fr}.span-6,.span-4{grid-column:span 12}.hero-points{grid-template-columns:1fr}.tool-head{flex-direction:column}.stats{justify-content:center}.legend{justify-content:center}}
+    @media(max-width:600px){.container{padding:14px}.hero-copy,.hero-panel,.tool-shell,.section-card,.cta-band,.footer-note{border-radius:16px}.hero-copy{padding:22px}.hero-copy h1{font-size:2rem}.browse-all,.workflow,.mini-grid,.related-grid{grid-template-columns:1fr}.browser-grid{grid-template-columns:repeat(3,1fr)}.search-box input{font-size:1rem}}
+    </style>
 </head>
 <body>
 <div class="container">
-<header>
-<h1>🌐 Browser Support Checker</h1>
-<p>Check CSS &amp; JavaScript API compatibility across browsers</p>
-</header>
-<div class="stats" id="stats"></div>
-<div class="legend">
-<span>✅ Full Support</span>
-<span>⚠️ Partial Support</span>
-<span>❌ No Support</span>
+    <section class="hero">
+        <div class="hero-copy">
+            <div class="eyebrow">🌐 Developer Docs • QA Workflow • Compatibility Triage</div>
+            <h1>Browser support checks that fit real launch workflow.</h1>
+            <p>Search CSS properties and JavaScript APIs, review support across major browsers, and document fallback decisions before you ship. This page is built for frontend developers, QA analysts, technical writers, and teams who need a fast compatibility checkpoint without leaving their dark-mode workflow.</p>
+            <div class="hero-points">
+                <div>
+                    <strong>Faster triage</strong>
+                    <span>Quickly confirm whether a feature is safe, partial, or risky before implementation or release.</span>
+                </div>
+                <div>
+                    <strong>Better handoffs</strong>
+                    <span>Turn support checks into clearer QA notes, browser matrices, and engineering tickets.</span>
+                </div>
+                <div>
+                    <strong>Cleaner launches</strong>
+                    <span>Combine support review with responsive, accessibility, API, and content QA before publishing.</span>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#checker">Open compatibility checker</a>
+                <a class="btn btn-secondary" href="/content-creator-toolkit.html">Explore Content Creator Toolkit</a>
+            </div>
+        </div>
+        <aside class="hero-panel">
+            <div>
+                <h2>Best fit for</h2>
+                <ul>
+                    <li>Frontend teams validating new CSS and modern JavaScript adoption</li>
+                    <li>QA reviewers building browser support acceptance criteria</li>
+                    <li>Agencies checking launch pages before handoff</li>
+                    <li>Docs writers explaining fallbacks, support ranges, and rollout notes</li>
+                </ul>
+            </div>
+            <div>
+                <h2>Pair it with</h2>
+                <p>Use this page alongside responsive QA, accessibility checks, API testing, and content review so compatibility issues do not hide inside bigger release bundles.</p>
+            </div>
+        </aside>
+    </section>
+
+    <section class="tool-shell" id="checker">
+        <div class="tool-head">
+            <div>
+                <h2>Browser Support Checker</h2>
+                <p>Search by CSS feature or JavaScript API, filter by category, and review support across Chrome, Firefox, Safari, Edge, Opera, and legacy IE coverage. Use the polyfill notes as a starting point for fallback planning.</p>
+            </div>
+            <div class="quick-links">
+                <a href="#use-cases">Use cases</a>
+                <a href="#workflow">Workflow</a>
+                <a href="#best-practices">Best practices</a>
+                <a href="#faq">FAQ</a>
+            </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="legend">
+            <span>✅ Full Support</span>
+            <span>⚠️ Partial Support</span>
+            <span>❌ No Support</span>
+        </div>
+
+        <div class="categories" id="categories">
+            <button class="active" data-cat="all">All</button>
+            <button data-cat="css">CSS</button>
+            <button data-cat="js">JavaScript</button>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search" placeholder="Search CSS property or JS API... (e.g. grid, fetch, flexbox)" autocomplete="off" aria-label="Search browser compatibility">
+            <div class="suggestions" id="suggestions" role="listbox"></div>
+        </div>
+
+        <div class="chip-row" aria-label="Popular browser support searches">
+            <button type="button" data-query="Container Queries">Container Queries</button>
+            <button type="button" data-query="View Transitions">View Transitions</button>
+            <button type="button" data-query="fetch API">fetch API</button>
+            <button type="button" data-query="ResizeObserver">ResizeObserver</button>
+            <button type="button" data-query="CSS Nesting">CSS Nesting</button>
+            <button type="button" data-query="AbortController">AbortController</button>
+        </div>
+
+        <div id="results"></div>
+        <div id="browse"></div>
+        <div class="empty-state" id="empty" style="display:none">
+            <div class="icon">🔍</div>
+            <p>No results found. Try a different search term.</p>
+        </div>
+    </section>
+
+    <section class="section-grid" id="use-cases">
+        <article class="section-card span-12">
+            <h2>Use cases for developer, QA, and docs workflow</h2>
+            <p class="lead">Compatibility review is not just an engineering concern. It affects requirement writing, release risk, documentation accuracy, and conversion performance when critical UI components fail in specific browsers.</p>
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <h3>Frontend implementation triage</h3>
+                    <p>Before merging a new CSS or JavaScript feature, confirm whether the target browser matrix supports it. If not, choose progressive enhancement, a build-time transform, or a fallback component.</p>
+                </div>
+                <div class="mini-card">
+                    <h3>QA regression review</h3>
+                    <p>When a bug appears only in Safari, Firefox, or older enterprise setups, use support checks to decide whether the issue is a code regression, an unsupported feature, or an accepted browser-policy exception.</p>
+                </div>
+                <div class="mini-card">
+                    <h3>Launch and funnel validation</h3>
+                    <p>Landing pages, signup funnels, pricing tables, sticky CTAs, and form validation often break because of browser-specific gaps. Compatibility checks reduce silent conversion leaks.</p>
+                </div>
+                <div class="mini-card">
+                    <h3>Documentation and customer support</h3>
+                    <p>Docs writers and support teams can use compatibility info to write clearer release notes, help center guidance, and fallback instructions when customers report browser-specific behavior.</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="section-grid" id="workflow">
+        <article class="section-card span-12">
+            <h2>Browser support workflow for shipping teams</h2>
+            <p class="lead">A lightweight compatibility workflow catches risky features early, keeps QA aligned with engineering, and gives PMs cleaner release decisions.</p>
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="step-no">1</div>
+                    <h3>Define target browsers</h3>
+                    <p>Start with product policy: which browsers, minimum versions, and traffic segments matter for the page or app you are shipping.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-no">2</div>
+                    <h3>Check new features early</h3>
+                    <p>Review modern CSS and JS choices during implementation, not after staging bugs appear. It is cheaper to swap patterns before UI and copy are finalized.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-no">3</div>
+                    <h3>Document fallbacks</h3>
+                    <p>Note polyfills, degraded behavior, acceptable UI variance, and non-blocking limitations so QA and support teams test against the same expectations.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-no">4</div>
+                    <h3>Run real QA passes</h3>
+                    <p>Validate the real user journey in responsive layouts and target browsers. Compatibility data is a guide, not a substitute for staged testing.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-no">5</div>
+                    <h3>Capture regression notes</h3>
+                    <p>When a bug is found, log the browser, version, impact severity, fallback status, and whether it violates release policy or design tolerance.</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="section-grid" id="best-practices">
+        <article class="section-card span-6">
+            <h2>Best practices for compatibility planning</h2>
+            <div class="best-list">
+                <div class="best-item">
+                    <div>🧭</div>
+                    <div><strong>Use progressive enhancement first</strong><p>Ship a solid baseline experience, then layer newer features where support exists. This is usually cleaner than building brittle polyfills for every edge case.</p></div>
+                </div>
+                <div class="best-item">
+                    <div>🧪</div>
+                    <div><strong>Pair support data with real browser tests</strong><p>Support tables tell you what should work. Real devices and browsers reveal layout bugs, performance regressions, and event-handling issues that tables cannot show.</p></div>
+                </div>
+                <div class="best-item">
+                    <div>📝</div>
+                    <div><strong>Write fallback behavior into QA acceptance criteria</strong><p>Do not leave “works in Safari” as an assumption. Define what success looks like when support is partial, degraded, or intentionally limited.</p></div>
+                </div>
+                <div class="best-item">
+                    <div>📦</div>
+                    <div><strong>Prefer build-time transforms when possible</strong><p>Autoprefixing, transpiling, and design system constraints often reduce compatibility risk better than runtime polyfills layered late in the process.</p></div>
+                </div>
+            </div>
+        </article>
+        <article class="section-card span-6">
+            <h2>What to document in a browser support note</h2>
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <h3>Feature under review</h3>
+                    <p>Record the CSS property, selector, API, or component dependency involved in the change.</p>
+                </div>
+                <div class="mini-card">
+                    <h3>Affected browsers</h3>
+                    <p>Call out browser family and version ranges rather than vague labels like “older Safari.”</p>
+                </div>
+                <div class="mini-card">
+                    <h3>User-visible impact</h3>
+                    <p>State whether the issue affects layout, interactivity, performance, accessibility, or conversion-critical content.</p>
+                </div>
+                <div class="mini-card">
+                    <h3>Fallback decision</h3>
+                    <p>Document whether you will polyfill, gracefully degrade, redesign, or accept the limitation.</p>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section class="cta-band">
+        <div>
+            <h2>Need conversion-ready content around your QA workflow?</h2>
+            <p>Use the Content Creator Toolkit to turn developer know-how into publishable tutorials, launch content, help docs, onboarding copy, and SEO pages that support your product and testing workflow.</p>
+        </div>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="/content-creator-toolkit.html">Open Content Creator Toolkit</a>
+            <a class="btn btn-secondary" href="#related-tools">See related QA tools</a>
+        </div>
+    </section>
+
+    <section class="section-grid" id="faq">
+        <article class="section-card span-12">
+            <h2>FAQ</h2>
+            <div class="faq">
+                <details class="faq-item" open>
+                    <summary>What is a browser support checker used for? <span>+</span></summary>
+                    <p>A browser support checker helps teams verify whether a CSS feature or JavaScript API is safe to ship across their target browsers. It is useful for implementation planning, QA triage, release notes, fallback decisions, and preventing regressions that only appear in specific browsers.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Does this replace responsive or real-device testing? <span>+</span></summary>
+                    <p>No. Compatibility review is the fast first layer. You should still test important flows on real browsers and combine that with responsive layout review, accessibility validation, and performance checks before launch.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How should QA treat partial browser support? <span>+</span></summary>
+                    <p>Partial support should trigger a review of user impact, acceptable degradation, and fallback behavior. Some partial support is harmless visual variance; some breaks key actions such as form completion, sticky CTAs, or content discoverability.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>When is a polyfill the wrong answer? <span>+</span></summary>
+                    <p>A polyfill may be the wrong answer when it adds bundle weight, creates maintenance risk, performs poorly, or still fails to reproduce native behavior. In those cases, a simpler supported pattern is usually better.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What pages usually need browser compatibility review first? <span>+</span></summary>
+                    <p>Prioritize revenue and risk-heavy surfaces: landing pages, signup flows, checkout or contact forms, dashboards, onboarding, app shells, design system primitives, and high-traffic content templates.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What should happen after this check? <span>+</span></summary>
+                    <p>After reviewing support, validate the page in real browsers, update QA notes, confirm fallback behavior, and send the page through related checks like responsive testing, accessibility review, API validation, and SEO meta inspection.</p>
+                </details>
+            </div>
+        </article>
+    </section>
+
+    <section class="section-grid" id="related-tools">
+        <article class="section-card span-12">
+            <h2>Related tools and next steps</h2>
+            <p class="lead">Compatibility checking works best as part of a larger quality loop. These related pages help extend the workflow from browser support into launch readiness.</p>
+            <div class="related-grid">
+                <div class="related-card">
+                    <h3>AI Responsive Tester</h3>
+                    <p>Preview layouts across device sizes to catch breakpoint issues after confirming browser support assumptions.</p>
+                    <a href="/ai-responsive-tester/">Open responsive tester →</a>
+                </div>
+                <div class="related-card">
+                    <h3>AI Accessibility Checker</h3>
+                    <p>Review accessibility issues that can compound browser-specific UI problems, especially in forms and navigation.</p>
+                    <a href="/ai-accessibility-checker/">Open accessibility checker →</a>
+                </div>
+                <div class="related-card">
+                    <h3>AI SEO Meta</h3>
+                    <p>Validate titles, descriptions, and social preview metadata before publishing docs, launch pages, or changelog content.</p>
+                    <a href="/ai-seo-meta/">Open SEO meta tool →</a>
+                </div>
+                <div class="related-card">
+                    <h3>AI API Tester</h3>
+                    <p>Use after frontend compatibility review to make sure the dependent API requests and responses still behave as expected.</p>
+                    <a href="/ai-api-tester/">Open API tester →</a>
+                </div>
+                <div class="related-card">
+                    <h3>AI Unit Test</h3>
+                    <p>Turn repeated compatibility bugs into automated checks so browser regressions do not come back later.</p>
+                    <a href="/ai-unit-test/">Open unit test tool →</a>
+                </div>
+                <div class="related-card">
+                    <h3>Content Creator Toolkit</h3>
+                    <p>Create tutorials, docs, social posts, and release content that explain your browser support policy and QA process clearly.</p>
+                    <a href="/content-creator-toolkit.html">Open toolkit →</a>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <div class="footer-note">
+        Data references in this tool are based on caniuse.com and MDN-style browser support snapshots in the page dataset. Use this as a fast planning layer, then confirm critical journeys in staging. Want to turn testing notes into publishable docs or launch assets? <a href="/content-creator-toolkit.html">Start with the Content Creator Toolkit</a>.
+    </div>
+
+    <footer>
+        <p>Browser support checker for developers, QA, compatibility docs, and launch workflow. Last dataset update in page source: Feb 2025.</p>
+    </footer>
 </div>
-<div class="categories" id="categories">
-<button class="active" data-cat="all">All</button>
-<button data-cat="css">CSS</button>
-<button data-cat="js">JavaScript</button>
-</div>
-<div class="search-box">
-<span class="search-icon">🔍</span>
-<input type="text" id="search" placeholder="Search CSS property or JS API... (e.g. grid, fetch, flexbox)" autocomplete="off" aria-label="Search browser compatibility">
-<div class="suggestions" id="suggestions" role="listbox"></div>
-</div>
-<div id="results"></div>
-<div id="browse"></div>
-<div class="empty-state" id="empty" style="display:none">
-<div class="icon">🔍</div>
-<p>No results found. Try a different search term.</p>
-</div>
-</div>
-<footer>
-<p>Data based on caniuse.com &amp; MDN Web Docs. Last updated Feb 2025.</p>
-</footer>
+
 <script>
 const DB = [{"name": "CSS Grid", "type": "css", "desc": "Two-dimensional grid-based layout system", "browsers": {"Chrome": ["full", "57+"], "Firefox": ["full", "52+"], "Safari": ["full", "10.1+"], "Edge": ["full", "16+"], "Opera": ["full", "44+"], "IE": ["partial", "10+ (old spec)"]}, "polyfill": "Use Autoprefixer for IE10-11 old grid spec. Consider fallback with flexbox."}, {"name": "Flexbox", "type": "css", "desc": "One-dimensional flexible box layout", "browsers": {"Chrome": ["full", "29+"], "Firefox": ["full", "28+"], "Safari": ["full", "9+"], "Edge": ["full", "12+"], "Opera": ["full", "17+"], "IE": ["partial", "10-11 (prefix)"]}, "polyfill": "Use Autoprefixer. IE10-11 has many bugs - use flexbugs for known issues."}, {"name": "Container Queries", "type": "css", "desc": "Style elements based on container size instead of viewport", "browsers": {"Chrome": ["full", "105+"], "Firefox": ["full", "110+"], "Safari": ["full", "16+"], "Edge": ["full", "105+"], "Opera": ["full", "91+"], "IE": ["none", "-"]}, "polyfill": "Use container-query-polyfill from Google Chrome Labs."}, {"name": ":has() Selector", "type": "css", "desc": "Parent selector - select elements that contain specific children", "browsers": {"Chrome": ["full", "105+"], "Firefox": ["full", "121+"], "Safari": ["full", "15.4+"], "Edge": ["full", "105+"], "Opera": ["full", "91+"], "IE": ["none", "-"]}, "polyfill": "No reliable polyfill. Use JavaScript querySelector as fallback."}, {"name": "aspect-ratio", "type": "css", "desc": "Set preferred aspect ratio for an element", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "89+"], "Safari": ["full", "15+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "Use padding-top percentage hack: padding-top: 56.25% for 16:9."}, {"name": "backdrop-filter", "type": "css", "desc": "Apply filters to area behind an element", "browsers": {"Chrome": ["full", "76+"], "Firefox": ["full", "103+"], "Safari": ["full", "9+ (-webkit-)"], "Edge": ["full", "17+"], "Opera": ["full", "63+"], "IE": ["none", "-"]}, "polyfill": "Safari needs -webkit-backdrop-filter prefix. No IE fallback."}, {"name": "Scroll Snap", "type": "css", "desc": "Control scroll snapping behavior", "browsers": {"Chrome": ["full", "69+"], "Firefox": ["full", "68+"], "Safari": ["full", "11+"], "Edge": ["full", "79+"], "Opera": ["full", "56+"], "IE": ["partial", "10+ (old spec)"]}, "polyfill": "IE10+ supports old -ms-scroll-snap spec."}, {"name": "Subgrid", "type": "css", "desc": "Inherit parent grid tracks in nested grids", "browsers": {"Chrome": ["full", "117+"], "Firefox": ["full", "71+"], "Safari": ["full", "16+"], "Edge": ["full", "117+"], "Opera": ["full", "103+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Use named grid lines or explicit track sizes."}, {"name": "@layer", "type": "css", "desc": "Cascade layers for managing CSS specificity", "browsers": {"Chrome": ["full", "99+"], "Firefox": ["full", "97+"], "Safari": ["full", "15.4+"], "Edge": ["full", "99+"], "Opera": ["full", "85+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Use BEM or specificity management as fallback."}, {"name": "color-mix()", "type": "css", "desc": "Mix two colors in a given color space", "browsers": {"Chrome": ["full", "111+"], "Firefox": ["full", "113+"], "Safari": ["full", "16.2+"], "Edge": ["full", "111+"], "Opera": ["full", "97+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS plugin postcss-color-mix or pre-calculate colors."}, {"name": ":is() Selector", "type": "css", "desc": "Matches any element matching the selector list", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "78+"], "Safari": ["full", "14+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "Use :-webkit-any() / :-moz-any() as prefix fallbacks."}, {"name": ":where() Selector", "type": "css", "desc": "Like :is() but with zero specificity", "browsers": {"Chrome": ["full", "88+"], "Firefox": ["full", "78+"], "Safari": ["full", "14+"], "Edge": ["full", "88+"], "Opera": ["full", "74+"], "IE": ["none", "-"]}, "polyfill": "No polyfill. Write selectors with low specificity manually."}, {"name": "gap (flexbox)", "type": "css", "desc": "Gap property support in flexbox layouts", "browsers": {"Chrome": ["full", "84+"], "Firefox": ["full", "63+"], "Safari": ["full", "14.1+"], "Edge": ["full", "84+"], "Opera": ["full", "70+"], "IE": ["none", "-"]}, "polyfill": "Use margin on flex children as fallback."}, {"name": "overflow-wrap", "type": "css", "desc": "Control line breaking within words", "browsers": {"Chrome": ["full", "23+"], "Firefox": ["full", "49+"], "Safari": ["full", "7+"], "Edge": ["full", "18+"], "Opera": ["full", "12.1+"], "IE": ["full", "5.5+ (word-wrap)"]}, "polyfill": "Use word-wrap: break-word as fallback."}, {"name": "text-wrap: balance", "type": "css", "desc": "Balance text across multiple lines", "browsers": {"Chrome": ["full", "114+"], "Firefox": ["full", "121+"], "Safari": ["partial", "17.5+"], "Edge": ["full", "114+"], "Opera": ["full", "100+"], "IE": ["none", "-"]}, "polyfill": "Use JavaScript text-balancer library as polyfill."}, {"name": "View Transitions", "type": "css", "desc": "Animate transitions between DOM states", "browsers": {"Chrome": ["full", "111+"], "Firefox": ["full", "126+"], "Safari": ["partial", "18+"], "Edge": ["full", "111+"], "Opera": ["full", "97+"], "IE": ["none", "-"]}, "polyfill": "Use view-transitions-polyfill or custom FLIP animations."}, {"name": "Anchor Positioning", "type": "css", "desc": "Position elements relative to anchor elements", "browsers": {"Chrome": ["full", "125+"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["full", "125+"], "Opera": ["full", "111+"], "IE": ["none", "-"]}, "polyfill": "Use Floating UI/Popper.js for JavaScript-based positioning."}, {"name": "@scope", "type": "css", "desc": "Scoped styling with upper and lower boundaries", "browsers": {"Chrome": ["full", "118+"], "Firefox": ["none", "-"], "Safari": ["partial", "17.4+"], "Edge": ["full", "118+"], "Opera": ["full", "104+"], "IE": ["none", "-"]}, "polyfill": "Use BEM naming or CSS Modules for scoped styles."}, {"name": "CSS Nesting", "type": "css", "desc": "Native CSS nesting without preprocessors", "browsers": {"Chrome": ["full", "120+"], "Firefox": ["full", "117+"], "Safari": ["full", "17.2+"], "Edge": ["full", "120+"], "Opera": ["full", "106+"], "IE": ["none", "-"]}, "polyfill": "Use Sass, Less, or PostCSS nesting plugin."}, {"name": "clamp()", "type": "css", "desc": "Clamp a value between min and max", "browsers": {"Chrome": ["full", "79+"], "Firefox": ["full", "75+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "66+"], "IE": ["none", "-"]}, "polyfill": "Use calc() with min()/max() or set min/max separately."}, {"name": "CSS Variables", "type": "css", "desc": "Custom properties for reusable values", "browsers": {"Chrome": ["full", "49+"], "Firefox": ["full", "31+"], "Safari": ["full", "9.1+"], "Edge": ["full", "15+"], "Opera": ["full", "36+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS custom properties plugin or Sass variables."}, {"name": "position: sticky", "type": "css", "desc": "Element sticks during scroll within container", "browsers": {"Chrome": ["full", "56+"], "Firefox": ["full", "32+"], "Safari": ["full", "6.1+ (-webkit-)"], "Edge": ["full", "16+"], "Opera": ["full", "43+"], "IE": ["none", "-"]}, "polyfill": "Use stickyfill.js polyfill."}, {"name": "@supports", "type": "css", "desc": "Feature queries to test CSS support", "browsers": {"Chrome": ["full", "28+"], "Firefox": ["full", "22+"], "Safari": ["full", "9+"], "Edge": ["full", "12+"], "Opera": ["full", "12.1+"], "IE": ["none", "-"]}, "polyfill": "Use Modernizr for feature detection."}, {"name": "object-fit", "type": "css", "desc": "Control how replaced elements fit their container", "browsers": {"Chrome": ["full", "32+"], "Firefox": ["full", "36+"], "Safari": ["full", "10+"], "Edge": ["full", "16+"], "Opera": ["full", "19+"], "IE": ["none", "-"]}, "polyfill": "Use object-fit-images polyfill for IE."}, {"name": "mix-blend-mode", "type": "css", "desc": "Blend element with background", "browsers": {"Chrome": ["full", "41+"], "Firefox": ["full", "32+"], "Safari": ["full", "8+"], "Edge": ["full", "79+"], "Opera": ["full", "28+"], "IE": ["none", "-"]}, "polyfill": "No IE support. Use canvas-based blending or solid fallback."}, {"name": "clip-path", "type": "css", "desc": "Clip element to basic shape or SVG path", "browsers": {"Chrome": ["full", "55+"], "Firefox": ["full", "54+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "42+"], "IE": ["none", "-"]}, "polyfill": "Use SVG clipPath element for broader support."}, {"name": "CSS Logical Properties", "type": "css", "desc": "Direction-aware properties (inline/block)", "browsers": {"Chrome": ["full", "87+"], "Firefox": ["full", "66+"], "Safari": ["full", "15+"], "Edge": ["full", "87+"], "Opera": ["full", "73+"], "IE": ["none", "-"]}, "polyfill": "Use PostCSS Logical plugin for physical property fallbacks."}, {"name": "accent-color", "type": "css", "desc": "Customize form control accent colors", "browsers": {"Chrome": ["full", "93+"], "Firefox": ["full", "92+"], "Safari": ["full", "15.4+"], "Edge": ["full", "93+"], "Opera": ["full", "79+"], "IE": ["none", "-"]}, "polyfill": "Use custom-styled form controls as fallback."}, {"name": "color-scheme", "type": "css", "desc": "Indicate supported color schemes (light/dark)", "browsers": {"Chrome": ["full", "81+"], "Firefox": ["full", "96+"], "Safari": ["full", "13+"], "Edge": ["full", "81+"], "Opera": ["full", "68+"], "IE": ["none", "-"]}, "polyfill": "Use prefers-color-scheme media query with manual theme switching."}, {"name": "content-visibility", "type": "css", "desc": "Skip rendering of off-screen content", "browsers": {"Chrome": ["full", "85+"], "Firefox": ["full", "125+"], "Safari": ["partial", "18+"], "Edge": ["full", "85+"], "Opera": ["full", "71+"], "IE": ["none", "-"]}, "polyfill": "Use IntersectionObserver with lazy rendering as alternative."}, {"name": "@property", "type": "css", "desc": "Register custom properties with syntax and defaults", "browsers": {"Chrome": ["full", "85+"], "Firefox": ["full", "128+"], "Safari": ["full", "15.4+"], "Edge": ["full", "85+"], "Opera": ["full", "71+"], "IE": ["none", "-"]}, "polyfill": "Use CSS.registerProperty() JS API or Houdini polyfill."}, {"name": "scroll-timeline", "type": "css", "desc": "Animation timeline based on scroll progress", "browsers": {"Chrome": ["full", "115+"], "Firefox": ["full", "110+"], "Safari": ["none", "-"], "Edge": ["full", "115+"], "Opera": ["full", "101+"], "IE": ["none", "-"]}, "polyfill": "Use scroll-timeline-polyfill or GSAP ScrollTrigger."}, {"name": "text-decoration-thickness", "type": "css", "desc": "Control thickness of text decorations", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["full", "70+"], "Safari": ["full", "12.1+"], "Edge": ["full", "89+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Use border-bottom with padding-bottom as fallback."}, {"name": "overscroll-behavior", "type": "css", "desc": "Control scroll chaining and bounce effects", "browsers": {"Chrome": ["full", "63+"], "Firefox": ["full", "59+"], "Safari": ["full", "16+"], "Edge": ["full", "18+"], "Opera": ["full", "50+"], "IE": ["none", "-"]}, "polyfill": "Use JS to prevent scroll propagation as fallback."}, {"name": "@container style queries", "type": "css", "desc": "Query computed styles of container", "browsers": {"Chrome": ["partial", "111+"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["partial", "111+"], "Opera": ["partial", "97+"], "IE": ["none", "-"]}, "polyfill": "Very limited support. Use CSS custom properties with JS."}, {"name": "IntersectionObserver", "type": "js", "desc": "Observe element visibility in viewport", "browsers": {"Chrome": ["full", "51+"], "Firefox": ["full", "55+"], "Safari": ["full", "12.1+"], "Edge": ["full", "15+"], "Opera": ["full", "38+"], "IE": ["none", "-"]}, "polyfill": "Use intersection-observer polyfill from W3C."}, {"name": "ResizeObserver", "type": "js", "desc": "Observe element size changes", "browsers": {"Chrome": ["full", "64+"], "Firefox": ["full", "69+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "51+"], "IE": ["none", "-"]}, "polyfill": "Use resize-observer-polyfill or @juggle/resize-observer."}, {"name": "fetch API", "type": "js", "desc": "Modern HTTP request API replacing XMLHttpRequest", "browsers": {"Chrome": ["full", "42+"], "Firefox": ["full", "39+"], "Safari": ["full", "10.1+"], "Edge": ["full", "14+"], "Opera": ["full", "29+"], "IE": ["none", "-"]}, "polyfill": "Use whatwg-fetch or unfetch polyfill. Or use axios."}, {"name": "Promise", "type": "js", "desc": "Asynchronous operation handling", "browsers": {"Chrome": ["full", "32+"], "Firefox": ["full", "29+"], "Safari": ["full", "8+"], "Edge": ["full", "12+"], "Opera": ["full", "19+"], "IE": ["none", "-"]}, "polyfill": "Use es6-promise polyfill or bluebird for IE11."}, {"name": "async/await", "type": "js", "desc": "Syntactic sugar for Promises", "browsers": {"Chrome": ["full", "55+"], "Firefox": ["full", "52+"], "Safari": ["full", "10.1+"], "Edge": ["full", "15+"], "Opera": ["full", "42+"], "IE": ["none", "-"]}, "polyfill": "Use Babel to transpile to ES5 with regenerator-runtime."}, {"name": "Web Components", "type": "js", "desc": "Custom elements, Shadow DOM, templates", "browsers": {"Chrome": ["full", "67+"], "Firefox": ["full", "63+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "54+"], "IE": ["none", "-"]}, "polyfill": "Use @webcomponents/webcomponentsjs polyfill bundle."}, {"name": "Service Worker", "type": "js", "desc": "Background scripts for offline and caching", "browsers": {"Chrome": ["full", "40+"], "Firefox": ["full", "44+"], "Safari": ["full", "11.1+"], "Edge": ["full", "17+"], "Opera": ["full", "27+"], "IE": ["none", "-"]}, "polyfill": "No IE polyfill. Use AppCache (deprecated) as fallback."}, {"name": "WebSocket", "type": "js", "desc": "Full-duplex communication channel", "browsers": {"Chrome": ["full", "16+"], "Firefox": ["full", "11+"], "Safari": ["full", "7+"], "Edge": ["full", "12+"], "Opera": ["full", "12.1+"], "IE": ["full", "10+"]}, "polyfill": "Broadly supported. Use Socket.IO for fallback to polling."}, {"name": "Clipboard API", "type": "js", "desc": "Async clipboard read/write access", "browsers": {"Chrome": ["full", "66+"], "Firefox": ["full", "63+"], "Safari": ["full", "13.1+"], "Edge": ["full", "79+"], "Opera": ["full", "53+"], "IE": ["none", "-"]}, "polyfill": "Use clipboard-polyfill or document.execCommand('copy')."}, {"name": "Web Share API", "type": "js", "desc": "Native sharing dialog on supported platforms", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["none", "-"], "Safari": ["full", "12.1+"], "Edge": ["full", "93+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "No Firefox desktop. Provide custom share buttons as fallback."}, {"name": "Intl API", "type": "js", "desc": "Internationalization: number, date, collation formatting", "browsers": {"Chrome": ["full", "24+"], "Firefox": ["full", "29+"], "Safari": ["full", "10+"], "Edge": ["full", "12+"], "Opera": ["full", "15+"], "IE": ["partial", "11 (basic)"]}, "polyfill": "Use @formatjs/intl polyfills for older browsers."}, {"name": "structuredClone()", "type": "js", "desc": "Deep clone JavaScript objects", "browsers": {"Chrome": ["full", "98+"], "Firefox": ["full", "94+"], "Safari": ["full", "15.4+"], "Edge": ["full", "98+"], "Opera": ["full", "84+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or JSON.parse(JSON.stringify()) for simple objects."}, {"name": "Array.at()", "type": "js", "desc": "Access array elements with negative indexing", "browsers": {"Chrome": ["full", "92+"], "Firefox": ["full", "90+"], "Safari": ["full", "15.4+"], "Edge": ["full", "92+"], "Opera": ["full", "78+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or arr[arr.length - 1]."}, {"name": "Object.hasOwn()", "type": "js", "desc": "Check own property existence (replaces hasOwnProperty)", "browsers": {"Chrome": ["full", "93+"], "Firefox": ["full", "92+"], "Safari": ["full", "15.4+"], "Edge": ["full", "93+"], "Opera": ["full", "79+"], "IE": ["none", "-"]}, "polyfill": "Use Object.prototype.hasOwnProperty.call(obj, prop)."}, {"name": "crypto.randomUUID()", "type": "js", "desc": "Generate RFC 4122 v4 UUID", "browsers": {"Chrome": ["full", "92+"], "Firefox": ["full", "95+"], "Safari": ["full", "15.4+"], "Edge": ["full", "92+"], "Opera": ["full", "78+"], "IE": ["none", "-"]}, "polyfill": "Use uuid npm package or Math.random() based generator."}, {"name": "AbortController", "type": "js", "desc": "Cancel fetch requests and other async operations", "browsers": {"Chrome": ["full", "66+"], "Firefox": ["full", "57+"], "Safari": ["full", "12.1+"], "Edge": ["full", "16+"], "Opera": ["full", "53+"], "IE": ["none", "-"]}, "polyfill": "Use abortcontroller-polyfill for older browsers."}, {"name": "Proxy", "type": "js", "desc": "Intercept and customize object operations", "browsers": {"Chrome": ["full", "49+"], "Firefox": ["full", "18+"], "Safari": ["full", "10+"], "Edge": ["full", "12+"], "Opera": ["full", "36+"], "IE": ["none", "-"]}, "polyfill": "Use proxy-polyfill (limited). Cannot fully polyfill."}, {"name": "WeakRef", "type": "js", "desc": "Weak reference to an object", "browsers": {"Chrome": ["full", "84+"], "Firefox": ["full", "79+"], "Safari": ["full", "14.1+"], "Edge": ["full", "84+"], "Opera": ["full", "70+"], "IE": ["none", "-"]}, "polyfill": "No polyfill possible. Redesign to avoid weak references."}, {"name": "Top-level await", "type": "js", "desc": "Use await at module top level", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["full", "89+"], "Safari": ["full", "15+"], "Edge": ["full", "89+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Wrap in async IIFE: (async () => { await ... })()."}, {"name": "Array.findLast()", "type": "js", "desc": "Find last matching element in array", "browsers": {"Chrome": ["full", "97+"], "Firefox": ["full", "104+"], "Safari": ["full", "15.4+"], "Edge": ["full", "97+"], "Opera": ["full", "83+"], "IE": ["none", "-"]}, "polyfill": "Use core-js polyfill or manual reverse iteration."}, {"name": "Navigator.share()", "type": "js", "desc": "Trigger native share dialog", "browsers": {"Chrome": ["full", "89+"], "Firefox": ["none", "-"], "Safari": ["full", "12.1+"], "Edge": ["full", "93+"], "Opera": ["full", "75+"], "IE": ["none", "-"]}, "polyfill": "Feature-detect with navigator.share, fallback to custom UI."}, {"name": "Temporal API", "type": "js", "desc": "Modern date/time API replacing Date", "browsers": {"Chrome": ["none", "-"], "Firefox": ["none", "-"], "Safari": ["none", "-"], "Edge": ["none", "-"], "Opera": ["none", "-"], "IE": ["none", "-"]}, "polyfill": "Use @js-temporal/polyfill. Still Stage 3 proposal."}, {"name": "import.meta", "type": "js", "desc": "Module metadata access", "browsers": {"Chrome": ["full", "64+"], "Firefox": ["full", "62+"], "Safari": ["full", "12+"], "Edge": ["full", "79+"], "Opera": ["full", "51+"], "IE": ["none", "-"]}, "polyfill": "Use bundler-specific alternatives like __dirname."}, {"name": "Optional Chaining (?.)", "type": "js", "desc": "Safe property access on nullish values", "browsers": {"Chrome": ["full", "80+"], "Firefox": ["full", "74+"], "Safari": ["full", "13.1+"], "Edge": ["full", "80+"], "Opera": ["full", "67+"], "IE": ["none", "-"]}, "polyfill": "Use Babel plugin @babel/plugin-proposal-optional-chaining."}, {"name": "Nullish Coalescing (??)", "type": "js", "desc": "Default value for null/undefined only", "browsers": {"Chrome": ["full", "80+"], "Firefox": ["full", "72+"], "Safari": ["full", "13.1+"], "Edge": ["full", "80+"], "Opera": ["full", "67+"], "IE": ["none", "-"]}, "polyfill": "Use Babel plugin @babel/plugin-proposal-nullish-coalescing-operator."}];
+const ITEMS = DB.map(item => ({
+  n: item.n || item.name,
+  t: item.t || item.type,
+  d: item.d || item.desc,
+  b: item.b || item.browsers,
+  p: item.p || item.polyfill
+}));
 const statusIcon = {full:'✅',partial:'⚠️',none:'❌'};
 const statusClass = {full:'support-full',partial:'support-partial',none:'support-none'};
 let currentFilter = 'all';
@@ -117,10 +539,10 @@ const emptyEl = document.getElementById('empty');
 const statsEl = document.getElementById('stats');
 
 // Stats
-const cssCount = DB.filter(e=>e.t==='css').length;
-const jsCount = DB.filter(e=>e.t==='js').length;
+const cssCount = ITEMS.filter(e => e.t === 'css').length;
+const jsCount = ITEMS.filter(e => e.t === 'js').length;
 statsEl.innerHTML = `
-  <div class="stat"><div class="num">${DB.length}</div><div class="label">Total Features</div></div>
+  <div class="stat"><div class="num">${ITEMS.length}</div><div class="label">Total Features</div></div>
   <div class="stat"><div class="num">${cssCount}</div><div class="label">CSS Properties</div></div>
   <div class="stat"><div class="num">${jsCount}</div><div class="label">JS APIs</div></div>
 `;
@@ -136,7 +558,7 @@ document.getElementById('categories').addEventListener('click', e => {
 });
 
 function getFiltered() {
-  return currentFilter === 'all' ? DB : DB.filter(e => e.t === currentFilter);
+  return currentFilter === 'all' ? ITEMS : ITEMS.filter(e => e.t === currentFilter);
 }
 
 function quickCompat(item) {
@@ -188,7 +610,6 @@ function showBrowse() {
   browseEl.innerHTML = html;
   resultsEl.innerHTML = '';
   emptyEl.style.display = 'none';
-  // Click handler for browse items
   browseEl.querySelectorAll('.browse-item').forEach(el => {
     el.addEventListener('click', () => {
       const name = el.dataset.name;
@@ -215,7 +636,6 @@ function doSearch(query) {
   resultsEl.innerHTML = items.map(renderCard).join('');
 }
 
-// Autocomplete suggestions
 function showSuggestions(query) {
   const q = query.toLowerCase().trim();
   if (!q) { suggestEl.classList.remove('show'); return; }
@@ -261,6 +681,9 @@ searchEl.addEventListener('keydown', e => {
       searchEl.value = items[activeIdx].dataset.name;
       suggestEl.classList.remove('show');
       doSearch(searchEl.value);
+    } else {
+      doSearch(searchEl.value);
+      suggestEl.classList.remove('show');
     }
   } else if (e.key === 'Escape') {
     suggestEl.classList.remove('show');
@@ -271,7 +694,14 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.search-box')) suggestEl.classList.remove('show');
 });
 
-// Initial browse view
+document.querySelectorAll('.chip-row button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    searchEl.value = btn.dataset.query;
+    showSuggestions(btn.dataset.query);
+    doSearch(btn.dataset.query);
+  });
+});
+
 showBrowse();
 </script>
 <script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
