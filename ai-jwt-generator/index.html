@@ -1,146 +1,597 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI JWT Generator - Create & Verify JSON Web Tokens</title>
-<meta name="description" content="Free online JWT Token generator and verifier. HS256, HS384, HS512 via Web Crypto API.">
+<meta name="robots" content="index, follow">
+<title>AI JWT Generator - Free JWT Token Generator for Auth Testing, API Debugging & Developer Workflows | Lifa AI Tools</title>
+<meta name="description" content="Free online JWT generator and verifier for developers. Create HS256, HS384, and HS512 JSON Web Tokens locally in your browser, test auth flows, debug bearer tokens, and validate API workflows.">
+<meta name="keywords" content="JWT generator, JWT token generator, create JWT online, auth testing tool, bearer token generator, API debugging, HS256 generator, HS384, HS512, developer tools, token workflow">
 <link rel="canonical" href="https://lifa-su.com/ai-jwt-generator/">
+<meta property="og:title" content="AI JWT Generator - Create JWT Tokens for Auth Testing and API Debugging">
+<meta property="og:description" content="Generate and verify JWT tokens locally in your browser. Built for developer auth workflows, API testing, bearer token debugging, and token lifecycle checks.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-jwt-generator/">
+<meta property="og:image" content="https://lifa-su.com/apple-touch-icon.png">
+<meta property="og:image:alt" content="AI JWT Generator interface showing token creation, verification, and developer auth workflow guidance">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI JWT Generator - Free JWT Token Generator Online">
+<meta name="twitter:description" content="Create, verify, and inspect JWT tokens for auth testing, API requests, webhook debugging, and developer workflows.">
+<meta name="twitter:image" content="https://lifa-su.com/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "AI JWT Generator",
+      "url": "https://lifa-su.com/ai-jwt-generator/",
+      "description": "Free browser-based JWT generator and verifier for developers who need to create HS256, HS384, and HS512 tokens for auth testing, API debugging, and token workflow validation.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Lifa AI Tools",
+        "url": "https://lifa-su.com/"
+      },
+      "featureList": [
+        "Generate JWT tokens locally in the browser",
+        "Sign tokens with HS256, HS384, or HS512",
+        "Set expiration presets or custom expiry windows",
+        "Verify JWT signatures with a shared secret",
+        "Decode header and payload for auth debugging",
+        "Use in API testing, webhook debugging, and developer documentation workflows"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a JWT generator used for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A JWT generator is used to create JSON Web Tokens for authentication testing, API request debugging, local development, QA workflows, and documentation examples. Developers often generate tokens to test bearer authentication, inspect claims, and reproduce auth scenarios faster."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this JWT generator send my token or secret to a server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "This tool runs in the browser and performs JWT generation and verification locally with Web Crypto APIs. That means token creation happens on your device rather than through a backend service."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which JWT algorithms are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "This page supports HMAC-based JWT signing and verification with HS256, HS384, and HS512. These are common symmetric signing options used in internal tools, staging environments, examples, and some production systems."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use generated JWTs for API testing?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Developers often generate a JWT here, add it to an Authorization Bearer header, and then continue testing in an API tester, HTTP client, webhook tester, or integration debugging workflow."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I avoid when generating JWTs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Avoid pasting production secrets into tools you do not trust, using long-lived tokens unnecessarily, forgetting audience or issuer checks, or confusing token decoding with signature verification. Use short expirations, least-privilege claims, and rotate secrets when appropriate."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Lifa AI Tools",
+          "item": "https://lifa-su.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Developer Tools",
+          "item": "https://lifa-su.com/ai-api-docs.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "AI JWT Generator",
+          "item": "https://lifa-su.com/ai-jwt-generator/"
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--ac2:#533483;--tx:#eee;--t2:#aab;--bd:#2a2a4e;--r:10px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
-.wrap{max-width:960px;margin:0 auto;padding:20px}
-header{text-align:center;padding:40px 0 30px}
-header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-header p{color:var(--t2);margin-top:6px;font-size:.95rem}
-.tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--sf);border-radius:var(--r);padding:4px}
-.tab{flex:1;padding:12px;text-align:center;border:none;background:none;color:var(--t2);font-size:.95rem;cursor:pointer;border-radius:8px;transition:.2s}
-.tab.on{background:var(--cd);color:var(--tx);box-shadow:0 4px 24px rgba(0,0,0,.4)}
-.tab:hover:not(.on){color:var(--tx)}
-.pnl{display:none}.pnl.on{display:block}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:20px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
-.card h2{font-size:1.1rem;margin-bottom:16px;color:var(--ac)}
-label{display:block;font-size:.85rem;color:var(--t2);margin-bottom:6px;font-weight:500}
-textarea,input[type=text],input[type=number]{width:100%;padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;transition:border .2s;resize:vertical}
-textarea:focus,input:focus{outline:none;border-color:var(--ac)}
+:root{
+--bg:#0b1020;
+--bg2:#10172c;
+--panel:#16213e;
+--panel2:#1b284f;
+--line:#27406f;
+--line2:#35538a;
+--text:#e6ecff;
+--muted:#9aa7c7;
+--soft:#7f8db1;
+--accent:#e94560;
+--accent2:#ff6b88;
+--blue:#53d8fb;
+--green:#95d5b2;
+--green-bg:#163628;
+--red:#ff9aa8;
+--red-bg:#3d1a24;
+--purple:#d4a5d0;
+--shadow:0 20px 50px rgba(0,0,0,.28);
+--radius:24px;
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(83,216,251,.08),transparent 26%),linear-gradient(180deg,var(--bg),#0f1630 45%,#0a1122);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--blue);text-decoration:none;transition:.2s}
+a:hover{color:#9be8ff}
+code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px;color:#dff7ff}
+.container{max-width:1180px;margin:0 auto;padding:22px 16px 72px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;color:var(--soft);font-size:13px}
+.topbar a{color:var(--muted)}
+.topbar a:hover{color:var(--text)}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px}
+.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.8fr);gap:18px;margin-bottom:22px}
+.hero-main,.hero-side,.tool-shell,.content-card,.cta-strip{background:linear-gradient(180deg,rgba(22,33,62,.95),rgba(14,22,43,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-main{padding:30px;background:radial-gradient(circle at top left,rgba(233,69,96,.16),transparent 30%),radial-gradient(circle at top right,rgba(83,216,251,.14),transparent 28%),linear-gradient(180deg,rgba(22,33,62,.96),rgba(14,22,43,.97))}
+.hero-side{padding:24px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(83,216,251,.08);border:1px solid rgba(83,216,251,.25);color:#b6efff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(2rem,4vw,3.4rem);line-height:1.05;letter-spacing:-.03em;margin-bottom:14px}
+.lead{font-size:1.03rem;color:var(--muted);max-width:64ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 18px}
+.btn-primary,.btn-secondary,.chip-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:800;transition:.2s}
+.btn-primary{padding:12px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 10px 30px rgba(233,69,96,.28)}
+.btn-primary:hover{color:#fff;transform:translateY(-1px)}
+.btn-secondary{padding:12px 20px;border:1px solid var(--line2);background:rgba(255,255,255,.02);color:var(--text)}
+.btn-secondary:hover{border-color:var(--blue);color:#fff;transform:translateY(-1px)}
+.hero-points,.signal-grid,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid{display:grid;gap:12px}
+.hero-points{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px}
+.point,.signal-card,.workflow-step,.practice,.use-card,.related-card,.next-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}
+.point strong,.hero-side h2,.content-card h2,.use-card h3,.workflow-step h3,.practice h3,.related-card h3,.next-card h3,.signal-card h3{display:block;margin-bottom:8px;color:var(--text)}
+.point span,.hero-side li,.content-card p,.content-card li,.use-card p,.workflow-step p,.practice p,.related-card p,.next-card p,.signal-card p{color:var(--muted)}
+.point span{font-size:.88rem}
+.hero-side ul{display:grid;gap:10px;padding:0;margin:0}
+.hero-side li{list-style:none;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:.94rem}
+.hero-side .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip-link{padding:8px 12px;font-size:12px;background:rgba(83,216,251,.08);border:1px solid rgba(83,216,251,.18);color:#c3f3ff}
+.chip-link:hover{background:rgba(83,216,251,.16);border-color:var(--blue);color:#fff}
+.section-label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.tool-shell{padding:22px;margin-bottom:18px}
+.tool-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.tool-head h2{font-size:1.5rem;letter-spacing:-.02em}
+.tool-head p{color:var(--muted);max-width:70ch}
+.notice{padding:16px 18px;border:1px solid rgba(83,216,251,.22);border-radius:16px;margin-bottom:18px;background:linear-gradient(180deg,rgba(83,216,251,.08),rgba(255,255,255,.02))}
+.notice strong{display:block;color:#d8f8ff;margin-bottom:6px}
+.notice p{color:#b7dceb;font-size:.94rem}
+.tabs{display:flex;gap:4px;margin-bottom:24px;background:#101a35;border-radius:16px;padding:4px;border:1px solid var(--line)}
+.tab{flex:1;padding:12px;text-align:center;border:none;background:none;color:var(--muted);font-size:.95rem;cursor:pointer;border-radius:12px;transition:.2s;font-weight:700}
+.tab.on{background:var(--panel2);color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.tab:hover:not(.on){color:var(--text)}
+.pnl{display:none}
+.pnl.on{display:block}
+.card{background:rgba(11,16,32,.46);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.card h2{font-size:1.08rem;margin-bottom:16px;color:var(--accent)}
+label{display:block;font-size:.85rem;color:#d7dfff;margin-bottom:6px;font-weight:700}
+textarea,input[type=text],input[type=number]{width:100%;padding:12px;background:#0f1832;border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.9rem;transition:border .2s,box-shadow .2s;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(233,69,96,.12)}
 textarea{min-height:100px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:.2s;width:100%}
-.btn-p{background:linear-gradient(135deg,var(--ac),#c0392b);color:#fff}
-.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
-.btn-s{background:var(--cd);color:var(--tx);border:1px solid var(--bd)}
-.btn-s:hover{border-color:var(--ac)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s;width:100%}
+.btn-p{background:linear-gradient(135deg,var(--accent),#c0392b);color:#fff}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(233,69,96,.35)}
+.btn-s{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn-s:hover{border-color:var(--accent)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.chip{padding:8px 16px;border-radius:20px;border:1px solid var(--bd);background:var(--bg);color:var(--t2);cursor:pointer;font-size:.85rem;transition:.2s}
-.chip.on,.chip:hover{border-color:var(--ac);color:var(--ac);background:rgba(233,69,96,.1)}
-.out{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px;word-break:break-all;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;position:relative;min-height:60px;margin-top:8px}
-.cpb{position:absolute;top:8px;right:8px;padding:6px 12px;font-size:.75rem;border-radius:6px;background:var(--cd);color:var(--t2);border:1px solid var(--bd);cursor:pointer;transition:.2s}
-.cpb:hover{color:var(--ac);border-color:var(--ac)}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#0f1832;color:var(--muted);cursor:pointer;font-size:.85rem;transition:.2s}
+.chip.on,.chip:hover{border-color:var(--accent);color:#ffd7de;background:rgba(233,69,96,.1)}
+.out{background:#0f1832;border:1px solid var(--line);border-radius:12px;padding:16px;word-break:break-all;font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.85rem;position:relative;min-height:60px;margin-top:8px;overflow-wrap:anywhere}
+.cpb{position:absolute;top:8px;right:8px;padding:6px 12px;font-size:.75rem;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line);cursor:pointer;transition:.2s}
+.cpb:hover{color:var(--accent);border-color:var(--accent)}
 .jh{color:#ff6b6b}.jp{color:#c084fc}.js{color:#4ecdc4}
-.st{padding:12px 16px;border-radius:8px;margin-top:12px;font-size:.9rem;display:none}
-.st.ok{display:block;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);color:#2ecc71}
-.st.er{display:block;background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.3);color:#e94560}
-.dec pre{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:14px;font-size:.85rem;overflow-x:auto;white-space:pre-wrap;margin-top:8px;color:var(--tx)}
-.dec h3{font-size:.9rem;color:var(--t2);margin-top:16px}
-footer{text-align:center;padding:30px 0 20px;color:var(--t2);font-size:.8rem}
+.st{padding:12px 16px;border-radius:12px;margin-top:12px;font-size:.9rem;display:none}
+.st.ok{display:block;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);color:#86efac}
+.st.er{display:block;background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.3);color:#fda4af}
+.dec pre{background:#0f1832;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:.85rem;overflow-x:auto;white-space:pre-wrap;margin-top:8px;color:var(--text)}
+.dec h3{font-size:.9rem;color:var(--muted);margin-top:16px}
 .alg{display:flex;gap:8px}
-.ao{flex:1;padding:10px;text-align:center;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--t2);cursor:pointer;font-size:.9rem;font-weight:500;transition:.2s}
-.ao.on{border-color:var(--ac);color:var(--ac);background:rgba(233,69,96,.1)}
-.ao:hover:not(.on){border-color:var(--ac2);color:var(--tx)}
-.leg{display:flex;gap:16px;margin-bottom:8px;font-size:.8rem;flex-wrap:wrap}
+.ao{flex:1;padding:10px;text-align:center;border-radius:12px;border:1px solid var(--line);background:#0f1832;color:var(--muted);cursor:pointer;font-size:.9rem;font-weight:700;transition:.2s}
+.ao.on{border-color:var(--accent);color:#ffd7de;background:rgba(233,69,96,.1)}
+.ao:hover:not(.on){border-color:var(--line2);color:var(--text)}
+.leg{display:flex;gap:16px;margin-bottom:8px;font-size:.8rem;flex-wrap:wrap;color:var(--muted)}
 .leg span{display:flex;align-items:center;gap:4px}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.signal-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:18px}
+.content-grid{display:grid;grid-template-columns:1fr;gap:16px}
+.content-card{padding:24px}
+.content-card h2{font-size:1.5rem;letter-spacing:-.02em}
+.content-card ul,.content-card ol{padding-left:20px;margin-top:12px;display:grid;gap:10px}
+.use-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.workflow-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px}
+.practice-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
+.related-grid,.next-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.related-card.primary,.next-card.primary{border-color:rgba(233,69,96,.45);background:linear-gradient(180deg,rgba(233,69,96,.12),rgba(255,255,255,.02))}
+.related-card a,.next-card a{font-weight:800}
+.cta-strip{margin-top:16px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-color:rgba(233,69,96,.26);background:linear-gradient(180deg,rgba(233,69,96,.14),rgba(17,26,48,.96))}
+.cta-strip p{margin:0;color:var(--muted)}
+.faq-list{display:grid;gap:16px}
+.faq-item{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);overflow:hidden}
+.faq-item summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:800;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';font-size:20px;color:var(--blue);line-height:1}
+.faq-item[open] summary::after{content:'–'}
+.faq-item p{padding:0 18px 18px;color:var(--muted)}
+footer{text-align:center;padding:28px 0 8px;color:var(--soft);font-size:.84rem}
+footer a{color:var(--muted)}
+footer a:hover{color:#fff}
+@media(max-width:980px){.hero,.signal-grid,.hero-points,.use-grid,.workflow-grid,.related-grid,.next-grid{grid-template-columns:1fr 1fr}.practice-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.container{padding:16px 12px 56px}.topbar{flex-direction:column;align-items:flex-start}.hero,.hero-points,.signal-grid,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid{grid-template-columns:1fr}.hero-main,.hero-side,.tool-shell,.content-card{padding:18px}h1{font-size:2rem}.lead{font-size:.98rem}.tabs{flex-direction:column}.row{grid-template-columns:1fr}.cta-strip{align-items:flex-start}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-<h1>&#128272; AI JWT Generator</h1>
-<p>Create and verify JSON Web Tokens &mdash; powered by Web Crypto API</p>
-</header>
-<div class="tabs">
-<button class="tab on" onclick="switchTab('gen')">&#9889; Generate JWT</button>
-<button class="tab" onclick="switchTab('ver')">&#128269; Verify JWT</button>
-</div>
+<div class="container">
+  <div class="topbar">
+    <div class="crumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/ai-api-docs.html">Developer Tools</a>
+      <span>/</span>
+      <span>AI JWT Generator</span>
+    </div>
+    <a href="/">← All Tools</a>
+  </div>
 
-<div id="pnl-gen" class="pnl on">
-<div class="card"><h2>&#128203; Header</h2>
-<label for="g-hdr">JWT Header (JSON)</label>
-<textarea id="g-hdr" rows="3">{"alg":"HS256","typ":"JWT"}</textarea></div>
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">Developer · Auth · Token Workflow</div>
+      <h1>Generate JWT tokens fast, verify signatures, and move through auth debugging with less guesswork</h1>
+      <p class="lead">This free JWT generator helps developers create and verify JSON Web Tokens for auth testing, bearer token debugging, API requests, webhook integrations, staging demos, and documentation examples. Generate HS256, HS384, or HS512 tokens locally in your browser, inspect the result instantly, and keep your auth workflow moving.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#jwt-tool">Open JWT Generator</a>
+        <a class="btn-secondary" href="/content-creator-toolkit.html">Get Content Creator Toolkit</a>
+        <a class="btn-secondary" href="/ai-jwt-decoder/">Open JWT Decoder</a>
+      </div>
+      <div class="hero-points">
+        <div class="point"><strong>Create realistic test tokens</strong><span>Generate JWTs with custom header and payload JSON, switch between <code>HS256</code>, <code>HS384</code>, and <code>HS512</code>, and set preset or custom expiration windows.</span></div>
+        <div class="point"><strong>Verify auth assumptions quickly</strong><span>Check whether a token signs correctly, inspect the decoded structure, and compare claims before you jump back into your API tester or backend logs.</span></div>
+        <div class="point"><strong>Use it inside a bigger workflow</strong><span>Pair this page with JWT decoding, API testing, webhook debugging, JSON schema validation, and auth docs pages to close the full developer loop.</span></div>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <h2>Best for</h2>
+      <ul>
+        <li>Frontend developers testing <strong>Authorization: Bearer</strong> flows without waiting on a full login UI.</li>
+        <li>Backend and platform teams validating <strong>claims, expiration, scopes, issuer, and audience</strong> during auth debugging.</li>
+        <li>Developer relations and API support teams creating <strong>working token examples</strong> for docs, demos, and onboarding.</li>
+      </ul>
+      <div>
+        <div class="section-label">Jump to</div>
+        <div class="chip-row">
+          <a class="chip-link" href="#use-cases">Use Cases</a>
+          <a class="chip-link" href="#jwt-workflow">JWT Workflow</a>
+          <a class="chip-link" href="#best-practices">Best Practices</a>
+          <a class="chip-link" href="#faq">FAQ</a>
+        </div>
+      </div>
+    </aside>
+  </section>
 
-<div class="card"><h2>&#128230; Payload</h2>
-<label for="g-pay">JWT Payload (JSON)</label>
-<textarea id="g-pay" rows="6">{
+  <section class="tool-shell" id="jwt-tool">
+    <div class="tool-head">
+      <div>
+        <div class="section-label">JWT Tool</div>
+        <h2>Generate and verify JWT tokens in one place</h2>
+        <p>Use the generator when you need a signed token for an API request. Use the verifier when you want to confirm the secret, inspect the payload, or troubleshoot an auth mismatch. All core interactions stay local in the browser with Web Crypto API.</p>
+      </div>
+    </div>
+
+    <div class="notice">
+      <strong>Security note</strong>
+      <p>For real production systems, avoid pasting sensitive live secrets unless your team explicitly allows it. This page is best for local development, sandbox environments, QA, staging, support reproduction, and documentation-ready examples.</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('gen')">⚡ Generate JWT</button>
+      <button class="tab" onclick="switchTab('ver')">🔎 Verify JWT</button>
+    </div>
+
+    <div id="pnl-gen" class="pnl on">
+      <div class="card"><h2>📋 Header</h2>
+      <label for="g-hdr">JWT Header (JSON)</label>
+      <textarea id="g-hdr" rows="3">{"alg":"HS256","typ":"JWT"}</textarea></div>
+
+      <div class="card"><h2>📦 Payload</h2>
+      <label for="g-pay">JWT Payload (JSON)</label>
+      <textarea id="g-pay" rows="6">{
   "sub": "1234567890",
   "name": "John Doe",
+  "role": "developer",
+  "scope": ["read:profile", "write:content"],
   "iat": 1516239022
 }</textarea></div>
 
-<div class="card"><h2>&#9881;&#65039; Options</h2>
-<div class="row"><div>
-<label>Signing Algorithm</label>
-<div class="alg" id="alg-row">
-<div class="ao on" data-a="HS256" onclick="pickAlg(this)">HS256</div>
-<div class="ao" data-a="HS384" onclick="pickAlg(this)">HS384</div>
-<div class="ao" data-a="HS512" onclick="pickAlg(this)">HS512</div>
-</div></div>
-<div><label for="g-sec">Secret Key</label>
-<input type="text" id="g-sec" value="your-256-bit-secret" placeholder="Enter secret key"></div></div>
+      <div class="card"><h2>⚙️ Options</h2>
+      <div class="row"><div>
+      <label>Signing Algorithm</label>
+      <div class="alg" id="alg-row">
+      <div class="ao on" data-a="HS256" onclick="pickAlg(this)">HS256</div>
+      <div class="ao" data-a="HS384" onclick="pickAlg(this)">HS384</div>
+      <div class="ao" data-a="HS512" onclick="pickAlg(this)">HS512</div>
+      </div></div>
+      <div><label for="g-sec">Secret Key</label>
+      <input type="text" id="g-sec" value="your-256-bit-secret" placeholder="Enter secret key"></div></div>
 
-<label style="margin-top:16px">Expiration Time</label>
-<div class="chips" id="exp-chips">
-<div class="chip" data-v="3600" onclick="pickExp(this)">1 Hour</div>
-<div class="chip" data-v="86400" onclick="pickExp(this)">1 Day</div>
-<div class="chip" data-v="604800" onclick="pickExp(this)">7 Days</div>
-<div class="chip" data-v="2592000" onclick="pickExp(this)">30 Days</div>
-<div class="chip" data-v="custom" onclick="pickExp(this)">Custom</div>
-<div class="chip on" data-v="none" onclick="pickExp(this)">None</div>
-</div>
-<div id="custom-exp" style="display:none">
-<label for="g-exp-val">Custom expiration (seconds from now)</label>
-<input type="number" id="g-exp-val" value="7200" min="1">
-</div>
+      <label style="margin-top:16px">Expiration Time</label>
+      <div class="chips" id="exp-chips">
+      <div class="chip" data-v="3600" onclick="pickExp(this)">1 Hour</div>
+      <div class="chip" data-v="86400" onclick="pickExp(this)">1 Day</div>
+      <div class="chip" data-v="604800" onclick="pickExp(this)">7 Days</div>
+      <div class="chip" data-v="2592000" onclick="pickExp(this)">30 Days</div>
+      <div class="chip" data-v="custom" onclick="pickExp(this)">Custom</div>
+      <div class="chip on" data-v="none" onclick="pickExp(this)">None</div>
+      </div>
+      <div id="custom-exp" style="display:none">
+      <label for="g-exp-val">Custom expiration (seconds from now)</label>
+      <input type="number" id="g-exp-val" value="7200" min="1">
+      </div>
 
-<button class="btn btn-p" style="margin-top:20px" onclick="generateJWT()">&#9889; Generate JWT</button>
-</div>
+      <button class="btn btn-p" style="margin-top:20px" onclick="generateJWT()">⚡ Generate JWT</button>
+      </div>
 
-<div class="card" id="gen-result" style="display:none">
-<h2>&#127919; Generated Token</h2>
-<div class="leg">
-<span><span class="dot" style="background:#ff6b6b"></span> Header</span>
-<span><span class="dot" style="background:#c084fc"></span> Payload</span>
-<span><span class="dot" style="background:#4ecdc4"></span> Signature</span>
-</div>
-<div class="out" id="gen-out"><button class="cpb" onclick="copyTk()">Copy</button><span id="gen-tk"></span></div>
-</div>
-</div>
+      <div class="card" id="gen-result" style="display:none">
+      <h2>🎯 Generated Token</h2>
+      <div class="leg">
+      <span><span class="dot" style="background:#ff6b6b"></span> Header</span>
+      <span><span class="dot" style="background:#c084fc"></span> Payload</span>
+      <span><span class="dot" style="background:#4ecdc4"></span> Signature</span>
+      </div>
+      <div class="out" id="gen-out"><button class="cpb" onclick="copyTk()">Copy</button><span id="gen-tk"></span></div>
+      </div>
+    </div>
 
-<div id="pnl-ver" class="pnl">
-<div class="card"><h2>&#128269; Verify Token</h2>
-<label for="v-tok">JWT Token</label>
-<textarea id="v-tok" rows="4" placeholder="Paste your JWT token here..."></textarea>
-<div class="row" style="margin-top:16px">
-<div><label for="v-sec">Secret Key</label>
-<input type="text" id="v-sec" placeholder="Enter the secret used to sign"></div>
-<div><label>Algorithm</label>
-<div class="alg" id="valg-row">
-<div class="ao on" data-a="HS256" onclick="pickVAlg(this)">HS256</div>
-<div class="ao" data-a="HS384" onclick="pickVAlg(this)">HS384</div>
-<div class="ao" data-a="HS512" onclick="pickVAlg(this)">HS512</div>
-</div></div></div>
-<button class="btn btn-p" style="margin-top:20px" onclick="verifyJWT()">&#128269; Verify Signature</button>
-<div id="v-status" class="st"></div>
-<div id="v-decoded" class="dec"></div>
-</div>
-</div>
+    <div id="pnl-ver" class="pnl">
+      <div class="card"><h2>🔎 Verify Token</h2>
+      <label for="v-tok">JWT Token</label>
+      <textarea id="v-tok" rows="4" placeholder="Paste your JWT token here..."></textarea>
+      <div class="row" style="margin-top:16px">
+      <div><label for="v-sec">Secret Key</label>
+      <input type="text" id="v-sec" placeholder="Enter the secret used to sign"></div>
+      <div><label>Algorithm</label>
+      <div class="alg" id="valg-row">
+      <div class="ao on" data-a="HS256" onclick="pickVAlg(this)">HS256</div>
+      <div class="ao" data-a="HS384" onclick="pickVAlg(this)">HS384</div>
+      <div class="ao" data-a="HS512" onclick="pickVAlg(this)">HS512</div>
+      </div></div></div>
+      <button class="btn btn-p" style="margin-top:20px" onclick="verifyJWT()">🔎 Verify Signature</button>
+      <div id="v-status" class="st"></div>
+      <div id="v-decoded" class="dec"></div>
+      </div>
+    </div>
+  </section>
 
-<footer>&copy; 2026 AI JWT Generator &mdash; All computations run locally in your browser.</footer>
+  <section class="content-grid">
+    <article class="content-card">
+      <div class="section-label">Why this page matters</div>
+      <h2>JWT generator for auth testing, API debugging, and faster developer support</h2>
+      <p>JWT generation is one of those deceptively small tasks that can block an entire workflow. If your login system is broken, your refresh flow is unstable, or your integration partner says the token is invalid, you often need a clean token immediately. That is where a fast browser-based JWT generator becomes useful.</p>
+      <p>Instead of waiting for a staging login, patching a backend route, or hand-building a token in code, you can create a JWT here, test the request, confirm the claim structure, and keep moving. For API teams, this shortens the loop between "the auth failed" and "we know why it failed."</p>
+      <div class="signal-grid">
+        <div class="signal-card"><h3>Faster QA cycles</h3><p>Generate a token with the exact claims you want and reproduce the auth scenario right away.</p></div>
+        <div class="signal-card"><h3>Cleaner docs examples</h3><p>Create predictable JWT examples for onboarding guides, auth tutorials, and support articles.</p></div>
+        <div class="signal-card"><h3>Better troubleshooting</h3><p>Verify the signature, inspect the payload, then jump into your HTTP request or webhook replay flow.</p></div>
+      </div>
+    </article>
+
+    <article class="content-card" id="use-cases">
+      <div class="section-label">Use Cases</div>
+      <h2>Common JWT generator use cases for developers and auth teams</h2>
+      <div class="use-grid">
+        <div class="use-card">
+          <h3>API request testing</h3>
+          <p>Create a signed token, paste it into an <code>Authorization: Bearer</code> header, and immediately test protected routes in your API tester or HTTP client.</p>
+        </div>
+        <div class="use-card">
+          <h3>Staging and sandbox auth</h3>
+          <p>When your login screen is not ready or an identity provider is flaky, generate temporary JWTs to unblock staging and QA validation.</p>
+        </div>
+        <div class="use-card">
+          <h3>Webhook and integration debugging</h3>
+          <p>Some callbacks, internal services, or partner integrations use signed tokens. Generate a realistic sample token to reproduce failed deliveries and auth checks.</p>
+        </div>
+        <div class="use-card">
+          <h3>Docs and tutorials</h3>
+          <p>Developer relations and API documentation teams can create example payloads with readable claims for tutorials, SDK demos, and quickstart guides.</p>
+        </div>
+        <div class="use-card">
+          <h3>Role and scope simulation</h3>
+          <p>Test how your app behaves with different roles, scopes, tenants, or permissions by modifying the payload JSON before signing the token.</p>
+        </div>
+        <div class="use-card">
+          <h3>Support reproduction</h3>
+          <p>If a customer reports a token-related issue, support engineers can rebuild a similar token shape and narrow down whether the problem is expiry, claims, or signature mismatch.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card" id="jwt-workflow">
+      <div class="section-label">JWT Workflow</div>
+      <h2>A practical JWT workflow from token generation to request validation</h2>
+      <p>A JWT generator is not the whole workflow. It is one step inside a broader auth and integration process. The fastest teams use tools like this to create a repeatable loop: generate a token, send the request, inspect the response, and verify every assumption.</p>
+      <div class="workflow-grid">
+        <div class="workflow-step">
+          <h3>1. Define claims</h3>
+          <p>Set the header, payload, role, scope, issuer, subject, and timing claims needed for the exact scenario you want to test.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>2. Sign the token</h3>
+          <p>Choose the algorithm and shared secret, then generate a JWT that matches the behavior your API or middleware expects.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>3. Send the request</h3>
+          <p>Add the token to your bearer header in an API tester, HTTP client, Postman-style flow, browser app, or webhook replay step.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>4. Verify and iterate</h3>
+          <p>If the auth fails, verify the signature, decode the claims, compare <code>exp</code>, <code>iat</code>, <code>iss</code>, and <code>aud</code>, then adjust and retest.</p>
+        </div>
+      </div>
+      <ol>
+        <li>Use this page to create a clean test token.</li>
+        <li>Move to <a href="/ai-jwt-decoder/">AI JWT Decoder</a> if you need quick visual inspection.</li>
+        <li>Continue with <a href="/ai-api-tester/">AI API Tester</a>, <a href="/ai-http-client/">AI HTTP Client</a>, or <a href="/ai-webhook-tester/">AI Webhook Tester</a> to validate the full request path.</li>
+        <li>Document the final auth setup in <a href="/ai-api-docs.html">API docs</a> or team runbooks so the same issue is easier to solve next time.</li>
+      </ol>
+    </article>
+
+    <article class="content-card" id="best-practices">
+      <div class="section-label">Best Practices</div>
+      <h2>JWT best practices when generating tokens for testing or documentation</h2>
+      <div class="practice-grid">
+        <div class="practice">
+          <h3>Use short expiration windows</h3>
+          <p>For most testing scenarios, shorter-lived JWTs reduce confusion and better reflect secure production patterns. If a token should only exist for minutes, do not default to a month-long expiry.</p>
+        </div>
+        <div class="practice">
+          <h3>Avoid production secrets in casual workflows</h3>
+          <p>Even with a browser-based tool, be deliberate. Prefer local, staging, or sandbox secrets unless your team has approved a stricter workflow.</p>
+        </div>
+        <div class="practice">
+          <h3>Keep issuer and audience consistent</h3>
+          <p>Many auth bugs are not about signature failure. They come from mismatched <code>iss</code> and <code>aud</code> values between the token and the backend validation rules.</p>
+        </div>
+        <div class="practice">
+          <h3>Separate decoding from verifying</h3>
+          <p>Seeing a readable payload does not mean the token is trusted. Decode to inspect. Verify to confirm the signature. Then compare with backend policy checks.</p>
+        </div>
+        <div class="practice">
+          <h3>Model realistic claims</h3>
+          <p>Testing with overly simple payloads can hide bugs. Include roles, scopes, tenant IDs, and timestamps that reflect how your app behaves in production.</p>
+        </div>
+        <div class="practice">
+          <h3>Document the auth recipe</h3>
+          <p>When you find the correct claim structure, write it down. Auth issues repeat. Good internal docs save more time than another one-off debugging session.</p>
+        </div>
+      </div>
+    </article>
+
+    <div class="cta-strip">
+      <div>
+        <strong style="display:block;margin-bottom:6px;color:#fff">Need stronger copy for your developer tools or auth product pages?</strong>
+        <p>Use the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> to turn working tools into landing pages, blog posts, emails, and launch content that actually converts.</p>
+      </div>
+      <a class="btn-primary" href="/content-creator-toolkit.html">Explore the Toolkit</a>
+    </div>
+
+    <article class="content-card" id="related-tools">
+      <div class="section-label">Related Tools</div>
+      <h2>Continue the auth and API workflow with related developer tools</h2>
+      <div class="related-grid">
+        <div class="related-card primary">
+          <h3><a href="/ai-jwt-decoder/">AI JWT Decoder</a></h3>
+          <p>Decode header and payload, inspect claims, and quickly spot expiration or malformed token issues after generation.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-api-tester/">AI API Tester</a></h3>
+          <p>Take the generated token into a protected request flow and validate endpoints, headers, status codes, and payload behavior.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-http-client/">AI HTTP Client</a></h3>
+          <p>Build requests with bearer auth, inspect responses, and debug the request lifecycle beyond just the token itself.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-webhook-tester/">AI Webhook Tester</a></h3>
+          <p>Useful when signed callbacks or integration events depend on headers, signatures, and auth-aware delivery testing.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-json-schema/">AI JSON Schema</a></h3>
+          <p>Validate the shape of auth-related payloads, claims, or API responses after you get the token and request flow working.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-api-docs.html">API Docs Tools</a></h3>
+          <p>Turn the working token recipe into cleaner onboarding docs, auth examples, and internal troubleshooting references.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card" id="next-steps">
+      <div class="section-label">Next Steps</div>
+      <h2>What to do after you generate a JWT</h2>
+      <div class="next-grid">
+        <div class="next-card primary">
+          <h3><a href="/content-creator-toolkit.html">Turn this workflow into content</a></h3>
+          <p>Create tutorials, launch copy, support docs, and content marketing assets for your auth or API product with the Content Creator Toolkit.</p>
+        </div>
+        <div class="next-card">
+          <h3><a href="/ai-jwt-decoder/">Inspect the final claims</a></h3>
+          <p>Double-check the exact output in the decoder before sharing the token example with teammates or customers.</p>
+        </div>
+        <div class="next-card">
+          <h3><a href="/ai-api-tester/">Test the protected route</a></h3>
+          <p>Use your generated JWT inside a real request and verify that the API behavior matches your expectation.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card" id="faq">
+      <div class="section-label">FAQ</div>
+      <h2>JWT generator FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What is a JWT generator?</summary>
+          <p>A JWT generator is a tool that creates JSON Web Tokens from a header, payload, signing algorithm, and secret. Developers use it for auth testing, API debugging, QA, onboarding examples, and internal tooling.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I generate a JWT for bearer token testing?</summary>
+          <p>Yes. This is one of the most common uses. Generate the token, copy it, and paste it into your <code>Authorization: Bearer</code> header when testing an authenticated endpoint.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does this tool verify JWT signatures too?</summary>
+          <p>Yes. The verify tab lets you paste a token, choose the HMAC algorithm, provide the shared secret, and confirm whether the signature matches. It also shows the decoded header and payload for inspection.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Should I use HS256, HS384, or HS512?</summary>
+          <p>Use the algorithm your backend expects. HS256 is the most common for HMAC-signed JWT examples, but some systems use HS384 or HS512. If the algorithm does not match the backend verification rules, the token will fail.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is decoding a JWT the same as trusting it?</summary>
+          <p>No. Decoding simply reveals the contents. Trust comes from verifying the signature and then checking backend rules like issuer, audience, expiration, and authorization logic.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Why is my JWT valid structurally but still rejected?</summary>
+          <p>Common reasons include the wrong secret, mismatched algorithm, expired <code>exp</code> claim, incorrect <code>iss</code> or <code>aud</code>, missing scopes, bad clock synchronization, or a malformed bearer header in the request.</p>
+        </details>
+      </div>
+    </article>
+  </section>
+
+  <footer>
+    <p>© 2026 AI JWT Generator — All core computations run locally in your browser. Explore more auth and developer tools on <a href="/">Lifa AI Tools</a>.</p>
+  </footer>
 </div>
 
 <script>
@@ -250,7 +701,7 @@ async function verifyJWT(){
     try{pay=JSON.parse(b64urlDec(parts[1]))}catch(e){st.className='st er';st.textContent='Invalid payload: cannot decode';return}
     const valid=await hmacVerify(curVAlg,sec,parts[0]+'.'+parts[1],parts[2]);
     if(valid){
-      let msg='&#9989; Signature is valid!';
+      let msg='✅ Signature is valid!';
       if(pay.exp&&pay.exp<Math.floor(Date.now()/1000))msg+=' (Token is expired)';
       st.className='st ok';st.innerHTML=msg;
     }else{st.className='st er';st.textContent='Signature verification failed. Check your secret and algorithm.'}
