@@ -160,7 +160,7 @@ header .top-link:hover{color:var(--tx)}
 .btn-primary:hover{color:#fff;transform:translateY(-1px)}
 .btn-secondary{padding:12px 20px;border:1px solid var(--bd2);background:rgba(255,255,255,.02);color:var(--tx)}
 .btn-secondary:hover{transform:translateY(-1px);border-color:var(--ac);color:#fff}
-.hero-points,.content-grid,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid{display:grid;gap:12px}
+.hero-points,.content-grid,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid,.chain-grid{display:grid;gap:12px}
 .hero-points{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
 .point,.workflow-step,.practice,.use-card,.related-card,.next-card{padding:16px;border:1px solid var(--bd);border-radius:16px;background:rgba(255,255,255,.02)}
 .point strong,.hero-side h3,.content-card h2,.use-card h3,.workflow-step h3,.practice h3,.related-card h3,.next-card h3{display:block;margin-bottom:8px;color:var(--tx)}
@@ -229,7 +229,14 @@ textarea.be{width:100%;min-height:220px;font-family:'SF Mono',Monaco,Consolas,mo
 .practice-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
 .related-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
 .next-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.chain-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px}
 .related-card a,.next-card a{font-weight:700}
+.chain-card{padding:18px;border:1px solid var(--bd);border-radius:16px;background:rgba(255,255,255,.02);position:relative}
+.chain-card::after{content:'→';position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:999px;background:var(--bg);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ac);font-size:12px}
+.chain-card:last-child::after{display:none}
+.chain-card h3{margin-bottom:8px;color:var(--tx)}
+.chain-card p{color:var(--tx2);font-size:14px}
+.chain-card a{display:inline-flex;margin-top:10px;font-weight:700}
 .related-card.primary{border-color:rgba(88,166,255,.45);background:linear-gradient(180deg,rgba(31,111,235,.16),rgba(255,255,255,.02))}
 .cta-strip{margin-top:16px;padding:18px 20px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-color:rgba(88,166,255,.28);background:linear-gradient(180deg,rgba(88,166,255,.12),rgba(22,27,34,.94))}
 .cta-strip p{margin:0;color:var(--tx2)}
@@ -243,8 +250,8 @@ textarea.be{width:100%;min-height:220px;font-family:'SF Mono',Monaco,Consolas,mo
 footer{text-align:center;padding:18px;color:var(--tx2);font-size:12px;border-top:1px solid var(--bd)}
 footer a{color:var(--tx2)}
 footer a:hover{color:var(--tx)}
-@media(max-width:980px){.hero-shell,.hero-points,.use-grid,.workflow-grid,.related-grid,.next-grid{grid-template-columns:1fr 1fr}.practice-grid{grid-template-columns:1fr}.tool-head{flex-direction:column}}
-@media(max-width:768px){header{padding:12px 16px;flex-wrap:wrap}header h1{font-size:18px}.ct{padding:18px 14px 46px}.hero-main,.hero-side,.content-card,.tool-shell{padding:18px}.hero-shell,.hero-points,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid,.mc{grid-template-columns:1fr}.rb{flex-wrap:wrap}.rb select,.rb input,.rb button{width:100%}.tabs{gap:2px}.tab{padding:8px 12px}.lead{font-size:16px}}
+@media(max-width:980px){.hero-shell,.hero-points,.use-grid,.workflow-grid,.related-grid,.next-grid,.chain-grid{grid-template-columns:1fr 1fr}.practice-grid{grid-template-columns:1fr}.tool-head{flex-direction:column}.chain-card::after{display:none}}
+@media(max-width:768px){header{padding:12px 16px;flex-wrap:wrap}header h1{font-size:18px}.ct{padding:18px 14px 46px}.hero-main,.hero-side,.content-card,.tool-shell{padding:18px}.hero-shell,.hero-points,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid,.chain-grid,.mc{grid-template-columns:1fr}.rb{flex-wrap:wrap}.rb select,.rb input,.rb button{width:100%}.tabs{gap:2px}.tab{padding:8px 12px}.lead{font-size:16px}}
 </style>
 </head>
 <body>
@@ -412,6 +419,22 @@ footer a:hover{color:var(--tx)}
 <div class="practice"><h3>Compare response headers, not just body text</h3><p>Caching, auth, rate limits, and content type problems often show up first in headers rather than the JSON body.</p></div>
 <div class="practice"><h3>Translate tests into onboarding content</h3><p>Every repeated debugging step is a candidate for a setup guide, FAQ entry, docs section, or tutorial that saves future support time.</p></div>
 </div>
+<div class="cta-strip" style="margin-top:18px">
+<p><strong>Debug chain:</strong> test the request here, verify edge cases in API Tester, formalize payload shape in JSON Schema, document the endpoint in API Docs Generator, then inspect event delivery with the webhook tool.</p>
+<a class="btn-secondary" href="#developer-chain">See the 4-step developer chain</a>
+</div>
+</section>
+
+<section id="developer-chain" class="content-card">
+<div class="section-label">Developer chain</div>
+<h2>The clearest next steps after a successful request test</h2>
+<p>HTTP testing is usually only step one. The higher-value workflow is to carry the same endpoint through validation, documentation, event testing, and data-contract cleanup so your developer experience does not break between tools.</p>
+<div class="chain-grid">
+<div class="chain-card"><h3>1. Re-run in API Tester</h3><p>Use a parallel browser request flow when you want another quick surface for comparing methods, params, and response output.</p><a href="/ai-api-tester/">Open /ai-api-tester/</a></div>
+<div class="chain-card"><h3>2. Generate docs from the request</h3><p>Once the method, URL, and example response look right, convert them into readable endpoint documentation instead of leaving them in ad hoc notes.</p><a href="/ai-api-docs-generator/">Open /ai-api-docs-generator/</a></div>
+<div class="chain-card"><h3>3. Check webhook delivery</h3><p>If the endpoint triggers callbacks or outbound events, move from request testing into event inspection so the full API flow is covered.</p><a href="/ai-webhook/">Open /ai-webhook/</a></div>
+<div class="chain-card"><h3>4. Lock the JSON contract</h3><p>After you know the payload shape, turn it into a clearer data contract for validation, docs, onboarding, and implementation handoff.</p><a href="/ai-json-schema/">Open /ai-json-schema/</a></div>
+</div>
 </section>
 
 <section id="faq" class="content-card">
@@ -422,7 +445,7 @@ footer a:hover{color:var(--tx)}
 <details class="faq-item"><summary>Why do I sometimes get “Failed to fetch” instead of an API response?</summary><p>Because requests are sent from the browser. Common causes include CORS restrictions, blocked preflight requests, network problems, invalid TLS certificates, or APIs that are not intended to accept browser-origin traffic.</p></details>
 <details class="faq-item"><summary>Can I send JSON bodies, form data, and custom headers?</summary><p>Yes. The tool supports JSON, form-style payloads, and raw bodies, along with custom header fields you can add or replay from local history.</p></details>
 <details class="faq-item"><summary>Is this a full Postman replacement?</summary><p>No. Think of it as a lightweight browser HTTP client for fast checks and debugging. If you need advanced environments, collections, team collaboration, or complex auth flows, you may still pair it with dedicated API clients.</p></details>
-<details class="faq-item"><summary>What should I do after I validate the endpoint?</summary><p>A strong next step is to document the endpoint, capture example requests and responses, map the schema, and turn the verified workflow into internal docs, tutorials, changelogs, or customer-facing technical content.</p></details>
+<details class="faq-item"><summary>What should I do after I validate the endpoint?</summary><p>A strong next step is to document the endpoint, capture example requests and responses, map the schema, test any webhook callbacks, and turn the verified workflow into internal docs, tutorials, changelogs, or customer-facing technical content.</p></details>
 </div>
 </section>
 
@@ -432,10 +455,10 @@ footer a:hover{color:var(--tx)}
 <p>This page should help you test quickly. These related tools help you carry that work forward into docs, validation, and content that compounds.</p>
 <div class="related-grid">
 <div class="related-card primary"><h3>Content Creator Toolkit</h3><p>Turn validated API workflows into tutorials, launch pages, onboarding emails, and technical marketing content that is faster to publish.</p><a href="/content-creator-toolkit.html">Go to Content Creator Toolkit</a></div>
-<div class="related-card"><h3>AI API Docs Generator</h3><p>Draft readable endpoint documentation after you confirm headers, methods, and example responses.</p><a href="/ai-api-docs-generator/">Open API Docs Generator</a></div>
-<div class="related-card"><h3>AI API Tester</h3><p>Use another lightweight testing flow when you want a parallel browser-based request workflow.</p><a href="/ai-api-tester/">Open API Tester</a></div>
-<div class="related-card"><h3>AI JSON Schema</h3><p>Map request and response structures into a more formal schema workflow after testing payload shape.</p><a href="/ai-json-schema/">Open JSON Schema Tool</a></div>
-<div class="related-card"><h3>AI Webhook Tester</h3><p>Extend your debugging workflow into event-driven delivery, callback inspection, and webhook validation.</p><a href="/ai-webhook-tester/">Open Webhook Tester</a></div>
+<div class="related-card"><h3>AI API Tester</h3><p>Re-check requests in a parallel testing surface when you want to compare methods, params, and browser request behavior.</p><a href="/ai-api-tester/">Open /ai-api-tester/</a></div>
+<div class="related-card"><h3>AI API Docs Generator</h3><p>Turn a working request into readable endpoint docs with auth notes, example responses, and developer-facing structure.</p><a href="/ai-api-docs-generator/">Open /ai-api-docs-generator/</a></div>
+<div class="related-card"><h3>AI Webhook</h3><p>Continue from request debugging into webhook callback inspection and event-delivery troubleshooting for async flows.</p><a href="/ai-webhook/">Open /ai-webhook/</a></div>
+<div class="related-card"><h3>AI JSON Schema</h3><p>Formalize request and response payload shapes into a clearer contract for validation, docs, and implementation handoff.</p><a href="/ai-json-schema/">Open /ai-json-schema/</a></div>
 <div class="related-card"><h3>AI README Generator</h3><p>Package your tested API workflow into README content for internal tools, SDKs, and public repos.</p><a href="/ai-readme-generator/">Open README Generator</a></div>
 </div>
 </section>
@@ -447,7 +470,7 @@ footer a:hover{color:var(--tx)}
 <div class="next-grid">
 <div class="next-card"><h3>Document the request</h3><p>Save the method, URL, required headers, and example payload so the next developer or customer success teammate can reproduce it quickly.</p><a href="/ai-api-docs-generator/">Create docs next →</a></div>
 <div class="next-card"><h3>Formalize the data contract</h3><p>If the response shape matters across teams, move it into a schema or validation workflow instead of leaving it as an ad hoc test.</p><a href="/ai-json-schema/">Map the schema →</a></div>
-<div class="next-card"><h3>Repurpose into content</h3><p>Convert the tested workflow into onboarding docs, support articles, release notes, or landing-page content that keeps compounding.</p><a href="/content-creator-toolkit.html">Build the content asset →</a></div>
+<div class="next-card"><h3>Validate async delivery</h3><p>If the request eventually triggers outbound events, test the webhook leg too so the workflow is covered beyond the initial 200.</p><a href="/ai-webhook/">Inspect webhook flow →</a></div>
 </div>
 </section>
 </main>
