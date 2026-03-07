@@ -1,18 +1,101 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Visualize JSON data as an interactive tree structure. Expand and collapse nodes, search keys, copy paths, and explore complex JSON objects with ease.">
+<title>JSON Tree Viewer - 可视化 API Responses & Nested JSON Online | AI JSON Tree</title>
+<meta name="description" content="Free online JSON tree viewer for developers, data inspection, and API docs workflows. Visualize nested JSON, search keys, expand or collapse nodes, and inspect payloads directly in your browser.">
+<meta name="keywords" content="JSON tree viewer, JSON visualizer, API response viewer, nested JSON inspector, JSON inspection workflow, JSON explorer, JSON tree online, developer JSON tool, data inspection tool">
+<meta name="author" content="FeiDev">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#1a1a2e">
 <link rel="canonical" href="https://lifa-su.com/ai-json-tree/">
-<title>AI JSON Tree - JSON树形可视化工具</title>
+<meta property="og:title" content="JSON Tree Viewer - Inspect API Responses & Nested JSON Online">
+<meta property="og:description" content="Explore large nested JSON structures with a fast tree view built for developer, data, and documentation workflows.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-json-tree/">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JSON Tree Viewer - Inspect API Responses & Nested JSON Online">
+<meta name="twitter:description" content="Paste JSON, inspect structure, search fields, and move faster from API debugging to docs and content creation.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AI JSON Tree",
+  "url": "https://lifa-su.com/ai-json-tree/",
+  "description": "Free online JSON tree viewer for developers, data inspection, and API docs workflows.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "FeiDev",
+    "url": "https://ko-fi.com/feidev"
+  },
+  "browserRequirements": "Requires JavaScript enabled"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a JSON tree viewer used for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A JSON tree viewer helps you inspect nested objects and arrays faster than reading plain text. It is useful for debugging API responses, reviewing webhook payloads, checking event logs, and understanding data structures before writing code or docs."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this JSON tree tool send my data to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "JSON parsing and tree rendering happen in your browser on this page, so you can inspect payloads locally while exploring structure, fields, and values."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do developers use JSON tree view during API debugging?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Developers usually paste an API response, expand the top-level keys, search for the exact field they need, collapse noisy branches, and then move on to validation, JSONPath queries, schema checks, or documentation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I do after inspecting JSON structure?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Common next steps are formatting the payload, validating it against a schema, extracting fields with JSONPath, comparing versions with a diff tool, or turning the inspected payload into API docs, tutorials, changelogs, and internal documentation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can this tool help with docs and content workflows too?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Once you understand the structure in tree view, it becomes easier to explain endpoints, write examples, create onboarding guides, and package technical knowledge into reusable content assets."
+      }
+    }
+  ]
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column}
+a{color:#66d9ef;text-decoration:none}
+a:hover{text-decoration:underline}
 .header{padding:16px 24px;background:#16213e;border-bottom:1px solid #0f3460;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .header h1{font-size:20px;color:#e94560;font-weight:700;white-space:nowrap}
 .header h1 span{color:#66d9ef}
@@ -22,14 +105,29 @@ body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;backgr
 .search-box::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px}
 .search-info{font-size:12px;color:#888;margin-left:8px;white-space:nowrap}
 .toolbar{padding:12px 24px;background:#16213e;border-bottom:1px solid #0f3460;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn{padding:6px 14px;border:1px solid #0f3460;background:#1a1a2e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;white-space:nowrap}
-.btn:hover{background:#0f3460;border-color:#e94560}
+.btn{padding:6px 14px;border:1px solid #0f3460;background:#1a1a2e;color:#e0e0e0;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{background:#0f3460;border-color:#e94560;text-decoration:none}
 .btn-primary{background:#e94560;border-color:#e94560;color:#fff}
 .btn-primary:hover{background:#c73652}
+.btn-ghost{background:transparent;border-color:#533483;color:#c8b6ff}
 .input-area{padding:12px 24px;background:#16213e;border-bottom:1px solid #0f3460}
 .input-area textarea{width:100%;height:120px;background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;color:#e0e0e0;padding:12px;font-size:13px;font-family:inherit;resize:vertical;outline:none;transition:border-color .2s}
 .input-area textarea:focus{border-color:#e94560}
 .error-msg{color:#f92672;font-size:13px;margin-top:6px;display:none}
+.hero-panel{padding:24px;background:linear-gradient(180deg,rgba(22,33,62,.98) 0%,rgba(15,52,96,.55) 100%);border-bottom:1px solid #0f3460}
+.hero-shell{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.9fr);gap:18px;align-items:stretch}
+.hero-copy h2{font-size:30px;line-height:1.15;color:#fff;max-width:820px}
+.hero-copy p{margin-top:12px;color:#b8c0d4;line-height:1.75;font-size:14px;max-width:780px}
+.hero-badges,.cta-row,.jump-links,.mini-link-row,.related-links,.footer-links{display:flex;flex-wrap:wrap;gap:10px}
+.hero-badges{margin-top:14px}
+.badge,.jump-links a,.mini-link{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #0f3460;background:rgba(15,52,96,.35);color:#b8c0d4;font-size:12px}
+.cta-row{margin-top:18px}
+.hero-side,.content-block,.use-case-card,.workflow-step,.checklist,.faq-list details,.related-card,.next-step-card,.cta-banner{background:#16213e;border:1px solid #0f3460;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.hero-side{padding:18px}
+.hero-side h3{font-size:14px;color:#fff;margin-bottom:10px}
+.hero-side ul{list-style:none;display:grid;gap:10px;color:#b8c0d4;font-size:13px;line-height:1.65}
+.hero-side li{padding-left:18px;position:relative}
+.hero-side li::before{content:'•';position:absolute;left:0;color:#e94560}
 .tree-container{flex:1;padding:16px 24px;overflow:auto}
 .tree-node{padding-left:20px;position:relative}
 .tree-node.root{padding-left:0}
@@ -54,9 +152,36 @@ body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;backgr
 .legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-left:auto}
 .legend span{font-size:12px;display:flex;align-items:center;gap:4px}
 .legend .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-@media(max-width:600px){.header{padding:12px 16px}.toolbar,.input-area,.tree-container,.stats{padding-left:16px;padding-right:16px}.tree-node{padding-left:14px}}
-.pro-section{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;margin:16px 24px}
-.pro-mock{padding:16px;background:#16213e;border:1px solid #0f3460;border-radius:8px;filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.7}
+.content-shell{padding:24px;display:grid;gap:18px}
+.content-block{padding:22px}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.section-head h2{font-size:22px;color:#fff}
+.section-head p{max-width:760px;color:#9da7bd;line-height:1.7;font-size:13px}
+.two-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.use-case-card,.workflow-step,.related-card,.next-step-card{padding:16px}
+.use-case-card h3,.workflow-step h3,.related-card h3,.next-step-card h3,.checklist h3,.cta-banner h2{color:#fff;font-size:15px;margin-bottom:8px}
+.use-case-card p,.workflow-step p,.related-card p,.next-step-card p,.checklist li,.cta-banner p{color:#aeb8cf;font-size:13px;line-height:1.72}
+.workflow-step .step-no{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:999px;background:#e94560;color:#fff;font-size:12px;font-weight:700;margin-bottom:10px}
+.checklist{padding:18px}
+.checklist ul{padding-left:18px;display:grid;gap:10px}
+.kpi-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.kpi{padding:14px;border-radius:12px;background:rgba(15,52,96,.3);border:1px solid rgba(102,217,239,.15)}
+.kpi strong{display:block;color:#fff;font-size:18px;margin-bottom:6px}
+.kpi span{color:#93a0bb;font-size:12px;line-height:1.6}
+.jump-links{margin-top:14px}
+.faq-list{display:grid;gap:12px}
+.faq-list details{padding:14px 16px}
+.faq-list summary{cursor:pointer;color:#fff;font-size:14px;font-weight:700}
+.faq-list p{margin-top:10px;color:#aeb8cf;line-height:1.75;font-size:13px}
+.related-card a,.next-step-card a,.footer-links a,.mini-link-row a{color:#66d9ef}
+.related-links{margin-top:12px}
+.next-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cta-banner{padding:24px;background:linear-gradient(135deg,rgba(233,69,96,.14),rgba(83,52,131,.24))}
+.cta-banner p{max-width:900px;margin-top:10px}
+.cta-banner .cta-row{margin-top:16px}
+.pro-section{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;margin:0 24px 24px}
+.pro-mock{padding:16px;background:#16213e;border:1px solid #0f3460;border-radius:8px;filter:blur(3px);-webkit-filter:blur(3px);pointer-events:none;user-select:none;opacity:.72}
 .pro-mock-title{font-size:12px;text-transform:uppercase;color:#888;margin-bottom:8px;letter-spacing:.5px;font-weight:600}
 .pro-mock-item{background:rgba(255,255,255,.05);border-radius:4px;padding:6px 10px;margin-bottom:5px;font-size:12px;color:#888}
 .pro-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.45);border-radius:8px;z-index:10;transition:background .2s}
@@ -66,17 +191,32 @@ body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;backgr
 .pro-lock-sub{font-size:11px;color:#aaa;margin-top:2px}
 #proModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
 #proModal.show{display:flex}
-.pro-modal{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center}
+.pro-modal{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:32px;max-width:460px;width:90%;text-align:center}
 .pro-modal h2{font-size:20px;margin-bottom:4px;color:#e94560}
 .pro-modal .pro-price{font-size:32px;font-weight:700;color:#fff;margin:12px 0}
 .pro-modal .pro-features{text-align:left;margin:16px 0;padding:0;list-style:none}
-.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:center;gap:8px}
+.pro-modal .pro-features li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px;color:#ccc;display:flex;align-items:flex-start;gap:8px;line-height:1.6}
 .pro-modal .pro-features li:last-child{border-bottom:none}
 .pro-modal .pro-features li::before{content:'✓';color:#4ecca3;font-weight:700;font-size:16px}
 .pro-btn-upgrade{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#e94560,#533483);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;margin-top:16px;text-align:center;transition:opacity .2s}
-.pro-btn-upgrade:hover{opacity:.9}
+.pro-btn-upgrade:hover{opacity:.9;text-decoration:none}
+.pro-btn-secondary{display:block;width:100%;padding:11px;border:1px solid #0f3460;background:#1a1a2e;color:#c8d0e2;border-radius:10px;font-size:14px;text-decoration:none;margin-top:10px}
+.pro-btn-secondary:hover{border-color:#e94560;background:#0f3460;text-decoration:none}
 .pro-btn-later{display:block;width:100%;padding:10px;background:transparent;color:#888;border:none;font-size:14px;cursor:pointer;margin-top:8px}
 .pro-btn-later:hover{color:#ccc}
+.site-footer{padding:0 24px 24px}
+.footer-card{max-width:1160px;margin:0 auto;padding:18px;border-radius:14px;background:#16213e;border:1px solid #0f3460;color:#8e9bb6;font-size:12px;line-height:1.8}
+.footer-card strong{color:#fff}
+@media(max-width:980px){
+  .hero-shell,.two-col,.three-col,.next-steps,.kpi-strip{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .header{padding:12px 16px}
+  .toolbar,.input-area,.tree-container,.stats,.content-shell,.hero-panel,.site-footer{padding-left:16px;padding-right:16px}
+  .tree-node{padding-left:14px}
+  .hero-copy h2{font-size:24px}
+  .pro-section{margin-left:16px;margin-right:16px}
+}
 </style>
 </head>
 <body>
@@ -94,6 +234,48 @@ body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;backgr
   <button class="btn" onclick="collapseAll()">全部折叠</button>
   <button class="btn" onclick="copyJSON()">复制 JSON</button>
 </div>
+<section class="hero-panel">
+  <div class="hero-shell">
+    <div class="hero-copy">
+      <h2>Inspect nested JSON faster — from API debugging to docs, audits, and content handoff.</h2>
+      <p>Paste any payload, webhook sample, export file, or config object to explore structure in tree view. This page is designed for <strong>developers</strong>, <strong>data inspection workflows</strong>, and <strong>technical documentation</strong> teams that need to understand fields before they validate, transform, explain, or publish them.</p>
+      <div class="hero-badges">
+        <span class="badge">Developer workflow</span>
+        <span class="badge">Data inspection</span>
+        <span class="badge">API response review</span>
+        <span class="badge">Docs handoff</span>
+        <span class="badge">Client-side parsing</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Open Content Creator Toolkit</a>
+        <a class="btn btn-ghost" href="/ai-api-docs/">See API Docs Tools</a>
+        <a class="btn" href="/ai-json-formatter/">Open JSON Formatter</a>
+      </div>
+      <div class="jump-links">
+        <a href="#use-cases">Use cases</a>
+        <a href="#workflow">JSON inspection workflow</a>
+        <a href="#best-practices">Best practices</a>
+        <a href="#faq">FAQ</a>
+        <a href="#related-tools">Related tools</a>
+      </div>
+    </div>
+    <aside class="hero-side" aria-label="Why developers use JSON tree view">
+      <h3>Why this workflow matters</h3>
+      <ul>
+        <li>Spot nested arrays, optional fields, and object depth before you touch production code.</li>
+        <li>Move from raw payload to cleaner API docs, examples, changelogs, and support content.</li>
+        <li>Reduce copy-paste confusion when you are reviewing logs, webhooks, or third-party integrations.</li>
+        <li>Use the tree view as the first inspection layer before JSONPath, schema validation, diffing, or export.</li>
+      </ul>
+      <div class="kpi-strip">
+        <div class="kpi"><strong>1</strong><span>Paste payloads directly and render the structure instantly.</span></div>
+        <div class="kpi"><strong>2</strong><span>Search keys or values to jump to the fields that matter.</span></div>
+        <div class="kpi"><strong>3</strong><span>Collapse noise, inspect depth, then hand off to docs or QA.</span></div>
+        <div class="kpi"><strong>4</strong><span>Keep your exploration inside the browser with a focused dark UI.</span></div>
+      </div>
+    </aside>
+  </div>
+</section>
 <div class="input-area">
   <textarea id="jsonInput" placeholder="在此粘贴 JSON 数据，或点击「示例 JSON」快速体验..." spellcheck="false" aria-label="JSON输入"></textarea>
   <div class="error-msg" id="errorMsg"></div>
@@ -109,23 +291,269 @@ body{font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;backgr
     <span><i class="dot" style="background:#f92672"></i>null</span>
   </div>
 </div>
+<section class="content-shell">
+  <article class="content-block" id="use-cases">
+    <div class="section-head">
+      <div>
+        <h2>Developer use cases / 开发者场景</h2>
+        <p>JSON tree view is most useful when raw payloads are too wide, too deep, or too noisy to scan line by line. These are the common workflows this page supports well.</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="use-case-card">
+        <h3>Inspect API responses</h3>
+        <p>Open nested REST or GraphQL payloads, verify shape, confirm field names, and check whether optional branches are present before you map them in code.</p>
+      </div>
+      <div class="use-case-card">
+        <h3>Review webhook payloads</h3>
+        <p>Paste Stripe, Slack, GitHub, CMS, or automation webhook examples to understand event-specific properties without losing context in plain-text blobs.</p>
+      </div>
+      <div class="use-case-card">
+        <h3>Explore log snapshots</h3>
+        <p>When error traces include JSON context, use tree view to locate the exact customer, request, or object branch tied to a failure.</p>
+      </div>
+      <div class="use-case-card">
+        <h3>Prepare technical docs</h3>
+        <p>Inspect the structure first, then turn the important fields into endpoint examples, onboarding guides, response references, and release notes.</p>
+      </div>
+      <div class="use-case-card">
+        <h3>Audit exported datasets</h3>
+        <p>Review product exports, content records, settings snapshots, or AI workflow state files before you transform them into CSV, YAML, or internal tooling.</p>
+      </div>
+      <div class="use-case-card">
+        <h3>Support QA and handoff</h3>
+        <p>Give PMs, QA, and docs teammates a cleaner way to understand nested objects before bug triage, schema review, and content creation.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="content-block" id="workflow">
+    <div class="section-head">
+      <div>
+        <h2>JSON inspection workflow</h2>
+        <p>A simple repeatable workflow helps teams go from payload review to implementation or documentation faster, especially when the same endpoint changes often.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="workflow-step">
+        <span class="step-no">01</span>
+        <h3>Paste and normalize</h3>
+        <p>Paste the raw response or event sample, then use <strong>格式化</strong> if the payload is minified. Clean structure makes depth and hierarchy visible immediately.</p>
+      </div>
+      <div class="workflow-step">
+        <span class="step-no">02</span>
+        <h3>Scan top-level branches</h3>
+        <p>Expand only the main objects first. Identify arrays, summary blocks, metadata branches, and noisy sections you can collapse while you focus on the target path.</p>
+      </div>
+      <div class="workflow-step">
+        <span class="step-no">03</span>
+        <h3>Search the fields that matter</h3>
+        <p>Use the search box to locate key names, IDs, enum values, status flags, timestamps, and any field that appears across multiple levels.</p>
+      </div>
+      <div class="workflow-step">
+        <span class="step-no">04</span>
+        <h3>Hand off to the next tool</h3>
+        <p>Once structure is clear, continue with formatting, diffing, JSONPath extraction, schema validation, API docs, or long-form technical content creation.</p>
+      </div>
+    </div>
+    <div class="mini-link-row" style="margin-top:14px">
+      <a class="mini-link" href="/ai-json-path/">Continue with JSONPath</a>
+      <a class="mini-link" href="/ai-json-schema/">Validate with JSON Schema</a>
+      <a class="mini-link" href="/ai-json-diff/">Compare two payloads</a>
+      <a class="mini-link" href="/ai-api-tester/">Test the endpoint again</a>
+    </div>
+  </article>
+
+  <article class="content-block" id="best-practices">
+    <div class="section-head">
+      <div>
+        <h2>Best practices for JSON inspection</h2>
+        <p>Most JSON mistakes are not syntax mistakes. They are field-assumption mistakes. These habits help you avoid them.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="checklist">
+        <h3>For developers and QA</h3>
+        <ul>
+          <li>Check whether a field is always present or only appears in edge cases, failed requests, or specific event types.</li>
+          <li>Look for arrays with mixed object shapes instead of assuming every item has the same properties.</li>
+          <li>Confirm types carefully: numeric strings, nullable timestamps, booleans as strings, and empty arrays often cause bugs.</li>
+          <li>Collapse irrelevant branches early so you can focus on request-critical paths and avoid visual overload.</li>
+        </ul>
+      </div>
+      <div class="checklist">
+        <h3>For docs, data, and content teams</h3>
+        <ul>
+          <li>Document representative examples, not idealized payloads that hide optional or deprecated fields.</li>
+          <li>Explain nested objects in task order: auth, request body, response body, error states, then pagination or metadata.</li>
+          <li>Keep a shared sample set for tutorials, changelogs, and support docs so explanations stay consistent across channels.</li>
+          <li>After inspection, package the insight into reusable assets: guides, templates, quick references, and explainer content.</li>
+        </ul>
+      </div>
+    </div>
+  </article>
+
+  <article class="content-block">
+    <div class="section-head">
+      <div>
+        <h2>From raw payload to publishable technical content</h2>
+        <p>This page solves the inspection step. The next conversion step is turning what you learned into documentation, onboarding, examples, and evergreen content that keeps helping your team or your audience.</p>
+      </div>
+    </div>
+    <div class="cta-banner">
+      <h2>Turn inspected JSON into docs, tutorials, changelogs, and product content</h2>
+      <p>If you are building technical explainers, endpoint guides, internal SOPs, or developer-facing tutorials, start with the <strong>Content Creator Toolkit</strong>. It is the best next step after you understand the data shape and want to package it into something readable and reusable.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Go to Content Creator Toolkit</a>
+        <a class="btn" href="/ai-api-docs/">Open API Docs Tool</a>
+        <a class="btn" href="/ai-api-docs-generator/">Generate API Docs</a>
+      </div>
+    </div>
+  </article>
+
+  <article class="content-block" id="related-tools">
+    <div class="section-head">
+      <div>
+        <h2>Related JSON and API tools</h2>
+        <p>Use the tree view as your first stop, then branch into more specific tools depending on whether you need validation, querying, comparison, or documentation.</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="related-card">
+        <h3><a href="/ai-json-formatter/">JSON Formatter</a></h3>
+        <p>Beautify, minify, and validate raw JSON before you share samples with teammates or paste examples into docs.</p>
+      </div>
+      <div class="related-card">
+        <h3><a href="/ai-json-path/">JSONPath Tool</a></h3>
+        <p>Extract target fields once you already know the nested structure and need repeatable queries.</p>
+      </div>
+      <div class="related-card">
+        <h3><a href="/ai-json-schema/">JSON Schema</a></h3>
+        <p>Check whether real payloads match the contract your app, automation, or integration expects.</p>
+      </div>
+      <div class="related-card">
+        <h3><a href="/ai-json-diff/">JSON Diff</a></h3>
+        <p>Compare old and new payloads to see which branches changed after a release or provider update.</p>
+      </div>
+      <div class="related-card">
+        <h3><a href="/ai-api-tester/">API Tester</a></h3>
+        <p>Retest endpoints, inspect live responses again, and confirm whether fixes changed the output you care about.</p>
+      </div>
+      <div class="related-card">
+        <h3><a href="/ai-yaml-json/">YAML ⇄ JSON</a></h3>
+        <p>Switch between config-friendly YAML and machine-friendly JSON when working across docs, DevOps, and app tooling.</p>
+      </div>
+    </div>
+    <div class="related-links">
+      <a href="/ai-api-docs/">API docs</a>
+      <a href="/ai-api-docs-generator/">API docs generator</a>
+      <a href="/ai-http-client/">HTTP client</a>
+      <a href="/ai-webhook-tester/">Webhook tester</a>
+      <a href="/ai-manifest-json/">Manifest JSON</a>
+      <a href="/ai-package-json/">Package JSON</a>
+    </div>
+  </article>
+
+  <article class="content-block">
+    <div class="section-head">
+      <div>
+        <h2>Next steps</h2>
+        <p>Once the shape is obvious, choose the next workflow on purpose instead of bouncing between tabs without a plan.</p>
+      </div>
+    </div>
+    <div class="next-steps">
+      <div class="next-step-card">
+        <h3>1. Clean the sample</h3>
+        <p>Use <a href="/ai-json-formatter/">JSON Formatter</a> to create a readable baseline payload for teammates.</p>
+      </div>
+      <div class="next-step-card">
+        <h3>2. Validate assumptions</h3>
+        <p>Open <a href="/ai-json-schema/">JSON Schema</a> when you need contract confidence, edge-case checks, or QA gates.</p>
+      </div>
+      <div class="next-step-card">
+        <h3>3. Test and document</h3>
+        <p>Run <a href="/ai-api-tester/">API Tester</a> or <a href="/ai-api-docs/">API Docs</a> to turn inspected structure into something operational.</p>
+      </div>
+      <div class="next-step-card">
+        <h3>4. Publish reusable content</h3>
+        <p>Package what you learned into tutorials and explainers with the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="content-block" id="faq">
+    <div class="section-head">
+      <div>
+        <h2>FAQ</h2>
+        <p>Quick answers for developers, analysts, and technical writers using JSON tree view in real workflows.</p>
+      </div>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>What is the difference between a JSON formatter and a JSON tree viewer?</summary>
+        <p>A formatter makes raw JSON readable as text. A tree viewer makes hierarchy readable as structure. In practice you often use both: format first if the payload is minified, then inspect it as a tree when you need to understand depth, nesting, and repeated branches.</p>
+      </details>
+      <details>
+        <summary>When should I use tree view instead of scanning raw JSON text?</summary>
+        <p>Use tree view when objects are deeply nested, arrays are long, or the response contains lots of metadata you want to collapse. It is especially helpful for webhook payloads, event logs, and third-party APIs with inconsistent optional fields.</p>
+      </details>
+      <details>
+        <summary>Is this useful for data inspection and docs work, not just coding?</summary>
+        <p>Yes. Data analysts use tree view to inspect exported records and event shapes. Docs and content teams use it to understand what should be explained, omitted, grouped, or highlighted in endpoint guides and onboarding content.</p>
+      </details>
+      <details>
+        <summary>What should I do if a payload is too large or too noisy?</summary>
+        <p>Start by formatting it, expand only the top-level branches, and use search to jump to the keys you care about. Then move to a schema or diff workflow if you need contract checks or change tracking. The point is to reduce noise before you reason about the data.</p>
+      </details>
+      <details>
+        <summary>How does this page fit into a developer-to-content workflow?</summary>
+        <p>The tree view gives you structural understanding. After that, you can extract examples, write API docs, publish tutorials, prepare changelogs, and convert technical insight into reusable content. That is why the next-step CTAs point to API docs and the Content Creator Toolkit.</p>
+      </details>
+    </div>
+  </article>
+</section>
 <div class="pro-section" onclick="document.getElementById('proModal').classList.add('show')">
-<div class="pro-mock">
-<div class="pro-mock-title">&#128202; Large File Support</div>
-<div class="pro-mock-item">&#9654; Load JSON files up to 50MB</div>
-<div class="pro-mock-item">&#9654; Virtual scrolling for 100K+ nodes</div>
-<div class="pro-mock-title" style="margin-top:10px">&#128269; Search &amp; Replace</div>
-<div class="pro-mock-item">&#9654; Find &amp; replace keys or values</div>
-<div class="pro-mock-item">&#9654; Regex pattern matching</div>
-<div class="pro-mock-title" style="margin-top:10px">&#128247; Export as Image</div>
-<div class="pro-mock-item">&#9654; Export tree as PNG / SVG</div>
+  <div class="pro-mock">
+    <div class="pro-mock-title">Developer → Docs workflow upgrade</div>
+    <div class="pro-mock-item">▶ Turn inspected payloads into API explainers and onboarding guides</div>
+    <div class="pro-mock-item">▶ Build repeatable content assets from release data and endpoint samples</div>
+    <div class="pro-mock-title" style="margin-top:10px">Content packaging</div>
+    <div class="pro-mock-item">▶ Publish changelogs, SOPs, and technical tutorials faster</div>
+    <div class="pro-mock-item">▶ Reuse one inspection pass across docs, support, and marketing content</div>
+  </div>
+  <div class="pro-lock-overlay">
+    <div class="pro-lock-icon">🔐</div>
+    <div class="pro-lock-text">Unlock the next workflow</div>
+    <div class="pro-lock-sub">Docs, explainers, and reusable content assets</div>
+  </div>
 </div>
-<div class="pro-lock-overlay">
-<div class="pro-lock-icon">&#128274;</div>
-<div class="pro-lock-text">Pro Features</div>
-<div class="pro-lock-sub">Click to unlock</div>
+<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="pro-modal">
+    <h2>🚀 After JSON inspection, ship the explanation</h2>
+    <div class="pro-price">Next step</div>
+    <ul class="pro-features">
+      <li>Convert payload understanding into docs, tutorials, and onboarding content.</li>
+      <li>Package technical insight into reusable assets for product, support, and distribution.</li>
+      <li>Keep your workflow inside the site with JSON, API, and publishing tools that work together.</li>
+      <li>Use one clean handoff from developer inspection to content creation and documentation.</li>
+    </ul>
+    <a href="/content-creator-toolkit.html" class="pro-btn-upgrade">Open Content Creator Toolkit</a>
+    <a href="/ai-api-docs/" class="pro-btn-secondary">Browse API Docs Tools</a>
+    <button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
+  </div>
 </div>
-</div>
+<footer class="site-footer">
+  <div class="footer-card">
+    <strong>AI JSON Tree</strong> helps you inspect structure first, then move into validation, querying, API testing, and publishable content. Useful for developers, QA, data inspection, docs, and technical marketing.
+    <div class="footer-links" style="margin-top:10px">
+      <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+      <a href="/ai-json-formatter/">JSON Formatter</a>
+      <a href="/ai-json-schema/">JSON Schema</a>
+      <a href="/ai-api-docs/">API Docs</a>
+      <a href="/ai-api-tester/">API Tester</a>
+    </div>
+  </div>
+</footer>
 <script>
 let jsonData=null;
 const $=id=>document.getElementById(id);
@@ -277,20 +705,6 @@ function collapseAll(){
 
 function handleSearch(){renderTree()}
 </script>
-<div id="proModal" onclick="if(event.target===this)this.classList.remove('show')">
-<div class="pro-modal">
-<h2>&#128640; JSON Tree Pro</h2>
-<div class="pro-price">$9</div>
-<ul class="pro-features">
-<li>Large File Support — handle JSON up to 50MB</li>
-<li>Search &amp; Replace — find and replace keys or values with regex</li>
-<li>Export as Image — save tree view as PNG or SVG</li>
-<li>Priority support &amp; all future updates</li>
-</ul>
-<a href="https://ko-fi.com/feidev" target="_blank" class="pro-btn-upgrade">Upgrade to Pro — $9</a>
-<button class="pro-btn-later" onclick="event.stopPropagation();document.getElementById('proModal').classList.remove('show')">Maybe later</button>
-</div>
-</div>
 <script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
