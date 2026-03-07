@@ -1,75 +1,554 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI JWT Decoder - JWT Token 在线解码工具</title>
-<meta name="description" content="免费在线JWT Token解码器，实时解析Header、Payload、Signature，检测过期时间。">
+<meta name="robots" content="index, follow">
+<title>AI JWT Decoder - Free Online JWT Token Decoder for Auth Debugging, API Testing & Developer Workflows | Lifa AI Tools</title>
+<meta name="description" content="Free online JWT decoder for developers. Decode JWT header, payload, and signature, inspect exp / iat / nbf claims, troubleshoot auth errors, and debug API tokens in your browser.">
+<meta name="keywords" content="JWT decoder, JWT token decoder, decode JWT online, auth debugging tool, API token debugger, inspect JWT claims, JWT exp checker, developer tools, bearer token debugging, JWT troubleshooting">
 <link rel="canonical" href="https://lifa-su.com/ai-jwt-decoder/">
+<meta property="og:title" content="AI JWT Decoder - Free Online JWT Token Decoder for Auth Debugging">
+<meta property="og:description" content="Decode JWT tokens, inspect claims, check expiration, and troubleshoot auth or API debugging workflows in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-jwt-decoder/">
+<meta property="og:image" content="https://lifa-su.com/apple-touch-icon.png">
+<meta property="og:image:alt" content="AI JWT decoder interface showing decoded header, payload, signature, and JWT troubleshooting content">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI JWT Decoder - Decode and Debug JWT Tokens Online">
+<meta name="twitter:description" content="A free browser-based JWT decoder for developers, auth troubleshooting, API debugging, and claim inspection.">
+<meta name="twitter:image" content="https://lifa-su.com/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "AI JWT Decoder",
+      "url": "https://lifa-su.com/ai-jwt-decoder/",
+      "description": "Free browser-based JWT decoder for inspecting header, payload, signature, expiration, and auth claims during developer and API debugging workflows.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Lifa AI Tools",
+        "url": "https://lifa-su.com/"
+      },
+      "featureList": [
+        "Decode JWT header, payload, and signature locally in the browser",
+        "Inspect exp, iat, nbf, auth_time, created_at, and updated_at claims",
+        "Check token expiration state instantly",
+        "Copy decoded JSON sections for debugging and documentation",
+        "Use in auth troubleshooting, API testing, and developer support workflows"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does a JWT decoder do?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A JWT decoder parses a JSON Web Token into its header, payload, and signature parts so developers can inspect claims like exp, iat, nbf, iss, aud, sub, and roles while debugging authentication and API flows."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does decoding a JWT verify its signature?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Decoding only reveals the token contents. Signature verification requires the correct secret or public key and should be handled separately in your auth or backend verification workflow."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is my JWT valid structurally but still rejected by the API?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Common reasons include expired tokens, wrong audience or issuer, clock skew around nbf or iat, malformed Bearer headers, stale refresh flows, revoked sessions, or signature verification mismatches on the server."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it safe to decode a JWT in the browser?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Decoding in the browser can be safe for debugging if you avoid pasting production secrets into untrusted tools, understand the token may contain sensitive claims, and follow your team's security policies. Use caution with real user data."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I use after decoding a JWT?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "After decoding a JWT, developers often continue with an HTTP client, API tester, webhook tester, or schema validator to trace the full auth request, inspect headers, validate payload shape, and document the debugging workflow."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Lifa AI Tools",
+          "item": "https://lifa-su.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Developer Tools",
+          "item": "https://lifa-su.com/ai-api-docs.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "AI JWT Decoder",
+          "item": "https://lifa-su.com/ai-jwt-decoder/"
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;line-height:1.6}
-.container{max-width:900px;margin:0 auto;padding:20px 16px 60px}
-h1{text-align:center;font-size:1.8rem;margin-bottom:6px;color:#e94560}
-.subtitle{text-align:center;color:#888;font-size:.9rem;margin-bottom:24px}
-.input-section{margin-bottom:24px}
-.input-section label{display:block;font-weight:600;margin-bottom:8px;color:#c0c0c0}
-textarea{width:100%;height:120px;background:#16213e;border:2px solid #0f3460;border-radius:8px;color:#e0e0e0;padding:12px;font-family:'Courier New',monospace;font-size:.85rem;resize:vertical;transition:border-color .2s}
-textarea:focus{outline:none;border-color:#e94560}
-textarea::placeholder{color:#555}
-.error{background:#2d1525;border:1px solid #e94560;color:#ff6b8a;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none}
-.result-section{display:none}
-.part{margin-bottom:20px;border-radius:10px;overflow:hidden;border:1px solid #0f3460}
-.part-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;font-weight:700}
-.copy-btn{background:none;border:1px solid rgba(255,255,255,.2);color:#ccc;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.8rem;transition:all .2s}
-.copy-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-.part-body{padding:14px 16px;background:#16213e;font-family:'Courier New',monospace;font-size:.85rem;white-space:pre-wrap;word-break:break-all}
-.header-part .part-header{background:#0f3460;color:#53d8fb}
-.payload-part .part-header{background:#1b4332;color:#95d5b2}
-.signature-part .part-header{background:#4a1942;color:#d4a5d0}
-.header-part .part-body{color:#7ec8e3}
-.payload-part .part-body{color:#b7e4c7}
-.signature-part .part-body{color:#d4a5d0}
-.exp-banner{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;display:none}
-.exp-valid{background:#1b4332;border:1px solid #2d6a4f;color:#95d5b2}
-.exp-expired{background:#3d1a1a;border:1px solid #8b2020;color:#ff8a8a}
-@media(max-width:600px){
-h1{font-size:1.4rem}
-.container{padding:14px 10px 50px}
-textarea{height:100px;font-size:.78rem}
-.part-body{font-size:.78rem;padding:10px 12px}
+:root{
+--bg:#0b1020;
+--bg2:#121a31;
+--panel:#16213e;
+--panel2:#1b284f;
+--line:#27406f;
+--line2:#35538a;
+--text:#e6ecff;
+--muted:#9aa7c7;
+--soft:#7f8db1;
+--accent:#e94560;
+--accent2:#ff6b88;
+--blue:#53d8fb;
+--green:#95d5b2;
+--green-bg:#163628;
+--red:#ff9aa8;
+--red-bg:#3d1a24;
+--purple:#d4a5d0;
+--shadow:0 20px 50px rgba(0,0,0,.28);
 }
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(83,216,251,.08),transparent 26%),linear-gradient(180deg,var(--bg),#0f1630 45%,#0a1122);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--blue);text-decoration:none;transition:.2s}
+a:hover{color:#9be8ff}
+.container{max-width:1180px;margin:0 auto;padding:22px 16px 72px}
+.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;color:var(--soft);font-size:13px}
+.topbar a{color:var(--muted)}
+.topbar a:hover{color:var(--text)}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px}
+.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.8fr);gap:18px;margin-bottom:22px}
+.hero-main,.hero-side,.tool-shell,.content-card,.cta-strip,.pro-section{background:linear-gradient(180deg,rgba(22,33,62,.95),rgba(14,22,43,.96));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.hero-main{padding:30px;background:radial-gradient(circle at top left,rgba(233,69,96,.16),transparent 30%),radial-gradient(circle at top right,rgba(83,216,251,.14),transparent 28%),linear-gradient(180deg,rgba(22,33,62,.96),rgba(14,22,43,.97))}
+.hero-side{padding:24px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(83,216,251,.08);border:1px solid rgba(83,216,251,.25);color:#b6efff;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(2rem,4vw,3.4rem);line-height:1.05;letter-spacing:-.03em;margin-bottom:14px}
+.lead{font-size:1.03rem;color:var(--muted);max-width:62ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0 18px}
+.btn-primary,.btn-secondary,.chip-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;font-weight:800;transition:.2s}
+.btn-primary{padding:12px 20px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 10px 30px rgba(233,69,96,.28)}
+.btn-primary:hover{color:#fff;transform:translateY(-1px)}
+.btn-secondary{padding:12px 20px;border:1px solid var(--line2);background:rgba(255,255,255,.02);color:var(--text)}
+.btn-secondary:hover{border-color:var(--blue);color:#fff;transform:translateY(-1px)}
+.hero-points,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid{display:grid;gap:12px}
+.hero-points{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px}
+.point,.workflow-step,.practice,.use-card,.related-card,.next-card,.signal-card{padding:16px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}
+.point strong,.hero-side h2,.content-card h2,.use-card h3,.workflow-step h3,.practice h3,.related-card h3,.next-card h3,.signal-card h3{display:block;margin-bottom:8px;color:var(--text)}
+.point span,.hero-side li,.content-card p,.content-card li,.use-card p,.workflow-step p,.practice p,.related-card p,.next-card p,.signal-card p{color:var(--muted)}
+.point span{font-size:.88rem}
+.hero-side ul{display:grid;gap:10px;padding:0;margin:0}
+.hero-side li{list-style:none;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:.94rem}
+.hero-side .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip-link{padding:8px 12px;font-size:12px;background:rgba(83,216,251,.08);border:1px solid rgba(83,216,251,.18);color:#c3f3ff}
+.chip-link:hover{background:rgba(83,216,251,.16);border-color:var(--blue);color:#fff}
+.section-label{font-size:12px;color:var(--blue);font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.tool-shell{padding:22px;margin-bottom:18px}
+.tool-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.tool-head h2{font-size:1.5rem;letter-spacing:-.02em}
+.tool-head p{color:var(--muted);max-width:70ch}
+.notice{padding:16px 18px;border:1px solid rgba(83,216,251,.22);border-radius:16px;margin-bottom:18px;background:linear-gradient(180deg,rgba(83,216,251,.08),rgba(255,255,255,.02))}
+.notice strong{display:block;color:#d8f8ff;margin-bottom:6px}
+.notice p{color:#b7dceb;font-size:.94rem}
+.input-section{margin-bottom:24px}
+.input-section label{display:block;font-weight:700;margin-bottom:8px;color:#d7dfff}
+textarea{width:100%;height:132px;background:#0f1832;border:2px solid var(--line);border-radius:12px;color:var(--text);padding:14px;font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:.9rem;resize:vertical;transition:border-color .2s,box-shadow .2s}
+textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(233,69,96,.12)}
+textarea::placeholder{color:#5e6c92}
+.error{background:#2d1525;border:1px solid var(--accent);color:#ff8fa4;padding:12px 14px;border-radius:12px;margin-bottom:16px;display:none}
+.result-section{display:none}
+.result-grid{display:grid;gap:18px}
+.part{border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.part-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-weight:800;gap:12px}
+.copy-btn{background:none;border:1px solid rgba(255,255,255,.18);color:#d6deff;padding:6px 12px;border-radius:999px;cursor:pointer;font-size:.8rem;font-weight:700;transition:.2s}
+.copy-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.part-body{padding:16px;background:#101a35;font-family:'SF Mono',Monaco,Consolas,'Courier New',monospace;font-size:.86rem;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+.header-part .part-header{background:#12345c;color:var(--blue)}
+.payload-part .part-header{background:#17392c;color:var(--green)}
+.signature-part .part-header{background:#432042;color:var(--purple)}
+.header-part .part-body{color:#9fe9ff}
+.payload-part .part-body{color:#c9edd7}
+.signature-part .part-body{color:#e1bcdd}
+.exp-banner{padding:13px 16px;border-radius:12px;margin-bottom:18px;font-weight:700;display:none}
+.exp-valid{background:var(--green-bg);border:1px solid #275e47;color:var(--green)}
+.exp-expired{background:var(--red-bg);border:1px solid #823247;color:var(--red)}
+.signal-grid,.content-grid,.faq-list{display:grid;gap:16px}
+.signal-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:18px}
+.content-grid{grid-template-columns:1fr}
+.content-card{padding:24px}
+.content-card h2{font-size:1.5rem;letter-spacing:-.02em}
+.content-card ul,.content-card ol{padding-left:20px;margin-top:12px;display:grid;gap:10px}
+.content-card code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px;color:#dff7ff}
+.use-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.workflow-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:14px}
+.practice-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
+.related-grid,.next-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
+.related-card.primary,.next-card.primary{border-color:rgba(233,69,96,.45);background:linear-gradient(180deg,rgba(233,69,96,.12),rgba(255,255,255,.02))}
+.related-card a,.next-card a{font-weight:800}
+.cta-strip{margin-top:16px;padding:20px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-color:rgba(233,69,96,.26);background:linear-gradient(180deg,rgba(233,69,96,.14),rgba(17,26,48,.96))}
+.cta-strip p{margin:0;color:var(--muted)}
+.faq-item{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);overflow:hidden}
+.faq-item summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:800;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';font-size:20px;color:var(--blue);line-height:1}
+.faq-item[open] summary::after{content:'–'}
+.faq-item p{padding:0 18px 18px;color:var(--muted)}
+.pro-section{margin-top:18px;padding:24px}
+.pro-hd{text-align:center;margin-bottom:20px}
+.pro-hd h2{font-size:1.45rem;color:var(--accent);margin-bottom:4px}
+.pro-hd p{color:var(--muted);font-size:.95rem}
+.pro-wrap{position:relative;cursor:pointer;border-radius:18px;overflow:hidden}
+.pro-blur{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;filter:blur(6px);opacity:.62;pointer-events:none;user-select:none}
+.pro-card{background:#101a35;border:1px solid var(--line);border-radius:16px;padding:20px}
+.pro-card h3{font-size:1rem;color:var(--blue);margin-bottom:8px}
+.pro-card p{color:var(--muted);font-size:.9rem;line-height:1.6}
+.pro-card .mock-ui{margin-top:12px;background:#0b1020;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:monospace;font-size:.77rem;color:#6d7ea9}
+.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(11,16,32,.42);z-index:2}
+.pro-lock-icon{font-size:3rem;margin-bottom:10px}
+.pro-lock-text{font-size:1.1rem;font-weight:800;color:var(--text)}
+.pro-lock-sub{font-size:.86rem;color:var(--muted);margin-top:4px}
+.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.pro-modal-overlay.active{display:flex}
+.pro-modal{background:#16213e;border:1px solid var(--line);border-radius:20px;padding:36px;max-width:460px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.pro-modal h3{font-size:1.45rem;color:#fff;margin-bottom:6px}
+.pro-modal .pro-price{font-size:2rem;font-weight:800;color:var(--accent);margin:12px 0}
+.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
+.pro-modal ul li{padding:8px 0;color:#d4dbef;font-size:.97rem;border-bottom:1px solid var(--line)}
+.pro-modal ul li::before{content:'✅ ';margin-right:6px}
+.pro-modal ul li:last-child{border-bottom:none}
+.pro-btn-upgrade{display:inline-block;width:100%;padding:14px;background:var(--accent);color:#fff;font-size:1.05rem;font-weight:800;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:8px}
+.pro-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4);color:#fff}
+.pro-btn-later{background:none;border:none;color:var(--muted);font-size:.9rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
+.pro-btn-later:hover{color:#fff}
+footer{text-align:center;padding:28px 0 8px;color:var(--soft);font-size:.84rem}
+footer a{color:var(--muted)}
+footer a:hover{color:#fff}
+@media(max-width:980px){.hero,.signal-grid,.hero-points,.use-grid,.workflow-grid,.related-grid,.next-grid{grid-template-columns:1fr 1fr}.practice-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.container{padding:16px 12px 56px}.topbar{flex-direction:column;align-items:flex-start}.hero,.hero-points,.signal-grid,.use-grid,.workflow-grid,.practice-grid,.related-grid,.next-grid,.pro-blur{grid-template-columns:1fr}.hero-main,.hero-side,.tool-shell,.content-card,.pro-section{padding:18px}h1{font-size:2rem}.lead{font-size:.98rem}textarea{height:112px;font-size:.84rem}.part-body{font-size:.79rem;padding:12px 14px}.cta-strip{align-items:flex-start}}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🔐 AI JWT Decoder</h1>
-<p class="subtitle">粘贴 JWT Token，实时解码 Header / Payload / Signature</p>
-<div class="input-section">
-<label for="jwt-input">JWT Token</label>
-<textarea id="jwt-input" placeholder="粘贴你的 JWT Token（eyJhbGciOi...）" spellcheck="false"></textarea>
+  <div class="topbar">
+    <div class="crumbs">
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/ai-api-docs.html">Developer Tools</a>
+      <span>/</span>
+      <span>AI JWT Decoder</span>
+    </div>
+    <a href="/">← All Tools</a>
+  </div>
+
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">Developer · Auth · API Debugging</div>
+      <h1>Decode JWT tokens fast, then fix the auth workflow around them</h1>
+      <p class="lead">Use this free JWT decoder to inspect header, payload, signature, and expiration claims in seconds. It is built for developers debugging bearer tokens, 401 responses, broken refresh flows, webhook auth, and API integration issues.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#decoder">Open JWT Decoder</a>
+        <a class="btn-secondary" href="/content-creator-toolkit.html">Get Content Creator Toolkit</a>
+        <a class="btn-secondary" href="#faq">See JWT FAQ</a>
+      </div>
+      <div class="hero-points">
+        <div class="point"><strong>Inspect claims instantly</strong><span>Check <code>exp</code>, <code>iat</code>, <code>nbf</code>, issuer, audience, subject, roles, and custom claims without leaving the browser.</span></div>
+        <div class="point"><strong>Triage auth failures</strong><span>Useful for expired tokens, audience mismatches, malformed bearer headers, stale sessions, and auth middleware debugging.</span></div>
+        <div class="point"><strong>Move to the next tool</strong><span>After decoding, continue with API tester, HTTP client, webhook tester, schema validator, and docs pages to close the full troubleshooting loop.</span></div>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <h2>Best for</h2>
+      <ul>
+        <li>Frontend developers debugging <strong>401 / 403</strong> errors</li>
+        <li>Backend and auth teams checking <strong>issuer, audience, scopes, and expiry</strong></li>
+        <li>API support and developer success teams reproducing token problems</li>
+        <li>Webhook, OAuth, SSO, and mobile app teams tracing auth edge cases</li>
+      </ul>
+      <div>
+        <div class="section-label">Related workflow</div>
+        <div class="chip-row">
+          <a class="chip-link" href="/ai-http-client/">HTTP Client</a>
+          <a class="chip-link" href="/ai-api-tester/">API Tester</a>
+          <a class="chip-link" href="/ai-webhook-tester/">Webhook Tester</a>
+          <a class="chip-link" href="/ai-json-schema/">JSON Schema</a>
+          <a class="chip-link" href="/ai-yaml-json/">YAML ↔ JSON</a>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="signal-grid">
+    <div class="signal-card">
+      <h3>Why decode JWTs?</h3>
+      <p>A JWT often looks fine until you inspect the real claims. The token may be structurally valid but still fail because the audience is wrong, the clock is off, or the API expects a different issuer or scope.</p>
+    </div>
+    <div class="signal-card">
+      <h3>What this tool does</h3>
+      <p>It decodes the token and highlights time-based claims so you can understand what the client is sending. That speeds up debugging and shortens the path from “401 again” to the actual root cause.</p>
+    </div>
+    <div class="signal-card">
+      <h3>What it does not do</h3>
+      <p>Decoding is not signature verification. You still need your backend secret or public key, auth middleware, or provider-side checks to prove the token was signed correctly.</p>
+    </div>
+  </section>
+
+  <section class="tool-shell" id="decoder">
+    <div class="tool-head">
+      <div>
+        <h2>JWT Decoder</h2>
+        <p>Paste a JWT token below to decode its header, payload, and signature. The tool also checks whether the token is currently expired based on the <code>exp</code> claim.</p>
+      </div>
+    </div>
+    <div class="notice">
+      <strong>Debugging note</strong>
+      <p>This tool decodes locally in your browser for fast inspection. Be careful with real production tokens and avoid exposing sensitive user data in screenshots, tickets, or public bug reports.</p>
+    </div>
+    <div class="input-section">
+      <label for="jwt-input">JWT Token</label>
+      <textarea id="jwt-input" placeholder="Paste your JWT token here (eyJhbGciOi...)" spellcheck="false"></textarea>
+    </div>
+    <div class="error" id="error"></div>
+    <div class="exp-banner" id="exp-banner"></div>
+    <div class="result-section" id="results">
+      <div class="result-grid">
+        <div class="part header-part">
+          <div class="part-header"><span>📋 Header</span><button class="copy-btn" onclick="copyPart('header-body', this)">Copy</button></div>
+          <div class="part-body" id="header-body"></div>
+        </div>
+        <div class="part payload-part">
+          <div class="part-header"><span>📦 Payload</span><button class="copy-btn" onclick="copyPart('payload-body', this)">Copy</button></div>
+          <div class="part-body" id="payload-body"></div>
+        </div>
+        <div class="part signature-part">
+          <div class="part-header"><span>🔑 Signature</span><button class="copy-btn" onclick="copyPart('sig-body', this)">Copy</button></div>
+          <div class="part-body" id="sig-body"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    <article class="content-card">
+      <div class="section-label">Use cases</div>
+      <h2>Common JWT decoder use cases for developers and API teams</h2>
+      <div class="use-grid">
+        <div class="use-card">
+          <h3>401 / 403 auth triage</h3>
+          <p>Check whether the token is expired, missing scopes, using the wrong issuer, or targeting the wrong audience before blaming the API route or frontend code.</p>
+        </div>
+        <div class="use-card">
+          <h3>OAuth and SSO debugging</h3>
+          <p>Inspect provider claims, timestamps, tenant IDs, and user identity fields when an OAuth callback or SSO login seems to work but protected requests still fail.</p>
+        </div>
+        <div class="use-card">
+          <h3>Webhook and service auth</h3>
+          <p>Decode signed tokens from internal services, integrations, or webhooks to confirm whether the sending system minted the token you expected.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <div class="section-label">Troubleshooting workflow</div>
+      <h2>A simple JWT troubleshooting workflow that actually finds the issue</h2>
+      <div class="workflow-grid">
+        <div class="workflow-step">
+          <h3>1. Decode the token</h3>
+          <p>Start with structure: header, payload, and signature. Make sure the token has three sections and readable JSON in the first two parts.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>2. Inspect time claims</h3>
+          <p>Look at <code>exp</code>, <code>iat</code>, and <code>nbf</code>. Many auth bugs come from expired tokens, clock drift, or using tokens before they are valid.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>3. Compare auth context</h3>
+          <p>Check <code>iss</code>, <code>aud</code>, <code>sub</code>, scopes, roles, tenant IDs, and environment markers against what the API or middleware expects.</p>
+        </div>
+        <div class="workflow-step">
+          <h3>4. Test the request path</h3>
+          <p>Take the same token into an <a href="/ai-http-client/">HTTP client</a> or <a href="/ai-api-tester/">API tester</a>, reproduce the call, and confirm whether the failure comes from the token, headers, body, or route config.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <div class="section-label">Best practices</div>
+      <h2>JWT debugging best practices</h2>
+      <div class="practice-grid">
+        <div class="practice">
+          <h3>Separate decode from verify</h3>
+          <p>Decoding helps you inspect claims. Verification proves trust. Treat them as two different steps so you do not assume a readable token is automatically valid.</p>
+        </div>
+        <div class="practice">
+          <h3>Check environment mismatches</h3>
+          <p>Development and production tokens often differ by issuer, audience, tenant, or signing key. Many “random” failures are really environment mismatch bugs.</p>
+        </div>
+        <div class="practice">
+          <h3>Be careful with logs and screenshots</h3>
+          <p>JWTs can contain user IDs, email addresses, roles, and internal claims. Redact or shorten sensitive values before sharing with teammates, customers, or bug trackers.</p>
+        </div>
+        <div class="practice">
+          <h3>Trace the full auth loop</h3>
+          <p>If the token looks correct, move upstream and downstream: refresh flow, cookie/session storage, CORS, gateway headers, proxy rewrites, and backend verification logic.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <div class="section-label">Related tools</div>
+      <h2>Use this JWT decoder as one step in a larger debugging workflow</h2>
+      <div class="related-grid">
+        <div class="related-card primary">
+          <h3><a href="/content-creator-toolkit.html">Content Creator Toolkit</a></h3>
+          <p>Primary CTA: if you also publish tutorials, onboarding docs, changelogs, or creator-led developer content, use this toolkit to turn debugging knowledge into content that converts.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-http-client/">AI HTTP Client</a></h3>
+          <p>Replay the same bearer token in a controlled request and inspect response codes, headers, and payloads.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-api-tester/">AI API Tester</a></h3>
+          <p>Validate endpoint behavior end-to-end after decoding the token and checking the auth context.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-webhook-tester/">AI Webhook Tester</a></h3>
+          <p>Useful when incoming signed events or service tokens trigger webhook auth and verification issues.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-json-schema/">AI JSON Schema</a></h3>
+          <p>Define and validate payload shape after auth succeeds so you can separate token problems from data contract problems.</p>
+        </div>
+        <div class="related-card">
+          <h3><a href="/ai-yaml-json/">AI YAML to JSON</a></h3>
+          <p>Convert config and API examples between YAML and JSON when docs, headers, or environment configs live in different formats.</p>
+        </div>
+      </div>
+      <div class="cta-strip">
+        <div>
+          <strong>Want a stronger content + tooling funnel?</strong>
+          <p>Use the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> to turn developer know-how into SEO pages, lead magnets, and productized tutorials.</p>
+        </div>
+        <a class="btn-primary" href="/content-creator-toolkit.html">Explore the toolkit</a>
+      </div>
+    </article>
+
+    <article class="content-card">
+      <div class="section-label">Next steps</div>
+      <h2>What to do after you decode the JWT</h2>
+      <div class="next-grid">
+        <div class="next-card">
+          <h3>Reproduce the failing request</h3>
+          <p>Use the same token in <a href="/ai-http-client/">HTTP Client</a> or <a href="/ai-api-tester/">API Tester</a> and confirm whether the API rejects the auth header, the route, or the payload.</p>
+        </div>
+        <div class="next-card">
+          <h3>Document the fix</h3>
+          <p>Once the issue is clear, convert it into an internal runbook, developer doc, or support answer so the team stops rediscovering the same auth bug.</p>
+        </div>
+        <div class="next-card primary">
+          <h3>Turn support pain into content</h3>
+          <p>If you ship developer tools, APIs, or SaaS onboarding content, package those repeat questions into pages and assets with the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="content-card" id="faq">
+      <div class="section-label">FAQ</div>
+      <h2>JWT decoder FAQ</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>What does a JWT decoder help me check?</summary>
+          <p>A JWT decoder helps you inspect the token header, payload, signature segment, and claims such as <code>exp</code>, <code>iat</code>, <code>nbf</code>, <code>iss</code>, <code>aud</code>, and custom roles or scopes. That makes it easier to debug auth failures and API access issues.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can this tool verify whether the token signature is valid?</summary>
+          <p>No. This page decodes the token so you can read it. Signature verification requires the correct secret or public key and should happen in a dedicated verification step or your backend auth stack.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Why does my API still return 401 even if the JWT decodes correctly?</summary>
+          <p>Because decoding only confirms the token is readable. The API may still reject it due to expiration, wrong audience, wrong issuer, missing scope, revocation, malformed bearer header, gateway rewriting, or verification failure.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Which claims should I check first during JWT troubleshooting?</summary>
+          <p>Start with <code>exp</code>, <code>iat</code>, and <code>nbf</code>, then compare <code>iss</code> and <code>aud</code>, then inspect identity and permission claims like <code>sub</code>, scopes, roles, tenant IDs, and environment markers.</p>
+        </details>
+        <details class="faq-item">
+          <summary>When should I use another tool after decoding the JWT?</summary>
+          <p>Use another tool when you need to reproduce the actual API call, inspect headers, validate a request or response schema, test a webhook, or document the workflow for teammates and users.</p>
+        </details>
+      </div>
+    </article>
+  </section>
+
+  <section class="pro-section">
+    <div class="pro-hd">
+      <h2>🔒 Pro Features</h2>
+      <p>Advanced JWT utilities for auth debugging and developer workflows</p>
+    </div>
+    <div class="pro-wrap" onclick="document.getElementById('proModal').classList.add('active')">
+      <div class="pro-blur">
+        <div class="pro-card"><h3>🔧 JWT Generator</h3><p>Create JWT tokens with custom headers and payloads, choose an algorithm, set expiry, and generate test fixtures for auth workflows.</p><div class="mock-ui">{"alg":"HS256","typ":"JWT"}<br>→ eyJhbGciOi...</div></div>
+        <div class="pro-card"><h3>✅ Signature Verification</h3><p>Verify HMAC, RSA, or ECDSA signatures with a secret or public key so you can separate claim issues from signing issues.</p><div class="mock-ui">Key: ••••••••<br>Status: ✓ Valid</div></div>
+        <div class="pro-card"><h3>📋 Batch Decode</h3><p>Decode multiple JWTs at once for logs, support tickets, migration checks, or API debugging sessions with many tokens.</p><div class="mock-ui">Token 1: ✓ decoded<br>Token 2: ✓ decoded</div></div>
+      </div>
+      <div class="pro-lock"><div class="pro-lock-icon">🔒</div><div class="pro-lock-text">Pro Features Locked</div><div class="pro-lock-sub">Click to unlock</div></div>
+    </div>
+  </section>
 </div>
-<div class="error" id="error"></div>
-<div class="exp-banner" id="exp-banner"></div>
-<div class="result-section" id="results">
-<div class="part header-part">
-<div class="part-header"><span>📋 Header</span><button class="copy-btn" onclick="copyPart('header-body')">复制</button></div>
-<div class="part-body" id="header-body"></div>
+
+<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="pro-modal">
+    <h3>Unlock Pro Features</h3>
+    <div class="pro-price">$14</div>
+    <ul>
+      <li>JWT Generator — create and sign test tokens</li>
+      <li>Signature Verification — HMAC, RSA, and ECDSA</li>
+      <li>Batch Decode — inspect multiple tokens at once</li>
+      <li>Priority updates and support</li>
+    </ul>
+    <a class="pro-btn-upgrade" href="https://ko-fi.com/feidev" target="_blank" rel="noopener">Upgrade to Pro — $14</a>
+    <br><button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
+  </div>
 </div>
-<div class="part payload-part">
-<div class="part-header"><span>📦 Payload</span><button class="copy-btn" onclick="copyPart('payload-body')">复制</button></div>
-<div class="part-body" id="payload-body"></div>
-</div>
-<div class="part signature-part">
-<div class="part-header"><span>🔑 Signature</span><button class="copy-btn" onclick="copyPart('sig-body')">复制</button></div>
-<div class="part-body" id="sig-body"></div>
-</div>
-</div>
-</div>
+
+<footer>
+  Built for developers, auth debugging, and API workflows · Explore more at <a href="/">Lifa AI Tools</a>
+</footer>
+
 <script>
 function b64urlDecode(s){
 s=s.replace(/-/g,'+').replace(/_/g,'/');
@@ -79,33 +558,36 @@ catch(e){return atob(s);}
 }
 function formatTime(ts){
 var d=new Date(ts*1000);
-return d.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+return d.toLocaleString('en-US',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
 }
 function humanDur(ms){
 var s=Math.floor(Math.abs(ms)/1000);
-if(s<60)return s+'秒';
+if(s<60)return s+' seconds';
 var m=Math.floor(s/60);
-if(m<60)return m+'分钟';
+if(m<60)return m+' minutes';
 var h=Math.floor(m/60);
-if(h<24)return h+'小时'+(m%60?' '+m%60+'分钟':'');
+if(h<24)return h+' hours'+(m%60?' '+m%60+' minutes':'');
 var d=Math.floor(h/24);
-return d+'天'+(h%24?' '+h%24+'小时':'');
+return d+' days'+(h%24?' '+h%24+' hours':'');
 }
 var timeKeys=['exp','iat','nbf','auth_time','updated_at','created_at'];
 function annotate(obj){
 var t=JSON.stringify(obj,null,2);
 timeKeys.forEach(function(k){
 if(obj[k]&&typeof obj[k]==='number'&&obj[k]>1e9&&obj[k]<2e10){
-t=t.replace(new RegExp('("'+k+'":\\s*)(\\d+)'),'$1$2  ← '+formatTime(obj[k]));
+t=t.replace(new RegExp('(\\"'+k+'\\":\\s*)(\\d+)'),'$1$2  ← '+formatTime(obj[k]));
 }
 });
 return t;
 }
-function copyPart(id){
+function copyPart(id, btn){
 var text=document.getElementById(id).textContent;
 navigator.clipboard.writeText(text).then(function(){
-event.target.textContent='已复制✓';
-setTimeout(function(){event.target.textContent='复制';},1500);
+if(btn){
+var old=btn.textContent;
+btn.textContent='Copied ✓';
+setTimeout(function(){btn.textContent=old;},1500);
+}
 });
 }
 function decode(){
@@ -117,14 +599,15 @@ var token=el.value.trim();
 if(!token){err.style.display='none';res.style.display='none';ban.style.display='none';return;}
 var parts=token.split('.');
 if(parts.length!==3){
-err.textContent='❌ 无效的 JWT 格式：需要三段由 . 分隔的字符串';
+err.textContent='❌ Invalid JWT format: a token must have three dot-separated segments.';
 err.style.display='block';res.style.display='none';ban.style.display='none';return;
 }
+var header,payload;
 try{
-var header=JSON.parse(b64urlDecode(parts[0]));
-var payload=JSON.parse(b64urlDecode(parts[1]));
+header=JSON.parse(b64urlDecode(parts[0]));
+payload=JSON.parse(b64urlDecode(parts[1]));
 }catch(e){
-err.textContent='❌ 解码失败：Base64 或 JSON 解析错误';
+err.textContent='❌ Decode failed: Base64 or JSON parsing error.';
 err.style.display='block';res.style.display='none';ban.style.display='none';return;
 }
 err.style.display='none';
@@ -138,10 +621,10 @@ var expMs=payload.exp*1000;
 var diff=expMs-now;
 if(diff>0){
 ban.className='exp-banner exp-valid';
-ban.textContent='✅ Token 有效 — 将在 '+humanDur(diff)+' 后过期（'+formatTime(payload.exp)+'）';
+ban.textContent='✅ Token is valid — expires in '+humanDur(diff)+' ('+formatTime(payload.exp)+')';
 }else{
 ban.className='exp-banner exp-expired';
-ban.textContent='❌ Token 已过期 — 过期于 '+humanDur(diff)+' 前（'+formatTime(payload.exp)+'）';
+ban.textContent='❌ Token expired — expired '+humanDur(diff)+' ago ('+formatTime(payload.exp)+')';
 }
 ban.style.display='block';
 }else{
@@ -150,62 +633,6 @@ ban.style.display='none';
 }
 document.getElementById('jwt-input').addEventListener('input',decode);
 </script>
-<!-- Pro Features Section -->
-<style>
-.pro-section{max-width:900px;margin:40px auto 0;padding:0 16px 40px;position:relative}
-.pro-hd{text-align:center;margin-bottom:20px}
-.pro-hd h2{font-size:1.5rem;color:#e94560;margin-bottom:4px}
-.pro-hd p{color:#888;font-size:.9rem}
-.pro-wrap{position:relative;cursor:pointer;border-radius:12px;overflow:hidden}
-.pro-blur{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;filter:blur(6px);opacity:.6;pointer-events:none;user-select:none}
-.pro-card{background:#16213e;border:1px solid #0f3460;border-radius:10px;padding:20px}
-.pro-card h3{font-size:1rem;color:#53d8fb;margin-bottom:8px}
-.pro-card p{color:#999;font-size:.85rem;line-height:1.5}
-.pro-card .mock-ui{margin-top:12px;background:#1a1a2e;border:1px solid #0f3460;border-radius:6px;padding:10px;font-family:monospace;font-size:.75rem;color:#555}
-.pro-lock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(26,26,46,.4);z-index:2}
-.pro-lock-icon{font-size:3rem;margin-bottom:10px}
-.pro-lock-text{font-size:1.1rem;font-weight:600;color:#e0e0e0}
-.pro-lock-sub{font-size:.85rem;color:#888;margin-top:4px}
-.pro-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.pro-modal-overlay.active{display:flex}
-.pro-modal{background:#16213e;border:1px solid #0f3460;border-radius:16px;padding:36px;max-width:440px;width:90%;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.pro-modal h3{font-size:1.4rem;color:#fff;margin-bottom:6px}
-.pro-modal .pro-price{font-size:2rem;font-weight:700;color:#e94560;margin:12px 0}
-.pro-modal ul{text-align:left;list-style:none;margin:18px 0;padding:0}
-.pro-modal ul li{padding:8px 0;color:#ccc;font-size:.95rem;border-bottom:1px solid #0f3460}
-.pro-modal ul li::before{content:"✅ ";margin-right:6px}
-.pro-modal ul li:last-child{border-bottom:none}
-.pro-btn-upgrade{display:inline-block;width:100%;padding:14px;background:#e94560;color:#fff;font-size:1.05rem;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-decoration:none;transition:transform .2s,box-shadow .2s;margin-top:8px}
-.pro-btn-upgrade:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(233,69,96,.4)}
-.pro-btn-later{background:none;border:none;color:#888;font-size:.9rem;cursor:pointer;margin-top:14px;padding:8px;transition:color .2s}
-.pro-btn-later:hover{color:#ccc}
-@media(max-width:600px){.pro-blur{grid-template-columns:1fr}}
-</style>
-<div class="pro-section">
-<div class="pro-hd"><h2>🔒 Pro Features</h2><p>Advanced JWT tools for developers</p></div>
-<div class="pro-wrap" onclick="document.getElementById('proModal').classList.add('active')">
-<div class="pro-blur">
-<div class="pro-card"><h3>🔧 JWT Generator</h3><p>Create JWT tokens with custom headers and payloads. Choose algorithm, set expiry, and sign with your secret.</p><div class="mock-ui">{"alg":"HS256","typ":"JWT"}<br>→ eyJhbGciOi...</div></div>
-<div class="pro-card"><h3>✅ Signature Verification</h3><p>Verify JWT signatures with HMAC, RSA, or ECDSA keys. Paste your secret or public key to validate.</p><div class="mock-ui">Secret: ••••••••<br>Status: ✓ Valid</div></div>
-<div class="pro-card"><h3>📋 Batch Decode</h3><p>Decode multiple JWT tokens at once. Paste a list of tokens and get all headers and payloads decoded.</p><div class="mock-ui">Token 1: ✓ decoded<br>Token 2: ✓ decoded</div></div>
-</div>
-<div class="pro-lock"><div class="pro-lock-icon">🔒</div><div class="pro-lock-text">Pro Features Locked</div><div class="pro-lock-sub">Click to unlock</div></div>
-</div>
-</div>
-<div class="pro-modal-overlay" id="proModal" onclick="if(event.target===this)this.classList.remove('active')">
-<div class="pro-modal">
-<h3>Unlock Pro Features</h3>
-<div class="pro-price">$14</div>
-<ul>
-<li>JWT Generator — create & sign tokens</li>
-<li>Signature Verification — HMAC, RSA, ECDSA</li>
-<li>Batch Decode — process multiple tokens</li>
-<li>Priority updates & support</li>
-</ul>
-<a class="pro-btn-upgrade" href="https://ko-fi.com/feidev" target="_blank">Upgrade to Pro — $14</a>
-<br><button class="pro-btn-later" onclick="document.getElementById('proModal').classList.remove('active')">Maybe later</button>
-</div>
-</div>
 <script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 <script defer src="/_vercel/speed-insights/script.js"></script>
