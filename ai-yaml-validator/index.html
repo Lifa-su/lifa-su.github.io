@@ -1,76 +1,530 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI YAML Validator - Online YAML Validation & Conversion Tool</title>
-<meta name="description" content="Free online YAML validator, formatter, and converter. Validate YAML syntax, convert between YAML and JSON, format and minify YAML instantly.">
+<title>YAML Validator Online - Validate, Format & Convert YAML to JSON</title>
+<meta name="description" content="Free online YAML validator for developers, docs teams, and config workflows. Validate YAML syntax, format files, minify output, and convert YAML to JSON or JSON to YAML instantly.">
+<meta name="keywords" content="yaml validator, yaml formatter, yaml to json, json to yaml, yaml lint, config validator, github actions yaml, kubernetes yaml, docs front matter">
+<meta name="robots" content="index,follow">
 <link rel="canonical" href="https://lifa-su.com/ai-yaml-validator/">
+<meta property="og:title" content="YAML Validator Online - Validate, Format & Convert YAML to JSON">
+<meta property="og:description" content="Validate YAML, fix syntax errors, format config files, and convert YAML ↔ JSON in one fast developer-friendly tool.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-yaml-validator/">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="YAML Validator Online">
+<meta name="twitter:description" content="Free YAML validator, formatter, minifier, and YAML ↔ JSON converter for config and docs workflows.">
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "YAML Validator Online",
+  "url": "https://lifa-su.com/ai-yaml-validator/",
+  "description": "Free online YAML validator, formatter, minifier, and YAML to JSON converter for developers, configuration files, and documentation workflows.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Lifa AI Tools",
+    "url": "https://lifa-su.com"
+  },
+  "featureList": [
+    "Validate YAML syntax",
+    "Highlight YAML errors by line",
+    "Convert YAML to JSON",
+    "Convert JSON to YAML",
+    "Format and minify YAML",
+    "Client-side processing"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does this YAML validator do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It validates YAML syntax, highlights parsing errors, formats YAML, minifies YAML, converts YAML to JSON, and converts JSON back to YAML directly in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use this for GitHub Actions, Docker Compose, or Kubernetes YAML?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. This tool is useful for checking indentation, mapping structure, list nesting, and syntax problems in common developer config files such as GitHub Actions workflows, Docker Compose files, Kubernetes manifests, and CI pipelines."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does the validator send my YAML to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The validation runs client-side in the browser using js-yaml, which makes it convenient for fast local checks before you commit or publish config and docs changes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is my YAML invalid even though it looks correct?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The most common causes are inconsistent indentation, tabs mixed with spaces, missing colons, incorrect list nesting, unquoted special characters, or accidental JSON and YAML mixing. The tool shows the line that likely caused the parser error."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I convert YAML to JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Convert YAML to JSON when you need to inspect parsed structure, feed data into APIs or schema tools, compare objects more easily, or pass config through systems that expect JSON."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the best way to keep YAML clean in docs workflows?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use 2-space indentation, keep repeated structures consistent, quote ambiguous strings when necessary, validate before commit, and format YAML before sharing examples in documentation or tutorials."
+      }
+    }
+  ]
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aaa;--success:#00d2a0;--error:#ff6b6b;--border:#2a2a4a;--line-bg:#111;--mono:'Menlo','Consolas','Courier New',monospace}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-header{background:var(--surface);padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-header h1{font-size:1.4rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-header h1 span{font-size:.8rem;color:var(--text2);-webkit-text-fill-color:var(--text2)}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-.toolbar button{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .2s;white-space:nowrap}
-.toolbar button:hover{background:var(--accent2);border-color:var(--accent2)}
+:root{--bg:#0b0d16;--surface:#12172a;--surface2:#16213e;--surface3:#0f3460;--surface4:#1d2848;--accent:#e94560;--accent2:#7c5cff;--accent3:#57c7ff;--text:#eef2ff;--text2:#aab3cf;--text3:#7c86a8;--border:#283252;--line-bg:#0b1120;--success:#00d2a0;--error:#ff6b6b;--warn:#ffc857;--shadow:0 20px 60px rgba(0,0,0,.28);--mono:'Menlo','Consolas','Courier New',monospace}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(124,92,255,.14),transparent 30%),var(--bg);color:var(--text);line-height:1.65}
+a{color:var(--accent3);text-decoration:none}
+a:hover{color:#8fdcff}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+.site-header{position:sticky;top:0;z-index:20;background:rgba(11,13,22,.84);backdrop-filter:blur(14px);border-bottom:1px solid rgba(40,50,82,.8)}
+.site-header .container{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 12px 30px rgba(124,92,255,.25);font-size:19px}
+.brand h1{font-size:1rem;line-height:1.2}
+.brand p{font-size:.82rem;color:var(--text3)}
+.header-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.header-links a{font-size:.92rem;color:var(--text2)}
+.header-links .header-cta{padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700}
+.hero{padding:64px 0 34px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:28px;align-items:start}
+.hero-copy h2{font-size:clamp(2rem,4.8vw,3.6rem);line-height:1.06;margin:16px 0 16px;max-width:780px}
+.hero-copy p{font-size:1.05rem;color:var(--text2);max-width:760px}
+.kicker{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid rgba(87,199,255,.25);border-radius:999px;background:rgba(87,199,255,.08);color:#cfeeff;font-size:.83rem;font-weight:700;letter-spacing:.02em}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin:26px 0 18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;border:1px solid var(--border);font-weight:700;transition:transform .2s ease,background .2s ease,border-color .2s ease;color:var(--text)}
+.btn:hover{transform:translateY(-1px);border-color:#55648f}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 16px 36px rgba(124,92,255,.24)}
+.btn-secondary{background:rgba(18,23,42,.8)}
+.hero-points{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.hero-points span,.tool-meta span,.chip{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(18,23,42,.9);border:1px solid var(--border);color:var(--text2);font-size:.88rem}
+.hero-card{background:linear-gradient(180deg,rgba(18,23,42,.96),rgba(15,52,96,.62));border:1px solid var(--border);border-radius:22px;padding:24px;box-shadow:var(--shadow)}
+.hero-card h3{font-size:1.05rem;margin-bottom:12px}
+.hero-card ul{padding-left:18px;color:var(--text2)}
+.hero-card li+li{margin-top:8px}
+.section{padding:28px 0 10px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.section-heading h2{font-size:clamp(1.45rem,3vw,2.25rem)}
+.section-heading p{max-width:760px;color:var(--text2)}
+.tool-shell{background:linear-gradient(180deg,rgba(18,23,42,.96),rgba(11,17,32,.98));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(15,52,96,.32)}
+.toolbar button{background:var(--surface3);color:var(--text);border:1px solid var(--border);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.9rem;transition:all .2s;white-space:nowrap}
+.toolbar button:hover{background:#19497c;border-color:#3a5b91}
 .toolbar button.primary{background:var(--accent);border-color:var(--accent)}
-.toolbar button.primary:hover{opacity:.85}
-main{flex:1;display:flex;gap:0;overflow:hidden}
+.toolbar button.primary:hover{opacity:.88}
+.tool-meta{display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 16px}
+.tool-main{display:flex;gap:0;min-height:560px}
 .panel{flex:1;display:flex;flex-direction:column;min-width:0}
-.panel-header{background:var(--surface);padding:10px 16px;font-size:.85rem;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.badge{font-size:.75rem;padding:2px 8px;border-radius:10px;font-weight:600}
-.badge.valid{background:rgba(0,210,160,.15);color:var(--success)}
-.badge.invalid{background:rgba(255,107,107,.15);color:var(--error)}
-.badge.idle{background:rgba(170,170,170,.1);color:var(--text2)}
+.panel-header{background:var(--surface);padding:11px 16px;font-size:.85rem;color:var(--text2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.badge{font-size:.74rem;padding:3px 9px;border-radius:999px;font-weight:700;border:1px solid transparent}
+.badge.valid{background:rgba(0,210,160,.16);color:var(--success);border-color:rgba(0,210,160,.18)}
+.badge.invalid{background:rgba(255,107,107,.16);color:var(--error);border-color:rgba(255,107,107,.18)}
+.badge.idle{background:rgba(170,179,207,.08);color:var(--text2);border-color:rgba(170,179,207,.08)}
 .editor-wrap{flex:1;display:flex;overflow:auto;background:var(--line-bg);position:relative}
-.line-numbers{padding:12px 0;text-align:right;color:#555;font:13px/1.6 var(--mono);user-select:none;min-width:44px;padding-right:10px;background:rgba(0,0,0,.2);border-right:1px solid var(--border);flex-shrink:0}
+.line-numbers{padding:12px 0;text-align:right;color:#54627f;font:13px/1.6 var(--mono);user-select:none;min-width:48px;padding-right:10px;background:rgba(0,0,0,.18);border-right:1px solid var(--border);flex-shrink:0}
 .editor-container{flex:1;position:relative}
 textarea{width:100%;height:100%;background:transparent;color:var(--text);border:none;outline:none;resize:none;font:13px/1.6 var(--mono);padding:12px;tab-size:2;position:absolute;top:0;left:0}
+textarea::placeholder{color:#6e7a98}
 .highlight-layer{position:absolute;top:0;left:0;right:0;padding:12px;font:13px/1.6 var(--mono);pointer-events:none;white-space:pre-wrap;word-wrap:break-word;color:transparent}
 .highlight-layer .err-line{background:rgba(255,107,107,.12);display:inline-block;width:100%;border-left:3px solid var(--error);padding-left:9px;margin-left:-12px}
 .divider{width:1px;background:var(--border);flex-shrink:0}
 .output-content{flex:1;overflow:auto;padding:12px;font:13px/1.6 var(--mono);white-space:pre-wrap;word-wrap:break-word;background:var(--line-bg);color:var(--text)}
-.error-panel{background:rgba(255,107,107,.08);border-top:1px solid var(--border);padding:12px 16px;font-size:.85rem;color:var(--error);max-height:120px;overflow:auto;display:none}
+.error-panel{background:rgba(255,107,107,.08);border-top:1px solid var(--border);padding:12px 16px;font-size:.88rem;color:var(--error);max-height:120px;overflow:auto;display:none}
 .error-panel.show{display:block}
-footer{background:var(--surface);padding:10px 24px;text-align:center;font-size:.75rem;color:var(--text2);border-top:1px solid var(--border)}
-footer a{color:var(--accent);text-decoration:none}
-@media(max-width:768px){main{flex-direction:column}.divider{width:auto;height:1px}.editor-wrap,.output-content{min-height:35vh}header{padding:12px 16px}header h1{font-size:1.1rem}.toolbar button{padding:6px 10px;font-size:.8rem}}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card,.step,.faq-item,.cta-panel,.related-card,.practice-card{background:linear-gradient(180deg,rgba(18,23,42,.9),rgba(18,23,42,.68));border:1px solid var(--border);border-radius:18px;padding:20px}
+.card h3,.step h3,.practice-card h3,.related-card h3,.cta-panel h3{font-size:1.05rem;margin-bottom:10px}
+.card p,.step p,.practice-card p,.related-card p,.cta-panel p{color:var(--text2);font-size:.96rem}
+.card ul,.practice-card ul{padding-left:18px;color:var(--text2)}
+.card ul li+li,.practice-card ul li+li{margin-top:8px}
+.step-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.step-num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;margin-bottom:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:800}
+.practice-grid,.related-grid,.next-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.faq-list{display:grid;gap:12px}
+.faq-item{padding:0;overflow:hidden}
+.faq-item summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;display:flex;justify-content:space-between;gap:16px}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';color:var(--text3);font-size:1.2rem;line-height:1}
+.faq-item[open] summary::after{content:'–';color:var(--accent3)}
+.faq-answer{padding:0 20px 18px;color:var(--text2)}
+.related-card a,.cta-panel a{font-weight:700}
+.cta-band{padding:20px 0 40px}
+.cta-panel{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border-radius:24px;background:linear-gradient(135deg,rgba(233,69,96,.16),rgba(124,92,255,.16),rgba(87,199,255,.12))}
+.cta-links{display:flex;gap:12px;flex-wrap:wrap}
+.site-footer{border-top:1px solid var(--border);margin-top:28px}
+.site-footer .container{padding:24px}
+.footer-links{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.site-footer p{color:var(--text3);font-size:.9rem}
+@media(max-width:980px){.hero-grid,.cards,.step-grid,.practice-grid,.related-grid,.next-grid{grid-template-columns:1fr 1fr}.tool-main{min-height:520px}}
+@media(max-width:780px){.site-header .container{align-items:flex-start;flex-direction:column}.tool-main{flex-direction:column}.divider{width:auto;height:1px}.editor-wrap,.output-content{min-height:38vh}.hero-grid,.cards,.step-grid,.practice-grid,.related-grid,.next-grid{grid-template-columns:1fr}.hero{padding-top:42px}.hero-copy p{font-size:1rem}}
+@media(max-width:480px){.container{padding:0 16px}.site-header .container{padding:12px 16px}.toolbar button{padding:8px 10px;font-size:.82rem}.hero-actions{flex-direction:column;align-items:stretch}.btn{width:100%}}
 </style>
 </head>
 <body>
-<header>
-<h1>&#9889; YAML Validator <span>| Online Tool</span></h1>
-<div class="toolbar">
-<button class="primary" onclick="validateYAML()">&#10003; Validate</button>
-<button onclick="toJSON()">YAML&#8594;JSON</button>
-<button onclick="toYAML()">JSON&#8594;YAML</button>
-<button onclick="formatYAML()">Format</button>
-<button onclick="minifyYAML()">Minify</button>
-<button onclick="clearAll()">Clear</button>
-<button onclick="copyOutput()">Copy</button>
-</div>
+<header class="site-header">
+  <div class="container">
+    <div class="brand">
+      <div class="brand-mark">⚡</div>
+      <div>
+        <h1>YAML Validator</h1>
+        <p>Free online validator, formatter, and YAML ↔ JSON converter</p>
+      </div>
+    </div>
+    <nav class="header-links">
+      <a href="/ai-markdown-editor/">Markdown Editor</a>
+      <a href="/ai-json-schema/">JSON Schema Tool</a>
+      <a href="/ai-api-docs-generator.html">API Docs Generator</a>
+      <a href="/content-creator-toolkit.html" class="header-cta">Content Creator Toolkit</a>
+    </nav>
+  </div>
 </header>
-<main>
-<div class="panel">
-<div class="panel-header"><span>&#128221; Input (YAML/JSON)</span><span id="status" class="badge idle">Ready</span></div>
-<div class="editor-wrap"><div class="line-numbers" id="lineNums">1</div><div class="editor-container"><div class="highlight-layer" id="hl"></div><textarea id="inp" spellcheck="false" placeholder="Paste your YAML here..."></textarea></div></div>
-<div class="error-panel" id="ep"></div>
-</div>
-<div class="divider"></div>
-<div class="panel">
-<div class="panel-header"><span>&#128196; Output</span><span id="oi" class="badge idle">&mdash;</span></div>
-<div class="output-content" id="out">Output will appear here...</div>
-</div>
-</main>
-<footer>Built with &#10084;&#65039; &mdash; <a href="https://github.com/Lifa-su/ai-yaml-validator" target="_blank">GitHub</a></footer>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="kicker">Developer workflow · config QA · docs-ready formatting</span>
+      <h2>Validate YAML fast before it breaks your docs, CI, or production config.</h2>
+      <p>Use this YAML validator to catch indentation mistakes, inspect parsed structure, convert YAML to JSON, format messy files, and clean up examples before you commit README snippets, front matter, GitHub Actions, Docker Compose, or Kubernetes manifests.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#validator">Use the YAML validator</a>
+        <a class="btn btn-secondary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+      </div>
+      <div class="hero-points">
+        <span>⚙️ Great for config files</span>
+        <span>📘 Useful for docs front matter</span>
+        <span>🔁 YAML ↔ JSON conversion</span>
+        <span>🧠 Runs instantly in-browser</span>
+      </div>
+    </div>
+    <aside class="hero-card">
+      <h3>Common files people check here</h3>
+      <ul>
+        <li><strong>GitHub Actions</strong> workflow YAML before pushing CI changes</li>
+        <li><strong>Docker Compose</strong> and server config files before deploys</li>
+        <li><strong>Kubernetes manifests</strong> when structure or nesting feels off</li>
+        <li><strong>Docs front matter</strong> for blogs, changelogs, API docs, and READMEs</li>
+        <li><strong>AI-generated config</strong> that needs a fast sanity check</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<section class="section" id="validator">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>YAML validator, formatter, and converter</h2>
+        <p>Paste YAML or JSON below. Validate syntax, highlight the line with errors, convert formats, and copy the cleaned output into your config or documentation workflow.</p>
+      </div>
+    </div>
+
+    <div class="tool-shell">
+      <div class="toolbar">
+        <button class="primary" onclick="validateYAML()">✓ Validate</button>
+        <button onclick="toJSON()">YAML→JSON</button>
+        <button onclick="toYAML()">JSON→YAML</button>
+        <button onclick="formatYAML()">Format</button>
+        <button onclick="minifyYAML()">Minify</button>
+        <button onclick="loadExample()">Example</button>
+        <button onclick="clearAll()">Clear</button>
+        <button onclick="copyOutput()">Copy</button>
+      </div>
+      <div class="tool-meta">
+        <span>🔒 Client-side processing</span>
+        <span>🧩 Built for developer and docs workflows</span>
+        <span>📄 Good for YAML examples, front matter, and config cleanup</span>
+      </div>
+      <div class="tool-main">
+        <div class="panel">
+          <div class="panel-header"><span>📝 Input (YAML / JSON)</span><span id="status" class="badge idle">Ready</span></div>
+          <div class="editor-wrap"><div class="line-numbers" id="lineNums">1</div><div class="editor-container"><div class="highlight-layer" id="hl"></div><textarea id="inp" spellcheck="false" placeholder="Paste your YAML here..."></textarea></div></div>
+          <div class="error-panel" id="ep"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="panel">
+          <div class="panel-header"><span>📄 Output</span><span id="oi" class="badge idle">—</span></div>
+          <div class="output-content" id="out">Output will appear here...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>Use cases for developers, docs teams, and config-heavy workflows</h2>
+        <p>This page is most useful when YAML is part of a bigger publishing, deployment, or handoff process — not just one-off syntax checks.</p>
+      </div>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <h3>Validate CI and automation files</h3>
+        <p>Check GitHub Actions, task runners, or deployment workflows before a broken indent or misplaced list item takes down your pipeline.</p>
+      </article>
+      <article class="card">
+        <h3>Clean up docs front matter</h3>
+        <p>Make sure title, tags, category lists, and metadata blocks parse correctly before publishing docs, changelogs, blogs, or knowledge-base content.</p>
+      </article>
+      <article class="card">
+        <h3>Inspect AI-generated YAML</h3>
+        <p>When ChatGPT, Claude, or another tool drafts config for you, validate it here before trusting it in production or documentation.</p>
+      </article>
+      <article class="card">
+        <h3>Convert YAML to JSON for debugging</h3>
+        <p>Sometimes structure is easier to inspect in JSON. Convert quickly to spot nesting mistakes, duplicated keys, or unexpected object shapes.</p>
+      </article>
+      <article class="card">
+        <h3>Standardize examples for tutorials</h3>
+        <p>Format YAML snippets before pasting them into READMEs, docs pages, API guides, and onboarding material so examples stay readable.</p>
+      </article>
+      <article class="card">
+        <h3>Prepare configs for handoff</h3>
+        <p>Use formatted output when you need to share cleaner YAML with teammates, clients, or future-you during reviews and troubleshooting.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>Simple validation workflow</h2>
+        <p>A practical way to use this tool in real work: validate first, inspect structure second, then clean and share the final YAML.</p>
+      </div>
+    </div>
+    <div class="step-grid">
+      <article class="step">
+        <div class="step-num">1</div>
+        <h3>Paste raw YAML</h3>
+        <p>Drop in config from your editor, docs draft, AI output, or repo file exactly as it exists today.</p>
+      </article>
+      <article class="step">
+        <div class="step-num">2</div>
+        <h3>Run validation</h3>
+        <p>Catch syntax problems quickly. If there is an error, use the highlighted line as your first debugging checkpoint.</p>
+      </article>
+      <article class="step">
+        <div class="step-num">3</div>
+        <h3>Convert or format</h3>
+        <p>Switch to JSON when you need a clearer structural view, or format YAML when the content is valid but messy.</p>
+      </article>
+      <article class="step">
+        <div class="step-num">4</div>
+        <h3>Copy cleaned output</h3>
+        <p>Paste the result back into your repo, docs CMS, README, deployment config, or teammate handoff note.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>Best practices for YAML that survives production and documentation</h2>
+        <p>Most YAML issues are not about complexity — they come from tiny inconsistencies. Keep these habits and you will prevent a lot of avoidable failures.</p>
+      </div>
+    </div>
+    <div class="practice-grid">
+      <article class="practice-card">
+        <h3>Keep formatting predictable</h3>
+        <ul>
+          <li>Use spaces, not tabs.</li>
+          <li>Stay consistent with 2-space indentation unless your project says otherwise.</li>
+          <li>Format before commit so diffs stay readable.</li>
+          <li>Keep lists and nested mappings aligned line by line.</li>
+        </ul>
+      </article>
+      <article class="practice-card">
+        <h3>Quote risky values when needed</h3>
+        <ul>
+          <li>Quote strings that contain colons, hashes, or special characters.</li>
+          <li>Be careful with values that can be interpreted as booleans, dates, or numbers.</li>
+          <li>When examples are for docs, explicit quoting often improves clarity.</li>
+        </ul>
+      </article>
+      <article class="practice-card">
+        <h3>Validate before publishing docs</h3>
+        <ul>
+          <li>Front matter errors can break builds or hide metadata unexpectedly.</li>
+          <li>Format snippets before pasting them into tutorials and READMEs.</li>
+          <li>Use JSON conversion to verify the structure your readers will actually inherit.</li>
+        </ul>
+      </article>
+      <article class="practice-card">
+        <h3>Treat AI output as draft config</h3>
+        <ul>
+          <li>Never assume generated YAML is deployment-safe without validation.</li>
+          <li>Compare generated keys against the official schema or product docs.</li>
+          <li>Use this validator as a fast checkpoint, not the only review step.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>FAQ</h2>
+        <p>Short answers to common YAML validation, formatting, and conversion questions.</p>
+      </div>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What does this YAML validator do?</summary>
+        <div class="faq-answer">It validates YAML syntax, highlights likely error lines, formats YAML, minifies YAML, converts YAML to JSON, and converts JSON back to YAML in one place.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I use this for GitHub Actions, Docker Compose, or Kubernetes files?</summary>
+        <div class="faq-answer">Yes. It is useful for fast syntax checks and structure inspection on common developer config files, especially when indentation or nesting is easy to get wrong.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Why does YAML fail when the file looks almost correct?</summary>
+        <div class="faq-answer">Usually because of spaces vs tabs, one bad indent level, a missing colon, mixed list and mapping structure, or an unquoted special value. YAML is human-readable, but it is not forgiving.</div>
+      </details>
+      <details class="faq-item">
+        <summary>When is YAML to JSON conversion useful?</summary>
+        <div class="faq-answer">When you want to inspect parsed structure more clearly, compare output with a schema, pass content into an API or validation layer, or debug nested objects without YAML-specific syntax noise.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Should I format YAML before putting it in docs?</summary>
+        <div class="faq-answer">Yes. Clean, consistently formatted YAML is easier to read, easier to debug, and less likely to confuse readers who copy examples into production systems.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does this tool help with documentation workflows too?</summary>
+        <div class="faq-answer">Definitely. It is especially handy for front matter, docs metadata blocks, static site content, API examples, and README snippets that use YAML or YAML-like structure.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>Related tools for docs and developer workflows</h2>
+        <p>If you are validating YAML, there is a good chance you also need schema checks, markdown editing, API docs, or README cleanup.</p>
+      </div>
+    </div>
+    <div class="related-grid">
+      <article class="related-card">
+        <h3><a href="/ai-json-schema/">AI JSON Schema Tool</a></h3>
+        <p>Move from raw data validation into schemas, contracts, and API-friendly structure checks.</p>
+      </article>
+      <article class="related-card">
+        <h3><a href="/ai-markdown-editor/">AI Markdown Editor</a></h3>
+        <p>Clean up docs content, preview markdown, and package YAML-backed docs examples into something publishable.</p>
+      </article>
+      <article class="related-card">
+        <h3><a href="/ai-api-docs-generator.html">AI API Docs Generator</a></h3>
+        <p>Turn technical inputs into clearer API documentation, reference pages, and implementation notes.</p>
+      </article>
+      <article class="related-card">
+        <h3><a href="/ai-readme-generator.html">AI README Generator</a></h3>
+        <p>Great when YAML validation is only one step in polishing setup guides, onboarding docs, or OSS documentation.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container">
+    <div class="cta-panel">
+      <div>
+        <h3>Next step: turn clean config into clearer docs and better conversion pages</h3>
+        <p>If your workflow includes setup guides, tutorials, product docs, or content assets around developer tools, the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> helps you draft publish-ready explanations, launch content, and supporting pages much faster.</p>
+      </div>
+      <div class="cta-links">
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Explore the Content Creator Toolkit</a>
+        <a class="btn btn-secondary" href="/free-ai-tools-guide.html">Browse more free AI tools</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <h2>Practical next steps</h2>
+        <p>Use this page as the first checkpoint, then move downstream into editing, documentation, and publishing.</p>
+      </div>
+    </div>
+    <div class="next-grid">
+      <article class="related-card">
+        <h3>1. Validate the config</h3>
+        <p>Use the tool above to catch syntax issues, confirm structure, and format the final YAML.</p>
+      </article>
+      <article class="related-card">
+        <h3>2. Turn structure into docs</h3>
+        <p>Open <a href="/ai-markdown-editor/">Markdown Editor</a> or <a href="/ai-readme-generator.html">README Generator</a> to build cleaner developer-facing documentation.</p>
+      </article>
+      <article class="related-card">
+        <h3>3. Add stronger explanation and content</h3>
+        <p>Use the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> to draft tutorials, changelogs, launch copy, and support articles around your config workflow.</p>
+      </article>
+      <article class="related-card">
+        <h3>4. Keep the internal toolchain connected</h3>
+        <p>Pair this YAML validator with <a href="/ai-json-schema/">JSON Schema</a>, <a href="/ai-api-docs-generator.html">API Docs Generator</a>, and <a href="/ai-html-to-jsx/">HTML to JSX</a> for a fuller docs + developer stack.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-links">
+      <a href="/">All Tools</a>
+      <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+      <a href="/job-toolkit.html">Job Toolkit Bundle</a>
+      <a href="/ai-markdown-editor/">Markdown Editor</a>
+      <a href="/ai-json-schema/">JSON Schema</a>
+    </div>
+    <p>Built for developers, docs teams, and creators who want cleaner config, cleaner examples, and cleaner workflows.</p>
+  </div>
+</footer>
+
 <script>
 (function(){
 var inp=document.getElementById('inp'),out=document.getElementById('out'),
@@ -91,7 +545,7 @@ function setStatus(type,text){
 
 function setOutput(type,text,info){
   oi.className='badge '+(type||'idle');
-  oi.textContent=info||'\u2014';
+  oi.textContent=info||'—';
   out.textContent=text;
 }
 
@@ -191,10 +645,19 @@ window.minifyYAML=function(){
   }
 };
 
+window.loadExample=function(){
+  inp.value='site:\n  name: Docs Portal\n  env: production\n  features:\n    - search\n    - api-reference\n    - changelog\n  deploy:\n    provider: vercel\n    branch: main\n    previews: true\nfrontmatter:\n  title: YAML Validation Workflow\n  tags:\n    - docs\n    - developer-tools\n    - config\n';
+  updateLines();
+  validateYAML();
+};
+
 window.clearAll=function(){
-  inp.value='';out.textContent='Output will appear here...';
-  setStatus('idle','Ready');setOutput('idle','');
-  clearError();updateLines();
+  inp.value='';
+  out.textContent='Output will appear here...';
+  setStatus('idle','Ready');
+  setOutput('idle','Output will appear here...');
+  clearError();
+  updateLines();
 };
 
 window.copyOutput=function(){
@@ -224,6 +687,10 @@ inp.addEventListener('keydown',function(e){
     this.value=this.value.substring(0,s)+'  '+this.value.substring(end);
     this.selectionStart=this.selectionEnd=s+2;
     updateLines();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    e.preventDefault();
+    validateYAML();
   }
 });
 
