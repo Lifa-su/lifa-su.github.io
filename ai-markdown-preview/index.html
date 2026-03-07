@@ -1,90 +1,616 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Live Markdown preview editor with syntax highlighting. Write Markdown on the left, see rendered HTML on the right. Supports GFM tables, code blocks, and more.">
+<meta name="robots" content="index, follow">
+<title>AI Markdown Preview - Live Markdown Editor, README & Docs Preview Tool</title>
+<meta name="description" content="Free AI Markdown preview tool with live side-by-side editor. Preview README files, blog drafts, docs, tables, code blocks, and export clean HTML for creator, developer, and documentation workflows.">
+<meta name="keywords" content="markdown preview, live markdown editor, markdown preview tool, README preview, markdown to HTML, docs workflow, creator tools, developer tools">
 <link rel="canonical" href="https://lifa-su.com/ai-markdown-preview/">
-<title>AI Markdown Preview</title>
+<meta property="og:title" content="AI Markdown Preview - Live Markdown Editor for README, Docs & Content Workflows">
+<meta property="og:description" content="Write Markdown on the left, preview it instantly on the right, then export polished HTML. Built for creators, developers, and docs teams.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:url" content="https://lifa-su.com/ai-markdown-preview/">
+<meta property="og:image" content="https://lifa-su.com/assets/og-social-post.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Markdown Preview - Live Editor for README, Docs & Content">
+<meta name="twitter:description" content="Preview Markdown instantly, format code blocks, test tables, and export HTML for publishing.">
+<meta name="twitter:image" content="https://lifa-su.com/assets/og-social-post.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "AI Markdown Preview",
+      "url": "https://lifa-su.com/ai-markdown-preview/",
+      "description": "Free live Markdown preview editor for README files, documentation, notes, blog drafts, and content publishing workflows.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Lifa AI Tools",
+        "url": "https://lifa-su.com"
+      },
+      "featureList": [
+        "Live Markdown preview",
+        "GitHub Flavored Markdown support",
+        "Code block syntax highlighting",
+        "Markdown table preview",
+        "One-click HTML export",
+        "Responsive split-screen editor"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is this AI Markdown Preview tool used for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It helps you write Markdown and preview the rendered result in real time. You can use it for README files, blog drafts, documentation pages, changelogs, meeting notes, tutorials, and content workflows before publishing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it support code blocks and Markdown tables?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The editor supports GitHub Flavored Markdown, including fenced code blocks, syntax highlighting, tables, lists, blockquotes, headings, inline code, and links."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I export the preview as HTML?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Use the Export HTML button to download a styled HTML file based on your rendered Markdown preview."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who is this tool for?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is useful for content creators, developers, technical writers, product marketers, indie hackers, and docs teams who need a fast way to validate Markdown output before publishing."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://lifa-su.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "AI Markdown Preview",
+          "item": "https://lifa-su.com/ai-markdown-preview/"
+        }
+      ]
+    }
+  ]
+}
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--text:#e0e0e0;--text-muted:#8892b0;--accent:#e94560;--accent2:#533483;--border:#2a2a4a;--code-bg:#0d1117}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text)}
-.app{display:flex;flex-direction:column;height:100vh}
-.toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
-.toolbar h1{font-size:18px;font-weight:600;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.toolbar-actions{display:flex;gap:8px}
-.btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+:root{
+  --bg:#1a1a2e;
+  --bg2:#141425;
+  --surface:#16213e;
+  --surface2:#0f3460;
+  --surface3:#121b33;
+  --text:#e0e0e0;
+  --text-muted:#8892b0;
+  --accent:#e94560;
+  --accent2:#533483;
+  --accent3:#7c5cff;
+  --border:#2a2a4a;
+  --code-bg:#0d1117;
+  --success:#22c55e;
+  --shadow:0 20px 60px rgba(0,0,0,.28)
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(124,92,255,.08),transparent 35%),var(--bg);color:var(--text);line-height:1.6}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+.hero{padding:56px 0 28px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.03);font-size:12px;font-weight:700;color:#c7ccef;letter-spacing:.08em;text-transform:uppercase}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:28px;align-items:start;margin-top:18px}
+.hero-copy h1{font-size:clamp(34px,5vw,56px);line-height:1.05;letter-spacing:-.03em;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,#d7d9ff 42%,#ff7b93 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-copy p{font-size:18px;color:var(--text-muted);max-width:760px}
+.hero-points{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 26px}
+.hero-points span{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:999px;font-size:13px;color:#d7daf6}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.btn-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:12px;font-size:14px;font-weight:700;border:1px solid var(--border);transition:all .2s}
+.btn-primary-link{background:linear-gradient(135deg,var(--accent),#ff6f86);color:#fff;border-color:transparent;box-shadow:0 14px 34px rgba(233,69,96,.22)}
+.btn-primary-link:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-secondary-link{background:rgba(255,255,255,.03);color:var(--text)}
+.btn-secondary-link:hover{text-decoration:none;border-color:#55608a;color:#fff}
+.hero-note{font-size:13px;color:var(--text-muted)}
+.hero-card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+.hero-card h2{font-size:16px;margin-bottom:12px}
+.hero-card ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+.hero-card li{padding:12px 14px;border:1px solid rgba(255,255,255,.05);border-radius:14px;background:rgba(0,0,0,.12)}
+.hero-card strong{display:block;font-size:14px;color:#fff;margin-bottom:3px}
+.hero-card span{font-size:13px;color:var(--text-muted)}
+.app-shell{padding:12px 0 32px}
+.app-card{border:1px solid var(--border);border-radius:22px;overflow:hidden;background:rgba(11,14,24,.65);box-shadow:var(--shadow)}
+.app{display:flex;flex-direction:column;min-height:70vh}
+.toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.toolbar h2{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.toolbar small{color:var(--text-muted);font-size:12px;font-weight:500}
+.toolbar-title{display:flex;flex-direction:column;gap:2px}
+.toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
 .btn-export{background:var(--accent);color:#fff}
 .btn-export:hover{background:#d63851;transform:translateY(-1px)}
 .btn-clear{background:var(--surface2);color:var(--text)}
 .btn-clear:hover{background:#1a4a7a}
-.editor-wrap{display:flex;flex:1;overflow:hidden}
+.editor-wrap{display:flex;flex:1;overflow:hidden;min-height:560px}
 .pane{flex:1;display:flex;flex-direction:column;min-width:0}
-.pane-header{padding:6px 14px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);background:var(--surface);border-bottom:1px solid var(--border)}
+.pane-header{padding:8px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);background:var(--surface);border-bottom:1px solid var(--border)}
 .pane+.pane{border-left:1px solid var(--border)}
-#editor{flex:1;width:100%;padding:16px;border:none;outline:none;resize:none;font-family:'SF Mono',Monaco,'Fira Code',Consolas,monospace;font-size:14px;line-height:1.7;background:var(--bg);color:var(--text);tab-size:2}
+#editor{flex:1;width:100%;padding:18px;border:none;outline:none;resize:none;font-family:'SF Mono',Monaco,'Fira Code',Consolas,monospace;font-size:14px;line-height:1.7;background:var(--bg2);color:var(--text);tab-size:2}
 #editor::placeholder{color:var(--text-muted)}
-#preview{flex:1;padding:16px 24px;overflow-y:auto;background:var(--bg);line-height:1.7;font-size:15px}
-#preview h1{font-size:2em;margin:.5em 0 .3em;padding-bottom:.2em;border-bottom:1px solid var(--border)}
+#preview{flex:1;padding:18px 24px;overflow-y:auto;background:var(--bg2);line-height:1.75;font-size:15px}
+#preview h1{font-size:2em;margin:.5em 0 .3em;padding-bottom:.25em;border-bottom:1px solid var(--border)}
 #preview h2{font-size:1.5em;margin:.5em 0 .3em;padding-bottom:.2em;border-bottom:1px solid var(--border)}
-#preview h3{font-size:1.25em;margin:.5em 0 .3em}
+#preview h3{font-size:1.25em;margin:.55em 0 .3em}
 #preview h4{font-size:1.1em;margin:.5em 0 .3em}
 #preview h5,#preview h6{font-size:1em;margin:.5em 0 .3em;color:var(--text-muted)}
-#preview p{margin:.6em 0}
+#preview p{margin:.7em 0}
 #preview a{color:var(--accent);text-decoration:none}
 #preview a:hover{text-decoration:underline}
 #preview strong{color:#fff}
 #preview del{color:var(--text-muted)}
-#preview blockquote{margin:.6em 0;padding:8px 16px;border-left:4px solid var(--accent);background:var(--surface);border-radius:0 6px 6px 0;color:var(--text-muted)}
+#preview blockquote{margin:.8em 0;padding:10px 16px;border-left:4px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0;color:var(--text-muted)}
 #preview blockquote p{margin:.3em 0}
-#preview code{font-family:'SF Mono',Monaco,'Fira Code',Consolas,monospace;font-size:.9em;padding:2px 6px;background:var(--code-bg);border-radius:4px;color:#e06c75}
-#preview pre{margin:.8em 0;border-radius:8px;overflow:hidden;background:var(--code-bg);border:1px solid var(--border)}
+#preview code{font-family:'SF Mono',Monaco,'Fira Code',Consolas,monospace;font-size:.92em;padding:2px 6px;background:var(--code-bg);border-radius:4px;color:#e06c75}
+#preview pre{margin:.9em 0;border-radius:10px;overflow:hidden;background:var(--code-bg);border:1px solid var(--border)}
 #preview pre code{display:block;padding:16px;background:none;color:var(--text);font-size:.85em;line-height:1.6;overflow-x:auto}
-#preview ul,#preview ol{margin:.6em 0;padding-left:2em}
-#preview li{margin:.2em 0}
-#preview table{width:100%;border-collapse:collapse;margin:.8em 0;font-size:.9em}
-#preview th,#preview td{padding:8px 12px;border:1px solid var(--border);text-align:left}
-#preview th{background:var(--surface);font-weight:600}
+#preview ul,#preview ol{margin:.7em 0;padding-left:2em}
+#preview li{margin:.22em 0}
+#preview table{width:100%;border-collapse:collapse;margin:1em 0;font-size:.92em}
+#preview th,#preview td{padding:10px 12px;border:1px solid var(--border);text-align:left}
+#preview th{background:var(--surface);font-weight:700}
 #preview tr:nth-child(even){background:rgba(255,255,255,.02)}
-#preview img{max-width:100%;border-radius:6px;margin:.5em 0}
-#preview hr{border:none;border-top:1px solid var(--border);margin:1.5em 0}
-::-webkit-scrollbar{width:8px}
+#preview img{max-width:100%;border-radius:8px;margin:.6em 0}
+#preview hr{border:none;border-top:1px solid var(--border);margin:1.6em 0}
+.section{padding:32px 0}
+.section-head{margin-bottom:18px}
+.section-head .label{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c7ccef;margin-bottom:10px}
+.section-head h2{font-size:clamp(28px,4vw,40px);line-height:1.15;margin-bottom:10px}
+.section-head p{max-width:760px;color:var(--text-muted)}
+.grid-3,.grid-4,.grid-2{display:grid;gap:18px}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:18px;padding:22px}
+.card h3{font-size:18px;margin-bottom:8px}
+.card p,.card li{color:var(--text-muted);font-size:14px}
+.card ul{padding-left:18px;margin-top:8px}
+.stat{padding:20px;border-radius:18px;border:1px solid var(--border);background:rgba(255,255,255,.03)}
+.stat strong{display:block;font-size:30px;line-height:1;margin-bottom:8px;color:#fff}
+.stat span{color:var(--text-muted);font-size:14px}
+.workflow{counter-reset:flow}
+.step{position:relative;padding:24px 22px 22px 22px;border:1px solid var(--border);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02))}
+.step::before{counter-increment:flow;content:counter(flow);position:absolute;top:16px;right:16px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;font-weight:800;font-size:14px}
+.step h3{font-size:18px;margin-bottom:8px;padding-right:44px}
+.step p{font-size:14px;color:var(--text-muted)}
+.list-card{display:flex;flex-direction:column;gap:14px}
+.list-item{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid rgba(255,255,255,.05);border-radius:14px;background:rgba(0,0,0,.12)}
+.list-item .icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(124,92,255,.14);font-size:16px;flex-shrink:0}
+.list-item h3{font-size:16px;margin-bottom:4px}
+.list-item p{font-size:14px;color:var(--text-muted)}
+.best-practices ol{padding-left:22px;display:flex;flex-direction:column;gap:14px}
+.best-practices li{color:var(--text-muted)}
+.best-practices strong{color:#fff}
+.faq{display:flex;flex-direction:column;gap:12px}
+.faq details{border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);padding:0 18px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:700}
+.faq summary::-webkit-details-marker{display:none}
+.faq details p{padding:0 0 18px;color:var(--text-muted);font-size:14px}
+.related-grid a,.next-grid a{display:block;height:100%;color:inherit;text-decoration:none}
+.link-card{height:100%;border:1px solid var(--border);border-radius:18px;padding:20px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));transition:transform .2s,border-color .2s,box-shadow .2s}
+.link-card:hover{transform:translateY(-2px);border-color:#51608f;box-shadow:0 18px 42px rgba(0,0,0,.18)}
+.link-card .tag{display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(124,92,255,.12);color:#d0d4ff;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.link-card h3{font-size:18px;margin-bottom:8px;color:#fff}
+.link-card p{font-size:14px;color:var(--text-muted)}
+.cta-band{margin-top:8px;padding:28px;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:linear-gradient(135deg,rgba(83,52,131,.35),rgba(233,69,96,.16),rgba(124,92,255,.16));display:grid;grid-template-columns:minmax(0,1.15fr) auto;gap:20px;align-items:center}
+.cta-band h2{font-size:clamp(26px,4vw,38px);line-height:1.12;margin-bottom:8px}
+.cta-band p{color:#d7daf6;max-width:680px}
+.cta-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end}
+.footer{padding:26px 0 50px;color:var(--text-muted);font-size:13px}
+.mini-nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.mini-nav a{padding:8px 12px;border:1px solid var(--border);border-radius:999px;color:#d7daf6;font-size:13px;background:rgba(255,255,255,.03)}
+.mini-nav a:hover{text-decoration:none;border-color:#55608a}
+::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+@media(max-width:1024px){
+  .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero-grid,.cta-band{grid-template-columns:1fr}
+  .cta-actions{justify-content:flex-start}
+}
 @media(max-width:768px){
-.editor-wrap{flex-direction:column}
-.pane+.pane{border-left:none;border-top:1px solid var(--border)}
-.pane{flex:none;height:50%}
-.toolbar h1{font-size:15px}
+  .hero{padding-top:38px}
+  .editor-wrap{flex-direction:column;min-height:auto}
+  .pane+.pane{border-left:none;border-top:1px solid var(--border)}
+  .pane{flex:none;min-height:320px}
+  .toolbar h2{font-size:16px}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .hero-copy p{font-size:16px}
+  .btn-link{width:100%}
 }
 </style>
 </head>
 <body>
-<div class="app">
-<div class="toolbar">
-<h1>&#10024; AI Markdown Preview</h1>
-<div class="toolbar-actions">
-<button class="btn btn-clear" onclick="clearEditor()">清空</button>
-<button class="btn btn-export" onclick="exportHTML()">导出 HTML</button>
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Markdown workflow • README preview • docs publishing</div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>Preview Markdown live before you publish README files, docs, and content.</h1>
+        <p>Use this free AI Markdown preview editor to write on the left, review the rendered output on the right, and export clean HTML when you are ready to ship. It fits creator, developer, and documentation workflows without adding friction.</p>
+        <div class="hero-points">
+          <span>⚡ Live split-screen preview</span>
+          <span>🧩 GFM tables + code blocks</span>
+          <span>🎨 Syntax highlighting</span>
+          <span>📤 One-click HTML export</span>
+        </div>
+        <div class="hero-actions">
+          <a class="btn-link btn-primary-link" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+          <a class="btn-link btn-secondary-link" href="#editor-tool">Jump to the live editor</a>
+        </div>
+        <p class="hero-note">Best for README drafts, changelogs, release notes, developer docs, blog outlines, and markdown-first publishing workflows.</p>
+        <div class="mini-nav">
+          <a href="#use-cases">Use cases</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#best-practices">Best practices</a>
+          <a href="#faq">FAQ</a>
+          <a href="#related-tools">Related tools</a>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <h2>What teams use this for</h2>
+        <ul>
+          <li><strong>Creators</strong><span>Draft newsletters, tutorials, content upgrades, and blog posts with faster formatting checks.</span></li>
+          <li><strong>Developers</strong><span>Validate README.md files, API examples, release notes, and issue templates before committing.</span></li>
+          <li><strong>Docs teams</strong><span>Check heading structure, code snippets, tables, and readability before publishing docs.</span></li>
+          <li><strong>Marketers</strong><span>Turn markdown drafts into shareable HTML for landing page notes, handoff docs, and internal specs.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="app-shell" id="editor-tool">
+  <div class="container">
+    <div class="app-card">
+      <div class="app">
+        <div class="toolbar">
+          <div class="toolbar-title">
+            <h2>✨ AI Markdown Preview</h2>
+            <small>Live editor + preview + export HTML</small>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn btn-clear" onclick="clearEditor()">Clear</button>
+            <button class="btn btn-export" onclick="exportHTML()">Export HTML</button>
+          </div>
+        </div>
+        <div class="editor-wrap">
+          <div class="pane">
+            <div class="pane-header">Markdown Editor</div>
+            <textarea id="editor" placeholder="Write Markdown here..." spellcheck="false" aria-label="Markdown editor"></textarea>
+          </div>
+          <div class="pane">
+            <div class="pane-header">Live Preview</div>
+            <div id="preview" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid-4">
+      <div class="stat"><strong>README</strong><span>Preview GitHub-style markdown before pushing changes.</span></div>
+      <div class="stat"><strong>Docs</strong><span>Check structure, tables, and code formatting in one place.</span></div>
+      <div class="stat"><strong>Content</strong><span>Draft tutorials, lead magnets, and long-form posts with cleaner output.</span></div>
+      <div class="stat"><strong>HTML</strong><span>Export a styled file for internal sharing or fast publishing.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="use-cases">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Use cases</div>
+      <h2>Built for real markdown-first workflows, not just demo text.</h2>
+      <p>Markdown is the common language between creators, developers, and docs teams. This page now supports that search intent with practical use cases and a clear next step into your broader content stack.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card list-card">
+        <div class="list-item">
+          <div class="icon">✍️</div>
+          <div>
+            <h3>Content creator workflow</h3>
+            <p>Draft blog posts, tutorial notes, newsletter sections, and repurposed content in Markdown before moving them into CMS tools or email platforms.</p>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="icon">💻</div>
+          <div>
+            <h3>Developer workflow</h3>
+            <p>Preview README.md changes, project setup steps, changelogs, API examples, and contribution guides before a commit or PR review.</p>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="icon">📚</div>
+          <div>
+            <h3>Documentation workflow</h3>
+            <p>Validate heading hierarchy, code fences, tables, admonition-like blocks, and internal linking patterns for clean documentation pages.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card list-card">
+        <div class="list-item">
+          <div class="icon">🚀</div>
+          <div>
+            <h3>Launch workflow</h3>
+            <p>Prepare product announcements, release notes, roadmap updates, onboarding docs, and public changelogs with fewer rendering surprises.</p>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="icon">🧠</div>
+          <div>
+            <h3>Knowledge base workflow</h3>
+            <p>Turn raw notes into polished support docs and SOPs, then export HTML for quick internal sharing or lightweight publishing.</p>
+          </div>
+        </div>
+        <div class="list-item">
+          <div class="icon">📈</div>
+          <div>
+            <h3>SEO content workflow</h3>
+            <p>Use Markdown to draft long-form content with cleaner headings, better scannability, and a simpler review flow before publishing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="workflow">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Markdown workflow</div>
+      <h2>A fast markdown workflow for creators, developers, and docs teams.</h2>
+      <p>If you already think in Markdown, the bottleneck is usually preview confidence. This workflow keeps drafting, reviewing, and publishing tight.</p>
+    </div>
+    <div class="grid-4 workflow">
+      <div class="step">
+        <h3>Draft in plain text first</h3>
+        <p>Start with headings, lists, and short paragraphs. Clean source text makes rendering errors easier to spot and fix.</p>
+      </div>
+      <div class="step">
+        <h3>Preview structure live</h3>
+        <p>Check heading depth, tables, code blocks, links, and spacing in the live pane before the content reaches GitHub, your CMS, or docs site.</p>
+      </div>
+      <div class="step">
+        <h3>Polish for readability</h3>
+        <p>Rewrite dense paragraphs, tighten lists, and make examples scannable. Markdown becomes more useful when readers can skim it fast.</p>
+      </div>
+      <div class="step">
+        <h3>Export or ship</h3>
+        <p>Export HTML for quick sharing, or copy the final Markdown into your README, blog, docs platform, or internal knowledge base.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section best-practices" id="best-practices">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Best practices</div>
+      <h2>How to make Markdown previews cleaner and easier to publish.</h2>
+      <p>Most markdown problems are structural, not technical. These habits reduce broken formatting and make downstream publishing smoother.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <ol>
+          <li><strong>Keep heading levels consistent.</strong> Don’t jump from H1 to H4 unless the information hierarchy really requires it.</li>
+          <li><strong>Test tables early.</strong> Markdown tables break quietly. Preview them before your final review, especially when cells contain links or code.</li>
+          <li><strong>Use fenced code blocks with language labels.</strong> Syntax highlighting is more useful when the parser knows whether the block is <code>js</code>, <code>bash</code>, <code>python</code>, or another language.</li>
+          <li><strong>Write for skim readers.</strong> Short paragraphs, bullets, and clear subheads usually outperform dense markdown walls.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <ol start="5">
+          <li><strong>Preview external links and inline code.</strong> They often look fine in plain text but feel noisy once rendered.</li>
+          <li><strong>Use Markdown as a source format, not the final bottleneck.</strong> Draft once, then reuse the same structure for docs, blog posts, emails, and internal notes.</li>
+          <li><strong>Export HTML for fast handoff.</strong> If a teammate does not live in Markdown, HTML export gives them a cleaner review artifact.</li>
+          <li><strong>Pair this tool with related editors.</strong> Tables, TOCs, and README helpers save time when your workflow is documentation-heavy.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Why this page matters</div>
+      <h2>A stronger content and conversion layer around the tool itself.</h2>
+      <p>This page is no longer just a thin utility. It now explains intent, solves adjacent workflow questions, and routes visitors into the next logical offer.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <h3>For content creators</h3>
+        <p>Markdown is a fast drafting format for tutorials, newsletters, content briefs, and repurposing systems. If you publish often, pairing this page with the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> gives you both formatting and ideation leverage.</p>
+      </div>
+      <div class="card">
+        <h3>For developers</h3>
+        <p>README quality affects onboarding, trust, and GitHub conversion. Previewing examples, installation instructions, and changelog sections before commit is a low-friction win.</p>
+      </div>
+      <div class="card">
+        <h3>For docs teams</h3>
+        <p>Structure consistency matters. A lightweight preview tool helps writers catch avoidable formatting issues before they hit your docs platform or static site pipeline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">FAQ</div>
+      <h2>Common questions about live Markdown preview.</h2>
+      <p>These answers mirror the structured FAQ schema in the page metadata so the page is stronger for both users and search engines.</p>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>What does this Markdown preview tool do?</summary>
+        <p>It gives you a live editor on the left and a rendered preview on the right, so you can validate Markdown formatting before publishing or exporting.</p>
+      </details>
+      <details>
+        <summary>Can I use it for README.md files?</summary>
+        <p>Yes. It is especially useful for README drafting, checking code fences, table layouts, setup instructions, and link formatting before pushing changes to GitHub.</p>
+      </details>
+      <details>
+        <summary>Does it work for creators and marketers too?</summary>
+        <p>Yes. Markdown is useful for drafting blog posts, content outlines, launch notes, internal briefs, and newsletter copy. The live preview helps you catch readability issues faster.</p>
+      </details>
+      <details>
+        <summary>Does it support tables and syntax highlighting?</summary>
+        <p>Yes. The page uses GitHub Flavored Markdown settings plus syntax highlighting for code blocks, making it practical for tutorials, docs, and technical content.</p>
+      </details>
+      <details>
+        <summary>Can I export my Markdown preview as HTML?</summary>
+        <p>Yes. Click Export HTML to download a styled HTML file based on the current preview pane.</p>
+      </details>
+      <details>
+        <summary>What should I use next after previewing Markdown?</summary>
+        <p>If you need more content production help, start with the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>. If your workflow is docs-heavy, the related tools below are the next logical step.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="related-tools">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Related tools</div>
+      <h2>Build a better markdown and publishing stack.</h2>
+      <p>These related pages extend the same creator + developer + documentation workflow instead of leaving the user at a dead end.</p>
+    </div>
+    <div class="grid-4 related-grid">
+      <a href="/content-creator-toolkit.html">
+        <div class="link-card">
+          <div class="tag">Primary CTA</div>
+          <h3>Content Creator Toolkit</h3>
+          <p>Get prompt-driven writing workflows for blog posts, social content, newsletters, and publishing systems.</p>
+        </div>
+      </a>
+      <a href="/ai-markdown-table/">
+        <div class="link-card">
+          <div class="tag">Markdown</div>
+          <h3>AI Markdown Table Generator</h3>
+          <p>Build clean Markdown tables visually, then paste them back into your docs, README, or content draft.</p>
+        </div>
+      </a>
+      <a href="/ai-table-of-contents/">
+        <div class="link-card">
+          <div class="tag">Docs structure</div>
+          <h3>AI Table of Contents Generator</h3>
+          <p>Generate a linked TOC for long Markdown docs, guides, tutorials, and SEO articles.</p>
+        </div>
+      </a>
+      <a href="/ai-readme-generator/">
+        <div class="link-card">
+          <div class="tag">Developer docs</div>
+          <h3>AI README Generator</h3>
+          <p>Create a stronger README, then use this Markdown preview page to validate the final layout.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="label">Next steps</div>
+      <h2>Where to go after you preview your Markdown.</h2>
+      <p>Keep users moving inside the site with the next most relevant action based on what they are trying to publish.</p>
+    </div>
+    <div class="grid-3 next-grid">
+      <a href="/content-creator-toolkit.html">
+        <div class="link-card">
+          <div class="tag">Creators</div>
+          <h3>Turn drafts into a repeatable content engine</h3>
+          <p>Use the Content Creator Toolkit to generate better blog ideas, social posts, emails, and content calendars after your Markdown structure is ready.</p>
+        </div>
+      </a>
+      <a href="/ai-html-minifier/">
+        <div class="link-card">
+          <div class="tag">Performance</div>
+          <h3>Minify exported HTML</h3>
+          <p>After exporting HTML from this page, compress it with the HTML minifier if you care about lighter files and faster delivery.</p>
+        </div>
+      </a>
+      <a href="/ai-responsive-tester/">
+        <div class="link-card">
+          <div class="tag">QA</div>
+          <h3>Check the published result across devices</h3>
+          <p>Once the content is live, use the responsive tester to spot layout issues on mobile, tablet, and desktop breakpoints.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <div>
+        <h2>Need more than preview? Build the full content workflow.</h2>
+        <p>Use this Markdown preview tool for structure and validation, then move into the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> for faster ideation, writing, repurposing, and publishing. That’s the highest-value next step for creator-intent visitors landing here.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn-link btn-primary-link" href="/content-creator-toolkit.html">Open Content Creator Toolkit</a>
+        <a class="btn-link btn-secondary-link" href="/ai-markdown-table/">Open Markdown Table Tool</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container footer">
+  <p>AI Markdown Preview by Lifa AI Tools — built for faster README checks, documentation reviews, and markdown-first publishing.</p>
 </div>
-</div>
-<div class="editor-wrap">
-<div class="pane">
-<div class="pane-header">编辑器</div>
-<textarea id="editor" placeholder="在这里输入 Markdown..." spellcheck="false"></textarea>
-</div>
-<div class="pane">
-<div class="pane-header">预览</div>
-<div id="preview"></div>
-</div>
-</div>
-</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
@@ -98,15 +624,14 @@ function render(){preview.innerHTML=marked.parse(editor.value);}
 editor.addEventListener('input',render);
 function clearEditor(){editor.value='';render();}
 function exportHTML(){
-var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Markdown Export</title>';
+var h='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Markdown Export</title>';
 h+='<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">';
-h+='<style>body{max-width:800px;margin:40px auto;padding:0 20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;line-height:1.7}';
-h+='a{color:#e94560}pre{background:#0d1117;padding:16px;border-radius:8px;overflow-x:auto}code{font-family:SF Mono,Monaco,Consolas,monospace;font-size:.9em;background:#0d1117;padding:2px 6px;border-radius:4px;color:#e06c75}';
-h+='pre code{background:none;padding:0;color:#e0e0e0}blockquote{border-left:4px solid #e94560;padding:8px 16px;margin:.6em 0;background:#16213e;color:#8892b0}';
-h+='table{width:100%;border-collapse:collapse;margin:.8em 0}th,td{padding:8px 12px;border:1px solid #2a2a4a;text-align:left}th{background:#16213e}img{max-width:100%}hr{border:none;border-top:1px solid #2a2a4a;margin:1.5em 0}';
-h+='</style></head><body>'+preview.innerHTML+'<script defer src="/_vercel/insights/script.js"></script>
-<script defer src="/_vercel/speed-insights/script.js"></script>
-</body></html>';
+h+='<style>body{max-width:860px;margin:40px auto;padding:0 20px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;line-height:1.7}';
+h+='a{color:#e94560}pre{background:#0d1117;padding:16px;border-radius:10px;overflow-x:auto;border:1px solid #2a2a4a}code{font-family:SF Mono,Monaco,Consolas,monospace;font-size:.9em;background:#0d1117;padding:2px 6px;border-radius:4px;color:#e06c75}';
+h+='pre code{background:none;padding:0;color:#e0e0e0}blockquote{border-left:4px solid #e94560;padding:8px 16px;margin:.6em 0;background:#16213e;color:#8892b0;border-radius:0 6px 6px 0}';
+h+='table{width:100%;border-collapse:collapse;margin:1em 0}th,td{padding:8px 12px;border:1px solid #2a2a4a;text-align:left}th{background:#16213e}img{max-width:100%;border-radius:8px}hr{border:none;border-top:1px solid #2a2a4a;margin:1.5em 0}';
+h+='h1,h2{border-bottom:1px solid #2a2a4a;padding-bottom:.25em}';
+h+='</style></head><body>'+preview.innerHTML+'<script defer src="/_vercel/insights/script.js"><\/script><script defer src="/_vercel/speed-insights/script.js"><\/script></body></html>';
 var b=new Blob([h],{type:'text/html'});
 var a=document.createElement('a');
 a.href=URL.createObjectURL(b);
@@ -116,7 +641,7 @@ URL.revokeObjectURL(a.href);
 }
 </script>
 <script>
-var defaultMd="# \ud83d\ude80 AI Markdown Preview\n\n\u4e00\u4e2a\u7b80\u6d01\u4f18\u96c5\u7684 Markdown \u5b9e\u65f6\u9884\u89c8\u5de5\u5177\u3002\n\n## \u529f\u80fd\u7279\u6027\n\n- \u2705 **\u5b9e\u65f6\u9884\u89c8** \u2014 \u5de6\u8fb9\u7f16\u8f91\uff0c\u53f3\u8fb9\u5373\u65f6\u6e32\u67d3\n- \u2705 *\u659c\u4f53\u6587\u672c* \u548c ~~\u5220\u9664\u7ebf~~\n- \u2705 \u4ee3\u7801\u8bed\u6cd5\u9ad8\u4eae\n- \u2705 \u5bfc\u51fa HTML \u6587\u4ef6\n- \u2705 \u6697\u8272\u4e3b\u9898\uff0c\u62a4\u773c\u8212\u9002\n\n## \u4ee3\u7801\u793a\u4f8b\n\n\u884c\u5185\u4ee3\u7801\uff1a`console.log('Hello!')`\n\n```javascript\n// JavaScript \u793a\u4f8b\nfunction fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\nconsole.log(fibonacci(10)); // 55\n```\n\n```python\n# Python \u793a\u4f8b\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)\n```\n\n## \u8868\u683c\n\n| \u529f\u80fd | \u72b6\u6001 | \u8bf4\u660e |\n|------|------|------|\n| Markdown \u89e3\u6790 | \u2705 | \u4f7f\u7528 marked.js |\n| \u8bed\u6cd5\u9ad8\u4eae | \u2705 | \u4f7f\u7528 highlight.js |\n| \u5bfc\u51fa HTML | \u2705 | \u4e00\u952e\u4e0b\u8f7d |\n| \u54cd\u5e94\u5f0f | \u2705 | \u79fb\u52a8\u7aef\u53cb\u597d |\n\n## \u5f15\u7528\n\n> \u201cThe best way to predict the future is to invent it.\u201d\n> \u2014 Alan Kay\n\n## \u5217\u8868\n\n### \u6709\u5e8f\u5217\u8868\n1. \u7b2c\u4e00\u6b65\uff1a\u6253\u5f00\u7f16\u8f91\u5668\n2. \u7b2c\u4e8c\u6b65\uff1a\u8f93\u5165 Markdown\n3. \u7b2c\u4e09\u6b65\uff1a\u5b9e\u65f6\u67e5\u770b\u9884\u89c8\n\n### \u65e0\u5e8f\u5217\u8868\n- \u9879\u76ee\u4e00\n  - \u5b50\u9879\u76ee A\n  - \u5b50\u9879\u76ee B\n- \u9879\u76ee\u4e8c\n- \u9879\u76ee\u4e09\n\n## \u56fe\u7247\n\n![Placeholder](https://via.placeholder.com/600x200/1a1a2e/e94560?text=AI+Markdown+Preview)\n\n## \u6c34\u5e73\u7ebf\n\n---\n\n### \u6807\u9898\u5c42\u7ea7\u6f14\u793a\n\n# H1 \u6807\u9898\n## H2 \u6807\u9898\n### H3 \u6807\u9898\n#### H4 \u6807\u9898\n##### H5 \u6807\u9898\n###### H6 \u6807\u9898\n\n---\n\n\u2728 *\u5f00\u59cb\u7f16\u8f91\u5427\uff01\u5c06\u5de6\u4fa7\u5185\u5bb9\u66ff\u6362\u4e3a\u4f60\u81ea\u5df1\u7684 Markdown \u6587\u672c\u3002*";
+var defaultMd="# AI Markdown Preview\n\nA live Markdown editor for creators, developers, and docs teams. Draft on the left, review on the right, then export clean HTML when you're done.\n\n## Best uses\n\n- Preview a `README.md` before opening a pull request\n- Draft a tutorial or changelog with headings and code samples\n- Test Markdown tables before publishing a docs page\n- Turn notes into a clean HTML export for quick sharing\n\n## Code example\n\nInline code: `npm run build`\n\n```javascript\nfunction publishDraft(title, status) {\n  return `${title} is ${status}`;\n}\n\nconsole.log(publishDraft('Release notes', 'ready to ship'));\n```\n\n```bash\n# Example docs workflow\ngit checkout -b docs/update-readme\nnpm install\nnpm test\n```\n\n## Markdown table\n\n| Workflow | Team | Why it matters |\n| --- | --- | --- |\n| README review | Developers | Catch formatting issues before commit |\n| Tutorial draft | Creators | Make long-form content easier to scan |\n| Docs QA | Technical writers | Validate hierarchy, tables, and examples |\n\n## Quote\n\n> Good Markdown is not just valid. It is easy to read before and after rendering.\n\n## Publishing checklist\n\n1. Confirm heading structure\n2. Test code fences\n3. Check links and tables\n4. Export HTML if you need a fast handoff\n\n### Next step\n\nWhen the structure looks good, move into the Content Creator Toolkit for faster drafting and repurposing.\n\n---\n\nStart typing and replace this sample with your own Markdown.";
 editor.value=defaultMd;
 render();
 </script>
