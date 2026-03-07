@@ -1,95 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Generate JSON Schema from sample JSON data automatically. Validate JSON against schemas, edit schema properties, and export for API documentation.">
-<link rel="canonical" href="https://lifa-su.com/ai-json-schema/">
-<title>AI JSON Schema Generator</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0d1117;--sf:#161b22;--bd:#30363d;--tx:#e6edf3;--mt:#8b949e;--ac:#58a6ff;--gn:#3fb950;--rd:#f85149;--yl:#d29922;--mn:'SF Mono','Cascadia Code','Fira Code',monospace}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
-header{background:var(--sf);border-bottom:1px solid var(--bd);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-header h1{font-size:18px;font-weight:600}
-header h1 em{color:var(--ac);font-style:normal}
-.hb{display:flex;gap:8px;flex-wrap:wrap}
-button{background:var(--sf);color:var(--tx);border:1px solid var(--bd);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-button:hover{background:var(--bd)}
-button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}
-button.pr:hover{background:#79c0ff}
-.main{display:flex;flex:1;overflow:hidden}
-.pn{flex:1;display:flex;flex-direction:column;min-width:0}
-.ph{padding:10px 16px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--mt)}
-.dv{width:1px;background:var(--bd);flex-shrink:0}
-textarea,.co{width:100%;height:100%;background:transparent;color:var(--tx);border:none;resize:none;padding:16px;font-family:var(--mn);font-size:13px;line-height:1.6;outline:none;tab-size:2}
-textarea::placeholder{color:var(--mt)}
-.co{overflow:auto}
-.vb{padding:8px 16px;border-top:1px solid var(--bd);font-size:12px;display:flex;align-items:center;gap:8px;background:var(--sf);min-height:36px;flex-wrap:wrap}
-.dt{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
-.dt.g{background:var(--gn)}.dt.r{background:var(--rd)}.dt.y{background:var(--yl)}.dt.x{background:var(--mt)}
-.ed{color:var(--rd);font-family:var(--mn);font-size:11px}
-.tb{display:flex;background:var(--sf);border-bottom:1px solid var(--bd)}
-.tb button{border:none;border-radius:0;border-bottom:2px solid transparent;padding:8px 16px;font-size:12px;color:var(--mt)}
-.tb button.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(88,166,255,.08)}
-.se{flex:1;overflow:auto;padding:16px}
-.se::-webkit-scrollbar{width:8px}
-.se::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
-.pi{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px}
-.pi .nm{font-family:var(--mn);font-size:13px;color:var(--ac);font-weight:600}
-.pi .tp{font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--mn);display:inline-block}
-.ts{background:#1f3a5f;color:#79c0ff}
-.tn,.ti{background:#3b2e1a;color:var(--yl)}
-.tb2{background:#1a3b2e;color:var(--gn)}
-.to{background:#2d1f4e;color:#d2a8ff}
-.ta{background:#3b1a2e;color:#ff7b72}
-.tl{background:#2d2d2d;color:var(--mt)}
-.pc{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
-.pc label{font-size:12px;color:var(--mt);display:flex;align-items:center;gap:4px;cursor:pointer}
-.pc input[type=checkbox]{accent-color:var(--ac)}
-.pc select{background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:2px 6px;border-radius:4px;font-size:11px}
-.pd{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:4px 8px;border-radius:4px;font-size:12px;margin-top:6px;outline:none}
-.pd:focus{border-color:var(--ac)}
-.ns{margin-left:16px;margin-top:8px;padding-left:12px;border-left:2px solid var(--bd)}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--gn);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
-.toast.show{opacity:1;transform:translateY(0)}
-.hd{display:none!important}
-@media(max-width:768px){.main{flex-direction:column}.dv{width:100%;height:1px}.pn{min-height:40vh}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI JSON Schema Generator & Validator for Developers, APIs, and Config Workflows</title>
+    <meta name="description" content="Generate JSON Schema from sample JSON, edit properties visually, validate payloads, and document data contracts faster. Built for developers, API teams, config files, forms, and validation workflows.">
+    <meta name="keywords" content="json schema generator, json schema validator, sample json to schema, api schema tool, config validation, json contract generator, developer workflow, ajv validator, json schema draft-07, form schema builder">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="canonical" href="https://lifa-su.com/ai-json-schema/">
+    <meta property="og:title" content="AI JSON Schema Generator & Validator for Developers, APIs, and Config Workflows">
+    <meta property="og:description" content="Turn sample JSON into editable JSON Schema, validate payloads, and tighten API, form, and config workflows with a faster browser-based tool.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lifa-su.com/ai-json-schema/">
+    <meta property="og:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <meta property="og:site_name" content="Lifa AI Tools">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI JSON Schema Generator & Validator for Developers">
+    <meta name="twitter:description" content="Free JSON Schema generator and validator for API payloads, form models, config files, and technical docs workflows.">
+    <meta name="twitter:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "AI JSON Schema Generator",
+          "alternateName": "JSON Schema Generator and Validator",
+          "url": "https://lifa-su.com/ai-json-schema/",
+          "description": "Free browser-based JSON Schema generator that infers schema from sample JSON, lets users edit field settings visually, and validates payloads for API, config, form, and documentation workflows.",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript and a modern browser.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Generate JSON Schema from sample JSON",
+            "Edit schema fields in a visual property editor",
+            "Validate JSON payloads against the generated schema",
+            "Copy raw schema output for docs or implementation",
+            "Support API, form, config, and data contract workflows"
+          ],
+          "publisher": {
+            "@type": "Organization",
+            "name": "Lifa AI Tools",
+            "url": "https://lifa-su.com"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is a JSON Schema generator used for?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A JSON Schema generator turns sample JSON into a reusable schema definition so developers can validate payloads, document API contracts, define form structures, and keep data formats consistent across systems."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I validate JSON against the generated schema on this page?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. This page lets you generate schema from input JSON, edit the schema, and validate JSON data against it in the browser using a built-in validation workflow."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Who should use this JSON Schema tool?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "It is useful for backend developers, frontend developers, API designers, technical writers, QA engineers, automation teams, and anyone who needs clearer JSON contracts for apps, integrations, forms, or configuration files."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is generated schema enough for production use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "It is a strong starting point, but production schemas usually need refinement. Teams often add descriptions, required rules, enum constraints, array details, versioning notes, and stricter validation logic before shipping."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does JSON Schema fit into API and config workflows?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "JSON Schema helps standardize payload expectations, validate requests and responses, reduce breaking changes, power generated documentation, and keep config or automation inputs predictable across environments."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What should I do after generating a schema?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "After generating a schema, review required fields, improve field descriptions, test example payloads, connect it to docs or validation code, and explore related tools for JSON, YAML, API docs, and content workflows."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://lifa-su.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "AI JSON Schema Generator",
+              "item": "https://lifa-su.com/ai-json-schema/"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+    <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d1117;
+      --bg2:#0b1220;
+      --sf:#161b22;
+      --sf2:#111827;
+      --sf3:#0f1724;
+      --bd:#30363d;
+      --bd2:#253041;
+      --tx:#e6edf3;
+      --tx2:#a7b0ba;
+      --tx3:#7d8590;
+      --ac:#58a6ff;
+      --ac2:#79c0ff;
+      --gn:#3fb950;
+      --rd:#f85149;
+      --yl:#d29922;
+      --mn:'SF Mono','Cascadia Code','Fira Code',monospace;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(88,166,255,.10),transparent 30%),var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+    a{color:var(--ac2);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code,pre{font-family:var(--mn)}
+    .container{max-width:1180px;margin:0 auto;padding:0 20px}
+    .hero{padding:56px 0 28px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid rgba(121,192,255,.16);border-radius:999px;background:rgba(88,166,255,.08);color:var(--ac2);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .hero-grid{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(290px,.82fr);gap:22px;align-items:start;margin-top:18px}
+    .hero-copy,.hero-card,.tool-shell,.section-card,.use-card,.workflow-step,.best-card,.faq-item,.related-card,.next-card,.cta-band,.footer-note{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));border:1px solid var(--bd);border-radius:24px;box-shadow:var(--shadow)}
+    .hero-copy{padding:32px}
+    .hero-copy h1{font-size:clamp(2.3rem,5vw,4rem);line-height:1.04;letter-spacing:-.03em;margin:14px 0 16px;max-width:12ch}
+    .hero-copy p{color:var(--tx2);font-size:1.02rem;max-width:760px}
+    .hero-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0 24px}
+    .hero-points div{padding:14px;border:1px solid rgba(121,192,255,.14);border-radius:16px;background:rgba(88,166,255,.06)}
+    .hero-points strong{display:block;margin-bottom:4px;font-size:1rem}
+    .hero-points span{color:var(--tx2);font-size:.92rem}
+    .hero-actions,.mini-nav,.cta-actions{display:flex;flex-wrap:wrap;gap:12px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700;border:1px solid var(--bd);transition:transform .18s ease,background .18s ease,border-color .18s ease;color:var(--tx)}
+    .btn:hover{text-decoration:none;transform:translateY(-1px);border-color:var(--ac)}
+    .btn-primary{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;box-shadow:0 12px 30px rgba(88,166,255,.22)}
+    .btn-secondary{background:rgba(255,255,255,.03)}
+    .hero-note{margin-top:14px;font-size:.92rem;color:var(--tx3)}
+    .hero-card{padding:24px;display:flex;flex-direction:column;gap:18px}
+    .hero-card h2{font-size:1.1rem}
+    .hero-card p,.hero-card li{color:var(--tx2);font-size:.94rem}
+    .hero-card ul{padding-left:18px;display:grid;gap:8px}
+    .mini-nav{margin-top:18px}
+    .mini-nav a{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--bd);color:var(--tx2);font-size:.86rem}
+    .mini-nav a:hover{text-decoration:none;color:var(--tx);border-color:var(--ac)}
+    .tool-shell{padding:24px;margin:10px 0 30px}
+    .tool-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+    .tool-head h2{font-size:1.55rem;margin-bottom:8px}
+    .tool-head p{color:var(--tx2);max-width:760px}
+    .tool-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .tool-tags span,.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--bd);color:var(--tx2);font-size:.82rem}
+    .tool-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+    .tool-app-wrap{border:1px solid var(--bd);border-radius:20px;overflow:hidden;background:var(--sf);box-shadow:var(--shadow)}
+    .tool-side{display:grid;gap:14px}
+    .side-card{background:rgba(22,27,34,.9);border:1px solid var(--bd);border-radius:18px;padding:18px}
+    .side-card h3{font-size:1rem;margin-bottom:8px}
+    .side-card p,.side-card li{color:var(--tx2);font-size:.92rem}
+    .side-card ul{padding-left:18px;display:grid;gap:8px}
+    .side-card code{font-size:.82rem;color:var(--ac2)}
+    .tool-app .app-top{padding:16px 20px;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+    .tool-app .app-title{font-size:1rem;font-weight:700}
+    .tool-app .app-sub{font-size:.88rem;color:var(--tx2)}
+    .tool-app .hb{display:flex;gap:8px;flex-wrap:wrap}
+    .tool-app button{background:var(--sf);color:var(--tx);border:1px solid var(--bd);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+    .tool-app button:hover{background:var(--bd)}
+    .tool-app button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}
+    .tool-app button.pr:hover{background:#79c0ff}
+    .main{display:flex;min-height:540px;overflow:hidden}
+    .pn{flex:1;display:flex;flex-direction:column;min-width:0}
+    .ph{padding:10px 16px;background:var(--sf);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--tx2)}
+    .dv{width:1px;background:var(--bd);flex-shrink:0}
+    textarea,.co{width:100%;height:100%;background:transparent;color:var(--tx);border:none;resize:none;padding:16px;font-family:var(--mn);font-size:13px;line-height:1.6;outline:none;tab-size:2}
+    textarea::placeholder{color:var(--tx3)}
+    .co{overflow:auto}
+    .vb{padding:8px 16px;border-top:1px solid var(--bd);font-size:12px;display:flex;align-items:center;gap:8px;background:var(--sf);min-height:36px;flex-wrap:wrap}
+    .dt{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+    .dt.g{background:var(--gn)}.dt.r{background:var(--rd)}.dt.y{background:var(--yl)}.dt.x{background:var(--tx3)}
+    .ed{color:var(--rd);font-family:var(--mn);font-size:11px}
+    .tb{display:flex;background:var(--sf);border-bottom:1px solid var(--bd)}
+    .tb button{border:none;border-radius:0;border-bottom:2px solid transparent;padding:8px 16px;font-size:12px;color:var(--tx3)}
+    .tb button.on{color:var(--ac);border-bottom-color:var(--ac);background:rgba(88,166,255,.08)}
+    .se{flex:1;overflow:auto;padding:16px;background:var(--sf3)}
+    .se::-webkit-scrollbar{width:8px}
+    .se::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+    .pi{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+    .pi .nm{font-family:var(--mn);font-size:13px;color:var(--ac);font-weight:600}
+    .pi .tp{font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--mn);display:inline-block}
+    .ts{background:#1f3a5f;color:#79c0ff}
+    .tn,.ti{background:#3b2e1a;color:var(--yl)}
+    .tb2{background:#1a3b2e;color:var(--gn)}
+    .to{background:#2d1f4e;color:#d2a8ff}
+    .ta{background:#3b1a2e;color:#ff7b72}
+    .tl{background:#2d2d2d;color:var(--tx2)}
+    .pc{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+    .pc label{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;cursor:pointer}
+    .pc input[type=checkbox]{accent-color:var(--ac)}
+    .pc select{background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:2px 6px;border-radius:4px;font-size:11px}
+    .pd{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);padding:4px 8px;border-radius:4px;font-size:12px;margin-top:6px;outline:none}
+    .pd:focus{border-color:var(--ac)}
+    .ns{margin-left:16px;margin-top:8px;padding-left:12px;border-left:2px solid var(--bd)}
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--gn);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;z-index:999}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .hd{display:none!important}
+    .section{padding:18px 0 30px}
+    .section-head{margin-bottom:18px}
+    .label{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ac2);margin-bottom:10px}
+    .section-head h2{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.12;margin-bottom:10px}
+    .section-head p{max-width:820px;color:var(--tx2)}
+    .section-card{padding:24px}
+    .grid-2,.grid-3,.grid-4{display:grid;gap:16px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .use-card,.workflow-step,.best-card,.related-card,.next-card{padding:20px}
+    .use-card h3,.workflow-step h3,.best-card h3,.related-card h3,.next-card h3{font-size:1.02rem;margin-bottom:8px}
+    .use-card p,.workflow-step p,.best-card p,.best-card li,.related-card p,.next-card p{color:var(--tx2);font-size:.94rem}
+    .workflow-step .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(88,166,255,.14);border:1px solid rgba(88,166,255,.25);color:var(--ac2);font-weight:800;margin-bottom:12px}
+    .best-list{display:grid;gap:12px}
+    .best-item{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:14px}
+    .best-item strong{display:block;margin-bottom:4px}
+    .best-item p{color:var(--tx2);font-size:.93rem}
+    .code-box{background:var(--sf3);border:1px solid var(--bd);border-radius:16px;padding:16px;overflow:auto}
+    .code-box pre{white-space:pre-wrap;word-break:break-word;color:#dbeafe;font-size:.88rem;line-height:1.7}
+    .faq{display:grid;gap:12px}
+    .faq-item{padding:0;overflow:hidden}
+    .faq-item summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;display:flex;justify-content:space-between;gap:12px}
+    .faq-item summary::-webkit-details-marker{display:none}
+    .faq-item p{padding:0 20px 18px;color:var(--tx2)}
+    .related-card a,.next-card a{display:inline-flex;align-items:center;gap:6px;font-weight:700;margin-top:12px}
+    .cta-band{padding:26px;display:grid;grid-template-columns:minmax(0,1.15fr) auto;gap:20px;align-items:center;background:linear-gradient(135deg,rgba(88,166,255,.14),rgba(121,192,255,.06))}
+    .cta-band h2{font-size:clamp(1.8rem,4vw,2.5rem);line-height:1.12;margin-bottom:8px}
+    .cta-band p{color:var(--tx2);max-width:760px}
+    .footer-note{padding:18px 20px;margin-bottom:26px;color:var(--tx2);font-size:.92rem}
+    footer{padding:8px 0 42px;color:var(--tx3);font-size:.84rem}
+    @media(max-width:980px){
+      .hero-grid,.tool-layout,.cta-band{grid-template-columns:1fr}
+      .hero-points,.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
+    }
+    @media(max-width:768px){
+      .container{padding:0 14px}
+      .hero{padding-top:28px}
+      .hero-copy,.hero-card,.tool-shell,.section-card,.cta-band,.footer-note{border-radius:18px}
+      .main{flex-direction:column;min-height:auto}
+      .dv{width:100%;height:1px}
+      .pn{min-height:42vh}
+    }
+    </style>
 </head>
 <body>
-<header>
-<h1>&#129504; <em>AI JSON Schema</em> Generator</h1>
-<div class="hb">
-<button onclick="loadExample()">&#128203; Example</button>
-<button onclick="validateJson()" class="pr">&#9989; Validate</button>
-<button onclick="copySchema()">&#128203; Copy Schema</button>
+<div class="container">
+    <section class="hero">
+        <div class="eyebrow">JSON Schema • API contracts • Config validation • Developer workflow</div>
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <h1>Generate, edit, and validate JSON Schema in one fast workflow.</h1>
+                <p>This page is built for developers, API teams, technical writers, QA, and automation-heavy workflows that need clearer JSON contracts. Paste sample JSON, infer a schema instantly, refine it visually, validate payloads, and move into docs, configs, forms, or handoff notes without leaving the browser.</p>
+                <div class="hero-points">
+                    <div>
+                        <strong>Faster schema drafting</strong>
+                        <span>Turn example payloads into a useful first-pass schema before you write stricter validation rules by hand.</span>
+                    </div>
+                    <div>
+                        <strong>Better validation loops</strong>
+                        <span>Check whether your request bodies, config files, or generated outputs actually match the contract you expect.</span>
+                    </div>
+                    <div>
+                        <strong>Cleaner documentation</strong>
+                        <span>Copy the schema into API references, internal docs, onboarding guides, or implementation tickets.</span>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#generator">Open the JSON Schema tool</a>
+                    <a class="btn btn-secondary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+                </div>
+                <div class="hero-note">Best fit for API payloads, form models, config files, webhook events, data contracts, and schema-first documentation workflows.</div>
+                <div class="mini-nav">
+                    <a href="#use-cases">Use cases</a>
+                    <a href="#workflow">Workflow</a>
+                    <a href="#best-practices">Best practices</a>
+                    <a href="#faq">FAQ</a>
+                    <a href="#related-tools">Related tools</a>
+                </div>
+            </div>
+            <aside class="hero-card">
+                <div>
+                    <h2>What this page helps you do</h2>
+                    <ul>
+                        <li>Infer JSON Schema from a sample payload.</li>
+                        <li>Edit required fields, types, and descriptions visually.</li>
+                        <li>Validate JSON against the generated schema in-browser.</li>
+                        <li>Use the output for API docs, configs, forms, or QA notes.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Common users</h2>
+                    <p>Backend and frontend developers, API designers, low-code builders, technical writers, PMs creating integration docs, and teams standardizing machine-readable inputs.</p>
+                </div>
+                <div>
+                    <h2>Best next move after this tool</h2>
+                    <p>If you want repeatable publishing, documentation, and conversion workflows around technical content, start with the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section class="tool-shell" id="generator">
+        <div class="tool-head">
+            <div>
+                <h2>AI JSON Schema generator and validator</h2>
+                <p>Paste JSON on the left, review the generated schema on the right, adjust property details in the visual editor, and validate the payload against your updated rules. The core generator and validator below keep the original browser-based interaction intact.</p>
+                <div class="tool-tags">
+                    <span>Draft-07 schema output</span>
+                    <span>Visual field editor</span>
+                    <span>AJV validation</span>
+                    <span>Copy-ready raw schema</span>
+                </div>
+            </div>
+            <div class="pill">Free web tool • no signup required</div>
+        </div>
+        <div class="tool-layout">
+            <div class="tool-app-wrap tool-app">
+                <div class="app-top">
+                    <div>
+                        <div class="app-title">🧠 AI JSON Schema Generator</div>
+                        <div class="app-sub">Generate schema from JSON, then validate or refine it for production use.</div>
+                    </div>
+                    <div class="hb">
+                        <button onclick="loadExample()">📋 Example</button>
+                        <button onclick="validateJson()" class="pr">✅ Validate</button>
+                        <button onclick="copySchema()">📋 Copy Schema</button>
+                    </div>
+                </div>
+                <div class="main">
+                    <div class="pn">
+                        <div class="ph"><span>JSON Input</span><span style="font-size:11px">Paste your JSON data</span></div>
+                        <div style="flex:1;overflow:hidden">
+                            <textarea id="ji" placeholder="Paste your JSON here..."></textarea>
+                        </div>
+                        <div class="vb" id="vbar"><span class="dt x"></span><span style="color:var(--tx2)">Paste JSON to generate schema</span></div>
+                    </div>
+                    <div class="dv"></div>
+                    <div class="pn">
+                        <div class="tb">
+                            <button class="on" onclick="stab('vis',this)">Visual Editor</button>
+                            <button onclick="stab('raw',this)">Raw Schema</button>
+                        </div>
+                        <div id="vis" class="se"></div>
+                        <div id="raw" class="hd" style="flex:1;overflow:hidden">
+                            <textarea id="so" class="co" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tool-side">
+                <div class="side-card">
+                    <h3>How to use it</h3>
+                    <ul>
+                        <li>Paste a representative JSON sample.</li>
+                        <li>Review inferred property types and required fields.</li>
+                        <li>Add better descriptions for docs and team handoffs.</li>
+                        <li>Run validation against real payload examples.</li>
+                    </ul>
+                </div>
+                <div class="side-card">
+                    <h3>Useful outputs</h3>
+                    <p>Generated schema can support request validation, config file checks, form builders, webhook specs, test fixtures, or internal technical documentation.</p>
+                </div>
+                <div class="side-card">
+                    <h3>Production note</h3>
+                    <p>Treat auto-generated schema as a strong starting point, not the final contract. Add stricter rules like enums, formats, nested array constraints, and versioning notes before shipping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="use-cases">
+        <div class="section-head">
+            <div class="label">Use cases</div>
+            <h2>Where this JSON Schema page fits real developer and product work</h2>
+            <p>The tool itself is simple. The value comes from how often teams need a lightweight way to turn raw JSON into a shareable contract. These are the highest-fit use cases for this page.</p>
+        </div>
+        <div class="grid-3">
+            <article class="use-card">
+                <h3>API request and response contracts</h3>
+                <p>Use a live example payload to draft schema for endpoints, webhook events, or automation responses. Then move the output into API docs, validation middleware, or team review notes.</p>
+            </article>
+            <article class="use-card">
+                <h3>Config and environment files</h3>
+                <p>When tools, apps, or pipelines accept JSON configs, a schema helps catch missing keys, wrong types, and invalid structure before bad settings hit staging or production.</p>
+            </article>
+            <article class="use-card">
+                <h3>Dynamic forms and UI models</h3>
+                <p>Frontend teams can use schema as a first pass for form generation, input validation, and clearer communication between design, product, and engineering.</p>
+            </article>
+            <article class="use-card">
+                <h3>Technical documentation</h3>
+                <p>Technical writers and developer advocates can use schema snippets to explain payload structure faster, especially when docs need a quick reference table or sample object breakdown.</p>
+            </article>
+            <article class="use-card">
+                <h3>QA and test fixtures</h3>
+                <p>Validation catches drift between expected and actual test data. That makes this page useful for smoke checks, regression triage, and debugging generated JSON outputs.</p>
+            </article>
+            <article class="use-card">
+                <h3>Automation and AI output checks</h3>
+                <p>If you rely on structured JSON output from scripts or AI workflows, schema gives you a clearer acceptance layer before data flows into downstream tools.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" id="workflow">
+        <div class="section-card">
+            <div class="section-head">
+                <div class="label">JSON Schema workflow</div>
+                <h2>A practical workflow from sample payload to production-ready validation</h2>
+                <p>You usually do not start with a perfect schema. You start with a realistic payload, infer the structure, then tighten it as the workflow becomes clearer.</p>
+            </div>
+            <div class="grid-4">
+                <article class="workflow-step">
+                    <div class="num">1</div>
+                    <h3>Collect a representative sample</h3>
+                    <p>Use a payload that reflects real data, not a tiny toy example. This gives the generator better structure to work from.</p>
+                </article>
+                <article class="workflow-step">
+                    <div class="num">2</div>
+                    <h3>Generate the first schema draft</h3>
+                    <p>Let the tool infer the base types, nested objects, arrays, and default required fields from your sample JSON.</p>
+                </article>
+                <article class="workflow-step">
+                    <div class="num">3</div>
+                    <h3>Refine descriptions and rules</h3>
+                    <p>Clarify field meaning, toggle required properties, and adjust types so the schema matches your intended contract, not just your sample.</p>
+                </article>
+                <article class="workflow-step">
+                    <div class="num">4</div>
+                    <h3>Validate real payloads</h3>
+                    <p>Test known-good and known-bad examples to see whether the schema catches drift, missing keys, or wrong shapes early.</p>
+                </article>
+                <article class="workflow-step">
+                    <div class="num">5</div>
+                    <h3>Move it into docs and code</h3>
+                    <p>Copy the raw schema into API references, config validation, client libraries, QA notes, or internal documentation so everyone works from the same contract.</p>
+                </article>
+                <article class="workflow-step">
+                    <div class="num">6</div>
+                    <h3>Iterate as the contract evolves</h3>
+                    <p>As endpoints, forms, or integrations change, update the schema and examples together so teams can spot breaking changes faster.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="best-practices">
+        <div class="grid-2">
+            <div class="section-card">
+                <div class="section-head">
+                    <div class="label">Best practices</div>
+                    <h2>How to get more reliable schema output</h2>
+                </div>
+                <div class="best-list">
+                    <div class="best-item">
+                        <div>✅</div>
+                        <div>
+                            <strong>Use realistic samples</strong>
+                            <p>Schemas generated from incomplete payloads often miss optional branches, nested arrays, or mixed-value edge cases.</p>
+                        </div>
+                    </div>
+                    <div class="best-item">
+                        <div>📝</div>
+                        <div>
+                            <strong>Add descriptions while context is fresh</strong>
+                            <p>Descriptions turn raw structure into something teammates can actually understand in docs, PRs, and handoffs.</p>
+                        </div>
+                    </div>
+                    <div class="best-item">
+                        <div>🔒</div>
+                        <div>
+                            <strong>Review required fields carefully</strong>
+                            <p>Auto-generated required arrays are helpful, but production contracts often need more nuance than one sample can reveal.</p>
+                        </div>
+                    </div>
+                    <div class="best-item">
+                        <div>🧪</div>
+                        <div>
+                            <strong>Test both valid and invalid payloads</strong>
+                            <p>Validation is only trustworthy when you confirm that the schema accepts good data and rejects the bad cases you care about.</p>
+                        </div>
+                    </div>
+                    <div class="best-item">
+                        <div>🔁</div>
+                        <div>
+                            <strong>Version schema with the workflow</strong>
+                            <p>When APIs or configs evolve, update schemas, examples, and documentation together to reduce contract drift.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-card">
+                <div class="section-head">
+                    <div class="label">Example</div>
+                    <h2>A small schema snippet you can build from this page</h2>
+                    <p>Use the visual editor for the first draft, then carry the raw schema into docs, tests, or stricter validator code.</p>
+                </div>
+                <div class="code-box">
+<pre>{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "description": "Primary email address" },
+        "active": { "type": "boolean", "description": "Whether the user can access the app" }
+      },
+      "required": ["name", "email"]
+    }
+  },
+  "required": ["user"]
+}</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="cta-band">
+            <div>
+                <h2>Need more than one tool? Build the full workflow.</h2>
+                <p>This page helps with JSON structure and validation. The next leverage point is turning technical ideas into publishable docs, examples, lead magnets, tutorials, and creator-friendly content systems. That is exactly what the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> is for.</p>
+            </div>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+                <a class="btn btn-secondary" href="/ai-json-toolkit/">Open AI JSON Toolkit</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="related-tools">
+        <div class="section-head">
+            <div class="label">Related tools</div>
+            <h2>Keep the developer workflow moving</h2>
+            <p>If JSON Schema is one step in a bigger docs or validation stack, these pages fit naturally around it. The toolkit stays the primary CTA, then the related technical tools deepen the workflow.</p>
+        </div>
+        <div class="grid-3">
+            <article class="related-card">
+                <h3>Content Creator Toolkit</h3>
+                <p>Best next step if you want repeatable systems for technical content, tutorials, prompts, distribution, and conversion-focused publishing.</p>
+                <a href="/content-creator-toolkit.html">Open toolkit →</a>
+            </article>
+            <article class="related-card">
+                <h3>AI JSON Toolkit</h3>
+                <p>Use this when you need a broader JSON workflow beyond schema generation, including formatting and structure-focused utility steps.</p>
+                <a href="/ai-json-toolkit/">Go to AI JSON Toolkit →</a>
+            </article>
+            <article class="related-card">
+                <h3>AI YAML Validator</h3>
+                <p>Useful when your workflow moves between JSON contracts and human-edited YAML configs for deployment, docs, or automation.</p>
+                <a href="/ai-yaml-validator/">Open YAML Validator →</a>
+            </article>
+            <article class="related-card">
+                <h3>AI API Docs Generator</h3>
+                <p>Once your payload structure is clearer, move into API documentation so developers and users can understand the contract faster.</p>
+                <a href="/ai-api-docs-generator/">Open API Docs Generator →</a>
+            </article>
+            <article class="related-card">
+                <h3>AI Markdown Editor</h3>
+                <p>Helpful for writing technical notes, release docs, integration guides, and schema explanations after the validation layer is done.</p>
+                <a href="/ai-markdown-editor/">Open Markdown Editor →</a>
+            </article>
+            <article class="related-card">
+                <h3>AI HTML to JSX</h3>
+                <p>If schema work leads into frontend implementation, this tool helps move documentation examples or UI snippets into component workflows.</p>
+                <a href="/ai-html-to-jsx/">Open HTML to JSX →</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-head">
+            <div class="label">Next steps</div>
+            <h2>What to do after generating a JSON Schema</h2>
+            <p>The generator gets you to a useful draft. These next steps are what make it valuable in a real shipping workflow.</p>
+        </div>
+        <div class="grid-3">
+            <article class="next-card">
+                <h3>Document the contract</h3>
+                <p>Paste the schema into API references, onboarding docs, or internal handoff notes so fewer implementation details stay implicit.</p>
+                <a href="/ai-api-docs/">Explore AI API Docs →</a>
+            </article>
+            <article class="next-card">
+                <h3>Check adjacent formats</h3>
+                <p>If your team mixes YAML and JSON, validate both sides to avoid format drift between source files, generated output, and deployment config.</p>
+                <a href="/ai-yaml-json/">Open YAML ↔ JSON →</a>
+            </article>
+            <article class="next-card">
+                <h3>Turn knowledge into content</h3>
+                <p>Use the technical workflow you just clarified as source material for tutorials, case studies, product content, or lead-gen assets.</p>
+                <a href="/content-creator-toolkit.html">Start with the Toolkit →</a>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" id="faq">
+        <div class="section-card">
+            <div class="section-head">
+                <div class="label">FAQ</div>
+                <h2>Common questions about JSON Schema generators and validation workflows</h2>
+                <p>Short answers for developers, docs teams, QA, and builders using this page as part of a larger technical workflow.</p>
+            </div>
+            <div class="faq">
+                <details class="faq-item" open>
+                    <summary>What is a JSON Schema generator used for?</summary>
+                    <p>A JSON Schema generator creates a structured contract from example JSON so you can validate inputs, document payloads, build forms, standardize configs, and reduce ambiguity across teams.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I validate JSON against the generated schema here?</summary>
+                    <p>Yes. This page includes a browser-based validation step, so you can generate a schema, refine it, and test whether a JSON payload matches the current rules without leaving the page.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Is auto-generated schema enough for production?</summary>
+                    <p>Usually not by itself. Auto-generated schema gives you a fast first draft, but production use often needs better descriptions, stricter requirements, edge-case coverage, and sometimes manual constraints that one sample payload does not reveal.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>How does this help with API and config workflows?</summary>
+                    <p>It gives you a cleaner contract layer. That helps API consumers understand request and response structure, and it helps config-heavy workflows catch mistakes before invalid data reaches runtime systems.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>Who should use this JSON Schema tool?</summary>
+                    <p>Backend engineers, frontend engineers, QA analysts, technical writers, developer advocates, automation builders, indie hackers, and product teams that rely on structured JSON all benefit from it.</p>
+                </details>
+                <details class="faq-item">
+                    <summary>What is the best next page on this site after this tool?</summary>
+                    <p>The strongest next step is the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> if you want a broader content and conversion workflow. For technical follow-ups, AI JSON Toolkit, AI YAML Validator, and AI API Docs are the best supporting pages.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-note">
+        JSON Schema generator for developers, API payloads, config files, validation workflows, and technical documentation. If this page saves you time, the best broader workflow upgrade is the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>.
+    </div>
+
+    <footer>
+        <p>AI JSON Schema Generator — free browser-based schema drafting and validation for developer docs, contracts, configs, and structured data workflows.</p>
+    </footer>
 </div>
-</header>
-<div class="main">
-<div class="pn">
-<div class="ph"><span>JSON Input</span><span style="font-size:11px">Paste your JSON data</span></div>
-<div style="flex:1;overflow:hidden">
-<textarea id="ji" placeholder="Paste your JSON here..."></textarea>
-</div>
-<div class="vb" id="vbar"><span class="dt x"></span><span style="color:var(--mt)">Paste JSON to generate schema</span></div>
-</div>
-<div class="dv"></div>
-<div class="pn">
-<div class="tb">
-<button class="on" onclick="stab('vis',this)">Visual Editor</button>
-<button onclick="stab('raw',this)">Raw Schema</button>
-</div>
-<div id="vis" class="se"></div>
-<div id="raw" class="hd" style="flex:1;overflow:hidden">
-<textarea id="so" class="co" readonly></textarea>
-</div>
-</div>
-</div>
+
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.12.0/ajv7.min.js"></script>
 <script>
@@ -171,7 +761,7 @@ function setVbar(dot,msg){
 
 function renderVisual(s){
   vis.innerHTML='';
-  if(!s||!s.properties){vis.innerHTML='<div style="color:var(--mt);padding:20px;text-align:center">No object properties to display</div>';return}
+  if(!s||!s.properties){vis.innerHTML='<div style="color:var(--tx2);padding:20px;text-align:center">No object properties to display</div>';return}
   renderProps(s,vis,'');
 }
 
@@ -201,7 +791,7 @@ function renderProps(s,container,path){
     }
     if(ps.type==='array'&&ps.items&&ps.items.type==='object'&&ps.items.properties){
       const nest=document.createElement('div');nest.className='ns';
-      const lbl=document.createElement('div');lbl.style.cssText='font-size:11px;color:var(--mt);margin-bottom:4px';lbl.textContent='items (object):';
+      const lbl=document.createElement('div');lbl.style.cssText='font-size:11px;color:var(--tx2);margin-bottom:4px';lbl.textContent='items (object):';
       nest.appendChild(lbl);
       div.appendChild(nest);
       renderProps(ps.items,nest,fp+'.items');
@@ -279,7 +869,6 @@ function validateJson(){
 
 ji.addEventListener('input',function(){clearTimeout(this._t);this._t=setTimeout(generate,300)});
 
-// init
 generate();
 </script>
 <script src="https://alwingulla.com/88/tag.min.js" data-zone="130747" async data-cfasync="false"></script>
