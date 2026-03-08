@@ -1,117 +1,491 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Interactive HSL color picker tool. Select colors using hue, saturation, and lightness sliders. Convert between HSL, RGB, and HEX color formats easily.">
-<link rel="canonical" href="https://lifa-su.com/ai-css-hsl/">
-<title>HSL Color Picker - AI CSS HSL</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
-h1{font-size:1.6rem;margin-bottom:20px;color:#fff;text-align:center}
-.container{width:100%;max-width:480px}
-.preview{width:100%;height:180px;border-radius:16px;margin-bottom:20px;border:2px solid rgba(255,255,255,.1);transition:background-color .1s}
-.sliders{background:rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:20px}
-.sg{margin-bottom:16px}.sg:last-child{margin-bottom:0}
-.sl{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.9rem}
-.sl span:first-child{font-weight:600}.sl span:last-child{color:#aaa;font-variant-numeric:tabular-nums}
-input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;outline:none;cursor:pointer}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.3);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
-#hue{background:linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%))}
-.vals{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.vr{display:flex;align-items:center;background:rgba(255,255,255,.05);border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .2s;user-select:none}
-.vr:hover{background:rgba(255,255,255,.1)}.vr:active{background:rgba(255,255,255,.15)}
-.vl{font-size:.75rem;font-weight:700;color:#888;width:36px;flex-shrink:0}
-.vt{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.95rem;flex:1}
-.ch{font-size:.7rem;color:#666;margin-left:8px}.copied{color:#4ade80!important}
-.hist{background:rgba(255,255,255,.05);border-radius:16px;padding:16px}
-.ht{font-size:.85rem;font-weight:600;color:#888;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.hc{font-size:.7rem;color:#666;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s}
-.hc:hover{background:rgba(255,255,255,.1);color:#aaa}
-.hg{display:flex;flex-wrap:wrap;gap:8px}
-.hi{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .15s}
-.hi:hover{border-color:rgba(255,255,255,.4);transform:scale(1.1)}
-.eh{font-size:.8rem;color:#555;text-align:center;padding:10px 0}
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(74,222,128,.9);color:#000;padding:8px 20px;border-radius:20px;font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:500px){body{padding:12px}h1{font-size:1.3rem}.preview{height:140px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSL Color Picker & CSS Workflow Tool | AI CSS HSL</title>
+    <meta name="description" content="Interactive HSL color picker for CSS workflows. Adjust hue, saturation, and lightness, copy HSL RGB HEX values, save color history, and learn how to turn picks into better frontend color systems.">
+    <meta name="keywords" content="HSL color picker, CSS HSL, HSL to HEX, HSL to RGB, frontend color workflow, CSS design tool, HSL generator, design tokens">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#0b1020">
+    <link rel="canonical" href="https://lifa-su.com/ai-css-hsl/">
+    <meta property="og:title" content="HSL Color Picker & CSS Workflow Tool">
+    <meta property="og:description" content="Pick colors with HSL sliders, copy CSS-ready values, and follow a practical workflow for UI, brand, and content design.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lifa-su.com/ai-css-hsl/">
+    <meta property="og:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <meta property="og:image:alt" content="HSL color picker and CSS workflow tool preview">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HSL Color Picker & CSS Workflow Tool">
+    <meta name="twitter:description" content="Use HSL to fine-tune hue, saturation, and lightness, then turn color picks into better CSS variables, palettes, and UI decisions.">
+    <meta name="twitter:image" content="https://lifa-su.com/assets/og-social-post.png">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#0b1020;
+            --bg2:#111931;
+            --surface:rgba(255,255,255,.05);
+            --surface2:rgba(255,255,255,.08);
+            --border:rgba(255,255,255,.12);
+            --text:#e6ecff;
+            --muted:#a4b2d3;
+            --soft:#7f8fb6;
+            --accent:#7c3aed;
+            --accent2:#22d3ee;
+            --accent3:#4ade80;
+            --danger:#fb7185;
+            --shadow:0 24px 60px rgba(0,0,0,.35);
+            --radius:18px;
+            --max:1120px;
+        }
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+            background:radial-gradient(circle at top,rgba(124,58,237,.18),transparent 28%),radial-gradient(circle at 88% 10%,rgba(34,211,238,.12),transparent 22%),linear-gradient(180deg,#0b1020 0%,#0a0f1d 100%);
+            color:var(--text);
+            min-height:100vh;
+            line-height:1.6;
+        }
+        a{color:var(--accent2);text-decoration:none}
+        .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+        .hero{padding:56px 0 28px}
+        .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(124,58,237,.14);border:1px solid rgba(167,139,250,.26);color:#dfd4ff;font-size:.82rem;font-weight:700;letter-spacing:.02em;margin-bottom:16px}
+        h1{font-size:clamp(2rem,4vw,3.3rem);line-height:1.08;color:#fff;margin-bottom:14px}
+        .hero p{max-width:760px;color:var(--muted);font-size:1.02rem}
+        .hero-actions,.cta-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;font-weight:700;transition:transform .18s ease,border-color .18s ease,background .18s ease}
+        .btn:hover{transform:translateY(-1px)}
+        .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 14px 36px rgba(124,58,237,.28)}
+        .btn-secondary{background:rgba(255,255,255,.04);color:var(--text);border:1px solid var(--border)}
+        .hero-points{display:flex;flex-wrap:wrap;gap:10px 16px;color:var(--soft);font-size:.92rem;margin-top:16px}
+        .hero-points span::before{content:'•';color:var(--accent2);margin-right:8px}
+        .tool-shell{padding:0 0 24px}
+        .tool-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.035));border:1px solid var(--border);border-radius:26px;box-shadow:var(--shadow);overflow:hidden}
+        .tool-head{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:22px 24px 0}
+        .tool-head h2{font-size:1.08rem;color:#fff}
+        .tool-head p{max-width:700px;color:var(--muted);font-size:.92rem}
+        .tool-badges{display:flex;flex-wrap:wrap;gap:10px}
+        .tool-badges span{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--soft);font-size:.8rem}
+        .container{width:100%;max-width:520px;margin:0 auto;padding:22px 20px 24px}
+        .preview{width:100%;height:180px;border-radius:16px;margin-bottom:20px;border:2px solid rgba(255,255,255,.1);transition:background-color .1s}
+        .sliders,.hist,.vr{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
+        .sliders{border-radius:16px;padding:20px;margin-bottom:20px}
+        .sg{margin-bottom:16px}.sg:last-child{margin-bottom:0}
+        .sl{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.92rem}
+        .sl span:first-child{font-weight:600}.sl span:last-child{color:#b6c4e7;font-variant-numeric:tabular-nums}
+        input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;outline:none;cursor:pointer}
+        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.3);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+        #hue{background:linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%))}
+        .vals{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+        .vr{display:flex;align-items:center;border-radius:10px;padding:12px 16px;cursor:pointer;transition:background .2s,border-color .2s;user-select:none}
+        .vr:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+        .vr:active{background:rgba(255,255,255,.12)}
+        .vl{font-size:.75rem;font-weight:700;color:#90a2cb;width:42px;flex-shrink:0}
+        .vt{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.95rem;flex:1}
+        .ch{font-size:.72rem;color:#7e8db2;margin-left:8px}
+        .copied{color:var(--accent3)!important}
+        .hist{border-radius:16px;padding:16px}
+        .ht{font-size:.85rem;font-weight:600;color:#b8c7ea;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+        .hc{font-size:.72rem;color:#8090b8;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s,color .2s}
+        .hc:hover{background:rgba(255,255,255,.08);color:#d3ddf8}
+        .hg{display:flex;flex-wrap:wrap;gap:8px}
+        .hi{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:border-color .2s,transform .15s}
+        .hi:hover{border-color:rgba(255,255,255,.4);transform:scale(1.08)}
+        .eh{font-size:.82rem;color:#6d7ca2;text-align:center;padding:10px 0;width:100%}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(74,222,128,.92);color:#04110a;padding:8px 20px;border-radius:20px;font-size:.85rem;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+        .section{margin:20px 0;padding:28px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+        .section h2{font-size:1.5rem;margin-bottom:10px;color:#fff}
+        .section-intro{color:var(--muted);max-width:820px}
+        .grid-2,.grid-3,.steps,.tips,.tool-links,.next-steps{display:grid;gap:16px;margin-top:18px}
+        .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .steps{grid-template-columns:repeat(5,minmax(0,1fr))}
+        .tips{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .tool-links{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .next-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .card,.step,.tip,.faq,.tool-link,.next-step{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px}
+        .card h3,.step h3,.faq h3,.next-step h3{font-size:1rem;margin-bottom:8px;color:#fff}
+        .card p,.card li,.step p,.faq p,.tip span,.tool-link p,.next-step p{color:var(--muted);font-size:.94rem}
+        .card ul{padding-left:18px;margin-top:8px}
+        .step-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:.82rem;font-weight:800;margin-bottom:10px}
+        .tip strong{display:block;color:#fff;margin-bottom:6px}
+        .tool-link{display:flex;flex-direction:column;gap:8px;color:var(--text);transition:transform .18s ease,border-color .18s ease}
+        .tool-link:hover{transform:translateY(-2px);border-color:rgba(34,211,238,.34)}
+        .tool-link small{color:var(--accent2);font-weight:700;letter-spacing:.02em}
+        .faq-list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+        .cta-panel{margin:20px 0 28px;padding:28px;border-radius:24px;border:1px solid rgba(167,139,250,.28);background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(34,211,238,.08))}
+        .cta-panel h2{font-size:1.6rem;margin-bottom:10px}
+        .cta-panel p{max-width:760px;color:#d7e0fb}
+        footer{padding:0 0 42px;color:#7e8db2;font-size:.9rem}
+        footer .footer-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
+        @media(max-width:960px){.grid-3,.tool-links,.next-steps,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:720px){.tool-head{padding:18px 18px 0}.container{padding:18px 16px 20px}.grid-2,.grid-3,.tool-links,.next-steps,.steps,.tips{grid-template-columns:1fr}.section,.cta-panel{padding:22px}.preview{height:152px}}
+        @media(max-width:500px){.hero-actions,.cta-actions{flex-direction:column;align-items:stretch}.btn{width:100%}}
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "HSL Color Picker & CSS Workflow Tool",
+      "url": "https://lifa-su.com/ai-css-hsl/",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "description": "Interactive HSL color picker for frontend workflows. Adjust hue, saturation, and lightness, copy HSL RGB HEX values, and build better CSS color systems.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does HSL mean in CSS?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HSL stands for hue, saturation, and lightness. In CSS it gives you a more intuitive way to tune color families, intensity, and brightness than editing raw hex values by hand."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When should I use HSL instead of HEX?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use HSL when you want to iterate systematically for design systems, theming, UI states, and brand color variations. HEX is still useful for handoff, but HSL is often faster for exploration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use HSL for dark mode design?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. HSL is especially helpful for dark mode because you can keep the same hue family and adjust lightness and saturation to create readable surfaces, accents, hover states, and focus states."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I do after I choose a color?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "After picking a color, turn it into tokens or CSS variables, test contrast, build matching palette variants, and apply it consistently across product UI, landing pages, and content assets."
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
-<h1>&#127912; HSL Color Picker</h1>
-<div class="container">
-<div class="preview" id="preview"></div>
-<div class="sliders">
-<div class="sg"><div class="sl"><span>H (色相)</span><span id="hV">180°</span></div><input type="range" id="hue" min="0" max="360" value="180"></div>
-<div class="sg"><div class="sl"><span>S (饱和度)</span><span id="sV">80%</span></div><input type="range" id="sat" min="0" max="100" value="80"></div>
-<div class="sg"><div class="sl"><span>L (亮度)</span><span id="lV">55%</span></div><input type="range" id="lit" min="0" max="100" value="55"></div>
-</div>
-<div class="vals">
-<div class="vr" onclick="cp('hsl')"><span class="vl">HSL</span><span class="vt" id="oH"></span><span class="ch" id="cH">点击复制</span></div>
-<div class="vr" onclick="cp('rgb')"><span class="vl">RGB</span><span class="vt" id="oR"></span><span class="ch" id="cR">点击复制</span></div>
-<div class="vr" onclick="cp('hex')"><span class="vl">HEX</span><span class="vt" id="oX"></span><span class="ch" id="cX">点击复制</span></div>
-</div>
-<div class="hist">
-<div class="ht"><span>历史记录</span><span class="hc" onclick="clrH()">清空</span></div>
-<div class="hg" id="hGrid"><div class="eh">暂无历史颜色</div></div>
-</div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-var E=function(id){return document.getElementById(id)};
-var hueR=E('hue'),satR=E('sat'),litR=E('lit'),prev=E('preview');
-var hist=JSON.parse(localStorage.getItem('hsl-hist')||'[]');
-var stm;
-function h2r(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);function f(n){var k=(n+h/30)%12;return l-a*Math.max(Math.min(k-3,9-k,1),-1)}return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)]}
-function r2h(r,g,b){return'#'+[r,g,b].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
-function upd(){
-var h=+hueR.value,s=+satR.value,l=+litR.value;
-prev.style.backgroundColor='hsl('+h+','+s+'%,'+l+'%)';
-E('hV').textContent=h+'°';E('sV').textContent=s+'%';E('lV').textContent=l+'%';
-satR.style.background='linear-gradient(to right,hsl('+h+',0%,'+l+'%),hsl('+h+',100%,'+l+'%))';
-litR.style.background='linear-gradient(to right,hsl('+h+','+s+'%,0%),hsl('+h+','+s+'%,50%),hsl('+h+','+s+'%,100%))';
-var rgb=h2r(h,s,l),hex=r2h(rgb[0],rgb[1],rgb[2]);
-E('oH').textContent='hsl('+h+', '+s+'%, '+l+'%)';
-E('oR').textContent='rgb('+rgb[0]+', '+rgb[1]+', '+rgb[2]+')';
-E('oX').textContent=hex;
-clearTimeout(stm);stm=setTimeout(function(){addH(h,s,l,hex)},800);
-}
-function addH(h,s,l,hex){
-var key=h+','+s+','+l;
-hist=hist.filter(function(c){return c.k!==key});
-hist.unshift({k:key,h:h,s:s,l:l,hex:hex});
-if(hist.length>20)hist=hist.slice(0,20);
-localStorage.setItem('hsl-hist',JSON.stringify(hist));
-renH();
-}
-function renH(){
-var g=E('hGrid');
-if(!hist.length){g.innerHTML='<div class="eh">暂无历史颜色</div>';return}
-g.innerHTML='';
-hist.forEach(function(c){
-var d=document.createElement('div');d.className='hi';
-d.style.backgroundColor=c.hex;d.title=c.hex;
-d.onclick=function(){hueR.value=c.h;satR.value=c.s;litR.value=c.l;upd()};
-g.appendChild(d);
-});
-}
-function cp(t){
-var txt=t==='hsl'?E('oH').textContent:t==='rgb'?E('oR').textContent:E('oX').textContent;
-var hid=t==='hsl'?'cH':t==='rgb'?'cR':'cX';
-navigator.clipboard.writeText(txt).then(function(){toast('已复制 '+txt);var el=E(hid);el.textContent='已复制!';el.classList.add('copied');setTimeout(function(){el.textContent='点击复制';el.classList.remove('copied')},1500)});
-}
-function clrH(){hist=[];localStorage.removeItem('hsl-hist');renH()}
-function toast(m){var t=E('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
-hueR.addEventListener('input',upd);satR.addEventListener('input',upd);litR.addEventListener('input',upd);
-upd();renH();
-</script>
-<script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
-<script defer src="/_vercel/insights/script.js"></script>
-<script defer src="/_vercel/speed-insights/script.js"></script>
+    <div class="wrap">
+        <section class="hero">
+            <div class="eyebrow">🎨 Interactive CSS color workflow</div>
+            <h1>HSL Color Picker for faster frontend color decisions</h1>
+            <p>Use hue, saturation, and lightness sliders to explore colors with more control than random hex tweaking. Copy HSL, RGB, and HEX instantly, save color history, and follow the workflow below to turn a quick pick into a usable UI system.</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+                <a class="btn btn-secondary" href="#picker">Jump to the HSL picker</a>
+            </div>
+            <div class="hero-points">
+                <span>Copy CSS-ready values</span>
+                <span>Save recent color history</span>
+                <span>Better for palettes and dark mode</span>
+                <span>Works for UI, brand, and content design</span>
+            </div>
+        </section>
+
+        <section class="tool-shell" id="picker">
+            <div class="tool-card">
+                <div class="tool-head">
+                    <div>
+                        <h2>🎛️ Interactive HSL picker</h2>
+                        <p>Keep the original fast slider workflow: adjust a base hue, dial saturation up or down, and fine-tune lightness until the preview feels right. Then click any output row to copy it.</p>
+                    </div>
+                    <div class="tool-badges">
+                        <span>HSL → RGB → HEX</span>
+                        <span>Local history</span>
+                        <span>Dark-mode friendly</span>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="preview" id="preview"></div>
+                    <div class="sliders">
+                        <div class="sg"><div class="sl"><span>H (Hue)</span><span id="hV">180°</span></div><input type="range" id="hue" min="0" max="360" value="180"></div>
+                        <div class="sg"><div class="sl"><span>S (Saturation)</span><span id="sV">80%</span></div><input type="range" id="sat" min="0" max="100" value="80"></div>
+                        <div class="sg"><div class="sl"><span>L (Lightness)</span><span id="lV">55%</span></div><input type="range" id="lit" min="0" max="100" value="55"></div>
+                    </div>
+                    <div class="vals">
+                        <div class="vr" onclick="cp('hsl')"><span class="vl">HSL</span><span class="vt" id="oH"></span><span class="ch" id="cH">Click to copy</span></div>
+                        <div class="vr" onclick="cp('rgb')"><span class="vl">RGB</span><span class="vt" id="oR"></span><span class="ch" id="cR">Click to copy</span></div>
+                        <div class="vr" onclick="cp('hex')"><span class="vl">HEX</span><span class="vt" id="oX"></span><span class="ch" id="cX">Click to copy</span></div>
+                    </div>
+                    <div class="hist">
+                        <div class="ht"><span>Recent colors</span><span class="hc" onclick="clrH()">Clear</span></div>
+                        <div class="hg" id="hGrid"><div class="eh">No saved colors yet</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Use cases for HSL in real frontend work</h2>
+            <p class="section-intro">Thin tool pages usually stop at the widget. This one should help people finish the job. These are the common cases where HSL is more practical than guessing hex codes one by one.</p>
+            <div class="grid-3">
+                <div class="card">
+                    <h3>UI theming</h3>
+                    <p>Keep one hue family and create hover, active, muted, and surface variants by changing lightness and saturation instead of rebuilding colors from scratch.</p>
+                </div>
+                <div class="card">
+                    <h3>Dark mode systems</h3>
+                    <p>Lower lightness and moderate saturation to keep accents vibrant without blowing out contrast on deep backgrounds.</p>
+                </div>
+                <div class="card">
+                    <h3>Design tokens</h3>
+                    <p>Turn a chosen color into CSS variables for buttons, links, borders, badges, chart accents, and marketing callouts.</p>
+                </div>
+                <div class="card">
+                    <h3>Landing page polish</h3>
+                    <p>Test multiple headline highlight colors, CTA button states, and card backgrounds quickly before locking the page style.</p>
+                </div>
+                <div class="card">
+                    <h3>Content graphics</h3>
+                    <p>Match social visuals, blog covers, and promo banners to your site palette so content and product pages feel connected.</p>
+                </div>
+                <div class="card">
+                    <h3>Rapid experimentation</h3>
+                    <p>When a page feels flat or noisy, HSL lets you systematically tune intensity and brightness instead of random trial-and-error.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>HSL color workflow: from one pick to a usable system</h2>
+            <p class="section-intro">A picker is useful. A workflow is what makes it convert into actual work. This sequence is simple enough for solo builders and precise enough for frontend teams.</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Start with hue</h3>
+                    <p>Choose the base family first: blue for trust, green for success, purple for creative tools, red for urgency, and so on.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>Set intensity</h3>
+                    <p>Adjust saturation to decide whether the color should feel muted, premium, energetic, or playful.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Tune brightness</h3>
+                    <p>Move lightness until the color works on your current background, especially for buttons, highlights, and labels.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <h3>Create states</h3>
+                    <p>Derive hover, active, surface, and border variants by changing lightness in small increments instead of picking unrelated colors.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">5</div>
+                    <h3>Ship as variables</h3>
+                    <p>Store the final values as CSS variables or tokens so product UI, blog assets, and landing pages stay visually consistent.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Best practices for better HSL output</h2>
+            <p class="section-intro">A few small rules prevent most color mistakes. These matter more than endlessly generating extra shades.</p>
+            <div class="tips">
+                <div class="tip"><strong>Do not max out saturation by default</strong><span>Very high saturation often looks cheap or harsh on dark backgrounds. Try reducing saturation before changing hue.</span></div>
+                <div class="tip"><strong>Use lightness for state changes</strong><span>Hover and active states usually feel more coherent when they stay in the same hue family and shift brightness slightly.</span></div>
+                <div class="tip"><strong>Check readability early</strong><span>A color that looks great in a swatch can still fail on text, borders, or tiny icons. Test it in real UI components.</span></div>
+                <div class="tip"><strong>Build a role-based palette</strong><span>Pick colors for primary, secondary, success, warning, danger, and neutral roles instead of collecting disconnected pretty colors.</span></div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Quick starter ranges</h3>
+                    <ul>
+                        <li><strong>Accent buttons:</strong> 60–85% saturation, 45–60% lightness</li>
+                        <li><strong>Soft surfaces:</strong> 20–45% saturation, 14–24% lightness in dark mode</li>
+                        <li><strong>Borders:</strong> keep saturation lower and contrast subtle</li>
+                        <li><strong>Text highlights:</strong> prefer readable mid-to-high lightness over neon extremes</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Why HSL helps</h3>
+                    <p>HEX is compact, but it hides the logic behind the color. HSL exposes the logic directly, so you can answer questions like “same color, but calmer” or “same hue, but lighter for dark mode” without starting over.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-panel">
+            <h2>Need the same consistency in your content funnel?</h2>
+            <p>Color decisions matter, but messaging and assets convert the click. If you are building landing pages, promo graphics, social posts, or launch content, the fastest next step is the <strong>Content Creator Toolkit</strong>—so your design and copy feel like one system instead of disconnected pieces.</p>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/content-creator-toolkit.html">Go to Content Creator Toolkit</a>
+                <a class="btn btn-secondary" href="/ai-css-variable/">Pair this with CSS Variable Manager</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>FAQ</h2>
+            <p class="section-intro">Short answers to the questions people usually have right after using an HSL picker.</p>
+            <div class="faq-list">
+                <div class="faq">
+                    <h3>What is the difference between HSL and RGB?</h3>
+                    <p>RGB describes a color by red, green, and blue channel values. HSL describes the same color space in a way humans can tweak more intuitively: hue for family, saturation for intensity, and lightness for brightness.</p>
+                </div>
+                <div class="faq">
+                    <h3>Is HSL good for CSS variables and design tokens?</h3>
+                    <p>Yes. It is especially useful when you want a family of related states or theme variants because you can keep hue stable and adjust saturation or lightness deliberately.</p>
+                </div>
+                <div class="faq">
+                    <h3>Should I still keep HEX values?</h3>
+                    <p>Usually yes. Teams often explore in HSL, then keep both HSL and HEX available for documentation, design handoff, or integrations that expect hex.</p>
+                </div>
+                <div class="faq">
+                    <h3>Why does a color look different on cards, text, and buttons?</h3>
+                    <p>Because context changes perception. The same hue behaves differently depending on surrounding contrast, size, weight, and background. Always test colors in real components, not just in isolation.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Related tools for CSS and design workflows</h2>
+            <p class="section-intro">Once the base color is chosen, these related pages help turn it into a more complete UI system.</p>
+            <div class="tool-links">
+                <a class="tool-link" href="/ai-css-variable/">
+                    <small>Design tokens</small>
+                    <strong>AI CSS Variable Manager</strong>
+                    <p>Turn selected colors into reusable CSS custom properties for themes and components.</p>
+                </a>
+                <a class="tool-link" href="/ai-color-palette/">
+                    <small>Palette building</small>
+                    <strong>AI Color Palette Generator</strong>
+                    <p>Expand one HSL direction into matching brand, UI, or content palette options.</p>
+                </a>
+                <a class="tool-link" href="/ai-color-contrast/">
+                    <small>Accessibility</small>
+                    <strong>AI Color Contrast Checker</strong>
+                    <p>Verify whether your chosen combinations stay readable in real interfaces.</p>
+                </a>
+                <a class="tool-link" href="/ai-gradient-generator/">
+                    <small>Visual polish</small>
+                    <strong>AI Gradient Generator</strong>
+                    <p>Use your chosen hue family to build hero backgrounds, badges, and CTA treatments.</p>
+                </a>
+                <a class="tool-link" href="/ai-css-gradient-text/">
+                    <small>Headline styling</small>
+                    <strong>AI CSS Gradient Text</strong>
+                    <p>Apply your palette to strong headline highlights without hand-writing gradient syntax.</p>
+                </a>
+                <a class="tool-link" href="/content-creator-toolkit.html">
+                    <small>Conversion support</small>
+                    <strong>Content Creator Toolkit</strong>
+                    <p>Match your design choices with faster landing page copy, promo content, and launch assets.</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Next steps</h2>
+            <p class="section-intro">If you already found a promising color, do not stop at the swatch. Use this simple rollout checklist.</p>
+            <div class="next-steps">
+                <div class="next-step">
+                    <h3>1. Save the core value</h3>
+                    <p>Copy HSL and HEX, then document which role it serves: primary, accent, success, warning, or decorative.</p>
+                </div>
+                <div class="next-step">
+                    <h3>2. Create UI states</h3>
+                    <p>Make hover, active, muted, and border variants by adjusting lightness and saturation in controlled increments.</p>
+                </div>
+                <div class="next-step">
+                    <h3>3. Test in context</h3>
+                    <p>Apply the color to buttons, headings, cards, and promo blocks on your actual page before you finalize it.</p>
+                </div>
+                <div class="next-step">
+                    <h3>4. Connect design and copy</h3>
+                    <p>Use the same visual direction across your landing page, content assets, and funnel messaging for stronger conversion consistency.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-panel">
+            <h2>Design looks cleaner when the content around it is sharper too</h2>
+            <p>You already have the color tool. The higher-leverage next move is improving the pages and assets that use those colors. Start with the toolkit built for landing pages, social posts, email, and creator workflows.</p>
+            <div class="cta-actions">
+                <a class="btn btn-primary" href="/content-creator-toolkit.html">Start with Content Creator Toolkit</a>
+                <a class="btn btn-secondary" href="/ai-color-palette/">Explore more color tools</a>
+            </div>
+        </section>
+
+        <footer>
+            <div>AI CSS HSL — interactive color picker plus practical frontend workflow guidance.</div>
+            <div class="footer-links">
+                <a href="/ai-css-variable/">CSS Variable Manager</a>
+                <a href="/ai-color-palette/">Color Palette Generator</a>
+                <a href="/ai-color-contrast/">Color Contrast Checker</a>
+                <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+            </div>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+    var E=function(id){return document.getElementById(id)};
+    var hueR=E('hue'),satR=E('sat'),litR=E('lit'),prev=E('preview');
+    var hist=JSON.parse(localStorage.getItem('hsl-hist')||'[]');
+    var stm;
+    function h2r(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);function f(n){var k=(n+h/30)%12;return l-a*Math.max(Math.min(k-3,9-k,1),-1)}return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)]}
+    function r2h(r,g,b){return'#'+[r,g,b].map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+    function upd(){
+    var h=+hueR.value,s=+satR.value,l=+litR.value;
+    prev.style.backgroundColor='hsl('+h+','+s+'%,'+l+'%)';
+    E('hV').textContent=h+'°';E('sV').textContent=s+'%';E('lV').textContent=l+'%';
+    satR.style.background='linear-gradient(to right,hsl('+h+',0%,'+l+'%),hsl('+h+',100%,'+l+'%))';
+    litR.style.background='linear-gradient(to right,hsl('+h+','+s+'%,0%),hsl('+h+','+s+'%,50%),hsl('+h+','+s+'%,100%))';
+    var rgb=h2r(h,s,l),hex=r2h(rgb[0],rgb[1],rgb[2]);
+    E('oH').textContent='hsl('+h+', '+s+'%, '+l+'%)';
+    E('oR').textContent='rgb('+rgb[0]+', '+rgb[1]+', '+rgb[2]+')';
+    E('oX').textContent=hex;
+    clearTimeout(stm);stm=setTimeout(function(){addH(h,s,l,hex)},800);
+    }
+    function addH(h,s,l,hex){
+    var key=h+','+s+','+l;
+    hist=hist.filter(function(c){return c.k!==key});
+    hist.unshift({k:key,h:h,s:s,l:l,hex:hex});
+    if(hist.length>20)hist=hist.slice(0,20);
+    localStorage.setItem('hsl-hist',JSON.stringify(hist));
+    renH();
+    }
+    function renH(){
+    var g=E('hGrid');
+    if(!hist.length){g.innerHTML='<div class="eh">No saved colors yet</div>';return}
+    g.innerHTML='';
+    hist.forEach(function(c){
+    var d=document.createElement('div');d.className='hi';
+    d.style.backgroundColor=c.hex;d.title=c.hex;
+    d.onclick=function(){hueR.value=c.h;satR.value=c.s;litR.value=c.l;upd()};
+    g.appendChild(d);
+    });
+    }
+    function cp(t){
+    var txt=t==='hsl'?E('oH').textContent:t==='rgb'?E('oR').textContent:E('oX').textContent;
+    var hid=t==='hsl'?'cH':t==='rgb'?'cR':'cX';
+    navigator.clipboard.writeText(txt).then(function(){toast('Copied '+txt);var el=E(hid);el.textContent='Copied!';el.classList.add('copied');setTimeout(function(){el.textContent='Click to copy';el.classList.remove('copied')},1500)});
+    }
+    function clrH(){hist=[];localStorage.removeItem('hsl-hist');renH()}
+    function toast(m){var t=E('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000)}
+    hueR.addEventListener('input',upd);satR.addEventListener('input',upd);litR.addEventListener('input',upd);
+    upd();renH();
+    </script>
+    <script src="https://alwingulla.com/88/tag.min.js" data-zone="130647" async data-cfasync="false"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
 </body>
 </html>
