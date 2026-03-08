@@ -1,155 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CSS Object Position Generator</title>
-<meta name="description" content="Visual CSS object-position generator with 9-grid quick select, custom sliders, object-fit preview, and one-click code copy.">
+<title>CSS Object Position Generator — Visual object-position tool for responsive images</title>
+<meta name="description" content="Free CSS object-position generator with 9-grid presets, X/Y sliders, live preview, object-fit controls, and one-click code copy. Use it to fine-tune image crops for cards, hero sections, thumbnails, and video covers.">
+<meta name="keywords" content="css object-position generator, object-position tool, css image crop, object-position preview, object-fit object-position, responsive image crop css, css focal point tool">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0d1020">
 <link rel="canonical" href="https://lifa-su.com/ai-css-object-position/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CSS Object Position Generator — Visual object-position tool for responsive images">
+<meta property="og:description" content="Adjust image focal points visually with 9-grid presets, sliders, live preview, and instant CSS copy for object-position and object-fit.">
+<meta property="og:url" content="https://lifa-su.com/ai-css-object-position/">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta property="og:image" content="https://lifa-su.com/apple-touch-icon.png">
+<meta property="og:image:alt" content="CSS object-position generator by Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CSS Object Position Generator — Visual object-position tool for responsive images">
+<meta name="twitter:description" content="A free visual CSS object-position playground for developers, designers, and creators who need cleaner responsive image crops.">
+<meta name="twitter:image" content="https://lifa-su.com/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CSS Object Position Generator",
+  "url": "https://lifa-su.com/ai-css-object-position/",
+  "description": "Free visual tool to adjust CSS object-position, preview focal points, pair it with object-fit, and copy production-ready CSS.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "FeiDev"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does object-position do in CSS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CSS object-position controls which part of an image or video stays aligned inside its container. It is usually paired with object-fit, especially when cover crops part of the media."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between object-fit and object-position?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "object-fit controls how the media scales inside the box, while object-position controls the focal point or alignment of that media inside the same box."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use object-position?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use object-position when the container size is fixed or responsive and you need to decide which part of the image remains visible, such as faces in profile photos, products in cards, or subjects in hero banners."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use object-position without object-fit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, but object-position becomes most useful when paired with object-fit cover, contain, none, or scale-down, because that is when alignment and cropping behavior matter most."
+      }
+    }
+  ]
+}
+</script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#1a1a2e;--surface:#16213e;--surface2:#0f3460;--accent:#e94560;--accent2:#533483;--text:#eee;--text2:#aab;--radius:10px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
-a{color:var(--accent)}
-
-.container{max-width:1100px;margin:0 auto;padding:24px 16px}
-
-header{text-align:center;padding:32px 0 24px}
-header h1{font-size:1.8rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-header p{color:var(--text2);margin-top:6px;font-size:.95rem}
-
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1020;--bg2:#121833;--surface:#16213e;--surface2:#1b2749;--surface3:#0f3460;--accent:#e94560;--accent2:#ff7a90;--text:#eee;--text2:#aab1c7;--border:#293556;--ok:#2ea043;--radius:14px;--shadow:0 10px 30px rgba(0,0,0,.25)}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(circle at top,rgba(233,69,96,.08),transparent 28%),radial-gradient(circle at right top,rgba(15,52,96,.25),transparent 30%),var(--bg);color:var(--text);min-height:100vh;line-height:1.6;padding:20px}
+a{color:#9ecbff;text-decoration:none}
+a:hover{color:#fff}
+code{font-family:'SF Mono',Consolas,monospace}
+.wrap{max-width:1120px;margin:0 auto}
+.hero{padding:26px 0 24px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.25);color:#ffb7c2;border-radius:999px;padding:7px 14px;font-size:.76rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(2rem,4.8vw,3.4rem);line-height:1.08;margin-bottom:14px;background:linear-gradient(135deg,#fff,#f7a6b4 42%,#7bb7ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .sub{max-width:860px;margin:0 auto 22px;color:var(--text2);font-size:1.02rem}
+.hero-cta{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;border:1px solid transparent;font-weight:700;cursor:pointer;transition:.2s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 10px 24px rgba(233,69,96,.22)}
+.btn-primary:hover{transform:translateY(-1px);color:#fff}
+.btn-secondary{background:rgba(255,255,255,.03);border-color:var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--accent);color:#fff}
+.hero-points{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.hero-point{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 12px}
+.hero-point strong{display:block;font-size:1rem;color:#fff}
+.hero-point span{display:block;font-size:.8rem;color:var(--text2);margin-top:2px}
+.section{margin-top:26px}
+.section-head{margin-bottom:16px}
+.section-head h2{font-size:1.5rem;margin-bottom:6px}
+.section-head p{color:var(--text2);max-width:780px}
+.tool-shell,.panel,.use-card,.rel-card,.step-card,.cta-card,.faq-item,.best-card,.mini-card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.015));border:1px solid var(--border);box-shadow:var(--shadow)}
+.tool-shell{border-radius:20px;padding:20px}
+.panel,.use-card,.rel-card,.step-card,.cta-card,.faq-item,.best-card,.mini-card{border-radius:18px;padding:20px}
+.tool-topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.tool-topbar h2{font-size:1.1rem}
+.tool-topbar p{font-size:.9rem;color:var(--text2)}
 .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
-
-/* Controls Panel */
-.panel{background:var(--surface);border-radius:var(--radius);padding:24px;border:1px solid rgba(255,255,255,.06)}
-.panel h2{font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-size:.8rem}
-
-/* 9-Grid */
+.panel h3,.panel h2{font-size:1.02rem;font-weight:700;margin-bottom:12px;color:#fff}
+.tool-panel-title{font-size:.8rem;font-weight:700;margin-bottom:16px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
 .grid-9{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:24px}
-.grid-9 button{background:var(--surface2);border:2px solid transparent;border-radius:6px;color:var(--text);padding:10px 4px;font-size:.75rem;cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap}
+.grid-9 button{background:var(--surface3);border:2px solid transparent;border-radius:8px;color:var(--text);padding:10px 4px;font-size:.75rem;cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap}
 .grid-9 button:hover{border-color:var(--accent);background:rgba(233,69,96,.1)}
 .grid-9 button.active{border-color:var(--accent);background:rgba(233,69,96,.2);font-weight:600}
-
-/* Sliders */
 .slider-group{margin-bottom:20px}
 .slider-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:.85rem}
 .slider-label span:last-child{color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
-input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--surface2);outline:none}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:3px;background:var(--surface3);outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 8px rgba(233,69,96,.4)}
 input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:none}
-
-/* Object-fit selector */
-.fit-options{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px}
-.fit-options button{background:var(--surface2);border:2px solid transparent;border-radius:6px;color:var(--text);padding:7px 14px;font-size:.8rem;cursor:pointer;transition:all .2s}
-.fit-options button:hover{border-color:var(--accent2)}
+.fit-options{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.fit-options button{background:var(--surface3);border:2px solid transparent;border-radius:8px;color:var(--text);padding:7px 14px;font-size:.8rem;cursor:pointer;transition:all .2s}
+.fit-options button:hover{border-color:#7bb7ff}
 .fit-options button.active{border-color:var(--accent);background:rgba(233,69,96,.15);font-weight:600}
-
-/* Code output */
-.code-block{background:#0d1117;border-radius:8px;padding:16px;font-family:'SF Mono',Consolas,monospace;font-size:.85rem;position:relative;border:1px solid rgba(255,255,255,.06);margin-top:8px}
+.code-block{background:#0d1117;border-radius:12px;padding:16px;font-family:'SF Mono',Consolas,monospace;font-size:.85rem;position:relative;border:1px solid rgba(255,255,255,.06);margin-top:8px}
 .code-block code{color:#c9d1d9;white-space:pre;display:block;line-height:1.7}
 .code-block .prop{color:#79c0ff}
 .code-block .val{color:#a5d6ff}
 .code-block .punct{color:#8b949e}
 .copy-btn{position:absolute;top:10px;right:10px;background:var(--accent);border:none;color:#fff;padding:6px 14px;border-radius:6px;font-size:.75rem;cursor:pointer;transition:all .2s;font-weight:600}
 .copy-btn:hover{opacity:.85;transform:scale(1.03)}
-.copy-btn.copied{background:#2ea043}
-
-/* Preview Panel */
-.preview-area{position:relative;width:100%;aspect-ratio:4/3;background:repeating-conic-gradient(rgba(255,255,255,.03) 0% 25%,transparent 0% 50%) 0 0/20px 20px;border-radius:8px;overflow:hidden;border:2px dashed rgba(255,255,255,.1)}
+.copy-btn.copied{background:var(--ok)}
+.preview-area{position:relative;width:100%;aspect-ratio:4/3;background:repeating-conic-gradient(rgba(255,255,255,.03) 0% 25%,transparent 0% 50%) 0 0/20px 20px;border-radius:12px;overflow:hidden;border:2px dashed rgba(255,255,255,.1)}
 .preview-area img{width:100%;height:100%;display:block}
 .crosshair{position:absolute;pointer-events:none;z-index:2}
-.crosshair .h,.crosshair .v{position:absolute;background:var(--accent);opacity:.5}
+.crosshair .h,.crosshair .v{position:absolute;background:var(--accent);opacity:.55}
 .crosshair .h{height:1px;width:100%;left:0}
 .crosshair .v{width:1px;height:100%;top:0}
 .pos-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(233,69,96,.3);pointer-events:none;z-index:3}
-
-.upload-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text2);font-size:.85rem;gap:8px;cursor:pointer;transition:background .2s}
+.upload-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text2);font-size:.9rem;gap:8px;cursor:pointer;transition:background .2s}
 .upload-hint:hover{background:rgba(233,69,96,.05)}
-.upload-hint svg{opacity:.4}
+.upload-hint svg{opacity:.45}
 .upload-hint.hidden{display:none}
-
-.image-actions{display:flex;gap:8px;margin-top:10px}
-.image-actions button{background:var(--surface2);border:1px solid rgba(255,255,255,.08);color:var(--text2);padding:6px 14px;border-radius:6px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.image-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.image-actions button{background:var(--surface3);border:1px solid rgba(255,255,255,.08);color:var(--text2);padding:8px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:all .2s}
 .image-actions button:hover{border-color:var(--accent);color:var(--text)}
-
-/* Responsive */
-@media(max-width:720px){
-  .main-grid{grid-template-columns:1fr}
-  header h1{font-size:1.4rem}
-}
-
-footer{text-align:center;padding:32px 0 16px;color:var(--text2);font-size:.78rem}
+.content-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+.stack{display:grid;gap:18px}
+.bullets{display:grid;gap:10px;margin-top:12px}
+.bullets li{list-style:none;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 14px;color:var(--text2)}
+.bullets li strong{color:#fff}
+.use-grid,.related-grid,.step-grid,.faq-grid,.next-steps,.best-grid{display:grid;gap:16px}
+.use-grid{grid-template-columns:repeat(2,1fr)}
+.step-grid{grid-template-columns:repeat(4,1fr)}
+.related-grid{grid-template-columns:repeat(3,1fr)}
+.next-steps{grid-template-columns:repeat(3,1fr)}
+.best-grid{grid-template-columns:repeat(2,1fr)}
+.use-card h3,.rel-card h3,.step-card h3,.cta-card h3,.faq-item h3,.best-card h3,.mini-card h3{margin-bottom:8px;font-size:1.02rem}
+.use-card p,.rel-card p,.step-card p,.cta-card p,.faq-item p,.best-card p,.mini-card p,.panel p{color:var(--text2);font-size:.92rem}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:999px;background:rgba(233,69,96,.14);color:#ffb7c2;font-weight:800;margin-bottom:12px;border:1px solid rgba(233,69,96,.25)}
+.rel-card a{display:inline-flex;margin-top:12px;font-weight:700}
+.cta-band{margin-top:26px;background:linear-gradient(135deg,rgba(233,69,96,.16),rgba(15,52,96,.35));border:1px solid rgba(233,69,96,.22);border-radius:22px;padding:28px}
+.cta-band-inner{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center}
+.cta-list{display:grid;gap:8px;margin-top:14px;color:var(--text2)}
+.cta-list li{list-style:none}
+footer{text-align:center;color:var(--text2);font-size:.76rem;margin-top:34px;padding:18px 10px 8px;border-top:1px solid rgba(255,255,255,.06)}
+footer nav{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:8px}
+@media(max-width:980px){.main-grid,.content-grid,.cta-band-inner{grid-template-columns:1fr}.step-grid,.related-grid,.next-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.hero-points,.use-grid,.best-grid,.step-grid,.related-grid,.faq-grid,.next-steps{grid-template-columns:1fr}body{padding:14px}.hero{padding-top:10px}}
 </style>
 </head>
 <body>
-
-<div class="container">
-  <header>
-    <h1>CSS Object Position Generator</h1>
-    <p>Visually adjust object-position with live preview and instant code output</p>
-  </header>
-
-  <div class="main-grid">
-    <!-- Left: Controls -->
-    <div>
-      <div class="panel">
-        <h2>Quick Position (9-Grid)</h2>
-        <div class="grid-9" id="grid9"></div>
-
-        <h2>Custom Position</h2>
-        <div class="slider-group">
-          <div class="slider-label"><span>X (Horizontal)</span><span id="xVal">50%</span></div>
-          <input type="range" id="sliderX" min="0" max="100" value="50">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>Y (Vertical)</span><span id="yVal">50%</span></div>
-          <input type="range" id="sliderY" min="0" max="100" value="50">
-        </div>
-
-        <h2>Object Fit</h2>
-        <div class="fit-options" id="fitOptions"></div>
-      </div>
-
-      <div class="panel" style="margin-top:16px">
-        <h2>Generated CSS</h2>
-        <div class="code-block" id="codeBlock">
-          <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
-          <code id="codeOutput"></code>
-        </div>
-      </div>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Visual CSS focal point control</div>
+    <h1>Set the right crop focus with a visual CSS <code>object-position</code> generator</h1>
+    <p class="sub">Use 9-grid presets, fine-tune X and Y sliders, preview how <code>object-position</code> works with <code>object-fit</code>, and copy clean CSS for product cards, hero banners, profile images, blog covers, and video thumbnails.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+      <a class="btn btn-secondary" href="#tool">Open the object-position tool</a>
     </div>
+    <div class="hero-points">
+      <div class="hero-point"><strong>9 presets</strong><span>Top, center, bottom, corners</span></div>
+      <div class="hero-point"><strong>Live preview</strong><span>See crop focus before shipping</span></div>
+      <div class="hero-point"><strong>Object-fit ready</strong><span>Test with cover, contain, fill</span></div>
+      <div class="hero-point"><strong>Copy CSS</strong><span>Production-friendly output</span></div>
+    </div>
+  </section>
 
-    <!-- Right: Preview -->
-    <div>
-      <div class="panel">
-        <h2>Live Preview</h2>
-        <div class="preview-area" id="previewArea">
-          <img id="previewImg" src="" alt="Preview">
-          <div class="crosshair" id="crosshair">
-            <div class="h"></div>
-            <div class="v"></div>
+  <section class="section" id="tool">
+    <div class="tool-shell">
+      <div class="tool-topbar">
+        <div>
+          <h2>CSS Object Position Generator</h2>
+          <p>Upload an image, move the focal point visually, pair it with the right <code>object-fit</code> mode, and copy the CSS when the crop looks right.</p>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div>
+          <div class="panel">
+            <div class="tool-panel-title">Quick Position (9-Grid)</div>
+            <div class="grid-9" id="grid9"></div>
+
+            <div class="tool-panel-title">Custom Position</div>
+            <div class="slider-group">
+              <div class="slider-label"><span>X (Horizontal)</span><span id="xVal">50%</span></div>
+              <input type="range" id="sliderX" min="0" max="100" value="50">
+            </div>
+            <div class="slider-group">
+              <div class="slider-label"><span>Y (Vertical)</span><span id="yVal">50%</span></div>
+              <input type="range" id="sliderY" min="0" max="100" value="50">
+            </div>
+
+            <div class="tool-panel-title">Object Fit</div>
+            <div class="fit-options" id="fitOptions"></div>
           </div>
-          <div class="pos-dot" id="posDot"></div>
-          <label class="upload-hint" id="uploadHint" for="fileInput">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Click or drop an image to preview
-          </label>
-          <input type="file" id="fileInput" accept="image/*" hidden>
+
+          <div class="panel" style="margin-top:16px">
+            <div class="tool-panel-title">Generated CSS</div>
+            <div class="code-block" id="codeBlock">
+              <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy</button>
+              <code id="codeOutput"></code>
+            </div>
+          </div>
         </div>
-        <div class="image-actions">
-          <button onclick="useDefaultImage()">Use Sample Image</button>
-          <button onclick="document.getElementById('fileInput').click()">Upload Image</button>
-          <button onclick="resetImage()">Reset</button>
+
+        <div>
+          <div class="panel">
+            <div class="tool-panel-title">Live Preview</div>
+            <div class="preview-area" id="previewArea">
+              <img id="previewImg" src="" alt="CSS object-position preview">
+              <div class="crosshair" id="crosshair">
+                <div class="h"></div>
+                <div class="v"></div>
+              </div>
+              <div class="pos-dot" id="posDot"></div>
+              <label class="upload-hint" id="uploadHint" for="fileInput">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Click or drop an image to preview
+              </label>
+              <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+            <div class="image-actions">
+              <button onclick="useDefaultImage()">Use Sample Image</button>
+              <button onclick="document.getElementById('fileInput').click()">Upload Image</button>
+              <button onclick="resetImage()">Reset</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <footer>&copy; 2026 CSS Object Position Generator</footer>
+  <section class="section content-grid">
+    <div class="stack">
+      <div class="panel">
+        <div class="section-head">
+          <h2>Use cases for <code>object-position</code></h2>
+          <p>This property matters whenever one reusable image box needs to handle many different source images without manual editing every asset.</p>
+        </div>
+        <div class="use-grid">
+          <div class="use-card">
+            <h3>Hero banners and landing pages</h3>
+            <p>Keep the headline subject visible when wide hero sections use <code>object-fit: cover</code> and responsive cropping changes across screen sizes.</p>
+          </div>
+          <div class="use-card">
+            <h3>Product cards and ecommerce grids</h3>
+            <p>Keep the product centered instead of accidentally cropping the label, packaging edge, or feature detail inside fixed image cards.</p>
+          </div>
+          <div class="use-card">
+            <h3>Creator thumbnails and blog covers</h3>
+            <p>Move the focal point toward a face, screenshot region, or text area so the thumbnail still reads clearly in smaller previews.</p>
+          </div>
+          <div class="use-card">
+            <h3>Profile photos, portfolios, and video covers</h3>
+            <p>Align portraits or demo frames inside square, circle, or widescreen containers without opening an editor every time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Object-position workflow</h2>
+          <p>A fast workflow for developers, designers, and content teams who need consistent focal-point control across reusable components.</p>
+        </div>
+        <div class="step-grid">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h3>Upload the real asset</h3>
+            <p>Use the kind of image you expect in production: hero art, product photos, portraits, screenshots, or video posters.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h3>Choose the fit mode</h3>
+            <p>Start with the layout rule first. In most UI blocks that means testing <code>cover</code> before you fine-tune the crop.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h3>Set the focal point</h3>
+            <p>Use the 9-grid or sliders to keep the important subject visible when the container becomes narrower, taller, or both.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <h3>Copy and ship</h3>
+            <p>Paste the CSS into your component, CMS block, design system, Shopify theme, Webflow embed, or no-code custom CSS area.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <h2>Best practices</h2>
+          <p>These habits help you avoid random crops, design drift, and media blocks that look different every time new content gets uploaded.</p>
+        </div>
+        <div class="best-grid">
+          <div class="best-card">
+            <h3>Start with the container, not the image</h3>
+            <p>Define the width, height, or aspect ratio of the UI component first. Then use <code>object-fit</code> and <code>object-position</code> to adapt the asset inside it.</p>
+          </div>
+          <div class="best-card">
+            <h3>Use <code>cover</code> when the box must stay filled</h3>
+            <p>Cards, thumbnails, and banners usually need edge-to-edge coverage. That is when <code>object-position</code> becomes the control that saves the crop.</p>
+          </div>
+          <div class="best-card">
+            <h3>Test mobile crop behavior early</h3>
+            <p>An image that looks perfect on desktop can hide the face, logo, or product detail on narrow screens. Always preview tighter boxes mentally and visually.</p>
+          </div>
+          <div class="best-card">
+            <h3>Keep focal logic consistent across a system</h3>
+            <p>If one card style uses <code>50% 20%</code> for portraits, document that pattern so your team does not keep re-solving the same crop problem.</p>
+          </div>
+          <div class="best-card">
+            <h3>Avoid using it to fix low-quality assets</h3>
+            <p><code>object-position</code> helps alignment, not image quality. Start with clear, well-cropped, reasonably large source files.</p>
+          </div>
+          <div class="best-card">
+            <h3>Pair visual polish with content polish</h3>
+            <p>Once the crop looks right, the next conversion lever is the surrounding content: title, hook, CTA, caption, and supporting copy.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel">
+        <h3>Quick decision guide</h3>
+        <ul class="bullets">
+          <li><strong>Center focus</strong> — use <code>50% 50%</code> for balanced product shots and symmetrical visuals</li>
+          <li><strong>Top focus</strong> — use higher vertical emphasis when faces or logos sit near the top</li>
+          <li><strong>Side focus</strong> — shift left or right when the subject is off-center in the source image</li>
+          <li><strong>Cover + object-position</strong> — best for filled cards and banners</li>
+          <li><strong>Contain + object-position</strong> — useful when alignment matters but full visibility must remain</li>
+        </ul>
+      </div>
+
+      <div class="mini-card">
+        <h3>Why this matters for conversion</h3>
+        <p>Bad crops reduce perceived quality. Better visual focus makes cards easier to scan, banners more readable, and thumbnails more clickable. On content-heavy pages, media alignment quietly affects trust and click-through rate.</p>
+      </div>
+
+      <div class="mini-card">
+        <h3>Next step after fixing the crop</h3>
+        <p>Once the visuals are aligned, the next bottleneck is usually content production: captions, product blurbs, social posts, emails, intros, hooks, and repurposing workflows.</p>
+        <a class="btn btn-primary" style="margin-top:14px" href="/content-creator-toolkit.html">See the Content Creator Toolkit</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel">
+      <div class="section-head">
+        <h2>FAQ</h2>
+        <p>Short answers to the most common CSS <code>object-position</code> questions.</p>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>What does object-position do in CSS?</h3>
+          <p>It controls the alignment or focal point of replaced elements like images and videos inside their container. It becomes especially useful when some part of the media is cropped.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What is the difference between object-fit and object-position?</h3>
+          <p><code>object-fit</code> controls how the asset scales. <code>object-position</code> controls where that scaled asset sits inside the box.</p>
+        </div>
+        <div class="faq-item">
+          <h3>When should I use object-position with cover?</h3>
+          <p>Use it when <code>object-fit: cover</code> fills the box correctly but crops the wrong part of the image, such as cutting off a face or product detail.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can I use object-position on videos?</h3>
+          <p>Yes. It works on replaced elements such as <code>img</code> and <code>video</code>, so it is useful for video posters, previews, and cover-style media components.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Does object-position work on background images?</h3>
+          <p>No. For background images, use properties like <code>background-position</code> and <code>background-size</code> instead.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What values can I use for object-position?</h3>
+          <p>You can use keywords like <code>center</code>, <code>top</code>, and <code>left</code>, or percentages like <code>35% 20%</code> for more precise focal-point control.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel">
+      <div class="section-head">
+        <h2>Related tools</h2>
+        <p>Use these together when you are building cleaner image systems and higher-converting content pages.</p>
+      </div>
+      <div class="related-grid">
+        <div class="rel-card">
+          <h3>CSS Object-Fit Preview Tool</h3>
+          <p>Compare <code>cover</code>, <code>contain</code>, <code>fill</code>, <code>none</code>, and <code>scale-down</code> before choosing the best layout rule.</p>
+          <a href="/ai-css-object-fit/">Open tool →</a>
+        </div>
+        <div class="rel-card">
+          <h3>AI Image Compressor</h3>
+          <p>Compress media before publishing so your cards, thumbnails, and landing pages load faster without avoidable image bloat.</p>
+          <a href="/ai-image-compressor/">Open tool →</a>
+        </div>
+        <div class="rel-card">
+          <h3>Content Creator Toolkit</h3>
+          <p>After your visuals look right, use this to create blog posts, captions, promos, hooks, emails, and repurposed content faster.</p>
+          <a href="/content-creator-toolkit.html">See toolkit →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band section">
+    <div class="cta-band-inner">
+      <div>
+        <div class="section-head" style="margin-bottom:0">
+          <h2>Next steps: turn polished image crops into publish-ready content</h2>
+          <p>You fixed the focal point. Now make the surrounding content convert: stronger headlines, better social captions, cleaner promos, and faster content repurposing.</p>
+        </div>
+        <ul class="cta-list">
+          <li>✓ Use the object-position generator to keep the subject visible</li>
+          <li>✓ Pair it with the right fit mode and lighter assets</li>
+          <li>✓ Use better content workflows to turn visuals into clicks and sales</li>
+        </ul>
+      </div>
+      <div class="cta-card">
+        <h3>Content Creator Toolkit</h3>
+        <p>A practical bundle for creators, marketers, freelancers, and solo builders who want more output without more blank-page time.</p>
+        <div class="next-steps" style="margin:14px 0 18px">
+          <div class="best-card"><h3>Blog drafts</h3><p>Outline and write faster.</p></div>
+          <div class="best-card"><h3>Social posts</h3><p>Turn visuals into hooks.</p></div>
+          <div class="best-card"><h3>Email copy</h3><p>Promote consistently.</p></div>
+        </div>
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Explore the toolkit</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>CSS Object Position Generator</div>
+    <nav>
+      <a href="/ai-css-object-fit/">Object Fit</a>
+      <a href="/ai-image-compressor/">Image Compressor</a>
+      <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+    </nav>
+  </footer>
 </div>
 
 <script>
