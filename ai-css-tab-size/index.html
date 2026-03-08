@@ -1,93 +1,496 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CSS Tab Size 演示 - 可视化 tab-size 属性效果</title>
-<meta name="description" content="交互式CSS tab-size属性演示工具，支持多种编程语言预览，实时调整tab宽度，一键复制CSS代码。">
-<link rel="canonical" href="https://lifa-su.com/ai-css-tab-size/">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a2e;--sf:#16213e;--cd:#0f3460;--ac:#e94560;--a2:#533483;--tx:#eee;--t2:#aab;--bd:#2a2a4e;--r:10px}
-body{font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
-a{color:var(--ac)}
-.ctn{max-width:1100px;margin:0 auto;padding:20px}
-header{text-align:center;padding:40px 20px 30px}
-header h1{font-size:2rem;background:linear-gradient(135deg,var(--ac),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
-header p{color:var(--t2);font-size:.95rem}
-.ctrl{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:24px}
-.ctrl h2{font-size:1rem;color:var(--t2);margin-bottom:16px;font-weight:500}
-.tsz{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
-.tb{padding:10px 22px;border:2px solid var(--bd);border-radius:8px;background:0 0;color:var(--tx);font-size:1rem;cursor:pointer;transition:.2s;font-family:inherit}
-.tb:hover{border-color:var(--ac);color:var(--ac)}
-.tb.on{background:var(--ac);border-color:var(--ac);color:#fff}
-.ci{display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.ci label{color:var(--t2);font-size:.9rem;white-space:nowrap}
-.ci input[type=range]{flex:1;accent-color:var(--ac)}
-.ci .v{background:var(--cd);padding:4px 12px;border-radius:6px;min-width:40px;text-align:center;color:var(--ac)}
-.co{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.co code{color:var(--ac);font-size:.95rem;flex:1}
-.cp{padding:8px 18px;background:var(--ac);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:.85rem;font-family:inherit;transition:.2s;white-space:nowrap}
-.cp:hover{opacity:.85}.cp.ok{background:#2ecc71}
-.lt{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.lb{padding:6px 16px;border:1px solid var(--bd);border-radius:6px;background:0 0;color:var(--t2);cursor:pointer;font-size:.85rem;font-family:inherit;transition:.2s}
-.lb:hover{color:var(--tx);border-color:var(--a2)}
-.lb.on{background:var(--a2);border-color:var(--a2);color:#fff}
-.ps{margin-bottom:24px}
-.ps h2{font-size:1rem;color:var(--t2);margin-bottom:12px;font-weight:500}
-.cpv{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.ch{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
-.ch span{font-size:.8rem;color:var(--t2)}
-.dt{display:flex;gap:6px}
-.dt i{width:10px;height:10px;border-radius:50%;display:block}
-.dt i:nth-child(1){background:#ff5f57}.dt i:nth-child(2){background:#febc2e}.dt i:nth-child(3){background:#28c840}
-pre.cb{padding:20px;overflow-x:auto;font-size:.9rem;line-height:1.7;white-space:pre}
-.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-.cc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.cc .la{padding:10px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd);font-size:.8rem;color:var(--t2)}
-.cc pre{padding:16px;font-size:.85rem;line-height:1.7;white-space:pre;overflow-x:auto}
-.info{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:24px;margin-bottom:24px}
-.info h2{font-size:1.1rem;margin-bottom:12px}
-.info p{color:var(--t2);font-size:.9rem;margin-bottom:8px}
-.info table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem}
-.info th,.info td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--bd)}
-.info th{color:var(--ac);font-weight:500}.info td{color:var(--t2)}
-.info code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:.8rem;color:var(--ac)}
-footer{text-align:center;padding:30px 20px;color:var(--t2);font-size:.8rem;border-top:1px solid var(--bd)}
-@media(max-width:700px){.cmp{grid-template-columns:1fr}header h1{font-size:1.5rem}.tsz{gap:6px}.tb{padding:8px 16px;font-size:.9rem}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Tab Size Generator | Live tab-size Preview for Code Blocks & Docs</title>
+    <meta name="description" content="Free CSS tab-size generator with live code preview. Test tab-size values for code blocks, documentation, Markdown snippets, and developer tutorials, then copy clean CSS instantly.">
+    <meta name="keywords" content="CSS tab size generator, tab-size CSS, code block formatting, CSS code preview, tab width CSS, markdown code formatting, documentation styling">
+    <meta name="author" content="Lifa AI Tools">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="canonical" href="https://lifa-su.com/ai-css-tab-size/">
+    <meta property="og:title" content="CSS Tab Size Generator | Live tab-size Preview for Code Blocks & Docs">
+    <meta property="og:description" content="Preview CSS tab-size values live, compare common tab widths, and copy production-ready CSS for docs, developer tools, and readable code examples.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lifa-su.com/ai-css-tab-size/">
+    <meta property="og:image" content="https://lifa-su.com/apple-touch-icon.png">
+    <meta property="og:site_name" content="Lifa AI Tools">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CSS Tab Size Generator">
+    <meta name="twitter:description" content="Test and export clean CSS tab-size values for code blocks, docs, and developer-facing content.">
+    <meta name="twitter:image" content="https://lifa-su.com/apple-touch-icon.png">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"CSS Tab Size Generator","description":"Free online CSS tab-size generator with live preview for code blocks, docs, and formatted text.","url":"https://lifa-su.com/ai-css-tab-size/","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isPartOf":{"@type":"WebSite","name":"Lifa AI Tools","url":"https://lifa-su.com/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does CSS tab-size do?","acceptedAnswer":{"@type":"Answer","text":"The CSS tab-size property controls how wide literal tab characters render inside preformatted content such as pre blocks and elements using white-space: pre or pre-wrap."}},{"@type":"Question","name":"Does tab-size change spaces?","acceptedAnswer":{"@type":"Answer","text":"No. tab-size affects actual tab characters only. It does not resize normal spaces or indentation created with repeated space characters."}},{"@type":"Question","name":"What tab-size should I use for code snippets?","acceptedAnswer":{"@type":"Answer","text":"A value of 2 works well for compact front-end snippets, 4 is the safest all-purpose default for tutorials and documentation, and 8 matches traditional browser and terminal defaults in some developer environments."}}]}</script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#1a1a2e;
+            --bg2:#0f1325;
+            --surface:#16213e;
+            --surface2:#121b34;
+            --surface3:#0f3460;
+            --border:#2a2a4e;
+            --border2:#25345f;
+            --text:#edf1ff;
+            --muted:#aab3cf;
+            --soft:#8f97b4;
+            --accent:#e94560;
+            --accent2:#7f5af0;
+            --accent3:#7fd6ff;
+            --good:#2ecc71;
+            --max:1160px;
+            --radius:18px;
+            --shadow:0 18px 40px rgba(0,0,0,.22);
+        }
+        html{scroll-behavior:smooth}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+            background:radial-gradient(circle at top,rgba(127,90,240,.12),transparent 28%),var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            line-height:1.6;
+        }
+        a{color:var(--accent3);text-decoration:none}
+        a:hover{text-decoration:underline}
+        code{font-family:'SF Mono',Monaco,'Cascadia Code','Fira Code',Consolas,monospace}
+        .page{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+        .hero{padding:42px 0 26px;text-align:center}
+        .badge{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:8px 14px;border-radius:999px;
+            border:1px solid rgba(127,214,255,.18);
+            background:rgba(15,19,37,.75);
+            color:var(--accent3);font-size:.82rem;font-weight:700;margin-bottom:16px
+        }
+        h1{
+            font-size:clamp(2rem,4vw,3.5rem);line-height:1.08;margin-bottom:14px;
+            background:linear-gradient(135deg,#fff,var(--accent3) 42%,#b79cff 76%,var(--accent));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+        }
+        .hero p{max-width:820px;margin:0 auto;color:var(--muted);font-size:1.04rem}
+        .hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px}
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;gap:8px;
+            padding:12px 18px;border-radius:12px;border:1px solid var(--border2);
+            font-weight:700;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+            text-decoration:none
+        }
+        .btn:hover{text-decoration:none;transform:translateY(-1px)}
+        .btn-primary{background:linear-gradient(135deg,var(--accent),#ff6b7e);border-color:transparent;color:#fff;box-shadow:0 12px 28px rgba(233,69,96,.26)}
+        .btn-secondary{background:rgba(127,90,240,.1);color:#e2ddff}
+        .hero-meta{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:18px;color:var(--soft);font-size:.88rem}
+
+        .tool-shell{display:grid;grid-template-columns:minmax(0,1.2fr) 320px;gap:22px;align-items:start;margin:8px 0 18px}
+        .main-col,.side-col{display:flex;flex-direction:column;gap:18px}
+        .card,.side-card,.info-card,.step,.tip,.related-card,.next-card,.faq-item{
+            background:linear-gradient(180deg,rgba(22,33,62,.98),rgba(16,24,46,.98));
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow)
+        }
+        .card,.side-card,.info-card,.step,.tip,.related-card,.next-card{padding:22px}
+        .card h2,.side-card h3{margin-bottom:14px}
+        .card h2{font-size:1.05rem;color:var(--accent3)}
+        .side-card h3{font-size:1rem;color:#fff}
+        .side-card p,.side-card li,.info-card p,.info-card li,.step p,.tip p,.related-card p,.next-card p{color:var(--muted);font-size:.94rem}
+        .side-card ul,.info-card ul{padding-left:18px}
+        .side-card ul li+li,.info-card ul li+li{margin-top:8px}
+        .mini-cta{
+            display:block;margin-top:14px;padding:12px 14px;text-align:center;border-radius:12px;
+            background:linear-gradient(135deg,rgba(233,69,96,.16),rgba(127,90,240,.14));
+            border:1px solid rgba(233,69,96,.32);color:#fff;font-weight:700
+        }
+        .mini-cta:hover{text-decoration:none;transform:translateY(-1px)}
+
+        .ctrl-title{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+        .ctrl-title p{color:var(--muted);font-size:.9rem}
+        .tsz{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 18px}
+        .tb{padding:10px 22px;border:2px solid var(--border);border-radius:10px;background:transparent;color:var(--text);font-size:1rem;cursor:pointer;transition:.2s;font-family:inherit}
+        .tb:hover{border-color:var(--accent);color:#fff}
+        .tb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+        .ci{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+        .ci label{color:var(--muted);font-size:.92rem;white-space:nowrap}
+        .ci input[type=range]{flex:1;min-width:180px;accent-color:var(--accent)}
+        .ci .v{background:var(--surface3);padding:4px 12px;border-radius:8px;min-width:44px;text-align:center;color:#fff;font-weight:700}
+        .co{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+        .co code{color:var(--accent3);font-size:.95rem;flex:1;word-break:break-word}
+        .cp{padding:9px 18px;background:var(--accent);border:none;border-radius:10px;color:#fff;cursor:pointer;font-size:.86rem;font-family:inherit;font-weight:700;transition:.2s;white-space:nowrap}
+        .cp:hover{opacity:.88}.cp.ok{background:var(--good)}
+        .lt{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+        .lb{padding:7px 16px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;font-size:.87rem;font-family:inherit;transition:.2s}
+        .lb:hover{color:var(--text);border-color:var(--accent2)}
+        .lb.on{background:var(--accent2);border-color:var(--accent2);color:#fff}
+        .cpv{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .ch{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,.18);border-bottom:1px solid var(--border)}
+        .ch span{font-size:.82rem;color:var(--muted)}
+        .dt{display:flex;gap:6px}.dt i{width:10px;height:10px;border-radius:50%;display:block}
+        .dt i:nth-child(1){background:#ff5f57}.dt i:nth-child(2){background:#febc2e}.dt i:nth-child(3){background:#28c840}
+        pre.cb{padding:20px;overflow-x:auto;font-size:.92rem;line-height:1.7;white-space:pre;background:transparent;color:#f3f6ff}
+        .cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .cc{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+        .cc .la{padding:10px 16px;background:rgba(0,0,0,.18);border-bottom:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+        .cc pre{padding:16px;font-size:.86rem;line-height:1.7;white-space:pre;overflow-x:auto;color:#eff3ff}
+        .note{margin-top:14px;color:var(--soft);font-size:.88rem}
+
+        .section{padding:38px 0 6px}
+        .section-head{max-width:760px;margin:0 auto 22px;text-align:center}
+        .section-kicker{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px}
+        .section h2{font-size:clamp(1.55rem,2.5vw,2.25rem);margin-bottom:10px}
+        .section-head p{color:var(--muted)}
+        .grid-4,.grid-3,.faq-grid,.next-grid,.related-grid{display:grid;gap:18px}
+        .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .grid-3,.related-grid,.next-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+        .faq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .icon{font-size:1.45rem;display:inline-block;margin-bottom:10px}
+        .info-card h3,.step h3,.tip h3,.related-card h3,.next-card h3{font-size:1rem;margin-bottom:8px;color:#fff}
+        .step{position:relative;padding-top:50px}
+        .step-num{position:absolute;top:18px;left:18px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:.88rem;font-weight:800;color:#fff}
+        .tip strong{color:#fff}
+        .faq-item{overflow:hidden}
+        .faq-item summary{list-style:none;cursor:pointer;padding:18px 20px;font-weight:700;color:#fff;display:flex;justify-content:space-between;gap:12px}
+        .faq-item summary::-webkit-details-marker{display:none}
+        .faq-item summary::after{content:'+';color:var(--accent3);font-size:1.2rem;line-height:1}
+        .faq-item[open] summary::after{content:'−'}
+        .faq-body{padding:0 20px 18px;color:var(--muted);font-size:.94rem}
+        .related-card,.next-card{display:block}
+        .related-card:hover,.next-card:hover{transform:translateY(-2px);border-color:rgba(127,214,255,.3);text-decoration:none}
+        .pill{display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(127,214,255,.08);border:1px solid rgba(127,214,255,.14);font-size:.78rem;color:var(--accent3)}
+        .callout{
+            margin-top:22px;padding:22px;border-radius:22px;
+            background:linear-gradient(135deg,rgba(233,69,96,.13),rgba(127,90,240,.13));
+            border:1px solid rgba(233,69,96,.25)
+        }
+        .callout h3{font-size:1.2rem;margin-bottom:8px}
+        .callout p{color:#dfe5ff;max-width:760px}
+        .callout-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+        footer{margin-top:48px;padding:28px 0 32px;text-align:center;color:#7f87a6;font-size:.83rem;border-top:1px solid rgba(255,255,255,.06)}
+        footer .footer-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+
+        @media(max-width:1020px){
+            .tool-shell{grid-template-columns:1fr}
+            .grid-4,.grid-3,.related-grid,.next-grid,.faq-grid{grid-template-columns:1fr 1fr}
+        }
+        @media(max-width:700px){
+            .page{width:min(var(--max),calc(100% - 24px))}
+            .hero{padding-top:30px}
+            .grid-4,.grid-3,.related-grid,.next-grid,.faq-grid,.cmp{grid-template-columns:1fr}
+            .card,.side-card,.info-card,.step,.tip,.related-card,.next-card{padding:18px}
+            .co{align-items:flex-start}
+            .tb{padding:9px 16px;font-size:.92rem}
+        }
+    </style>
 </head>
 <body>
-<header><h1>CSS Tab Size 演示</h1><p>可视化 <code style="background:#16213e;padding:2px 8px;border-radius:4px">tab-size</code> 属性对代码缩进的影响</p></header>
-<div class="ctn">
-<section class="ctrl"><h2>选择 Tab 宽度</h2>
-<div class="tsz" id="btns"></div>
-<div class="ci"><label for="rng">自定义：</label><input type="range" id="rng" min="1" max="16" value="4"><span class="v" id="rv">4</span></div>
-<div class="co"><code id="css">tab-size: 4; -moz-tab-size: 4;</code><button class="cp" id="cpb" aria-label="复制CSS代码">复制 CSS</button></div>
-</section>
-<section class="ps"><h2>代码预览</h2>
-<div class="lt" id="langs"></div>
-<div class="cpv"><div class="ch"><div class="dt"><i></i><i></i><i></i></div><span id="fn">example.js</span></div><pre class="cb" id="code"></pre></div>
-</section>
-<section class="ps"><h2>对比：Tab Size 2 vs 8</h2>
-<div class="cmp"><div class="cc"><div class="la">tab-size: 2</div><pre id="c2"></pre></div><div class="cc"><div class="la">tab-size: 8</div><pre id="c8"></pre></div></div>
-</section>
-<section class="info"><h2>关于 tab-size</h2>
-<p><code>tab-size</code> CSS 属性控制制表符（U+0009）的显示宽度，默认值为 8。</p>
-<p>该属性仅对 <code>&lt;pre&gt;</code> 和 <code>white-space: pre</code> 元素中的实际 Tab 字符生效。</p>
-<table><thead><tr><th>值</th><th>说明</th><th>常见用途</th></tr></thead>
-<tbody>
-<tr><td><code>2</code></td><td>紧凑缩进</td><td>HTML/Ruby/YAML</td></tr>
-<tr><td><code>4</code></td><td>标准缩进（推荐）</td><td>JavaScript/Python/Java</td></tr>
-<tr><td><code>8</code></td><td>浏览器默认值</td><td>Linux 内核/Go/Makefile</td></tr>
-</tbody></table>
-</section>
+<div class="page">
+    <header class="hero">
+        <div class="badge">CSS code formatting tool · live preview</div>
+        <h1>CSS Tab Size Generator</h1>
+        <p>Preview exactly how <code>tab-size</code> changes code indentation in JavaScript, HTML, CSS, and Python snippets. Use it to make tutorials, docs, code samples, and developer-facing content easier to scan before you copy the final CSS.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+            <a class="btn btn-secondary" href="#generator">Use the generator</a>
+            <a class="btn btn-secondary" href="#related-tools">Related CSS tools</a>
+        </div>
+        <div class="hero-meta">
+            <span>Live tab preview</span>
+            <span>Common presets</span>
+            <span>Copy-ready CSS</span>
+            <span>Built for docs and code blocks</span>
+        </div>
+    </header>
+
+    <main>
+        <section class="tool-shell" id="generator">
+            <div class="main-col">
+                <section class="card">
+                    <div class="ctrl-title">
+                        <div>
+                            <h2>Choose your tab width</h2>
+                            <p>Start with a safe preset, then fine-tune with the slider if your code samples feel too cramped or too wide.</p>
+                        </div>
+                    </div>
+                    <div class="tsz" id="btns"></div>
+                    <div class="ci"><label for="rng">Custom value</label><input type="range" id="rng" min="1" max="16" value="4"><span class="v" id="rv">4</span></div>
+                    <div class="co"><code id="css">tab-size: 4; -moz-tab-size: 4;</code><button class="cp" id="cpb" aria-label="Copy CSS code">Copy CSS</button></div>
+                </section>
+
+                <section class="card">
+                    <h2>Live code preview</h2>
+                    <div class="lt" id="langs"></div>
+                    <div class="cpv"><div class="ch"><div class="dt"><i></i><i></i><i></i></div><span id="fn">example.js</span></div><pre class="cb" id="code"></pre></div>
+                </section>
+
+                <section class="card">
+                    <h2>Compare a compact vs wide tab width</h2>
+                    <div class="cmp"><div class="cc"><div class="la">tab-size: 2</div><pre id="c2"></pre></div><div class="cc"><div class="la">tab-size: 8</div><pre id="c8"></pre></div></div>
+                    <p class="note">Use this side-by-side view when you are deciding between tighter snippets for landing pages and wider indentation for tutorials or internal documentation.</p>
+                </section>
+
+                <section class="card">
+                    <h2>About <code>tab-size</code></h2>
+                    <p style="color:var(--muted);margin-bottom:10px"><code>tab-size</code> controls how wide literal tab characters render. It is most useful inside <code>&lt;pre&gt;</code> blocks, code samples, markdown-rendered snippets, and any element using preformatted white-space.</p>
+                    <p style="color:var(--muted);margin-bottom:14px">It does <strong>not</strong> resize regular spaces. If a snippet was indented with spaces instead of actual tabs, changing <code>tab-size</code> will not affect the layout.</p>
+                    <div style="overflow-x:auto">
+                        <table style="width:100%;border-collapse:collapse;font-size:.9rem">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--accent3)">Value</th>
+                                    <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--accent3)">Feel</th>
+                                    <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--accent3)">Best fit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text)"><code>2</code></td>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted)">Tight and compact</td>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted)">UI snippets, narrow layouts, short examples, front-end docs</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text)"><code>4</code></td>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted)">Balanced default</td>
+                                    <td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted)">Tutorials, blog posts, general documentation, multi-language examples</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 12px;color:var(--text)"><code>8</code></td>
+                                    <td style="padding:10px 12px;color:var(--muted)">Traditional wide spacing</td>
+                                    <td style="padding:10px 12px;color:var(--muted)">Legacy code views, terminal-style formatting, environments matching browser defaults</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="side-col">
+                <section class="side-card">
+                    <h3>Why this small CSS property matters</h3>
+                    <ul>
+                        <li>Cleaner code samples improve readability and dwell time on technical content.</li>
+                        <li>Good indentation makes tutorials feel more trustworthy and easier to follow.</li>
+                        <li>Compact tabs help narrow layouts, while wider tabs make nesting easier to parse.</li>
+                        <li>Consistent code formatting reduces friction across docs, blog posts, and product walkthroughs.</li>
+                    </ul>
+                </section>
+
+                <section class="side-card">
+                    <h3>Quick unit reality check</h3>
+                    <p><code>tab-size</code> accepts either an integer or a length, but integer values are the most predictable for code blocks. In most content workflows, <code>2</code>, <code>4</code>, and <code>8</code> cover almost every real need.</p>
+                </section>
+
+                <section class="side-card">
+                    <h3>Need content around your code examples?</h3>
+                    <p>If you are building tutorials, documentation, landing pages, or creator guides, pair better formatting with better copy so the whole page converts instead of just looking tidy.</p>
+                    <a class="mini-cta" href="/content-creator-toolkit.html">Go to the Content Creator Toolkit</a>
+                </section>
+            </aside>
+        </section>
+
+        <section class="section" id="use-cases">
+            <div class="section-head">
+                <div class="section-kicker">Use Cases</div>
+                <h2>Where CSS tab-size actually helps</h2>
+                <p>This property is small, but it matters anywhere code readability supports comprehension, trust, or conversion.</p>
+            </div>
+            <div class="grid-4">
+                <article class="info-card">
+                    <div class="icon">📘</div>
+                    <h3>Documentation and knowledge bases</h3>
+                    <p>Use a consistent tab width so examples in setup guides, API docs, and troubleshooting notes stay readable across desktop and mobile screens.</p>
+                </article>
+                <article class="info-card">
+                    <div class="icon">🧑‍🏫</div>
+                    <h3>Coding tutorials and blog posts</h3>
+                    <p>Compact indentation often works better for embedded tutorials, especially when you need code and explanation to coexist in narrow content columns.</p>
+                </article>
+                <article class="info-card">
+                    <div class="icon">🛠️</div>
+                    <h3>Developer tools and internal dashboards</h3>
+                    <p>When showing formatted JSON, logs, or generated snippets, tab width helps users scan structure faster without horizontal overflow everywhere.</p>
+                </article>
+                <article class="info-card">
+                    <div class="icon">📝</div>
+                    <h3>Markdown-driven publishing</h3>
+                    <p>If your docs site or blog renders preformatted snippets, the right tab width can make code blocks feel intentional instead of browser-default and messy.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="workflow">
+            <div class="section-head">
+                <div class="section-kicker">Tab Size Workflow</div>
+                <h2>A practical workflow for choosing the right tab width</h2>
+                <p>Use the generator as a fast design-to-publish step whenever code blocks are part of your content or product UI.</p>
+            </div>
+            <div class="grid-4">
+                <article class="step">
+                    <div class="step-num">1</div>
+                    <h3>Pick the content context</h3>
+                    <p>Start by asking whether the snippet lives in docs, a blog post, a landing page, or a dense app UI. Narrow layouts usually want tighter tabs.</p>
+                </article>
+                <article class="step">
+                    <div class="step-num">2</div>
+                    <h3>Preview real code, not fake lines</h3>
+                    <p>Switch between JavaScript, HTML, CSS, and Python to see how nesting feels in the kinds of examples your audience will actually read.</p>
+                </article>
+                <article class="step">
+                    <div class="step-num">3</div>
+                    <h3>Compare tight vs default</h3>
+                    <p>Look at 2 and 8 side by side, then settle on 4 if you want the safest middle ground for mixed technical content.</p>
+                </article>
+                <article class="step">
+                    <div class="step-num">4</div>
+                    <h3>Copy and test inside your layout</h3>
+                    <p>Paste the CSS into your code block component, docs theme, or markdown renderer and confirm readability on mobile before shipping.</p>
+                </article>
+            </div>
+            <div class="callout">
+                <h3>Formatting is only half the page.</h3>
+                <p>If your tutorial, docs page, or lead magnet also needs stronger headlines, body copy, email follow-ups, or launch messaging, the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> helps you turn clean formatting into content people actually finish and act on.</p>
+                <div class="callout-actions">
+                    <a class="btn btn-primary" href="/content-creator-toolkit.html">See the Content Creator Toolkit</a>
+                    <a class="btn btn-secondary" href="#best-practices">Read best practices</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="best-practices">
+            <div class="section-head">
+                <div class="section-kicker">Best Practices</div>
+                <h2>How to use tab-size without creating new formatting problems</h2>
+                <p>A good value improves readability quietly. A bad value makes code blocks look either cramped or wasteful.</p>
+            </div>
+            <div class="grid-3">
+                <article class="tip">
+                    <h3>Default to <code>4</code> when you need the safest answer</h3>
+                    <p><strong>Why:</strong> It feels familiar across many languages and works well for tutorials, blog posts, docs, and mixed-code examples.</p>
+                </article>
+                <article class="tip">
+                    <h3>Use <code>2</code> for narrow content columns</h3>
+                    <p><strong>Why:</strong> If code blocks live inside article layouts, sidebars, email-style embeds, or mobile-first docs, tighter indentation reduces horizontal scrolling.</p>
+                </article>
+                <article class="tip">
+                    <h3>Do not expect it to fix space-indented code</h3>
+                    <p><strong>Why:</strong> <code>tab-size</code> only changes literal tab characters. If your source uses spaces, update the source formatting instead of forcing CSS to compensate.</p>
+                </article>
+                <article class="tip">
+                    <h3>Test with your real syntax highlighting theme</h3>
+                    <p><strong>Why:</strong> Font choice, line-height, and token coloring all influence perceived spacing, especially in dark themes and dense code samples.</p>
+                </article>
+                <article class="tip">
+                    <h3>Keep docs and product UI consistent</h3>
+                    <p><strong>Why:</strong> Switching tab widths between help docs, onboarding screens, and in-app examples makes your developer experience feel less polished.</p>
+                </article>
+                <article class="tip">
+                    <h3>Check mobile before publishing</h3>
+                    <p><strong>Why:</strong> A width that looks elegant on desktop can produce avoidable overflow and awkward nesting on smaller screens.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="faq">
+            <div class="section-head">
+                <div class="section-kicker">FAQ</div>
+                <h2>Common questions about CSS tab-size</h2>
+                <p>Most confusion comes from tabs vs spaces, browser defaults, and where this property actually applies.</p>
+            </div>
+            <div class="faq-grid">
+                <details class="faq-item" open>
+                    <summary>What does CSS tab-size do?</summary>
+                    <div class="faq-body">It controls the rendered width of literal tab characters. It is mainly used in preformatted text such as <code>&lt;pre&gt;</code> blocks, code examples, and elements with pre-style white-space behavior.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Does tab-size affect spaces?</summary>
+                    <div class="faq-body">No. It only affects actual tab characters. If your code uses spaces for indentation, changing <code>tab-size</code> will not visibly change the snippet.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>What is the default browser value?</summary>
+                    <div class="faq-body">In many environments, the default rendered width behaves like <code>8</code>. That is why unstyled code blocks can feel surprisingly wide, especially in narrow layouts.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Should I use 2 or 4 for code examples?</summary>
+                    <div class="faq-body">Use <code>2</code> when space is tight and the code is relatively shallow. Use <code>4</code> when you want the most familiar, broadly readable default for tutorials and documentation.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I use tab-size in production?</summary>
+                    <div class="faq-body">Yes, especially for docs sites, blogs, internal tools, and product interfaces that display code or structured text. Just test it in your target browsers and layouts.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Is tab-size useful outside code blocks?</summary>
+                    <div class="faq-body">Sometimes, but its most reliable use is with actual tab characters in preformatted content. For normal layout spacing, other CSS properties are usually more appropriate.</div>
+                </details>
+            </div>
+        </section>
+
+        <section class="section" id="related-tools">
+            <div class="section-head">
+                <div class="section-kicker">Related Tools</div>
+                <h2>Keep your CSS formatting workflow connected</h2>
+                <p>If you are cleaning up code presentation, these related tools cover adjacent formatting and text-layout tasks.</p>
+            </div>
+            <div class="related-grid">
+                <a class="related-card" href="/ai-css-text-indent/">
+                    <span class="pill">Editorial layout</span>
+                    <h3>CSS Text Indent Generator</h3>
+                    <p>Build first-line and hanging indents for long-form content, docs, essays, and reference sections.</p>
+                </a>
+                <a class="related-card" href="/ai-css-text-decoration/">
+                    <span class="pill">Readable UI text</span>
+                    <h3>CSS Text Decoration Generator</h3>
+                    <p>Fine-tune underline style, thickness, and offset for links, headings, notes, and conversion-focused UI.</p>
+                </a>
+                <a class="related-card" href="/ai-css-writing-mode/">
+                    <span class="pill">Advanced text flow</span>
+                    <h3>CSS Writing Mode Tool</h3>
+                    <p>Preview vertical and alternate writing directions for multilingual layouts, labels, and experimental interfaces.</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="section" id="next-steps">
+            <div class="section-head">
+                <div class="section-kicker">Next Steps</div>
+                <h2>Turn better formatting into better-performing content</h2>
+                <p>Once your code blocks read cleanly, the next win is improving the page around them so more readers stay, trust you, and convert.</p>
+            </div>
+            <div class="next-grid">
+                <article class="next-card">
+                    <h3>1. Keep the code block readable</h3>
+                    <p>Use this generator to pick the right tab width for your docs theme, article template, or onboarding component.</p>
+                </article>
+                <article class="next-card">
+                    <h3>2. Upgrade the surrounding copy</h3>
+                    <p>Add sharper headlines, clearer explanations, and stronger CTAs so your tutorial or lead magnet does more than just look neat.</p>
+                </article>
+                <article class="next-card">
+                    <h3>3. Use one toolkit for the content work</h3>
+                    <p>The <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> helps you create blog posts, launch copy, social promos, emails, and content plans around the same asset.</p>
+                </article>
+            </div>
+            <div class="callout">
+                <h3>Want the easiest next click?</h3>
+                <p>If you are publishing tutorials, dev tools, or creator resources, go straight to the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>. It is the most relevant next step if you need stronger content, distribution, and conversion around the technical pages you are already building.</p>
+                <div class="callout-actions">
+                    <a class="btn btn-primary" href="/content-creator-toolkit.html">Open the Content Creator Toolkit</a>
+                    <a class="btn btn-secondary" href="/ai-css-generator.html">Browse more CSS tools</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+            <a href="/ai-css-text-indent/">Text Indent</a>
+            <a href="/ai-css-text-decoration/">Text Decoration</a>
+            <a href="/ai-css-writing-mode/">Writing Mode</a>
+        </div>
+        <p>CSS Tab Size Generator · Built with pure HTML, CSS, and JavaScript</p>
+    </footer>
 </div>
-<footer><p>CSS Tab Size 演示工具 · 使用纯 HTML/CSS/JS 构建</p></footer>
 <script>
 const S={
 js:{name:'JavaScript',file:'app.js',code:"function greet(name) {\n\tconst msg = `Hello, ${name}!`;\n\tif (name) {\n\t\tconsole.log(msg);\n\t\treturn {\n\t\t\tstatus: 'ok',\n\t\t\tmessage: msg\n\t\t};\n\t}\n\treturn null;\n}"},
@@ -128,8 +531,8 @@ el.c8.textContent=d.code;el.c8.style.tabSize=8;el.c8.style.MozTabSize=8;
 
 function copy(){
 navigator.clipboard.writeText('tab-size: '+cur+';\n-moz-tab-size: '+cur+';').then(()=>{
-el.cpb.textContent='已复制 ✓';el.cpb.classList.add('ok');
-setTimeout(()=>{el.cpb.textContent='复制 CSS';el.cpb.classList.remove('ok')},1500);
+el.cpb.textContent='Copied ✓';el.cpb.classList.add('ok');
+setTimeout(()=>{el.cpb.textContent='Copy CSS';el.cpb.classList.remove('ok')},1500);
 });
 }
 init();
