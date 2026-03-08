@@ -1,84 +1,393 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="CSS writing-mode generator for vertical and horizontal text layouts. Preview text direction changes for CJK languages and creative typography designs.">
+<title>CSS Writing Mode Generator - Vertical Text, CJK Layout & Direction Preview Tool</title>
+<meta name="description" content="Free CSS writing-mode generator with live preview. Test vertical text, horizontal flow, text-orientation, and direction for CJK layouts, editorial design, packaging, manga UI, and multilingual interfaces.">
+<meta name="keywords" content="CSS writing mode generator, writing-mode CSS, vertical text CSS, text-orientation CSS, CJK typography, vertical layout tool, Japanese vertical text, Chinese vertical text">
+<meta name="author" content="Lifa AI Tools">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a1a2e">
 <link rel="canonical" href="https://lifa-su.com/ai-css-writing-mode/">
-<title>CSS Writing Mode Generator</title>
+<meta property="og:title" content="CSS Writing Mode Generator - Vertical Text & CJK Layout Tool">
+<meta property="og:description" content="Preview CSS writing-mode, text-orientation, and direction in real time. Ideal for vertical typography, East Asian layouts, creative editorial design, and multilingual UI experiments.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lifa-su.com/ai-css-writing-mode/">
+<meta property="og:image" content="https://lifa-su.com/apple-touch-icon.png">
+<meta property="og:site_name" content="Lifa AI Tools">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CSS Writing Mode Generator">
+<meta name="twitter:description" content="Generate and preview vertical text, text-orientation, and direction settings for CJK and multilingual layouts.">
+<meta name="twitter:image" content="https://lifa-su.com/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"CSS Writing Mode Generator","description":"Free online CSS writing-mode generator with live preview for vertical and horizontal text layouts.","url":"https://lifa-su.com/ai-css-writing-mode/","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"isPartOf":{"@type":"WebSite","name":"Lifa AI Tools","url":"https://lifa-su.com/"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does writing-mode do in CSS?","acceptedAnswer":{"@type":"Answer","text":"The CSS writing-mode property controls the block flow direction of text. It lets you switch between horizontal and vertical layouts, which is especially useful for CJK typography, labels, editorial design, and creative UI patterns."}},{"@type":"Question","name":"What is the difference between writing-mode and text-orientation?","acceptedAnswer":{"@type":"Answer","text":"writing-mode controls the overall text flow direction, while text-orientation controls how individual characters are displayed inside vertical layouts. You usually use them together when building vertical text interfaces."}},{"@type":"Question","name":"When should I use vertical-rl or vertical-lr?","acceptedAnswer":{"@type":"Answer","text":"Use vertical-rl when content should flow vertically with new lines progressing from right to left, which is common in traditional East Asian vertical layouts. Use vertical-lr when you want the next vertical line to move from left to right."}}]}</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a2e;--sf:#16213e;--ac:#e94560;--ac2:#533483;--tx:#eee;--tx2:#aab;--r:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans SC',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.6}
-a{color:var(--ac)}
-.hd{text-align:center;padding:2.5rem 1rem 1.5rem;background:linear-gradient(135deg,var(--bg),var(--sf))}
-.hd h1{font-size:1.8rem;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem}
-.hd p{color:var(--tx2);font-size:.95rem}
-.ct{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start}
-@media(max-width:768px){.ct{grid-template-columns:1fr;padding:1rem}}
-.pn{background:var(--sf);border-radius:var(--r);padding:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06)}
-.pn h2{font-size:1.05rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+:root{
+--bg:#1a1a2e;--bg2:#0d1117;--sf:#16213e;--sf2:#121a33;--sf3:#111827;--bd:#243457;
+--ac:#e94560;--ac2:#533483;--ac3:#7f5af0;--tx:#eef2ff;--tx2:#aab3cf;--tx3:#c9d1e5;--ok:#2ea043;--r:14px;--max:1180px
+}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans SC','Noto Sans JP',sans-serif;background:radial-gradient(circle at top,rgba(127,90,240,.14),transparent 28%),var(--bg);color:var(--tx);min-height:100vh;line-height:1.65}
+a{color:#8fd3ff;text-decoration:none}
+a:hover{text-decoration:underline}
+.page{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+.hero{text-align:center;padding:48px 0 28px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(233,69,96,.1);border:1px solid rgba(233,69,96,.24);color:#ff98a7;font-size:.82rem;font-weight:700;margin-bottom:16px}
+.hero h1{font-size:clamp(2rem,4vw,3.3rem);line-height:1.08;margin-bottom:14px;background:linear-gradient(135deg,#fff,#d6c6ff 45%,#8fd3ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{max-width:820px;margin:0 auto;color:var(--tx2);font-size:1.03rem}
+.hero-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;border:1px solid var(--bd);font-weight:700;transition:.2s ease;color:var(--tx);background:rgba(255,255,255,.02)}
+.btn:hover{text-decoration:none;transform:translateY(-1px);border-color:var(--ac3)}
+.btn-primary{background:linear-gradient(135deg,var(--ac),#ff7286 55%,var(--ac3));border-color:transparent;color:#fff;box-shadow:0 14px 34px rgba(127,90,240,.22)}
+.hero-points{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hero-points span{padding:7px 11px;border-radius:999px;background:rgba(22,33,62,.9);border:1px solid rgba(255,255,255,.06);font-size:.84rem;color:var(--tx2)}
+.ct{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start;padding:12px 0 28px}
+@media(max-width:900px){.ct{grid-template-columns:1fr}}
+.pn{background:linear-gradient(180deg,rgba(22,33,62,.98),rgba(18,26,50,.98));border-radius:var(--r);padding:22px;box-shadow:0 16px 40px rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.06)}
+.pn h2{font-size:1.08rem;margin-bottom:16px;display:flex;align-items:center;gap:.5rem;color:#fff}
+.pn h3{font-size:1rem;margin-bottom:10px;color:#fff}
+.pn p,.pn li{color:var(--tx2);font-size:.94rem}
+.pn ul{padding-left:18px;display:grid;gap:8px}
 .cg{margin-bottom:1.2rem}
-.cg>label{display:block;font-size:.85rem;color:var(--tx2);margin-bottom:.5rem;font-weight:500}
+.cg>label{display:block;font-size:.85rem;color:var(--tx2);margin-bottom:.5rem;font-weight:600}
 .dc{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-.di{cursor:pointer;padding:.7rem;border-radius:8px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);transition:all .2s;text-align:center}
+.di{cursor:pointer;padding:.7rem;border-radius:10px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);transition:all .2s;text-align:center}
 .di:hover{border-color:var(--ac);transform:translateY(-1px)}
-.di.on{border-color:var(--ac);background:rgba(233,69,96,.1);box-shadow:0 0 16px rgba(233,69,96,.12)}
+.di.on{border-color:var(--ac);background:rgba(233,69,96,.12);box-shadow:0 0 18px rgba(233,69,96,.12)}
 .di em{font-size:1.5rem;font-style:normal;display:block;margin-bottom:.2rem}
-.di small{font-size:.72rem;color:var(--tx2);display:block}
-.di.on small{color:var(--ac)}
+.di small{font-size:.72rem;color:var(--tx2);display:block;line-height:1.45}
+.di.on small{color:#ffd2da}
 .rg{display:flex;flex-wrap:wrap;gap:.5rem}
-.rg span{cursor:pointer;padding:.4rem .75rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--tx);transition:all .2s}
+.rg span{cursor:pointer;padding:.45rem .8rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:.82rem;color:var(--tx);transition:all .2s}
 .rg span:hover{border-color:var(--ac)}
-.rg span.on{border-color:var(--ac);background:rgba(233,69,96,.12);color:var(--ac)}
-.cb{position:relative;background:#0d1117;border-radius:8px;padding:1rem;margin-top:.5rem;font-family:Monaco,Consolas,monospace;font-size:.82rem;line-height:1.7;color:#c9d1d9;overflow-x:auto;border:1px solid rgba(255,255,255,.06);white-space:pre}
-.cp{position:absolute;top:.5rem;right:.5rem;background:var(--ac);color:#fff;border:none;padding:.35rem .75rem;border-radius:6px;cursor:pointer;font-size:.75rem;opacity:.85}
+.rg span.on{border-color:var(--ac);background:rgba(233,69,96,.12);color:#ffb5c1}
+.cb{position:relative;background:var(--bg2);border-radius:10px;padding:1rem;margin-top:.5rem;font-family:ui-monospace,SFMono-Regular,Monaco,Consolas,monospace;font-size:.84rem;line-height:1.7;color:#c9d1d9;overflow-x:auto;border:1px solid rgba(255,255,255,.06);white-space:pre}
+.cp{position:absolute;top:.5rem;right:.5rem;background:var(--ac);color:#fff;border:none;padding:.38rem .8rem;border-radius:7px;cursor:pointer;font-size:.76rem;opacity:.9;font-weight:700}
 .cp:hover{opacity:1}
-.cp.ok{background:#2ea043}
-.tb{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
-.tb span{padding:.4rem .85rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:.8rem;color:var(--tx2);transition:all .2s}
+.cp.ok{background:var(--ok)}
+.tb{display:flex;gap:.45rem;margin-bottom:1rem;flex-wrap:wrap}
+.tb span{padding:.45rem .9rem;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:.82rem;color:var(--tx2);transition:all .2s}
 .tb span:hover{border-color:var(--ac)}
-.tb span.on{background:rgba(233,69,96,.12);border-color:var(--ac);color:var(--ac)}
-.pb{background:rgba(0,0,0,.2);border-radius:10px;padding:1.5rem;min-height:220px;border:1px dashed rgba(255,255,255,.1);overflow:auto;max-height:500px}
-.ft{text-align:center;padding:2rem 1rem;color:var(--tx2);font-size:.8rem}
-@media(max-width:480px){.hd h1{font-size:1.4rem}.pb{min-height:160px;padding:1rem}}
+.tb span.on{background:rgba(233,69,96,.12);border-color:var(--ac);color:#ffb5c1}
+.pb{background:rgba(0,0,0,.22);border-radius:12px;padding:1.5rem;min-height:260px;border:1px dashed rgba(255,255,255,.1);overflow:auto;max-height:560px}
+.side-stack{display:grid;gap:20px}
+.mini-cta{display:block;margin-top:14px;padding:12px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(233,69,96,.22),rgba(127,90,240,.18));border:1px solid rgba(233,69,96,.35);color:#fff;font-weight:700;text-align:center}
+.mini-cta:hover{text-decoration:none;transform:translateY(-1px)}
+.section{padding:22px 0}
+.section-head{max-width:780px;margin:0 auto 20px;text-align:center}
+.kicker{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#8fd3ff;margin-bottom:8px}
+.section h2{font-size:clamp(1.6rem,2.6vw,2.35rem);margin-bottom:10px}
+.section-head p{color:var(--tx2)}
+.grid-3,.grid-4,.faq-grid,.related-grid,.next-grid{display:grid;gap:18px}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.related-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.next-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.faq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:980px){.grid-3,.grid-4,.related-grid,.next-grid,.faq-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.page{width:min(var(--max),calc(100% - 24px))}.grid-3,.grid-4,.related-grid,.next-grid,.faq-grid{grid-template-columns:1fr}.hero{padding:32px 0 22px}.pb{min-height:180px;padding:1rem}}
+.card{background:linear-gradient(180deg,rgba(22,33,62,.96),rgba(15,24,45,.96));border:1px solid var(--bd);border-radius:18px;padding:20px;box-shadow:0 14px 34px rgba(0,0,0,.18)}
+.card h3{font-size:1.02rem;margin-bottom:8px;color:#fff}.card p,.card li{color:var(--tx2);font-size:.94rem}.card ul{padding-left:18px}.card ul li+li{margin-top:8px}
+.icon{font-size:1.5rem;display:inline-block;margin-bottom:10px}
+.workflow-step{position:relative;padding-top:48px}.step-num{position:absolute;top:18px;left:18px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--ac),var(--ac3));font-size:.88rem;font-weight:800;color:#fff}
+.details{background:linear-gradient(180deg,rgba(22,33,62,.96),rgba(15,24,45,.96));border:1px solid var(--bd);border-radius:16px;padding:0 18px;overflow:hidden}
+.details summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:700;color:#fff}.details summary::-webkit-details-marker{display:none}.details p{padding:0 0 18px;color:var(--tx2);font-size:.94rem}
+.related-card{display:flex;flex-direction:column;gap:10px}.related-card a{font-weight:700;color:#fff}.related-card a:hover{color:#8fd3ff}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(143,211,255,.08);border:1px solid rgba(143,211,255,.18);font-size:.78rem;color:#b7e6ff}
+.callout{margin-top:22px;padding:22px;border-radius:20px;background:linear-gradient(135deg,rgba(233,69,96,.14),rgba(127,90,240,.14));border:1px solid rgba(233,69,96,.22)}
+.callout h3{margin-bottom:8px}.callout p{color:var(--tx3)}.callout-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.ft{text-align:center;padding:2rem 1rem 2.6rem;color:var(--tx2);font-size:.84rem}.footer-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px}
 </style>
 </head>
 <body>
-<div class="hd"><h1>CSS Writing Mode Generator</h1><p>实时预览水平、垂直、混合书写方向</p></div>
-<div class="ct">
-<div class="pn">
-<h2>⚙️ Settings</h2>
-<div class="cg"><label>Writing Mode</label><div class="dc" id="mc"></div></div>
-<div class="cg"><label>Text Orientation</label><div class="rg" id="og"></div></div>
-<div class="cg"><label>Direction</label><div class="rg" id="dg"></div></div>
-<div class="cg"><label>Generated CSS</label><div style="position:relative"><div class="cb" id="code"></div><button class="cp" id="cpb" onclick="copyCSS()">📋 Copy</button></div></div>
+<div class="page">
+<header class="hero">
+  <div class="badge">CSS typography tool · vertical text & CJK layout preview</div>
+  <h1>CSS Writing Mode Generator</h1>
+  <p>Preview horizontal and vertical text flow, test <code>text-orientation</code>, and compare direction settings before shipping multilingual layouts, editorial UI, packaging labels, manga-style components, or creative landing page sections.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="/content-creator-toolkit.html">Get the Content Creator Toolkit</a>
+    <a class="btn" href="#generator">Use the generator</a>
+    <a class="btn" href="#related-tools">Explore related tools</a>
+  </div>
+  <div class="hero-points">
+    <span>Vertical text preview</span>
+    <span>text-orientation controls</span>
+    <span>LTR / RTL direction</span>
+    <span>Copy-ready CSS</span>
+  </div>
+</header>
+
+<main>
+  <section class="ct" id="generator">
+    <aside class="side-stack">
+      <div class="pn">
+        <h2>⚙️ Settings</h2>
+        <div class="cg"><label>Writing Mode</label><div class="dc" id="mc"></div></div>
+        <div class="cg"><label>Text Orientation</label><div class="rg" id="og"></div></div>
+        <div class="cg"><label>Direction</label><div class="rg" id="dg"></div></div>
+        <div class="cg"><label>Generated CSS</label><div style="position:relative"><div class="cb" id="code"></div><button class="cp" id="cpb" onclick="copyCSS()">📋 Copy</button></div></div>
+      </div>
+      <div class="pn">
+        <h3>When writing-mode is useful</h3>
+        <ul>
+          <li>Vertical Japanese, Chinese, or mixed CJK content experiments</li>
+          <li>Book-cover, poster, packaging, and museum-label layouts</li>
+          <li>Creative hero sections and editorial storytelling UI</li>
+          <li>Compact side labels, navigation rails, and annotation blocks</li>
+        </ul>
+      </div>
+      <div class="pn">
+        <h3>Best next step for creators</h3>
+        <p>Once the layout feels right, the next bottleneck is usually the copy. Use the Content Creator Toolkit to draft landing page sections, launch posts, blog content, and repurposed social assets around the same design.</p>
+        <a class="mini-cta" href="/content-creator-toolkit.html">Open Content Creator Toolkit</a>
+      </div>
+    </aside>
+
+    <div class="pn">
+      <h2>👁️ Live Preview</h2>
+      <div class="tb" id="tabs"></div>
+      <div class="pb"><div id="prev" style="font-size:1.1rem;line-height:1.8"></div></div>
+    </div>
+  </section>
+
+  <section class="section" id="use-cases">
+    <div class="section-head">
+      <div class="kicker">Use cases</div>
+      <h2>Where CSS writing mode matters in real projects</h2>
+      <p>Most teams only think about <code>writing-mode</code> when they need vertical text, but it is also a fast way to test multilingual UX, editorial layout ideas, and compact interface patterns without rebuilding the page structure.</p>
+    </div>
+    <div class="grid-4">
+      <article class="card">
+        <div class="icon">🈶</div>
+        <h3>CJK typography previews</h3>
+        <p>Test how Chinese and Japanese text behaves in vertical layouts before building long-form pages, exhibition labels, or culturally specific reading experiences.</p>
+      </article>
+      <article class="card">
+        <div class="icon">📰</div>
+        <h3>Editorial and magazine UI</h3>
+        <p>Use vertical headings, side notes, chapter labels, and pull-quote treatments to make articles and visual stories feel more distinctive.</p>
+      </article>
+      <article class="card">
+        <div class="icon">📦</div>
+        <h3>Packaging and product mockups</h3>
+        <p>Preview vertical labels, spine text, badge copy, and narrow packaging layouts without guessing how characters will stack or rotate.</p>
+      </article>
+      <article class="card">
+        <div class="icon">🧭</div>
+        <h3>Creative UI components</h3>
+        <p>Build navigation rails, slim tabs, metadata strips, and directional interface elements when space is tight and horizontal text feels awkward.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="workflow">
+    <div class="section-head">
+      <div class="kicker">Writing mode workflow</div>
+      <h2>A simple workflow from layout idea to production CSS</h2>
+      <p>This tool works best as a fast test bench. Validate the text flow first, then move the final CSS into your component, template, or content system.</p>
+    </div>
+    <div class="grid-4">
+      <article class="card workflow-step">
+        <div class="step-num">1</div>
+        <h3>Pick the reading direction</h3>
+        <p>Start with <code>horizontal-tb</code>, <code>vertical-rl</code>, or <code>vertical-lr</code> based on the language, medium, and visual rhythm you want.</p>
+      </article>
+      <article class="card workflow-step">
+        <div class="step-num">2</div>
+        <h3>Adjust character orientation</h3>
+        <p>Use <code>mixed</code>, <code>upright</code>, or <code>sideways</code> to decide whether Latin characters should rotate, stay upright, or blend into the vertical flow.</p>
+      </article>
+      <article class="card workflow-step">
+        <div class="step-num">3</div>
+        <h3>Check multilingual samples</h3>
+        <p>Preview Chinese, Japanese, English, and Arabic examples to spot overflow, awkward punctuation, or readability issues early.</p>
+      </article>
+      <article class="card workflow-step">
+        <div class="step-num">4</div>
+        <h3>Copy and ship the CSS</h3>
+        <p>Export the snippet, apply it to headings, labels, sidebars, callouts, or content blocks, then verify responsiveness and spacing inside the real UI.</p>
+      </article>
+    </div>
+    <div class="callout">
+      <h3>Need the content that goes inside the layout too?</h3>
+      <p>Once the vertical or multilingual presentation works, use the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> to generate the landing page copy, launch narrative, blog sections, and social repurposing assets that make the design useful.</p>
+      <div class="callout-links">
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Go to Content Creator Toolkit</a>
+        <a class="btn" href="/ai-markdown-editor.html">Open Markdown Editor</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="best-practices">
+    <div class="section-head">
+      <div class="kicker">Best practices</div>
+      <h2>How to keep vertical and directional text readable</h2>
+      <p>Writing mode is powerful, but it becomes hard to use when aesthetics outrun readability. These checks keep the result practical.</p>
+    </div>
+    <div class="grid-3">
+      <article class="card">
+        <h3>Use vertical layouts where the format supports them</h3>
+        <ul>
+          <li>Great for labels, side headers, short editorial accents, and CJK-first designs.</li>
+          <li>Usually not ideal for long English paragraphs unless you intentionally want an experimental effect.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Test mixed scripts, not just one language</h3>
+        <ul>
+          <li>Latin letters, numbers, punctuation, and symbols can behave differently inside vertical layouts.</li>
+          <li>Preview the real mix of content you expect in production, especially dates, URLs, and product names.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Check overflow and mobile constraints</h3>
+        <ul>
+          <li>Vertical text blocks can create unexpected container heights and clipping issues.</li>
+          <li>Confirm spacing, scroll behavior, and touch layout on narrow screens before publishing.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <div class="section-head">
+      <div class="kicker">FAQ</div>
+      <h2>Common questions about CSS writing mode</h2>
+      <p>Quick answers for the implementation details people usually hit while building vertical or multilingual layouts.</p>
+    </div>
+    <div class="faq-grid">
+      <details class="details" open>
+        <summary>What does <code>writing-mode</code> do in CSS?</summary>
+        <p><code>writing-mode</code> controls the block flow direction of text. It lets you switch between normal horizontal layout and vertical text flow for CJK typography, creative layouts, labels, and directional interface patterns.</p>
+      </details>
+      <details class="details">
+        <summary>What is the difference between <code>writing-mode</code> and <code>text-orientation</code>?</summary>
+        <p><code>writing-mode</code> defines the overall flow direction, while <code>text-orientation</code> defines how characters appear inside vertical layouts. You often need both together for clean vertical typography.</p>
+      </details>
+      <details class="details">
+        <summary>When should I use <code>vertical-rl</code>?</summary>
+        <p>Use <code>vertical-rl</code> when text should flow vertically and new lines should progress from right to left, which is common in traditional East Asian vertical reading patterns and many editorial experiments.</p>
+      </details>
+      <details class="details">
+        <summary>Does <code>direction</code> still matter with writing mode?</summary>
+        <p>Yes. <code>direction</code> can still affect inline progression and bidi behavior, especially when your content includes RTL scripts or mixed-language components.</p>
+      </details>
+      <details class="details">
+        <summary>Is vertical text good for accessibility?</summary>
+        <p>It can be, when used intentionally and kept readable. Avoid long decorative blocks that make scanning difficult, and always test with real content, zoom, and assistive technology where possible.</p>
+      </details>
+      <details class="details">
+        <summary>What is a safe production workflow?</summary>
+        <p>Prototype with a tool like this, test multiple scripts and breakpoints, then apply the final CSS in a limited scope such as labels, headings, metadata, or specialized content modules.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" id="related-tools">
+    <div class="section-head">
+      <div class="kicker">Related tools</div>
+      <h2>Keep going with nearby typography and content tools</h2>
+      <p>If you are already tuning text flow, these tools help you finish the rest of the typography, publishing, and creator workflow faster.</p>
+    </div>
+    <div class="related-grid">
+      <article class="card related-card">
+        <a href="/ai-css-direction/">CSS Direction Tool</a>
+        <p>Fine-tune LTR and RTL behavior when multilingual layouts need more than writing-mode alone.</p>
+        <div class="tag-row"><span class="tag">Bidi</span><span class="tag">Multilingual UI</span></div>
+      </article>
+      <article class="card related-card">
+        <a href="/ai-css-text-indent/">CSS Text Indent Generator</a>
+        <p>Improve paragraph rhythm and editorial formatting after your vertical or horizontal flow is in place.</p>
+        <div class="tag-row"><span class="tag">Editorial</span><span class="tag">Long-form</span></div>
+      </article>
+      <article class="card related-card">
+        <a href="/ai-css-text-decoration/">CSS Text Decoration Generator</a>
+        <p>Style headings, links, and annotated text once layout direction is solved.</p>
+        <div class="tag-row"><span class="tag">Typography</span><span class="tag">UI polish</span></div>
+      </article>
+      <article class="card related-card">
+        <a href="/ai-markdown-editor.html">Markdown Editor</a>
+        <p>Draft and structure content before dropping it into custom reading-mode layouts.</p>
+        <div class="tag-row"><span class="tag">Content</span><span class="tag">Drafting</span></div>
+      </article>
+      <article class="card related-card">
+        <a href="/ai-html-formatter/">HTML Formatter</a>
+        <p>Clean the markup around your content blocks before shipping the final typography styles.</p>
+        <div class="tag-row"><span class="tag">Frontend workflow</span><span class="tag">Cleanup</span></div>
+      </article>
+      <article class="card related-card">
+        <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+        <p>Turn layout experiments into publishable blog posts, social content, newsletters, and landing page copy.</p>
+        <div class="tag-row"><span class="tag">Primary CTA</span><span class="tag">Conversion</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="next-steps">
+    <div class="section-head">
+      <div class="kicker">Next steps</div>
+      <h2>Move from CSS experimentation to publishable content</h2>
+      <p>The layout is only the first layer. Once the reading direction works, the biggest leverage usually comes from stronger copy and faster publishing workflows.</p>
+    </div>
+    <div class="next-grid">
+      <article class="card">
+        <div class="icon">1️⃣</div>
+        <h3>Export the CSS snippet</h3>
+        <p>Copy the generated rules and apply them to vertical labels, headings, metadata strips, side notes, or multilingual content blocks.</p>
+      </article>
+      <article class="card">
+        <div class="icon">2️⃣</div>
+        <h3>Build the page content</h3>
+        <p>Use the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a> to draft creator-friendly copy, launch assets, and repurposed content around the design.</p>
+      </article>
+      <article class="card">
+        <div class="icon">3️⃣</div>
+        <h3>Polish the surrounding UI</h3>
+        <p>Chain in adjacent typography and formatting tools so the final page feels consistent, readable, and easier to ship.</p>
+      </article>
+    </div>
+    <div class="callout">
+      <h3>Primary recommendation: go from layout to conversion</h3>
+      <p>If this page helped you solve the front-end side, the best next click is the <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>. It is the fastest way to turn your typography work into usable blog posts, promo copy, emails, and social content.</p>
+      <div class="callout-links">
+        <a class="btn btn-primary" href="/content-creator-toolkit.html">Open Content Creator Toolkit</a>
+        <a class="btn" href="/index.html">Browse all tools</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="ft">
+  <div class="footer-links">
+    <a href="/content-creator-toolkit.html">Content Creator Toolkit</a>
+    <a href="/ai-css-direction/">CSS Direction</a>
+    <a href="/ai-css-text-indent/">Text Indent</a>
+    <a href="/ai-css-text-decoration/">Text Decoration</a>
+  </div>
+  <div>CSS Writing Mode Generator © 2026 · Lifa AI Tools</div>
+</footer>
 </div>
-<div class="pn">
-<h2>👁️ Preview</h2>
-<div class="tb" id="tabs"></div>
-<div class="pb"><div id="prev" style="font-size:1.1rem;line-height:1.8"></div></div>
-</div>
-</div>
-<div class="ft">CSS Writing Mode Generator © 2026</div>
+
 <script>
 var S={mode:'horizontal-tb',orient:'mixed',dir:'ltr',lang:'zh'};
 var MODES=[
-{v:'horizontal-tb',i:'→',n:'horizontal-tb',d:'水平（默认）'},
-{v:'vertical-rl',i:'↓',n:'vertical-rl',d:'垂直右到左'},
-{v:'vertical-lr',i:'↓',n:'vertical-lr',d:'垂直左到右'},
-{v:'sideways-rl',i:'⟲',n:'sideways-rl',d:'侧向右到左'}
+{v:'horizontal-tb',i:'→',n:'horizontal-tb',d:'Horizontal top-to-bottom'},
+{v:'vertical-rl',i:'↓',n:'vertical-rl',d:'Vertical right-to-left'},
+{v:'vertical-lr',i:'↓',n:'vertical-lr',d:'Vertical left-to-right'},
+{v:'sideways-rl',i:'⟲',n:'sideways-rl',d:'Sideways right-to-left'}
 ];
-var ORI=[{v:'mixed',n:'mixed 混合'},{v:'upright',n:'upright 直立'},{v:'sideways',n:'sideways 侧向'}];
+var ORI=[{v:'mixed',n:'mixed'},{v:'upright',n:'upright'},{v:'sideways',n:'sideways'}];
 var DIR=[{v:'ltr',n:'LTR →'},{v:'rtl',n:'RTL ←'}];
 var LANG=[
 {id:'zh',n:'中文',t:'天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。寒来暑往，秋收冬藏。闰余成岁，律吕调阳。'},
 {id:'ja',n:'日本語',t:'吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。'},
-{id:'en',n:'English',t:'The quick brown fox jumps over the lazy dog. Typography is the art and technique of arranging type to make written language legible and appealing.'},
+{id:'en',n:'English',t:'The quick brown fox jumps over the lazy dog. Typography is the art and technique of arranging type to make written language legible and expressive.'},
 {id:'ar',n:'العربية',t:'في البدء كانت الكلمة، والكلمة كانت عند الله. الخط العربي فن جميل وعريق له تاريخ طويل.'}
 ];
 function $(id){return document.getElementById(id)}
