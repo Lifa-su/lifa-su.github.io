@@ -78,6 +78,14 @@ textarea{resize:vertical;min-height:60px}
 .stat-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .stat-value{font-size:28px;font-weight:700}
 .stat-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.board-router{margin:0 0 24px;padding:20px;border:1px solid rgba(99,102,241,.18);border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(255,255,255,.03))}
+.board-router-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.board-router-head h2{font-size:1.2rem;line-height:1.3}
+.board-router-head p{max-width:760px;color:#d4d4d8;font-size:14px}
+.board-router-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.board-router-card{padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+.board-router-card h3{font-size:1rem;margin-bottom:8px}
+.board-router-card p{font-size:14px;color:var(--text-muted);margin-bottom:12px}
 
 /* Pie chart */
 .pie-container{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px}
@@ -166,6 +174,7 @@ textarea{resize:vertical;min-height:60px}
 @media(max-width:1024px){
 .kanban{grid-template-columns:repeat(3,1fr)}
 .route-map{grid-template-columns:repeat(2,minmax(0,1fr))}
+.board-router-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:768px){
 .nav-links{display:none;position:absolute;top:56px;left:0;right:0;background:#111;border-bottom:1px solid var(--border);flex-direction:column;padding:16px 24px;gap:12px}
@@ -186,6 +195,8 @@ textarea{resize:vertical;min-height:60px}
 .pie-row{flex-direction:column;align-items:center}
 .list-table{font-size:13px}
 .list-table th,.list-table td{padding:8px 10px}
+.board-router{padding:18px}
+.board-router-grid{grid-template-columns:1fr}
 }
 @media(max-width:480px){
 .stats-panel{grid-template-columns:1fr}
@@ -399,7 +410,41 @@ textarea{resize:vertical;min-height:60px}
 <div class="stat-card"><div class="stat-label">Active Pipeline</div><div class="stat-value" id="statActive">0</div><div class="stat-sub" id="statActiveSub">In progress</div></div>
 <div class="stat-card"><div class="stat-label">Follow-Ups Due</div><div class="stat-value" id="statFollowUps">0</div><div class="stat-sub" id="statFollowUpsSub">Nothing due today</div></div>
 </div>
-<p style="margin:0 0 24px;color:var(--text-muted);font-size:13px">Silent applications? Rework ATS-safe, human-readable inputs in <a href="/ai-resume/">AI Resume Builder</a> · Candidate story drifting? Align <a href="/ai-social-bio/">AI Social Bio</a> or <a href="/ai-linkedin-optimizer.html">AI LinkedIn Optimizer</a> · Interviews live? Move straight into <a href="/ai-interview-prep/">AI Interview Prep</a> so prep and follow-up stay continuous · Weekly system broken? Use <a href="/job-search-system.html">Job Search System</a> · Multiple assets drifting? Use <a href="/job-toolkit.html">Job Toolkit</a> · Need to compare later? Use <a href="/pricing.html">Pricing</a>.</p>
+<section class="board-router fade-in" aria-labelledby="board-router-title">
+<div class="board-router-head">
+<div>
+<p class="seo-eyebrow">Next move from the live board</p>
+<h2 id="board-router-title">Use the tracker to choose the next step fast</h2>
+</div>
+<p>Stay on the free path when the blocker is narrow. Move to the <a href="/job-toolkit.html">$29 Job Toolkit</a> only when your resume, cover letter, LinkedIn/profile story, and interview prep are drifting together. Use <a href="/pricing.html">Pricing</a> later only if you want to compare optional human review.</p>
+</div>
+<div class="board-router-grid">
+<article class="board-router-card">
+<h3>Replies are weak</h3>
+<p>Fix the input before the next batch goes out so the board is measuring a stronger job-search story.</p>
+<div class="route-links">
+<a href="/ai-resume/">AI Resume Builder</a>
+<a href="/ai-skill-assessment.html">AI Skill Assessment</a>
+</div>
+</article>
+<article class="board-router-card">
+<h3>Interviews are live</h3>
+<p>Switch from tracking mode to prep mode while follow-ups, notes, and rehearsal still belong to the same active pipeline.</p>
+<div class="route-links">
+<a href="/ai-interview-prep/">AI Interview Prep</a>
+<a href="/job-search-system.html">Job Search System</a>
+</div>
+</article>
+<article class="board-router-card">
+<h3>The whole story is drifting</h3>
+<p>Use the first paid reset when multiple assets are slipping out of sync instead of jumping straight to later-stage review options.</p>
+<div class="route-links">
+<a href="/job-toolkit.html">Start with Job Toolkit - $29</a>
+<a href="/ai-linkedin-optimizer.html">Free LinkedIn pass first</a>
+</div>
+</article>
+</div>
+</section>
 
 <!-- Pie Chart -->
 <div class="pie-container" id="pieContainer" style="display:none">
@@ -1535,10 +1580,6 @@ function handleEmailSignup(e){e.preventDefault();var em=document.getElementById(
 function shareTwitter(){var t=document.title,u=encodeURIComponent(location.href),txt=encodeURIComponent("Check out this free AI tool: "+t);window.open("https://twitter.com/intent/tweet?text="+txt+"&url="+u,"_blank","width=600,height=400")}
 function shareLinkedIn(){var u=encodeURIComponent(location.href);window.open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","width=600,height=500")}
 function copyLink(btn){navigator.clipboard.writeText(location.href).then(function(){var orig=btn.textContent;btn.textContent="✅ Copied!";btn.style.color="#22c55e";setTimeout(function(){btn.textContent=orig;btn.style.color=""},2000)}).catch(function(){prompt("Copy this link:",location.href)})}
-</script>
-</body>
-</html>
-("Copy this link:",location.href)})}
 </script>
 </body>
 </html>
