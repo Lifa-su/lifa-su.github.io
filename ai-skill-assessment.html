@@ -378,6 +378,9 @@ a:hover{color:var(--primary)}
 .content-section li+li{margin-top:0.45rem}
 .lead-card{padding:1.5rem;background:linear-gradient(180deg,rgba(99,102,241,0.12),rgba(99,102,241,0.03));border:1px solid rgba(99,102,241,0.28);border-radius:var(--radius);margin-bottom:1.25rem}
 .lead-card p:last-child{margin-bottom:0}
+.route-eyebrow{display:inline-block;margin-bottom:0.75rem;padding:0.25rem 0.7rem;border-radius:999px;background:rgba(99,102,241,0.16);color:var(--primary-light);font-size:0.76rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.result-route-card h3{margin-bottom:0.65rem;font-size:1.2rem}
+.result-route-card .route-note{margin-top:0.85rem;color:var(--text-dim);font-size:0.92rem}
 .inline-links{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1rem}
 .inline-links a,.cta-link{display:inline-flex;align-items:center;justify-content:center;padding:0.7rem 1rem;border-radius:var(--radius-sm);border:1px solid rgba(99,102,241,0.28);background:rgba(99,102,241,0.08);color:var(--primary-light);font-weight:600}
 .inline-links a:hover,.cta-link:hover{background:rgba(99,102,241,0.16);color:#fff}
@@ -512,6 +515,13 @@ a:hover{color:var(--primary)}
   <h2 class="section-title">📊 Skill Gap Analysis</h2>
   <p class="section-desc">Compare your current skills against the target role requirements. Focus on critical gaps first.</p>
   <div class="gap-summary" id="gap-summary"></div>
+  <div class="lead-card result-route-card" id="next-step-card" style="display:none">
+    <span class="route-eyebrow">Recommended next move</span>
+    <h3 id="next-step-title"></h3>
+    <p id="next-step-copy"></p>
+    <p class="route-note" id="next-step-note"></p>
+    <div class="inline-links" id="next-step-links"></div>
+  </div>
   <div class="card" id="radar-section" style="margin-bottom:2rem">
     <h3 style="margin-bottom:1rem;font-size:1.1rem">🕸️ Skill Radar Chart</h3>
     <div class="radar-container">
@@ -1294,6 +1304,7 @@ class SkillAssessment {
       <div class="gap-card ${criticalCount === 0 ? 'good' : 'danger'}"><div class="value">${criticalCount}</div><div class="label">Critical Gaps</div></div>
       <div class="gap-card good"><div class="value">${metCount}/${allSkills.length}</div><div class="label">Skills Met</div></div>
     `;
+    this.renderNextStepRecommendation(gaps, overallScore, criticalCount);
     // Gap list
     const listEl = document.getElementById('gap-list');
     listEl.innerHTML = '';
@@ -1314,6 +1325,82 @@ class SkillAssessment {
       `;
       listEl.appendChild(div);
     });
+  }
+
+  renderNextStepRecommendation(gaps, overallScore, criticalCount) {
+    const card = document.getElementById('next-step-card');
+    const titleEl = document.getElementById('next-step-title');
+    const copyEl = document.getElementById('next-step-copy');
+    const noteEl = document.getElementById('next-step-note');
+    const linksEl = document.getElementById('next-step-links');
+    if (!card || !titleEl || !copyEl || !noteEl || !linksEl) return;
+
+    const openGaps = gaps.filter(item => item.gap > 0);
+    const topGaps = openGaps.slice(0, 2).map(item => item.name);
+    const topGapText = topGaps.length === 0
+      ? 'your strongest categories'
+      : topGaps.length === 1
+        ? topGaps[0]
+        : `${topGaps[0]} and ${topGaps[1]}`;
+    const careerTitle = CAREER_DATA[this.selectedCareer]?.title || 'target role';
+    const topGapContext = openGaps[0] ? `${openGaps[0].name} is the biggest open gap right now.` : '';
+
+    let recommendation;
+    if (openGaps.length === 0 || (overallScore >= 80 && criticalCount === 0)) {
+      recommendation = {
+        title: 'You are close enough to ship proof before you buy more help',
+        copy: `You already match most of the ${careerTitle} benchmark. Turn ${topGapText} into stronger resume bullets, project proof, and interview stories before adding another paid layer.`,
+        note: `Free first: start with <a href="/ai-resume/">AI Resume</a>. If interviews are already live, pair it with <a href="/ai-interview-prep/">AI Interview Prep</a>. Keep <a href="/pricing.html">Pricing</a> for later only if self-serve still leaves a blocker.`,
+        links: [
+          { href: '/ai-resume/', label: 'Start with AI Resume' },
+          { href: '/ai-interview-prep/', label: 'Practice interviews free' }
+        ]
+      };
+    } else if (criticalCount >= 3 || overallScore < 55) {
+      recommendation = {
+        title: 'Multiple blockers are showing up, so use one system next',
+        copy: `${topGapContext} With ${criticalCount} critical gap${criticalCount === 1 ? '' : 's'}, this is usually bigger than one resume tweak or one profile edit. Start where the full candidate story can be aligned.`,
+        note: `Default paid next step: open the <a href="/job-toolkit.html">$29 Job Toolkit</a> when the resume, profile story, cover letter, and interview prep are drifting together. Use <a href="/job-search-system.html">Job Search System</a> if you want the map first. Keep <a href="/pricing.html">Pricing</a> as the compare-later page.`,
+        links: [
+          { href: '/job-toolkit.html', label: 'Start with the $29 Job Toolkit' },
+          { href: '/job-search-system.html', label: 'See the full job-search path' }
+        ]
+      };
+    } else if (this.isStoryGap(openGaps[0])) {
+      recommendation = {
+        title: 'This looks like a narrow explanation or positioning gap',
+        copy: `${topGapContext} Stay free first and tighten how you explain your work before you add a broader paid layer.`,
+        note: `Start with <a href="/ai-interview-prep/">AI Interview Prep</a> for clearer answers, then clean up public-facing positioning in the free <a href="/ai-linkedin-optimizer.html">AI LinkedIn Optimizer</a>. If the same story still drifts across assets, move into <a href="/job-toolkit.html">Job Toolkit</a>.`,
+        links: [
+          { href: '/ai-interview-prep/', label: 'Open AI Interview Prep' },
+          { href: '/ai-linkedin-optimizer.html', label: 'Try AI LinkedIn Optimizer free' },
+          { href: '/job-toolkit.html', label: 'Use Job Toolkit if the story drifts' }
+        ]
+      };
+    } else {
+      recommendation = {
+        title: 'This looks like one narrow proof gap, not full-funnel drift',
+        copy: `${topGapContext} Stay free first and turn the skills you already have into clearer proof before you add a broader paid layer.`,
+        note: `Start with <a href="/ai-resume/">AI Resume</a> to make stronger categories visible. If the problem is public positioning, use the free <a href="/ai-linkedin-optimizer.html">AI LinkedIn Optimizer</a>. Move to <a href="/job-toolkit.html">Job Toolkit</a> only if the same blocker shows up across resume, profile story, and interviews.`,
+        links: [
+          { href: '/ai-resume/', label: 'Build proof in AI Resume' },
+          { href: '/ai-linkedin-optimizer.html', label: 'Warm up LinkedIn free' },
+          { href: '/job-toolkit.html', label: 'Use Job Toolkit if multiple assets drift' }
+        ]
+      };
+    }
+
+    titleEl.textContent = recommendation.title;
+    copyEl.textContent = recommendation.copy;
+    noteEl.innerHTML = recommendation.note;
+    linksEl.innerHTML = recommendation.links.map(link => `<a href="${link.href}">${link.label}</a>`).join('');
+    card.style.display = '';
+  }
+
+  isStoryGap(skill) {
+    if (!skill) return false;
+    const text = `${skill.name} ${skill.desc}`.toLowerCase();
+    return /communication|story|stakeholder|leadership|research|strategy|user research|presentation/.test(text);
   }
 
   // --- Radar Chart (SVG) ---
@@ -1625,14 +1712,6 @@ function goToStep(step) {
 // Initialize app
 let app;
 document.addEventListener('DOMContentLoaded', () => { app = new SkillAssessment(); });
-</script>
-
-<!-- Vercel Analytics -->
-<script defer src="/_vercel/insights/script.js"></script>
-
-</body>
-</html>
-ssment(); });
 </script>
 
 <!-- Vercel Analytics -->
