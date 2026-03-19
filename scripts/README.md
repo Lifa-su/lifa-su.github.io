@@ -1,5 +1,20 @@
 # Scripts
 
+## `apex_remote_host_helper.py`
+
+Small read-only wrapper for the apex fallback verification flow at `opc@64.181.255.230`, centered on `/etc/nginx/conf.d/lifa-su.com.conf`.
+
+Usage:
+
+```bash
+python3 scripts/apex_remote_host_helper.py
+python3 scripts/apex_remote_host_helper.py --list-sections
+python3 scripts/apex_remote_host_helper.py --run --section vhost --section headers
+python3 scripts/apex_remote_host_helper.py --root /path/from/root-or-alias --run --section disk --section hash
+```
+
+This helper complements `research/apex-remote-host-verification-command-pack-2026-03-19.md`; it is a convenience wrapper for printing or running the same non-mutating SSH/curl/grep/sed/ls/stat/sha256sum checks.
+
 ## `check_live_parity.py`
 
 Quick live parity check for the current job-line blocker pages across `lifa-su.github.io` and `lifa-su.com`.
