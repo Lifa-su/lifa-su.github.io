@@ -8,8 +8,12 @@ Usage:
 
 ```bash
 python3 scripts/check_live_parity.py
+python3 scripts/check_live_parity.py --green-gate
 python3 scripts/check_live_parity.py --page /job-toolkit.html --marker "*::ko-fi.com/s/41d7ec67e7"
+python3 scripts/check_live_parity.py --green-gate --resume-route-page /linkedin-audit.html
 ```
+
+Use `--green-gate` for the operator preset: the three blocker pages plus one ResumeForge downstream spot-check page, with `gate`, `last-modified`, freshness, and header-signal summaries.
 
 Use `--domain`, `--page`, and `--marker PAGE::TEXT` to rerun the same checker against other pages or extra markers later.
 

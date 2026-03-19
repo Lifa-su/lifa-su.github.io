@@ -15,11 +15,15 @@ DEFAULT_DOMAINS = [
     "https://lifa-su.com",
 ]
 
-DEFAULT_PAGES = [
+DEFAULT_BLOCKER_PAGES = [
     "/job-toolkit.html",
     "/pricing.html",
     "/job-search-system.html",
 ]
+
+DEFAULT_RESUMEFORGE_ROUTE_PAGE = "/resume-review-fast-track.html"
+
+DEFAULT_PAGES = list(DEFAULT_BLOCKER_PAGES)
 
 DEFAULT_HEADERS = [
     "server",
@@ -30,6 +34,23 @@ DEFAULT_HEADERS = [
     "x-cache",
     "via",
     "age",
+    "last-modified",
+    "etag",
+    "cache-control",
+]
+
+INFRA_SIGNAL_HEADERS = [
+    "server",
+    "cf-cache-status",
+    "x-vercel-cache",
+    "x-vercel-id",
+    "x-vercel-deployment-url",
+    "x-cache",
+    "via",
+    "age",
+]
+
+FRESHNESS_HEADERS = [
     "last-modified",
     "etag",
     "cache-control",
@@ -51,6 +72,21 @@ DEFAULT_MARKERS = {
         "The first paid step when you need one same-candidate system",
         "Free tools first, Job Toolkit as the first paid step, human review only if needed",
     ],
+    "/resume-review-fast-track.html": [
+        "Resume Review Fast Track",
+        "within 48 hours",
+        "/contact.html",
+    ],
+    "/linkedin-audit.html": [
+        "LinkedIn Audit Fast Track",
+        "within 48 hours",
+        "/contact.html",
+    ],
+    "/ai-resume/": [
+        "ResumeForge",
+        "Unlock Pro on Pricing",
+        "/resume-review-fast-track.html",
+    ],
 }
 
 USER_AGENT = "live-parity-checker/1.0"
@@ -71,6 +107,22 @@ def parse_args() -> argparse.Namespace:
         action="append",
         dest="pages",
         help="Page path to check, for example /pricing.html. Can be repeated.",
+    )
+    parser.add_argument(
+        "--green-gate",
+        action="store_true",
+        help=(
+            "Use the green-gate preset: the three blocker pages plus one "
+            "ResumeForge downstream spot-check page."
+        ),
+    )
+    parser.add_argument(
+        "--resume-route-page",
+        default=DEFAULT_RESUMEFORGE_ROUTE_PAGE,
+        help=(
+            "ResumeForge downstream page to include with --green-gate. "
+            "Default: /resume-review-fast-track.html."
+        ),
     )
     parser.add_argument(
         "--marker",
@@ -101,6 +153,18 @@ def normalize_page(page: str) -> str:
     if not page.startswith("/"):
         return f"/{page}"
     return page
+
+
+def gate_pages(args: argparse.Namespace) -> list[str]:
+    if args.pages:
+        return [normalize_page(page) for page in args.pages]
+    if args.green_gate:
+        route_page = normalize_page(args.resume_route_page)
+        pages = list(DEFAULT_BLOCKER_PAGES)
+        if route_page not in pages:
+            pages.append(route_page)
+        return pages
+    return [normalize_page(page) for page in DEFAULT_PAGES]
 
 
 def parse_marker_arg(raw_marker: str) -> tuple[str, str]:
@@ -228,9 +292,91 @@ def parity_status(results: list[dict[str, object]], markers: list[str]) -> str:
     return "drift"
 
 
+def header_value(result: dict[str, object], header: str) -> str | None:
+    value = result["headers"].get(header)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def header_alignment(results: list[dict[str, object]], header: str) -> str:
+    if len(results) < 2:
+        return "n/a"
+
+    values = [header_value(result, header) for result in results]
+    present_values = [value for value in values if value is not None]
+    if not present_values:
+        return "missing"
+    if len(set(present_values)) == 1 and len(present_values) == len(values):
+        return "match"
+    if len(set(present_values)) == 1:
+        return "partial"
+    return "drift"
+
+
+def page_role(page: str, resume_route_page: str) -> str:
+    if page in DEFAULT_BLOCKER_PAGES:
+        return "blocker"
+    if page == resume_route_page:
+        return "resumeforge-spot-check"
+    return "custom"
+
+
+def build_page_summary(
+    page: str,
+    results: list[dict[str, object]],
+    markers: list[str],
+    resume_route_page: str,
+) -> dict[str, object]:
+    parity = parity_status(results, markers)
+    freshness = {
+        header: header_alignment(results, header) for header in FRESHNESS_HEADERS
+    }
+    header_watch = [
+        f"{header}={header_alignment(results, header)}"
+        for header in INFRA_SIGNAL_HEADERS
+        if header_alignment(results, header) in {"drift", "partial"}
+    ]
+    requests_ok = all(result["status"] and result["ok"] for result in results)
+
+    if not requests_ok or parity in {"drift", "unknown"}:
+        gate = "red"
+    elif len(results) < 2:
+        gate = "single-domain"
+    elif parity != "full-match":
+        gate = "watch"
+    elif any(status in {"drift", "partial"} for status in freshness.values()):
+        gate = "watch"
+    else:
+        gate = "green"
+
+    return {
+        "page": page,
+        "role": page_role(page, resume_route_page),
+        "gate": gate,
+        "parity": parity,
+        "last_modified": freshness["last-modified"],
+        "freshness": freshness,
+        "header_watch": header_watch,
+        "requests_ok": requests_ok,
+    }
+
+
+def format_freshness(summary: dict[str, object]) -> str:
+    freshness = dict(summary["freshness"])
+    return ", ".join(
+        f"{header}={freshness[header]}" for header in FRESHNESS_HEADERS if header != "last-modified"
+    )
+
+
 def print_page_report(
-    page: str, domains: list[str], marker_map: dict[str, list[str]], timeout: float
-) -> int:
+    page: str,
+    domains: list[str],
+    marker_map: dict[str, list[str]],
+    timeout: float,
+    resume_route_page: str,
+) -> tuple[int, dict[str, object]]:
     print(f"=== {page} ===")
     page_results: list[dict[str, object]] = []
 
@@ -262,21 +408,74 @@ def print_page_report(
             print("  (no markers configured)")
         print()
 
-    print(f"parity: {parity_status(page_results, marker_map.get(page, []))}")
+    summary = build_page_summary(
+        page,
+        page_results,
+        marker_map.get(page, []),
+        resume_route_page,
+    )
+    print(f"parity: {summary['parity']}")
+    print(f"role: {summary['role']}")
+    print(f"gate: {summary['gate']}")
+    print(f"last-modified: {summary['last_modified']}")
+    print(f"freshness: {format_freshness(summary)}")
+    print(
+        "header-signal-watch: "
+        f"{', '.join(summary['header_watch']) if summary['header_watch'] else 'none'}"
+    )
     print()
 
-    return 0 if all(result["status"] and result["ok"] for result in page_results) else 1
+    exit_code = 0 if summary["requests_ok"] and summary["parity"] != "drift" else 1
+    return exit_code, summary
+
+
+def overall_gate_status(summaries: list[dict[str, object]]) -> str:
+    statuses = [str(summary["gate"]) for summary in summaries]
+    if "red" in statuses:
+        return "red"
+    if "watch" in statuses:
+        return "watch"
+    if "single-domain" in statuses:
+        return "single-domain"
+    return "green"
+
+
+def print_green_gate_summary(summaries: list[dict[str, object]]) -> None:
+    print("=== green-gate summary ===")
+    for summary in summaries:
+        print(
+            f"[{summary['gate']}] {summary['role']} {summary['page']} "
+            f"parity={summary['parity']} "
+            f"last-modified={summary['last_modified']} "
+            f"{format_freshness(summary)} "
+            f"header-watch="
+            f"{','.join(summary['header_watch']) if summary['header_watch'] else 'none'}"
+        )
+    print(f"overall: {overall_gate_status(summaries)}")
+    print()
 
 
 def main() -> int:
     args = parse_args()
     domains = [normalize_domain(domain) for domain in (args.domains or DEFAULT_DOMAINS)]
-    pages = [normalize_page(page) for page in (args.pages or DEFAULT_PAGES)]
+    pages = gate_pages(args)
     marker_map = build_marker_map(args, pages)
+    resume_route_page = normalize_page(args.resume_route_page)
 
     exit_code = 0
+    summaries: list[dict[str, object]] = []
     for page in pages:
-        exit_code |= print_page_report(page, domains, marker_map, args.timeout)
+        page_exit_code, summary = print_page_report(
+            page,
+            domains,
+            marker_map,
+            args.timeout,
+            resume_route_page,
+        )
+        exit_code |= page_exit_code
+        summaries.append(summary)
+    if args.green_gate:
+        print_green_gate_summary(summaries)
     return exit_code
 
 
