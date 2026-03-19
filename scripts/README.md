@@ -55,3 +55,14 @@ python3 scripts/find_route_entries.py --route /job-toolkit.html --route /pricing
 ```
 
 By default it scans tracked `.html`, `.js`, `.json`, and `.xml` files and prints tab-separated `path`, `line`, and `route` rows plus a per-route summary.
+
+## `rank_cleanup_targets.py`
+
+Compact read-only operator summary that combines `find_route_entries.py` and `find_direct_checkout_exits.py` into ranked route hot spots, direct checkout clusters, overlap targets, and generic shop hubs.
+
+Usage:
+
+```bash
+python3 scripts/rank_cleanup_targets.py
+python3 scripts/rank_cleanup_targets.py --path blog --top 5
+```
