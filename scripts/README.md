@@ -41,3 +41,17 @@ python3 scripts/find_direct_checkout_exits.py --path blog
 ```
 
 By default it scans tracked `.html`, `.js`, `.json`, and `.xml` files and prints tab-separated `kind`, `path`, `line`, and `url` rows plus a summary.
+
+## `find_route_entries.py`
+
+Inventory tracked site-source references to the key cleanup landing routes: `/job-toolkit.html`, `/pricing.html`, `/job-search-system.html`, and `/ai-resume/`.
+
+Usage:
+
+```bash
+python3 scripts/find_route_entries.py
+python3 scripts/find_route_entries.py --path blog
+python3 scripts/find_route_entries.py --route /job-toolkit.html --route /pricing.html
+```
+
+By default it scans tracked `.html`, `.js`, `.json`, and `.xml` files and prints tab-separated `path`, `line`, and `route` rows plus a per-route summary.
