@@ -12,3 +12,16 @@ python3 scripts/check_live_parity.py --page /job-toolkit.html --marker "*::ko-fi
 ```
 
 Use `--domain`, `--page`, and `--marker PAGE::TEXT` to rerun the same checker against other pages or extra markers later.
+
+## `find_direct_checkout_exits.py`
+
+Inventory tracked site-source files for direct `gumroad`, `kofi_sku`, and `kofi_shop` links during cleanup review.
+
+Usage:
+
+```bash
+python3 scripts/find_direct_checkout_exits.py
+python3 scripts/find_direct_checkout_exits.py --path blog
+```
+
+By default it scans tracked `.html`, `.js`, `.json`, and `.xml` files and prints tab-separated `kind`, `path`, `line`, and `url` rows plus a summary.
