@@ -29,6 +29,20 @@ python3 scripts/parity_snapshot.py --strict-exit
 python3 scripts/parity_snapshot.py --page /job-toolkit.html --timeout 5
 ```
 
+## `domain_layer_fingerprint.py`
+
+Read-only domain-layer fingerprint for `lifa-su.github.io` and `lifa-su.com`: DNS answers when available, root response headers, and header/final-URL fingerprints for the three blocker page URLs.
+
+Usage:
+
+```bash
+python3 scripts/domain_layer_fingerprint.py
+python3 scripts/domain_layer_fingerprint.py --timeout 5
+python3 scripts/domain_layer_fingerprint.py --page /pricing.html --skip-dns
+```
+
+Use this when parity looks off but you need a fast infra view first. It complements `check_live_parity.py` and `parity_snapshot.py` by focusing on DNS, redirects/final URLs, and response-header drift instead of page-marker content.
+
 ## `find_direct_checkout_exits.py`
 
 Inventory tracked site-source files for direct `gumroad`, `kofi_sku`, and `kofi_shop` links during cleanup review.
