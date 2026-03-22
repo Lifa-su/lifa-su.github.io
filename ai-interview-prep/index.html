@@ -1414,10 +1414,30 @@ S.page="results";S.resultData=result;render();
 function renderResults(app){
 const r=S.resultData;const avg=r.avg;const cls=avg>=7?"sh":avg>=4?"sm":"sl";
 const elapsed=Math.round((Date.now()-S.startTime)/1000);
-const routeTitle=avg>=7?"Keep this same-candidate story aligned":"Fix the wider blocker before the next real interview";
+const routeTitle=avg>=7?"Keep the story consistent from practice to live interviews":"Fix the real blocker before the next interview";
 const routeCopy=avg>=7
-?"You already have usable interview material. Keep the same proof aligned across your resume, LinkedIn, cover letter, and follow-up so the next round sounds like the same candidate."
-:"If this score feels lower than your actual experience, the weak point is often outside the answer itself. Tighten proof in your resume, fix recruiter-facing profile drift, and use Job Toolkit when multiple materials need one same-candidate story.";
+?"You already have usable interview material. Keep the same proof aligned across your resume, LinkedIn, cover letter, follow-up, and live interview answers so each round still sounds like you."
+:"If this score feels lower than your actual experience, the weak point is often outside the answer itself. Tighten weak proof in your resume, clean up recruiter-facing profile drift, and use Job Toolkit only when multiple materials need one same-candidate story.";
+const routeButtons=avg>=7
+?`<a class="btn btn-p" href="/ai-job-tracker.html">Track live interviews</a>
+<a class="btn btn-s" href="/job-toolkit.html">Use Job Toolkit when multiple materials drift</a>`
+:`<a class="btn btn-p" href="/ai-resume/">Fix weak proof in AI Resume</a>
+<a class="btn btn-s" href="/ai-linkedin-optimizer.html">Clean up profile drift</a>`;
+const routeLinks=avg>=7
+?`<a href="/ai-resume/">Weak proof → AI Resume</a>
+<a href="/ai-job-tracker.html">Live interviews → AI Job Tracker</a>
+<a href="/ai-linkedin-optimizer.html">Profile drift → AI LinkedIn Optimizer</a>
+<a href="/job-toolkit.html">Full line drift → Job Toolkit</a>
+<a href="/pricing.html">Compare later → Pricing</a>`
+:`<a href="/ai-resume/">Weak proof → AI Resume</a>
+<a href="/ai-linkedin-optimizer.html">Profile drift → AI LinkedIn Optimizer</a>
+<a href="/ai-skill-assessment.html">Role fit → AI Skill Assessment</a>
+<a href="/ai-social-bio/">Story cleanup → AI Social Bio</a>
+<a href="/job-toolkit.html">Full line drift → Job Toolkit</a>
+<a href="/pricing.html">Compare later → Pricing</a>`;
+const routeNote=avg>=7
+?"Keep the route people-first: stay in the free tool while answers are improving, track live interviews in AI Job Tracker, and use Job Toolkit only when resume, cover letter, LinkedIn/profile story, and interview prep all start drifting together. Keep Pricing as compare-later if you want option clarity."
+:"Keep the route people-first: fix weak proof in AI Resume, clean up profile drift, and use Job Toolkit only when resume, cover letter, LinkedIn/profile story, and interview prep all need to line up. Keep Pricing as compare-later if you want option clarity.";
 const catScores={};
 S.questions.forEach((q,i)=>{
 const cat=q.cat;if(!catScores[cat])catScores[cat]={total:0,count:0};
@@ -1463,16 +1483,12 @@ ${weaknesses.length?`<div class="card"><div class="section-title">📚 需要加
 <h2 style="font-size:1.05rem;margin-bottom:10px">${routeTitle}</h2>
 <p style="color:var(--text2);font-size:.88rem;line-height:1.7">${routeCopy}</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-<a class="btn btn-p" href="/job-toolkit.html">Start with Job Toolkit - $29</a>
-<a class="btn btn-s" href="/pricing.html">Compare paths on Pricing</a>
+${routeButtons}
 </div>
 <div class="inline-links">
-<a href="/ai-resume/">Weak proof → AI Resume</a>
-<a href="/ai-linkedin-optimizer.html">Profile drift → AI LinkedIn Optimizer</a>
-<a href="/ai-skill-assessment.html">Role fit → AI Skill Assessment</a>
-<a href="/ai-social-bio/">Story cleanup → AI Social Bio</a>
+${routeLinks}
 </div>
-<p style="color:var(--text2);font-size:.82rem;margin-top:12px">Stay on the free practice tool when the blocker is narrow. Use Job Toolkit as the default paid reset when resume, cover letter, LinkedIn/profile story, and interview prep all need to line up. Keep Pricing as compare-later if you want option clarity.</p>
+<p style="color:var(--text2);font-size:.82rem;margin-top:12px">${routeNote}</p>
 </div>
 <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
 <button class="btn btn-p" onclick="resetToSetup()">🔄 再来一次</button>
